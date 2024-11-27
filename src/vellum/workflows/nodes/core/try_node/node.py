@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar
+import sys
+from types import ModuleType
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, cast
 
 from vellum.workflows.errors.types import VellumError, VellumErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -128,11 +130,15 @@ Message: {event.error.message}""",
                 class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
                     pass
 
+            dynamic_module = f"{inner_cls.__module__}.{inner_cls.__name__}.{ADORNMENT_MODULE_NAME}"
+            # This dynamic module allows calls to `type_hints` to work
+            sys.modules[dynamic_module] = ModuleType(dynamic_module)
+
             WrappedNode = type(
                 cls.__name__,
                 (TryNode,),
                 {
-                    "__module__": f"{inner_cls.__module__}.{inner_cls.__name__}.{ADORNMENT_MODULE_NAME}",
+                    "__module__": dynamic_module,
                     "on_error_code": _on_error_code,
                     "subworkflow": Subworkflow,
                 },

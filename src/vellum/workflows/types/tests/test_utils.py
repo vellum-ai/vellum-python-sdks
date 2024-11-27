@@ -1,6 +1,8 @@
 import pytest
 from typing import ClassVar, Generic, List, TypeVar, Union
 
+from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
@@ -30,6 +32,11 @@ class ExampleGenericClass(Generic[T]):
 class ExampleInheritedClass(ExampleClass):
     theta: int
 
+@TryNode.wrap()
+class ExampleNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        iota: str
+
 
 @pytest.mark.parametrize(
     "cls, attr_name, expected_type",
@@ -45,6 +52,7 @@ class ExampleInheritedClass(ExampleClass):
         (ExampleInheritedClass, "theta", (int,)),
         (ExampleInheritedClass, "alpha", (str,)),
         (ExampleInheritedClass, "beta", (int,)),
+        (ExampleNode.Outputs, "iota", (str,)),
     ],
     ids=[
         "str",
@@ -58,6 +66,7 @@ class ExampleInheritedClass(ExampleClass):
         "inherited_int",
         "inherited_parent_annotation",
         "inherited_parent_class_var",
+        "try_node_output",
     ],
 )
 def test_infer_types(cls, attr_name, expected_type):
