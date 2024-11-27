@@ -57,7 +57,7 @@ class InlineSubworkflowNode(BaseSubworkflowNode[StateType], Generic[StateType, W
         if outputs is None:
             raise NodeException(
                 message="Expected to receive outputs from Workflow Deployment",
-                code=VellumErrorCode.INTERNAL_ERROR,
+                code=VellumErrorCode.INVALID_OUTPUTS,
             )
 
         # For any outputs somehow in our final fulfilled outputs array,

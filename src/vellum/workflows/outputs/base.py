@@ -5,6 +5,7 @@ from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
 from vellum.workflows.constants import UNDEF
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
 
@@ -75,6 +76,23 @@ class BaseOutput(Generic[_Delta, _Accumulated]):
             data["delta"] = self.delta
 
         return data
+
+    def __repr__(self) -> str:
+        if self.value is not UNDEF:
+            return f"{self.__class__.__name__}({self.name}={self.value})"
+        elif self.delta is not UNDEF:
+            return f"{self.__class__.__name__}({self.name}={self.delta})"
+        else:
+            return f"{self.__class__.__name__}(name='{self.name}')"
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, BaseOutput):
+            return False
+
+        return self.name == other.name and self.value == other.value and self.delta == other.delta
+    
+    def __hash__(self) -> int:
+        return hash((self._name, self._value, self._value))
 
 
 @dataclass_transform(kw_only_default=True)
@@ -175,7 +193,9 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
         if not isinstance(other, dict):
             return super().__eq__(other)
 
-        outputs = {name: value for name, value in vars(self).items() if not name.startswith("_") and value is not UNDEF}
+        outputs = {
+            name: value for name, value in vars(self).items() if not name.startswith("_") and value is not UNDEF
+        }
         return outputs == other
 
     def __repr__(self) -> str:
@@ -184,7 +204,11 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
 
     def __iter__(self) -> Iterator[Tuple[OutputReference, Any]]:
         for output_descriptor in self.__class__:
-            yield (output_descriptor, getattr(self, output_descriptor.name, output_descriptor.instance))
+            output_value = getattr(self, output_descriptor.name, UNDEF)
+            if isinstance(output_value, BaseDescriptor):
+                output_value = UNDEF
+
+            yield (output_descriptor, output_value)
 
     def __getitem__(self, key: str) -> Any:
         return getattr(self, key)

@@ -1,10 +1,10 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Optional, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar
 
 from vellum.workflows.errors.types import VellumError, VellumErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.types.generics import StateType
 
 if TYPE_CHECKING:
@@ -56,33 +56,59 @@ class TryNode(BaseNode[StateType], Generic[StateType], metaclass=_TryNodeMeta):
     class Outputs(BaseNode.Outputs):
         error: Optional[VellumError] = None
 
-    def run(self) -> Outputs:
+    def run(self) -> Iterator[BaseOutput]:
         subworkflow = self.subworkflow(
             parent_state=self.state,
             context=self._context,
         )
-        terminal_event = subworkflow.run()
+        subworkflow_stream = subworkflow.stream()
 
-        if terminal_event.name == "workflow.execution.fulfilled":
-            outputs = self.Outputs()
-            for descriptor, value in terminal_event.outputs:
-                setattr(outputs, descriptor.name, value)
-            return outputs
-        elif terminal_event.name == "workflow.execution.paused":
+        outputs: Optional[BaseOutputs] = None
+        exception: Optional[NodeException] = None
+        fulfilled_output_names: Set[str] = set()
+
+        for event in subworkflow_stream:
+            if exception:
+                continue
+
+            if event.name == "workflow.execution.streaming":
+                if event.output.is_fulfilled:
+                    fulfilled_output_names.add(event.output.name)
+                yield event.output
+            elif event.name == "workflow.execution.fulfilled":
+                outputs = event.outputs
+            elif event.name == "workflow.execution.paused":
+                exception = NodeException(
+                    code=VellumErrorCode.INVALID_OUTPUTS,
+                    message="Subworkflow unexpectedly paused within Try Node",
+                )
+            elif event.name == "workflow.execution.rejected":
+                if self.on_error_code and self.on_error_code != event.error.code:
+                    exception = NodeException(
+                        code=VellumErrorCode.INVALID_OUTPUTS,
+                        message=f"""Unexpected rejection: {event.error.code.value}.
+Message: {event.error.message}""",
+                    )
+                else:
+                    outputs = self.Outputs(error=event.error)
+
+        if exception:
+            raise exception
+
+        if outputs is None:
             raise NodeException(
                 code=VellumErrorCode.INVALID_OUTPUTS,
-                message="Subworkflow unexpectedly paused within Try Node",
+                message="Expected to receive outputs from Try Node's subworkflow",
             )
-        elif self.on_error_code and self.on_error_code != terminal_event.error.code:
-            raise NodeException(
-                code=VellumErrorCode.INVALID_OUTPUTS,
-                message=f"""Unexpected rejection: {terminal_event.error.code.value}.
-Message: {terminal_event.error.message}""",
-            )
-        else:
-            return self.Outputs(
-                error=terminal_event.error,
-            )
+
+        # For any outputs somehow in our final fulfilled outputs array,
+        # but not fulfilled by the stream.
+        for descriptor, value in outputs:
+            if descriptor.name not in fulfilled_output_names:
+                yield BaseOutput(
+                    name=descriptor.name,
+                    value=value,
+                )
 
     @classmethod
     def wrap(cls, on_error_code: Optional[VellumErrorCode] = None) -> Callable[..., Type["TryNode"]]:
@@ -101,11 +127,15 @@ Message: {terminal_event.error.message}""",
                 class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
                     pass
 
-            class WrappedNode(TryNode[StateType]):
-                on_error_code = _on_error_code
-
-                subworkflow = Subworkflow
-
+            WrappedNode = type(
+                cls.__name__,
+                (TryNode,),
+                {
+                    "__module__": f"{inner_cls.__module__}.{inner_cls.__name__}.<adornment>",
+                    "on_error_code": _on_error_code,
+                    "subworkflow": Subworkflow,
+                },
+            )
             return WrappedNode
 
         return decorator

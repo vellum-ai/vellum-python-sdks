@@ -11,13 +11,13 @@ from vellum import (
     StringVellumValue,
     VellumError,
 )
-
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.errors import VellumError as WacVellumError
 from vellum.workflows.errors.types import VellumErrorCode
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.base import StateMeta
 
@@ -136,13 +136,13 @@ def test_inline_text_prompt_node__catch_provider_error(vellum_adhoc_prompt_clien
             meta=StateMeta(workflow_inputs=Inputs(input="Say something.")),
         )
     )
-    outputs = node.run()
+    outputs = list(node.run())
 
     # THEN the node should have produced the outputs we expect
-    # We need mypy support for annotations to remove these type ignores
-    # https://app.shortcut.com/vellum/story/4890
-    assert outputs.error == WacVellumError(  # type: ignore[attr-defined]
-        message="OpenAI failed",
-        code=VellumErrorCode.PROVIDER_ERROR,
-    )
-    assert outputs.text is UNDEF  # type: ignore[attr-defined]
+    assert BaseOutput(
+        name="error",
+        value=WacVellumError(
+            message="OpenAI failed",
+            code=VellumErrorCode.PROVIDER_ERROR,
+        ),
+    ) in outputs
