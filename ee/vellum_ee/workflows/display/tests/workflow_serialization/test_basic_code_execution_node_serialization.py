@@ -1,5 +1,6 @@
 from deepdiff import DeepDiff
 
+from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -430,7 +431,7 @@ def test_serialize_workflow__try_wrapped():
                 "basic_code_execution_node",
                 "try_workflow",
                 "SimpleCodeExecutionNode",
-                "<decorator>",
+                ADORNMENT_MODULE_NAME,
             ],
             "name": "TryNode",
         },

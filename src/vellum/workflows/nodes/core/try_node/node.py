@@ -4,6 +4,7 @@ from vellum.workflows.errors.types import VellumError, VellumErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.types.generics import StateType
 
@@ -131,7 +132,7 @@ Message: {event.error.message}""",
                 cls.__name__,
                 (TryNode,),
                 {
-                    "__module__": f"{inner_cls.__module__}.{inner_cls.__name__}.<adornment>",
+                    "__module__": f"{inner_cls.__module__}.{inner_cls.__name__}.{ADORNMENT_MODULE_NAME}",
                     "on_error_code": _on_error_code,
                     "subworkflow": Subworkflow,
                 },

@@ -1,4 +1,5 @@
 from vellum.workflows.events.types import WorkflowEventType
+from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 
 from tests.workflows.stream_try_node_annotation.workflow import InnerNode, Inputs, StreamingTryExample
 
@@ -26,7 +27,7 @@ def test_workflow_stream__happy_path():
     assert events[1].node_definition == InnerNode
     assert events[1].model_dump(mode="json")["body"]["node_definition"] == {
         "name": "TryNode",
-        "module": ["tests", "workflows", "stream_try_node_annotation", "workflow", "InnerNode", "<adornment>"],
+        "module": ["tests", "workflows", "stream_try_node_annotation", "workflow", "InnerNode", ADORNMENT_MODULE_NAME],
     }
 
     assert events[2].name == "node.execution.streaming"

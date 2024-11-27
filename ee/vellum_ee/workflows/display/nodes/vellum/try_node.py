@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import Any, ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.core.try_node.node import TryNode
-from vellum.workflows.nodes.utils import get_wrapped_node
+from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME, get_wrapped_node
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
@@ -45,7 +45,7 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
                 serialized_node_definition_module.extend(
                     [
                         serialized_node_definition["name"],
-                        "<decorator>",
+                        ADORNMENT_MODULE_NAME,
                     ]
                 )
                 serialized_node_definition["name"] = node.__name__
