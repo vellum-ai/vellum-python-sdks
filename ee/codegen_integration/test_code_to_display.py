@@ -1,10 +1,9 @@
 import json
-from typing import Dict, Any
+from typing import Any, Dict
 
 from deepdiff import DeepDiff
 
 from vellum.workflows.workflows.base import BaseWorkflow
-
 from vellum_ee.workflows.display.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display

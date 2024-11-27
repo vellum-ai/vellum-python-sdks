@@ -1,7 +1,7 @@
 from typing import Optional, Type
 
-from vellum_ee.workflows.display.types import WorkflowDisplayContext, WorkflowDisplayType
 from vellum.workflows.types.generics import WorkflowType
+from vellum_ee.workflows.display.types import WorkflowDisplayContext, WorkflowDisplayType
 
 
 def get_workflow_display(
@@ -23,10 +23,5 @@ def get_workflow_display(
             )
         except IndexError:
             return base_display_class(workflow_class)
-
-    if not issubclass(workflow_display_class, base_display_class):
-        raise TypeError(
-            f"Expected to find a subclass of '{base_display_class.__name__}' for workflow class '{workflow_class.__name__}'"  # noqa: E501
-        )
 
     return workflow_display_class(workflow_class, parent_display_context=parent_display_context)

@@ -1,17 +1,16 @@
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar
+from typing import Any, ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, cast
 
 from vellum import VellumVariable
-
+from vellum.workflows.nodes import InlineSubworkflowNode
+from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
-from vellum_ee.workflows.display.vellum import NodeInput
+from vellum_ee.workflows.display.vellum import NodeInput, WorkflowOutputVellumDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum.workflows.nodes import InlineSubworkflowNode
-from vellum.workflows.types.core import JsonObject
 
 _InlineSubworkflowNodeType = TypeVar("_InlineSubworkflowNodeType", bound=InlineSubworkflowNode)
 
@@ -28,13 +27,13 @@ class BaseInlineSubworkflowNodeDisplay(
         node_id = self.node_id
 
         node_inputs, workflow_inputs = self._generate_node_and_workflow_inputs(node_id, node, display_context)
-        workflow_outputs = self._generate_workflow_outputs(node)
 
         subworkflow_display = get_workflow_display(
             base_display_class=display_context.workflow_display_class,
             workflow_class=raise_if_descriptor(node.subworkflow),
             parent_display_context=display_context,
         )
+        workflow_outputs = self._generate_workflow_outputs(node, subworkflow_display.display_context)
         serialized_subworkflow = subworkflow_display.serialize()
 
         return {
@@ -87,13 +86,14 @@ class BaseInlineSubworkflowNodeDisplay(
     def _generate_workflow_outputs(
         self,
         node: Type[InlineSubworkflowNode],
+        display_context: WorkflowDisplayContext,
     ) -> List[VellumVariable]:
         workflow_outputs: List[VellumVariable] = []
         for output_descriptor in raise_if_descriptor(node.subworkflow).Outputs:  # type: ignore[union-attr]
-            node_output_display = self.get_node_output_display(output_descriptor)
+            workflow_output_display = cast(WorkflowOutputVellumDisplay, display_context.workflow_output_displays[output_descriptor])
             output_type = infer_vellum_variable_type(output_descriptor)
             workflow_outputs.append(
-                VellumVariable(id=str(node_output_display.id), key=node_output_display.name, type=output_type)
+                VellumVariable(id=str(workflow_output_display.id), key=workflow_output_display.name, type=output_type)
             )
 
         return workflow_outputs

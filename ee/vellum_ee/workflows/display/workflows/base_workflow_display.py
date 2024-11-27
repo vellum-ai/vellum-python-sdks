@@ -28,8 +28,10 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.uuids import uuid4_from_hash
+from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +130,8 @@ class BaseWorkflowDisplay(
                     inner_node_display = self._get_node_display(inner_node)
                     self._enrich_node_output_displays(inner_node, inner_node_display, node_output_displays)
 
+            # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
+            # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
             node_output_displays[node_output] = node, node_display.get_node_output_display(node_output)
 
     def _enrich_node_port_displays(

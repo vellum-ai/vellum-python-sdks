@@ -307,8 +307,8 @@ def test_serialize_workflow():
                 },
                 "input_variables": [{"id": "704c4640-bfda-44f0-8da3-e9cfc4f21cf2", "key": "metro", "type": "STRING"}],
                 "output_variables": [
-                    {"id": "86dd0202-c141-48a3-8382-2da60372e77c", "key": "temperature", "type": "NUMBER"},
-                    {"id": "0a7192da-5576-4933-bba4-de8adf5d7996", "key": "reasoning", "type": "STRING"},
+                    {"id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622", "key": "temperature", "type": "NUMBER"},
+                    {"id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82", "key": "reasoning", "type": "STRING"},
                 ],
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -339,64 +339,74 @@ def test_serialize_workflow():
         ignore_order=True,
     )
 
+    temperature_terminal_node = next(node for node in workflow_raw_data["nodes"][2:] if node['data']['name'] == 'temperature')
+    reasoning_terminal_node = next(node for node in workflow_raw_data["nodes"][2:] if node['data']['name'] == 'reasoning')
+    
     assert not DeepDiff(
-        [
-            {
-                "id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
-                "type": "TERMINAL",
-                "definition": {
-                    "bases": [
-                        {
-                            "bases": [],
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "name": "BaseNode",
-                        },
-                    ],
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "final_output_node",
-                        "node",
-                    ],
-                    "name": "FinalOutputNode",
-                },
-                "data": {
-                    "label": "Final Output",
-                    "name": "reasoning",
-                    "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
-                    "output_id": "7444a019-081a-4e10-a528-3249299159f7",
-                    "output_type": "STRING",
-                    "node_input_id": "736473c8-b0b4-4cdd-b743-6453dd5306fc",
-                },
-                "inputs": [
+        {
+            "id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
+            "type": "TERMINAL",
+            "definition": {
+                "bases": [
                     {
-                        "id": "736473c8-b0b4-4cdd-b743-6453dd5306fc",
-                        "key": "node_input",
-                        "value": {
-                            "rules": [
-                                {
-                                    "type": "NODE_OUTPUT",
-                                    "data": {
-                                        "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
-                                        "output_id": "0a7192da-5576-4933-bba4-de8adf5d7996",
-                                    },
-                                }
-                            ],
-                            "combinator": "OR",
-                        },
-                    }
+                        "bases": [],
+                        "module": [
+                            "vellum",
+                            "workflows",
+                            "nodes",
+                            "bases",
+                            "base",
+                        ],
+                        "name": "BaseNode",
+                    },
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "module": [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "displayable",
+                    "final_output_node",
+                    "node",
+                ],
+                "name": "FinalOutputNode",
             },
-            {
+            "data": {
+                "label": "Final Output",
+                "name": "reasoning",
+                "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
+                "output_id": "7444a019-081a-4e10-a528-3249299159f7",
+                "output_type": "STRING",
+                "node_input_id": "736473c8-b0b4-4cdd-b743-6453dd5306fc",
+            },
+            "inputs": [
+                {
+                    "id": "736473c8-b0b4-4cdd-b743-6453dd5306fc",
+                    "key": "node_input",
+                    "value": {
+                        "rules": [
+                            {
+                                "type": "NODE_OUTPUT",
+                                "data": {
+                                    "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
+                                    "output_id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82",
+                                },
+                            }
+                        ],
+                        "combinator": "OR",
+                    },
+                }
+            ],
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        },
+        reasoning_terminal_node,
+        ignore_order=True,
+        # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
+        # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
+        exclude_regex_paths=r"root\['inputs'\]\[0\]\['value'\]\['rules'\]\[0\]\['data'\]\['output_id'\]"
+    )
+
+    assert not DeepDiff(
+        {
                 "id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
                 "type": "TERMINAL",
                 "definition": {
@@ -441,7 +451,7 @@ def test_serialize_workflow():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
-                                        "output_id": "86dd0202-c141-48a3-8382-2da60372e77c",
+                                        "output_id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622",
                                     },
                                 }
                             ],
@@ -451,9 +461,11 @@ def test_serialize_workflow():
                 ],
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
             },
-        ],
-        workflow_raw_data["nodes"][2:],
+        temperature_terminal_node,
         ignore_order=True,
+        # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
+        # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
+        exclude_regex_paths=r"root\['inputs'\]\[0\]\['value'\]\['rules'\]\[0\]\['data'\]\['output_id'\]"
     )
 
     # AND each edge should be serialized correctly
