@@ -1,13 +1,13 @@
 from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar, cast
 
+from vellum.workflows.nodes.displayable import APINode
+from vellum.workflows.references.output import OutputReference
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum.workflows.nodes.displayable import APINode
-from vellum.workflows.references.output import OutputReference
-from vellum.workflows.types.core import JsonArray, JsonObject
 
 _APINodeType = TypeVar("_APINodeType", bound=APINode)
 
@@ -32,9 +32,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
     # A mapping between node input keys and their ids for inputs representing additional header values
     additional_header_value_input_ids: ClassVar[Optional[Dict[str, UUID]]] = None
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
@@ -177,7 +175,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             "inputs": [input.dict() for input in inputs],
             "data": {
                 "label": self.label,
-                "error_output_id": str(error_output_id) if error_output_id else None,
+                "error_output_id": None,
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "url_input_id": url_node_input.id,

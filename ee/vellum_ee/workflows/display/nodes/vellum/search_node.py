@@ -30,9 +30,7 @@ class VariableIdMap:
 class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_SearchNodeType]):
     variable_ids: Optional[VariableIdMap] = None
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
         node_inputs = self._generate_search_node_inputs(node_id, node, display_context)
@@ -48,7 +46,7 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
                 "label": self.label,
                 "results_output_id": str(results_output_display.id),
                 "text_output_id": str(text_output_display.id),
-                "error_output_id": str(error_output_id) if error_output_id else None,
+                "error_output_id": None,
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "query_node_input_id": str(node_inputs["query"].id),

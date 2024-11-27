@@ -2,7 +2,9 @@ from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union, cast
 
 from vellum import PromptBlock, RichTextChildBlock, VellumVariable
-
+from vellum.workflows.nodes import InlinePromptNode
+from vellum.workflows.references import OutputReference
+from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -10,9 +12,6 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import NodeInput
-from vellum.workflows.nodes import InlinePromptNode
-from vellum.workflows.references import OutputReference
-from vellum.workflows.types.core import JsonObject
 
 _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
@@ -22,9 +21,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
     array_output_id: ClassVar[Optional[UUID]] = None
     prompt_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
@@ -42,7 +39,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
             "data": {
                 "label": self.label,
                 "output_id": str(output_display.id),
-                "error_output_id": str(error_output_id) if error_output_id else None,
+                "error_output_id": None,
                 "array_output_id": str(array_display.id),
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),

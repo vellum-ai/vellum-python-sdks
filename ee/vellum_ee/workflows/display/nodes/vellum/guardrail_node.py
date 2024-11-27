@@ -1,12 +1,12 @@
 from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar
 
+from vellum.workflows.nodes import GuardrailNode
+from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum.workflows.nodes import GuardrailNode
-from vellum.workflows.types.core import JsonObject
 
 _GuardrailNodeType = TypeVar("_GuardrailNodeType", bound=GuardrailNode)
 
@@ -14,9 +14,7 @@ _GuardrailNodeType = TypeVar("_GuardrailNodeType", bound=GuardrailNode)
 class BaseGuardrailNodeDisplay(BaseNodeVellumDisplay[_GuardrailNodeType], Generic[_GuardrailNodeType]):
     metric_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
@@ -40,7 +38,7 @@ class BaseGuardrailNodeDisplay(BaseNodeVellumDisplay[_GuardrailNodeType], Generi
                 "label": self.label,
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
-                "error_output_id": str(error_output_id) if error_output_id else None,
+                "error_output_id": None,
                 "metric_definition_id": str(raise_if_descriptor(node.metric_definition)),
                 "release_tag": raise_if_descriptor(node.release_tag),
             },

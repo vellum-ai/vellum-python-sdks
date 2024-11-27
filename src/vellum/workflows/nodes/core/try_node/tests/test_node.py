@@ -7,6 +7,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 
@@ -23,11 +24,15 @@ def test_try_node__on_error_code__successfully_caught():
 
     # WHEN the node is run and throws a PROVIDER_ERROR
     node = TestNode(state=BaseState())
-    outputs = node.run()
+    outputs = [o for o in node.run()]
 
-    # THEN the exception is retried
-    assert outputs == {
-        "error": VellumError(message="This will be caught", code=VellumErrorCode.PROVIDER_ERROR),
+    # THEN the exception is caught and returned
+    assert len(outputs) == 2
+    assert set(outputs) == {
+        BaseOutput(name="value"),
+        BaseOutput(
+            name="error", value=VellumError(message="This will be caught", code=VellumErrorCode.PROVIDER_ERROR)
+        ),
     }
 
 
@@ -44,7 +49,7 @@ def test_try_node__retry_on_error_code__missed():
     # WHEN the node is run and throws a different exception
     node = TestNode(state=BaseState())
     with pytest.raises(NodeException) as exc_info:
-        node.run()
+        list(node.run())
 
     # THEN the exception is not caught
     assert exc_info.value.message == "Unexpected rejection: INTERNAL_ERROR.\nMessage: This will be missed"
@@ -78,10 +83,11 @@ def test_try_node__use_parent_inputs_and_state():
             meta=StateMeta(workflow_inputs=Inputs(foo="foo")),
         ),
     )
-    outputs = node.run()
+    outputs = list(node.run())
 
     # THEN the data is used successfully
-    assert outputs == {"value": "foo bar"}
+    assert len(outputs) == 1
+    assert outputs[-1] == BaseOutput(name="value", value="foo bar")
 
 
 def test_try_node__use_parent_execution_context():
@@ -100,7 +106,8 @@ def test_try_node__use_parent_execution_context():
             _vellum_client=Vellum(api_key="test-key"),
         )
     )
-    outputs = node.run()
+    outputs = list(node.run())
 
     # THEN the inner node had access to the key
-    assert outputs == {"key": "test-key"}
+    assert len(outputs) == 1
+    assert outputs[-1] == BaseOutput(name="key", value="test-key")

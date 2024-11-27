@@ -5,6 +5,8 @@ from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references import NodeReference
 from vellum.workflows.types.generics import NodeType
 
+ADORNMENT_MODULE_NAME = "<adornment>"
+
 
 @cache
 def get_wrapped_node(node: Type[NodeType]) -> Type[BaseNode]:
