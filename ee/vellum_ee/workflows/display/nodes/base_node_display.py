@@ -3,9 +3,6 @@ import inspect
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Type, TypeVar, get_args
 
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.vellum import CodeResourceDefinition, NodeDefinition
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
 from vellum.workflows.ports import Port
@@ -14,6 +11,9 @@ from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.names import pascal_to_title_case
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.utils.uuids import uuid4_from_hash
+from vellum_ee.workflows.display.vellum import CodeResourceDefinition, NodeDefinition
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -31,7 +31,7 @@ class BaseNodeDisplay(Generic[NodeType]):
     def __init__(self, node: Type[NodeType]):
         self._node = node
 
-    def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
+    def serialize(self, display_context: "WorkflowDisplayContext") -> JsonObject:
         raise NotImplementedError(f"Serialization for nodes of type {self._node.__name__} is not supported.")
 
     def get_definition(self) -> NodeDefinition:

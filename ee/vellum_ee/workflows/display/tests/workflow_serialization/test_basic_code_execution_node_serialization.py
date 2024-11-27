@@ -1,9 +1,10 @@
 from deepdiff import DeepDiff
 
-from tests.workflows.basic_code_execution_node.try_workflow import TrySimpleCodeExecutionWorkflow
-from tests.workflows.basic_code_execution_node.workflow import SimpleCodeExecutionWorkflow
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+from tests.workflows.basic_code_execution_node.try_workflow import TrySimpleCodeExecutionWorkflow
+from tests.workflows.basic_code_execution_node.workflow import SimpleCodeExecutionWorkflow
 
 
 def test_serialize_workflow():
@@ -428,8 +429,10 @@ def test_serialize_workflow__try_wrapped():
                 "workflows",
                 "basic_code_execution_node",
                 "try_workflow",
+                "SimpleCodeExecutionNode",
+                "<decorator>",
             ],
-            "name": "SimpleCodeExecutionNode",
+            "name": "TryNode",
         },
     }
 

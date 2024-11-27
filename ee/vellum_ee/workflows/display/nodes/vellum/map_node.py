@@ -2,7 +2,8 @@ from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, List, Optional, Type, TypeVar
 
 from vellum import VellumVariable
-
+from vellum.workflows.nodes import MapNode
+from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -10,8 +11,6 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum.workflows.nodes import MapNode
-from vellum.workflows.types.core import JsonObject
 
 _MapNodeType = TypeVar("_MapNodeType", bound=MapNode)
 
@@ -19,9 +18,7 @@ _MapNodeType = TypeVar("_MapNodeType", bound=MapNode)
 class BaseMapNodeDisplay(BaseNodeVellumDisplay[_MapNodeType], Generic[_MapNodeType]):
     workflow_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
@@ -32,7 +29,8 @@ class BaseMapNodeDisplay(BaseNodeVellumDisplay[_MapNodeType], Generic[_MapNodeTy
             # In Vellum it's always 'items'
             variable_name = descriptor.name if descriptor.name != "all_items" else "items"
             variable_id = str(
-                self.workflow_input_ids_by_name.get(variable_name) or uuid4_from_hash(f"{self.node_id}|{variable_name}")
+                self.workflow_input_ids_by_name.get(variable_name)
+                or uuid4_from_hash(f"{self.node_id}|{variable_name}")
             )
             workflow_inputs.append(
                 VellumVariable(
@@ -69,7 +67,7 @@ class BaseMapNodeDisplay(BaseNodeVellumDisplay[_MapNodeType], Generic[_MapNodeTy
             "inputs": [node_input.dict() for node_input in node_inputs],
             "data": {
                 "label": self.label,
-                "error_output_id": str(error_output_id) if error_output_id else None,
+                "error_output_id": None,
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "INLINE",

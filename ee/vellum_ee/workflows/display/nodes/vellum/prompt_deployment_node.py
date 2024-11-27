@@ -1,14 +1,14 @@
 from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar, cast
 
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
-from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
-from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
-from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum.workflows.nodes.displayable.prompt_deployment_node import PromptDeploymentNode
 from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.vellum_client import create_vellum_client
+from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
+from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
+from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _PromptDeploymentNodeType = TypeVar("_PromptDeploymentNodeType", bound=PromptDeploymentNode)
 
@@ -20,9 +20,7 @@ class BasePromptDeploymentNodeDisplay(
     array_output_id: ClassVar[Optional[UUID]] = None
     prompt_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
@@ -55,7 +53,7 @@ class BasePromptDeploymentNodeDisplay(
             "data": {
                 "label": self.label,
                 "output_id": str(output_display.id),
-                "error_output_id": str(error_output_id) if error_output_id else None,
+                "error_output_id": None,
                 "array_output_id": str(array_display.id),
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
