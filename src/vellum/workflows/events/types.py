@@ -11,8 +11,8 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.utils import datetime_now
 
 if TYPE_CHECKING:
-    from vellum.workflows.nodes.bases.base import BaseNode
-    from vellum.workflows.workflows.base import BaseWorkflow
+    from vellum.workflows import BaseWorkflow
+    from vellum.workflows.nodes import BaseNode
 
 
 class WorkflowEventType(Enum):
@@ -103,4 +103,4 @@ class BaseEvent(UniversalBaseModel):
     api_version: Literal["2024-10-25"] = "2024-10-25"
     trace_id: UUID
     span_id: UUID
-    parent: Optional['ParentContext'] = None
+    parent: Optional[ParentContext] = None

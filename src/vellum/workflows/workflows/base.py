@@ -35,11 +35,17 @@ from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors import VellumError, VellumErrorCode
 from vellum.workflows.events.node import (
     NodeExecutionFulfilledBody,
+    NodeExecutionFulfilledEvent,
     NodeExecutionInitiatedBody,
+    NodeExecutionInitiatedEvent,
     NodeExecutionPausedBody,
+    NodeExecutionPausedEvent,
     NodeExecutionRejectedBody,
+    NodeExecutionRejectedEvent,
     NodeExecutionResumedBody,
+    NodeExecutionResumedEvent,
     NodeExecutionStreamingBody,
+    NodeExecutionStreamingEvent,
 )
 from vellum.workflows.events.types import WorkflowEventType
 from vellum.workflows.events.workflow import (
@@ -55,6 +61,7 @@ from vellum.workflows.events.workflow import (
     WorkflowExecutionResumedBody,
     WorkflowExecutionResumedEvent,
     WorkflowExecutionStreamingBody,
+    WorkflowExecutionStreamingEvent,
 )
 from vellum.workflows.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
@@ -363,3 +370,17 @@ NodeExecutionRejectedBody.model_rebuild()
 NodeExecutionPausedBody.model_rebuild()
 NodeExecutionResumedBody.model_rebuild()
 NodeExecutionStreamingBody.model_rebuild()
+
+WorkflowExecutionInitiatedEvent.model_rebuild()
+WorkflowExecutionFulfilledEvent.model_rebuild()
+WorkflowExecutionRejectedEvent.model_rebuild()
+WorkflowExecutionPausedEvent.model_rebuild()
+WorkflowExecutionResumedEvent.model_rebuild()
+WorkflowExecutionStreamingEvent.model_rebuild()
+
+NodeExecutionInitiatedEvent.model_rebuild()
+NodeExecutionFulfilledEvent.model_rebuild()
+NodeExecutionRejectedEvent.model_rebuild()
+NodeExecutionPausedEvent.model_rebuild()
+NodeExecutionResumedEvent.model_rebuild()
+NodeExecutionStreamingEvent.model_rebuild()

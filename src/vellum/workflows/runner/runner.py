@@ -28,7 +28,7 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent
+from vellum.workflows.events.types import BaseEvent, ParentContext, WorkflowParentContext
 from vellum.workflows.events.utils import is_terminal_event
 from vellum.workflows.events.workflow import (
     WorkflowExecutionFulfilledBody,
@@ -71,6 +71,7 @@ class WorkflowRunner(Generic[StateType]):
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
+        parent_context: Optional[ParentContext] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -115,6 +116,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
+        self._parent_context = parent_context
 
         setattr(
             self._initial_state,
@@ -143,6 +145,11 @@ class WorkflowRunner(Generic[StateType]):
                         node_definition=node.__class__,
                         inputs=node._inputs,
                     ),
+                    parent=WorkflowParentContext(
+                        span_id=span_id,
+                        workflow_definition=self.workflow.__class__,
+                        parent=self._parent_context
+                    )
                 ),
             )
         )
@@ -192,6 +199,11 @@ class WorkflowRunner(Generic[StateType]):
                                             node_definition=node.__class__,
                                             output=BaseOutput(name=output.name),
                                         ),
+                                        parent=WorkflowParentContext(
+                                            span_id=span_id,
+                                            workflow_definition=self.workflow.__class__,
+                                            parent=self._parent_context
+                                        )
                                     ),
                                     invoked_ports=invoked_ports,
                                 )
@@ -208,6 +220,11 @@ class WorkflowRunner(Generic[StateType]):
                                         node_definition=node.__class__,
                                         output=output,
                                     ),
+                                    parent=WorkflowParentContext(
+                                        span_id=span_id,
+                                        workflow_definition=self.workflow.__class__,
+                                        parent=self._parent_context,
+                                    )
                                 ),
                                 invoked_ports=invoked_ports,
                             )
@@ -227,6 +244,11 @@ class WorkflowRunner(Generic[StateType]):
                                         node_definition=node.__class__,
                                         output=output,
                                     ),
+                                    parent=WorkflowParentContext(
+                                        span_id=span_id,
+                                        workflow_definition=self.workflow.__class__,
+                                        parent=self._parent_context,
+                                    )
                                 ),
                                 invoked_ports=invoked_ports,
                             )
@@ -248,6 +270,11 @@ class WorkflowRunner(Generic[StateType]):
                             node_definition=node.__class__,
                             outputs=outputs,
                         ),
+                        parent=WorkflowParentContext(
+                            span_id=span_id,
+                            workflow_definition=self.workflow.__class__,
+                            parent=self._parent_context,
+                        )
                     ),
                     invoked_ports=invoked_ports,
                 )
@@ -263,6 +290,11 @@ class WorkflowRunner(Generic[StateType]):
                             node_definition=node.__class__,
                             error=e.error,
                         ),
+                        parent=WorkflowParentContext(
+                            span_id=span_id,
+                            workflow_definition=self.workflow.__class__,
+                            parent=self._parent_context,
+                        )
                     ),
                 )
             )
@@ -282,6 +314,11 @@ class WorkflowRunner(Generic[StateType]):
                                 code=VellumErrorCode.INTERNAL_ERROR,
                             ),
                         ),
+                        parent=WorkflowParentContext(
+                            span_id=span_id,
+                            workflow_definition=self.workflow.__class__,
+                            parent=self._parent_context
+                        )
                     ),
                 )
             )
@@ -378,6 +415,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
             ),
+            parent=self._parent_context,
         )
 
     def _stream_workflow_event(self, output: BaseOutput) -> WorkflowExecutionStreamingEvent:
@@ -388,6 +426,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 output=output,
             ),
+            parent=self._parent_context
         )
 
     def _fulfill_workflow_event(self, outputs: OutputsType) -> WorkflowExecutionFulfilledEvent:
@@ -398,6 +437,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 outputs=outputs,
             ),
+            parent=self._parent_context,
         )
 
     def _reject_workflow_event(self, error: VellumError) -> WorkflowExecutionRejectedEvent:
@@ -408,6 +448,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 error=error,
             ),
+            parent=self._parent_context,
         )
 
     def _resume_workflow_event(self) -> WorkflowExecutionResumedEvent:
@@ -427,6 +468,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 external_inputs=external_inputs,
             ),
+            parent=self._parent_context,
         )
 
     def _stream(self) -> None:
