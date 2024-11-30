@@ -236,10 +236,13 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 if not invoked_by:
                     return True
 
-                is_ready = not state.meta.node_execution_cache.is_node_initiated(cls.node_class)
+                node_identifier = str(cls.node_class)
+                is_ready = (
+                    not state.meta.node_execution_cache.is_node_initiated(cls.node_class)
+                    and node_identifier not in state.meta.node_execution_cache.dependencies_invoked
+                )
 
                 invoked_identifier = str(invoked_by.from_port.node_class)
-                node_identifier = str(cls.node_class)
 
                 dependencies_invoked = state.meta.node_execution_cache.dependencies_invoked[node_identifier]
                 dependencies_invoked.add(invoked_identifier)
