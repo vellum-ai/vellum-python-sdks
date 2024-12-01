@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { Reference } from "@fern-api/python-ast/Reference";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { VellumValue } from "vellum-ai/api/types";
 
 import { PORTS_CLASS_NAME } from "src/constants";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
@@ -11,6 +10,8 @@ import {
   ConditionalNode as ConditionalNodeType,
   ConditionalNodeData,
   ConditionalRuleData,
+  NodeInput,
+  NodeInputValuePointer,
 } from "src/types/vellum";
 
 export class ConditionalNode extends BaseSingleFileNode<
@@ -23,9 +24,13 @@ export class ConditionalNode extends BaseSingleFileNode<
   protected getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    const inputVarIdsByRuleId = new Map<string, string>();
-    const constantValuesByRuleIds = new Map<string, VellumValue>();
-    this.constructMapsByRuleIds(inputVarIdsByRuleId, constantValuesByRuleIds);
+    const inputFieldsByRuleId = new Map<string, NodeInput>();
+    const valueInputsByRuleId = new Map<string, NodeInputValuePointer>();
+    this.constructMapContextForAllConditions(
+      inputFieldsByRuleId,
+      valueInputsByRuleId,
+      this.nodeData.data
+    );
 
     const baseNodeClassRef = this.getNodeBaseClass();
 
@@ -59,8 +64,8 @@ export class ConditionalNode extends BaseSingleFileNode<
             name: portName,
             initializer: new ConditionalNodePort({
               portContext: context,
-              inputVarIdsByRuleId: inputVarIdsByRuleId,
-              constantValuesByRuleIds: constantValuesByRuleIds,
+              inputFieldsByRuleId: inputFieldsByRuleId,
+              valueInputsByRuleIds: valueInputsByRuleId,
               conditionData: conditionData,
             }),
           })
@@ -250,31 +255,93 @@ export class ConditionalNode extends BaseSingleFileNode<
     });
   }
 
-  private constructMapsByRuleIds(
-    inputVarIdsByRuleId: Map<string, string>,
-    constantValuesByRuleIds: Map<string, unknown>
-  ) {
-    this.nodeData.inputs.forEach((input) => {
-      const fieldIdx = input.key.indexOf(".field");
-      const valueIdx = input.key.indexOf(".value");
-      if (fieldIdx !== -1) {
-        const ruleId = input.key.slice(0, fieldIdx);
-        input.value.rules.forEach((rule) => {
-          if (rule.type === "INPUT_VARIABLE") {
-            inputVarIdsByRuleId.set(ruleId, rule.data.inputVariableId);
-          }
-        });
-      } else if (valueIdx !== -1) {
-        const ruleId = input.key.slice(0, valueIdx);
-        input.value.rules.forEach((rule) => {
-          let value: string | unknown;
-          if (rule.type === "CONSTANT_VALUE") {
-            value = rule.data;
-          }
-          constantValuesByRuleIds.set(ruleId, value);
-        });
+  private constructMapContextForAllConditions(
+    inputFieldsByRuleId: Map<string, NodeInput>,
+    valueInputsByRuleIds: Map<string, unknown>,
+    nodeData: ConditionalNodeData
+  ): void {
+    nodeData.conditions.forEach((condition) => {
+      if (condition.data) {
+        this.constructMapContextByRuleIds(
+          inputFieldsByRuleId,
+          valueInputsByRuleIds,
+          condition.data
+        );
       }
     });
+  }
+
+  private constructMapContextByRuleIds(
+    inputFieldsByRuleId: Map<string, NodeInput>,
+    valueInputsByRuleIds: Map<string, unknown>,
+    ruleData: ConditionalRuleData
+  ): void {
+    const processLeafRule = (rule: ConditionalRuleData): void => {
+      if (!rule.id) return;
+
+      if (rule.fieldNodeInputId && !inputFieldsByRuleId.has(rule.id)) {
+        processFieldInputs(rule);
+      }
+
+      if (rule.valueNodeInputId) {
+        processValueNodeInput(rule);
+      }
+    };
+
+    const processFieldInputs = (rule: ConditionalRuleData): void => {
+      this.nodeData.inputs.forEach((input) => {
+        if (input.id === rule.fieldNodeInputId) {
+          if (!inputFieldsByRuleId.has(rule.id) && input) {
+            inputFieldsByRuleId.set(rule.id, input);
+          }
+        }
+      });
+    };
+
+    const processValueNodeInput = (rule: ConditionalRuleData): void => {
+      this.nodeData.inputs.forEach((input) => {
+        if (input.id === rule.valueNodeInputId) {
+          input.value.rules.forEach((valuePointer) => {
+            let value;
+            switch (valuePointer.type) {
+              case "CONSTANT_VALUE":
+                value = input.value;
+                break;
+              case "NODE_OUTPUT": {
+                value = input.value;
+                break;
+              }
+              case "WORKSPACE_SECRET": {
+                value = input.value;
+                break;
+              }
+              case "INPUT_VARIABLE": {
+                value = input.value;
+                break;
+              }
+              case "EXECUTION_COUNTER": {
+                value = input.value;
+                break;
+              }
+            }
+            if (!valueInputsByRuleIds.has(rule.id)) {
+              valueInputsByRuleIds.set(rule.id, value);
+            }
+          });
+        }
+      });
+    };
+
+    const processRule = (rule: ConditionalRuleData): void => {
+      if (!rule) return;
+      else if (rule.rules && rule.rules.length !== 0) {
+        rule.rules.forEach((childRule) => processRule(childRule));
+      } else {
+        processLeafRule(rule);
+      }
+    };
+
+    processRule(ruleData);
   }
 
   protected getErrorOutputId(): undefined {
