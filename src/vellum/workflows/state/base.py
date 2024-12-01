@@ -5,15 +5,15 @@ from datetime import datetime
 from queue import Queue
 from threading import Lock
 from uuid import UUID, uuid4
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, Optional, Sequence, Set, Tuple, Type, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Type, cast
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler, field_serializer
 from pydantic_core import core_schema
 
 from vellum.core.pydantic_utilities import UniversalBaseModel
-
 from vellum.workflows.constants import UNDEF
+from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
 from vellum.workflows.types.generics import StateType
@@ -71,58 +71,87 @@ def _make_snapshottable(value: Any, snapshot_callback: Callable[[], None]) -> An
 
 
 class NodeExecutionCache:
-    _node_execution_ids: Dict[Type["BaseNode"], Stack[UUID]]
+    _node_executions_fulfilled: Dict[Type["BaseNode"], Stack[UUID]]
     _node_executions_initiated: Dict[Type["BaseNode"], Set[UUID]]
-    _dependencies_invoked: Dict[str, Set[str]]
+    _node_executions_queued: Dict[Type["BaseNode"], List[UUID]]
+    _dependencies_invoked: Dict[UUID, Set[Type["BaseNode"]]]
 
     def __init__(
         self,
         dependencies_invoked: Optional[Dict[str, Sequence[str]]] = None,
-        node_execution_ids: Optional[Dict[str, Sequence[str]]] = None,
+        node_executions_fulfilled: Optional[Dict[str, Sequence[str]]] = None,
         node_executions_initiated: Optional[Dict[str, Sequence[str]]] = None,
+        node_executions_queued: Optional[Dict[str, Sequence[str]]] = None,
     ) -> None:
         self._dependencies_invoked = defaultdict(set)
-        self._node_execution_ids = defaultdict(Stack[UUID])
+        self._node_executions_fulfilled = defaultdict(Stack[UUID])
         self._node_executions_initiated = defaultdict(set)
+        self._node_executions_queued = defaultdict(list)
+        for execution_id, dependencies in (dependencies_invoked or {}).items():
+            self._dependencies_invoked[UUID(execution_id)] = {get_class_by_qualname(dep) for dep in dependencies}
 
-        for node, dependencies in (dependencies_invoked or {}).items():
-            self._dependencies_invoked[node].update(dependencies)
-
-        for node, execution_ids in (node_execution_ids or {}).items():
+        for node, execution_ids in (node_executions_fulfilled or {}).items():
             node_class = get_class_by_qualname(node)
-            self._node_execution_ids[node_class].extend(UUID(execution_id) for execution_id in execution_ids)
+            self._node_executions_fulfilled[node_class].extend(UUID(execution_id) for execution_id in execution_ids)
 
         for node, execution_ids in (node_executions_initiated or {}).items():
             node_class = get_class_by_qualname(node)
             self._node_executions_initiated[node_class].update({UUID(execution_id) for execution_id in execution_ids})
 
-    @property
-    def dependencies_invoked(self) -> Dict[str, Set[str]]:
-        return self._dependencies_invoked
+        for node, execution_ids in (node_executions_queued or {}).items():
+            node_class = get_class_by_qualname(node)
+            self._node_executions_queued[node_class].extend(UUID(execution_id) for execution_id in execution_ids)
 
-    def is_node_initiated(self, node: Type["BaseNode"]) -> bool:
-        return node in self._node_executions_initiated and len(self._node_executions_initiated[node]) > 0
+    def _invoke_dependency(
+        self, execution_id: UUID, node: Type["BaseNode"], dependency: Type["BaseNode"], dependencies: Set["Type[BaseNode]"]
+    ) -> None:
+        self._dependencies_invoked[execution_id].add(dependency)
+        if all(dep in self._dependencies_invoked[execution_id] for dep in dependencies):
+            self._node_executions_queued[node].remove(execution_id)
+
+    def queue_node_execution(
+        self, node: Type["BaseNode"], dependencies: Set["Type[BaseNode]"], invoked_by: Optional[Edge] = None
+    ) -> UUID:
+        execution_id = uuid4()
+        if not invoked_by:
+            return execution_id
+
+        source_node = invoked_by.from_port.node_class
+        for queued_node_execution_id in self._node_executions_queued[node]:
+            if source_node not in self._dependencies_invoked[queued_node_execution_id]:
+                self._invoke_dependency(queued_node_execution_id, node, source_node, dependencies)
+                return queued_node_execution_id
+
+        self._node_executions_queued[node].append(execution_id)
+        self._invoke_dependency(execution_id, node, source_node, dependencies)
+        return execution_id
+
+    def is_node_execution_initiated(self, node: Type["BaseNode"], execution_id: UUID) -> bool:
+        return execution_id in self._node_executions_initiated[node]
 
     def initiate_node_execution(self, node: Type["BaseNode"], execution_id: UUID) -> None:
         self._node_executions_initiated[node].add(execution_id)
 
     def fulfill_node_execution(self, node: Type["BaseNode"], execution_id: UUID) -> None:
-        self._node_executions_initiated[node].remove(execution_id)
-        self._node_execution_ids[node].push(execution_id)
+        self._node_executions_fulfilled[node].push(execution_id)
 
     def get_execution_count(self, node: Type["BaseNode"]) -> int:
-        return self._node_execution_ids[node].size()
+        return self._node_executions_fulfilled[node].size()
 
     def dump(self) -> Dict[str, Any]:
         return {
             "dependencies_invoked": {
-                node: list(dependencies) for node, dependencies in self._dependencies_invoked.items()
+                str(execution_id): [str(dep) for dep in dependencies]
+                for execution_id, dependencies in self._dependencies_invoked.items()
             },
             "node_executions_initiated": {
                 str(node): list(execution_ids) for node, execution_ids in self._node_executions_initiated.items()
             },
-            "node_execution_ids": {
-                str(node): execution_ids.dump() for node, execution_ids in self._node_execution_ids.items()
+            "node_executions_fulfilled": {
+                str(node): execution_ids.dump() for node, execution_ids in self._node_executions_fulfilled.items()
+            },
+            "node_executions_queued": {
+                str(node): execution_ids for node, execution_ids in self._node_executions_queued.items()
             },
         }
 

@@ -2,6 +2,7 @@ import time
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -35,13 +36,15 @@ class AwaitAttributesNode(BaseNode[BaseState]):
     top = TopNode.Outputs.total
     middle = MiddleNode.Outputs.total
 
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+
     class Outputs(BaseNode.Outputs):
         total: int
 
     def run(self) -> Outputs:
         middle = self.middle or 0
         bottom = self.state.meta.node_outputs.get(BottomNode.Outputs.total, 0)
-        print(self.top, middle, bottom)
         return self.Outputs(
             total=self.top + middle + bottom,
         )
