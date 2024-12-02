@@ -20,6 +20,7 @@ import {
   GenericNode,
   SubworkflowNode,
   NoteNode,
+  ErrorNode,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -952,6 +953,32 @@ export function apiNodeFactory({
     },
   };
   return nodeData;
+}
+
+export function errorNodeDataFactory(): ErrorNode {
+  const errorSourceInputId = "d2287fee-98fb-421c-9464-e54d8f70f046";
+
+  return {
+    id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
+    type: "ERROR",
+    data: {
+      label: "Error Node",
+      name: "error-node",
+      targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
+      errorSourceInputId,
+      errorOutputId: "69250713-617d-42a4-9326-456c70d0ef20",
+    },
+    inputs: [
+      {
+        id: errorSourceInputId,
+        key: "error_source",
+        value: {
+          rules: [],
+          combinator: "OR",
+        },
+      },
+    ],
+  };
 }
 
 export function genericNodeFactory(
