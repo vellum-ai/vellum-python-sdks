@@ -8,7 +8,6 @@ from vellum import (
     PromptOutput,
     StringVellumValue,
 )
-
 from vellum.workflows.constants import OMIT
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import PromptDeploymentNode

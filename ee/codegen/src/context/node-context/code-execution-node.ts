@@ -14,7 +14,7 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
 
   getNodeOutputNamesById(): Record<string, string> {
     return {
-      [this.nodeData.data.outputId]: "output",
+      [this.nodeData.data.outputId]: "result",
       ...(this.nodeData.data.logOutputId
         ? { [this.nodeData.data.logOutputId]: "logs" }
         : {}),

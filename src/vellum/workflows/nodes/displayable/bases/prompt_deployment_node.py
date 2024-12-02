@@ -11,7 +11,6 @@ from vellum import (
     RawPromptExecutionOverridesRequest,
     StringInputRequest,
 )
-
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.errors import VellumErrorCode
 from vellum.workflows.exceptions import NodeException

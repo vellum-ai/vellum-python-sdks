@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import ClassVar, Generic, Optional, TypeVar
+from typing import ClassVar, Dict, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
@@ -20,6 +20,8 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
     output_id: ClassVar[Optional[UUID]] = None
     log_output_id: ClassVar[Optional[UUID]] = None
 
+    node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
@@ -27,6 +29,19 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
         node_id = self.node_id
 
         code = read_file_from_path(raise_if_descriptor(node.filepath))
+        code_inputs = raise_if_descriptor(node.code_inputs)
+
+        inputs = [
+            create_node_input(
+                node_id=node_id,
+                input_name=variable_name,
+                value=variable_value,
+                display_context=display_context,
+                input_id=self.node_input_ids_by_name.get(variable_name),
+            )
+            for variable_name, variable_value in code_inputs.items()
+        ]
+
         code_node_input = create_node_input(
             node_id=node_id,
             input_name="code",
@@ -41,7 +56,7 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
             display_context=display_context,
             input_id=self.runtime_input_id,
         )
-        inputs = [code_node_input, runtime_node_input]
+        inputs.extend([code_node_input, runtime_node_input])
 
         packages = raise_if_descriptor(node.packages)
 

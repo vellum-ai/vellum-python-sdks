@@ -2,6 +2,34 @@
   "workflow_raw_data": {
     "nodes": [
       {
+        "id": "d49107fe-1424-42ba-9413-9ab5ce398077",
+        "type": "ENTRYPOINT",
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "08d78489-ce80-4743-a22d-2d5f62b575ac"
+        },
+        "definition": {
+          "bases": [],
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "bases",
+            "base"
+          ],
+          "name": "BaseNode"
+        },
+        "inputs": [],
+        "display_data": {
+          "width": 124,
+          "height": 48,
+          "position": {
+            "x": 1545,
+            "y": 330
+          }
+        }
+      },
+      {
         "id": "97240cb9-94a0-4a1a-b69e-3c2d96ebb1e2",
         "type": "CODE_EXECUTION",
         "data": {
@@ -72,23 +100,30 @@
             "x": 1816.3157894736842,
             "y": 213.93599376731305
           }
-        }
-      },
-      {
-        "id": "d49107fe-1424-42ba-9413-9ab5ce398077",
-        "type": "ENTRYPOINT",
-        "data": {
-          "label": "Entrypoint Node",
-          "source_handle_id": "08d78489-ce80-4743-a22d-2d5f62b575ac"
         },
-        "inputs": [],
-        "display_data": {
-          "width": 124,
-          "height": 48,
-          "position": {
-            "x": 1545,
-            "y": 330
-          }
+        "definition": {
+          "bases": [
+            {
+              "module": [
+                "vellum",
+                "workflows",
+                "nodes",
+                "displayable",
+                "code_execution_node",
+                "node"
+              ],
+              "name": "CodeExecutionNode"
+            }
+          ],
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_code_execution_node",
+            "code",
+            "nodes",
+            "code_execution_node"
+          ],
+          "name": "CodeExecutionNode"
         }
       },
       {
@@ -127,6 +162,30 @@
             "x": 2392.5396121883655,
             "y": 235.35180055401668
           }
+        },
+        "definition": {
+          "bases": [
+            {
+              "module": [
+                "vellum",
+                "workflows",
+                "nodes",
+                "displayable",
+                "final_output_node",
+                "node"
+              ],
+              "name": "FinalOutputNode"
+            }
+          ],
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_code_execution_node",
+            "code",
+            "nodes",
+            "final_output"
+          ],
+          "name": "FinalOutput"
         }
       }
     ],
@@ -158,10 +217,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
-        "vellum",
-        "workflows",
-        "codegen",
-        "tests",
+        "codegen_integration",
         "fixtures",
         "simple_code_execution_node",
         "code",
@@ -173,7 +229,12 @@
     {
       "id": "f55ef1d6-1d95-464c-adb1-11e3a19c2ed2",
       "key": "input",
-      "type": "STRING"
+      "type": "STRING",
+      "required": true,
+      "default": null,
+      "extensions": {
+        "color": null
+      }
     }
   ],
   "output_variables": [

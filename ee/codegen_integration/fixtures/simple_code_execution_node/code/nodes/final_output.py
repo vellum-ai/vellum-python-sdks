@@ -6,4 +6,4 @@ from .code_execution_node import CodeExecutionNode
 
 class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
-        value = CodeExecutionNode.Outputs.output
+        value = CodeExecutionNode.Outputs.result

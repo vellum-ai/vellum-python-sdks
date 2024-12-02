@@ -63,40 +63,40 @@ client.execute_code(
 <dl>
 <dd>
 
-**code:** `str` 
-    
+**code:** `str`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**runtime:** `CodeExecutionRuntime` 
-    
+**runtime:** `CodeExecutionRuntime`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**input_values:** `typing.Sequence[CodeExecutorInput]` 
-    
+**input_values:** `typing.Sequence[CodeExecutorInput]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**packages:** `typing.Sequence[CodeExecutionPackage]` 
-    
+**packages:** `typing.Sequence[CodeExecutionPackage]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**output_type:** `VellumVariableType` 
-    
+**output_type:** `VellumVariableType`
+
 </dd>
 </dl>
 
@@ -104,7 +104,7 @@ client.execute_code(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -171,7 +171,7 @@ client.execute_prompt(
 <dd>
 
 **inputs:** `typing.Sequence[PromptDeploymentInputRequest]` — A list consisting of the Prompt Deployment's input variables and their values.
-    
+
 </dd>
 </dl>
 
@@ -179,7 +179,7 @@ client.execute_prompt(
 <dd>
 
 **prompt_deployment_id:** `typing.Optional[str]` — The ID of the Prompt Deployment. Must provide either this or prompt_deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -187,7 +187,7 @@ client.execute_prompt(
 <dd>
 
 **prompt_deployment_name:** `typing.Optional[str]` — The unique name of the Prompt Deployment. Must provide either this or prompt_deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -195,7 +195,7 @@ client.execute_prompt(
 <dd>
 
 **release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Prompt Deployment
-    
+
 </dd>
 </dl>
 
@@ -203,7 +203,7 @@ client.execute_prompt(
 <dd>
 
 **external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Prompt Deployment.
-    
+
 </dd>
 </dl>
 
@@ -211,7 +211,7 @@ client.execute_prompt(
 <dd>
 
 **expand_meta:** `typing.Optional[PromptDeploymentExpandMetaRequest]` — An optionally specified configuration used to opt in to including additional metadata about this prompt execution in the API response. Corresponding values will be returned under the `meta` key of the API response.
-    
+
 </dd>
 </dl>
 
@@ -219,7 +219,7 @@ client.execute_prompt(
 <dd>
 
 **raw_overrides:** `typing.Optional[RawPromptExecutionOverridesRequest]` — Overrides for the raw API request sent to the model host. Combined with `expand_raw`, it can be used to access new features from models.
-    
+
 </dd>
 </dl>
 
@@ -227,7 +227,7 @@ client.execute_prompt(
 <dd>
 
 **expand_raw:** `typing.Optional[typing.Sequence[str]]` — A list of keys whose values you'd like to directly return from the JSON response of the model provider. Useful if you need lower-level info returned by model providers that Vellum would otherwise omit. Corresponding key/value pairs will be returned under the `raw` key of the API response.
-    
+
 </dd>
 </dl>
 
@@ -235,7 +235,7 @@ client.execute_prompt(
 <dd>
 
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
-    
+
 </dd>
 </dl>
 
@@ -243,7 +243,7 @@ client.execute_prompt(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -312,7 +312,7 @@ for chunk in response:
 <dd>
 
 **inputs:** `typing.Sequence[PromptDeploymentInputRequest]` — A list consisting of the Prompt Deployment's input variables and their values.
-    
+
 </dd>
 </dl>
 
@@ -320,7 +320,7 @@ for chunk in response:
 <dd>
 
 **prompt_deployment_id:** `typing.Optional[str]` — The ID of the Prompt Deployment. Must provide either this or prompt_deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -328,7 +328,7 @@ for chunk in response:
 <dd>
 
 **prompt_deployment_name:** `typing.Optional[str]` — The unique name of the Prompt Deployment. Must provide either this or prompt_deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -336,7 +336,7 @@ for chunk in response:
 <dd>
 
 **release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Prompt Deployment
-    
+
 </dd>
 </dl>
 
@@ -344,7 +344,7 @@ for chunk in response:
 <dd>
 
 **external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Prompt Deployment.
-    
+
 </dd>
 </dl>
 
@@ -352,7 +352,7 @@ for chunk in response:
 <dd>
 
 **expand_meta:** `typing.Optional[PromptDeploymentExpandMetaRequest]` — An optionally specified configuration used to opt in to including additional metadata about this prompt execution in the API response. Corresponding values will be returned under the `meta` key of the API response.
-    
+
 </dd>
 </dl>
 
@@ -360,7 +360,7 @@ for chunk in response:
 <dd>
 
 **raw_overrides:** `typing.Optional[RawPromptExecutionOverridesRequest]` — Overrides for the raw API request sent to the model host. Combined with `expand_raw`, it can be used to access new features from models.
-    
+
 </dd>
 </dl>
 
@@ -368,7 +368,7 @@ for chunk in response:
 <dd>
 
 **expand_raw:** `typing.Optional[typing.Sequence[str]]` — A list of keys whose values you'd like to directly return from the JSON response of the model provider. Useful if you need lower-level info returned by model providers that Vellum would otherwise omit. Corresponding key/value pairs will be returned under the `raw` key of the API response.
-    
+
 </dd>
 </dl>
 
@@ -376,7 +376,7 @@ for chunk in response:
 <dd>
 
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
-    
+
 </dd>
 </dl>
 
@@ -384,7 +384,7 @@ for chunk in response:
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -451,7 +451,7 @@ client.execute_workflow(
 <dd>
 
 **inputs:** `typing.Sequence[WorkflowRequestInputRequest]` — The list of inputs defined in the Workflow's Deployment with their corresponding values.
-    
+
 </dd>
 </dl>
 
@@ -459,7 +459,7 @@ client.execute_workflow(
 <dd>
 
 **expand_meta:** `typing.Optional[WorkflowExpandMetaRequest]` — An optionally specified configuration used to opt in to including additional metadata about this workflow execution in the API response. Corresponding values will be returned under the `execution_meta` key within NODE events in the response stream.
-    
+
 </dd>
 </dl>
 
@@ -467,7 +467,7 @@ client.execute_workflow(
 <dd>
 
 **workflow_deployment_id:** `typing.Optional[str]` — The ID of the Workflow Deployment. Must provide either this or workflow_deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -475,7 +475,7 @@ client.execute_workflow(
 <dd>
 
 **workflow_deployment_name:** `typing.Optional[str]` — The name of the Workflow Deployment. Must provide either this or workflow_deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -483,7 +483,7 @@ client.execute_workflow(
 <dd>
 
 **release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
-    
+
 </dd>
 </dl>
 
@@ -491,7 +491,7 @@ client.execute_workflow(
 <dd>
 
 **external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique for a given workflow deployment.
-    
+
 </dd>
 </dl>
 
@@ -499,7 +499,7 @@ client.execute_workflow(
 <dd>
 
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
-    
+
 </dd>
 </dl>
 
@@ -507,7 +507,7 @@ client.execute_workflow(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -576,7 +576,7 @@ for chunk in response:
 <dd>
 
 **inputs:** `typing.Sequence[WorkflowRequestInputRequest]` — The list of inputs defined in the Workflow's Deployment with their corresponding values.
-    
+
 </dd>
 </dl>
 
@@ -584,7 +584,7 @@ for chunk in response:
 <dd>
 
 **expand_meta:** `typing.Optional[WorkflowExpandMetaRequest]` — An optionally specified configuration used to opt in to including additional metadata about this workflow execution in the API response. Corresponding values will be returned under the `execution_meta` key within NODE events in the response stream.
-    
+
 </dd>
 </dl>
 
@@ -592,7 +592,7 @@ for chunk in response:
 <dd>
 
 **workflow_deployment_id:** `typing.Optional[str]` — The ID of the Workflow Deployment. Must provide either this or workflow_deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -600,7 +600,7 @@ for chunk in response:
 <dd>
 
 **workflow_deployment_name:** `typing.Optional[str]` — The name of the Workflow Deployment. Must provide either this or workflow_deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -608,7 +608,7 @@ for chunk in response:
 <dd>
 
 **release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
-    
+
 </dd>
 </dl>
 
@@ -616,7 +616,7 @@ for chunk in response:
 <dd>
 
 **external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique for a given workflow deployment.
-    
+
 </dd>
 </dl>
 
@@ -624,7 +624,7 @@ for chunk in response:
 <dd>
 
 **event_types:** `typing.Optional[typing.Sequence[WorkflowExecutionEventType]]` — Optionally specify which events you want to receive. Defaults to only WORKFLOW events. Note that the schema of non-WORKFLOW events is unstable and should be used with caution.
-    
+
 </dd>
 </dl>
 
@@ -632,7 +632,7 @@ for chunk in response:
 <dd>
 
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
-    
+
 </dd>
 </dl>
 
@@ -640,7 +640,7 @@ for chunk in response:
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -709,7 +709,7 @@ client.generate(
 <dd>
 
 **requests:** `typing.Sequence[GenerateRequest]` — The generation request to make. Bulk requests are no longer supported, this field must be an array of length 1.
-    
+
 </dd>
 </dl>
 
@@ -717,7 +717,7 @@ client.generate(
 <dd>
 
 **deployment_id:** `typing.Optional[str]` — The ID of the deployment. Must provide either this or deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -725,7 +725,7 @@ client.generate(
 <dd>
 
 **deployment_name:** `typing.Optional[str]` — The name of the deployment. Must provide either this or deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -733,7 +733,7 @@ client.generate(
 <dd>
 
 **options:** `typing.Optional[GenerateOptionsRequest]` — Additional configuration that can be used to control what's included in the response.
-    
+
 </dd>
 </dl>
 
@@ -741,7 +741,7 @@ client.generate(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -812,7 +812,7 @@ for chunk in response:
 <dd>
 
 **requests:** `typing.Sequence[GenerateRequest]` — The generation request to make. Bulk requests are no longer supported, this field must be an array of length 1.
-    
+
 </dd>
 </dl>
 
@@ -820,7 +820,7 @@ for chunk in response:
 <dd>
 
 **deployment_id:** `typing.Optional[str]` — The ID of the deployment. Must provide either this or deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -828,7 +828,7 @@ for chunk in response:
 <dd>
 
 **deployment_name:** `typing.Optional[str]` — The name of the deployment. Must provide either this or deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -836,7 +836,7 @@ for chunk in response:
 <dd>
 
 **options:** `typing.Optional[GenerateOptionsRequest]` — Additional configuration that can be used to control what's included in the response.
-    
+
 </dd>
 </dl>
 
@@ -844,7 +844,7 @@ for chunk in response:
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -906,7 +906,7 @@ client.search(
 <dd>
 
 **query:** `str` — The query to search for.
-    
+
 </dd>
 </dl>
 
@@ -914,7 +914,7 @@ client.search(
 <dd>
 
 **index_id:** `typing.Optional[str]` — The ID of the index to search against. Must provide either this or index_name.
-    
+
 </dd>
 </dl>
 
@@ -922,7 +922,7 @@ client.search(
 <dd>
 
 **index_name:** `typing.Optional[str]` — The name of the index to search against. Must provide either this or index_id.
-    
+
 </dd>
 </dl>
 
@@ -930,7 +930,7 @@ client.search(
 <dd>
 
 **options:** `typing.Optional[SearchRequestOptionsRequest]` — Configuration options for the search.
-    
+
 </dd>
 </dl>
 
@@ -938,7 +938,7 @@ client.search(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1000,7 +1000,7 @@ client.submit_completion_actuals(
 <dd>
 
 **actuals:** `typing.Sequence[SubmitCompletionActualRequest]` — Feedback regarding the quality of previously generated completions
-    
+
 </dd>
 </dl>
 
@@ -1008,7 +1008,7 @@ client.submit_completion_actuals(
 <dd>
 
 **deployment_id:** `typing.Optional[str]` — The ID of the deployment. Must provide either this or deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -1016,7 +1016,7 @@ client.submit_completion_actuals(
 <dd>
 
 **deployment_name:** `typing.Optional[str]` — The name of the deployment. Must provide either this or deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -1024,7 +1024,7 @@ client.submit_completion_actuals(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1088,7 +1088,7 @@ client.submit_workflow_execution_actuals(
 <dd>
 
 **actuals:** `typing.Sequence[SubmitWorkflowExecutionActualRequest]` — Feedback regarding the quality of an output on a previously executed workflow.
-    
+
 </dd>
 </dl>
 
@@ -1096,7 +1096,7 @@ client.submit_workflow_execution_actuals(
 <dd>
 
 **execution_id:** `typing.Optional[str]` — The Vellum-generated ID of a previously executed workflow. Must provide either this or external_id.
-    
+
 </dd>
 </dl>
 
@@ -1104,7 +1104,7 @@ client.submit_workflow_execution_actuals(
 <dd>
 
 **external_id:** `typing.Optional[str]` — The external ID that was originally provided by when executing the workflow, if applicable, that you'd now like to submit actuals for. Must provide either this or execution_id.
-    
+
 </dd>
 </dl>
 
@@ -1112,7 +1112,7 @@ client.submit_workflow_execution_actuals(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1201,64 +1201,64 @@ for chunk in response:
 <dl>
 <dd>
 
-**ml_model:** `str` 
-    
+**ml_model:** `str`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**input_values:** `typing.Sequence[PromptRequestInput]` 
-    
+**input_values:** `typing.Sequence[PromptRequestInput]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**input_variables:** `typing.Sequence[VellumVariable]` 
-    
+**input_variables:** `typing.Sequence[VellumVariable]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**parameters:** `PromptParameters` 
-    
+**parameters:** `PromptParameters`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**blocks:** `typing.Sequence[PromptBlock]` 
-    
+**blocks:** `typing.Sequence[PromptBlock]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**settings:** `typing.Optional[PromptSettings]` 
-    
+**settings:** `typing.Optional[PromptSettings]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**functions:** `typing.Optional[typing.Sequence[FunctionDefinition]]` 
-    
+**functions:** `typing.Optional[typing.Sequence[FunctionDefinition]]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**expand_meta:** `typing.Optional[AdHocExpandMeta]` 
-    
+**expand_meta:** `typing.Optional[AdHocExpandMeta]`
+
 </dd>
 </dl>
 
@@ -1266,7 +1266,7 @@ for chunk in response:
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1327,7 +1327,7 @@ client.container_images.list()
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -1335,7 +1335,7 @@ client.container_images.list()
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -1343,7 +1343,7 @@ client.container_images.list()
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
@@ -1351,7 +1351,7 @@ client.container_images.list()
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1413,7 +1413,7 @@ client.container_images.retrieve(
 <dd>
 
 **id:** `str` — Either the Container Image's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -1421,7 +1421,7 @@ client.container_images.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1481,7 +1481,7 @@ client.container_images.docker_service_token()
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1544,24 +1544,24 @@ client.container_images.push_container_image(
 <dl>
 <dd>
 
-**name:** `str` 
-    
+**name:** `str`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**sha:** `str` 
-    
+**sha:** `str`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**tags:** `typing.Sequence[str]` 
-    
+**tags:** `typing.Sequence[str]`
+
 </dd>
 </dl>
 
@@ -1569,7 +1569,7 @@ client.container_images.push_container_image(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1630,7 +1630,7 @@ client.deployments.list()
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -1638,7 +1638,7 @@ client.deployments.list()
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -1646,7 +1646,7 @@ client.deployments.list()
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
@@ -1654,7 +1654,7 @@ client.deployments.list()
 <dd>
 
 **status:** `typing.Optional[DeploymentsListRequestStatus]` — status
-    
+
 </dd>
 </dl>
 
@@ -1662,7 +1662,7 @@ client.deployments.list()
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1724,7 +1724,7 @@ client.deployments.retrieve(
 <dd>
 
 **id:** `str` — Either the Deployment's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -1732,7 +1732,7 @@ client.deployments.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1795,7 +1795,7 @@ client.deployments.deployment_history_item_retrieve(
 <dd>
 
 **history_id_or_release_tag:** `str` — Either the UUID of Deployment History Item you'd like to retrieve, or the name of a Release Tag that's pointing to the Deployment History Item you'd like to retrieve.
-    
+
 </dd>
 </dl>
 
@@ -1803,7 +1803,7 @@ client.deployments.deployment_history_item_retrieve(
 <dd>
 
 **id:** `str` — A UUID string identifying this deployment.
-    
+
 </dd>
 </dl>
 
@@ -1811,7 +1811,7 @@ client.deployments.deployment_history_item_retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1873,7 +1873,7 @@ client.deployments.list_deployment_release_tags(
 <dd>
 
 **id:** `str` — Either the Prompt Deployment's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -1881,7 +1881,7 @@ client.deployments.list_deployment_release_tags(
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -1889,7 +1889,7 @@ client.deployments.list_deployment_release_tags(
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -1897,15 +1897,15 @@ client.deployments.list_deployment_release_tags(
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**source:** `typing.Optional[ListDeploymentReleaseTagsRequestSource]` 
-    
+**source:** `typing.Optional[ListDeploymentReleaseTagsRequestSource]`
+
 </dd>
 </dl>
 
@@ -1913,7 +1913,7 @@ client.deployments.list_deployment_release_tags(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -1976,7 +1976,7 @@ client.deployments.retrieve_deployment_release_tag(
 <dd>
 
 **id:** `str` — A UUID string identifying this deployment.
-    
+
 </dd>
 </dl>
 
@@ -1984,7 +1984,7 @@ client.deployments.retrieve_deployment_release_tag(
 <dd>
 
 **name:** `str` — The name of the Release Tag associated with this Deployment that you'd like to retrieve.
-    
+
 </dd>
 </dl>
 
@@ -1992,7 +1992,7 @@ client.deployments.retrieve_deployment_release_tag(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2055,7 +2055,7 @@ client.deployments.update_deployment_release_tag(
 <dd>
 
 **id:** `str` — A UUID string identifying this deployment.
-    
+
 </dd>
 </dl>
 
@@ -2063,7 +2063,7 @@ client.deployments.update_deployment_release_tag(
 <dd>
 
 **name:** `str` — The name of the Release Tag associated with this Deployment that you'd like to update.
-    
+
 </dd>
 </dl>
 
@@ -2071,7 +2071,7 @@ client.deployments.update_deployment_release_tag(
 <dd>
 
 **history_item_id:** `typing.Optional[str]` — The ID of the Deployment History Item to tag
-    
+
 </dd>
 </dl>
 
@@ -2079,7 +2079,7 @@ client.deployments.update_deployment_release_tag(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2155,7 +2155,7 @@ client.deployments.retrieve_provider_payload(
 <dd>
 
 **inputs:** `typing.Sequence[PromptDeploymentInputRequest]` — The list of inputs defined in the Prompt's deployment with their corresponding values.
-    
+
 </dd>
 </dl>
 
@@ -2163,7 +2163,7 @@ client.deployments.retrieve_provider_payload(
 <dd>
 
 **deployment_id:** `typing.Optional[str]` — The ID of the deployment. Must provide either this or deployment_name.
-    
+
 </dd>
 </dl>
 
@@ -2171,7 +2171,7 @@ client.deployments.retrieve_provider_payload(
 <dd>
 
 **deployment_name:** `typing.Optional[str]` — The name of the deployment. Must provide either this or deployment_id.
-    
+
 </dd>
 </dl>
 
@@ -2179,15 +2179,15 @@ client.deployments.retrieve_provider_payload(
 <dd>
 
 **release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**expand_meta:** `typing.Optional[CompilePromptDeploymentExpandMetaRequest]` 
-    
+**expand_meta:** `typing.Optional[CompilePromptDeploymentExpandMetaRequest]`
+
 </dd>
 </dl>
 
@@ -2195,7 +2195,7 @@ client.deployments.retrieve_provider_payload(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2256,7 +2256,7 @@ client.document_indexes.list()
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -2264,7 +2264,7 @@ client.document_indexes.list()
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -2272,7 +2272,7 @@ client.document_indexes.list()
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
@@ -2280,20 +2280,20 @@ client.document_indexes.list()
 <dd>
 
 **search:** `typing.Optional[str]` — Search for document indices by name or label
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**status:** `typing.Optional[DocumentIndexesListRequestStatus]` 
+**status:** `typing.Optional[DocumentIndexesListRequestStatus]`
 
 Filter down to only document indices that have a status matching the status specified
 
 - `ACTIVE` - Active
 - `ARCHIVED` - Archived
-    
+
 </dd>
 </dl>
 
@@ -2301,7 +2301,7 @@ Filter down to only document indices that have a status matching the status spec
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2384,7 +2384,7 @@ client.document_indexes.create(
 <dd>
 
 **label:** `str` — A human-readable label for the document index
-    
+
 </dd>
 </dl>
 
@@ -2392,42 +2392,42 @@ client.document_indexes.create(
 <dd>
 
 **name:** `str` — A name that uniquely identifies this index within its workspace
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**indexing_config:** `DocumentIndexIndexingConfigRequest` 
-    
+**indexing_config:** `DocumentIndexIndexingConfigRequest`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**status:** `typing.Optional[EntityStatus]` 
+**status:** `typing.Optional[EntityStatus]`
 
 The current status of the document index
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**environment:** `typing.Optional[EnvironmentEnum]` 
+**environment:** `typing.Optional[EnvironmentEnum]`
 
 The environment this document index is used in
 
 * `DEVELOPMENT` - Development
 * `STAGING` - Staging
 * `PRODUCTION` - Production
-    
+
 </dd>
 </dl>
 
@@ -2435,7 +2435,7 @@ The environment this document index is used in
 <dd>
 
 **copy_documents_from_index_id:** `typing.Optional[str]` — Optionally specify the id of a document index from which you'd like to copy and re-index its documents into this newly created index
-    
+
 </dd>
 </dl>
 
@@ -2443,7 +2443,7 @@ The environment this document index is used in
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2505,7 +2505,7 @@ client.document_indexes.retrieve(
 <dd>
 
 **id:** `str` — Either the Document Index's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -2513,7 +2513,7 @@ client.document_indexes.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2576,7 +2576,7 @@ client.document_indexes.update(
 <dd>
 
 **id:** `str` — Either the Document Index's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -2584,34 +2584,34 @@ client.document_indexes.update(
 <dd>
 
 **label:** `str` — A human-readable label for the document index
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**status:** `typing.Optional[EntityStatus]` 
+**status:** `typing.Optional[EntityStatus]`
 
 The current status of the document index
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**environment:** `typing.Optional[EnvironmentEnum]` 
+**environment:** `typing.Optional[EnvironmentEnum]`
 
 The environment this document index is used in
 
 * `DEVELOPMENT` - Development
 * `STAGING` - Staging
 * `PRODUCTION` - Production
-    
+
 </dd>
 </dl>
 
@@ -2619,7 +2619,7 @@ The environment this document index is used in
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2681,7 +2681,7 @@ client.document_indexes.destroy(
 <dd>
 
 **id:** `str` — Either the Document Index's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -2689,7 +2689,7 @@ client.document_indexes.destroy(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2751,7 +2751,7 @@ client.document_indexes.partial_update(
 <dd>
 
 **id:** `str` — Either the Document Index's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -2759,34 +2759,34 @@ client.document_indexes.partial_update(
 <dd>
 
 **label:** `typing.Optional[str]` — A human-readable label for the document index
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**status:** `typing.Optional[EntityStatus]` 
+**status:** `typing.Optional[EntityStatus]`
 
 The current status of the document index
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**environment:** `typing.Optional[EnvironmentEnum]` 
+**environment:** `typing.Optional[EnvironmentEnum]`
 
 The environment this document index is used in
 
 * `DEVELOPMENT` - Development
 * `STAGING` - Staging
 * `PRODUCTION` - Production
-    
+
 </dd>
 </dl>
 
@@ -2794,7 +2794,7 @@ The environment this document index is used in
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2857,7 +2857,7 @@ client.document_indexes.add_document(
 <dd>
 
 **document_id:** `str` — Either the Vellum-generated ID or the originally supplied external_id that uniquely identifies the Document you'd like to add.
-    
+
 </dd>
 </dl>
 
@@ -2865,7 +2865,7 @@ client.document_indexes.add_document(
 <dd>
 
 **id:** `str` — Either the Vellum-generated ID or the originally specified name that uniquely identifies the Document Index to which you'd like to add the Document.
-    
+
 </dd>
 </dl>
 
@@ -2873,7 +2873,7 @@ client.document_indexes.add_document(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -2936,7 +2936,7 @@ client.document_indexes.remove_document(
 <dd>
 
 **document_id:** `str` — Either the Vellum-generated ID or the originally supplied external_id that uniquely identifies the Document you'd like to remove.
-    
+
 </dd>
 </dl>
 
@@ -2944,7 +2944,7 @@ client.document_indexes.remove_document(
 <dd>
 
 **id:** `str` — Either the Vellum-generated ID or the originally specified name that uniquely identifies the Document Index from which you'd like to remove a Document.
-    
+
 </dd>
 </dl>
 
@@ -2952,7 +2952,7 @@ client.document_indexes.remove_document(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3013,7 +3013,7 @@ client.documents.list()
 <dd>
 
 **document_index_id:** `typing.Optional[str]` — Filter down to only those documents that are included in the specified index. You may provide either the Vellum-generated ID or the unique name of the index specified upon initial creation.
-    
+
 </dd>
 </dl>
 
@@ -3021,7 +3021,7 @@ client.documents.list()
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -3029,7 +3029,7 @@ client.documents.list()
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -3037,7 +3037,7 @@ client.documents.list()
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
@@ -3045,7 +3045,7 @@ client.documents.list()
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3107,7 +3107,7 @@ client.documents.retrieve(
 <dd>
 
 **id:** `str` — A UUID string identifying this document.
-    
+
 </dd>
 </dl>
 
@@ -3115,7 +3115,7 @@ client.documents.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3177,7 +3177,7 @@ client.documents.destroy(
 <dd>
 
 **id:** `str` — A UUID string identifying this document.
-    
+
 </dd>
 </dl>
 
@@ -3185,7 +3185,7 @@ client.documents.destroy(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3247,7 +3247,7 @@ client.documents.partial_update(
 <dd>
 
 **id:** `str` — A UUID string identifying this document.
-    
+
 </dd>
 </dl>
 
@@ -3255,19 +3255,19 @@ client.documents.partial_update(
 <dd>
 
 **label:** `typing.Optional[str]` — A human-readable label for the document. Defaults to the originally uploaded file's file name.
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**status:** `typing.Optional[DocumentStatus]` 
+**status:** `typing.Optional[DocumentStatus]`
 
 The current status of the document
 
 * `ACTIVE` - Active
-    
+
 </dd>
 </dl>
 
@@ -3275,7 +3275,7 @@ The current status of the document
 <dd>
 
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — A JSON object containing any metadata associated with the document that you'd like to filter upon later.
-    
+
 </dd>
 </dl>
 
@@ -3283,7 +3283,7 @@ The current status of the document
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3355,7 +3355,7 @@ client.documents.upload(
 <dd>
 
 **label:** `str` — A human-friendly name for this document. Typically the filename.
-    
+
 </dd>
 </dl>
 
@@ -3365,7 +3365,7 @@ client.documents.upload(
 **contents:** `from __future__ import annotations
 
 core.File` — See core.File for more documentation
-    
+
 </dd>
 </dl>
 
@@ -3373,7 +3373,7 @@ core.File` — See core.File for more documentation
 <dd>
 
 **add_to_index_names:** `typing.Optional[typing.List[str]]` — Optionally include the names of all indexes that you'd like this document to be included in
-    
+
 </dd>
 </dl>
 
@@ -3381,7 +3381,7 @@ core.File` — See core.File for more documentation
 <dd>
 
 **external_id:** `typing.Optional[str]` — Optionally include an external ID for this document. This is useful if you want to re-upload the same document later when its contents change and would like it to be re-indexed.
-    
+
 </dd>
 </dl>
 
@@ -3389,7 +3389,7 @@ core.File` — See core.File for more documentation
 <dd>
 
 **keywords:** `typing.Optional[typing.List[str]]` — Optionally include a list of keywords that'll be associated with this document. Used when performing keyword searches.
-    
+
 </dd>
 </dl>
 
@@ -3397,7 +3397,7 @@ core.File` — See core.File for more documentation
 <dd>
 
 **metadata:** `typing.Optional[str]` — A stringified JSON object containing any metadata associated with the document that you'd like to filter upon later.
-    
+
 </dd>
 </dl>
 
@@ -3405,7 +3405,7 @@ core.File` — See core.File for more documentation
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3467,7 +3467,7 @@ client.folder_entities.list(
 <dl>
 <dd>
 
-**parent_folder_id:** `str` 
+**parent_folder_id:** `str`
 
 Filter down to only those entities whose parent folder has the specified ID.
 
@@ -3478,20 +3478,20 @@ a string representing the entity type of the root directory. Supported root dire
 - WORKFLOW_SANDBOX
 - DOCUMENT_INDEX
 - TEST_SUITE
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**entity_status:** `typing.Optional[FolderEntitiesListRequestEntityStatus]` 
+**entity_status:** `typing.Optional[FolderEntitiesListRequestEntityStatus]`
 
 Filter down to only those objects whose entities have a status matching the status specified.
 
 - `ACTIVE` - Active
 - `ARCHIVED` - Archived
-    
+
 </dd>
 </dl>
 
@@ -3499,7 +3499,7 @@ Filter down to only those objects whose entities have a status matching the stat
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -3507,7 +3507,7 @@ Filter down to only those objects whose entities have a status matching the stat
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -3515,7 +3515,7 @@ Filter down to only those objects whose entities have a status matching the stat
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
@@ -3523,7 +3523,7 @@ Filter down to only those objects whose entities have a status matching the stat
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3587,7 +3587,7 @@ client.folder_entities.add_entity_to_folder(
 <dl>
 <dd>
 
-**folder_id:** `str` 
+**folder_id:** `str`
 
 The ID of the folder to which the entity should be added. This can be a UUID of a folder, or the name of a root
 directory. Supported root directories include:
@@ -3596,7 +3596,7 @@ directory. Supported root directories include:
 - WORKFLOW_SANDBOX
 - DOCUMENT_INDEX
 - TEST_SUITE
-    
+
 </dd>
 </dl>
 
@@ -3604,7 +3604,7 @@ directory. Supported root directories include:
 <dd>
 
 **entity_id:** `str` — The ID of the entity you would like to move.
-    
+
 </dd>
 </dl>
 
@@ -3612,7 +3612,7 @@ directory. Supported root directories include:
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3681,23 +3681,23 @@ client.metric_definitions.execute_metric_definition(
 <dd>
 
 **id:** `str` — Either the Metric Definition's ID or its unique name
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**inputs:** `typing.Sequence[MetricDefinitionInput]` 
-    
+**inputs:** `typing.Sequence[MetricDefinitionInput]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**release_tag:** `typing.Optional[str]` 
-    
+**release_tag:** `typing.Optional[str]`
+
 </dd>
 </dl>
 
@@ -3705,7 +3705,7 @@ client.metric_definitions.execute_metric_definition(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3754,7 +3754,7 @@ client.metric_definitions.metric_definition_history_item_retrieve(
 <dd>
 
 **history_id_or_release_tag:** `str` — Either the UUID of Metric Definition History Item you'd like to retrieve, or the name of a Release Tag that's pointing to the Metric Definition History Item you'd like to retrieve.
-    
+
 </dd>
 </dl>
 
@@ -3762,7 +3762,7 @@ client.metric_definitions.metric_definition_history_item_retrieve(
 <dd>
 
 **id:** `str` — A UUID string identifying this metric definition.
-    
+
 </dd>
 </dl>
 
@@ -3770,7 +3770,7 @@ client.metric_definitions.metric_definition_history_item_retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3833,7 +3833,7 @@ client.ml_models.retrieve(
 <dd>
 
 **id:** `str` — Either the ML Model's ID, its unique name, or its ID in the workspace.
-    
+
 </dd>
 </dl>
 
@@ -3841,7 +3841,7 @@ client.ml_models.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -3891,7 +3891,7 @@ client.sandboxes.deploy_prompt(
 <dd>
 
 **id:** `str` — A UUID string identifying this sandbox.
-    
+
 </dd>
 </dl>
 
@@ -3899,7 +3899,7 @@ client.sandboxes.deploy_prompt(
 <dd>
 
 **prompt_variant_id:** `str` — An ID identifying the Prompt you'd like to deploy.
-    
+
 </dd>
 </dl>
 
@@ -3907,7 +3907,7 @@ client.sandboxes.deploy_prompt(
 <dd>
 
 **prompt_deployment_id:** `typing.Optional[str]` — The Vellum-generated ID of the Prompt Deployment you'd like to update. Cannot specify both this and prompt_deployment_name. Leave null to create a new Prompt Deployment.
-    
+
 </dd>
 </dl>
 
@@ -3915,7 +3915,7 @@ client.sandboxes.deploy_prompt(
 <dd>
 
 **prompt_deployment_name:** `typing.Optional[str]` — The unique name of the Prompt Deployment you'd like to either create or update. Cannot specify both this and prompt_deployment_id. If provided and matches an existing Prompt Deployment, that Prompt Deployment will be updated. Otherwise, a new Prompt Deployment will be created.
-    
+
 </dd>
 </dl>
 
@@ -3923,7 +3923,7 @@ client.sandboxes.deploy_prompt(
 <dd>
 
 **label:** `typing.Optional[str]` — In the event that a new Prompt Deployment is created, this will be the label it's given.
-    
+
 </dd>
 </dl>
 
@@ -3931,7 +3931,7 @@ client.sandboxes.deploy_prompt(
 <dd>
 
 **release_tags:** `typing.Optional[typing.Sequence[str]]` — Optionally provide the release tags that you'd like to be associated with the latest release of the created/updated Prompt Deployment.
-    
+
 </dd>
 </dl>
 
@@ -3939,7 +3939,7 @@ client.sandboxes.deploy_prompt(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4027,7 +4027,7 @@ client.sandboxes.upsert_sandbox_scenario(
 <dd>
 
 **id:** `str` — A UUID string identifying this sandbox.
-    
+
 </dd>
 </dl>
 
@@ -4035,15 +4035,15 @@ client.sandboxes.upsert_sandbox_scenario(
 <dd>
 
 **inputs:** `typing.Sequence[NamedScenarioInputRequest]` — The inputs for the scenario
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**label:** `typing.Optional[str]` 
-    
+**label:** `typing.Optional[str]`
+
 </dd>
 </dl>
 
@@ -4051,7 +4051,7 @@ client.sandboxes.upsert_sandbox_scenario(
 <dd>
 
 **scenario_id:** `typing.Optional[str]` — The id of the scenario to update. If none is provided, an id will be generated and a new scenario will be appended.
-    
+
 </dd>
 </dl>
 
@@ -4059,7 +4059,7 @@ client.sandboxes.upsert_sandbox_scenario(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4122,7 +4122,7 @@ client.sandboxes.delete_sandbox_scenario(
 <dd>
 
 **id:** `str` — A UUID string identifying this sandbox.
-    
+
 </dd>
 </dl>
 
@@ -4130,7 +4130,7 @@ client.sandboxes.delete_sandbox_scenario(
 <dd>
 
 **scenario_id:** `str` — An id identifying the scenario that you'd like to delete
-    
+
 </dd>
 </dl>
 
@@ -4138,7 +4138,7 @@ client.sandboxes.delete_sandbox_scenario(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4209,7 +4209,7 @@ client.test_suite_runs.create(
 <dd>
 
 **exec_config:** `TestSuiteRunExecConfigRequest` — Configuration that defines how the Test Suite should be run
-    
+
 </dd>
 </dl>
 
@@ -4217,7 +4217,7 @@ client.test_suite_runs.create(
 <dd>
 
 **test_suite_id:** `typing.Optional[str]` — The ID of the Test Suite to run. Must provide either this or test_suite_id.
-    
+
 </dd>
 </dl>
 
@@ -4225,7 +4225,7 @@ client.test_suite_runs.create(
 <dd>
 
 **test_suite_name:** `typing.Optional[str]` — The name of the Test Suite to run. Must provide either this or test_suite_id.
-    
+
 </dd>
 </dl>
 
@@ -4233,7 +4233,7 @@ client.test_suite_runs.create(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4295,7 +4295,7 @@ client.test_suite_runs.retrieve(
 <dd>
 
 **id:** `str` — A UUID string identifying this test suite run.
-    
+
 </dd>
 </dl>
 
@@ -4303,7 +4303,7 @@ client.test_suite_runs.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4351,21 +4351,21 @@ client.test_suite_runs.list_executions(
 <dd>
 
 **id:** `str` — A UUID string identifying this test suite run.
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**expand:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` 
+**expand:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]`
 
 The response fields to expand for more information.
 
 - 'results.metric_results.metric_label' expands the metric label for each metric result.
 - 'results.metric_results.metric_definition' expands the metric definition for each metric result.
 - 'results.metric_results.metric_definition.name' expands the metric definition name for each metric result.
-    
+
 </dd>
 </dl>
 
@@ -4373,7 +4373,7 @@ The response fields to expand for more information.
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -4381,7 +4381,7 @@ The response fields to expand for more information.
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -4389,7 +4389,7 @@ The response fields to expand for more information.
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4452,7 +4452,7 @@ client.test_suites.list_test_suite_test_cases(
 <dd>
 
 **id:** `str` — Either the Test Suites' ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -4460,7 +4460,7 @@ client.test_suites.list_test_suite_test_cases(
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -4468,7 +4468,7 @@ client.test_suites.list_test_suite_test_cases(
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -4476,7 +4476,7 @@ client.test_suites.list_test_suite_test_cases(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4554,7 +4554,7 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **id_:** `str` — Either the Test Suites' ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -4562,7 +4562,7 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **input_values:** `typing.Sequence[NamedTestCaseVariableValueRequest]` — Values for each of the Test Case's input variables
-    
+
 </dd>
 </dl>
 
@@ -4570,7 +4570,7 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **evaluation_values:** `typing.Sequence[NamedTestCaseVariableValueRequest]` — Values for each of the Test Case's evaluation variables
-    
+
 </dd>
 </dl>
 
@@ -4578,7 +4578,7 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **id:** `typing.Optional[str]` — The Vellum-generated ID of an existing Test Case whose data you'd like to replace. If specified and no Test Case exists with this ID, a 404 will be returned.
-    
+
 </dd>
 </dl>
 
@@ -4586,7 +4586,7 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **external_id:** `typing.Optional[str]` — An ID external to Vellum that uniquely identifies the Test Case that you'd like to create/update. If there's a match on a Test Case that was previously created with the same external_id, it will be updated. Otherwise, a new Test Case will be created with this value as its external_id. If no external_id is specified, then a new Test Case will always be created.
-    
+
 </dd>
 </dl>
 
@@ -4594,7 +4594,7 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **label:** `typing.Optional[str]` — A human-readable label used to convey the intention of this Test Case
-    
+
 </dd>
 </dl>
 
@@ -4602,7 +4602,7 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4688,15 +4688,15 @@ for chunk in response:
 <dd>
 
 **id:** `str` — Either the Test Suites' ID or its unique name
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**request:** `typing.Sequence[TestSuiteTestCaseBulkOperationRequest]` 
-    
+**request:** `typing.Sequence[TestSuiteTestCaseBulkOperationRequest]`
+
 </dd>
 </dl>
 
@@ -4704,7 +4704,7 @@ for chunk in response:
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4767,7 +4767,7 @@ client.test_suites.delete_test_suite_test_case(
 <dd>
 
 **id:** `str` — Either the Test Suites' ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -4775,7 +4775,7 @@ client.test_suites.delete_test_suite_test_case(
 <dd>
 
 **test_case_id:** `str` — An id identifying the test case that you'd like to delete
-    
+
 </dd>
 </dl>
 
@@ -4783,7 +4783,7 @@ client.test_suites.delete_test_suite_test_case(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4844,7 +4844,7 @@ client.workflow_deployments.list()
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -4852,7 +4852,7 @@ client.workflow_deployments.list()
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -4860,7 +4860,7 @@ client.workflow_deployments.list()
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
@@ -4868,7 +4868,7 @@ client.workflow_deployments.list()
 <dd>
 
 **status:** `typing.Optional[WorkflowDeploymentsListRequestStatus]` — status
-    
+
 </dd>
 </dl>
 
@@ -4876,7 +4876,7 @@ client.workflow_deployments.list()
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -4938,7 +4938,7 @@ client.workflow_deployments.retrieve(
 <dd>
 
 **id:** `str` — Either the Workflow Deployment's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -4946,7 +4946,7 @@ client.workflow_deployments.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5009,7 +5009,7 @@ client.workflow_deployments.workflow_deployment_history_item_retrieve(
 <dd>
 
 **history_id_or_release_tag:** `str` — Either the UUID of Workflow Deployment History Item you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment History Item you'd like to retrieve.
-    
+
 </dd>
 </dl>
 
@@ -5017,7 +5017,7 @@ client.workflow_deployments.workflow_deployment_history_item_retrieve(
 <dd>
 
 **id:** `str` — A UUID string identifying this workflow deployment.
-    
+
 </dd>
 </dl>
 
@@ -5025,7 +5025,7 @@ client.workflow_deployments.workflow_deployment_history_item_retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5087,7 +5087,7 @@ client.workflow_deployments.list_workflow_release_tags(
 <dd>
 
 **id:** `str` — Either the Workflow Deployment's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -5095,7 +5095,7 @@ client.workflow_deployments.list_workflow_release_tags(
 <dd>
 
 **limit:** `typing.Optional[int]` — Number of results to return per page.
-    
+
 </dd>
 </dl>
 
@@ -5103,7 +5103,7 @@ client.workflow_deployments.list_workflow_release_tags(
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the results.
-    
+
 </dd>
 </dl>
 
@@ -5111,15 +5111,15 @@ client.workflow_deployments.list_workflow_release_tags(
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**source:** `typing.Optional[ListWorkflowReleaseTagsRequestSource]` 
-    
+**source:** `typing.Optional[ListWorkflowReleaseTagsRequestSource]`
+
 </dd>
 </dl>
 
@@ -5127,7 +5127,7 @@ client.workflow_deployments.list_workflow_release_tags(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5190,7 +5190,7 @@ client.workflow_deployments.retrieve_workflow_release_tag(
 <dd>
 
 **id:** `str` — A UUID string identifying this workflow deployment.
-    
+
 </dd>
 </dl>
 
@@ -5198,7 +5198,7 @@ client.workflow_deployments.retrieve_workflow_release_tag(
 <dd>
 
 **name:** `str` — The name of the Release Tag associated with this Workflow Deployment that you'd like to retrieve.
-    
+
 </dd>
 </dl>
 
@@ -5206,7 +5206,7 @@ client.workflow_deployments.retrieve_workflow_release_tag(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5269,7 +5269,7 @@ client.workflow_deployments.update_workflow_release_tag(
 <dd>
 
 **id:** `str` — A UUID string identifying this workflow deployment.
-    
+
 </dd>
 </dl>
 
@@ -5277,7 +5277,7 @@ client.workflow_deployments.update_workflow_release_tag(
 <dd>
 
 **name:** `str` — The name of the Release Tag associated with this Workflow Deployment that you'd like to update.
-    
+
 </dd>
 </dl>
 
@@ -5285,7 +5285,7 @@ client.workflow_deployments.update_workflow_release_tag(
 <dd>
 
 **history_item_id:** `typing.Optional[str]` — The ID of the Workflow Deployment History Item to tag
-    
+
 </dd>
 </dl>
 
@@ -5293,7 +5293,7 @@ client.workflow_deployments.update_workflow_release_tag(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5343,7 +5343,7 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **id:** `str` — A UUID string identifying this workflow sandbox.
-    
+
 </dd>
 </dl>
 
@@ -5351,7 +5351,7 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **workflow_id:** `str` — An ID identifying the Workflow you'd like to deploy.
-    
+
 </dd>
 </dl>
 
@@ -5359,7 +5359,7 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **workflow_deployment_id:** `typing.Optional[str]` — The Vellum-generated ID of the Workflow Deployment you'd like to update. Cannot specify both this and workflow_deployment_name. Leave null to create a new Workflow Deployment.
-    
+
 </dd>
 </dl>
 
@@ -5367,7 +5367,7 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **workflow_deployment_name:** `typing.Optional[str]` — The unique name of the Workflow Deployment you'd like to either create or update. Cannot specify both this and workflow_deployment_id. If provided and matches an existing Workflow Deployment, that Workflow Deployment will be updated. Otherwise, a new Prompt Deployment will be created.
-    
+
 </dd>
 </dl>
 
@@ -5375,7 +5375,7 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **label:** `typing.Optional[str]` — In the event that a new Workflow Deployment is created, this will be the label it's given.
-    
+
 </dd>
 </dl>
 
@@ -5383,7 +5383,7 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **release_tags:** `typing.Optional[typing.Sequence[str]]` — Optionally provide the release tags that you'd like to be associated with the latest release of the created/updated Prompt Deployment.
-    
+
 </dd>
 </dl>
 
@@ -5391,7 +5391,7 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5455,31 +5455,31 @@ client.workflows.push(
 <dd>
 
 **exec_config:** `WorkflowPushExecConfig` — The execution configuration of the workflow.
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**label:** `str` 
-    
+**label:** `str`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**workflow_sandbox_id:** `typing.Optional[str]` 
-    
+**workflow_sandbox_id:** `typing.Optional[str]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**deployment_config:** `typing.Optional[WorkflowPushDeploymentConfigRequest]` 
-    
+**deployment_config:** `typing.Optional[WorkflowPushDeploymentConfigRequest]`
+
 </dd>
 </dl>
 
@@ -5489,7 +5489,7 @@ client.workflows.push(
 **artifact:** `from __future__ import annotations
 
 typing.Optional[core.File]` — See core.File for more documentation
-    
+
 </dd>
 </dl>
 
@@ -5497,7 +5497,7 @@ typing.Optional[core.File]` — See core.File for more documentation
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5560,7 +5560,7 @@ client.workspace_secrets.retrieve(
 <dd>
 
 **id:** `str` — Either the Workspace Secret's ID or its unique name
-    
+
 </dd>
 </dl>
 
@@ -5568,7 +5568,7 @@ client.workspace_secrets.retrieve(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5630,23 +5630,23 @@ client.workspace_secrets.partial_update(
 <dd>
 
 **id:** `str` — Either the Workspace Secret's ID or its unique name
-    
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**label:** `typing.Optional[str]` 
-    
+**label:** `typing.Optional[str]`
+
 </dd>
 </dl>
 
 <dl>
 <dd>
 
-**value:** `typing.Optional[str]` 
-    
+**value:** `typing.Optional[str]`
+
 </dd>
 </dl>
 
@@ -5654,7 +5654,7 @@ client.workspace_secrets.partial_update(
 <dd>
 
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
+
 </dd>
 </dl>
 </dd>
@@ -5664,4 +5664,3 @@ client.workspace_secrets.partial_update(
 </dd>
 </dl>
 </details>
-
