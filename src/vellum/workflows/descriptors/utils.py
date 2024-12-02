@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional, Sequence, Set, TypeVar, Union, cast, ove
 
 from pydantic import BaseModel
 
+from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.state.base import BaseState
 
@@ -88,3 +89,29 @@ def resolve_value(
         return cast(_T, set_value)
 
     return value
+
+
+def is_unresolved(value: Any) -> bool:
+    """
+    Recursively checks if a value has an unresolved value, represented by UNDEF.
+    """
+
+    if value is UNDEF:
+        return True
+
+    if dataclasses.is_dataclass(value):
+        return any(is_unresolved(getattr(value, field.name)) for field in dataclasses.fields(value))
+
+    if isinstance(value, BaseModel):
+        return any(is_unresolved(getattr(value, key)) for key in value.model_fields.keys())
+
+    if isinstance(value, Mapping):
+        return any(is_unresolved(item) for item in value.values())
+
+    if isinstance(value, Sequence):
+        return any(is_unresolved(item) for item in value)
+
+    if isinstance(value, Set):
+        return any(is_unresolved(item) for item in value)
+
+    return False

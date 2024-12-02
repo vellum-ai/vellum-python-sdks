@@ -12,5 +12,5 @@ def test_workflow__happy_path():
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
     assert terminal_event.outputs == {
         "final_value": "hello",
-        "final_counter": 3,
+        "final_counter": 2,
     }

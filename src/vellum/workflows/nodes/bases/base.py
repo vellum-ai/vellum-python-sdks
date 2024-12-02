@@ -1,11 +1,12 @@
 from functools import cached_property, reduce
 import inspect
 from types import MappingProxyType
+from uuid import UUID
 from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors.types import VellumErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -224,35 +225,36 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
         @classmethod
-        def should_initiate(
-            cls, state: StateType, dependencies: Set["Type[BaseNode]"], invoked_by: "Optional[Edge]" = None
-        ) -> bool:
+        def should_initiate(cls, state: StateType, dependencies: Set["Type[BaseNode]"], node_span_id: UUID) -> bool:
             """
             Determines whether a Node's execution should be initiated. Override this method to define custom
             trigger criteria.
             """
 
-            if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
-                if not invoked_by:
-                    return True
+            if cls.merge_behavior == MergeBehavior.AWAIT_ATTRIBUTES:
+                if state.meta.node_execution_cache.is_node_execution_initiated(cls.node_class, node_span_id):
+                    return False
 
-                is_ready = not state.meta.node_execution_cache.is_node_initiated(cls.node_class)
+                is_ready = True
+                for descriptor in cls.node_class:
+                    if not descriptor.instance:
+                        continue
 
-                invoked_identifier = str(invoked_by.from_port.node_class)
-                node_identifier = str(cls.node_class)
-
-                dependencies_invoked = state.meta.node_execution_cache.dependencies_invoked[node_identifier]
-                dependencies_invoked.add(invoked_identifier)
-                if all(str(dep) in dependencies_invoked for dep in dependencies):
-                    del state.meta.node_execution_cache.dependencies_invoked[node_identifier]
+                    resolved_value = resolve_value(descriptor.instance, state, path=descriptor.name)
+                    if is_unresolved(resolved_value):
+                        is_ready = False
+                        break
 
                 return is_ready
 
-            if cls.merge_behavior == MergeBehavior.AWAIT_ALL:
-                if not invoked_by:
-                    return True
+            if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
+                if state.meta.node_execution_cache.is_node_execution_initiated(cls.node_class, node_span_id):
+                    return False
 
-                if state.meta.node_execution_cache.is_node_initiated(cls.node_class):
+                return True
+
+            if cls.merge_behavior == MergeBehavior.AWAIT_ALL:
+                if state.meta.node_execution_cache.is_node_execution_initiated(cls.node_class, node_span_id):
                     return False
 
                 """
@@ -260,12 +262,10 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 when all of its dependencies have been executed N times.
                 """
                 current_node_execution_count = state.meta.node_execution_cache.get_execution_count(cls.node_class)
-                is_ready_outcome = all(
+                return all(
                     state.meta.node_execution_cache.get_execution_count(dep) == current_node_execution_count + 1
                     for dep in dependencies
                 )
-
-                return is_ready_outcome
 
             raise NodeException(message="Invalid Trigger Node Specification", code=VellumErrorCode.INVALID_INPUTS)
 
