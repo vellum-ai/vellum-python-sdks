@@ -3,20 +3,27 @@ import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { VellumValue as VellumValueType } from "vellum-ai/api/types";
 
 import { PortContext } from "src/context/port-context";
-import { VellumValue } from "src/generators/vellum-variable-value";
+import { NodeInputValuePointer } from "src/generators/node-inputs";
 import {
   ConditionalNodeConditionData,
   ConditionalRuleData,
+  ExecutionCounterData,
+  InputVariableData,
+  NodeInput as NodeInputType,
+  NodeInputValuePointer as NodeInputValuePointerType,
+  NodeOutputData,
+  WorkspaceSecretData,
 } from "src/types/vellum";
+import { toSnakeCase } from "src/utils/casing";
+import { assertUnreachable } from "src/utils/typing";
 
 export declare namespace ConditionalNodePort {
   export interface Args {
     portContext: PortContext;
-    inputVarIdsByRuleId: Map<string, string>;
-    constantValuesByRuleIds: Map<string, VellumValueType>;
+    inputFieldsByRuleId: Map<string, NodeInputType>;
+    valueInputsByRuleIds: Map<string, NodeInputValuePointerType>;
     conditionData: ConditionalNodeConditionData;
   }
 }
@@ -24,16 +31,16 @@ export declare namespace ConditionalNodePort {
 export class ConditionalNodePort extends AstNode {
   private portContext: PortContext;
   private conditionalNodeData: ConditionalNodeConditionData;
-  private inputVarIdsByRuleId: Map<string, string>;
-  private constantValuesByRuleIds: Map<string, VellumValueType>;
+  private inputFieldsByRuleId: Map<string, NodeInputType>;
+  private valueInputsByRuleIds: Map<string, NodeInputValuePointerType>;
   private astNode: AstNode;
 
   public constructor(args: ConditionalNodePort.Args) {
     super();
 
     this.portContext = args.portContext;
-    this.inputVarIdsByRuleId = args.inputVarIdsByRuleId;
-    this.constantValuesByRuleIds = args.constantValuesByRuleIds;
+    this.inputFieldsByRuleId = args.inputFieldsByRuleId;
+    this.valueInputsByRuleIds = args.valueInputsByRuleIds;
     this.conditionalNodeData = args.conditionData;
     this.astNode = this.constructPort();
     this.inheritReferences(this.astNode);
@@ -124,29 +131,118 @@ export class ConditionalNodePort extends AstNode {
 
   private buildDescriptor(conditionData: ConditionalRuleData): AstNode {
     const ruleId = conditionData.id;
-    const inputId = this.inputVarIdsByRuleId.get(ruleId);
-    if (!inputId) {
-      throw new Error(`No input variable id found given ${ruleId}`);
+    const fieldInput = this.inputFieldsByRuleId.get(ruleId);
+    if (!fieldInput) {
+      throw new Error(`No input found given ${ruleId}`);
     }
-    const inputVariableContext =
-      this.portContext.workflowContext.getInputVariableContextById(inputId);
-    const field = inputVariableContext.getInputVariableData().key;
+
+    const rule = fieldInput.value.rules[0];
+    if (!rule) {
+      throw new Error(`No node input pointer for rule ${ruleId}`);
+    }
+    let fieldInputRef;
+    switch (rule.type) {
+      case "CONSTANT_VALUE": {
+        throw new Error(
+          "Descriptors with a constant value on the left hand side is not supported"
+        );
+      }
+      case "NODE_OUTPUT": {
+        const data = rule.data as NodeOutputData;
+        const nodeContext = this.portContext.workflowContext.getNodeContext(
+          data.nodeId
+        );
+        fieldInputRef = python.reference({
+          name: nodeContext.getNodeOutputNameById(data.outputId),
+          modulePath: nodeContext.nodeModulePath,
+          attribute: (() => {
+            return conditionData.operator
+              ? [this.convertOperatorToMethod(conditionData.operator)]
+              : [];
+          })(),
+        });
+        break;
+      }
+      case "INPUT_VARIABLE": {
+        const data = rule.data as InputVariableData;
+        const inputContext =
+          this.portContext.workflowContext.getInputVariableContextById(
+            data.inputVariableId
+          );
+        fieldInputRef = python.reference({
+          name: "Inputs",
+          modulePath: inputContext.modulePath,
+          attribute: (() => {
+            return conditionData.operator
+              ? [
+                  toSnakeCase(inputContext.getInputVariableName()),
+                  this.convertOperatorToMethod(conditionData.operator),
+                ]
+              : [];
+          })(),
+        });
+        break;
+      }
+      case "WORKSPACE_SECRET": {
+        const data = rule.data as WorkspaceSecretData;
+        if (data.workspaceSecretId) {
+          fieldInputRef = python.reference({
+            name: "VellumSecretReference",
+            modulePath: [
+              ...this.portContext.workflowContext.sdkModulePathNames
+                .WORKFLOWS_MODULE_PATH,
+              "references",
+            ],
+            attribute: (() => {
+              return conditionData.operator
+                ? [
+                    data.workspaceSecretId,
+                    this.convertOperatorToMethod(conditionData.operator),
+                  ]
+                : [];
+            })(),
+          });
+        }
+        break;
+      }
+      case "EXECUTION_COUNTER": {
+        const data = rule.data as ExecutionCounterData;
+        const nodeContext = this.portContext.nodeContext;
+        fieldInputRef = python.reference({
+          name: nodeContext.getNodeOutputNameById(data.nodeId),
+          modulePath: nodeContext.nodeModulePath,
+          attribute: (() => {
+            return conditionData.operator
+              ? [
+                  "Execution",
+                  "count",
+                  this.convertOperatorToMethod(conditionData.operator),
+                ]
+              : [];
+          })(),
+        });
+        break;
+      }
+      default: {
+        assertUnreachable(rule);
+      }
+    }
+
+    if (!fieldInputRef) {
+      throw new Error("No reference made for field input");
+    }
+
     return python.invokeMethod({
-      methodReference: python.reference({
-        name: "Inputs",
-        modulePath: inputVariableContext.modulePath,
-        attribute: (() => {
-          return conditionData.operator
-            ? [field, this.convertOperatorToMethod(conditionData.operator)]
-            : [];
-        })(),
-      }),
+      methodReference: fieldInputRef,
       arguments_: (() => {
-        const value = this.constantValuesByRuleIds.get(ruleId);
+        const value = this.valueInputsByRuleIds.get(ruleId);
         return value
           ? [
               new MethodArgument({
-                value: new VellumValue({ vellumValue: value }),
+                value: new NodeInputValuePointer({
+                  workflowContext: this.portContext.workflowContext,
+                  nodeInputValuePointerData: value,
+                }),
               }),
             ]
           : [];

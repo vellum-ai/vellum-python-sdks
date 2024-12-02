@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
-import * as codegen from "src/codegen";
 import { PORTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -140,7 +139,7 @@ export abstract class BaseNode<
     }
 
     this.nodeData.inputs.forEach((nodeInputData) => {
-      const nodeInput = codegen.nodeInput({
+      const nodeInput = new NodeInput({
         workflowContext: this.workflowContext,
         nodeInputData,
       });
