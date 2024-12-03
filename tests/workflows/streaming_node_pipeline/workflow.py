@@ -31,7 +31,10 @@ class FirstNode(BaseNode[State]):
             return set()
 
         def __lt__(self, output: BaseOutput) -> Set[Port]:
-            return {self.default}
+            if output.is_initiated:
+                return {self.default}
+
+            return set()
 
     def run(self) -> Iterator[BaseOutput]:
         reversed_fruits = []
