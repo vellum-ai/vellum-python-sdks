@@ -55,6 +55,10 @@ jobs:
         working-directory: ee/codegen
 
   publish:
+    permissions:
+      contents: "read"
+      id-token: "write"
+
     needs: [compile, test]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-20.04
@@ -84,14 +88,11 @@ jobs:
           service_account: "github-gcr-service-account@vocify-prod.iam.gserviceaccount.com"
           access_token_lifetime: "1200s"
 
-      - name: Authenticate with registry
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
-        run: npm run gar-login
-        working-directory: ee/codegen
-
       - name: Publish
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
-        run: npm publish
+        run: |
+          npm config set @vellum-ai:registry https://us-central1-npm.pkg.dev/vocify-prod/vellum-private-npm
+          npm run gar-login
+          npm publish
         working-directory: ee/codegen
