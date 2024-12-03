@@ -5,10 +5,18 @@ import { ErrorNode } from "src/types/vellum";
 
 export class ErrorNodeContext extends BaseNodeContext<ErrorNode> {
   getNodeOutputNamesById(): Record<string, string> {
-    return {};
+    return {
+      [this.nodeData.data.errorOutputId]: "error",
+    };
   }
 
   createPortContexts(): PortContext[] {
-    return [];
+    return [
+      new PortContext({
+        workflowContext: this.workflowContext,
+        nodeContext: this,
+        portId: this.nodeData.data.sourceHandleId,
+      }),
+    ];
   }
 }

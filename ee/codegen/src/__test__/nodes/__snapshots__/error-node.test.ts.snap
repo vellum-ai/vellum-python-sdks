@@ -1,0 +1,34 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ErrorNode > basic > getNodeDisplayFile 1`] = `
+"from vellum_ee.workflows.display.nodes import BaseErrorNodeDisplay
+from ...nodes.error_node import ErrorNode
+from uuid import UUID
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+
+class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
+    label = "Error Node"
+    node_input_ids_by_name = {
+        "error_source_input_id": UUID("d2287fee-98fb-421c-9464-e54d8f70f046")
+    }
+    port_displays = {
+        ErrorNode.Ports.default: PortDisplayOverrides(
+            id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`ErrorNode > basic > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import ErrorNode as BaseErrorNode
+
+
+class ErrorNode(BaseErrorNode):
+    error = None
+"
+`;

@@ -578,6 +578,7 @@ export interface ErrorNodeData {
   targetHandleId: string;
   errorSourceInputId: string;
   errorOutputId: string;
+  sourceHandleId: string;
 }
 
 export interface ErrorNode extends BaseDisplayableWorkflowNode {
