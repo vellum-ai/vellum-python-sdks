@@ -29,8 +29,12 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.foobar: WorkflowInputsVellumDisplayOverrides(id=UUID("5f64210f-ec43-48ce-ae40-40a9ba4c4c11")),
-        Inputs.bazbaz: WorkflowInputsVellumDisplayOverrides(id=UUID("b81c5c88-9528-47d0-8106-14a75520ed47")),
+        Inputs.foobar: WorkflowInputsVellumDisplayOverrides(
+            id=UUID("5f64210f-ec43-48ce-ae40-40a9ba4c4c11"), required=True
+        ),
+        Inputs.bazbaz: WorkflowInputsVellumDisplayOverrides(
+            id=UUID("b81c5c88-9528-47d0-8106-14a75520ed47"), required=True
+        ),
     }
     entrypoint_displays = {
         ConditionalNode: EntrypointVellumDisplayOverrides(

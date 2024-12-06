@@ -20,6 +20,7 @@ WorkflowMetaDisplayOverridesType = TypeVar("WorkflowMetaDisplayOverridesType", b
 @dataclass
 class WorkflowInputsDisplayOverrides:
     id: UUID
+    required: Optional[bool] = None
     color: Optional[str] = None
 
 

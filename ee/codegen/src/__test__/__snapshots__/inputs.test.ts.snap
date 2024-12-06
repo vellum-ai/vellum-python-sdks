@@ -44,3 +44,117 @@ class Inputs(BaseInputs):
     input2: float
 "
 `;
+
+exports[`Inputs > write > should generate correct code when default is a 'ARRAY' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from typing import List
+from vellum import VellumValue
+
+
+class Inputs(BaseInputs):
+    array_input: List[VellumValue] = ["Example String", 123]
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'AUDIO' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from vellum import VellumAudio
+
+
+class Inputs(BaseInputs):
+    audio_input: VellumAudio
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'CHAT_HISTORY' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from typing import List
+from vellum import ChatMessage
+
+
+class Inputs(BaseInputs):
+    chat_history_input: List[ChatMessage] = [
+        ChatMessageRequest(role="USER", text="foo bar")
+    ]
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'ERROR' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from vellum import VellumError
+
+
+class Inputs(BaseInputs):
+    error_input: VellumError = VellumError(
+        message="Some 500 error", code="INTERNAL_SERVER_ERROR"
+    )
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'FUNCTION_CALL' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from vellum import FunctionCall
+
+
+class Inputs(BaseInputs):
+    function_call_input: FunctionCall = FunctionCall(
+        arguments={"arg1": "Hello World"}, name="function_call"
+    )
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'IMAGE' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from vellum import VellumImage
+
+
+class Inputs(BaseInputs):
+    image_input: VellumImage
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'JSON' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from typing import Any
+
+
+class Inputs(BaseInputs):
+    json_input: Any = {"key": "value"}
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'NUMBER' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    number_input: float = 123
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'SEARCH_RESULTS' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from typing import List
+from vellum import SearchResult, Document
+
+
+class Inputs(BaseInputs):
+    search_results_input: List[SearchResult] = [
+        SearchResult(
+            text="Hello, World!",
+            score=1,
+            keywords=["foo", "bar"],
+            document=Document(id="", label="Example Document"),
+        )
+    ]
+"
+`;
+
+exports[`Inputs > write > should generate correct code when default is a 'STRING' 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    string_input: str = "Example String"
+"
+`;

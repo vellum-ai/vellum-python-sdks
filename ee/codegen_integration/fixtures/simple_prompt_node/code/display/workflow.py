@@ -29,7 +29,9 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.text: WorkflowInputsVellumDisplayOverrides(id=UUID("90c6afd3-06cc-430d-aed1-35937c062531"))
+        Inputs.text: WorkflowInputsVellumDisplayOverrides(
+            id=UUID("90c6afd3-06cc-430d-aed1-35937c062531"), required=True
+        )
     }
     entrypoint_displays = {
         PromptNode: EntrypointVellumDisplayOverrides(

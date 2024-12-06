@@ -311,9 +311,12 @@
       "id": "a6ef8809-346e-469c-beed-2e5c4e9844c5",
       "key": "query",
       "type": "STRING",
-      "default": null,
+      "default": {
+        "type": "STRING",
+        "value": "Search node query default"
+      },
       "required": true,
-      "extensions": { "color": null }
+      "extensions": { "color": "someColor" }
     }
   ],
   "output_variables": [

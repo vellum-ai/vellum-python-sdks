@@ -78,6 +78,9 @@ export class Inputs extends BasePersistedFile {
           id: inputVariableData.id,
           name: inputVariableName,
           type: inputVariableData.type,
+          required: inputVariableData.required,
+          default: inputVariableData.default,
+          extensions: inputVariableData.extensions,
         },
       });
 
