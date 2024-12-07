@@ -1,3 +1,4 @@
+import pytest
 import io
 import json
 import os
@@ -74,7 +75,15 @@ def test_push__multiple_workflows_configured__not_found_module(mock_module):
     assert str(result.exception) == f"No workflow config for '{module}' found in project to push."
 
 
-def test_push__happy_path(mock_module, vellum_client):
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["push"],
+        ["push", "workflows"],
+    ],
+    ids=["push", "push_workflows"],
+)
+def test_push__happy_path(mock_module, vellum_client, base_command):
     # GIVEN a single workflow configured
     temp_dir, module, _ = mock_module
 
@@ -97,7 +106,7 @@ class ExampleWorkflow(BaseWorkflow):
 
     # WHEN calling `vellum push`
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["push", module])
+    result = runner.invoke(cli_main, base_command + [module])
 
     # THEN it should succeed
     assert result.exit_code == 0
@@ -115,7 +124,15 @@ class ExampleWorkflow(BaseWorkflow):
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
-def test_push__deployment(mock_module, vellum_client):
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["push"],
+        ["push", "workflows"],
+    ],
+    ids=["push", "push_workflows"],
+)
+def test_push__deployment(mock_module, vellum_client, base_command):
     # GIVEN a single workflow configured
     temp_dir, module, _ = mock_module
 
@@ -138,7 +155,7 @@ class ExampleWorkflow(BaseWorkflow):
 
     # WHEN calling `vellum push`
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["push", module, "--deploy"])
+    result = runner.invoke(cli_main, base_command + [module, "--deploy"])
 
     # THEN it should succeed
     assert result.exit_code == 0

@@ -1,3 +1,4 @@
+import pytest
 import io
 import os
 import tempfile
@@ -25,7 +26,15 @@ def _zip_file_map(file_map: dict[str, str]) -> bytes:
     return zip_bytes
 
 
-def test_pull(vellum_client, mock_module):
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["pull"],
+        ["pull", "workflows"],
+    ],
+    ids=["pull", "pull_workflows"],
+)
+def test_pull(vellum_client, mock_module, base_command):
     # GIVEN a module on the user's filesystem
     temp_dir, module, _ = mock_module
 
@@ -34,7 +43,7 @@ def test_pull(vellum_client, mock_module):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["pull", module])
+    result = runner.invoke(cli_main, base_command + [module])
 
     # THEN the command returns successfully
     assert result.exit_code == 0

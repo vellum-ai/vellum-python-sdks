@@ -20,12 +20,12 @@ from vellum_ee.workflows.display.workflows.vellum_workflow_display import Vellum
 
 
 def push_command(
-    module: Optional[str],
-    deploy: Optional[bool],
-    deployment_label: Optional[str],
-    deployment_name: Optional[str],
-    deployment_description: Optional[str],
-    release_tags: Optional[List[str]],
+    module: Optional[str] = None,
+    deploy: Optional[bool] = None,
+    deployment_label: Optional[str] = None,
+    deployment_name: Optional[str] = None,
+    deployment_description: Optional[str] = None,
+    release_tags: Optional[List[str]] = None,
 ) -> None:
     load_dotenv()
     logger = load_cli_logger()
