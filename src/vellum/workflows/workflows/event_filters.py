@@ -46,7 +46,10 @@ def root_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event:
     if event.parent.type != "WORKFLOW":
         return False
 
-    return event.parent.workflow_definition == CodeResourceDefinition.encode(workflow_definition)
+    event_parent_definition = event.parent.workflow_definition
+    current_workflow_definition = CodeResourceDefinition.encode(workflow_definition)
+
+    return event_parent_definition.model_dump() == current_workflow_definition.model_dump()
 
 
 def all_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event: "WorkflowEvent") -> bool:
