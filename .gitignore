@@ -10,4 +10,3 @@ ee/codegen/lib/
 examples/.ipynb_checkpoints/
 node_modules/
 tsconfig.tsbuildinfo
-.idea

@@ -9542,24 +9542,32 @@ components:
     TestSuiteRunExecConfig:
       oneOf:
       - $ref: '#/components/schemas/TestSuiteRunDeploymentReleaseTagExecConfig'
+      - $ref: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfig'
       - $ref: '#/components/schemas/TestSuiteRunWorkflowReleaseTagExecConfig'
+      - $ref: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfig'
       - $ref: '#/components/schemas/TestSuiteRunExternalExecConfig'
       discriminator:
         propertyName: type
         mapping:
           DEPLOYMENT_RELEASE_TAG: '#/components/schemas/TestSuiteRunDeploymentReleaseTagExecConfig'
+          PROMPT_SANDBOX_HISTORY_ITEM: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfig'
           WORKFLOW_RELEASE_TAG: '#/components/schemas/TestSuiteRunWorkflowReleaseTagExecConfig'
+          WORKFLOW_SANDBOX_HISTORY_ITEM: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfig'
           EXTERNAL: '#/components/schemas/TestSuiteRunExternalExecConfig'
     TestSuiteRunExecConfigRequest:
       oneOf:
       - $ref: '#/components/schemas/TestSuiteRunDeploymentReleaseTagExecConfigRequest'
+      - $ref: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfigRequest'
       - $ref: '#/components/schemas/TestSuiteRunWorkflowReleaseTagExecConfigRequest'
+      - $ref: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfigRequest'
       - $ref: '#/components/schemas/TestSuiteRunExternalExecConfigRequest'
       discriminator:
         propertyName: type
         mapping:
           DEPLOYMENT_RELEASE_TAG: '#/components/schemas/TestSuiteRunDeploymentReleaseTagExecConfigRequest'
+          PROMPT_SANDBOX_HISTORY_ITEM: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfigRequest'
           WORKFLOW_RELEASE_TAG: '#/components/schemas/TestSuiteRunWorkflowReleaseTagExecConfigRequest'
+          WORKFLOW_SANDBOX_HISTORY_ITEM: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfigRequest'
           EXTERNAL: '#/components/schemas/TestSuiteRunExternalExecConfigRequest'
     TestSuiteRunExecution:
       type: object
@@ -9949,6 +9957,80 @@ components:
       - STRING
       type: string
       description: '* `STRING` - STRING'
+    TestSuiteRunPromptSandboxHistoryItemExecConfig:
+      type: object
+      description: Execution configuration for running a Test Suite against a Prompt
+        Sandbox History Item
+      properties:
+        type:
+          $ref: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfigTypeEnum'
+        data:
+          $ref: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfigData'
+        test_case_ids:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Optionally specify a subset of test case ids to run. If not
+            provided, all test cases within the test suite will be run by default.
+      required:
+      - data
+    TestSuiteRunPromptSandboxHistoryItemExecConfigData:
+      type: object
+      properties:
+        history_item_id:
+          type: string
+          format: uuid
+          description: The ID of the Prompt Sandbox History Item that the Test Suite
+            will run against.
+        prompt_variant_id:
+          type: string
+          format: uuid
+          description: The ID of the Prompt Variant within the Prompt Sandbox History
+            Item that you'd like to run the Test Suite against.
+      required:
+      - history_item_id
+      - prompt_variant_id
+    TestSuiteRunPromptSandboxHistoryItemExecConfigDataRequest:
+      type: object
+      properties:
+        history_item_id:
+          type: string
+          format: uuid
+          description: The ID of the Prompt Sandbox History Item that the Test Suite
+            will run against.
+        prompt_variant_id:
+          type: string
+          format: uuid
+          description: The ID of the Prompt Variant within the Prompt Sandbox History
+            Item that you'd like to run the Test Suite against.
+      required:
+      - history_item_id
+      - prompt_variant_id
+    TestSuiteRunPromptSandboxHistoryItemExecConfigRequest:
+      type: object
+      description: Execution configuration for running a Test Suite against a Prompt
+        Sandbox History Item
+      properties:
+        type:
+          $ref: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfigTypeEnum'
+        data:
+          $ref: '#/components/schemas/TestSuiteRunPromptSandboxHistoryItemExecConfigDataRequest'
+        test_case_ids:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          nullable: true
+          description: Optionally specify a subset of test case ids to run. If not
+            provided, all test cases within the test suite will be run by default.
+      required:
+      - data
+    TestSuiteRunPromptSandboxHistoryItemExecConfigTypeEnum:
+      enum:
+      - PROMPT_SANDBOX_HISTORY_ITEM
+      type: string
+      description: '* `PROMPT_SANDBOX_HISTORY_ITEM` - PROMPT_SANDBOX_HISTORY_ITEM'
     TestSuiteRunRead:
       type: object
       properties:
@@ -10085,6 +10167,80 @@ components:
       - WORKFLOW_RELEASE_TAG
       type: string
       description: '* `WORKFLOW_RELEASE_TAG` - WORKFLOW_RELEASE_TAG'
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfig:
+      type: object
+      description: Execution configuration for running a Test Suite against a Workflow
+        Sandbox History Item
+      properties:
+        type:
+          $ref: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfigTypeEnum'
+        data:
+          $ref: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfigData'
+        test_case_ids:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Optionally specify a subset of test case ids to run. If not
+            provided, all test cases within the test suite will be run by default.
+      required:
+      - data
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfigData:
+      type: object
+      properties:
+        history_item_id:
+          type: string
+          format: uuid
+          description: The ID of the Workflow Sandbox History Item that the Test Suite
+            will run against.
+        workflow_variant_id:
+          type: string
+          format: uuid
+          description: The ID of the Workflow Variant within the Workflow Sandbox
+            History Item that you'd like to run the Test Suite against.
+      required:
+      - history_item_id
+      - workflow_variant_id
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfigDataRequest:
+      type: object
+      properties:
+        history_item_id:
+          type: string
+          format: uuid
+          description: The ID of the Workflow Sandbox History Item that the Test Suite
+            will run against.
+        workflow_variant_id:
+          type: string
+          format: uuid
+          description: The ID of the Workflow Variant within the Workflow Sandbox
+            History Item that you'd like to run the Test Suite against.
+      required:
+      - history_item_id
+      - workflow_variant_id
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfigRequest:
+      type: object
+      description: Execution configuration for running a Test Suite against a Workflow
+        Sandbox History Item
+      properties:
+        type:
+          $ref: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfigTypeEnum'
+        data:
+          $ref: '#/components/schemas/TestSuiteRunWorkflowSandboxHistoryItemExecConfigDataRequest'
+        test_case_ids:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          nullable: true
+          description: Optionally specify a subset of test case ids to run. If not
+            provided, all test cases within the test suite will be run by default.
+      required:
+      - data
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfigTypeEnum:
+      enum:
+      - WORKFLOW_SANDBOX_HISTORY_ITEM
+      type: string
+      description: '* `WORKFLOW_SANDBOX_HISTORY_ITEM` - WORKFLOW_SANDBOX_HISTORY_ITEM'
     TestSuiteTestCase:
       type: object
       properties:

@@ -406,6 +406,16 @@ from .test_suite_run_metric_json_output import TestSuiteRunMetricJsonOutput
 from .test_suite_run_metric_number_output import TestSuiteRunMetricNumberOutput
 from .test_suite_run_metric_output import TestSuiteRunMetricOutput
 from .test_suite_run_metric_string_output import TestSuiteRunMetricStringOutput
+from .test_suite_run_prompt_sandbox_history_item_exec_config import TestSuiteRunPromptSandboxHistoryItemExecConfig
+from .test_suite_run_prompt_sandbox_history_item_exec_config_data import (
+    TestSuiteRunPromptSandboxHistoryItemExecConfigData,
+)
+from .test_suite_run_prompt_sandbox_history_item_exec_config_data_request import (
+    TestSuiteRunPromptSandboxHistoryItemExecConfigDataRequest,
+)
+from .test_suite_run_prompt_sandbox_history_item_exec_config_request import (
+    TestSuiteRunPromptSandboxHistoryItemExecConfigRequest,
+)
 from .test_suite_run_read import TestSuiteRunRead
 from .test_suite_run_state import TestSuiteRunState
 from .test_suite_run_test_suite import TestSuiteRunTestSuite
@@ -415,6 +425,16 @@ from .test_suite_run_workflow_release_tag_exec_config_data_request import (
     TestSuiteRunWorkflowReleaseTagExecConfigDataRequest,
 )
 from .test_suite_run_workflow_release_tag_exec_config_request import TestSuiteRunWorkflowReleaseTagExecConfigRequest
+from .test_suite_run_workflow_sandbox_history_item_exec_config import TestSuiteRunWorkflowSandboxHistoryItemExecConfig
+from .test_suite_run_workflow_sandbox_history_item_exec_config_data import (
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfigData,
+)
+from .test_suite_run_workflow_sandbox_history_item_exec_config_data_request import (
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfigDataRequest,
+)
+from .test_suite_run_workflow_sandbox_history_item_exec_config_request import (
+    TestSuiteRunWorkflowSandboxHistoryItemExecConfigRequest,
+)
 from .test_suite_test_case import TestSuiteTestCase
 from .test_suite_test_case_bulk_operation_request import TestSuiteTestCaseBulkOperationRequest
 from .test_suite_test_case_bulk_result import TestSuiteTestCaseBulkResult
@@ -893,6 +913,10 @@ __all__ = [
     "TestSuiteRunMetricNumberOutput",
     "TestSuiteRunMetricOutput",
     "TestSuiteRunMetricStringOutput",
+    "TestSuiteRunPromptSandboxHistoryItemExecConfig",
+    "TestSuiteRunPromptSandboxHistoryItemExecConfigData",
+    "TestSuiteRunPromptSandboxHistoryItemExecConfigDataRequest",
+    "TestSuiteRunPromptSandboxHistoryItemExecConfigRequest",
     "TestSuiteRunRead",
     "TestSuiteRunState",
     "TestSuiteRunTestSuite",
@@ -900,6 +924,10 @@ __all__ = [
     "TestSuiteRunWorkflowReleaseTagExecConfigData",
     "TestSuiteRunWorkflowReleaseTagExecConfigDataRequest",
     "TestSuiteRunWorkflowReleaseTagExecConfigRequest",
+    "TestSuiteRunWorkflowSandboxHistoryItemExecConfig",
+    "TestSuiteRunWorkflowSandboxHistoryItemExecConfigData",
+    "TestSuiteRunWorkflowSandboxHistoryItemExecConfigDataRequest",
+    "TestSuiteRunWorkflowSandboxHistoryItemExecConfigRequest",
     "TestSuiteTestCase",
     "TestSuiteTestCaseBulkOperationRequest",
     "TestSuiteTestCaseBulkResult",

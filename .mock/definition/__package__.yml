@@ -4950,7 +4950,9 @@ types:
     discriminated: false
     union:
       - TestSuiteRunDeploymentReleaseTagExecConfig
+      - TestSuiteRunPromptSandboxHistoryItemExecConfig
       - TestSuiteRunWorkflowReleaseTagExecConfig
+      - TestSuiteRunWorkflowSandboxHistoryItemExecConfig
       - TestSuiteRunExternalExecConfig
     source:
       openapi: openapi/openapi.yml
@@ -4958,7 +4960,9 @@ types:
     discriminated: false
     union:
       - TestSuiteRunDeploymentReleaseTagExecConfigRequest
+      - TestSuiteRunPromptSandboxHistoryItemExecConfigRequest
       - TestSuiteRunWorkflowReleaseTagExecConfigRequest
+      - TestSuiteRunWorkflowSandboxHistoryItemExecConfigRequest
       - TestSuiteRunExternalExecConfigRequest
     source:
       openapi: openapi/openapi.yml
@@ -5218,6 +5222,73 @@ types:
   TestSuiteRunMetricStringOutputTypeEnum:
     type: literal<"STRING">
     docs: '* `STRING` - STRING'
+  TestSuiteRunPromptSandboxHistoryItemExecConfig:
+    docs: >-
+      Execution configuration for running a Test Suite against a Prompt Sandbox
+      History Item
+    properties:
+      type: literal<"PROMPT_SANDBOX_HISTORY_ITEM">
+      data: TestSuiteRunPromptSandboxHistoryItemExecConfigData
+      test_case_ids:
+        type: optional<list<string>>
+        docs: >-
+          Optionally specify a subset of test case ids to run. If not provided,
+          all test cases within the test suite will be run by default.
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunPromptSandboxHistoryItemExecConfigData:
+    properties:
+      history_item_id:
+        type: string
+        docs: >-
+          The ID of the Prompt Sandbox History Item that the Test Suite will run
+          against.
+        validation:
+          format: uuid
+      prompt_variant_id:
+        type: string
+        docs: >-
+          The ID of the Prompt Variant within the Prompt Sandbox History Item
+          that you'd like to run the Test Suite against.
+        validation:
+          format: uuid
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunPromptSandboxHistoryItemExecConfigDataRequest:
+    properties:
+      history_item_id:
+        type: string
+        docs: >-
+          The ID of the Prompt Sandbox History Item that the Test Suite will run
+          against.
+        validation:
+          format: uuid
+      prompt_variant_id:
+        type: string
+        docs: >-
+          The ID of the Prompt Variant within the Prompt Sandbox History Item
+          that you'd like to run the Test Suite against.
+        validation:
+          format: uuid
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunPromptSandboxHistoryItemExecConfigRequest:
+    docs: >-
+      Execution configuration for running a Test Suite against a Prompt Sandbox
+      History Item
+    properties:
+      type: literal<"PROMPT_SANDBOX_HISTORY_ITEM">
+      data: TestSuiteRunPromptSandboxHistoryItemExecConfigDataRequest
+      test_case_ids:
+        type: optional<list<string>>
+        docs: >-
+          Optionally specify a subset of test case ids to run. If not provided,
+          all test cases within the test suite will be run by default.
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunPromptSandboxHistoryItemExecConfigTypeEnum:
+    type: literal<"PROMPT_SANDBOX_HISTORY_ITEM">
+    docs: '* `PROMPT_SANDBOX_HISTORY_ITEM` - PROMPT_SANDBOX_HISTORY_ITEM'
   TestSuiteRunRead:
     properties:
       id:
@@ -5334,6 +5405,73 @@ types:
   TestSuiteRunWorkflowReleaseTagExecConfigTypeEnum:
     type: literal<"WORKFLOW_RELEASE_TAG">
     docs: '* `WORKFLOW_RELEASE_TAG` - WORKFLOW_RELEASE_TAG'
+  TestSuiteRunWorkflowSandboxHistoryItemExecConfig:
+    docs: >-
+      Execution configuration for running a Test Suite against a Workflow
+      Sandbox History Item
+    properties:
+      type: literal<"WORKFLOW_SANDBOX_HISTORY_ITEM">
+      data: TestSuiteRunWorkflowSandboxHistoryItemExecConfigData
+      test_case_ids:
+        type: optional<list<string>>
+        docs: >-
+          Optionally specify a subset of test case ids to run. If not provided,
+          all test cases within the test suite will be run by default.
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunWorkflowSandboxHistoryItemExecConfigData:
+    properties:
+      history_item_id:
+        type: string
+        docs: >-
+          The ID of the Workflow Sandbox History Item that the Test Suite will
+          run against.
+        validation:
+          format: uuid
+      workflow_variant_id:
+        type: string
+        docs: >-
+          The ID of the Workflow Variant within the Workflow Sandbox History
+          Item that you'd like to run the Test Suite against.
+        validation:
+          format: uuid
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunWorkflowSandboxHistoryItemExecConfigDataRequest:
+    properties:
+      history_item_id:
+        type: string
+        docs: >-
+          The ID of the Workflow Sandbox History Item that the Test Suite will
+          run against.
+        validation:
+          format: uuid
+      workflow_variant_id:
+        type: string
+        docs: >-
+          The ID of the Workflow Variant within the Workflow Sandbox History
+          Item that you'd like to run the Test Suite against.
+        validation:
+          format: uuid
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunWorkflowSandboxHistoryItemExecConfigRequest:
+    docs: >-
+      Execution configuration for running a Test Suite against a Workflow
+      Sandbox History Item
+    properties:
+      type: literal<"WORKFLOW_SANDBOX_HISTORY_ITEM">
+      data: TestSuiteRunWorkflowSandboxHistoryItemExecConfigDataRequest
+      test_case_ids:
+        type: optional<list<string>>
+        docs: >-
+          Optionally specify a subset of test case ids to run. If not provided,
+          all test cases within the test suite will be run by default.
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunWorkflowSandboxHistoryItemExecConfigTypeEnum:
+    type: literal<"WORKFLOW_SANDBOX_HISTORY_ITEM">
+    docs: '* `WORKFLOW_SANDBOX_HISTORY_ITEM` - WORKFLOW_SANDBOX_HISTORY_ITEM'
   TestSuiteTestCase:
     properties:
       id: optional<string>
