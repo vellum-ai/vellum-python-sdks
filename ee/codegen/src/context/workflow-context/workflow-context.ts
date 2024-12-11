@@ -11,7 +11,6 @@ import { NodeNotFoundError } from "src/generators/errors";
 import { BaseNode } from "src/generators/nodes/bases";
 import {
   EntrypointNode,
-  FinalOutputNode,
   WorkflowDataNode,
   WorkflowEdge,
 } from "src/types/vellum";
@@ -81,9 +80,6 @@ export class WorkflowContext {
 
   public readonly workflowRawEdges: WorkflowEdge[];
 
-  // This is used to track the final output names for the workflow keyed by terminal node id
-  public readonly outputNamesById: Map<string, string>;
-
   constructor({
     absolutePathToOutputDirectory,
     moduleName,
@@ -120,7 +116,6 @@ export class WorkflowContext {
 
     this.sdkModulePathNames = generateSdkModulePaths(workflowsSdkModulePath);
     this.workflowRawEdges = workflowRawEdges;
-    this.outputNamesById = new Map<string, string>();
   }
 
   /* Create a new workflow context for a nested workflow from its parent */
@@ -198,7 +193,6 @@ export class WorkflowContext {
   public addWorkflowOutputContext(
     workflowOutputContext: WorkflowOutputContext
   ): void {
-    this.generateUniqueFinalOutputName(workflowOutputContext);
     this.workflowOutputContexts.push(workflowOutputContext);
   }
 
@@ -270,37 +264,5 @@ export class WorkflowContext {
 
   public addWorkflowEdges(edges: WorkflowEdge[]): void {
     this.workflowRawEdges.push(...edges);
-  }
-
-  public getOutputName(terminalNodeId: string): string | undefined {
-    return this.outputNamesById.get(terminalNodeId);
-  }
-
-  public addOutputName(terminalNodeId: string, outputName: string): void {
-    this.outputNamesById.set(terminalNodeId, outputName);
-  }
-
-  private generateUniqueFinalOutputName(
-    workflowOutputContext: WorkflowOutputContext
-  ): string {
-    const node: FinalOutputNode =
-      workflowOutputContext.getFinalOutputNodeData();
-    const value = this.getOutputName(node.id);
-    if (value !== undefined) {
-      return value;
-    } else {
-      let counter = 1;
-      const names = new Set(this.outputNamesById.values());
-
-      const originalName = `${node.data.name}-`;
-      let uniqueName = `${originalName}${counter}`;
-
-      while (names.has(uniqueName)) {
-        counter++;
-        uniqueName = `${originalName}${counter}`;
-      }
-      this.addOutputName(node.id, uniqueName);
-      return uniqueName;
-    }
   }
 }

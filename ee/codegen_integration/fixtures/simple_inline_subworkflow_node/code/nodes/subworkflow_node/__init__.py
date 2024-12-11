@@ -7,4 +7,4 @@ class SubworkflowNode(InlineSubworkflowNode):
     subworkflow = SubworkflowNodeWorkflow
 
     class Outputs(InlineSubworkflowNode.Outputs):
-        final_output_1 = SubworkflowNodeWorkflow.Outputs.final_output_1
+        final_output = SubworkflowNodeWorkflow.Outputs.final_output

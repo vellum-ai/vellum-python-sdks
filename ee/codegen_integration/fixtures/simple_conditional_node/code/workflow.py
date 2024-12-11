@@ -10,4 +10,4 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
     graph = ConditionalNode.Ports.branch_1 >> FinalOutput
 
     class Outputs(BaseWorkflow.Outputs):
-        final_output_1 = FinalOutput.Outputs.value
+        final_output = FinalOutput.Outputs.value

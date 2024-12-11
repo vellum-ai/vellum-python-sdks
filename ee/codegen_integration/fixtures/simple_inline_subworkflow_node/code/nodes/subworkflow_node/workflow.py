@@ -8,4 +8,4 @@ class SubworkflowNodeWorkflow(BaseWorkflow):
     graph = SearchNode >> FinalOutput
 
     class Outputs(BaseWorkflow.Outputs):
-        final_output_1 = FinalOutput.Outputs.value
+        final_output = FinalOutput.Outputs.value

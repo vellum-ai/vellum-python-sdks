@@ -28,11 +28,9 @@ export function entrypointNodeDataFactory(): EntrypointNode {
   };
 }
 
-export function terminalNodeDataFactory({
-  id,
-}: { id?: string } = {}): FinalOutputNode {
+export function terminalNodeDataFactory(): FinalOutputNode {
   return {
-    id: id ? id : "terminal-node-1",
+    id: "terminal-node-1",
     type: WorkflowNodeType.TERMINAL,
     inputs: [
       {

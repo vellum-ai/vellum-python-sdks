@@ -87,7 +87,7 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
     graph = SearchNode
 
     class Outputs(BaseWorkflow.Outputs):
-        query_1 = FinalOutput.Outputs.value
+        query = FinalOutput.Outputs.value
 "
 `;
 
@@ -186,24 +186,7 @@ from .nodes.final_output import FinalOutput
 
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
     class Outputs(BaseWorkflow.Outputs):
-        query_1 = FinalOutput.Outputs.value
-"
-`;
-
-exports[`Workflow > write > should generate correct code with multiple terminal nodes with the same name 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .inputs import Inputs
-from vellum.workflows.state import BaseState
-from .nodes.final_output import FinalOutput
-from .nodes.final_output_1 import FinalOutput
-
-
-class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = None
-
-    class Outputs(BaseWorkflow.Outputs):
-        query_1 = FinalOutput.Outputs.value
-        query_2 = FinalOutput.Outputs.value
+        query = FinalOutput.Outputs.value
 "
 `;
 

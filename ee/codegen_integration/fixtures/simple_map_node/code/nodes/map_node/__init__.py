@@ -10,4 +10,4 @@ class MapNode(BaseMapNode):
     concurrency = 4
 
     class Outputs(BaseMapNode.Outputs):
-        final_output_1 = MapNodeWorkflow.Outputs.final_output_1
+        final_output = MapNodeWorkflow.Outputs.final_output

@@ -50,7 +50,6 @@ export class Workflow {
   private readonly entrypointNodeEdges: WorkflowEdge[];
   private readonly displayData: WorkflowDisplayData | undefined;
   private readonly entrypointNodeId: string;
-
   constructor({ workflowContext, inputs, nodes, displayData }: Workflow.Args) {
     this.workflowContext = workflowContext;
     this.inputs = inputs;
@@ -155,7 +154,6 @@ export class Workflow {
           new WorkflowOutput({
             workflowContext: this.workflowContext,
             workflowOutputContext,
-            outputNamesById: this.workflowContext.outputNamesById,
           })
         );
       }

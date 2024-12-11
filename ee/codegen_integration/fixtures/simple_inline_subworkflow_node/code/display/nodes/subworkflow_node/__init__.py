@@ -18,7 +18,7 @@ class SubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[SubworkflowNode]):
     workflow_input_ids_by_name = {}
     node_input_ids_by_name = {}
     output_display = {
-        SubworkflowNode.Outputs.final_output_1: NodeOutputDisplay(
+        SubworkflowNode.Outputs.final_output: NodeOutputDisplay(
             id=UUID("6ab3665f-881d-488b-9124-a6da40136c68"), name="final-output"
         )
     }
