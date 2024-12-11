@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import tarfile
+from importlib import metadata
 from uuid import UUID
 from typing import List, Optional
 
@@ -50,6 +51,9 @@ def push_command(
     workflow = BaseWorkflow.load_from_module(workflow_config.module)
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow)
     exec_config = workflow_display.serialize()
+    exec_config["runner_config"] = {
+        "sdk_version": metadata.version("vellum-ai"),
+    }
 
     label = snake_to_title_case(workflow_config.module.split(".")[-1])
 
