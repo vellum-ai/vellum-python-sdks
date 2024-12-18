@@ -157,6 +157,7 @@ class VellumMypyPlugin(Plugin):
         elif _is_subclass(
             ctx.cls.info, "vellum.workflows.nodes.displayable.code_execution_node.node.CodeExecutionNode"
         ):
+            self._code_execution_node_class_hook(ctx)
             self._dynamic_output_node_class_hook(ctx, "result")
         elif _is_subclass(ctx.cls.info, "vellum.workflows.nodes.displayable.final_output_node.node.FinalOutputNode"):
             self._dynamic_output_node_class_hook(ctx, "value")
@@ -643,6 +644,48 @@ class VellumMypyPlugin(Plugin):
                         sym.node.type = args[0]
 
         return new_type_info
+
+    def _code_execution_node_class_hook(self, ctx: ClassDefContext) -> None:
+        api = ctx.api
+        node_info = ctx.cls.info
+
+        primitive_types = [
+            api.named_type('builtins.str'),
+            api.named_type('typing.List', [api.named_type('vellum.types.ChatMessage')]),
+            api.named_type('typing.List', [api.named_type('vellum.types.SearchResultRequest')]),
+            api.named_type('typing.List', [api.named_type('vellum.types.SearchResult')]),
+            api.named_type('vellum.types.Json'),
+            api.named_type('builtins.float'),
+            api.named_type('vellum.types.FunctionCall'),
+            api.named_type('vellum.types.FunctionCallRequest'),
+            api.named_type('vellum.types.VellumError'),
+            api.named_type('vellum.types.VellumErrorRequest'),
+            api.named_type('typing.List', [api.named_type('vellum.types.VellumValueRequest')]),
+            api.named_type('typing.List', [api.named_type('vellum.types.VellumValue')]),
+            api.named_type('vellum.types.VellumImage'),
+            api.named_type('vellum.types.VellumImageRequest'),
+            api.named_type('vellum.types.VellumAudio'),
+            api.named_type('vellum.types.VellumAudioRequest'),
+            api.named_type('vellum.types.VellumSecret'),
+        ]
+
+        vellum_primitive_union = UnionType(primitive_types)
+
+        output_ref = api.named_type('vellum.workflows.nodes.core.output_reference.OutputReference')
+        output_ref.args = (vellum_primitive_union,)
+
+        descriptor_type = api.named_type_or_none(
+            'vellum.workflows.nodes.core.base_descriptor.BaseDescriptor',
+            [output_ref]
+        )
+
+        for name, symnode in node_info.names.items():
+            if name == 'Outputs':
+                outputs_class = symnode.node
+                if outputs_class and hasattr(outputs_class, 'names'):
+                    for output_name in outputs_class.names:
+                        if not output_name.startswith('_'):
+                            outputs_class.names[output_name] = descriptor_type
 
 
 def plugin(version: str) -> Type[VellumMypyPlugin]:
