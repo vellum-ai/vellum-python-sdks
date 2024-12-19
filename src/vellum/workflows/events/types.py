@@ -28,6 +28,15 @@ def serialize_type_encoder(obj: type) -> Dict[str, Any]:
     }
 
 
+def serialize_type_encoder_with_id(obj: type) -> Dict[str, Any]:
+    if not hasattr(obj, "__id__"):
+        raise AttributeError(f"The object of type '{type(obj).__name__}' must have an '__id__' attribute.")
+    return {
+        "id": getattr(obj, "__id__"),
+        **serialize_type_encoder(obj),
+    }
+
+
 def default_serializer(obj: Any) -> Any:
     return json.loads(
         json.dumps(
@@ -46,9 +55,17 @@ class CodeResourceDefinition(UniversalBaseModel):
         return CodeResourceDefinition(**serialize_type_encoder(obj))
 
 
+class VellumCodeResource(CodeResourceDefinition):
+    id: UUID
+
+    @staticmethod
+    def encode(obj: type) -> "VellumCodeResource":
+        return VellumCodeResource(**serialize_type_encoder_with_id(obj))
+
+
 VellumCodeResourceDefinition = Annotated[
-    CodeResourceDefinition,
-    BeforeValidator(lambda d: (d if type(d) is dict else serialize_type_encoder(d))),
+    VellumCodeResource,
+    BeforeValidator(lambda d: (d if type(d) is dict else serialize_type_encoder_with_id(d))),
 ]
 
 
