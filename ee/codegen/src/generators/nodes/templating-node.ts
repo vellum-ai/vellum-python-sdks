@@ -116,7 +116,9 @@ export class TemplatingNode extends BaseSingleFileNode<
       );
     }
 
-    return python.TypeInstantiation.str(templateRule.data.value);
+    return python.TypeInstantiation.str(templateRule.data.value, {
+      multiline: true,
+    });
   }
 
   protected getOutputDisplay(): python.Field {
