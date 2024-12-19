@@ -10,7 +10,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.types.generics import OutputsType
 
-from .types import BaseEvent, default_serializer, serialize_type_encoder
+from .types import BaseEvent, default_serializer, serialize_type_encoder_with_id
 
 if TYPE_CHECKING:
     from vellum.workflows.nodes.bases import BaseNode
@@ -21,7 +21,7 @@ class _BaseNodeExecutionBody(UniversalBaseModel):
 
     @field_serializer("node_definition")
     def serialize_node_definition(self, node_definition: Type, _info: Any) -> Dict[str, Any]:
-        return serialize_type_encoder(node_definition)
+        return serialize_type_encoder_with_id(node_definition)
 
     # Couldn't get this to work with model_config.exclude_none or model_config.exclude_defaults
     # so we're excluding null invoked_ports manually here for now

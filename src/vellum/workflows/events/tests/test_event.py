@@ -28,6 +28,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -73,6 +74,7 @@ module_root = name_parts[: name_parts.index("events")]
                 "name": "workflow.execution.initiated",
                 "body": {
                     "workflow_definition": {
+                        "id": str(uuid4_from_hash(MockWorkflow.__qualname__)),
                         "name": "MockWorkflow",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
@@ -113,6 +115,7 @@ module_root = name_parts[: name_parts.index("events")]
                 "name": "node.execution.initiated",
                 "body": {
                     "node_definition": {
+                        "id": str(uuid4_from_hash(MockNode.__qualname__)),
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
@@ -122,11 +125,13 @@ module_root = name_parts[: name_parts.index("events")]
                 },
                 "parent": {
                     "node_definition": {
+                        "id": str(uuid4_from_hash(MockNode.__qualname__)),
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
                     "parent": {
                         "workflow_definition": {
+                            "id": str(uuid4_from_hash(MockWorkflow.__qualname__)),
                             "name": "MockWorkflow",
                             "module": module_root + ["events", "tests", "test_event"],
                         },
@@ -162,6 +167,7 @@ module_root = name_parts[: name_parts.index("events")]
                 "name": "workflow.execution.streaming",
                 "body": {
                     "workflow_definition": {
+                        "id": str(uuid4_from_hash(MockWorkflow.__qualname__)),
                         "name": "MockWorkflow",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
@@ -195,6 +201,7 @@ module_root = name_parts[: name_parts.index("events")]
                 "name": "workflow.execution.fulfilled",
                 "body": {
                     "workflow_definition": {
+                        "id": str(uuid4_from_hash(MockWorkflow.__qualname__)),
                         "name": "MockWorkflow",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
@@ -228,6 +235,7 @@ module_root = name_parts[: name_parts.index("events")]
                 "name": "workflow.execution.rejected",
                 "body": {
                     "workflow_definition": {
+                        "id": str(uuid4_from_hash(MockWorkflow.__qualname__)),
                         "name": "MockWorkflow",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
@@ -262,6 +270,7 @@ module_root = name_parts[: name_parts.index("events")]
                 "name": "node.execution.streaming",
                 "body": {
                     "node_definition": {
+                        "id": str(uuid4_from_hash(MockNode.__qualname__)),
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
@@ -296,6 +305,7 @@ module_root = name_parts[: name_parts.index("events")]
                 "name": "node.execution.fulfilled",
                 "body": {
                     "node_definition": {
+                        "id": str(uuid4_from_hash(MockNode.__qualname__)),
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
                     },

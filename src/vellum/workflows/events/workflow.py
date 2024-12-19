@@ -16,7 +16,7 @@ from .node import (
     NodeExecutionResumedEvent,
     NodeExecutionStreamingEvent,
 )
-from .types import BaseEvent, default_serializer, serialize_type_encoder
+from .types import BaseEvent, default_serializer, serialize_type_encoder_with_id
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
@@ -27,7 +27,7 @@ class _BaseWorkflowExecutionBody(UniversalBaseModel):
 
     @field_serializer("workflow_definition")
     def serialize_workflow_definition(self, workflow_definition: Type, _info: Any) -> Dict[str, Any]:
-        return serialize_type_encoder(workflow_definition)
+        return serialize_type_encoder_with_id(workflow_definition)
 
 
 class _BaseWorkflowEvent(BaseEvent):

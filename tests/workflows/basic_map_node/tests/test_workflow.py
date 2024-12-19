@@ -1,5 +1,5 @@
 from vellum.workflows.events import NodeExecutionFulfilledEvent
-from vellum.workflows.events.types import CodeResourceDefinition, NodeParentContext, WorkflowParentContext
+from vellum.workflows.events.types import NodeParentContext, VellumCodeResourceDefinition, WorkflowParentContext
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_map_node.workflow import Inputs, IterationSubworkflow, SimpleMapExample
@@ -51,7 +51,7 @@ def test_map_node_streaming_events():
         assert event.parent.type == "WORKFLOW_NODE"
         assert event.parent.parent is not None
         assert event.parent.parent.type == "WORKFLOW"
-        assert event.parent.parent.workflow_definition == CodeResourceDefinition.encode(SimpleMapExample)
+        assert event.parent.parent.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
     # Node events
     assert len(node_events) == 6  # 2 initiated + 2 fulfilled + 2 others
@@ -60,7 +60,7 @@ def test_map_node_streaming_events():
     node_initiated = [e for e in node_events if e.name == "node.execution.initiated"]
     assert node_initiated[0].parent is not None
     assert node_initiated[0].parent.type == "WORKFLOW"
-    assert node_initiated[0].parent.workflow_definition == CodeResourceDefinition.encode(SimpleMapExample)
+    assert node_initiated[0].parent.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
     # Node fulfilled events
     node_fulfilled = [e for e in node_events if e.name == "node.execution.fulfilled"]
@@ -78,7 +78,7 @@ def test_map_node_streaming_events():
     assert first_event.parent is not None
     assert isinstance(first_event.parent, WorkflowParentContext)
     assert first_event.parent.type == "WORKFLOW"
-    assert first_event.parent.workflow_definition == CodeResourceDefinition.encode(IterationSubworkflow)
+    assert first_event.parent.workflow_definition == VellumCodeResourceDefinition.encode(IterationSubworkflow)
 
     parent_node = first_event.parent.parent
     assert parent_node is not None
@@ -89,7 +89,7 @@ def test_map_node_streaming_events():
     assert parent_workflow is not None
     assert isinstance(parent_workflow, WorkflowParentContext)
     assert parent_workflow.type == "WORKFLOW"
-    assert parent_workflow.workflow_definition == CodeResourceDefinition.encode(SimpleMapExample)
+    assert parent_workflow.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
     # Check second iteration
     second_event = node_fulfilled[1]
@@ -98,7 +98,7 @@ def test_map_node_streaming_events():
     assert second_event.parent is not None
     assert isinstance(second_event.parent, WorkflowParentContext)
     assert second_event.parent.type == "WORKFLOW"
-    assert second_event.parent.workflow_definition == CodeResourceDefinition.encode(IterationSubworkflow)
+    assert second_event.parent.workflow_definition == VellumCodeResourceDefinition.encode(IterationSubworkflow)
 
     parent_node = second_event.parent.parent
     assert parent_node is not None
@@ -109,7 +109,7 @@ def test_map_node_streaming_events():
     assert parent_workflow is not None
     assert isinstance(parent_workflow, WorkflowParentContext)
     assert parent_workflow.type == "WORKFLOW"
-    assert parent_workflow.workflow_definition == CodeResourceDefinition.encode(SimpleMapExample)
+    assert parent_workflow.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
     # Workflow fulfilled events
     assert len(workflow_fulfilled_events) == 3  # Main + 2 subworkflows
