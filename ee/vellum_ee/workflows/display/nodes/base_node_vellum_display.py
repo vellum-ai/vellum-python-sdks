@@ -1,6 +1,7 @@
 from uuid import UUID
 from typing import ClassVar, Dict, Optional
 
+from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.ports import Port
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -40,6 +41,8 @@ class BaseNodeVellumDisplay(BaseNodeDisplay[NodeType]):
         return self.get_target_handle_id()
 
     def get_source_handle_id(self, port_displays: Dict[Port, PortDisplay]) -> UUID:
-        default_port = self._node.Ports.default
+        unadorned_node = get_unadorned_node(self._node)
+        default_port = unadorned_node.Ports.default
+
         default_port_display = port_displays[default_port]
         return default_port_display.id

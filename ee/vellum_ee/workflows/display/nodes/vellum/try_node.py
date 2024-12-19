@@ -41,6 +41,7 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
             error_output_id=self.error_output_id or uuid4_from_hash(f"{node_display.node_id}|error_output_id"),
         )
 
+        # breakpoint()
         serialized_node_definition = serialized_node.get("definition")
         if isinstance(serialized_node_definition, dict):
             serialized_node_definition_module = serialized_node_definition.get("module")

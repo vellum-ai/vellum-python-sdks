@@ -10,13 +10,7 @@
         },
         "definition": {
           "bases": [],
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "bases",
-            "base"
-          ],
+          "module": ["vellum", "workflows", "nodes", "bases", "base"],
           "name": "BaseNode"
         },
         "inputs": [],
@@ -71,19 +65,19 @@
                           {
                             "block_type": "PLAIN_TEXT",
                             "text": "What is the origin of the following phrase\n\n",
-                            "id": "a92f2da2-754e-4b3c-b2c4-17346b459e2e",
+                            "id": "33995335-ab53-4034-8f3d-69d33d8286eb",
                             "state": "ENABLED",
                             "cache_config": null
                           },
                           {
                             "block_type": "VARIABLE",
-                            "id": "16649a45-b5e0-4781-9d9e-cdb1b704e7ec",
+                            "id": "16eba896-9259-4972-b04f-5f0d177c88f6",
                             "state": "ENABLED",
                             "cache_config": null,
                             "input_variable_id": "b2bc9402-6e50-4982-800c-1662c188899b"
                           }
                         ],
-                        "id": "7fbb1652-11e3-4e50-9c01-dc5e1af398cb",
+                        "id": "e5fe6f7d-b84e-4459-b19d-a44f28d672de",
                         "state": "ENABLED",
                         "cache_config": null
                       }
@@ -92,7 +86,7 @@
                     "chat_source": null,
                     "chat_message_unterminated": false
                   },
-                  "id": "6c7ba0a8-29ee-4575-b800-b5d1c80b5631",
+                  "id": "104ed422-c074-4aae-89f5-304e3ad1ebc6",
                   "state": "ENABLED",
                   "cache_config": null
                 }
@@ -145,12 +139,14 @@
           "module": [
             "codegen_integration",
             "fixtures",
-            "simple_prompt_node",
+            "simple_node_with_try_wrap",
             "code",
             "nodes",
-            "prompt_node"
+            "prompt_node",
+            "PromptNode",
+            "<adornment>"
           ],
-          "name": "PromptNode"
+          "name": "TryNode"
         }
       },
       {
@@ -207,7 +203,7 @@
           "module": [
             "codegen_integration",
             "fixtures",
-            "simple_prompt_node",
+            "simple_node_with_try_wrap",
             "code",
             "nodes",
             "final_output"
@@ -246,7 +242,7 @@
       "module": [
         "codegen_integration",
         "fixtures",
-        "simple_prompt_node",
+        "simple_node_with_try_wrap",
         "code",
         "workflow"
       ]
@@ -255,7 +251,7 @@
   "input_variables": [
     {
       "id": "2915dbdd-c4fa-4b52-a35c-11625bb47cbf",
-      "key": "input_",
+      "key": "input",
       "type": "STRING",
       "required": false,
       "default": null,
@@ -264,5 +260,11 @@
       }
     }
   ],
-  "output_variables": []
+  "output_variables": [
+    {
+      "id": "f1eca494-a7dc-41c0-9c74-9658a64955e6",
+      "key": "final-output",
+      "type": "STRING"
+    }
+  ]
 }
