@@ -13,6 +13,7 @@ import { makeTempDir } from "./helpers/temp-dir";
 
 import { SpyMocks } from "src/__test__/utils/SpyMocks";
 import { WorkflowProjectGenerator } from "src/project";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
@@ -112,5 +113,53 @@ describe("WorkflowProjectGenerator", () => {
         }
       }
     );
+
+    it("should generate code even if a node fails to generate", async () => {
+      const displayData = {};
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      expect(
+        fs.existsSync(join(tempDir, project.getModuleName(), "workflow.py"))
+      ).toBe(true);
+      expect(
+        fs.existsSync(join(tempDir, project.getModuleName(), "nodes"))
+      ).toBe(true);
+      expect(
+        fs.existsSync(
+          join(tempDir, project.getModuleName(), "nodes", "bad_node.py")
+        )
+      ).toBe(false);
+
+      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
+      expect(fs.existsSync(errorLogPath)).toBe(true);
+      expect(fs.readFileSync(errorLogPath, "utf-8")).toBe(`\
+Encountered 1 error(s) while generating code:
+
+Failed to generate node "BadNode": Failed to find output "foo" in node "Bar"
+`);
+    });
+    });
+
+    it("should fail to generate code if a node fails in strict mode", async () => {
+      const displayData = {};
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        strict: true,
+      });
+
+      expect(project.generateCode()).rejects.toThrow(
+        new NodeAttributeGenerationError("test")
+      );
+    });
   });
 });
