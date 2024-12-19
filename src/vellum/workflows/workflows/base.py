@@ -87,9 +87,9 @@ class _BaseWorkflowMeta(type):
             dct["graph"] = set()
 
         cls = super().__new__(mcs, name, bases, dct)
-        node_class = cast(Type["BaseNode"], cls)
-        node_class.__id__ = uuid4_from_hash(node_class.__qualname__)
-        return node_class
+        workflow_class = cast(Type["BaseWorkflow"], cls)
+        workflow_class.__id__ = uuid4_from_hash(workflow_class.__qualname__)
+        return workflow_class
 
 
 GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
