@@ -1679,6 +1679,7 @@ paths:
         \ `https://predict.vellum.ai`.    "
       tags:
       - submit-workflow-execution-actuals
+      - workflow-executions
       requestBody:
         content:
           application/json:
