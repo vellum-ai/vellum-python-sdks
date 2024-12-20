@@ -7,7 +7,7 @@ import { PortContext } from "src/context/port-context";
 import { generateSdkModulePaths } from "src/context/workflow-context/sdk-module-paths";
 import { SDK_MODULE_PATHS } from "src/context/workflow-context/types";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
-import { NodeNotFoundError } from "src/generators/errors";
+import { BaseCodegenError, NodeNotFoundError } from "src/generators/errors";
 import { BaseNode } from "src/generators/nodes/bases";
 import {
   EntrypointNode,
@@ -34,6 +34,7 @@ export declare namespace WorkflowContext {
     portContextByName?: PortContextById;
     vellumApiKey: string;
     workflowRawEdges: WorkflowEdge[];
+    strict?: boolean;
   };
 }
 
@@ -48,6 +49,7 @@ export class WorkflowContext {
   // Tracks local and global contexts in the case of nested workflows.
   public readonly inputVariableContextsById: InputVariableContextsById;
   public readonly globalInputVariableContextsById: InputVariableContextsById;
+  public readonly strict: boolean;
 
   // Track what input variables names are used within this workflow so that we can ensure name uniqueness when adding
   // new input variables.
@@ -85,6 +87,7 @@ export class WorkflowContext {
   // Used by the vellum api client
   public readonly vellumApiKey: string;
   private readonly mlModelNamesById: Record<string, string> = {};
+  private readonly errors: BaseCodegenError[] = [];
 
   public readonly workflowRawEdges: WorkflowEdge[];
 
@@ -99,6 +102,7 @@ export class WorkflowContext {
     portContextByName,
     vellumApiKey,
     workflowRawEdges,
+    strict = false,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -124,6 +128,8 @@ export class WorkflowContext {
 
     this.sdkModulePathNames = generateSdkModulePaths(workflowsSdkModulePath);
     this.workflowRawEdges = workflowRawEdges;
+    this.strict = strict;
+    this.errors = [];
   }
 
   /* Create a new workflow context for a nested workflow from its parent */
@@ -290,5 +296,17 @@ export class WorkflowContext {
 
   public addWorkflowEdges(edges: WorkflowEdge[]): void {
     this.workflowRawEdges.push(...edges);
+  }
+
+  public addError(error: BaseCodegenError): void {
+    if (this.strict) {
+      throw error;
+    }
+
+    this.errors.push(error);
+  }
+
+  public getErrors(): BaseCodegenError[] {
+    return [...this.errors];
   }
 }

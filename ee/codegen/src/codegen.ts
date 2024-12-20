@@ -1,4 +1,5 @@
 import {
+  ErrorLogFile,
   InitFile,
   Inputs,
   NodeInput,
@@ -29,4 +30,8 @@ export function workflow(args: Workflow.Args): Workflow {
 
 export function initFile(args: InitFile.Args): InitFile {
   return new InitFile(args);
+}
+
+export function errorLogFile(args: ErrorLogFile.Args): ErrorLogFile {
+  return new ErrorLogFile(args);
 }

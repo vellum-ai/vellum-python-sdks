@@ -13,5 +13,6 @@ export function workflowContextFactory({
     workflowClassName: workflowClassName || "Workflow",
     vellumApiKey: "<TEST_API_KEY>",
     workflowRawEdges: workflowRawEdges || [],
+    strict: true,
   });
 }

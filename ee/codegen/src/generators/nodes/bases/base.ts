@@ -150,11 +150,13 @@ export abstract class BaseNode<
         generatedNodeInputs.set(nodeInputData.key, nodeInput);
       } catch (error) {
         if (error instanceof BaseCodegenError) {
-          throw new NodeAttributeGenerationError(
+          const nodeAttributeGenerationError = new NodeAttributeGenerationError(
             `Failed to generate attribute '${this.nodeContext.nodeClassName}.inputs.${nodeInputData.key}': ${error.message}`
           );
+          this.workflowContext.addError(nodeAttributeGenerationError);
+        } else {
+          throw error;
         }
-        throw error;
       }
     });
 
