@@ -465,8 +465,7 @@ def test_pull__handle_error_log(vellum_client, mock_module):
     assert not os.path.exists(os.path.join(temp_dir, *module.split("."), "error.log"))
 
     # AND the error log is printed to the console
-    assert "test error" in result.output
-    assert "test error" in result.stderr
+    assert result.output.endswith("\x1b[31;20mtest error\x1b[0m\n")
 
 
 def test_pull__strict__with_error(vellum_client, mock_module):

@@ -13,6 +13,8 @@ from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import VellumCliConfig, WorkflowConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
 
+ERROR_LOG_FILE_NAME = "error.log"
+
 
 def _is_valid_uuid(val: Union[str, UUID, None]) -> bool:
     try:
@@ -81,6 +83,7 @@ def pull_command(
     workflow_deployment: Optional[str] = None,
     include_json: Optional[bool] = None,
     exclude_code: Optional[bool] = None,
+    strict: Optional[bool] = None,
 ) -> None:
     load_dotenv()
     logger = load_cli_logger()
@@ -109,6 +112,8 @@ def pull_command(
         query_parameters["include_json"] = include_json
     if exclude_code:
         query_parameters["exclude_code"] = exclude_code
+    if strict:
+        query_parameters["strict"] = strict
 
     response = client.workflows.pull(
         pk,
@@ -119,6 +124,7 @@ def pull_command(
     zip_buffer = io.BytesIO(zip_bytes)
 
     target_dir = os.path.join(os.getcwd(), *workflow_config.module.split("."))
+    error_content = ""
     with zipfile.ZipFile(zip_buffer) as zip_file:
         # Delete files in target_dir that aren't in the zip file
         if os.path.exists(target_dir):
@@ -146,8 +152,13 @@ def pull_command(
             target_file = os.path.join(target_dir, file_name)
             os.makedirs(os.path.dirname(target_file), exist_ok=True)
             with zip_file.open(file_name) as source, open(target_file, "w") as target:
+                content = source.read().decode("utf-8")
+                if file_name == ERROR_LOG_FILE_NAME:
+                    error_content = content
+                    continue
+
                 logger.info(f"Writing to {target_file}...")
-                target.write(source.read().decode("utf-8"))
+                target.write(content)
 
     if include_json:
         logger.warning(
@@ -158,4 +169,7 @@ Its schema should be considered unstable and subject to change at any time."""
     if save_lock_file:
         config.save()
 
-    logger.info(f"Successfully pulled Workflow into {workflow_config.module}")
+    if error_content:
+        logger.error(error_content)
+    else:
+        logger.info(f"Successfully pulled Workflow into {workflow_config.module}")

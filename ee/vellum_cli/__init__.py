@@ -125,10 +125,16 @@ Should only be used for debugging purposes.""",
     help="""Exclude the code definition of each Resource from the pull response. \
 Should only be used for debugging purposes.""",
 )
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="""Raises an error immediately if there are any issues with the pulling of the Resource.""",
+)
 def pull(
     ctx: click.Context,
     include_json: Optional[bool],
     exclude_code: Optional[bool],
+    strict: Optional[bool],
 ) -> None:
     """Pull Resources from Vellum"""
 
@@ -136,6 +142,7 @@ def pull(
         pull_command(
             include_json=include_json,
             exclude_code=exclude_code,
+            strict=strict,
         )
 
 
@@ -159,12 +166,18 @@ Should only be used for debugging purposes.""",
     help="""Exclude the code definition of the Workflow from the pull response. \
 Should only be used for debugging purposes.""",
 )
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="""Raises an error immediately if there are any issues with the pulling of the Workflow.""",
+)
 def workflows_pull(
     module: Optional[str],
     include_json: Optional[bool],
     workflow_sandbox_id: Optional[str],
     workflow_deployment: Optional[str],
     exclude_code: Optional[bool],
+    strict: Optional[bool],
 ) -> None:
     """
     Pull Workflows from Vellum. If a module is provided, only the Workflow for that module will be pulled.
@@ -177,6 +190,7 @@ def workflows_pull(
         workflow_sandbox_id=workflow_sandbox_id,
         workflow_deployment=workflow_deployment,
         exclude_code=exclude_code,
+        strict=strict,
     )
 
 
