@@ -696,6 +696,67 @@ export function subworkflowDeploymentNodeDataFactory(): SubworkflowNode {
   };
 }
 
+export function conditionalNodeWithNullOperatorFactory({
+  id,
+}: {
+  id?: string;
+} = {}): ConditionalNode {
+  const nodeData: ConditionalNode = {
+    id: id ?? "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+    type: WorkflowNodeType.CONDITIONAL,
+    data: {
+      label: "Conditional Node",
+      targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+      conditions: [
+        {
+          id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+          type: "IF",
+          sourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+          data: {
+            id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+            rules: [
+              {
+                id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
+                rules: [],
+                fieldNodeInputId: "2cb6582e-c329-4952-8598-097830b766c7",
+                operator: "null",
+              },
+            ],
+            combinator: "AND",
+          },
+        },
+      ],
+      version: "2",
+    },
+    inputs: [
+      {
+        id: "2cb6582e-c329-4952-8598-097830b766c7",
+        key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+        value: {
+          rules: [
+            {
+              type: "INPUT_VARIABLE",
+              data: {
+                inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
+              },
+            },
+          ],
+          combinator: "OR",
+        },
+      },
+    ],
+    displayData: {
+      width: 480,
+      height: 180,
+      position: {
+        x: 2247.2797390213086,
+        y: 30.917121251477084,
+      },
+    },
+  };
+  return nodeData;
+}
+
 export function conditionalNodeFactory({
   id,
   label,

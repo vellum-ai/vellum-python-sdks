@@ -6,7 +6,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
-from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
+from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node, has_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import WorkflowInputReference
 from vellum.workflows.references.output import OutputReference
@@ -352,17 +352,12 @@ class VellumWorkflowDisplay(
         port_displays: Dict[Port, PortDisplay],
         overrides: Optional[EdgeVellumDisplayOverrides] = None,
     ) -> EdgeVellumDisplay:
-        source_node = edge.from_port.node_class
-        target_node = edge.to_node
-
-        if has_wrapped_node(source_node):
-            source_node = get_wrapped_node(source_node)
-
-        if has_wrapped_node(target_node):
-            target_node = get_wrapped_node(target_node)
+        source_node = get_unadorned_node(edge.from_port.node_class)
+        target_node = get_unadorned_node(edge.to_node)
 
         source_node_id = node_displays[source_node].node_id
-        source_handle_id = port_displays[edge.from_port].id
+        from_port = get_unadorned_port(edge.from_port)
+        source_handle_id = port_displays[from_port].id
 
         target_node_display = node_displays[target_node]
         target_node_id = target_node_display.node_id

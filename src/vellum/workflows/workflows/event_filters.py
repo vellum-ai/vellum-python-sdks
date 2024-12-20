@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Type
 
-from vellum.workflows.events.types import CodeResourceDefinition
+from vellum.workflows.events.types import VellumCodeResourceDefinition
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
@@ -47,7 +47,7 @@ def root_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event:
         return False
 
     event_parent_definition = event.parent.workflow_definition
-    current_workflow_definition = CodeResourceDefinition.encode(workflow_definition)
+    current_workflow_definition = VellumCodeResourceDefinition.encode(workflow_definition)
 
     return event_parent_definition.model_dump() == current_workflow_definition.model_dump()
 

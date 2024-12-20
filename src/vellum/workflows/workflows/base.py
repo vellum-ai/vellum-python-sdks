@@ -4,6 +4,7 @@ import importlib
 import inspect
 
 from vellum.plugins.utils import load_runtime_plugins
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
 
 load_runtime_plugins()
@@ -11,7 +12,7 @@ load_runtime_plugins()
 from datetime import datetime
 from functools import lru_cache
 from threading import Event as ThreadingEvent
-from uuid import uuid4
+from uuid import UUID, uuid4
 from typing import (
     Any,
     Callable,
@@ -85,13 +86,17 @@ class _BaseWorkflowMeta(type):
         if "graph" not in dct:
             dct["graph"] = set()
 
-        return super().__new__(mcs, name, bases, dct)
+        cls = super().__new__(mcs, name, bases, dct)
+        workflow_class = cast(Type["BaseWorkflow"], cls)
+        workflow_class.__id__ = uuid4_from_hash(workflow_class.__qualname__)
+        return workflow_class
 
 
 GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
 
 
 class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkflowMeta):
+    __id__: UUID = uuid4_from_hash(__qualname__)
     graph: ClassVar[GraphAttribute]
     emitters: List[BaseWorkflowEmitter]
     resolvers: List[BaseWorkflowResolver]

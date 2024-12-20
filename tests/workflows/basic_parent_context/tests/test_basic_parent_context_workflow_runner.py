@@ -38,6 +38,7 @@ def test_stream_workflow__happy_path_inital_context():
     initial_parent_context_json = {
         "span_id": uuid4(),
         "node_definition": {
+            "id": uuid4(),
             "module": ["example", "test"],
             "name": "node_workflow",
         },
@@ -47,6 +48,7 @@ def test_stream_workflow__happy_path_inital_context():
     initial_parent_context_json["parent"] = {
         "span_id": uuid4(),
         "node_definition": {
+            "id": uuid4(),
             "module": ["example", "test"],
             "name": "node_workflow",
         },
@@ -57,7 +59,7 @@ def test_stream_workflow__happy_path_inital_context():
     assert isinstance(initial_parent_context, NodeParentContext)
     assert initial_parent_context is not None
     assert initial_parent_context.parent is not None
-    assert isinstance(initial_parent_context.node_definition, CodeResourceDefinition)
+    assert type(initial_parent_context.node_definition) is CodeResourceDefinition
 
     workflow = TrivialWorkflow(context=WorkflowContext(_parent_context=initial_parent_context))
 

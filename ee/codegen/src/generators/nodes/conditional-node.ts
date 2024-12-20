@@ -280,16 +280,15 @@ export class ConditionalNode extends BaseSingleFileNode<
     if (!ruleData) {
       return;
     }
-    if (
-      isNilOrEmpty(ruleData.rules) &&
-      ruleData.fieldNodeInputId &&
-      ruleData.valueNodeInputId
-    ) {
+    if (isNilOrEmpty(ruleData.rules) && ruleData.fieldNodeInputId) {
       this.nodeData.inputs.forEach((input) => {
         if (input.id === ruleData.fieldNodeInputId) {
           inputFieldsByRuleId.set(ruleData.id, input.key);
         }
-        if (input.id === ruleData.valueNodeInputId) {
+        if (
+          ruleData.valueNodeInputId &&
+          input.id === ruleData.valueNodeInputId
+        ) {
           valueInputsByRuleIds.set(ruleData.id, input.key);
         }
       });

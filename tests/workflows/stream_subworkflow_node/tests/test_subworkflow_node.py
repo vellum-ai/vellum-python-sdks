@@ -1,4 +1,4 @@
-from vellum.workflows.events.types import CodeResourceDefinition
+from vellum.workflows.events.types import VellumCodeResourceDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.stream_subworkflow_node.workflow import (
@@ -36,10 +36,10 @@ def test_workflow_stream__happy_path():
     assert workflow_initiated_events[1].workflow_definition == InnerWorkflow
     assert workflow_initiated_events[1].parent is not None
     assert workflow_initiated_events[1].parent.type == "WORKFLOW_NODE"
-    assert workflow_initiated_events[1].parent.node_definition == CodeResourceDefinition.encode(SubworkflowNode)
+    assert workflow_initiated_events[1].parent.node_definition == VellumCodeResourceDefinition.encode(SubworkflowNode)
     assert workflow_initiated_events[1].parent.parent is not None
     assert workflow_initiated_events[1].parent.parent.type == "WORKFLOW"
-    assert workflow_initiated_events[1].parent.parent.workflow_definition == CodeResourceDefinition.encode(
+    assert workflow_initiated_events[1].parent.parent.workflow_definition == VellumCodeResourceDefinition.encode(
         StreamingInlineSubworkflowExample
     )
     assert len(workflow_initiated_events) == 2
@@ -49,7 +49,7 @@ def test_workflow_stream__happy_path():
     assert node_initiated_events[0].node_definition == SubworkflowNode
     assert node_initiated_events[0].parent is not None
     assert node_initiated_events[0].parent.type == "WORKFLOW"
-    assert node_initiated_events[0].parent.workflow_definition == CodeResourceDefinition.encode(
+    assert node_initiated_events[0].parent.workflow_definition == VellumCodeResourceDefinition.encode(
         StreamingInlineSubworkflowExample
     )
     assert node_initiated_events[0].parent.parent is None
@@ -62,10 +62,10 @@ def test_workflow_stream__happy_path():
     for event in inner_node_streaming_events:
         assert event.parent is not None
         assert event.parent.type == "WORKFLOW_NODE"
-        assert event.parent.node_definition == CodeResourceDefinition.encode(SubworkflowNode)
+        assert event.parent.node_definition == VellumCodeResourceDefinition.encode(SubworkflowNode)
         assert event.parent.parent is not None
         assert event.parent.parent.type == "WORKFLOW"
-        assert event.parent.parent.workflow_definition == CodeResourceDefinition.encode(
+        assert event.parent.parent.workflow_definition == VellumCodeResourceDefinition.encode(
             StreamingInlineSubworkflowExample
         )
 

@@ -1,4 +1,5 @@
 import { python } from "@fern-api/python-ast";
+import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
@@ -252,10 +253,32 @@ export abstract class BaseNode<
 
   public generateNodeDisplayClasses(): python.Class[] {
     const nodeContext = this.nodeContext;
+    const errorOutputId = this.getErrorOutputId();
 
     const nodeClass = python.class_({
       name: nodeContext.nodeDisplayClassName,
       extends_: [this.getNodeDisplayBaseClass()],
+      decorators: errorOutputId
+        ? [
+            python.decorator({
+              callable: python.invokeMethod({
+                methodReference: python.reference({
+                  name: "BaseTryNodeDisplay",
+                  attribute: ["wrap"],
+                  modulePath:
+                    this.workflowContext.sdkModulePathNames
+                      .NODE_DISPLAY_MODULE_PATH,
+                }),
+                arguments_: [
+                  new MethodArgument({
+                    name: "error_output_id",
+                    value: python.TypeInstantiation.uuid(errorOutputId),
+                  }),
+                ],
+              }),
+            }),
+          ]
+        : undefined,
     });
 
     this.getNodeDisplayClassBodyStatements().forEach((statement) =>
@@ -290,28 +313,6 @@ export abstract class BaseNode<
 
     nodeClass.add(this.getDisplayData());
 
-    const errorOutputId = this.getErrorOutputId();
-    if (!errorOutputId) {
-      return [nodeClass];
-    }
-
-    const tryNodeDisplayClass = python.class_({
-      name: "TryNodeDisplay",
-      extends_: [
-        python.reference({
-          name: "BaseTryNodeDisplay",
-          modulePath:
-            this.workflowContext.sdkModulePathNames.NODE_DISPLAY_MODULE_PATH,
-        }),
-      ],
-    });
-    tryNodeDisplayClass.add(
-      python.field({
-        name: "error_output_id",
-        initializer: python.TypeInstantiation.uuid(errorOutputId),
-      })
-    );
-
-    return [tryNodeDisplayClass, nodeClass];
+    return [nodeClass];
   }
 }
