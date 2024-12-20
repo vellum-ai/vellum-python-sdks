@@ -20,6 +20,7 @@ import {
   PromptTemplateBlock,
   VellumLogicalConditionGroup,
   ConditionalNodeConditionData,
+  NodeOutputData,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -698,9 +699,11 @@ export function subworkflowDeploymentNodeDataFactory(): SubworkflowNode {
 
 export function conditionalNodeWithNullOperatorFactory({
   id,
+  nodeOutputReference,
 }: {
+  nodeOutputReference: NodeOutputData;
   id?: string;
-} = {}): ConditionalNode {
+}): ConditionalNode {
   const nodeData: ConditionalNode = {
     id: id ?? "b81a4453-7b80-41ea-bd55-c62df8878fd3",
     type: WorkflowNodeType.CONDITIONAL,
@@ -721,6 +724,12 @@ export function conditionalNodeWithNullOperatorFactory({
                 fieldNodeInputId: "2cb6582e-c329-4952-8598-097830b766c7",
                 operator: "null",
               },
+              {
+                id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cd",
+                rules: [],
+                fieldNodeInputId: "2cb6582e-c329-4952-8598-097830b766c8",
+                operator: "null",
+              },
             ],
             combinator: "AND",
           },
@@ -739,6 +748,19 @@ export function conditionalNodeWithNullOperatorFactory({
               data: {
                 inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
               },
+            },
+          ],
+          combinator: "OR",
+        },
+      },
+      {
+        id: "2cb6582e-c329-4952-8598-097830b766c8",
+        key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cd.field",
+        value: {
+          rules: [
+            {
+              type: "NODE_OUTPUT",
+              data: nodeOutputReference,
             },
           ],
           combinator: "OR",

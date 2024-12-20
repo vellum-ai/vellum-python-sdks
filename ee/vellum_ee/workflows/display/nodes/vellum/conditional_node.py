@@ -16,8 +16,12 @@ from vellum.workflows.expressions.equals import EqualsExpression
 from vellum.workflows.expressions.greater_than import GreaterThanExpression
 from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
 from vellum.workflows.expressions.in_ import InExpression
+from vellum.workflows.expressions.is_nil import IsNilExpression
+from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
 from vellum.workflows.expressions.is_not_null import IsNotNullExpression
+from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
+from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
@@ -242,9 +246,9 @@ but the defined conditions have length {len(condition_ids)}"""
             return "doesNotBeginWith"
         elif isinstance(descriptor, DoesNotEndWithExpression):
             return "doesNotEndWith"
-        elif isinstance(descriptor, IsNullExpression):
+        elif isinstance(descriptor, (IsNullExpression, IsNilExpression, IsUndefinedExpression)):
             return "null"
-        elif isinstance(descriptor, IsNotNullExpression):
+        elif isinstance(descriptor, (IsNotNullExpression, IsNotNilExpression, IsNotUndefinedExpression)):
             return "notNull"
         elif isinstance(descriptor, InExpression):
             return "in"

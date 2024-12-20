@@ -3745,7 +3745,7 @@ types:
         validation:
           minLength: 1
       type: literal<"JSON">
-      value: map<string, unknown>
+      value: unknown
     source:
       openapi: openapi/openapi.yml
   PromptRequestStringInput:

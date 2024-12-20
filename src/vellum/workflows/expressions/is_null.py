@@ -13,7 +13,7 @@ class IsNullExpression(BaseDescriptor[bool], Generic[_T]):
         *,
         expression: Union[BaseDescriptor[_T], _T],
     ) -> None:
-        super().__init__(name=f"{expression} is None", types=(bool,))
+        super().__init__(name=f"{expression} is null", types=(bool,))
         self._expression = expression
 
     def resolve(self, state: "BaseState") -> bool:

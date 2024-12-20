@@ -17,7 +17,9 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
     from vellum.workflows.expressions.in_ import InExpression
     from vellum.workflows.expressions.is_blank import IsBlankExpression
+    from vellum.workflows.expressions.is_nil import IsNilExpression
     from vellum.workflows.expressions.is_not_blank import IsNotBlankExpression
+    from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
     from vellum.workflows.expressions.is_not_null import IsNotNullExpression
     from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
     from vellum.workflows.expressions.is_null import IsNullExpression
@@ -267,6 +269,16 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.is_not_null import IsNotNullExpression
 
         return IsNotNullExpression(expression=self)
+
+    def is_nil(self) -> "IsNilExpression":
+        from vellum.workflows.expressions.is_nil import IsNilExpression
+
+        return IsNilExpression(expression=self)
+
+    def is_not_nil(self) -> "IsNotNilExpression":
+        from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
+
+        return IsNotNilExpression(expression=self)
 
     def is_undefined(self) -> "IsUndefinedExpression":
         from vellum.workflows.expressions.is_undefined import IsUndefinedExpression

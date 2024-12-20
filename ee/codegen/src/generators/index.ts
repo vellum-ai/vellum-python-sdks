@@ -1,3 +1,4 @@
+export { ErrorLogFile } from "./error-log-file";
 export { InitFile } from "./init-file";
 export { Inputs } from "./inputs";
 export { NodeInput } from "./node-inputs";

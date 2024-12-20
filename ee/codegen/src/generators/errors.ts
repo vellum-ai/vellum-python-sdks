@@ -1,6 +1,7 @@
 export type CodegenErrorCode =
   | "PROJECT_SERIALIZATION_ERROR"
   | "NODE_ATTRIBUTE_GENERATION_ERROR"
+  | "NODE_PORT_GENERATION_ERROR"
   | "NODE_NOT_FOUND_ERROR";
 
 export abstract class BaseCodegenError extends Error {
@@ -20,6 +21,13 @@ export class ProjectSerializationError extends BaseCodegenError {
  */
 export class NodeAttributeGenerationError extends BaseCodegenError {
   code = "NODE_ATTRIBUTE_GENERATION_ERROR" as const;
+}
+
+/**
+ * An error that raises when generating a node port fails.
+ */
+export class NodePortGenerationError extends BaseCodegenError {
+  code = "NODE_PORT_GENERATION_ERROR" as const;
 }
 
 /**

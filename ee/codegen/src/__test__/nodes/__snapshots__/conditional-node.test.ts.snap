@@ -162,7 +162,13 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
                 field_node_input_id=None,
                 value_node_input_id=None,
             ),
-            rhs=None,
+            rhs=RuleIdMap(
+                id=UUID("ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cd"),
+                lhs=None,
+                rhs=None,
+                field_node_input_id=None,
+                value_node_input_id=None,
+            ),
             field_node_input_id=None,
             value_node_input_id=None,
         )
@@ -176,7 +182,10 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(
             "2cb6582e-c329-4952-8598-097830b766c7"
-        )
+        ),
+        "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cd.field": UUID(
+            "2cb6582e-c329-4952-8598-097830b766c8"
+        ),
     }
     port_displays = {}
     display_data = NodeDisplayData(
@@ -191,10 +200,13 @@ exports[`ConditionalNode with null operator > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
 from ..inputs import Inputs
+from .templating_node import TemplatingNode
 
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(Inputs.field.is_null())
+        branch_1 = Port.on_if(
+            Inputs.field.is_null() and TemplatingNode.Outputs.result.is_nil()
+        )
 "
 `;

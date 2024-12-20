@@ -5,6 +5,8 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
+import { NodePortGenerationError } from "./errors";
+
 import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
 import { NodeInput } from "src/generators/node-inputs";
@@ -145,11 +147,18 @@ export class ConditionalNodePort extends AstNode {
     }
     const lhs = this.nodeInputsByKey.get(lhsKey);
     const rhs = !isNil(rhsKey) ? this.nodeInputsByKey.get(rhsKey) : undefined;
+    if (isNil(lhs)) {
+      throw new NodePortGenerationError(
+        `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey} for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+      );
+    }
     const expression = conditionData.operator
-      ? this.convertOperatorToMethod(conditionData.operator)
+      ? this.convertOperatorToMethod(conditionData.operator, lhs)
       : undefined;
-    if (isNil(lhs) || isNil(expression)) {
-      throw new Error("Port conditions require a lhs and an expression");
+    if (isNil(expression)) {
+      throw new NodePortGenerationError(
+        `Node ${this.nodeLabel} is missing required operator for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+      );
     }
     return new Expression({
       lhs: lhs,
@@ -158,7 +167,11 @@ export class ConditionalNodePort extends AstNode {
     });
   }
 
-  private convertOperatorToMethod(operator: string): string {
+  private convertOperatorToMethod(operator: string, lhs: NodeInput): string {
+    // Legacy conditional nodes in legacy workflows assumed `is_nil` functionality
+    // for the `null` operator. This workaround is to support that cutover.
+    const isNodeOutput =
+      lhs.nodeInputData.value.rules[0]?.type === "NODE_OUTPUT";
     const operatorMappings: { [key: string]: string } = {
       "=": "equals",
       "!=": "does_not_equal",
@@ -172,8 +185,8 @@ export class ConditionalNodePort extends AstNode {
       doesNotContain: "does_not_contain",
       doesNotBeginWith: "does_not_begin_with",
       doesNotEndWith: "does_not_end_with",
-      null: "is_null()",
-      notNull: "is_not_null()",
+      null: isNodeOutput ? "is_nil()" : "is_null()",
+      notNull: isNodeOutput ? "is_not_nil()" : "is_not_null()",
       in: "in",
       notIn: "not_in",
       between: "between",
@@ -181,7 +194,9 @@ export class ConditionalNodePort extends AstNode {
     };
     const value = operatorMappings[operator];
     if (!value) {
-      throw new Error(`This operator: ${operator} is not supported`);
+      throw new NodePortGenerationError(
+        `This operator: ${operator} is not supported`
+      );
     }
     return value;
   }

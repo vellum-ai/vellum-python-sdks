@@ -1,6 +1,7 @@
 import pytest
 
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 
 
@@ -15,6 +16,13 @@ class FixtureState(BaseState):
     zeta = {
         "foo": "bar",
     }
+
+    eta = None
+
+
+class DummyNode(BaseNode[FixtureState]):
+    class Outputs(BaseNode.Outputs):
+        empty: str
 
 
 @pytest.mark.parametrize(
@@ -36,7 +44,23 @@ class FixtureState(BaseState):
         (FixtureState.gamma.does_not_begin_with(FixtureState.delta), True),
         (FixtureState.gamma.does_not_end_with(FixtureState.delta), True),
         (FixtureState.alpha.is_null(), False),
+        (FixtureState.eta.is_null(), True),
+        (DummyNode.Outputs.empty.is_null(), False),
         (FixtureState.alpha.is_not_null(), True),
+        (FixtureState.eta.is_not_null(), False),
+        (DummyNode.Outputs.empty.is_not_null(), True),
+        (FixtureState.alpha.is_nil(), False),
+        (FixtureState.eta.is_nil(), True),
+        (DummyNode.Outputs.empty.is_nil(), True),
+        (FixtureState.alpha.is_not_nil(), True),
+        (FixtureState.eta.is_not_nil(), False),
+        (DummyNode.Outputs.empty.is_not_nil(), False),
+        (FixtureState.alpha.is_undefined(), False),
+        (FixtureState.eta.is_undefined(), False),
+        (DummyNode.Outputs.empty.is_undefined(), True),
+        (FixtureState.alpha.is_not_undefined(), True),
+        (FixtureState.eta.is_not_undefined(), True),
+        (DummyNode.Outputs.empty.is_not_undefined(), False),
         (FixtureState.delta.in_(FixtureState.gamma), True),
         (FixtureState.delta.not_in(FixtureState.gamma), False),
         (FixtureState.alpha.between(FixtureState.beta, FixtureState.epsilon), False),
@@ -66,8 +90,24 @@ class FixtureState(BaseState):
         "does_not_contain",
         "does_not_begin_with",
         "does_not_end_with",
-        "is_null",
-        "is_not_null",
+        "is_null_on_value",
+        "is_null_on_null",
+        "is_null_on_undefined",
+        "is_not_null_on_value",
+        "is_not_null_on_null",
+        "is_not_null_on_undefined",
+        "is_nil_on_value",
+        "is_nil_on_null",
+        "is_nil_on_undefined",
+        "is_not_nil_on_value",
+        "is_not_nil_on_null",
+        "is_not_nil_on_undefined",
+        "is_undefined_on_value",
+        "is_undefined_on_null",
+        "is_undefined_on_undefined",
+        "is_not_undefined_on_value",
+        "is_not_undefined_on_null",
+        "is_not_undefined_on_undefined",
         "in_",
         "not_in",
         "between",

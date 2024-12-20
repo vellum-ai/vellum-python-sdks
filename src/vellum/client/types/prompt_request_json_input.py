@@ -13,7 +13,7 @@ class PromptRequestJsonInput(UniversalBaseModel):
     """
 
     type: typing.Literal["JSON"] = "JSON"
-    value: typing.Dict[str, typing.Optional[typing.Any]]
+    value: typing.Optional[typing.Any] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

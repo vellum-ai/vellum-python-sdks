@@ -6,11 +6,11 @@ on:
     types: [closed]
     branches:
       - main
-    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')
 
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
