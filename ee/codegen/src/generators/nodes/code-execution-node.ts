@@ -20,21 +20,24 @@ export class CodeExecutionNode extends BaseSingleFileNode<
 > {
   public declare readonly nodeContext: CodeExecutionContext;
   private readonly scriptFileContents: string;
-  private readonly shouldGenerateStandaloneCodeFile: boolean;
+  private readonly codeRepresentationOverride:
+    | "STANDALONE"
+    | "INLINE"
+    | undefined;
 
   constructor({
     workflowContext,
     nodeContext,
   }: BaseNode.Args<CodeExecutionNodeType, CodeExecutionContext>) {
     super({ workflowContext, nodeContext });
-    this.shouldGenerateStandaloneCodeFile =
-      workflowContext.generateCodeExecutionNodeCodeAsStandaloneFile;
+    this.codeRepresentationOverride =
+      workflowContext.codeExecutionNodeCodeRepresentationOverride;
     this.scriptFileContents = this.generateScriptFileContents();
   }
 
   // Override
   public async persist(): Promise<void> {
-    if (!this.shouldGenerateStandaloneCodeFile) {
+    if (!this.shouldGenerateStandaloneCodeFile()) {
       return super.persist();
     }
 
@@ -67,7 +70,7 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     const nodeData = this.nodeData.data;
     const statements: AstNode[] = [];
 
-    if (this.shouldGenerateStandaloneCodeFile) {
+    if (this.shouldGenerateStandaloneCodeFile()) {
       statements.push(
         python.field({
           name: "filepath",
@@ -316,5 +319,16 @@ export class CodeExecutionNode extends BaseSingleFileNode<
         },
       ]),
     });
+  }
+
+  private shouldGenerateStandaloneCodeFile(): boolean {
+    if (this.codeRepresentationOverride === "STANDALONE") {
+      return true;
+    }
+    if (this.codeRepresentationOverride === "INLINE") {
+      return false;
+    }
+
+    return !!this.nodeData.data.filepath;
   }
 }

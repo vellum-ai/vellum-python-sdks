@@ -66,6 +66,14 @@ import {
 import { getNodeId } from "src/utils/nodes";
 import { assertUnreachable } from "src/utils/typing";
 
+export interface WorkflowProjectGeneratorOptions {
+  /**
+   * If true, the code backing a Code Execution Node will be generated as a standalone file regardless of whether
+   *  the node specifies it as an inlined code attribute or not. If false
+   */
+  codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
+}
+
 export declare namespace WorkflowProjectGenerator {
   interface BaseArgs {
     moduleName: string;
@@ -76,7 +84,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
-    generateCodeExecutionNodeCodeAsStandaloneFile?: boolean;
+    options?: WorkflowProjectGeneratorOptions;
   }
 
   interface NestedProject extends BaseArgs {
@@ -143,8 +151,8 @@ ${errors.slice(0, 3).map((err) => {
         workflowClassName,
         vellumApiKey,
         workflowRawEdges: rawEdges,
-        generateCodeExecutionNodeCodeAsStandaloneFile:
-          rest.generateCodeExecutionNodeCodeAsStandaloneFile ?? true,
+        codeExecutionNodeCodeRepresentationOverride:
+          rest.options?.codeExecutionNodeCodeRepresentationOverride,
       });
     }
   }

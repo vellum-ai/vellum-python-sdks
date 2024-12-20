@@ -64,7 +64,9 @@ describe("WorkflowProjectGenerator", () => {
           workflowVersionExecConfigData: displayData,
           moduleName: "code",
           vellumApiKey: "<TEST_API_KEY>",
-          generateCodeExecutionNodeCodeAsStandaloneFile: true,
+          options: {
+            codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
+          },
         });
 
         await project.generateCode();

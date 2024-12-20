@@ -1,12 +1,16 @@
 import { WorkflowContext } from "src/context";
 
-export function workflowContextFactory({
-  absolutePathToOutputDirectory,
-  moduleName,
-  workflowClassName,
-  workflowRawEdges,
-  generateCodeExecutionNodeCodeAsStandaloneFile,
-}: Partial<WorkflowContext.Args> = {}): WorkflowContext {
+export function workflowContextFactory(
+  {
+    absolutePathToOutputDirectory,
+    moduleName,
+    workflowClassName,
+    workflowRawEdges,
+    codeExecutionNodeCodeRepresentationOverride,
+  }: Partial<WorkflowContext.Args> = {
+    codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
+  }
+): WorkflowContext {
   return new WorkflowContext({
     absolutePathToOutputDirectory:
       absolutePathToOutputDirectory || "./src/__tests__/",
@@ -14,7 +18,6 @@ export function workflowContextFactory({
     workflowClassName: workflowClassName || "Workflow",
     vellumApiKey: "<TEST_API_KEY>",
     workflowRawEdges: workflowRawEdges || [],
-    generateCodeExecutionNodeCodeAsStandaloneFile:
-      generateCodeExecutionNodeCodeAsStandaloneFile ?? true,
+    codeExecutionNodeCodeRepresentationOverride,
   });
 }
