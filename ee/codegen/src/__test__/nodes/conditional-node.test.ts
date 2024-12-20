@@ -6,9 +6,11 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   conditionalNodeFactory,
   conditionalNodeWithNullOperatorFactory,
+  templatingNodeFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
+import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import {
   ConditionalNode as ConditionalNodeType,
@@ -73,7 +75,13 @@ describe("ConditionalNode with null operator", () => {
     workflowContext = workflowContextFactory();
     writer = new Writer();
 
-    const nodeData = conditionalNodeWithNullOperatorFactory();
+    const templatingNode = templatingNodeFactory();
+    const nodeData = conditionalNodeWithNullOperatorFactory({
+      nodeOutputReference: {
+        nodeId: templatingNode.id,
+        outputId: templatingNode.data.outputId,
+      },
+    });
 
     workflowContext.addInputVariableContext(
       inputVariableContextFactory({
@@ -85,6 +93,12 @@ describe("ConditionalNode with null operator", () => {
         workflowContext,
       })
     );
+
+    const upstreamNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: templatingNode,
+    })) as TemplatingNodeContext;
+    workflowContext.addNodeContext(upstreamNodeContext);
 
     const nodeContext = (await createNodeContext({
       workflowContext,
