@@ -1,3 +1,4 @@
+import json
 from uuid import uuid4
 from typing import ClassVar, Generic, Iterator, List, Optional, Tuple, cast
 
@@ -18,6 +19,7 @@ from vellum.client import RequestOptions
 from vellum.workflows.constants import OMIT
 from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
@@ -108,19 +110,30 @@ class BaseInlinePromptNode(BasePromptNode, Generic[StateType]):
                         value=cast(List[ChatMessage], input_value),
                     )
                 )
-            elif isinstance(input_value, dict):
-                # Note: We may want to fail early here if we know that input_value is not
-                #   JSON serializable.
+            else:
+                try:
+                    input_value = default_serializer(input_value)
+                except json.JSONDecodeError as e:
+                    raise NodeException(
+                        message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                    )
+
+                input_variables.append(
+                    VellumVariable(
+                        # TODO: Determine whether or not we actually need an id here and if we do,
+                        #   figure out how to maintain stable id references.
+                        #   https://app.shortcut.com/vellum/story/4080
+                        id=str(uuid4()),
+                        key=input_name,
+                        type="JSON",
+                    )
+                )
                 input_values.append(
                     PromptRequestJsonInput(
                         key=input_name,
                         value=input_value,
                     )
-                )
-            else:
-                raise NodeException(
-                    message=f"Unrecognized input type for input '{input_name}': {input_value.__class__}",
-                    code=WorkflowErrorCode.INVALID_INPUTS,
                 )
 
         return input_variables, input_values

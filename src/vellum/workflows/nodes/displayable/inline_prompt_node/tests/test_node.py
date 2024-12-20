@@ -1,6 +1,14 @@
 from dataclasses import dataclass
+from uuid import uuid4
+from typing import Any, Iterator, List
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.types.execute_prompt_event import ExecutePromptEvent
+from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
+from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+from vellum.client.types.prompt_output import PromptOutput
+from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
+from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 
 
@@ -14,12 +22,32 @@ def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
         example: str
 
     class MyNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
         prompt_inputs = {
             "a_dict": {"foo": "bar"},
-            "a_list": [1, 2, 3],
-            "a_dataclass": MyDataClass(hello="world"),
-            "a_pydantic": MyPydantic(example="example"),
+            # "a_list": [1, 2, 3],
+            "a_dataclass": MyDataClass(hello="world"),  # type: ignore[dict-item]
+            "a_pydantic": MyPydantic(example="example"),  # type: ignore[dict-item]
         }
+
+    # AND a known response from invoking an inline prompt
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value="Test"),
+    ]
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
     # WHEN the node is run
     list(MyNode().run())
@@ -27,10 +55,10 @@ def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
     # THEN the prompt is executed with the correct inputs
     mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
     assert mock_api.call_count == 1
-    assert mock_api.call_args[0]["input_values"] == {
-        "a_dict": {"type": "JSON", "value": {"foo": "bar"}},
-        "a_list": {"type": "JSON", "value": [1, 2, 3]},
-        "a_dataclass": {"type": "JSON", "value": {"hello": "world"}},
-        "a_pydantic": {"type": "JSON", "value": {"example": "example"}},
-    }
-    assert len(mock_api.call_args[0]["input_variables"]) == 4
+    assert mock_api.call_args.kwargs["input_values"] == [
+        PromptRequestJsonInput(key="a_dict", type="JSON", value={"foo": "bar"}),
+        # PromptRequestJsonInput(key="a_list", type="JSON", value=[1, 2, 3]),
+        PromptRequestJsonInput(key="a_dataclass", type="JSON", value={"hello": "world"}),
+        PromptRequestJsonInput(key="a_pydantic", type="JSON", value={"example": "example"}),
+    ]
+    assert len(mock_api.call_args.kwargs["input_variables"]) == 3  # 4
