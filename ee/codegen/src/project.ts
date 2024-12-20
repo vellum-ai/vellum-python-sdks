@@ -68,8 +68,9 @@ import { assertUnreachable } from "src/utils/typing";
 
 export interface WorkflowProjectGeneratorOptions {
   /**
-   * If true, the code backing a Code Execution Node will be generated as a standalone file regardless of whether
-   *  the node specifies it as an inlined code attribute or not. If false
+   * Used to override the default codegen behavior for Code Execution Nodes. If set to "STANDALONE",
+   *  the node's code will be generated in a separate file. If set to "INLINE", the node's code will
+   *  be inlined as a node attribute.
    */
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
 }
