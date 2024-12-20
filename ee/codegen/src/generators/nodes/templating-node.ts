@@ -118,6 +118,8 @@ export class TemplatingNode extends BaseSingleFileNode<
 
     return python.TypeInstantiation.str(templateRule.data.value, {
       multiline: true,
+      startOnNewLine: true,
+      endWithNewLine: true,
     });
   }
 

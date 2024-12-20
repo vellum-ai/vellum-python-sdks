@@ -70,6 +70,8 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
           name: "template",
           value: python.TypeInstantiation.str(promptBlock.properties.template, {
             multiline: true,
+            startOnNewLine: true,
+            endWithNewLine: true,
           }),
         })
       );
@@ -210,6 +212,8 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
         name: "text",
         value: python.TypeInstantiation.str(promptBlock.text, {
           multiline: true,
+          startOnNewLine: true,
+          endWithNewLine: true,
         }),
       })
     );
