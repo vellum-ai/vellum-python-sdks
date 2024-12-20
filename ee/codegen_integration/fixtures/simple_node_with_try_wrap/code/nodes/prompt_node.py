@@ -25,7 +25,13 @@ class PromptNode(InlinePromptNode):
                     cache_config=None,
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED", cache_config=None, text="What is the origin of the following phrase\n\n"
+                            state="ENABLED",
+                            cache_config=None,
+                            text="""\
+What is the origin of the following phrase
+
+\
+""",
                         ),
                         VariablePromptBlock(state="ENABLED", cache_config=None, input_variable="text"),
                     ],
