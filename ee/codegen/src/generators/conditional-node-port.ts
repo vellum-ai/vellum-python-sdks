@@ -149,14 +149,16 @@ export class ConditionalNodePort extends AstNode {
     const rhs = !isNil(rhsKey) ? this.nodeInputsByKey.get(rhsKey) : undefined;
     if (isNil(lhs)) {
       throw new NodePortGenerationError(
-        `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey}`
+        `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey} for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
       );
     }
     const expression = conditionData.operator
       ? this.convertOperatorToMethod(conditionData.operator, lhs)
       : undefined;
-    if (isNil(lhs) || isNil(expression)) {
-      throw new Error("Port conditions require a lhs and an expression");
+    if (isNil(expression)) {
+      throw new NodePortGenerationError(
+        `Node ${this.nodeLabel} is missing required operator for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+      );
     }
     return new Expression({
       lhs: lhs,
@@ -192,7 +194,9 @@ export class ConditionalNodePort extends AstNode {
     };
     const value = operatorMappings[operator];
     if (!value) {
-      throw new Error(`This operator: ${operator} is not supported`);
+      throw new NodePortGenerationError(
+        `This operator: ${operator} is not supported`
+      );
     }
     return value;
   }
