@@ -157,7 +157,6 @@ class VellumMypyPlugin(Plugin):
         elif _is_subclass(
             ctx.cls.info, "vellum.workflows.nodes.displayable.code_execution_node.node.CodeExecutionNode"
         ):
-            self._code_execution_node_class_hook(ctx)
             self._dynamic_output_node_class_hook(ctx, "result")
         elif _is_subclass(ctx.cls.info, "vellum.workflows.nodes.displayable.final_output_node.node.FinalOutputNode"):
             self._dynamic_output_node_class_hook(ctx, "value")
@@ -173,41 +172,39 @@ class VellumMypyPlugin(Plugin):
 
     def _dynamic_output_node_class_hook(self, ctx: ClassDefContext, attribute_name: str) -> None:
         """
-        We use this hook to properly annotate the Outputs class for Templating Node using the resolved type
-        of the TemplatingNode's class _OutputType generic.
+        We use this hook to properly annotate the Outputs class for Templating Node and
+        Code Execution Node using the resolved type
+        of the TemplatingNode's and CodeExecutionNode's class _OutputType generic.
         """
-
-        templating_node_info = ctx.cls.info
-        templating_node_bases = ctx.cls.info.bases
-        if not templating_node_bases:
+        node_info = ctx.cls.info
+        node_bases = ctx.cls.info.bases
+        if not node_bases:
             return
-        if not isinstance(templating_node_bases[0], Instance):
-            return
-
-        base_templating_args = templating_node_bases[0].args
-        base_templating_node = templating_node_bases[0].type
-        if not _is_subclass(base_templating_node, "vellum.workflows.nodes.core.templating_node.node.TemplatingNode"):
+        if not isinstance(node_bases[0], Instance):
             return
 
-        if len(base_templating_args) != 2:
+        base_args = node_bases[0].args
+        base_node = node_bases[0].type
+
+        if len(base_args) != 2:
             return
 
-        base_templating_node_resolved_type = base_templating_args[1]
-        if isinstance(base_templating_node_resolved_type, AnyType):
-            base_templating_node_resolved_type = ctx.api.named_type("builtins.str")
+        base_node_resolved_type = base_args[1]
+        if isinstance(base_node_resolved_type, AnyType):
+            base_node_resolved_type = ctx.api.named_type("builtins.str")
 
-        base_templating_node_outputs = base_templating_node.names.get("Outputs")
-        if not base_templating_node_outputs:
+        base_node_outputs = base_node.names.get("Outputs")
+        if not base_node_outputs:
             return
 
-        current_templating_node_outputs = templating_node_info.names.get("Outputs")
-        if not current_templating_node_outputs:
-            templating_node_info.names["Outputs"] = base_templating_node_outputs.copy()
-            new_outputs_sym = templating_node_info.names["Outputs"].node
+        current_node_outputs = node_info.names.get("Outputs")
+        if not current_node_outputs:
+            node_info.names["Outputs"] = base_node_outputs.copy()
+            new_outputs_sym = node_info.names["Outputs"].node
             if isinstance(new_outputs_sym, TypeInfo):
                 result_sym = new_outputs_sym.names[attribute_name].node
                 if isinstance(result_sym, Var):
-                    result_sym.type = base_templating_node_resolved_type
+                    result_sym.type = base_node_resolved_type
 
     def _base_node_class_hook(self, ctx: ClassDefContext) -> None:
         """
@@ -234,7 +231,6 @@ class VellumMypyPlugin(Plugin):
             type_ = sym.node.type
             if not type_:
                 continue
-
             sym.node.type = self._get_resolvable_type(
                 lambda fullname, types: ctx.api.named_type(fullname, types), type_
             )
@@ -644,48 +640,6 @@ class VellumMypyPlugin(Plugin):
                         sym.node.type = args[0]
 
         return new_type_info
-
-    def _code_execution_node_class_hook(self, ctx: ClassDefContext) -> None:
-        api = ctx.api
-        node_info = ctx.cls.info
-
-        primitive_types = [
-            api.named_type('builtins.str'),
-            api.named_type('typing.List', [api.named_type('vellum.types.ChatMessage')]),
-            api.named_type('typing.List', [api.named_type('vellum.types.SearchResultRequest')]),
-            api.named_type('typing.List', [api.named_type('vellum.types.SearchResult')]),
-            api.named_type('vellum.types.Json'),
-            api.named_type('builtins.float'),
-            api.named_type('vellum.types.FunctionCall'),
-            api.named_type('vellum.types.FunctionCallRequest'),
-            api.named_type('vellum.types.VellumError'),
-            api.named_type('vellum.types.VellumErrorRequest'),
-            api.named_type('typing.List', [api.named_type('vellum.types.VellumValueRequest')]),
-            api.named_type('typing.List', [api.named_type('vellum.types.VellumValue')]),
-            api.named_type('vellum.types.VellumImage'),
-            api.named_type('vellum.types.VellumImageRequest'),
-            api.named_type('vellum.types.VellumAudio'),
-            api.named_type('vellum.types.VellumAudioRequest'),
-            api.named_type('vellum.types.VellumSecret'),
-        ]
-
-        vellum_primitive_union = UnionType(primitive_types)
-
-        output_ref = api.named_type('vellum.workflows.nodes.core.output_reference.OutputReference')
-        output_ref.args = (vellum_primitive_union,)
-
-        descriptor_type = api.named_type_or_none(
-            'vellum.workflows.nodes.core.base_descriptor.BaseDescriptor',
-            [output_ref]
-        )
-
-        for name, symnode in node_info.names.items():
-            if name == 'Outputs':
-                outputs_class = symnode.node
-                if outputs_class and hasattr(outputs_class, 'names'):
-                    for output_name in outputs_class.names:
-                        if not output_name.startswith('_'):
-                            outputs_class.names[output_name] = descriptor_type
 
 
 def plugin(version: str) -> Type[VellumMypyPlugin]:
