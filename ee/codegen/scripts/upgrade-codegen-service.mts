@@ -36,8 +36,6 @@ const main = async () => {
   execSync(`git clone ${repoUrl} ${targetDir}`, { stdio: "inherit" });
 
   process.chdir(targetDir);
-  const branchName = `vellum-automation/${version}`;
-  execSync(`git checkout -b ${branchName}`, { stdio: "inherit" });
   execSync(`npm run gar-login`, { stdio: "inherit" });
   execSync(`npm install @vellum-ai/vellum-codegen@${version} --save-exact`, {
     stdio: "inherit",
@@ -53,8 +51,8 @@ const main = async () => {
   execSync(`git commit -m "Upgrade codegen service to ${version}"`, {
     stdio: "inherit",
   });
-  execSync(`git push origin ${branchName}`, { stdio: "inherit" });
-  console.log("Successfully pushed branch", branchName);
+  execSync(`git push origin main`, { stdio: "inherit" });
+  console.log("Successfully pushed", version, "to main!");
   process.exit(0);
 };
 
