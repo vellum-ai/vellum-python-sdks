@@ -220,7 +220,7 @@ from vellum.workflows.state import BaseState
 
 
 class BadNode(TemplatingNode[BaseState, str]):
-    template = "foo"
+    template = """foo"""
     inputs = {}
 `);
 

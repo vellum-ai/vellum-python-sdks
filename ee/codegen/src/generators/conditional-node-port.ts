@@ -149,7 +149,11 @@ export class ConditionalNodePort extends AstNode {
     const rhs = !isNil(rhsKey) ? this.nodeInputsByKey.get(rhsKey) : undefined;
     if (isNil(lhs)) {
       throw new NodePortGenerationError(
+<<<<<<< HEAD
         `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey} for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+=======
+        `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey}`
+>>>>>>> 3686114 (is_nil code generation for node outputs referenced in conditional node ports)
       );
     }
     const expression = conditionData.operator
