@@ -27,10 +27,7 @@ class VellumSecret:
         self.name = name
 
 
-EntityInputsInterface = Dict[
-    str,
-    Any,
-]
+EntityInputsInterface = Dict[str, Any]
 
 
 class MergeBehavior(Enum):
