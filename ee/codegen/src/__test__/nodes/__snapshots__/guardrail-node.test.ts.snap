@@ -129,8 +129,8 @@ class GuardrailNode(BaseGuardrailNode):
 
 exports[`GuardrailNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import (
-    BaseTryNodeDisplay,
     BaseGuardrailNodeDisplay,
+    BaseTryNodeDisplay,
 )
 from ...nodes.guardrail_node import GuardrailNode
 from uuid import UUID
@@ -141,10 +141,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[GuardrailNode]):
-    error_output_id = UUID("38361ff1-c826-49b8-aa8d-28179c3684cc")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("38361ff1-c826-49b8-aa8d-28179c3684cc"))
 class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
     label = "Guardrail Node"
     node_id = UUID("metric")

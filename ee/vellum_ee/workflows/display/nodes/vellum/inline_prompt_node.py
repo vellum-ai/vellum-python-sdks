@@ -23,7 +23,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
-        # breakpoint()
         node = self._node
         node_id = self.node_id
 

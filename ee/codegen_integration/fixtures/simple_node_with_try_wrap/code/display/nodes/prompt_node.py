@@ -7,10 +7,7 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.prompt_node import PromptNode
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
-    error_output_id = UUID("42823c15-2ba6-4c85-a0d7-74a4e0541a42")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("42823c15-2ba6-4c85-a0d7-74a4e0541a42"))
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt"
     node_id = UUID("1645c7e7-1b5f-4ca3-9610-0c5ac30a77ff")

@@ -208,8 +208,8 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > CHAT_MESSAGE block type > reject on error enabled > getNodeDisplayFile for CHAT_MESSAGE block type 1`] = `
 "from vellum_ee.workflows.display.nodes import (
-    BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
+    BaseTryNodeDisplay,
 )
 from ...nodes.prompt_node import PromptNode
 from uuid import UUID
@@ -220,10 +220,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
-    error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -461,8 +458,8 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > reject on error enabled > getNodeDisplayFile for FUNCTION_DEFINITION block type 1`] = `
 "from vellum_ee.workflows.display.nodes import (
-    BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
+    BaseTryNodeDisplay,
 )
 from ...nodes.prompt_node import PromptNode
 from uuid import UUID
@@ -473,10 +470,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
-    error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -693,8 +687,8 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > JINJA block type > reject on error enabled > getNodeDisplayFile for JINJA block type 1`] = `
 "from vellum_ee.workflows.display.nodes import (
-    BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
+    BaseTryNodeDisplay,
 )
 from ...nodes.prompt_node import PromptNode
 from uuid import UUID
@@ -705,10 +699,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
-    error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -936,8 +927,8 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > RICH_TEXT block type > reject on error enabled > getNodeDisplayFile for RICH_TEXT block type 1`] = `
 "from vellum_ee.workflows.display.nodes import (
-    BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
+    BaseTryNodeDisplay,
 )
 from ...nodes.prompt_node import PromptNode
 from uuid import UUID
@@ -948,10 +939,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
-    error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -1167,8 +1155,8 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > VARIABLE block type > reject on error enabled > getNodeDisplayFile for VARIABLE block type 1`] = `
 "from vellum_ee.workflows.display.nodes import (
-    BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
+    BaseTryNodeDisplay,
 )
 from ...nodes.prompt_node import PromptNode
 from uuid import UUID
@@ -1179,10 +1167,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
-    error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")

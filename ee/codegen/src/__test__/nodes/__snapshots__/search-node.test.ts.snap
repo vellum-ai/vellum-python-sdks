@@ -97,7 +97,7 @@ class SearchNode(BaseSearchNode):
 `;
 
 exports[`TextSearchNode > reject on error enabled > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseTryNodeDisplay, BaseSearchNodeDisplay
+"from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay, BaseTryNodeDisplay
 from ...nodes.search_node import SearchNode
 from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
@@ -107,10 +107,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay[SearchNode]):
-    error_output_id = UUID("af589f73-effe-4a80-b48f-fb912ac6ce67")
-
-
+@BaseTryNodeDisplay.wrap(error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"))
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     label = "Search Node"
     node_id = UUID("search")
