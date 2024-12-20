@@ -756,7 +756,7 @@ service:
       docs: |2-
             Used to submit feedback regarding the quality of previous workflow execution and its outputs.
 
-            **Note:** Uses a base url of `https://predict.vellum.ai`.    
+            **Note:** Uses a base url of `https://predict.vellum.ai`.
       source:
         openapi: openapi/openapi.yml
       request:
