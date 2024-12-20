@@ -7605,9 +7605,7 @@ components:
           description: The variable's name, as defined in the Prompt.
         type:
           type: string
-        value:
-          type: object
-          additionalProperties: {}
+        value: {}
       required:
       - key
       - type
