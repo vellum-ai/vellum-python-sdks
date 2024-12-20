@@ -76,6 +76,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
+    generateCodeExecutionNodeCodeAsStandaloneFile?: boolean;
   }
 
   interface NestedProject extends BaseArgs {
@@ -142,6 +143,8 @@ ${errors.slice(0, 3).map((err) => {
         workflowClassName,
         vellumApiKey,
         workflowRawEdges: rawEdges,
+        generateCodeExecutionNodeCodeAsStandaloneFile:
+          rest.generateCodeExecutionNodeCodeAsStandaloneFile ?? true,
       });
     }
   }

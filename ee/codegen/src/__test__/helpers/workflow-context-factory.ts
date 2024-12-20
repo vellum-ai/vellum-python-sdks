@@ -5,6 +5,7 @@ export function workflowContextFactory({
   moduleName,
   workflowClassName,
   workflowRawEdges,
+  generateCodeExecutionNodeCodeAsStandaloneFile,
 }: Partial<WorkflowContext.Args> = {}): WorkflowContext {
   return new WorkflowContext({
     absolutePathToOutputDirectory:
@@ -13,5 +14,7 @@ export function workflowContextFactory({
     workflowClassName: workflowClassName || "Workflow",
     vellumApiKey: "<TEST_API_KEY>",
     workflowRawEdges: workflowRawEdges || [],
+    generateCodeExecutionNodeCodeAsStandaloneFile:
+      generateCodeExecutionNodeCodeAsStandaloneFile ?? true,
   });
 }

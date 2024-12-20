@@ -20,17 +20,24 @@ export class CodeExecutionNode extends BaseSingleFileNode<
 > {
   public declare readonly nodeContext: CodeExecutionContext;
   private readonly scriptFileContents: string;
+  private readonly shouldGenerateStandaloneCodeFile: boolean;
 
   constructor({
     workflowContext,
     nodeContext,
   }: BaseNode.Args<CodeExecutionNodeType, CodeExecutionContext>) {
     super({ workflowContext, nodeContext });
+    this.shouldGenerateStandaloneCodeFile =
+      workflowContext.generateCodeExecutionNodeCodeAsStandaloneFile;
     this.scriptFileContents = this.generateScriptFileContents();
   }
 
   // Override
   public async persist(): Promise<void> {
+    if (!this.shouldGenerateStandaloneCodeFile) {
+      return super.persist();
+    }
+
     const nodeInitFile = new InitFile({
       workflowContext: this.workflowContext,
       modulePath: this.nodeContext.nodeModulePath,
@@ -60,12 +67,25 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     const nodeData = this.nodeData.data;
     const statements: AstNode[] = [];
 
-    statements.push(
-      python.field({
-        name: "filepath",
-        initializer: python.TypeInstantiation.str(this.nodeContext.filepath),
-      })
-    );
+    if (this.shouldGenerateStandaloneCodeFile) {
+      statements.push(
+        python.field({
+          name: "filepath",
+          initializer: python.TypeInstantiation.str(this.nodeContext.filepath),
+        })
+      );
+    } else {
+      statements.push(
+        python.field({
+          name: "code",
+          initializer: python.TypeInstantiation.str(this.scriptFileContents, {
+            multiline: true,
+            startOnNewLine: true,
+            endWithNewLine: true,
+          }),
+        })
+      );
+    }
 
     const systemInputs = [nodeData.codeInputId, nodeData.runtimeInputId];
     const codeInputs = Array.from(this.nodeInputsByKey.values()).filter(

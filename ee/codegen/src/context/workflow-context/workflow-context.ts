@@ -34,6 +34,7 @@ export declare namespace WorkflowContext {
     portContextByName?: PortContextById;
     vellumApiKey: string;
     workflowRawEdges: WorkflowEdge[];
+    generateCodeExecutionNodeCodeAsStandaloneFile?: boolean;
   };
 }
 
@@ -88,6 +89,8 @@ export class WorkflowContext {
 
   public readonly workflowRawEdges: WorkflowEdge[];
 
+  public readonly generateCodeExecutionNodeCodeAsStandaloneFile: boolean;
+
   constructor({
     absolutePathToOutputDirectory,
     moduleName,
@@ -99,6 +102,7 @@ export class WorkflowContext {
     portContextByName,
     vellumApiKey,
     workflowRawEdges,
+    generateCodeExecutionNodeCodeAsStandaloneFile = true,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -124,6 +128,9 @@ export class WorkflowContext {
 
     this.sdkModulePathNames = generateSdkModulePaths(workflowsSdkModulePath);
     this.workflowRawEdges = workflowRawEdges;
+
+    this.generateCodeExecutionNodeCodeAsStandaloneFile =
+      generateCodeExecutionNodeCodeAsStandaloneFile;
   }
 
   /* Create a new workflow context for a nested workflow from its parent */
@@ -146,6 +153,8 @@ export class WorkflowContext {
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,
       workflowRawEdges,
+      generateCodeExecutionNodeCodeAsStandaloneFile:
+        this.generateCodeExecutionNodeCodeAsStandaloneFile,
     });
   }
 
