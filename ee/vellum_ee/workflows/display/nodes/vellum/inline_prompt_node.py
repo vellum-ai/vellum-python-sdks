@@ -1,9 +1,8 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union, cast
+from typing import ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.nodes import InlinePromptNode
-from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
@@ -30,8 +29,8 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
         node_inputs, prompt_inputs = self._generate_node_and_prompt_inputs(node_id, node, display_context)
         input_variable_id_by_name = {prompt_input.key: prompt_input.id for prompt_input in prompt_inputs}
 
-        _, output_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.text)]
-        _, array_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.results)]
+        _, output_display = display_context.node_output_displays[node.Outputs.text]
+        _, array_display = display_context.node_output_displays[node.Outputs.results]
         node_blocks = raise_if_descriptor(node.blocks)
 
         return {

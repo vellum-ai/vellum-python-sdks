@@ -18,18 +18,21 @@ export declare namespace ConditionalNodePort {
     portContext: PortContext;
     inputFieldKeysByRuleId: Map<string, string>;
     valueInputKeysByRuleId: Map<string, string>;
-    conditionData: ConditionalNodeConditionData;
+    conditionDataWithIndex: [number, ConditionalNodeConditionData];
     nodeInputsByKey: Map<string, NodeInput>;
+    nodeLabel: string;
   }
 }
 
 export class ConditionalNodePort extends AstNode {
   private portContext: PortContext;
   private conditionalNodeData: ConditionalNodeConditionData;
+  private conditionalNodeDataIndex: number;
   private inputFieldKeysByRuleId: Map<string, string>;
   private valueInputKeysByRuleId: Map<string, string>;
   private nodeInputsByKey: Map<string, NodeInput>;
   private astNode: AstNode;
+  private nodeLabel: string;
 
   public constructor(args: ConditionalNodePort.Args) {
     super();
@@ -37,8 +40,10 @@ export class ConditionalNodePort extends AstNode {
     this.portContext = args.portContext;
     this.inputFieldKeysByRuleId = args.inputFieldKeysByRuleId;
     this.valueInputKeysByRuleId = args.valueInputKeysByRuleId;
-    this.conditionalNodeData = args.conditionData;
+    this.conditionalNodeDataIndex = args.conditionDataWithIndex[0];
+    this.conditionalNodeData = args.conditionDataWithIndex[1];
     this.nodeInputsByKey = args.nodeInputsByKey;
+    this.nodeLabel = args.nodeLabel;
     this.astNode = this.constructPort();
     this.inheritReferences(this.astNode);
   }
@@ -74,18 +79,19 @@ export class ConditionalNodePort extends AstNode {
   }
 
   private buildCondition(
-    conditionData: ConditionalRuleData | undefined
+    conditionData: ConditionalRuleData | undefined,
+    ruleIdx: number = -1
   ): AstNode {
     if (!conditionData) {
       return python.TypeInstantiation.none();
     }
 
     if (conditionData && conditionData.fieldNodeInputId) {
-      return this.buildDescriptor(conditionData);
+      return this.buildDescriptor(conditionData, ruleIdx);
     }
 
-    const otherConditions = (conditionData.rules || []).map((rule) => {
-      return this.buildCondition(rule);
+    const otherConditions = (conditionData.rules || []).map((rule, idx) => {
+      return this.buildCondition(rule, idx);
     });
 
     const combine =
@@ -105,10 +111,9 @@ export class ConditionalNodePort extends AstNode {
             });
           };
 
-    const combinedConditions = otherConditions.reduce((prev, curr) => {
+    return otherConditions.reduce((prev, curr) => {
       return combine(prev, curr);
     });
-    return combinedConditions;
   }
 
   private convertConditionTypeToPortAttribute(conditionType: string): string {
@@ -122,13 +127,18 @@ export class ConditionalNodePort extends AstNode {
     }
   }
 
-  private buildDescriptor(conditionData: ConditionalRuleData): AstNode {
+  private buildDescriptor(
+    conditionData: ConditionalRuleData,
+    ruleIdx: number
+  ): AstNode {
     const ruleId = conditionData.id;
 
     const lhsKey = this.inputFieldKeysByRuleId.get(ruleId);
     let rhsKey;
     if (isNil(lhsKey)) {
-      throw new Error(`Could not find input field key given rule id ${ruleId}`);
+      throw new Error(
+        `Could not find input field key given ruleId: ${ruleId} on rule index: ${ruleIdx} on condition index: ${this.conditionalNodeDataIndex} for node: ${this.nodeLabel}`
+      );
     }
     if (conditionData.valueNodeInputId) {
       rhsKey = this.valueInputKeysByRuleId.get(ruleId);
