@@ -61,7 +61,7 @@ from vellum.workflows.state import BaseState
 
 
 class TemplatingNode(BaseTemplatingNode[BaseState, str]):
-    template = "Hello, world!"
+    template = """Hello, world!"""
     inputs = {}
 "
 `;
@@ -114,7 +114,7 @@ from vellum.workflows.nodes.core import TryNode
 
 @TryNode.wrap()
 class TemplatingNode(BaseTemplatingNode[BaseState, str]):
-    template = "Hello, world!"
+    template = """Hello, world!"""
     inputs = {}
 "
 `;

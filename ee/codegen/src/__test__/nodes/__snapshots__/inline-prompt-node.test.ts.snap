@@ -89,7 +89,11 @@ class PromptNode(InlinePromptNode):
                         PlainTextPromptBlock(
                             state="ENABLED",
                             cache_config=None,
-                            text="Summarize the following text:\\n\\n",
+                            text="""\\
+Summarize the following text:
+
+\\
+""",
                         ),
                         VariablePromptBlock(
                             state="ENABLED", cache_config=None, input_variable="text"
@@ -181,7 +185,11 @@ class PromptNode(InlinePromptNode):
                         PlainTextPromptBlock(
                             state="ENABLED",
                             cache_config=None,
-                            text="Summarize the following text:\\n\\n",
+                            text="""\\
+Summarize the following text:
+
+\\
+""",
                         ),
                         VariablePromptBlock(
                             state="ENABLED", cache_config=None, input_variable="text"
@@ -282,7 +290,11 @@ class PromptNode(InlinePromptNode):
                         PlainTextPromptBlock(
                             state="ENABLED",
                             cache_config=None,
-                            text="Summarize the following text:\\n\\n",
+                            text="""\\
+Summarize the following text:
+
+\\
+""",
                         ),
                         VariablePromptBlock(
                             state="ENABLED", cache_config=None, input_variable="text"
@@ -605,7 +617,7 @@ class PromptNode(InlinePromptNode):
         JinjaPromptBlock(
             state="ENABLED",
             cache_config=None,
-            template="Summarize what this means {{ INPUT_VARIABLE }}",
+            template="""Summarize what this means {{ INPUT_VARIABLE }}""",
         )
     ]
     parameters = PromptParameters(
@@ -673,7 +685,7 @@ class PromptNode(InlinePromptNode):
         JinjaPromptBlock(
             state="ENABLED",
             cache_config=None,
-            template="Summarize what this means {{ INPUT_VARIABLE }}",
+            template="""Summarize what this means {{ INPUT_VARIABLE }}""",
         )
     ]
     parameters = PromptParameters(
@@ -750,7 +762,7 @@ class PromptNode(InlinePromptNode):
         JinjaPromptBlock(
             state="ENABLED",
             cache_config=None,
-            template="Summarize what this means {{ INPUT_VARIABLE }}",
+            template="""Summarize what this means {{ INPUT_VARIABLE }}""",
         )
     ]
     parameters = PromptParameters(
@@ -842,7 +854,7 @@ class PromptNode(InlinePromptNode):
             cache_config=None,
             blocks=[
                 PlainTextPromptBlock(
-                    state="ENABLED", cache_config=None, text="Hello World!"
+                    state="ENABLED", cache_config=None, text="""Hello World!"""
                 )
             ],
         )
@@ -914,7 +926,7 @@ class PromptNode(InlinePromptNode):
             cache_config=None,
             blocks=[
                 PlainTextPromptBlock(
-                    state="ENABLED", cache_config=None, text="Hello World!"
+                    state="ENABLED", cache_config=None, text="""Hello World!"""
                 )
             ],
         )
@@ -995,7 +1007,7 @@ class PromptNode(InlinePromptNode):
             cache_config=None,
             blocks=[
                 PlainTextPromptBlock(
-                    state="ENABLED", cache_config=None, text="Hello World!"
+                    state="ENABLED", cache_config=None, text="""Hello World!"""
                 )
             ],
         )

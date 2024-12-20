@@ -3,5 +3,5 @@ from vellum.workflows.state import BaseState
 
 
 class TemplatingNode2(TemplatingNode[BaseState, str]):
-    template = "Goodbye, world!"
+    template = """Goodbye, world!"""
     inputs = {}

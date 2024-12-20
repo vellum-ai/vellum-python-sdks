@@ -6,5 +6,8 @@ from .templating_node_2 import TemplatingNode2
 
 
 class TemplatingNode3(TemplatingNode[BaseState, str]):
-    template = "{{ input_a }}\n{{ input_b }}"
+    template = """\
+{{ input_a }}
+{{ input_b }}\
+"""
     inputs = {"input_a": TemplatingNode1.Outputs.result, "input_b": TemplatingNode2.Outputs.result}

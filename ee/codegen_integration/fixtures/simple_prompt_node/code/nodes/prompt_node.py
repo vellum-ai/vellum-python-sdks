@@ -25,7 +25,13 @@ class PromptNode(InlinePromptNode):
                     cache_config=None,
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED", cache_config=None, text="Summarize the following text:\n\n"
+                            state="ENABLED",
+                            cache_config=None,
+                            text="""\
+Summarize the following text:
+
+\
+""",
                         ),
                         VariablePromptBlock(state="ENABLED", cache_config=None, input_variable="text"),
                     ],
