@@ -47,24 +47,17 @@ def default_serializer(obj: Any) -> Any:
 
 
 class CodeResourceDefinition(UniversalBaseModel):
+    id: UUID
     name: str
     module: List[str]
 
     @staticmethod
     def encode(obj: type) -> "CodeResourceDefinition":
-        return CodeResourceDefinition(**serialize_type_encoder(obj))
-
-
-class VellumCodeResource(CodeResourceDefinition):
-    id: UUID
-
-    @staticmethod
-    def encode(obj: type) -> "VellumCodeResource":
-        return VellumCodeResource(**serialize_type_encoder_with_id(obj))
+        return CodeResourceDefinition(**serialize_type_encoder_with_id(obj))
 
 
 VellumCodeResourceDefinition = Annotated[
-    VellumCodeResource,
+    CodeResourceDefinition,
     BeforeValidator(lambda d: (d if type(d) is dict else serialize_type_encoder_with_id(d))),
 ]
 
