@@ -28,7 +28,7 @@ export class Expression extends AstNode {
     // TODO: We should ideally perform this using native fern functionality, but it requires being able to create
     //  a Reference object from an existing AstNode, which in turn requires all AstNode's to internally track their
     //  name and modulePath.
-    const rhsExpression = rhs ? `(${rhs.toString()})` : "";
+    const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
     const rawExpression = `${lhs.toString()}.${expression}${rhsExpression}`;
 
     return python.codeBlock(rawExpression);
