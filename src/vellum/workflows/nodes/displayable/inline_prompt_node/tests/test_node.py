@@ -26,9 +26,9 @@ def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
         blocks = []
         prompt_inputs = {
             "a_dict": {"foo": "bar"},
-            # "a_list": [1, 2, 3],
-            "a_dataclass": MyDataClass(hello="world"),  # type: ignore[dict-item]
-            "a_pydantic": MyPydantic(example="example"),  # type: ignore[dict-item]
+            "a_list": [1, 2, 3],
+            "a_dataclass": MyDataClass(hello="world"),
+            "a_pydantic": MyPydantic(example="example"),
         }
 
     # AND a known response from invoking an inline prompt
@@ -57,8 +57,8 @@ def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
     assert mock_api.call_count == 1
     assert mock_api.call_args.kwargs["input_values"] == [
         PromptRequestJsonInput(key="a_dict", type="JSON", value={"foo": "bar"}),
-        # PromptRequestJsonInput(key="a_list", type="JSON", value=[1, 2, 3]),
+        PromptRequestJsonInput(key="a_list", type="JSON", value=[1, 2, 3]),
         PromptRequestJsonInput(key="a_dataclass", type="JSON", value={"hello": "world"}),
         PromptRequestJsonInput(key="a_pydantic", type="JSON", value={"example": "example"}),
     ]
-    assert len(mock_api.call_args.kwargs["input_variables"]) == 3  # 4
+    assert len(mock_api.call_args.kwargs["input_variables"]) == 4

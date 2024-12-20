@@ -9,7 +9,6 @@ from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
-from vellum.workflows.types.core import VellumValuePrimitive
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -93,7 +92,7 @@ def create_node_input_value_pointer_rule(
     raise ValueError(f"Unsupported descriptor type: {value.__class__.__name__}")
 
 
-def primitive_to_vellum_value(value: VellumValuePrimitive) -> VellumValue:
+def primitive_to_vellum_value(value: Any) -> VellumValue:
     """Converts a python primitive to a VellumVariableValue"""
 
     if isinstance(value, str):
