@@ -117,8 +117,8 @@ class APINode(BaseAPINode):
 
 exports[`ApiNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseTryNodeDisplay, BaseAPINodeDisplay
-from uuid import UUID
 from ...nodes.api_node import APINode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
@@ -126,7 +126,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay):
+class TryNodeDisplay(BaseTryNodeDisplay[APINode]):
     error_output_id = UUID("af589f73-effe-4a80-b48f-fb912ac6ce67")
 
 

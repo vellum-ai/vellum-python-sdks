@@ -71,8 +71,8 @@ exports[`TemplatingNode > reject on error enabled > getNodeDisplayFile 1`] = `
     BaseTryNodeDisplay,
     BaseTemplatingNodeDisplay,
 )
-from uuid import UUID
 from ...nodes.templating_node import TemplatingNode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
@@ -80,7 +80,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay):
+class TryNodeDisplay(BaseTryNodeDisplay[TemplatingNode]):
     error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
 
 

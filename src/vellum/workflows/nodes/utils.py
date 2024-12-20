@@ -3,6 +3,7 @@ from typing import Type
 
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports.port import Port
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.generics import NodeType
 
 ADORNMENT_MODULE_NAME = "<adornment>"
@@ -10,8 +11,9 @@ ADORNMENT_MODULE_NAME = "<adornment>"
 
 @cache
 def get_unadorned_node(node: Type[BaseNode]) -> Type[BaseNode]:
-    if hasattr(node, "__wrapped_node__"):
-        return get_unadorned_node(node.__wrapped_node__)
+    wrapped_node = getattr(node, "__wrapped_node__", None)
+    if wrapped_node is not None:
+        return get_unadorned_node(wrapped_node)
 
     return node
 
@@ -23,6 +25,19 @@ def get_unadorned_port(port: Port) -> Port:
         return port
 
     return getattr(unadorned_node.Ports, port.name)
+
+
+@cache
+def get_unadorned_output(output: OutputReference) -> OutputReference:
+    if not hasattr(output.outputs_class, "_node_class"):
+        return output
+
+    node = output.outputs_class._node_class
+    unadorned_node = get_unadorned_node(node)
+    if unadorned_node == node:
+        return output
+
+    return getattr(unadorned_node.Outputs, output.name)
 
 
 @cache

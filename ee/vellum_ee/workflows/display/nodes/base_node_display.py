@@ -17,6 +17,7 @@ from typing import (
 )
 
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_output, get_unadorned_port
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonObject
@@ -35,12 +36,45 @@ _NodeDisplayAttrType = TypeVar("_NodeDisplayAttrType")
 
 class BaseNodeDisplayMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
+        orig_bases = dct.get("__orig_bases__")
+        if isinstance(orig_bases, tuple) and len(orig_bases) > 0:
+            # If an adorned node parameterizes a non-adornable display class, we need to replace the
+            # adorned node class with the unadorned one. We plan to replace this by making adornable
+            # display classes decorators in the future.
+            orig_base = orig_bases[0]
+            origin = get_origin(orig_base)
+            raw_node_class_arg = get_args(orig_base)[0]
+            unadorned_raw_node_class = get_unadorned_node(raw_node_class_arg)
+            is_adornable = getattr(origin, "__is_adornable__", False)
+            if unadorned_raw_node_class != raw_node_class_arg and not is_adornable:
+                orig_base.__args__ = (unadorned_raw_node_class,)
+
         cls = super().__new__(mcs, name, bases, dct)
+
+        base_node_display_class = cast(Type["BaseNodeDisplay"], cls)
+        node_class = base_node_display_class.infer_node_class()
+
+        if not issubclass(node_class, BaseNode):
+            return cls
+
+        # Display classes are able to override the id of the node class it's parameterized by
         if isinstance(dct.get("node_id"), UUID):
-            # Display classes are able to override the id of the node class it's parameterized by
-            base_node_display_class = cast(Type["BaseNodeDisplay"], cls)
-            node_class = base_node_display_class.infer_node_class()
             node_class.__id__ = dct["node_id"]
+
+        # Adorned nodes should be keyed by underlying ports instead of the adorned ones
+        old_ports = list(base_node_display_class.port_displays.keys())
+        for old_port in old_ports:
+            unadorned_port = get_unadorned_port(old_port)
+            base_node_display_class.port_displays[unadorned_port] = base_node_display_class.port_displays.pop(old_port)
+
+        # Same with output displays
+        old_outputs = list(base_node_display_class.output_display.keys())
+        for old_output in old_outputs:
+            unadorned_output = get_unadorned_output(old_output)
+            base_node_display_class.output_display[unadorned_output] = base_node_display_class.output_display.pop(
+                old_output
+            )
+
         return cls
 
 
@@ -50,6 +84,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     # Used to store the mapping between node types and their display classes
     _node_display_registry: Dict[Type[NodeType], Type["BaseNodeDisplay"]] = {}
+    __is_adornable__ = False
 
     def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
         raise NotImplementedError(f"Serialization for nodes of type {self._node.__name__} is not supported.")

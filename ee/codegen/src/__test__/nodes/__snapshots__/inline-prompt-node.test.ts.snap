@@ -211,8 +211,8 @@ exports[`InlinePromptNode > CHAT_MESSAGE block type > reject on error enabled > 
     BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
 )
-from uuid import UUID
 from ...nodes.prompt_node import PromptNode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
@@ -220,7 +220,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay):
+class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
     error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
 
 
@@ -464,8 +464,8 @@ exports[`InlinePromptNode > FUNCTION_DEFINITION block type > reject on error ena
     BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
 )
-from uuid import UUID
 from ...nodes.prompt_node import PromptNode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
@@ -473,7 +473,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay):
+class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
     error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
 
 
@@ -696,8 +696,8 @@ exports[`InlinePromptNode > JINJA block type > reject on error enabled > getNode
     BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
 )
-from uuid import UUID
 from ...nodes.prompt_node import PromptNode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
@@ -705,7 +705,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay):
+class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
     error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
 
 
@@ -939,8 +939,8 @@ exports[`InlinePromptNode > RICH_TEXT block type > reject on error enabled > get
     BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
 )
-from uuid import UUID
 from ...nodes.prompt_node import PromptNode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
@@ -948,7 +948,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay):
+class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
     error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
 
 
@@ -1170,8 +1170,8 @@ exports[`InlinePromptNode > VARIABLE block type > reject on error enabled > getN
     BaseTryNodeDisplay,
     BaseInlinePromptNodeDisplay,
 )
-from uuid import UUID
 from ...nodes.prompt_node import PromptNode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
@@ -1179,7 +1179,7 @@ from vellum_ee.workflows.display.nodes.types import (
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 
-class TryNodeDisplay(BaseTryNodeDisplay):
+class TryNodeDisplay(BaseTryNodeDisplay[PromptNode]):
     error_output_id = UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f")
 
 

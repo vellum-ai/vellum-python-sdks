@@ -302,6 +302,12 @@ export abstract class BaseNode<
           name: "BaseTryNodeDisplay",
           modulePath:
             this.workflowContext.sdkModulePathNames.NODE_DISPLAY_MODULE_PATH,
+          genericTypes: [
+            python.reference({
+              name: nodeContext.nodeClassName,
+              modulePath: nodeContext.nodeModulePath,
+            }),
+          ],
         }),
       ],
     });

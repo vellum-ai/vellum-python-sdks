@@ -15,6 +15,7 @@ _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
 
 
 class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeType]):
+    __is_adornable__ = True
     error_output_id: ClassVar[Optional[UUID]] = None
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
