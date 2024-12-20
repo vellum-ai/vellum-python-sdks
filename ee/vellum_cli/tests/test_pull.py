@@ -441,3 +441,49 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "deployments": [],
             },
         ]
+
+
+def test_pull__handle_error_log(vellum_client, mock_module):
+    # GIVEN a pyproject.toml with a workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND the workflow pull API call returns a zip file with an error log
+    vellum_client.workflows.pull.return_value = iter(
+        [_zip_file_map({"workflow.py": "print('hello')", "error.log": "test error"})]
+    )
+
+    # WHEN the user runs the pull command with the new workflow sandbox id
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-sandbox-id", workflow_sandbox_id])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the error log file is not written to the module directory
+    assert not os.path.exists(os.path.join(temp_dir, *module.split("."), "error.log"))
+
+    # AND the error log is printed to the console
+    assert "test error" in result.output
+    assert "test error" in result.stderr
+
+
+def test_pull__strict__with_error(vellum_client, mock_module):
+    # GIVEN a pyproject.toml with a workflow configured
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+
+    # WHEN the user runs the pull command with the new workflow sandbox id
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--strict", "--workflow-sandbox-id", workflow_sandbox_id])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the pull api is called with strict=True
+    vellum_client.workflows.pull.assert_called_once()
+    call_args = vellum_client.workflows.pull.call_args.kwargs
+    assert call_args["request_options"]["additional_query_parameters"] == {"strict": True}
