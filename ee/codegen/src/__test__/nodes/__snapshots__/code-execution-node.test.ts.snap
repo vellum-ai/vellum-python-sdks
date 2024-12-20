@@ -79,3 +79,51 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     packages = None
 "
 `;
+
+exports[`CodeExecutionNode > code representation override > should generate the correct node class when the override is INLINE 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    code = """print('Hello, World!')"""
+    code_inputs = {}
+    output_type = "STRING"
+    runtime = "PYTHON_3_11"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > code representation override > should generate the correct node class when the override is STANDALONE 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    output_type = "STRING"
+    runtime = "PYTHON_3_11"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > code representation override > should generate the correct node class when the override is undefined 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    code = """print('Hello, World!')"""
+    code_inputs = {}
+    output_type = "STRING"
+    runtime = "PYTHON_3_11"
+    packages = None
+"
+`;

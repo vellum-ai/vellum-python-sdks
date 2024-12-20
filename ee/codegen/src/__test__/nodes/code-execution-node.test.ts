@@ -49,6 +49,37 @@ describe("CodeExecutionNode", () => {
     });
   });
 
+  describe("code representation override", () => {
+    it.each<"INLINE" | "STANDALONE" | undefined>([
+      undefined,
+      "STANDALONE",
+      "INLINE",
+    ])(
+      "should generate the correct node class when the override is %s",
+      async (override) => {
+        workflowContext = workflowContextFactory({
+          codeExecutionNodeCodeRepresentationOverride: override,
+        });
+
+        const nodeData = codeExecutionNodeFactory();
+
+        const nodeContext = (await createNodeContext({
+          workflowContext,
+          nodeData,
+        })) as CodeExecutionContext;
+        workflowContext.addNodeContext(nodeContext);
+
+        node = new CodeExecutionNode({
+          workflowContext: workflowContext,
+          nodeContext,
+        });
+
+        node.getNodeFile().write(writer);
+        expect(await writer.toStringFormatted()).toMatchSnapshot();
+      }
+    );
+  });
+
   describe("failure cases", () => {
     it("rejects if code input is not a constant string", async () => {
       const nodeData = codeExecutionNodeFactory({
