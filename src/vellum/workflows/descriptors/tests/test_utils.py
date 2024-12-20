@@ -1,6 +1,7 @@
 import pytest
 
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 
 
@@ -15,6 +16,11 @@ class FixtureState(BaseState):
     zeta = {
         "foo": "bar",
     }
+
+
+class DummyNode(BaseNode[FixtureState]):
+    class Outputs(BaseNode.Outputs):
+        empty: str
 
 
 @pytest.mark.parametrize(
@@ -36,7 +42,9 @@ class FixtureState(BaseState):
         (FixtureState.gamma.does_not_begin_with(FixtureState.delta), True),
         (FixtureState.gamma.does_not_end_with(FixtureState.delta), True),
         (FixtureState.alpha.is_null(), False),
+        (DummyNode.Outputs.empty.is_null(), True),
         (FixtureState.alpha.is_not_null(), True),
+        (DummyNode.Outputs.empty.is_not_null(), False),
         (FixtureState.delta.in_(FixtureState.gamma), True),
         (FixtureState.delta.not_in(FixtureState.gamma), False),
         (FixtureState.alpha.between(FixtureState.beta, FixtureState.epsilon), False),
@@ -67,7 +75,9 @@ class FixtureState(BaseState):
         "does_not_begin_with",
         "does_not_end_with",
         "is_null",
+        "is_null_with_undefined",
         "is_not_null",
+        "is_not_null_with_undefined",
         "in_",
         "not_in",
         "between",
