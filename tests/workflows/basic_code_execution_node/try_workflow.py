@@ -11,10 +11,6 @@ class SimpleCodeExecutionNode(CodeExecutionNode[BaseState, int]):
     filepath = "./tests/code.py"
     code_inputs = {}
 
-    class Outputs(CodeExecutionNode.Outputs):
-        result: int
-        log: str
-
 
 class TrySimpleCodeExecutionWorkflow(BaseWorkflow):
     graph = SimpleCodeExecutionNode
