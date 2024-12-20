@@ -1,12 +1,9 @@
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-
-import { BasePersistedFile } from "./base-persisted-file";
 import { writeFile } from "fs/promises";
 import { join } from "path";
 
-export declare namespace ErrorLogFile {
-  interface Args extends BasePersistedFile.Args {}
-}
+import { AstNode } from "@fern-api/python-ast/core/AstNode";
+
+import { BasePersistedFile } from "./base-persisted-file";
 
 export class ErrorLogFile extends BasePersistedFile {
   protected getFileStatements(): AstNode[] {

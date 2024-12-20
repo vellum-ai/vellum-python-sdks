@@ -7,6 +7,7 @@ import {
   VellumVariable,
   Workflow,
 } from "./generators";
+import { BasePersistedFile } from "./generators/base-persisted-file";
 
 export function vellumVariable(args: VellumVariable.Args): VellumVariable {
   return new VellumVariable(args);
@@ -32,6 +33,6 @@ export function initFile(args: InitFile.Args): InitFile {
   return new InitFile(args);
 }
 
-export function errorLogFile(args: ErrorLogFile.Args): ErrorLogFile {
+export function errorLogFile(args: BasePersistedFile.Args): ErrorLogFile {
   return new ErrorLogFile(args);
 }

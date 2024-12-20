@@ -12,8 +12,8 @@ import {
 import { makeTempDir } from "./helpers/temp-dir";
 
 import { SpyMocks } from "src/__test__/utils/SpyMocks";
-import { WorkflowProjectGenerator } from "src/project";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { WorkflowProjectGenerator } from "src/project";
 
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
@@ -21,7 +21,6 @@ describe("WorkflowProjectGenerator", () => {
   beforeEach(async () => {
     tempDir = makeTempDir("project-test");
     await mkdir(tempDir, { recursive: true });
-    console.log("tempDir", tempDir);
   });
 
   afterEach(async () => {

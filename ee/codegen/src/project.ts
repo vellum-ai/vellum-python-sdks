@@ -17,10 +17,7 @@ import {
 import { createNodeContext, WorkflowContext } from "./context";
 import { InputVariableContext } from "./context/input-variable-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "./generators";
-import {
-  NodeAttributeGenerationError,
-  ProjectSerializationError,
-} from "./generators/errors";
+import { ProjectSerializationError } from "./generators/errors";
 import { BaseNode } from "./generators/nodes/bases";
 import { GuardrailNode } from "./generators/nodes/guardrail-node";
 import { InlineSubworkflowNode } from "./generators/nodes/inline-subworkflow-node";
