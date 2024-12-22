@@ -65,6 +65,8 @@ import {
 } from "src/types/vellum";
 import { getNodeId } from "src/utils/nodes";
 import { assertUnreachable } from "src/utils/typing";
+import { SandboxFile } from "./generators/sandbox-file";
+import { WorkflowFile } from "./generators/workflow";
 
 export interface WorkflowProjectGeneratorOptions {
   /**
@@ -101,7 +103,7 @@ export declare namespace WorkflowProjectGenerator {
 export class WorkflowProjectGenerator {
   public readonly workflowVersionExecConfig: WorkflowVersionExecConfig;
   public readonly workflowContext: WorkflowContext;
-
+  private readonly sandboxInputs?: Record<string, unknown>[];
   constructor({ moduleName, ...rest }: WorkflowProjectGenerator.Args) {
     if ("workflowContext" in rest) {
       this.workflowContext = rest.workflowContext;
@@ -158,6 +160,7 @@ ${errors.slice(0, 3).map((err) => {
         codeExecutionNodeCodeRepresentationOverride:
           rest.options?.codeExecutionNodeCodeRepresentationOverride,
       });
+      this.sandboxInputs = rest.sandboxInputs;
     }
   }
 
@@ -177,6 +180,8 @@ ${errors.slice(0, 3).map((err) => {
       recursive: true,
     });
 
+    const workflowFile = workflow.getWorkflowFile();
+
     await Promise.all([
       // __init__.py
       this.generateRootInitFile().persist(),
@@ -187,13 +192,21 @@ ${errors.slice(0, 3).map((err) => {
       // inputs.py
       inputs.persist(),
       // workflow.py
-      workflow.getWorkflowFile().persist(),
+      workflowFile.persist(),
       // nodes/*
       ...this.generateNodeFiles(nodes),
     ]);
 
     // error.log
     await this.generateErrorLogFile().persist();
+
+    // sandbox.py
+    if (this.sandboxInputs) {
+      await this.generateSandboxFile({
+        workflowFile,
+        inputsFile: inputs,
+      }).persist();
+    }
 
     const setupCfgPath = this.resolvePythonConfigFilePath();
     const isortCmd = process.env.ISORT_CMD ?? "isort";
@@ -620,6 +633,21 @@ ${errors.slice(0, 3).map((err) => {
   private generateErrorLogFile(): ErrorLogFile {
     return codegen.errorLogFile({
       workflowContext: this.workflowContext,
+    });
+  }
+
+  private generateSandboxFile({
+    workflowFile,
+    inputsFile,
+  }: {
+    workflowFile: WorkflowFile;
+    inputsFile: Inputs;
+  }): SandboxFile {
+    return codegen.sandboxFile({
+      workflowContext: this.workflowContext,
+      workflowFile,
+      inputsFile,
+      sandboxInputs: this.sandboxInputs ?? [],
     });
   }
 

@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WorkflowProjectGenerator > inlude sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
+"from vellum.workflows.sandbox.runner import SandboxRunner
+
+from .inputs import Inputs
+from .workflow import Workflow
+
+if __name__ != "__main__":
+    raise Exception("This file is not meant to be imported")
+
+
+runner = SandboxRunner(workflow=Workflow, inputs=[Inputs(input="foo"), Inputs(input="bar"), Inputs(input="hello")])
+
+runner.run()
+"
+`;
