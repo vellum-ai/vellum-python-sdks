@@ -1,6 +1,9 @@
 import dataclasses
 import inspect
-from typing import Any, Callable, Union, get_args, get_origin
+from typing import Any, Callable, Optional, Union, get_args, get_origin
+
+from pydantic import BaseModel
+from pydantic_core import PydanticUndefined
 
 from vellum.client.types.function_definition import FunctionDefinition
 
@@ -16,7 +19,10 @@ type_map = {
 }
 
 
-def _compile_annotation(annotation: Any, defs: dict[str, Any]) -> dict:
+def _compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
+    if annotation is None:
+        return {"type": "null"}
+
     if get_origin(annotation) is Union:
         return {"anyOf": [_compile_annotation(a, defs) for a in get_args(annotation)]}
 
@@ -39,6 +45,22 @@ def _compile_annotation(annotation: Any, defs: dict[str, Any]) -> dict:
                 else:
                     properties[field.name]["default"] = field.default
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
+        return {"$ref": f"#/$defs/{annotation.__name__}"}
+
+    if issubclass(annotation, BaseModel):
+        if annotation.__name__ not in defs:
+            properties = {}
+            required = []
+            for field_name, field in annotation.model_fields.items():
+                # Mypy is incorrect here, the `annotation` attribute is defined on `FieldInfo`
+                field_annotation = field.annotation  # type: ignore[attr-defined]
+                properties[field_name] = _compile_annotation(field_annotation, defs)
+                if field.default is PydanticUndefined:
+                    required.append(field_name)
+                else:
+                    properties[field_name]["default"] = field.default
+            defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
+
         return {"$ref": f"#/$defs/{annotation.__name__}"}
 
     return {"type": type_map[annotation]}
