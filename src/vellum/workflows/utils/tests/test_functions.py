@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 
+from pydantic import BaseModel
+
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.utils.functions import compile_function_definition
 
@@ -162,6 +164,36 @@ def test_compile_function_definition__dataclasses():
             "required": ["c"],
             "$defs": {
                 "MyDataClass": {
+                    "type": "object",
+                    "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
+                    "required": ["a", "b"],
+                }
+            },
+        },
+    )
+
+
+def test_compile_function_definition__pydantic():
+    # GIVEN a function with a pydantic model
+    class MyPydanticModel(BaseModel):
+        a: int
+        b: str
+
+    def my_function(c: MyPydanticModel):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {"c": {"$ref": "#/$defs/MyPydanticModel"}},
+            "required": ["c"],
+            "$defs": {
+                "MyPydanticModel": {
                     "type": "object",
                     "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
                     "required": ["a", "b"],
