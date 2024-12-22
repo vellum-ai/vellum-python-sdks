@@ -86,6 +86,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
+    sandboxInputs?: Record<string, unknown>[];
     options?: WorkflowProjectGeneratorOptions;
   }
 

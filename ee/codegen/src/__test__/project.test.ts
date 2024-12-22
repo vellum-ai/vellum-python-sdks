@@ -252,4 +252,110 @@ Encountered 1 error(s) while generating code:
       );
     });
   });
+  describe("inlude sandbox", () => {
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: "templating-node",
+            type: "TEMPLATING",
+            data: {
+              label: "Templating Node",
+              template_node_input_id: "template",
+              output_id: "output",
+              output_type: "STRING",
+              source_handle_id: "template_source",
+              target_handle_id: "template_target",
+            },
+            inputs: [
+              {
+                id: "template",
+                key: "template",
+                value: {
+                  combinator: "OR",
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "{{input}}",
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                id: "input",
+                key: "other",
+                value: {
+                  combinator: "OR",
+                  rules: [
+                    {
+                      type: "INPUT_VARIABLE",
+                      data: {
+                        input_variable_id: "workflow-input",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: "templating-node",
+            target_handle_id: "template_target",
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+        ],
+      },
+      input_variables: [
+        {
+          key: "input",
+          type: "STRING",
+          id: "workflow-input",
+        },
+      ],
+      output_variables: [],
+    };
+    it("should include a sandbox.py file when passed sandboxInputs", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        sandboxInputs: [
+          {
+            input: "foo",
+          },
+          {
+            input: "bar",
+          },
+          {
+            input: "hello",
+          },
+        ],
+      });
+
+      await project.generateCode();
+
+      const sandboxPath = join(tempDir, project.getModuleName(), "sandbox.py");
+      expect(fs.existsSync(sandboxPath)).toBe(true);
+      expect(fs.readFileSync(sandboxPath, "utf-8")).toMatchSnapshot();
+    });
+  });
 });
