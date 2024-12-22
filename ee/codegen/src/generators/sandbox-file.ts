@@ -1,9 +1,10 @@
+import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BasePersistedFile } from "./base-persisted-file";
-import { python } from "@fern-api/python-ast";
-import type { WorkflowFile } from "./workflow";
+
 import type { Inputs } from "./inputs";
+import type { WorkflowFile } from "./workflow";
 
 export declare namespace SandboxFile {
   interface Args extends BasePersistedFile.Args {

@@ -56,6 +56,8 @@ import { MergeNode } from "src/generators/nodes/merge-node";
 import { NoteNode } from "src/generators/nodes/note-node";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
+import { SandboxFile } from "src/generators/sandbox-file";
+import { WorkflowFile } from "src/generators/workflow";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   EntrypointNode,
@@ -65,8 +67,6 @@ import {
 } from "src/types/vellum";
 import { getNodeId } from "src/utils/nodes";
 import { assertUnreachable } from "src/utils/typing";
-import { SandboxFile } from "./generators/sandbox-file";
-import { WorkflowFile } from "./generators/workflow";
 
 export interface WorkflowProjectGeneratorOptions {
   /**
