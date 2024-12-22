@@ -43,13 +43,13 @@ def test_sandbox_runner__happy_path(mock_logger, run_kwargs, expected_last_log):
             final_results = StartNode.Outputs.bar
 
     # AND a dataset for this workflow
-    dataset: List[Inputs] = [
+    inputs: List[Inputs] = [
         Inputs(foo="first"),
         Inputs(foo="second"),
     ]
 
     # WHEN we run the sandbox
-    runner = SandboxRunner(Workflow, dataset)
+    runner = SandboxRunner(workflow=Workflow, inputs=inputs)
     runner.run(**run_kwargs)
 
     # THEN we see the logs

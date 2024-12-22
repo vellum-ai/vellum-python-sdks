@@ -10,12 +10,12 @@ from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 
 class SandboxRunner(Generic[WorkflowType]):
-    def __init__(self, workflow: Type[WorkflowType], dataset: Sequence[BaseInputs]):
-        if not dataset:
-            raise ValueError("Dataset is required to have at least one defined inputs")
+    def __init__(self, workflow: Type[WorkflowType], inputs: Sequence[BaseInputs]):
+        if not inputs:
+            raise ValueError("Inputs are required to have at least one defined inputs")
 
         self._workflow = workflow
-        self._dataset = dataset
+        self._inputs = inputs
 
         dotenv.load_dotenv()
         self._logger = load_logger()
@@ -24,11 +24,11 @@ class SandboxRunner(Generic[WorkflowType]):
         if index < 0:
             self._logger.warning("Index is less than 0, running first input")
             index = 0
-        elif index >= len(self._dataset):
+        elif index >= len(self._inputs):
             self._logger.warning("Index is greater than the number of provided inputs, running last input")
-            index = len(self._dataset) - 1
+            index = len(self._inputs) - 1
 
-        selected_inputs = self._dataset[index]
+        selected_inputs = self._inputs[index]
 
         workflow = self._workflow()
         events = workflow.stream(
