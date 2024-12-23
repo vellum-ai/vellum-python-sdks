@@ -2,7 +2,8 @@ export type CodegenErrorCode =
   | "PROJECT_SERIALIZATION_ERROR"
   | "NODE_ATTRIBUTE_GENERATION_ERROR"
   | "NODE_PORT_GENERATION_ERROR"
-  | "NODE_NOT_FOUND_ERROR";
+  | "NODE_NOT_FOUND_ERROR"
+  | "UNSUPPORTED_SANDBOX_INPUT_ERROR";
 
 export abstract class BaseCodegenError extends Error {
   abstract code: CodegenErrorCode;
@@ -35,4 +36,11 @@ export class NodePortGenerationError extends BaseCodegenError {
  */
 export class NodeNotFoundError extends BaseCodegenError {
   code = "NODE_NOT_FOUND_ERROR" as const;
+}
+
+/**
+ * An error that raises when a sandbox input is not supported.
+ */
+export class UnsupportedSandboxInputError extends BaseCodegenError {
+  code = "UNSUPPORTED_SANDBOX_INPUT_ERROR" as const;
 }

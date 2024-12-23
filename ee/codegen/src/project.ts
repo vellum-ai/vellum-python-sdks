@@ -56,8 +56,10 @@ import { MergeNode } from "src/generators/nodes/merge-node";
 import { NoteNode } from "src/generators/nodes/note-node";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
-import { SandboxFile } from "src/generators/sandbox-file";
-import { WorkflowFile } from "src/generators/workflow";
+import {
+  SandboxInputs,
+  WorkflowSandboxFile,
+} from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   EntrypointNode,
@@ -88,7 +90,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
-    sandboxInputs?: Record<string, unknown>[];
+    sandboxInputs?: SandboxInputs[];
     options?: WorkflowProjectGeneratorOptions;
   }
 
@@ -103,7 +105,7 @@ export declare namespace WorkflowProjectGenerator {
 export class WorkflowProjectGenerator {
   public readonly workflowVersionExecConfig: WorkflowVersionExecConfig;
   public readonly workflowContext: WorkflowContext;
-  private readonly sandboxInputs?: Record<string, unknown>[];
+  private readonly sandboxInputs?: SandboxInputs[];
   constructor({ moduleName, ...rest }: WorkflowProjectGenerator.Args) {
     if ("workflowContext" in rest) {
       this.workflowContext = rest.workflowContext;
@@ -195,18 +197,13 @@ ${errors.slice(0, 3).map((err) => {
       workflowFile.persist(),
       // nodes/*
       ...this.generateNodeFiles(nodes),
+      // sandbox.py
+      ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
     ]);
 
-    // error.log
+    // error.log - this gets generated separately from the other files because it
+    // collects errors raised by the rest of the codegen process
     await this.generateErrorLogFile().persist();
-
-    // sandbox.py
-    if (this.sandboxInputs) {
-      await this.generateSandboxFile({
-        workflowFile,
-        inputsFile: inputs,
-      }).persist();
-    }
 
     const setupCfgPath = this.resolvePythonConfigFilePath();
     const isortCmd = process.env.ISORT_CMD ?? "isort";
@@ -636,17 +633,9 @@ ${errors.slice(0, 3).map((err) => {
     });
   }
 
-  private generateSandboxFile({
-    workflowFile,
-    inputsFile,
-  }: {
-    workflowFile: WorkflowFile;
-    inputsFile: Inputs;
-  }): SandboxFile {
-    return codegen.sandboxFile({
+  private generateSandboxFile(): WorkflowSandboxFile {
+    return codegen.workflowSandboxFile({
       workflowContext: this.workflowContext,
-      workflowFile,
-      inputsFile,
       sandboxInputs: this.sandboxInputs ?? [],
     });
   }

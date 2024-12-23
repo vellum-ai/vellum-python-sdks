@@ -339,15 +339,27 @@ Encountered 1 error(s) while generating code:
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
         sandboxInputs: [
-          {
-            input: "foo",
-          },
-          {
-            input: "bar",
-          },
-          {
-            input: "hello",
-          },
+          [
+            {
+              name: "input",
+              type: "STRING",
+              value: "foo",
+            },
+          ],
+          [
+            {
+              name: "input",
+              type: "STRING",
+              value: "bar",
+            },
+          ],
+          [
+            {
+              name: "input",
+              type: "STRING",
+              value: "hello",
+            },
+          ],
         ],
       });
 
