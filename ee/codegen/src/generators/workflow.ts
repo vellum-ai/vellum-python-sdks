@@ -597,7 +597,7 @@ declare namespace WorkflowFile {
   }
 }
 
-export class WorkflowFile extends BasePersistedFile {
+class WorkflowFile extends BasePersistedFile {
   private readonly workflow: Workflow;
 
   constructor({ workflow }: WorkflowFile.Args) {
@@ -605,7 +605,7 @@ export class WorkflowFile extends BasePersistedFile {
     this.workflow = workflow;
   }
 
-  getModulePath(): string[] {
+  protected getModulePath(): string[] {
     let modulePath: string[];
     if (this.workflowContext.parentNode) {
       modulePath = [

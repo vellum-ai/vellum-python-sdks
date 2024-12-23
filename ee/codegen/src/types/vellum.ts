@@ -4,12 +4,16 @@ import {
   LogicalOperator,
 } from "vellum-ai/api";
 import {
+  ChatHistoryInput,
   ChatMessageRequest,
   ChatMessageRole,
+  JsonInput,
+  NumberInput,
   PromptBlockState,
   PromptParameters,
   SearchResult,
   SearchResultRequest,
+  StringInput,
   VellumValue,
   VellumVariable,
   VellumVariableType,
@@ -671,3 +675,10 @@ export interface WorkflowVersionExecConfig {
   outputVariables: VellumVariable[];
   runnerConfig?: RunnerConfig;
 }
+
+type WorkflowSandboxInput =
+  | StringInput
+  | JsonInput
+  | ChatHistoryInput
+  | NumberInput;
+export type WorkflowSandboxInputs = WorkflowSandboxInput[];

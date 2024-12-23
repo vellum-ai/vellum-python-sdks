@@ -3,14 +3,14 @@ from typing import List
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.sandbox.runner import SandboxRunner
+from vellum.workflows.sandbox import SandboxRunner
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
 @pytest.fixture
 def mock_logger(mocker):
-    return mocker.patch("vellum.workflows.sandbox.runner.load_logger")
+    return mocker.patch("vellum.workflows.sandbox.load_logger")
 
 
 @pytest.mark.parametrize(

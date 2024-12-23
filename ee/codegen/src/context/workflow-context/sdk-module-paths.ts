@@ -17,11 +17,7 @@ export function generateSdkModulePaths(
     CORE_NODES_MODULE_PATH: [...nodesModulePath, "core"] as const,
     DISPLAYABLE_NODES_MODULE_PATH: [...nodesModulePath, "displayable"] as const,
     INPUTS_MODULE_PATH: [...workflowsSdkModulePath, "inputs"] as const,
-    SANDBOX_RUNNER_MODULE_PATH: [
-      ...workflowsSdkModulePath,
-      "sandbox",
-      "runner",
-    ] as const,
+    SANDBOX_RUNNER_MODULE_PATH: [...workflowsSdkModulePath, "sandbox"] as const,
     STATE_MODULE_PATH: [...workflowsSdkModulePath, "state"] as const,
     NODE_DISPLAY_MODULE_PATH: [
       "vellum_ee",

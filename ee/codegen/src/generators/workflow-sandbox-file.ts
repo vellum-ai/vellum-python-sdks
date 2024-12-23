@@ -1,30 +1,19 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import {
-  ChatHistoryInput,
-  JsonInput,
-  NumberInput,
-  StringInput,
-} from "vellum-ai/api";
 
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { WorkflowSandboxInputs } from "src/types/vellum";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
-
-type SandboxInput = StringInput | JsonInput | ChatHistoryInput | NumberInput;
-export type SandboxInputs = SandboxInput[];
 
 export declare namespace WorkflowSandboxFile {
   interface Args extends BasePersistedFile.Args {
-    // Intentionally a nested array. Each `SandboxInputs` is a list of inputs for a single
-    // scenario / datapoint / test case. The outer array is a list of all the scenarios,
-    // dataset, test cases.
-    sandboxInputs: SandboxInputs[];
+    sandboxInputs: WorkflowSandboxInputs[];
   }
 }
 
 export class WorkflowSandboxFile extends BasePersistedFile {
-  private readonly sandboxInputs: SandboxInputs[];
+  private readonly sandboxInputs: WorkflowSandboxInputs[];
 
   public constructor({
     workflowContext,
@@ -83,7 +72,9 @@ if __name__ != "__main__":
     ];
   }
 
-  private getWorkflowInput(inputs: SandboxInput[]): python.ClassInstantiation {
+  private getWorkflowInput(
+    inputs: WorkflowSandboxInputs
+  ): python.ClassInstantiation {
     return python.instantiateClass({
       classReference: python.reference({
         name: "Inputs",

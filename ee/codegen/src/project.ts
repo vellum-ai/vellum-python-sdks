@@ -56,15 +56,13 @@ import { MergeNode } from "src/generators/nodes/merge-node";
 import { NoteNode } from "src/generators/nodes/note-node";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
-import {
-  SandboxInputs,
-  WorkflowSandboxFile,
-} from "src/generators/workflow-sandbox-file";
+import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   EntrypointNode,
   WorkflowDataNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
+  WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
 import { getNodeId } from "src/utils/nodes";
@@ -90,7 +88,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
-    sandboxInputs?: SandboxInputs[];
+    sandboxInputs?: WorkflowSandboxInputs[];
     options?: WorkflowProjectGeneratorOptions;
   }
 
@@ -105,7 +103,7 @@ export declare namespace WorkflowProjectGenerator {
 export class WorkflowProjectGenerator {
   public readonly workflowVersionExecConfig: WorkflowVersionExecConfig;
   public readonly workflowContext: WorkflowContext;
-  private readonly sandboxInputs?: SandboxInputs[];
+  private readonly sandboxInputs?: WorkflowSandboxInputs[];
   constructor({ moduleName, ...rest }: WorkflowProjectGenerator.Args) {
     if ("workflowContext" in rest) {
       this.workflowContext = rest.workflowContext;
@@ -182,8 +180,6 @@ ${errors.slice(0, 3).map((err) => {
       recursive: true,
     });
 
-    const workflowFile = workflow.getWorkflowFile();
-
     await Promise.all([
       // __init__.py
       this.generateRootInitFile().persist(),
@@ -194,7 +190,7 @@ ${errors.slice(0, 3).map((err) => {
       // inputs.py
       inputs.persist(),
       // workflow.py
-      workflowFile.persist(),
+      workflow.getWorkflowFile().persist(),
       // nodes/*
       ...this.generateNodeFiles(nodes),
       // sandbox.py
