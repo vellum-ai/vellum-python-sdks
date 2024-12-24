@@ -1,5 +1,6 @@
 import { VellumVariableType } from "vellum-ai/api";
 
+import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   EntrypointNode,
   CodeExecutionNode,
@@ -21,6 +22,7 @@ import {
   VellumLogicalConditionGroup,
   ConditionalNodeConditionData,
   NodeOutputData,
+  NodeInput,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -85,32 +87,92 @@ export function mergeNodeDataFactory(): MergeNode {
   };
 }
 
-const generateLogicalExpression: VellumLogicalConditionGroup = {
-  type: "LOGICAL_CONDITION_GROUP",
-  negated: false,
-  combinator: "AND",
-  conditions: [
-    {
-      type: "LOGICAL_CONDITION_GROUP",
-      negated: false,
-      combinator: "AND",
-      conditions: [
-        {
-          type: "LOGICAL_CONDITION",
-          operator: "=",
-          lhsVariableId: "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-          rhsVariableId: "c539a2e2-0873-43b0-ae21-81790bb1c4cb",
-        },
-      ],
-    },
-  ],
+const generateLogicalExpression = (): VellumLogicalConditionGroup => {
+  return {
+    type: "LOGICAL_CONDITION_GROUP",
+    negated: false,
+    combinator: "AND",
+    conditions: [
+      {
+        type: "LOGICAL_CONDITION_GROUP",
+        negated: false,
+        combinator: "AND",
+        conditions: [
+          {
+            type: "LOGICAL_CONDITION",
+            operator: "=",
+            lhsVariableId: "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
+            rhsVariableId: "c539a2e2-0873-43b0-ae21-81790bb1c4cb",
+          },
+        ],
+      },
+    ],
+  };
 };
 
-export function searchNodeDataFactory({
-  errorOutputId,
-}: {
+export function searchNodeDataFactory(args?: {
+  metadataFiltersNodeInputId?: string;
+  metadataFilters?: VellumLogicalConditionGroup;
+  metadataFilterInputs?: NodeInput[];
   errorOutputId?: string;
-} = {}): SearchNode {
+}): SearchNode {
+  const errorOutputId = args?.errorOutputId;
+
+  const metadataFiltersNodeInputId =
+    args?.metadataFiltersNodeInputId ?? "7c43b315-d1f2-4727-9540-6cc3fd4641f3";
+  const metadataFilters = args?.metadataFilters ?? {
+    type: "LOGICAL_CONDITION_GROUP",
+    negated: false,
+    combinator: "AND",
+    conditions: [
+      {
+        type: "LOGICAL_CONDITION_GROUP",
+        negated: false,
+        combinator: "AND",
+        conditions: [
+          {
+            type: "LOGICAL_CONDITION",
+            operator: "=",
+            lhsVariableId: "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
+            rhsVariableId: "c539a2e2-0873-43b0-ae21-81790bb1c4cb",
+          },
+        ],
+      },
+    ],
+  };
+  const metadataFilterInputs: NodeInput[] = args?.metadataFilterInputs ?? [
+    {
+      id: "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
+      key: "vellum-query-builder-variable-a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
+      value: {
+        rules: [
+          {
+            type: "INPUT_VARIABLE",
+            data: {
+              inputVariableId: "c95cccdc-8881-4528-bc63-97d9df6e1d87",
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    },
+    {
+      id: "c539a2e2-0873-43b0-ae21-81790bb1c4cb",
+      key: "vellum-query-builder-variable-c539a2e2-0873-43b0-ae21-81790bb1c4cb",
+      value: {
+        rules: [
+          {
+            type: "INPUT_VARIABLE",
+            data: {
+              inputVariableId: "c95cccdc-8881-4528-bc63-97d9df6e1d87",
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    },
+  ];
+
   const nodeData: SearchNode = {
     id: "search",
     type: WorkflowNodeType.SEARCH,
@@ -128,7 +190,8 @@ export function searchNodeDataFactory({
       separatorNodeInputId: "4eddefc0-90d5-422a-aec2-bc94c8f1d83c",
       resultMergingEnabledNodeInputId: "dc9f880b-81bc-4644-b025-8f7d5db23a48",
       externalIdFiltersNodeInputId: "61933e79-b0c2-4e3c-bf07-e2d93b9d9c54",
-      metadataFiltersNodeInputId: "7c43b315-d1f2-4727-9540-6cc3fd4641f3",
+      metadataFiltersNodeInputId:
+        metadataFiltersNodeInputId ?? "7c43b315-d1f2-4727-9540-6cc3fd4641f3",
     },
     inputs: [
       {
@@ -246,7 +309,7 @@ export function searchNodeDataFactory({
         },
       },
       {
-        id: "7c43b315-d1f2-4727-9540-6cc3fd4641f3",
+        id: metadataFiltersNodeInputId,
         key: "metadata_filters",
         value: {
           rules: [
@@ -254,43 +317,17 @@ export function searchNodeDataFactory({
               type: "CONSTANT_VALUE",
               data: {
                 type: "JSON",
-                value: generateLogicalExpression,
+                value:
+                  VellumValueLogicalExpressionSerializer.jsonOrThrow(
+                    metadataFilters
+                  ),
               },
             },
           ],
           combinator: "OR",
         },
       },
-      {
-        id: "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-        key: "vellum-query-builder-variable-a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "c95cccdc-8881-4528-bc63-97d9df6e1d87",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "c539a2e2-0873-43b0-ae21-81790bb1c4cb",
-        key: "vellum-query-builder-variable-c539a2e2-0873-43b0-ae21-81790bb1c4cb",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "c95cccdc-8881-4528-bc63-97d9df6e1d87",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
+      ...metadataFilterInputs,
     ],
   };
 
