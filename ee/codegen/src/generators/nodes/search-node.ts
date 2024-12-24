@@ -10,7 +10,6 @@ import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base"
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   ConstantValuePointer,
-  InputVariablePointer,
   SearchNode as SearchNodeType,
   VellumLogicalCondition as VellumLogicalConditionType,
   VellumLogicalConditionGroup as VellumLogicalConditionGroupType,
@@ -192,19 +191,27 @@ export class SearchNode extends BaseSingleFileNode<
         rule.type === "CONSTANT_VALUE" && rule.data.type === "JSON"
     );
 
-    if (nodeInputValuePointer) {
-      const rawData = nodeInputValuePointer.data;
-
-      const metadataFilter = rawData.value;
-
-      const parsedData =
-        VellumValueLogicalExpressionSerializer.parse(metadataFilter);
-
-      if (parsedData.ok) {
-        return parsedData.value;
-      }
+    if (!nodeInputValuePointer) {
+      return;
     }
-    return undefined;
+
+    const metadataFilters = nodeInputValuePointer.data.value;
+    if (!metadataFilters) {
+      return undefined;
+    }
+
+    const parsedData =
+      VellumValueLogicalExpressionSerializer.parse(metadataFilters);
+
+    if (!parsedData.ok) {
+      throw new Error(
+        `Failed to parse metadata filter JSON: ${JSON.stringify(
+          parsedData.errors
+        )}`
+      );
+    }
+
+    return parsedData.value;
   }
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
@@ -238,17 +245,22 @@ export class SearchNode extends BaseSingleFileNode<
     if (metadataNodeInput) {
       rawMetadata = this.convertNodeInputToMetadata(metadataNodeInput);
       if (rawMetadata) {
-        const inputVariableIdsByLogicalIdMap =
-          this.generateInputVariableIdsByLogicalIdMap(rawMetadata);
+        const metadataFilterInputIdByOperandId =
+          this.generateMetadataFilterInputIdByOperandIdMap(rawMetadata);
+
         statements.push(
           python.field({
-            name: "input_variable_ids_by_logical_id",
+            name: "metadata_filter_input_id_by_operand_id",
             initializer: python.TypeInstantiation.dict(
-              Array.from(inputVariableIdsByLogicalIdMap.entries()).map(
-                ([key, value]) => ({
-                  key: python.TypeInstantiation.str(key),
-                  value: python.TypeInstantiation.str(value),
-                })
+              Array.from(metadataFilterInputIdByOperandId.entries()).map(
+                ([metadataFilterOperandId, metadataFilterNodeInputId]) => {
+                  return {
+                    key: python.TypeInstantiation.uuid(metadataFilterOperandId),
+                    value: python.TypeInstantiation.uuid(
+                      metadataFilterNodeInputId
+                    ),
+                  };
+                }
               )
             ),
           })
@@ -259,7 +271,7 @@ export class SearchNode extends BaseSingleFileNode<
     return statements;
   }
 
-  private generateInputVariableIdsByLogicalIdMap(
+  private generateMetadataFilterInputIdByOperandIdMap(
     rawData: VellumLogicalExpression
   ): Map<string, string> {
     const result = new Map<string, string>();
@@ -267,31 +279,25 @@ export class SearchNode extends BaseSingleFileNode<
 
     const traverse = (logicalExpression: VellumLogicalExpression) => {
       if (logicalExpression.type === "LOGICAL_CONDITION") {
-        const lhsQueryInput = this.nodeInputsByKey.get(
-          `${prefix}${logicalExpression.lhsVariableId}`
-        )?.nodeInputData?.value.rules[0] as InputVariablePointer;
-        const rhsQueryInput = this.nodeInputsByKey.get(
-          `${prefix}${logicalExpression.rhsVariableId}`
-        )?.nodeInputData?.value.rules[0] as InputVariablePointer;
+        const lhsQueryInput = this.nodeInputsById.get(
+          logicalExpression.lhsVariableId
+        )?.nodeInputData?.id;
+        const rhsQueryInput = this.nodeInputsById.get(
+          logicalExpression.rhsVariableId
+        )?.nodeInputData?.id;
         if (!lhsQueryInput) {
           throw new Error(
-            `Could not find node input for key ${prefix}${logicalExpression.lhsVariableId}}`
+            `Could not find node input for id ${logicalExpression.lhsVariableId}`
           );
         }
         if (!rhsQueryInput) {
           throw new Error(
-            `Could not find node input for key ${prefix}${logicalExpression.rhsVariableId}}`
+            `Could not find node input for id ${logicalExpression.rhsVariableId}`
           );
         }
 
-        result.set(
-          logicalExpression.lhsVariableId,
-          rhsQueryInput.data.inputVariableId
-        );
-        result.set(
-          logicalExpression.rhsVariableId,
-          rhsQueryInput.data.inputVariableId
-        );
+        result.set(logicalExpression.lhsVariableId, rhsQueryInput);
+        result.set(logicalExpression.rhsVariableId, rhsQueryInput);
       } else if (logicalExpression.type === "LOGICAL_CONDITION_GROUP") {
         logicalExpression.conditions.forEach((condition) =>
           traverse(condition)
