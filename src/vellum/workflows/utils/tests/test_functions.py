@@ -201,3 +201,34 @@ def test_compile_function_definition__pydantic():
             },
         },
     )
+
+
+def test_compile_function_definition__default_dataclass():
+    # GIVEN a function with a dataclass
+    @dataclass
+    class MyDataClass:
+        a: int
+        b: str
+
+    def my_function(c: MyDataClass = MyDataClass(a=1, b="hello")):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {"c": {"$ref": "#/$defs/MyDataClass", "default": {"a": 1, "b": "hello"}}},
+            "required": ["c"],
+            "$defs": {
+                "MyDataClass": {
+                    "type": "object",
+                    "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
+                    "required": ["a", "b"],
+                }
+            },
+        },
+    )
