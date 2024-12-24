@@ -35,6 +35,7 @@
     "@fern-fern/generator-cli-sdk": "file:./stubs/generator-cli-sdk",
     "@fern-fern/generator-exec-sdk": "file:./stubs/generator-exec-sdk",
     "lodash": "^4.17.21",
+    "uuid": "^11.0.3",
     "vellum-ai": "0.10.7"
   },
   "devDependencies": {

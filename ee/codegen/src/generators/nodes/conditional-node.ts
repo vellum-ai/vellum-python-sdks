@@ -13,6 +13,7 @@ import {
   ConditionalRuleData,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
+import { generateId } from "src/utils/uuid";
 
 export class ConditionalNode extends BaseSingleFileNode<
   ConditionalNodeType,
@@ -165,12 +166,12 @@ export class ConditionalNode extends BaseSingleFileNode<
           arguments_: [
             python.methodArgument({
               name: "id",
-              value: python.TypeInstantiation.uuid(condition.id),
+              value: generateId(condition.id),
             }),
             python.methodArgument({
               name: "rule_group_id",
               value: condition.data
-                ? python.TypeInstantiation.uuid(condition.data.id)
+                ? generateId(condition.data.id)
                 : python.TypeInstantiation.none(),
             }),
           ],
@@ -230,7 +231,7 @@ export class ConditionalNode extends BaseSingleFileNode<
       arguments_: [
         python.methodArgument({
           name: "id",
-          value: python.TypeInstantiation.uuid(ruleData.id),
+          value: generateId(ruleData.id),
         }),
         python.methodArgument({
           name: "lhs",
@@ -243,13 +244,13 @@ export class ConditionalNode extends BaseSingleFileNode<
         python.methodArgument({
           name: "field_node_input_id",
           value: fieldId
-            ? python.TypeInstantiation.uuid(fieldId)
+            ? generateId(fieldId)
             : python.TypeInstantiation.none(),
         }),
         python.methodArgument({
           name: "value_node_input_id",
           value: valueId
-            ? python.TypeInstantiation.uuid(valueId)
+            ? generateId(valueId)
             : python.TypeInstantiation.none(),
         }),
       ],

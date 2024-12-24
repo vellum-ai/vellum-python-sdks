@@ -25,7 +25,7 @@ class BaseTemplatingNodeDisplay(BaseNodeVellumDisplay[_TemplatingNodeType], Gene
 
         template_input_id = self.template_input_id or next(
             (
-                input_id
+                UUID(input_id) if isinstance(input_id, str) else input_id
                 for input_name, input_id in self.node_input_ids_by_name.items()
                 if input_name == TEMPLATE_INPUT_NAME
             ),

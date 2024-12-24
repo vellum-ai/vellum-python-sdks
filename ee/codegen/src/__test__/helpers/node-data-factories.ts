@@ -801,6 +801,7 @@ export function conditionalNodeFactory({
   elseSourceHandleId,
   inputReferenceId,
   inputReferenceNodeId,
+  invalidUUID,
   includeElif = false,
 }: {
   id?: string;
@@ -810,6 +811,7 @@ export function conditionalNodeFactory({
   elseSourceHandleId?: string;
   inputReferenceId?: string;
   inputReferenceNodeId?: string;
+  invalidUUID?: string;
   includeElif?: boolean;
 } = {}): ConditionalNode {
   const conditions: ConditionalNodeConditionData[] = [];
@@ -823,9 +825,9 @@ export function conditionalNodeFactory({
         {
           id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
           rules: [],
-          fieldNodeInputId: "2cb6582e-c329-4952-8598-097830b766c7",
+          fieldNodeInputId: invalidUUID ?? "2cb6582e-c329-4952-8598-097830b766c7",
           operator: "=",
-          valueNodeInputId: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+          valueNodeInputId: invalidUUID ?? "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
         },
       ],
       combinator: "AND",
@@ -903,8 +905,8 @@ export function conditionalNodeFactory({
           ]
         : [
             {
-              id: "2cb6582e-c329-4952-8598-097830b766c7",
-              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+              id: invalidUUID ?? "2cb6582e-c329-4952-8598-097830b766c7",
+              key: invalidUUID ?? "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
               value: {
                 rules: [
                   {
@@ -918,8 +920,8 @@ export function conditionalNodeFactory({
               },
             },
             {
-              id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
-              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+              id: invalidUUID ?? "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+              key: invalidUUID ?? "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
               value: {
                 rules: [
                   {

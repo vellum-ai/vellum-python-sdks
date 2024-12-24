@@ -40,17 +40,17 @@ _ConditionalNodeType = TypeVar("_ConditionalNodeType", bound=ConditionalNode)
 
 @dataclass
 class RuleIdMap:
-    id: UUID
+    id: Union[UUID, str]
     lhs: Optional["RuleIdMap"]
     rhs: Optional["RuleIdMap"]
-    field_node_input_id: Optional[UUID]
-    value_node_input_id: Optional[UUID]
+    field_node_input_id: Union[Optional[UUID], Optional[str]]
+    value_node_input_id: Union[Optional[UUID], Optional[str]]
 
 
 @dataclass
 class ConditionId:
-    id: UUID
-    rule_group_id: Optional[UUID]
+    id: Union[UUID, str]
+    rule_group_id: Union[Optional[UUID], Optional[str]]
 
 
 class BaseConditionalNodeDisplay(BaseNodeVellumDisplay[_ConditionalNodeType], Generic[_ConditionalNodeType]):
@@ -148,7 +148,7 @@ but the defined conditions have length {len(condition_ids)}"""
                     value_node_input_id = UUID(rhs_node_input.id)
 
                 operator = self._convert_descriptor_to_operator(descriptor)
-                field_node_input_id = UUID(lhs_node_input.id)
+                field_node_input_id = lhs_node_input.id
 
             return {
                 "id": str(current_id),
@@ -263,7 +263,9 @@ but the defined conditions have length {len(condition_ids)}"""
 
     def get_nested_rule_details_by_path(
         self, rule_ids: List[RuleIdMap], path: List[int]
-    ) -> Union[Tuple[UUID, Optional[UUID], Optional[UUID]], None]:
+    ) -> Union[
+        Tuple[Union[UUID, str], Union[Optional[UUID], Optional[str]], Union[Optional[UUID], Optional[str]]], None
+    ]:
         current_rule = rule_ids[path[0]]
 
         for step in path[1:]:

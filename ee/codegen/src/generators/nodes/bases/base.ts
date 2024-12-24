@@ -14,6 +14,7 @@ import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode } from "src/types/vellum";
+import {generateId} from "src/utils/uuid";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -302,7 +303,7 @@ export abstract class BaseNode<
         }>(([key, nodeInput]) => {
           return {
             key: python.TypeInstantiation.str(key),
-            value: python.TypeInstantiation.uuid(nodeInput.nodeInputData.id),
+            value: generateId(nodeInput.nodeInputData.id),
           };
         })
       ),

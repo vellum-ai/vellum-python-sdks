@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Any, List, Optional, Type, cast
+from typing import Any, List, Optional, Type, Union, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
@@ -27,10 +27,10 @@ def create_node_input(
     input_name: str,
     value: Any,
     display_context: WorkflowDisplayContext,
-    input_id: Optional[UUID],
+    input_id: Union[Optional[UUID], Optional[str]],
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = ConstantValuePointer,
 ) -> NodeInput:
-    input_id = input_id or uuid4_from_hash(f"{node_id}|{input_name}")
+    input_id = str(input_id) if input_id else str(uuid4_from_hash(f"{node_id}|{input_name}"))
     if (
         isinstance(value, OutputReference)
         and value.outputs_class._node_class
@@ -42,7 +42,7 @@ def create_node_input(
 
     rules = create_node_input_value_pointer_rules(value, display_context, pointer_type=pointer_type)
     return NodeInput(
-        id=str(input_id),
+        id=input_id,
         key=input_name,
         value=NodeInputValuePointer(
             rules=rules,

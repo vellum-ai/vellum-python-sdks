@@ -66,6 +66,58 @@ describe("ConditionalNode", () => {
   });
 });
 
+describe("ConditionalNode with invalid uuid for field and value node input ids", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const invalidUUID =
+      "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8";
+
+    const nodeData = conditionalNodeFactory({ invalidUUID: invalidUUID });
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "d2287fee-98fb-421c-9464-e54d8f70f046",
+          key: "field",
+          type: "STRING",
+        },
+        workflowContext,
+      })
+    );
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+    workflowContext.addNodeContext(nodeContext);
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it("getNodeDisplayFile", async () => {
+    node.getNodeDisplayFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it("getNodeDefinition", () => {
+    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
+  });
+});
+
 describe("ConditionalNode with null operator", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
