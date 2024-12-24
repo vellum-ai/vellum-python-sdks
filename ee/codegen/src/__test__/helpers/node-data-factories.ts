@@ -87,29 +87,6 @@ export function mergeNodeDataFactory(): MergeNode {
   };
 }
 
-const generateLogicalExpression = (): VellumLogicalConditionGroup => {
-  return {
-    type: "LOGICAL_CONDITION_GROUP",
-    negated: false,
-    combinator: "AND",
-    conditions: [
-      {
-        type: "LOGICAL_CONDITION_GROUP",
-        negated: false,
-        combinator: "AND",
-        conditions: [
-          {
-            type: "LOGICAL_CONDITION",
-            operator: "=",
-            lhsVariableId: "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-            rhsVariableId: "c539a2e2-0873-43b0-ae21-81790bb1c4cb",
-          },
-        ],
-      },
-    ],
-  };
-};
-
 export function searchNodeDataFactory(args?: {
   metadataFiltersNodeInputId?: string;
   metadataFilters?: VellumLogicalConditionGroup;

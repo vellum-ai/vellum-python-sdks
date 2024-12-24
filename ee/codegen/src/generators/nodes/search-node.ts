@@ -276,7 +276,6 @@ export class SearchNode extends BaseSingleFileNode<
     rawData: VellumLogicalExpression
   ): Map<string, string> {
     const result = new Map<string, string>();
-    const prefix = "vellum-query-builder-variable-";
 
     const traverse = (logicalExpression: VellumLogicalExpression) => {
       if (logicalExpression.type === "LOGICAL_CONDITION") {
