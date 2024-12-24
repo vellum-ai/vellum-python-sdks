@@ -222,7 +222,7 @@ def test_compile_function_definition__default_dataclass():
         parameters={
             "type": "object",
             "properties": {"c": {"$ref": "#/$defs/MyDataClass", "default": {"a": 1, "b": "hello"}}},
-            "required": ["c"],
+            "required": [],
             "$defs": {
                 "MyDataClass": {
                     "type": "object",

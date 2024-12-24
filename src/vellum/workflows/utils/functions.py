@@ -43,7 +43,7 @@ def _compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict
                 if field.default is dataclasses.MISSING:
                     required.append(field.name)
                 else:
-                    properties[field.name]["default"] = field.default
+                    properties[field.name]["default"] = _compile_default_value(field.default)
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
         return {"$ref": f"#/$defs/{annotation.__name__}"}
 
@@ -58,12 +58,21 @@ def _compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict
                 if field.default is PydanticUndefined:
                     required.append(field_name)
                 else:
-                    properties[field_name]["default"] = field.default
+                    properties[field_name]["default"] = _compile_default_value(field.default)
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
 
         return {"$ref": f"#/$defs/{annotation.__name__}"}
 
     return {"type": type_map[annotation]}
+
+
+def _compile_default_value(default: Any) -> Any:
+    if dataclasses.is_dataclass(default):
+        return {
+            field.name: _compile_default_value(getattr(default, field.name)) for field in dataclasses.fields(default)
+        }
+
+    return default
 
 
 def compile_function_definition(function: Callable) -> FunctionDefinition:
@@ -84,7 +93,7 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
         if param.default is inspect.Parameter.empty:
             required.append(param.name)
         else:
-            properties[param.name]["default"] = param.default
+            properties[param.name]["default"] = _compile_default_value(param.default)
 
     parameters = {"type": "object", "properties": properties, "required": required}
     if defs:
