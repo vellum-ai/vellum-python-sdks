@@ -92,7 +92,6 @@ from vellum import (
 from vellum.types import (
     VellumValueLogicalConditionGroupRequest,
     VellumValueLogicalConditionRequest,
-    StringVellumValueRequest,
 )
 
 
@@ -117,15 +116,9 @@ class SearchNode(BaseSearchNode):
                         conditions=[
                             VellumValueLogicalConditionRequest(
                                 type="LOGICAL_CONDITION",
-                                lhs_variable=StringVellumValueRequest(
-                                    type="STRING",
-                                    value="a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-                                ),
+                                lhs_variable=Inputs.var1,
                                 operator="=",
-                                rhs_variable=StringVellumValueRequest(
-                                    type="STRING",
-                                    value="c539a2e2-0873-43b0-ae21-81790bb1c4cb",
-                                ),
+                                rhs_variable=Inputs.var1,
                             )
                         ],
                     )
@@ -222,7 +215,6 @@ from vellum import (
 from vellum.types import (
     VellumValueLogicalConditionGroupRequest,
     VellumValueLogicalConditionRequest,
-    StringVellumValueRequest,
 )
 
 
@@ -242,33 +234,21 @@ class SearchNode(BaseSearchNode):
                 conditions=[
                     VellumValueLogicalConditionRequest(
                         type="LOGICAL_CONDITION",
-                        lhs_variable=StringVellumValueRequest(
-                            type="STRING", value="500ce391-ee26-4588-a5a0-2dfa6b70add5"
-                        ),
+                        lhs_variable="TYPE",
                         operator="=",
-                        rhs_variable=StringVellumValueRequest(
-                            type="STRING", value="3321686c-b131-4651-a18c-3e578252abf4"
-                        ),
+                        rhs_variable="VENDOR",
                     ),
                     VellumValueLogicalConditionRequest(
                         type="LOGICAL_CONDITION",
-                        lhs_variable=StringVellumValueRequest(
-                            type="STRING", value="28682e34-ef0c-47fd-a32e-8228a53360b0"
-                        ),
+                        lhs_variable="STATUS",
                         operator="=",
-                        rhs_variable=StringVellumValueRequest(
-                            type="STRING", value="65a90810-f26b-4848-9c7f-29f324450e07"
-                        ),
+                        rhs_variable="1",
                     ),
                     VellumValueLogicalConditionRequest(
                         type="LOGICAL_CONDITION",
-                        lhs_variable=StringVellumValueRequest(
-                            type="STRING", value="4f88fdee-4bee-40d8-a998-bbbc7255029c"
-                        ),
+                        lhs_variable="DELETED_AT",
                         operator="null",
-                        rhs_variable=StringVellumValueRequest(
-                            type="STRING", value="dc1b9237-5fde-4d9f-9648-792475e02cfa"
-                        ),
+                        rhs_variable="true",
                     ),
                 ],
             ),
@@ -350,7 +330,6 @@ from vellum import (
 from vellum.types import (
     VellumValueLogicalConditionGroupRequest,
     VellumValueLogicalConditionRequest,
-    StringVellumValueRequest,
 )
 
 
@@ -376,15 +355,9 @@ class SearchNode(BaseSearchNode):
                         conditions=[
                             VellumValueLogicalConditionRequest(
                                 type="LOGICAL_CONDITION",
-                                lhs_variable=StringVellumValueRequest(
-                                    type="STRING",
-                                    value="a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-                                ),
+                                lhs_variable=Inputs.var1,
                                 operator="=",
-                                rhs_variable=StringVellumValueRequest(
-                                    type="STRING",
-                                    value="c539a2e2-0873-43b0-ae21-81790bb1c4cb",
-                                ),
+                                rhs_variable=Inputs.var1,
                             )
                         ],
                     )

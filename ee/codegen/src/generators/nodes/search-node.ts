@@ -174,6 +174,7 @@ export class SearchNode extends BaseSingleFileNode<
           value: rawMetadata
             ? new SearchNodeMetadataFilters({
                 metadata: rawMetadata,
+                nodeInputsById: this.nodeInputsById,
               })
             : python.TypeInstantiation.none(),
         }),
@@ -380,17 +381,20 @@ export class SearchNode extends BaseSingleFileNode<
 export declare namespace SearchNodeMetadataFilters {
   export interface Args {
     metadata: VellumLogicalExpressionType;
+    nodeInputsById: Map<string, NodeInput>;
   }
 }
 
 export class SearchNodeMetadataFilters extends AstNode {
   private metadata: VellumLogicalExpressionType;
+  private nodeInputsById: Map<string, NodeInput>;
   private astNode: AstNode;
 
   public constructor(args: SearchNodeMetadataFilters.Args) {
     super();
 
     this.metadata = args.metadata;
+    this.nodeInputsById = args.nodeInputsById;
     this.astNode = this.generateAstNode();
     this.inheritReferences(this.astNode);
   }
@@ -451,8 +455,16 @@ export class SearchNodeMetadataFilters extends AstNode {
     data: VellumLogicalConditionType
   ): python.ClassInstantiation {
     const lhsId = data.lhsVariableId;
+    const lhs = this.nodeInputsById.get(lhsId);
+    if (!lhs) {
+      throw new Error(`Could not find node input for id ${lhsId}`);
+    }
 
     const rhsId = data.rhsVariableId;
+    const rhs = this.nodeInputsById.get(rhsId);
+    if (!rhs) {
+      throw new Error(`Could not find node input for id ${rhsId}`);
+    }
 
     return python.instantiateClass({
       classReference: python.reference({
@@ -466,22 +478,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         }),
         python.methodArgument({
           name: "lhs_variable",
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "StringVellumValueRequest",
-              modulePath: [...VELLUM_CLIENT_MODULE_PATH, "types"],
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "type",
-                value: python.TypeInstantiation.str("STRING"),
-              }),
-              python.methodArgument({
-                name: "value",
-                value: python.TypeInstantiation.str(lhsId),
-              }),
-            ],
-          }),
+          value: lhs,
         }),
         python.methodArgument({
           name: "operator",
@@ -489,22 +486,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         }),
         python.methodArgument({
           name: "rhs_variable",
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "StringVellumValueRequest",
-              modulePath: [...VELLUM_CLIENT_MODULE_PATH, "types"],
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "type",
-                value: python.TypeInstantiation.str("STRING"),
-              }),
-              python.methodArgument({
-                name: "value",
-                value: python.TypeInstantiation.str(rhsId),
-              }),
-            ],
-          }),
+          value: rhs,
         }),
       ],
     });
