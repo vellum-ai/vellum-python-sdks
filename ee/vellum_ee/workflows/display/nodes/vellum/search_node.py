@@ -28,7 +28,9 @@ class VariableIdMap:
 
 
 class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_SearchNodeType]):
-    input_variable_ids_by_logical_id: Optional[Dict[str, str]] = None
+    # A mapping between the id of the operand (e.g. "lhs_variable_id" or "rhs_variable_id") and the id of the node input
+    # that the operand is pointing to.
+    metadata_filter_input_id_by_operand_id: Dict[UUID, UUID] = {}
 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
@@ -149,18 +151,20 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
                 variables,
             )
         elif isinstance(logical_expression, VellumValueLogicalConditionRequest):
-            lhs_variable_id = str(logical_expression.lhs_variable.value)
-            rhs_variable_id = str(logical_expression.rhs_variable.value)
-            lhs_query_input_id = (
-                self.input_variable_ids_by_logical_id[lhs_variable_id]
-                if self.input_variable_ids_by_logical_id
-                else str(uuid4_from_hash(f"{self.node_id}|{hash(tuple(path))}"))
-            )
-            rhs_query_input_id = (
-                self.input_variable_ids_by_logical_id[rhs_variable_id]
-                if self.input_variable_ids_by_logical_id
-                else str(uuid4_from_hash(f"{self.node_id}|{hash(tuple(path))}"))
-            )
+            lhs_variable_id = logical_expression.lhs_variable.value
+            if not isinstance(lhs_variable_id, str):
+                raise TypeError(f"Expected lhs_variable_id to be a string, got {type(lhs_variable_id)}")
+
+            rhs_variable_id = logical_expression.rhs_variable.value
+            if not isinstance(rhs_variable_id, str):
+                raise TypeError(f"Expected rhs_variable_id to be a string, got {type(rhs_variable_id)}")
+
+            lhs_query_input_id: UUID = self.metadata_filter_input_id_by_operand_id.get(
+                UUID(lhs_variable_id)
+            ) or uuid4_from_hash(f"{self.node_id}|{hash(tuple(path))}")
+            rhs_query_input_id: UUID = self.metadata_filter_input_id_by_operand_id.get(
+                UUID(rhs_variable_id)
+            ) or uuid4_from_hash(f"{self.node_id}|{hash(tuple(path))}")
 
             return (
                 {
@@ -173,7 +177,7 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
                     create_node_input(
                         self.node_id,
                         f"vellum-query-builder-variable-{lhs_variable_id}",
-                        lhs_query_input_id,
+                        str(lhs_query_input_id),
                         display_context,
                         input_id=UUID(lhs_variable_id),
                         pointer_type=InputVariablePointer,
@@ -181,7 +185,7 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
                     create_node_input(
                         self.node_id,
                         f"vellum-query-builder-variable-{rhs_variable_id}",
-                        rhs_query_input_id,
+                        str(rhs_query_input_id),
                         display_context,
                         input_id=UUID(rhs_variable_id),
                         pointer_type=InputVariablePointer,
