@@ -31,6 +31,7 @@ export abstract class BaseNode<
   public readonly nodeContext: V;
 
   protected readonly nodeInputsByKey: Map<string, NodeInput>;
+  protected readonly nodeInputsById: Map<string, NodeInput>;
 
   private readonly errorOutputId: string | undefined;
 
@@ -39,7 +40,7 @@ export abstract class BaseNode<
     this.nodeContext = nodeContext;
     this.nodeData = nodeContext.nodeData;
 
-    this.nodeInputsByKey = this.generateNodeInputs();
+    [this.nodeInputsByKey, this.nodeInputsById] = this.generateNodeInputs();
     this.errorOutputId = this.getErrorOutputId();
   }
 
@@ -133,11 +134,15 @@ export abstract class BaseNode<
     return this.nodeContext.nodeDisplayModulePath;
   }
 
-  private generateNodeInputs(): Map<string, NodeInput> {
-    const generatedNodeInputs = new Map<string, NodeInput>();
+  private generateNodeInputs(): [
+    Map<string, NodeInput>,
+    Map<string, NodeInput>
+  ] {
+    const nodeInputsByKey = new Map<string, NodeInput>();
+    const nodeInputsById = new Map<string, NodeInput>();
 
     if (!("inputs" in this.nodeData)) {
-      return generatedNodeInputs;
+      return [nodeInputsByKey, nodeInputsById];
     }
 
     this.nodeData.inputs.forEach((nodeInputData) => {
@@ -147,7 +152,8 @@ export abstract class BaseNode<
           nodeInputData,
         });
 
-        generatedNodeInputs.set(nodeInputData.key, nodeInput);
+        nodeInputsByKey.set(nodeInputData.key, nodeInput);
+        nodeInputsById.set(nodeInputData.id, nodeInput);
       } catch (error) {
         if (error instanceof BaseCodegenError) {
           const nodeAttributeGenerationError = new NodeAttributeGenerationError(
@@ -160,7 +166,7 @@ export abstract class BaseNode<
       }
     });
 
-    return generatedNodeInputs;
+    return [nodeInputsByKey, nodeInputsById];
   }
 
   protected getPortDisplay(): python.Field | undefined {
