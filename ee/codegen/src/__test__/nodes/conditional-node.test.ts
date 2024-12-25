@@ -133,10 +133,10 @@ describe("ConditionalNode with invalid uuid for field and value node input ids",
                   id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
                   rules: [],
                   fieldNodeInputId:
-                      "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+                    "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8",
                   operator: "=",
                   valueNodeInputId:
-                      "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d",
+                    "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d",
                 },
               ],
               combinator: "AND",

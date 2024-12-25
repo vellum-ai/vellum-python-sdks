@@ -329,8 +329,8 @@ export function noteNodeDataFactory(): NoteNode {
 }
 
 export function guardrailNodeDataFactory({
-                                           errorOutputId,
-                                         }: {
+  errorOutputId,
+}: {
   errorOutputId?: string;
 } = {}): GuardrailNode {
   const nodeData: GuardrailNode = {
@@ -458,9 +458,9 @@ const generateBlockGivenType = (blockType: string): PromptTemplateBlock => {
 };
 
 export function inlinePromptNodeDataInlineVariantFactory({
-                                                           blockType,
-                                                           errorOutputId,
-                                                         }: {
+  blockType,
+  errorOutputId,
+}: {
   blockType: string;
   errorOutputId?: string;
 }): PromptNode {
@@ -523,9 +523,9 @@ export function inlinePromptNodeDataInlineVariantFactory({
 }
 
 export function inlinePromptNodeDataLegacyVariantFactory({
-                                                           blockType,
-                                                           errorOutputId,
-                                                         }: {
+  blockType,
+  errorOutputId,
+}: {
   blockType: string;
   errorOutputId?: string;
 }): PromptNode {
@@ -630,13 +630,13 @@ export function promptDeploymentNodeDataFactory(): PromptNode {
 }
 
 export function templatingNodeFactory({
-                                        id,
-                                        label,
-                                        sourceHandleId,
-                                        targetHandleId,
-                                        errorOutputId,
-                                        inputRules,
-                                      }: {
+  id,
+  label,
+  sourceHandleId,
+  targetHandleId,
+  errorOutputId,
+  inputRules,
+}: {
   id?: string;
   label?: string;
   sourceHandleId?: string;
@@ -712,9 +712,9 @@ export function subworkflowDeploymentNodeDataFactory(): SubworkflowNode {
 }
 
 export function conditionalNodeWithNullOperatorFactory({
-                                                         id,
-                                                         nodeOutputReference,
-                                                       }: {
+  id,
+  nodeOutputReference,
+}: {
   nodeOutputReference: NodeOutputData;
   id?: string;
 }): ConditionalNode {
@@ -794,15 +794,15 @@ export function conditionalNodeWithNullOperatorFactory({
 }
 
 export function conditionalNodeFactory({
-                                         id,
-                                         label,
-                                         targetHandleId,
-                                         ifSourceHandleId,
-                                         elseSourceHandleId,
-                                         inputReferenceId,
-                                         inputReferenceNodeId,
-                                         includeElif = false,
-                                       }: {
+  id,
+  label,
+  targetHandleId,
+  ifSourceHandleId,
+  elseSourceHandleId,
+  inputReferenceId,
+  inputReferenceNodeId,
+  includeElif = false,
+}: {
   id?: string;
   label?: string;
   targetHandleId?: string;
@@ -854,7 +854,7 @@ export function conditionalNodeFactory({
     id: "ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60",
     type: "ELSE",
     sourceHandleId:
-        elseSourceHandleId ?? "14a8b603-6039-4491-92d4-868a4dae4c15",
+      elseSourceHandleId ?? "14a8b603-6039-4491-92d4-868a4dae4c15",
   });
   const nodeData: ConditionalNode = {
     id: id ?? "b81a4453-7b80-41ea-bd55-c62df8878fd3",
@@ -866,74 +866,74 @@ export function conditionalNodeFactory({
       version: "2",
     },
     inputs:
-        inputReferenceId && inputReferenceNodeId
-            ? [
-              {
-                id: "2cb6582e-c329-4952-8598-097830b766c7",
-                key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
-                value: {
-                  rules: [
-                    {
-                      type: "NODE_OUTPUT",
-                      data: {
-                        nodeId: inputReferenceNodeId,
-                        outputId: inputReferenceId,
-                      },
+      inputReferenceId && inputReferenceNodeId
+        ? [
+            {
+              id: "2cb6582e-c329-4952-8598-097830b766c7",
+              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+              value: {
+                rules: [
+                  {
+                    type: "NODE_OUTPUT",
+                    data: {
+                      nodeId: inputReferenceNodeId,
+                      outputId: inputReferenceId,
                     },
-                  ],
-                  combinator: "OR",
-                },
+                  },
+                ],
+                combinator: "OR",
               },
-              {
-                id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
-                key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
-                value: {
-                  rules: [
-                    {
-                      type: "CONSTANT_VALUE",
-                      data: {
-                        type: "STRING",
-                        value: "testtest",
-                      },
+            },
+            {
+              id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+              value: {
+                rules: [
+                  {
+                    type: "CONSTANT_VALUE",
+                    data: {
+                      type: "STRING",
+                      value: "testtest",
                     },
-                  ],
-                  combinator: "OR",
-                },
+                  },
+                ],
+                combinator: "OR",
               },
-            ]
-            : [
-              {
-                id: "2cb6582e-c329-4952-8598-097830b766c7",
-                key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
-                value: {
-                  rules: [
-                    {
-                      type: "INPUT_VARIABLE",
-                      data: {
-                        inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
-                      },
+            },
+          ]
+        : [
+            {
+              id: "2cb6582e-c329-4952-8598-097830b766c7",
+              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+              value: {
+                rules: [
+                  {
+                    type: "INPUT_VARIABLE",
+                    data: {
+                      inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
                     },
-                  ],
-                  combinator: "OR",
-                },
+                  },
+                ],
+                combinator: "OR",
               },
-              {
-                id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
-                key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
-                value: {
-                  rules: [
-                    {
-                      type: "CONSTANT_VALUE",
-                      data: {
-                        type: "STRING",
-                        value: "testtest",
-                      },
+            },
+            {
+              id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+              value: {
+                rules: [
+                  {
+                    type: "CONSTANT_VALUE",
+                    data: {
+                      type: "STRING",
+                      value: "testtest",
                     },
-                  ],
-                  combinator: "OR",
-                },
+                  },
+                ],
+                combinator: "OR",
               },
-            ],
+            },
+          ],
     displayData: {
       width: 480,
       height: 180,
@@ -947,8 +947,8 @@ export function conditionalNodeFactory({
 }
 
 export function apiNodeFactory({
-                                 errorOutputId,
-                               }: {
+  errorOutputId,
+}: {
   errorOutputId?: string;
 } = {}): ApiNode {
   const nodeData: ApiNode = {
@@ -1203,8 +1203,8 @@ export function apiNodeFactory({
 }
 
 export function codeExecutionNodeFactory({
-                                           codeInputValueRule,
-                                         }: {
+  codeInputValueRule,
+}: {
   codeInputValueRule?: NodeInputValuePointerRule;
 } = {}): CodeExecutionNode {
   const nodeData: CodeExecutionNode = {
@@ -1226,8 +1226,8 @@ export function codeExecutionNodeFactory({
         value: {
           combinator: "OR",
           rules: codeInputValueRule
-              ? [codeInputValueRule]
-              : [
+            ? [codeInputValueRule]
+            : [
                 {
                   type: "CONSTANT_VALUE",
                   data: {
@@ -1305,7 +1305,7 @@ export function errorNodeDataFactory(): ErrorNode {
 }
 
 export function genericNodeFactory(
-    { name }: { name: string } = { name: "MyCustomNode" }
+  { name }: { name: string } = { name: "MyCustomNode" }
 ): GenericNode {
   const nodeData: GenericNode = {
     type: WorkflowNodeType.GENERIC,
