@@ -72,6 +72,12 @@ def _compile_default_value(default: Any) -> Any:
             field.name: _compile_default_value(getattr(default, field.name)) for field in dataclasses.fields(default)
         }
 
+    if isinstance(default, BaseModel):
+        return {
+            field_name: _compile_default_value(getattr(default, field_name))
+            for field_name in default.model_fields.keys()
+        }
+
     return default
 
 
