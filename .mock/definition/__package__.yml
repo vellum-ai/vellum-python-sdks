@@ -1123,9 +1123,9 @@ types:
   ChatMessagePromptBlock:
     docs: A block that represents a chat message in a prompt template.
     properties:
+      block_type: literal<"CHAT_MESSAGE">
       state: optional<PromptBlockState>
       cache_config: optional<EphemeralPromptCacheConfig>
-      block_type: literal<"CHAT_MESSAGE">
       chat_role: ChatMessageRole
       chat_source:
         type: optional<string>
@@ -2295,18 +2295,35 @@ types:
     source:
       openapi: openapi/openapi.yml
   FunctionDefinition:
-    docs: A block that represents a function definition in a prompt template.
+    docs: >-
+      The definition of a Function (aka "Tool Call") that a Prompt/Model has
+      access to.
     properties:
       state: optional<PromptBlockState>
       cache_config: optional<EphemeralPromptCacheConfig>
       name:
         type: optional<string>
+        docs: The name identifying the function.
         validation:
           minLength: 1
-      description: optional<string>
-      parameters: optional<map<string, unknown>>
-      forced: optional<boolean>
-      strict: optional<boolean>
+      description:
+        type: optional<string>
+        docs: A description to help guide the model when to invoke this function.
+      parameters:
+        type: optional<map<string, unknown>>
+        docs: >-
+          An OpenAPI specification of parameters that are supported by this
+          function.
+      forced:
+        type: optional<boolean>
+        docs: >-
+          Set this option to true to force the model to return a function call
+          of this function.
+        default: false
+      strict:
+        type: optional<boolean>
+        docs: Set this option to use strict schema decoding when available.
+        default: false
     source:
       openapi: openapi/openapi.yml
   GenerateErrorResponse:
@@ -2643,9 +2660,9 @@ types:
   JinjaPromptBlock:
     docs: A block of Jinja template code that is used to generate a prompt
     properties:
+      block_type: literal<"JINJA">
       state: optional<PromptBlockState>
       cache_config: optional<EphemeralPromptCacheConfig>
-      block_type: literal<"JINJA">
       template:
         type: string
         validation:
@@ -3571,9 +3588,9 @@ types:
   PlainTextPromptBlock:
     docs: A block that holds a plain text string value.
     properties:
+      block_type: literal<"PLAIN_TEXT">
       state: optional<PromptBlockState>
       cache_config: optional<EphemeralPromptCacheConfig>
-      block_type: literal<"PLAIN_TEXT">
       text: string
     source:
       openapi: openapi/openapi.yml
@@ -3932,9 +3949,9 @@ types:
   RichTextPromptBlock:
     docs: A block that includes a combination of plain text and variable blocks.
     properties:
+      block_type: literal<"RICH_TEXT">
       state: optional<PromptBlockState>
       cache_config: optional<EphemeralPromptCacheConfig>
-      block_type: literal<"RICH_TEXT">
       blocks: list<RichTextChildBlock>
     source:
       openapi: openapi/openapi.yml
@@ -5777,9 +5794,9 @@ types:
   VariablePromptBlock:
     docs: A block that represents a variable in a prompt template.
     properties:
+      block_type: literal<"VARIABLE">
       state: optional<PromptBlockState>
       cache_config: optional<EphemeralPromptCacheConfig>
-      block_type: literal<"VARIABLE">
       input_variable:
         type: string
         validation:
