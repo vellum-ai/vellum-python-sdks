@@ -26,7 +26,7 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants impor
 from vellum.workflows.types.generics import StateType
 
 
-class BaseInlinePromptNode(BasePromptNode, Generic[StateType]):
+class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     """
     Used to execute a Prompt defined inline.
 
