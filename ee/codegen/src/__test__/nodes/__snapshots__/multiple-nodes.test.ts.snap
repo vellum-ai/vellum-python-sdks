@@ -43,9 +43,9 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     }
     rule_ids = [
         RuleIdMap(
-            id=UUID("fa50fb0c-8d62-40e3-bd88-080b52efd4b2"),
+            id="fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
             lhs=RuleIdMap(
-                id=UUID("ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc"),
+                id="ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
                 lhs=None,
                 rhs=None,
                 field_node_input_id=None,
@@ -58,12 +58,10 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     ]
     condition_ids = [
         ConditionId(
-            id=UUID("8d0d8b56-6c17-4684-9f16-45dd6ce23060"),
-            rule_group_id=UUID("fa50fb0c-8d62-40e3-bd88-080b52efd4b2"),
+            id="8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+            rule_group_id="fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
         ),
-        ConditionId(
-            id=UUID("ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60"), rule_group_id=None
-        ),
+        ConditionId(id="ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60", rule_group_id=None),
     ]
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(

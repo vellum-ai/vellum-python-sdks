@@ -75,10 +75,7 @@ describe("ConditionalNode with invalid uuid for field and value node input ids",
     workflowContext = workflowContextFactory();
     writer = new Writer();
 
-    const invalidUUID =
-      "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8";
-
-    const nodeData = conditionalNodeFactory({ invalidUUID: invalidUUID });
+    const nodeData = constructConditionalNodeWithInvalidUUID();
 
     workflowContext.addInputVariableContext(
       inputVariableContextFactory({
@@ -116,6 +113,85 @@ describe("ConditionalNode with invalid uuid for field and value node input ids",
   it("getNodeDefinition", () => {
     expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
   });
+
+  function constructConditionalNodeWithInvalidUUID(): ConditionalNodeType {
+    return {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+            type: "IF",
+            sourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+            data: {
+              id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+              rules: [
+                {
+                  id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
+                  rules: [],
+                  fieldNodeInputId:
+                      "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+                  operator: "=",
+                  valueNodeInputId:
+                      "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d",
+                },
+              ],
+              combinator: "AND",
+            },
+          },
+          {
+            id: "ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60",
+            type: "ELSE",
+            sourceHandleId: "14a8b603-6039-4491-92d4-868a4dae4c15",
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+          key: "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d",
+          key: "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+    };
+  }
 });
 
 describe("ConditionalNode with null operator", () => {

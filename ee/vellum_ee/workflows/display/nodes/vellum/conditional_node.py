@@ -40,17 +40,17 @@ _ConditionalNodeType = TypeVar("_ConditionalNodeType", bound=ConditionalNode)
 
 @dataclass
 class RuleIdMap:
-    id: Union[UUID, str]
+    id: str
     lhs: Optional["RuleIdMap"]
     rhs: Optional["RuleIdMap"]
-    field_node_input_id: Union[Optional[UUID], Optional[str]]
-    value_node_input_id: Union[Optional[UUID], Optional[str]]
+    field_node_input_id: Optional[str]
+    value_node_input_id: Optional[str]
 
 
 @dataclass
 class ConditionId:
-    id: Union[UUID, str]
-    rule_group_id: Union[Optional[UUID], Optional[str]]
+    id: str
+    rule_group_id: Optional[str]
 
 
 class BaseConditionalNodeDisplay(BaseNodeVellumDisplay[_ConditionalNodeType], Generic[_ConditionalNodeType]):
@@ -112,7 +112,7 @@ but the defined conditions have length {len(condition_ids)}"""
                     node_id, f"{current_id}.field", descriptor._expression, display_context, field_node_input_id
                 )
                 node_inputs.append(expression_node_input)
-                field_node_input_id = UUID(expression_node_input.id)
+                field_node_input_id = expression_node_input.id
                 operator = self._convert_descriptor_to_operator(descriptor)
 
             elif isinstance(descriptor, (BetweenExpression, NotBetweenExpression)):
@@ -128,8 +128,8 @@ but the defined conditions have length {len(condition_ids)}"""
                 )
                 node_inputs.extend([field_node_input, value_node_input])
                 operator = self._convert_descriptor_to_operator(descriptor)
-                field_node_input_id = UUID(field_node_input.id)
-                value_node_input_id = UUID(value_node_input.id)
+                field_node_input_id = field_node_input.id
+                value_node_input_id = value_node_input.id
 
             else:
                 lhs = descriptor._lhs  # type: ignore[attr-defined]
@@ -145,19 +145,19 @@ but the defined conditions have length {len(condition_ids)}"""
                         node_id, f"{current_id}.value", rhs, display_context, value_node_input_id
                     )
                     node_inputs.append(rhs_node_input)
-                    value_node_input_id = UUID(rhs_node_input.id)
+                    value_node_input_id = rhs_node_input.id
 
                 operator = self._convert_descriptor_to_operator(descriptor)
                 field_node_input_id = lhs_node_input.id
 
             return {
-                "id": str(current_id),
+                "id": current_id,
                 "rules": None,
                 "combinator": None,
                 "negated": False,
-                "field_node_input_id": str(field_node_input_id),
+                "field_node_input_id": field_node_input_id,
                 "operator": operator,
-                "value_node_input_id": str(value_node_input_id),
+                "value_node_input_id": value_node_input_id,
             }
 
         conditions = []
@@ -263,9 +263,7 @@ but the defined conditions have length {len(condition_ids)}"""
 
     def get_nested_rule_details_by_path(
         self, rule_ids: List[RuleIdMap], path: List[int]
-    ) -> Union[
-        Tuple[Union[UUID, str], Union[Optional[UUID], Optional[str]], Union[Optional[UUID], Optional[str]]], None
-    ]:
+    ) -> Union[Tuple[str, Optional[str], Optional[str]], None]:
         current_rule = rule_ids[path[0]]
 
         for step in path[1:]:
@@ -286,11 +284,11 @@ but the defined conditions have length {len(condition_ids)}"""
 
         return None
 
-    def _generate_hash_for_rule_ids(self, node_id, rule_id) -> Tuple[UUID, UUID, UUID]:
+    def _generate_hash_for_rule_ids(self, node_id, rule_id) -> Tuple[str, str, str]:
         return (
-            uuid4_from_hash(f"{node_id}|{rule_id}|current"),
-            uuid4_from_hash(f"{node_id}|{rule_id}||field"),
-            uuid4_from_hash(f"{node_id}|{rule_id}||value"),
+            str(uuid4_from_hash(f"{node_id}|{rule_id}|current")),
+            str(uuid4_from_hash(f"{node_id}|{rule_id}||field")),
+            str(uuid4_from_hash(f"{node_id}|{rule_id}||value")),
         )
 
     def _get_source_handle_ids(self) -> Dict[int, UUID]:
