@@ -825,9 +825,11 @@ export function conditionalNodeFactory({
         {
           id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
           rules: [],
-          fieldNodeInputId: invalidUUID ?? "2cb6582e-c329-4952-8598-097830b766c7",
+          fieldNodeInputId:
+            invalidUUID ?? "2cb6582e-c329-4952-8598-097830b766c7",
           operator: "=",
-          valueNodeInputId: invalidUUID ?? "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+          valueNodeInputId:
+            invalidUUID ?? "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
         },
       ],
       combinator: "AND",
