@@ -2277,6 +2277,10 @@ paths:
         notice. Not intended for public use.
       parameters:
       - in: query
+        name: exclude_code
+        schema:
+          type: boolean
+      - in: query
         name: format
         schema:
           type: string
@@ -2289,6 +2293,18 @@ paths:
           type: string
         description: The ID of the Workflow to pull from
         required: true
+      - in: query
+        name: include_json
+        schema:
+          type: boolean
+      - in: query
+        name: include_sandbox
+        schema:
+          type: boolean
+      - in: query
+        name: strict
+        schema:
+          type: boolean
       tags:
       - workflows
       security:
@@ -2979,14 +2995,14 @@ components:
       type: object
       description: A block that represents a chat message in a prompt template.
       properties:
+        block_type:
+          $ref: '#/components/schemas/ChatMessageEnum'
         state:
           $ref: '#/components/schemas/PromptBlockState'
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
           nullable: true
-        block_type:
-          $ref: '#/components/schemas/ChatMessageEnum'
         chat_role:
           $ref: '#/components/schemas/ChatMessageRole'
         chat_source:
@@ -5180,7 +5196,8 @@ components:
       - value
     FunctionDefinition:
       type: object
-      description: A block that represents a function definition in a prompt template.
+      description: The definition of a Function (aka "Tool Call") that a Prompt/Model
+        has access to.
       properties:
         state:
           $ref: '#/components/schemas/PromptBlockState'
@@ -5192,19 +5209,28 @@ components:
           type: string
           nullable: true
           minLength: 1
+          description: The name identifying the function.
         description:
           type: string
           nullable: true
+          description: A description to help guide the model when to invoke this function.
         parameters:
           type: object
           additionalProperties: {}
           nullable: true
+          description: An OpenAPI specification of parameters that are supported by
+            this function.
         forced:
           type: boolean
           nullable: true
+          default: false
+          description: Set this option to true to force the model to return a function
+            call of this function.
         strict:
           type: boolean
           nullable: true
+          default: false
+          description: Set this option to use strict schema decoding when available.
     GenerateBodyRequest:
       type: object
       properties:
@@ -5743,14 +5769,14 @@ components:
       type: object
       description: A block of Jinja template code that is used to generate a prompt
       properties:
+        block_type:
+          $ref: '#/components/schemas/JinjaEnum'
         state:
           $ref: '#/components/schemas/PromptBlockState'
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
           nullable: true
-        block_type:
-          $ref: '#/components/schemas/JinjaEnum'
         template:
           type: string
           minLength: 1
@@ -7341,14 +7367,14 @@ components:
       type: object
       description: A block that holds a plain text string value.
       properties:
+        block_type:
+          $ref: '#/components/schemas/PlainTextEnum'
         state:
           $ref: '#/components/schemas/PromptBlockState'
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
           nullable: true
-        block_type:
-          $ref: '#/components/schemas/PlainTextEnum'
         text:
           type: string
       required:
@@ -7904,14 +7930,14 @@ components:
       description: A block that includes a combination of plain text and variable
         blocks.
       properties:
+        block_type:
+          $ref: '#/components/schemas/RichTextEnum'
         state:
           $ref: '#/components/schemas/PromptBlockState'
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
           nullable: true
-        block_type:
-          $ref: '#/components/schemas/RichTextEnum'
         blocks:
           type: array
           items:
@@ -10683,14 +10709,14 @@ components:
       type: object
       description: A block that represents a variable in a prompt template.
       properties:
+        block_type:
+          $ref: '#/components/schemas/VariableEnum'
         state:
           $ref: '#/components/schemas/PromptBlockState'
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
           nullable: true
-        block_type:
-          $ref: '#/components/schemas/VariableEnum'
         input_variable:
           type: string
           minLength: 1

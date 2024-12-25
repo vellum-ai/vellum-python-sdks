@@ -27,7 +27,11 @@ service:
       request:
         name: WorkflowsPullRequest
         query-parameters:
+          exclude_code: optional<boolean>
           format: optional<WorkflowsPullRequestFormat>
+          include_json: optional<boolean>
+          include_sandbox: optional<boolean>
+          strict: optional<boolean>
       response:
         docs: ''
         type: file
