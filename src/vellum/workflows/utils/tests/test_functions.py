@@ -232,3 +232,33 @@ def test_compile_function_definition__default_dataclass():
             },
         },
     )
+
+
+def test_compile_function_definition__default_pydantic():
+    # GIVEN a function with a pydantic model as the default value
+    class MyPydanticModel(BaseModel):
+        a: int
+        b: str
+
+    def my_function(c: MyPydanticModel = MyPydanticModel(a=1, b="hello")):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {"c": {"$ref": "#/$defs/MyPydanticModel", "default": {"a": 1, "b": "hello"}}},
+            "required": [],
+            "$defs": {
+                "MyPydanticModel": {
+                    "type": "object",
+                    "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
+                    "required": ["a", "b"],
+                }
+            },
+        },
+    )
