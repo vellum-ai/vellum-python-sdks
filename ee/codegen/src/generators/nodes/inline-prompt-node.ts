@@ -52,6 +52,7 @@ export class InlinePromptNode extends BaseSingleFileNode<
         initializer: python.TypeInstantiation.list(
           blocksExcludingFunctionDefinition.map((block) => {
             return new PromptBlock({
+              workflowContext: this.workflowContext,
               promptBlock: block,
               inputVariableNameById: Object.fromEntries(
                 this.nodeData.data.execConfig.inputVariables.map(
