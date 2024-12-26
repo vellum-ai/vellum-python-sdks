@@ -47,7 +47,7 @@ export abstract class BasePromptBlock<
   protected constructCommonClassArguments(promptBlock: T): MethodArgument[] {
     const args: MethodArgument[] = [];
 
-    if (promptBlock.state) {
+    if (promptBlock.state && promptBlock.state !== "ENABLED") {
       args.push(
         new MethodArgument({
           name: "state",

@@ -1,13 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`PromptBlock > JINJA > should generate a basic jinja block 1`] = `
-"JinjaPromptBlock(state="ENABLED", template="""Hello, {{ name }}!""")
+"JinjaPromptBlock(template="""Hello, {{ name }}!""")
 "
 `;
 
 exports[`PromptBlock > JINJA > should generate a jinja block with a cache config 1`] = `
 "JinjaPromptBlock(
-    state="ENABLED",
     cache_config=EphemeralPromptCacheConfig(type="EPHEMERAL"),
     template="""Hello, {{ name }}!""",
 )
