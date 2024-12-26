@@ -2998,7 +2998,9 @@ components:
         block_type:
           $ref: '#/components/schemas/ChatMessageEnum'
         state:
-          $ref: '#/components/schemas/PromptBlockState'
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
@@ -5200,7 +5202,9 @@ components:
         has access to.
       properties:
         state:
-          $ref: '#/components/schemas/PromptBlockState'
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
@@ -5772,7 +5776,9 @@ components:
         block_type:
           $ref: '#/components/schemas/JinjaEnum'
         state:
-          $ref: '#/components/schemas/PromptBlockState'
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
@@ -7370,7 +7376,9 @@ components:
         block_type:
           $ref: '#/components/schemas/PlainTextEnum'
         state:
-          $ref: '#/components/schemas/PromptBlockState'
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
@@ -7418,8 +7426,8 @@ components:
       - DISABLED
       type: string
       description: |-
-        * `ENABLED` - ENABLED
-        * `DISABLED` - DISABLED
+        * `ENABLED` - Enabled
+        * `DISABLED` - Disabled
     PromptDeploymentExpandMetaRequest:
       type: object
       properties:
@@ -7933,7 +7941,9 @@ components:
         block_type:
           $ref: '#/components/schemas/RichTextEnum'
         state:
-          $ref: '#/components/schemas/PromptBlockState'
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
@@ -10712,7 +10722,9 @@ components:
         block_type:
           $ref: '#/components/schemas/VariableEnum'
         state:
-          $ref: '#/components/schemas/PromptBlockState'
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
         cache_config:
           allOf:
           - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
