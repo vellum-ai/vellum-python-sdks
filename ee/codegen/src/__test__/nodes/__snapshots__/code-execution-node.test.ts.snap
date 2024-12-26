@@ -120,7 +120,7 @@ from vellum.workflows.state import BaseState
 
 
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
-    code = """print('Hello, World!')"""
+    filepath = "./script.py"
     code_inputs = {}
     output_type = "STRING"
     runtime = "PYTHON_3_11"
