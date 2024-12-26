@@ -199,7 +199,7 @@ export interface EntrypointNode extends BaseDisplayableWorkflowNode {
 }
 
 export interface CacheConfig {
-  type: "EPHEMERAL";
+  type?: "EPHEMERAL";
 }
 
 export interface JinjaPromptTemplateBlock {

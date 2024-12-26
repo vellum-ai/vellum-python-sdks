@@ -101,7 +101,7 @@ import {
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
-  type: stringLiteralSchema("EPHEMERAL"),
+  type: stringLiteralSchema("EPHEMERAL").optional(),
 });
 
 export const JinjaPromptTemplateBlockSerializer: ObjectSchema<
@@ -124,7 +124,7 @@ export declare namespace JinjaPromptTemplateBlockSerializer {
   interface Raw {
     id: string;
     state: PromptBlockState;
-    cache_config?: { type: "EPHEMERAL" } | null;
+    cache_config?: { type?: "EPHEMERAL" | null } | null;
     properties: {
       template?: string | null;
       template_type?: string | null;
@@ -164,7 +164,7 @@ export declare namespace ChatMessagePromptTemplateBlockSerializer {
   interface Raw {
     id: string;
     state: PromptBlockState;
-    cache_config?: { type: "EPHEMERAL" } | null;
+    cache_config?: { type?: "EPHEMERAL" | null } | null;
     properties: {
       chat_role?: ChatMessageRole | null;
       chat_source?: string | null;
@@ -188,7 +188,7 @@ export declare namespace VariablePromptTemplateBlockSerializer {
   interface Raw {
     id: string;
     state: PromptBlockState;
-    cache_config?: { type: "EPHEMERAL" } | null;
+    cache_config?: { type?: "EPHEMERAL" | null } | null;
     input_variable_id: string;
   }
 }
@@ -207,7 +207,7 @@ export declare namespace PlainTextPromptTemplateBlockSerializer {
   interface Raw {
     id: string;
     state: PromptBlockState;
-    cache_config?: { type: "EPHEMERAL" } | null;
+    cache_config?: { type?: "EPHEMERAL" | null } | null;
     text: string;
   }
 }
@@ -241,7 +241,7 @@ export declare namespace RichTextPromptTemplateBlockSerializer {
   interface Raw {
     id: string;
     state: PromptBlockState;
-    cache_config?: { type: "EPHEMERAL" } | null;
+    cache_config?: { type?: "EPHEMERAL" | null } | null;
     blocks: Array<
       | PlainTextPromptTemplateBlockSerializer.Raw
       | VariablePromptTemplateBlockSerializer.Raw
@@ -281,7 +281,7 @@ export declare namespace FunctionDefinitionPromptTemplateBlockSerializer {
   interface Raw {
     id: string;
     state: PromptBlockState;
-    cache_config?: { type: "EPHEMERAL" } | null;
+    cache_config?: { type?: "EPHEMERAL" | null } | null;
     properties: {
       function_name?: string | null;
       function_description?: string | null;
