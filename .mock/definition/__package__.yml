@@ -3623,8 +3623,8 @@ types:
       - ENABLED
       - DISABLED
     docs: |-
-      * `ENABLED` - ENABLED
-      * `DISABLED` - DISABLED
+      * `ENABLED` - Enabled
+      * `DISABLED` - Disabled
     source:
       openapi: openapi/openapi.yml
   PromptDeploymentExpandMetaRequest:
