@@ -77,14 +77,12 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             state="ENABLED",
-            cache_config=None,
             chat_role="SYSTEM",
             chat_source=None,
             chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     state="ENABLED",
-                    cache_config=None,
                     blocks=[
                         PlainTextPromptBlock(
                             state="ENABLED",
@@ -95,9 +93,7 @@ Summarize the following text:
 \\
 """,
                         ),
-                        VariablePromptBlock(
-                            state="ENABLED", cache_config=None, input_variable="text"
-                        ),
+                        VariablePromptBlock(state="ENABLED", input_variable="text"),
                     ],
                 )
             ],
@@ -173,14 +169,12 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             state="ENABLED",
-            cache_config=None,
             chat_role="SYSTEM",
             chat_source=None,
             chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     state="ENABLED",
-                    cache_config=None,
                     blocks=[
                         PlainTextPromptBlock(
                             state="ENABLED",
@@ -191,9 +185,7 @@ Summarize the following text:
 \\
 """,
                         ),
-                        VariablePromptBlock(
-                            state="ENABLED", cache_config=None, input_variable="text"
-                        ),
+                        VariablePromptBlock(state="ENABLED", input_variable="text"),
                     ],
                 )
             ],
@@ -275,14 +267,12 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             state="ENABLED",
-            cache_config=None,
             chat_role="SYSTEM",
             chat_source=None,
             chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     state="ENABLED",
-                    cache_config=None,
                     blocks=[
                         PlainTextPromptBlock(
                             state="ENABLED",
@@ -293,9 +283,7 @@ Summarize the following text:
 \\
 """,
                         ),
-                        VariablePromptBlock(
-                            state="ENABLED", cache_config=None, input_variable="text"
-                        ),
+                        VariablePromptBlock(state="ENABLED", input_variable="text"),
                     ],
                 )
             ],
@@ -610,7 +598,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         JinjaPromptBlock(
             state="ENABLED",
-            cache_config=None,
             template="""Summarize what this means {{ INPUT_VARIABLE }}""",
         )
     ]
@@ -678,7 +665,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         JinjaPromptBlock(
             state="ENABLED",
-            cache_config=None,
             template="""Summarize what this means {{ INPUT_VARIABLE }}""",
         )
     ]
@@ -752,7 +738,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         JinjaPromptBlock(
             state="ENABLED",
-            cache_config=None,
             template="""Summarize what this means {{ INPUT_VARIABLE }}""",
         )
     ]
@@ -842,7 +827,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         RichTextPromptBlock(
             state="ENABLED",
-            cache_config=None,
             blocks=[
                 PlainTextPromptBlock(
                     state="ENABLED", cache_config=None, text="""Hello World!"""
@@ -914,7 +898,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         RichTextPromptBlock(
             state="ENABLED",
-            cache_config=None,
             blocks=[
                 PlainTextPromptBlock(
                     state="ENABLED", cache_config=None, text="""Hello World!"""
@@ -992,7 +975,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         RichTextPromptBlock(
             state="ENABLED",
-            cache_config=None,
             blocks=[
                 PlainTextPromptBlock(
                     state="ENABLED", cache_config=None, text="""Hello World!"""
@@ -1083,9 +1065,7 @@ from ..inputs import Inputs
 
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
-    blocks = [
-        VariablePromptBlock(state="ENABLED", cache_config=None, input_variable="text")
-    ]
+    blocks = [VariablePromptBlock(state="ENABLED", input_variable="text")]
     parameters = PromptParameters(
         stop=None,
         temperature=0,
@@ -1147,9 +1127,7 @@ from ..inputs import Inputs
 
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
-    blocks = [
-        VariablePromptBlock(state="ENABLED", cache_config=None, input_variable="text")
-    ]
+    blocks = [VariablePromptBlock(state="ENABLED", input_variable="text")]
     parameters = PromptParameters(
         stop=None,
         temperature=0,
@@ -1217,9 +1195,7 @@ from ..inputs import Inputs
 @TryNode.wrap()
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
-    blocks = [
-        VariablePromptBlock(state="ENABLED", cache_config=None, input_variable="text")
-    ]
+    blocks = [VariablePromptBlock(state="ENABLED", input_variable="text")]
     parameters = PromptParameters(
         stop=None,
         temperature=0,
