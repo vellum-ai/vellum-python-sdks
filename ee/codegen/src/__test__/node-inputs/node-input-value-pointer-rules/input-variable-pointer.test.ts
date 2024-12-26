@@ -42,4 +42,22 @@ describe("InputVariablePointer", () => {
 
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
+
+  it("should handle when it's referencing an input variable that no longer exists", async () => {
+    const workflowContext = workflowContextFactory();
+
+    const inputVariablePointer = new InputVariablePointerRule({
+      workflowContext: workflowContext,
+      nodeInputValuePointerRule: {
+        type: "INPUT_VARIABLE",
+        data: {
+          inputVariableId: "missing-input-id",
+        },
+      },
+    });
+
+    inputVariablePointer.write(writer);
+
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
 });

@@ -4,3 +4,8 @@ exports[`InputVariablePointer > should generate correct Python code 1`] = `
 "Inputs.test_variable
 "
 `;
+
+exports[`InputVariablePointer > should handle when it's referencing an input variable that no longer exists 1`] = `
+"None
+"
+`;
