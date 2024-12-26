@@ -84,6 +84,7 @@ def pull_command(
     include_json: Optional[bool] = None,
     exclude_code: Optional[bool] = None,
     strict: Optional[bool] = None,
+    include_sandbox: Optional[bool] = None,
 ) -> None:
     load_dotenv()
     logger = load_cli_logger()
@@ -114,6 +115,8 @@ def pull_command(
         query_parameters["exclude_code"] = exclude_code
     if strict:
         query_parameters["strict"] = strict
+    if include_sandbox:
+        query_parameters["include_sandbox"] = include_sandbox
 
     response = client.workflows.pull(
         pk,
@@ -165,6 +168,17 @@ def pull_command(
             """The pulled JSON representation of the Workflow should be used for debugging purposely only. \
 Its schema should be considered unstable and subject to change at any time."""
         )
+
+    if include_sandbox:
+        if not workflow_config.ignore:
+            workflow_config.ignore = "sandbox.py"
+            save_lock_file = True
+        elif isinstance(workflow_config.ignore, str) and "sandbox.py" != workflow_config.ignore:
+            workflow_config.ignore = [workflow_config.ignore, "sandbox.py"]
+            save_lock_file = True
+        elif isinstance(workflow_config.ignore, list) and "sandbox.py" not in workflow_config.ignore:
+            workflow_config.ignore.append("sandbox.py")
+            save_lock_file = True
 
     if save_lock_file:
         config.save()

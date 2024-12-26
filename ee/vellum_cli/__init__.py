@@ -130,11 +130,18 @@ Should only be used for debugging purposes.""",
     is_flag=True,
     help="""Raises an error immediately if there are any issues with the pulling of the Resource.""",
 )
+@click.option(
+    "--include-sandbox",
+    is_flag=True,
+    help="""Include the sandbox code in the pull response. \
+Helpful for running and debugging workflows locally.""",
+)
 def pull(
     ctx: click.Context,
     include_json: Optional[bool],
     exclude_code: Optional[bool],
     strict: Optional[bool],
+    include_sandbox: Optional[bool],
 ) -> None:
     """Pull Resources from Vellum"""
 
@@ -143,6 +150,7 @@ def pull(
             include_json=include_json,
             exclude_code=exclude_code,
             strict=strict,
+            include_sandbox=include_sandbox,
         )
 
 
@@ -171,6 +179,12 @@ Should only be used for debugging purposes.""",
     is_flag=True,
     help="""Raises an error immediately if there are any issues with the pulling of the Workflow.""",
 )
+@click.option(
+    "--include-sandbox",
+    is_flag=True,
+    help="""Include the sandbox code in the pull response. \
+Helpful for running and debugging workflows locally.""",
+)
 def workflows_pull(
     module: Optional[str],
     include_json: Optional[bool],
@@ -178,6 +192,7 @@ def workflows_pull(
     workflow_deployment: Optional[str],
     exclude_code: Optional[bool],
     strict: Optional[bool],
+    include_sandbox: Optional[bool],
 ) -> None:
     """
     Pull Workflows from Vellum. If a module is provided, only the Workflow for that module will be pulled.
@@ -191,6 +206,7 @@ def workflows_pull(
         workflow_deployment=workflow_deployment,
         exclude_code=exclude_code,
         strict=strict,
+        include_sandbox=include_sandbox,
     )
 
 
@@ -208,10 +224,23 @@ Should only be used for debugging purposes.""",
     help="""Exclude the code definition of the Resource from the pull response. \
 Should only be used for debugging purposes.""",
 )
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="""Raises an error immediately if there are any issues with the pulling of the Resource.""",
+)
+@click.option(
+    "--include-sandbox",
+    is_flag=True,
+    help="""Include the sandbox code in the pull response. \
+Helpful for running and debugging resources locally.""",
+)
 def pull_module(
     ctx: click.Context,
     include_json: Optional[bool],
     exclude_code: Optional[bool],
+    strict: Optional[bool],
+    include_sandbox: Optional[bool],
 ) -> None:
     """Pull a specific module from Vellum"""
 
@@ -220,6 +249,8 @@ def pull_module(
             module=ctx.parent.invoked_subcommand,
             include_json=include_json,
             exclude_code=exclude_code,
+            strict=strict,
+            include_sandbox=include_sandbox,
         )
 
 
