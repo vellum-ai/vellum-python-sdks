@@ -486,3 +486,25 @@ def test_pull__strict__with_error(vellum_client, mock_module):
     vellum_client.workflows.pull.assert_called_once()
     call_args = vellum_client.workflows.pull.call_args.kwargs
     assert call_args["request_options"]["additional_query_parameters"] == {"strict": True}
+
+
+def test_pull__include_sandbox(vellum_client, mock_module):
+    # GIVEN a module on the user's filesystem
+    module = mock_module.module
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter(
+        [_zip_file_map({"workflow.py": "print('hello')", "sandbox.py": "print('hello')"})]
+    )
+
+    # WHEN the user runs the pull command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["pull", module, "--include-sandbox"])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the pull api is called with include_sandbox=True
+    vellum_client.workflows.pull.assert_called_once()
+    call_args = vellum_client.workflows.pull.call_args.kwargs
+    assert call_args["request_options"]["additional_query_parameters"] == {"include_sandbox": True}
