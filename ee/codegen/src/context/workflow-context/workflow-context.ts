@@ -211,11 +211,17 @@ export class WorkflowContext {
     this.addUsedInputVariableName(inputVariableContext.name);
   }
 
+  public findInputVariableContextById(
+    inputVariableId: string
+  ): InputVariableContext | undefined {
+    return this.globalInputVariableContextsById.get(inputVariableId);
+  }
+
   public getInputVariableContextById(
     inputVariableId: string
   ): InputVariableContext {
     const inputVariableContext =
-      this.globalInputVariableContextsById.get(inputVariableId);
+      this.findInputVariableContextById(inputVariableId);
 
     if (!inputVariableContext) {
       throw new Error(
