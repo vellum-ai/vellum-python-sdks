@@ -329,6 +329,8 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       return false;
     }
 
-    return !!this.nodeData.data.filepath;
+    // By default, we generate standalone code files unless there's an override saying otherwise.
+    // If no filepath is specified, we'll create a `script.py` file in the node directory.
+    return true;
   }
 }
