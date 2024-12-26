@@ -75,7 +75,7 @@ def test_inline_text_prompt_node__basic(vellum_adhoc_prompt_client):
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.assert_called_once_with(
         blocks=[],
         expand_meta=Ellipsis,
-        functions=Ellipsis,
+        functions=None,
         input_values=[],
         input_variables=[],
         ml_model="gpt-4o",

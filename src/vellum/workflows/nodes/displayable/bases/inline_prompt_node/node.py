@@ -1,6 +1,6 @@
 import json
 from uuid import uuid4
-from typing import ClassVar, Generic, Iterator, List, Optional, Tuple, cast
+from typing import Callable, ClassVar, Generic, Iterator, List, Optional, Tuple, Union, cast
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -24,6 +24,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.types.generics import StateType
+from vellum.workflows.utils.functions import compile_function_definition
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -45,7 +46,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     blocks: ClassVar[List[PromptBlock]]
 
     # The functions/tools that a Prompt has access to
-    functions: Optional[List[FunctionDefinition]] = OMIT
+    functions: Optional[List[Union[FunctionDefinition, Callable]]] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = OMIT
@@ -59,6 +60,14 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             "execution_context": {"parent_context": parent_context},
             **request_options.get("additional_body_parameters", {}),
         }
+        normalized_functions = (
+            [
+                function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
+                for function in self.functions
+            ]
+            if self.functions
+            else None
+        )
 
         return self._context.vellum_client.ad_hoc.adhoc_execute_prompt_stream(
             ml_model=self.ml_model,
@@ -66,7 +75,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             input_variables=input_variables,
             parameters=self.parameters,
             blocks=self.blocks,
-            functions=self.functions,
+            functions=normalized_functions,
             expand_meta=self.expand_meta,
             request_options=self.request_options,
         )
