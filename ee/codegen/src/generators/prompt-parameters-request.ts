@@ -35,13 +35,11 @@ export class PromptParameters extends AstNode {
   private generatePromptParameters(): python.ClassInstantiation {
     const classArgs: MethodArgument[] = [];
 
-    const stopValue = isNil(this.promptParametersRequest.stop)
-      ? python.TypeInstantiation.none()
-      : python.TypeInstantiation.list(
-          this.promptParametersRequest.stop.map((str) =>
-            python.TypeInstantiation.str(str)
-          )
-        );
+    const stopValue = python.TypeInstantiation.list(
+      (this.promptParametersRequest.stop ?? []).map((str) =>
+        python.TypeInstantiation.str(str)
+      )
+    );
     classArgs.push(
       new MethodArgument({
         name: "stop",

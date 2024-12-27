@@ -99,7 +99,7 @@ Summarize the following text:
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -189,7 +189,7 @@ Summarize the following text:
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -285,7 +285,7 @@ Summarize the following text:
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -374,7 +374,7 @@ class PromptNode(InlinePromptNode):
         FunctionDefinition(name="functionTest", description="This is a test function"),
     ]
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -441,7 +441,7 @@ class PromptNode(InlinePromptNode):
         FunctionDefinition(name="functionTest", description="This is a test function"),
     ]
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -514,7 +514,7 @@ class PromptNode(InlinePromptNode):
         FunctionDefinition(name="functionTest", description="This is a test function"),
     ]
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -602,7 +602,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -668,7 +668,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -740,7 +740,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -834,7 +834,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -906,7 +906,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -984,7 +984,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -1072,7 +1072,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -1138,7 +1138,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -1210,7 +1210,7 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,

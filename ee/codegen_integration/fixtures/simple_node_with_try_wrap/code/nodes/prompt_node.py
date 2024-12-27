@@ -37,7 +37,7 @@ What is the origin of the following phrase
         "text": "Hello, World!",
     }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
