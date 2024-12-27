@@ -47,7 +47,8 @@ export class WorkflowSandboxFile extends BasePersistedFile {
           python.methodArgument({
             name: "inputs",
             value: python.TypeInstantiation.list(
-              this.sandboxInputs.map((input) => this.getWorkflowInput(input))
+              this.sandboxInputs.map((input) => this.getWorkflowInput(input)),
+              { endWithComma: true }
             ),
           }),
         ],

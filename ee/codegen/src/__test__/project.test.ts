@@ -329,6 +329,11 @@ Encountered 1 error(s) while generating code:
           type: "STRING",
           id: "workflow-input",
         },
+        {
+          key: "chat",
+          type: "CHAT_HISTORY",
+          id: "workflow-chat",
+        },
       ],
       output_variables: [],
     };
@@ -345,6 +350,16 @@ Encountered 1 error(s) while generating code:
               type: "STRING",
               value: "foo",
             },
+            {
+              name: "chat",
+              type: "CHAT_HISTORY",
+              value: [
+                {
+                  role: "USER",
+                  text: "foo",
+                },
+              ],
+            },
           ],
           [
             {
@@ -352,12 +367,45 @@ Encountered 1 error(s) while generating code:
               type: "STRING",
               value: "bar",
             },
+            {
+              name: "chat",
+              type: "CHAT_HISTORY",
+              value: [
+                {
+                  role: "USER",
+                  content: {
+                    type: "STRING",
+                    value: "bar",
+                  },
+                  // The API sometimes sends null for source, but it's not a valid value
+                  source: null as unknown as undefined,
+                },
+              ],
+            },
           ],
           [
             {
               name: "input",
               type: "STRING",
               value: "hello",
+            },
+            {
+              name: "chat",
+              type: "CHAT_HISTORY",
+              value: [
+                {
+                  role: "USER",
+                  content: {
+                    type: "ARRAY",
+                    value: [
+                      {
+                        type: "STRING",
+                        value: "hello",
+                      },
+                    ],
+                  },
+                },
+              ],
             },
           ],
         ],
