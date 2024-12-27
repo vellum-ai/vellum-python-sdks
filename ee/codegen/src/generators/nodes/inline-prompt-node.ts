@@ -60,17 +60,11 @@ export class InlinePromptNode extends BaseSingleFileNode<
                 )
               ),
             });
-          })
+          }),
+          {
+            endWithComma: true,
+          }
         ),
-      })
-    );
-
-    statements.push(
-      python.field({
-        name: "parameters",
-        initializer: new PromptParameters({
-          promptParametersRequest: this.nodeData.data.execConfig.parameters,
-        }),
       })
     );
 
@@ -81,7 +75,10 @@ export class InlinePromptNode extends BaseSingleFileNode<
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
             key: python.TypeInstantiation.str(key),
             value: value,
-          }))
+          })),
+          {
+            endWithComma: true,
+          }
         ),
       })
     );
@@ -94,11 +91,23 @@ export class InlinePromptNode extends BaseSingleFileNode<
             functionDefinitions.map(
               (functionDefinition) =>
                 new FunctionDefinition({ functionDefinition })
-            )
+            ),
+            {
+              endWithComma: true,
+            }
           ),
         })
       );
     }
+
+    statements.push(
+      python.field({
+        name: "parameters",
+        initializer: new PromptParameters({
+          promptParametersRequest: this.nodeData.data.execConfig.parameters,
+        }),
+      })
+    );
 
     return statements;
   }

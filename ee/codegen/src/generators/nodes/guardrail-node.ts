@@ -33,7 +33,10 @@ export class GuardrailNode extends BaseSingleFileNode<
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
             key: python.TypeInstantiation.str(key),
             value: value,
-          }))
+          })),
+          {
+            endWithComma: true,
+          }
         ),
       })
     );

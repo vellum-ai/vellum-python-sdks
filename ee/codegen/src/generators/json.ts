@@ -45,7 +45,10 @@ export class Json extends AstNode {
           const jsonValue = new Json(item);
           this.inheritReferences(jsonValue);
           return jsonValue;
-        })
+        }),
+        {
+          endWithComma: true,
+        }
       );
     }
 
@@ -59,7 +62,9 @@ export class Json extends AstNode {
           value: jsonValue,
         };
       });
-      return python.TypeInstantiation.dict(entries);
+      return python.TypeInstantiation.dict(entries, {
+        endWithComma: true,
+      });
     }
 
     throw new Error(`Unsupported JSON value type: ${typeof value}`);

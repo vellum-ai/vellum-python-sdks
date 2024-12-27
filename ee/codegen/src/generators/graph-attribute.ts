@@ -696,7 +696,10 @@ export class GraphAttribute extends AstNode {
 
     if (mutableAst.type === "set") {
       return python.TypeInstantiation.set(
-        mutableAst.values.map((ast) => this.getGraphAttributeAstNode(ast))
+        mutableAst.values.map((ast) => this.getGraphAttributeAstNode(ast)),
+        {
+          endWithComma: true,
+        }
       );
     }
 

@@ -46,7 +46,10 @@ export class TemplatingNode extends BaseSingleFileNode<
           otherInputs.map((codeInput) => ({
             key: python.TypeInstantiation.str(codeInput.nodeInputData.key),
             value: codeInput,
-          }))
+          })),
+          {
+            endWithComma: true,
+          }
         ),
       })
     );

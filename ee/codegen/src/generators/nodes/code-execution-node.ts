@@ -139,7 +139,10 @@ export class CodeExecutionNode extends BaseSingleFileNode<
                     }),
                   ],
                 })
-              )
+              ),
+              {
+                endWithComma: true,
+              }
             )
           : python.TypeInstantiation.none(),
       })

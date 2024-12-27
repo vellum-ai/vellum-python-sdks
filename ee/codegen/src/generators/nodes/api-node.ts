@@ -73,7 +73,10 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
                 key,
                 value,
               };
-            })
+            }),
+            {
+              endWithComma: true,
+            }
           ),
         })
       );
