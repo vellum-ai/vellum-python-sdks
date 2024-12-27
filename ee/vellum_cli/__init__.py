@@ -133,7 +133,7 @@ Should only be used for debugging purposes.""",
 @click.option(
     "--include-sandbox",
     is_flag=True,
-    help="""Include the sandbox code in the pull response. \
+    help="""Generates a runnable sandbox.py file containing test data from the Resource's sandbox. \
 Helpful for running and debugging workflows locally.""",
 )
 def pull(
@@ -182,7 +182,7 @@ Should only be used for debugging purposes.""",
 @click.option(
     "--include-sandbox",
     is_flag=True,
-    help="""Include the sandbox code in the pull response. \
+    help="""Generates a runnable sandbox.py file containing test data from the Resource's sandbox. \
 Helpful for running and debugging workflows locally.""",
 )
 def workflows_pull(
@@ -232,7 +232,7 @@ Should only be used for debugging purposes.""",
 @click.option(
     "--include-sandbox",
     is_flag=True,
-    help="""Include the sandbox code in the pull response. \
+    help="""Generates a runnable sandbox.py file containing test data from the Resource's sandbox. \
 Helpful for running and debugging resources locally.""",
 )
 def pull_module(
