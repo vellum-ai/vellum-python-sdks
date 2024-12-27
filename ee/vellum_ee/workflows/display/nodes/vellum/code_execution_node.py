@@ -27,8 +27,8 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
         node = self._node
         node_id = self.node_id
         raw_code = raise_if_descriptor(node.code)
-        code_value = None
 
+        code_value: Optional[str]
         if raw_code:
             code_value = raw_code
         else:
