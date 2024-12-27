@@ -31,7 +31,7 @@
     "upgrade-codegen-service": "ts-node-esm --project tsconfig.json scripts/upgrade-codegen-service.mts"
   },
   "dependencies": {
-    "@fern-api/python-ast": "^0.0.19",
+    "@fern-api/python-ast": "^0.0.20",
     "@fern-fern/generator-cli-sdk": "file:./stubs/generator-cli-sdk",
     "@fern-fern/generator-exec-sdk": "file:./stubs/generator-exec-sdk",
     "lodash": "^4.17.21",
