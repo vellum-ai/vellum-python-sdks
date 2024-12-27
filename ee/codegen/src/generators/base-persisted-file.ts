@@ -1,4 +1,4 @@
-import { mkdir, writeFile, readFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import path, { join } from "path";
 
 import { python } from "@fern-api/python-ast";
