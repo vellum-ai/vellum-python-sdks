@@ -145,7 +145,9 @@ class ChatHistoryVellumValue extends AstNode {
       });
     });
 
-    python.TypeInstantiation.list(chatMessages).write(writer);
+    python.TypeInstantiation.list(chatMessages, { endWithComma: true }).write(
+      writer
+    );
   }
 }
 
@@ -229,7 +231,8 @@ class ArrayVellumValue extends AstNode {
       throw new Error("Expected array value for ArrayVellumValue");
     }
     this.astNode = python.TypeInstantiation.list(
-      value.map((item) => new VellumValue({ vellumValue: item }))
+      value.map((item) => new VellumValue({ vellumValue: item })),
+      { endWithComma: true }
     );
     this.inheritReferences(this.astNode);
   }
@@ -388,7 +391,9 @@ class SearchResultsVellumValue extends AstNode {
       });
     });
 
-    const searchResults = python.TypeInstantiation.list(searchResultItems);
+    const searchResults = python.TypeInstantiation.list(searchResultItems, {
+      endWithComma: true,
+    });
 
     this.inheritReferences(searchResults);
 

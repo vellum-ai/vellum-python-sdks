@@ -40,7 +40,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
           python.methodArgument({
             name: "workflow",
             value: python.reference({
-              name: "Workflow",
+              name: this.workflowContext.workflowClassName,
               modulePath: this.workflowContext.modulePath,
             }),
           }),
@@ -56,20 +56,15 @@ export class WorkflowSandboxFile extends BasePersistedFile {
     });
     this.inheritReferences(sandboxRunnerField);
 
-    const runMethodInvocation = python.invokeMethod({
-      methodReference: python.reference({
-        name: "runner.run",
-      }),
-      arguments_: [],
-    });
-
     return [
       python.codeBlock(`\
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 `),
       sandboxRunnerField,
-      runMethodInvocation,
+      // Using code block instead of method invocation since the latter tries to import `runner.run` after
+      // specifying as a reference, even though it's a locally defined variable.
+      python.codeBlock(`runner.run()`),
     ];
   }
 

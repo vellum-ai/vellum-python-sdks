@@ -36,20 +36,23 @@ export class ChatMessageContent extends AstNode {
   }
 
   private addReferences(): void {
-    this.addReference(this.getChatMessageContentRef());
-
     if (this.chatMessageContent.type === "STRING") {
       this.addReference(this.getStringChatMessageContentRef());
     } else if (this.chatMessageContent.type === "FUNCTION_CALL") {
       this.addReference(this.getFunctionCallChatMessageContentRef());
       this.addReference(this.getFunctionCallChatMessageContentValueRef());
+    } else if (this.chatMessageContent.type === "ARRAY") {
+      this.addReference(this.getArrayChatMessageContentRef());
+    } else if (this.chatMessageContent.type === "IMAGE") {
+      this.addReference(this.getImageChatMessageContentRef());
+    } else if (this.chatMessageContent.type === "AUDIO") {
+      this.addReference(this.getAudioChatMessageContentRef());
     }
   }
 
-  private getChatMessageContentRef(): python.Reference {
+  private getArrayChatMessageContentRef(): python.Reference {
     return python.reference({
-      name:
-        this.chatMessageContent.type + (this.isRequestType ? "Request" : ""),
+      name: "ArrayChatMessageContent" + (this.isRequestType ? "Request" : ""),
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
   }
@@ -168,14 +171,24 @@ export class ChatMessageContent extends AstNode {
     }
 
     if (contentType === "ARRAY") {
-      const arrayValue = this.chatMessageContent.value as unknown[];
+      const arrayValue = this.chatMessageContent.value;
       const arrayElements = arrayValue.map(
         (element) =>
           new ChatMessageContent({
             chatMessageContent: element as ChatMessageContentRequestType,
           })
       );
-      const instance = python.TypeInstantiation.list(arrayElements);
+      const instance = python.instantiateClass({
+        classReference: this.getArrayChatMessageContentRef(),
+        arguments_: [
+          python.methodArgument({
+            name: "value",
+            value: python.TypeInstantiation.list(arrayElements, {
+              endWithComma: true,
+            }),
+          }),
+        ],
+      });
       this.inheritReferences(instance);
       instance.write(writer);
       return;

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, writeFile, readFile } from "fs/promises";
 import path, { join } from "path";
 
 import { python } from "@fern-api/python-ast";
@@ -84,7 +84,7 @@ export abstract class BasePersistedFile extends AstNode {
     try {
       contents = await writer.toStringFormatted({ line_width: 120 });
     } catch (error) {
-      console.error("Error formatting file", error);
+      console.error("Error formatting", fileName, "with error", error);
       contents = writer.toString();
     }
 
