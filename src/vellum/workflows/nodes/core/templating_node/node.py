@@ -1,41 +1,15 @@
-import datetime
-import itertools
-import json
-import random
-import re
 from typing import Any, Callable, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, Union, get_args
 
-import dateutil.parser
-import pydash
-import pytz
-import yaml
-
+from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS
+from vellum.utils.templating.exceptions import JinjaTemplateError
+from vellum.utils.templating.render import render_sandboxed_jinja_template
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.nodes.core.templating_node.custom_filters import is_valid_json_string
-from vellum.workflows.nodes.core.templating_node.exceptions import JinjaTemplateError
-from vellum.workflows.nodes.core.templating_node.render import render_sandboxed_jinja_template
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
-
-_DEFAULT_JINJA_GLOBALS: Dict[str, Any] = {
-    "datetime": datetime,
-    "dateutil": dateutil,
-    "itertools": itertools,
-    "json": json,
-    "pydash": pydash,
-    "pytz": pytz,
-    "random": random,
-    "re": re,
-    "yaml": yaml,
-}
-
-_DEFAULT_JINJA_CUSTOM_FILTERS: Dict[str, Callable[[Union[str, bytes]], bool]] = {
-    "is_valid_json_string": is_valid_json_string,
-}
 
 _OutputType = TypeVar("_OutputType")
 
@@ -78,8 +52,8 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
     # The inputs to render the template with.
     inputs: ClassVar[EntityInputsInterface]
 
-    jinja_globals: Dict[str, Any] = _DEFAULT_JINJA_GLOBALS
-    jinja_custom_filters: Mapping[str, Callable[[Union[str, bytes]], bool]] = _DEFAULT_JINJA_CUSTOM_FILTERS
+    jinja_globals: Dict[str, Any] = DEFAULT_JINJA_GLOBALS
+    jinja_custom_filters: Mapping[str, Callable[[Union[str, bytes]], bool]] = DEFAULT_JINJA_CUSTOM_FILTERS
 
     class Outputs(BaseNode.Outputs):
         """

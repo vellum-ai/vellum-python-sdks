@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Optional, Union
 
 from jinja2.sandbox import SandboxedEnvironment
 
-from vellum.workflows.nodes.core.templating_node.exceptions import JinjaTemplateError
+from vellum.utils.templating.exceptions import JinjaTemplateError
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
 
