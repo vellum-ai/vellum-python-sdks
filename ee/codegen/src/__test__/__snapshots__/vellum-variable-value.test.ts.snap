@@ -20,7 +20,13 @@ exports[`VellumValue > ERROR > should write a ERROR value correctly 1`] = `
 `;
 
 exports[`VellumValue > FUNCTION_CALL > should write a FUNCTION_CALL value correctly 1`] = `
-"FunctionCall(arguments={"key": "value"}, name="test", id="123")
+"FunctionCall(
+    arguments={
+        "key": "value",
+    },
+    name="test",
+    id="123",
+)
 "
 `;
 
@@ -30,7 +36,16 @@ exports[`VellumValue > IMAGE > should write a IMAGE value correctly 1`] = `
 `;
 
 exports[`VellumValue > JSON > should write a JSON value correctly 1`] = `
-"{"key": "value", "nested": {"array": [1, 2, 3]}}
+"{
+    "key": "value",
+    "nested": {
+        "array": [
+            1,
+            2,
+            3,
+        ],
+    },
+}
 "
 `;
 

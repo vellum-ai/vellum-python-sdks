@@ -24,7 +24,10 @@ from .nodes.merge_node import MergeNode
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = {TemplatingNode >> TemplatingNode3, TemplatingNode2} >> MergeNode
+    graph = {
+        TemplatingNode >> TemplatingNode3,
+        TemplatingNode2,
+    } >> MergeNode
 "
 `;
 
@@ -37,7 +40,14 @@ from .nodes.templating_node_3 import TemplatingNode3
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = {TemplatingNode, TemplatingNode2} >> MergeNode >> TemplatingNode3
+    graph = (
+        {
+            TemplatingNode,
+            TemplatingNode2,
+        }
+        >> MergeNode
+        >> TemplatingNode3
+    )
 "
 `;
 
@@ -49,7 +59,10 @@ from .nodes.merge_node import MergeNode
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = {TemplatingNode, TemplatingNode2} >> MergeNode
+    graph = {
+        TemplatingNode,
+        TemplatingNode2,
+    } >> MergeNode
 "
 `;
 
@@ -62,7 +75,11 @@ from .nodes.merge_node import MergeNode
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = {TemplatingNode, TemplatingNode2, TemplatingNode3} >> MergeNode
+    graph = {
+        TemplatingNode,
+        TemplatingNode2,
+        TemplatingNode3,
+    } >> MergeNode
 "
 `;
 
@@ -73,7 +90,10 @@ from .nodes.templating_node_2 import TemplatingNode2
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = {TemplatingNode, TemplatingNode2}
+    graph = {
+        TemplatingNode,
+        TemplatingNode2,
+    }
 "
 `;
 
@@ -131,7 +151,11 @@ class TestWorkflow(BaseWorkflow):
         ConditionalNode.Ports.branch_1 >> TemplatingNode,
         ConditionalNode.Ports.branch_2
         >> {
-            ConditionalNode2.Ports.branch_2 >> {TemplatingNode3, TemplatingNode4},
+            ConditionalNode2.Ports.branch_2
+            >> {
+                TemplatingNode3,
+                TemplatingNode4,
+            },
             TemplatingNode2,
         },
     }
@@ -146,7 +170,10 @@ from .nodes.templating_node_3 import TemplatingNode3
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> {TemplatingNode2, TemplatingNode3}
+    graph = TemplatingNode >> {
+        TemplatingNode2,
+        TemplatingNode3,
+    }
 "
 `;
 
@@ -159,7 +186,14 @@ from .nodes.templating_node_4 import TemplatingNode4
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> {TemplatingNode2, TemplatingNode3} >> TemplatingNode4
+    graph = (
+        TemplatingNode
+        >> {
+            TemplatingNode2,
+            TemplatingNode3,
+        }
+        >> TemplatingNode4
+    )
 "
 `;
 
@@ -171,7 +205,10 @@ from .nodes.templating_node_2 import TemplatingNode2
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = ConditionalNode.Ports.branch_1 >> {TemplatingNode, TemplatingNode2}
+    graph = ConditionalNode.Ports.branch_1 >> {
+        TemplatingNode,
+        TemplatingNode2,
+    }
 "
 `;
 
@@ -186,7 +223,11 @@ from .nodes.templating_node_3 import TemplatingNode3
 class TestWorkflow(BaseWorkflow):
     graph = {
         ConditionalNode.Ports.branch_1 >> TemplatingNode,
-        ConditionalNode.Ports.branch_2 >> {TemplatingNode2, TemplatingNode3},
+        ConditionalNode.Ports.branch_2
+        >> {
+            TemplatingNode2,
+            TemplatingNode3,
+        },
     }
 "
 `;
@@ -199,7 +240,10 @@ from .nodes.templating_node_3 import TemplatingNode3
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = {TemplatingNode >> TemplatingNode2, TemplatingNode3}
+    graph = {
+        TemplatingNode >> TemplatingNode2,
+        TemplatingNode3,
+    }
 "
 `;
 
@@ -215,7 +259,10 @@ from .nodes.templating_node_5 import TemplatingNode5
 
 class TestWorkflow(BaseWorkflow):
     graph = (
-        {TemplatingNode >> TemplatingNode3 >> TemplatingNode4, TemplatingNode2}
+        {
+            TemplatingNode >> TemplatingNode3 >> TemplatingNode4,
+            TemplatingNode2,
+        }
         >> MergeNode
         >> TemplatingNode5
     )
@@ -230,7 +277,11 @@ from .nodes.templating_node_3 import TemplatingNode3
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = {TemplatingNode, TemplatingNode2, TemplatingNode3}
+    graph = {
+        TemplatingNode,
+        TemplatingNode2,
+        TemplatingNode3,
+    }
 "
 `;
 
@@ -248,7 +299,10 @@ class TestWorkflow(BaseWorkflow):
     graph = {
         ConditionalNode.Ports.branch_1
         >> TemplatingNode
-        >> {TemplatingNode3 >> TemplatingNode4, TemplatingNode5},
+        >> {
+            TemplatingNode3 >> TemplatingNode4,
+            TemplatingNode5,
+        },
         ConditionalNode.Ports.branch_2 >> TemplatingNode2 >> TemplatingNode3,
     }
 "

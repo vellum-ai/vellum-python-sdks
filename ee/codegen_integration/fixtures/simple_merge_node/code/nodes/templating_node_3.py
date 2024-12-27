@@ -10,4 +10,7 @@ class TemplatingNode3(TemplatingNode[BaseState, str]):
 {{ input_a }}
 {{ input_b }}\
 """
-    inputs = {"input_a": TemplatingNode1.Outputs.result, "input_b": TemplatingNode2.Outputs.result}
+    inputs = {
+        "input_a": TemplatingNode1.Outputs.result,
+        "input_b": TemplatingNode2.Outputs.result,
+    }

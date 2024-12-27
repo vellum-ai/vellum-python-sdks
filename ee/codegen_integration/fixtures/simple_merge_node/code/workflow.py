@@ -8,7 +8,15 @@ from .nodes.templating_node_3 import TemplatingNode3
 
 
 class Workflow(BaseWorkflow):
-    graph = {TemplatingNode2, TemplatingNode1} >> MergeNode >> TemplatingNode3 >> FinalOutput
+    graph = (
+        {
+            TemplatingNode2,
+            TemplatingNode1,
+        }
+        >> MergeNode
+        >> TemplatingNode3
+        >> FinalOutput
+    )
 
     class Outputs(BaseWorkflow.Outputs):
         final_output = FinalOutput.Outputs.value

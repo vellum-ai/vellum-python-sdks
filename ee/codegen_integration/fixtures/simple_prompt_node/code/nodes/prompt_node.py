@@ -33,8 +33,11 @@ Summarize the following text:
                     ]
                 )
             ],
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
         stop=None,
         temperature=0,
@@ -46,4 +49,3 @@ Summarize the following text:
         logit_bias={},
         custom_parameters=None,
     )
-    prompt_inputs = {"text": Inputs.text}

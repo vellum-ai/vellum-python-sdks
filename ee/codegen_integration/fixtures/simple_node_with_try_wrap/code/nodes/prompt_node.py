@@ -33,8 +33,11 @@ What is the origin of the following phrase
                     ]
                 )
             ],
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": "Hello, World!",
+    }
     parameters = PromptParameters(
         stop=None,
         temperature=0,
@@ -46,4 +49,3 @@ What is the origin of the following phrase
         logit_bias={},
         custom_parameters=None,
     )
-    prompt_inputs = {"text": "Hello, World!"}

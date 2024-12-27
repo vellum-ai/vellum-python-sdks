@@ -1,7 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Json > write > should handle arrays 1`] = `
-"[1, "test", True]
+"[
+    1,
+    "test",
+    True,
+]
 "
 `;
 
@@ -21,7 +25,11 @@ exports[`Json > write > should handle complex nested structures 1`] = `
     "metadata": {
         "created": "2024-01-01",
         "modified": "2024-01-02",
-        "tags": ["important", "test", "complex"],
+        "tags": [
+            "important",
+            "test",
+            "complex",
+        ],
     },
     "data": {
         "users": [
@@ -29,19 +37,38 @@ exports[`Json > write > should handle complex nested structures 1`] = `
                 "id": 1,
                 "name": "John Doe",
                 "settings": {
-                    "preferences": {"theme": "dark", "notifications": True},
-                    "permissions": ["read", "write"],
+                    "preferences": {
+                        "theme": "dark",
+                        "notifications": True,
+                    },
+                    "permissions": [
+                        "read",
+                        "write",
+                    ],
                 },
-                "scores": [98.5, 87.2, 92],
+                "scores": [
+                    98.5,
+                    87.2,
+                    92,
+                ],
             },
             {
                 "id": 2,
                 "name": "Jane Smith",
                 "settings": {
-                    "preferences": {"theme": "light", "notifications": False},
-                    "permissions": ["read"],
+                    "preferences": {
+                        "theme": "light",
+                        "notifications": False,
+                    },
+                    "permissions": [
+                        "read",
+                    ],
                 },
-                "scores": [95, 88.5, 91.2],
+                "scores": [
+                    95,
+                    88.5,
+                    91.2,
+                ],
             },
         ],
         "statistics": {
@@ -51,7 +78,11 @@ exports[`Json > write > should handle complex nested structures 1`] = `
             "metadata": {
                 "lastUpdated": "2024-01-02",
                 "source": "system",
-                "flags": [None, True, False],
+                "flags": [
+                    None,
+                    True,
+                    False,
+                ],
             },
         },
     },
@@ -70,7 +101,18 @@ exports[`Json > write > should handle integers 1`] = `
 `;
 
 exports[`Json > write > should handle nested structures 1`] = `
-"{"array": [1, 2, 3], "nested": {"a": 1, "b": "test"}, "null": None}
+"{
+    "array": [
+        1,
+        2,
+        3,
+    ],
+    "nested": {
+        "a": 1,
+        "b": "test",
+    },
+    "null": None,
+}
 "
 `;
 
@@ -80,7 +122,10 @@ exports[`Json > write > should handle null values 1`] = `
 `;
 
 exports[`Json > write > should handle objects 1`] = `
-"{"key": "value", "num": 123}
+"{
+    "key": "value",
+    "num": 123,
+}
 "
 `;
 

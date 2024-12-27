@@ -118,7 +118,10 @@ from vellum import FunctionCall
 
 class Inputs(BaseInputs):
     function_call_input: FunctionCall = FunctionCall(
-        arguments={"arg1": "Hello World"}, name="function_call"
+        arguments={
+            "arg1": "Hello World",
+        },
+        name="function_call",
     )
 "
 `;
@@ -139,7 +142,9 @@ from typing import Any
 
 
 class Inputs(BaseInputs):
-    json_input: Any = {"key": "value"}
+    json_input: Any = {
+        "key": "value",
+    }
 "
 `;
 
