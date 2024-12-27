@@ -15,8 +15,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
-            chat_source=None,
-            chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     blocks=[

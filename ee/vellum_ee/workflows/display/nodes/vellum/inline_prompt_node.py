@@ -104,13 +104,12 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
             chat_properties: JsonObject = {
                 "chat_role": prompt_block.chat_role,
                 "chat_source": prompt_block.chat_source,
+                "chat_message_unterminated": bool(prompt_block.chat_message_unterminated),
                 "blocks": [
                     self._generate_prompt_block(block, input_variable_id_by_name, path + [i])
                     for i, block in enumerate(prompt_block.blocks)
                 ],
             }
-            if prompt_block.chat_message_unterminated is not None:
-                chat_properties["chat_message_unterminated"] = prompt_block.chat_message_unterminated
 
             block = {
                 "block_type": "CHAT_MESSAGE",

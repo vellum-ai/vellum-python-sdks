@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
+import { isNil } from "lodash";
 import { PlainTextPromptBlock as PlainTextPromptBlockType } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
@@ -102,28 +103,27 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
       );
     }
 
-    classArgs.push(
-      new MethodArgument({
-        name: "chat_source",
-        value: promptBlock.properties.chatSource
-          ? python.TypeInstantiation.str(promptBlock.properties.chatSource)
-          : python.TypeInstantiation.none(),
-      })
-    );
+    if (!isNil(promptBlock.properties.chatSource)) {
+      classArgs.push(
+        new MethodArgument({
+          name: "chat_source",
+          value: python.TypeInstantiation.str(
+            promptBlock.properties.chatSource
+          ),
+        })
+      );
+    }
 
-    const chatMessageUnterminatedValue =
-      promptBlock.properties.chatMessageUnterminated !== undefined &&
-      promptBlock.properties.chatMessageUnterminated !== null
-        ? python.TypeInstantiation.bool(
+    if (promptBlock.properties.chatMessageUnterminated) {
+      classArgs.push(
+        new MethodArgument({
+          name: "chat_message_unterminated",
+          value: python.TypeInstantiation.bool(
             promptBlock.properties.chatMessageUnterminated
-          )
-        : python.TypeInstantiation.none();
-    classArgs.push(
-      new MethodArgument({
-        name: "chat_message_unterminated",
-        value: chatMessageUnterminatedValue,
-      })
-    );
+          ),
+        })
+      );
+    }
 
     const childBlocks = promptBlock.properties.blocks.filter(
       (block): block is PromptTemplateBlockExcludingFunctionDefinition =>
