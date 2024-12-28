@@ -49,3 +49,6 @@ class SandboxRunner(Generic[WorkflowType]):
                 self._logger.info(f"Just started Node: {event.node_definition.__name__}")
             elif event.name == "node.execution.fulfilled":
                 self._logger.info(f"Just finished Node: {event.node_definition.__name__}")
+            elif event.name == "node.execution.rejected":
+                self._logger.debug(f"Error: {event.error}")
+                self._logger.error(f"Failed to run Node: {event.node_definition.__name__}")
