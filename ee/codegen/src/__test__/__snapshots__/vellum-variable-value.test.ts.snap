@@ -14,9 +14,9 @@ exports[`VellumValue > AUDIO > should write a AUDIO value correctly 1`] = `
 "
 `;
 
-exports[`VellumValue > CHAT_HISTORY > should write a CHAT_HISTORY value with a string content 1`] = `"[ChatMessageRequest(role="USER", content=StringChatMessageContentRequest(value="Hello, AI!")),]"`;
+exports[`VellumValue > CHAT_HISTORY > should write a CHAT_HISTORY value with a string content 1`] = `"[ChatMessage(role="USER", content=StringChatMessageContent(value="Hello, AI!")),]"`;
 
-exports[`VellumValue > CHAT_HISTORY > should write a CHAT_HISTORY value with just text 1`] = `"[ChatMessageRequest(role="USER", text="Hello, AI!"),]"`;
+exports[`VellumValue > CHAT_HISTORY > should write a CHAT_HISTORY value with just text 1`] = `"[ChatMessage(role="USER", text="Hello, AI!"),]"`;
 
 exports[`VellumValue > ERROR > should write a ERROR value correctly 1`] = `
 "VellumError(message="This is an error!", code="INTERNAL_SERVER_ERROR")

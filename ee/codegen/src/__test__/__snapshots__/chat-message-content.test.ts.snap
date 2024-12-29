@@ -1,11 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ChatMessageContent > ARRAY > should write an array of content correctly 1`] = `
-"ArrayChatMessageContentRequest(
+"ArrayChatMessageContent(
     value=[
-        StringChatMessageContentRequest(value="First message"),
-        FunctionCallChatMessageContentRequest(
-            value=FunctionCallChatMessageContentValueRequest(
+        StringChatMessageContent(value="First message"),
+        FunctionCallChatMessageContent(
+            value=FunctionCallChatMessageContentValue(
                 name="get_weather",
                 arguments={
                     "location": "Seattle",
@@ -18,7 +18,7 @@ exports[`ChatMessageContent > ARRAY > should write an array of content correctly
 `;
 
 exports[`ChatMessageContent > AUDIO > should write an audio content correctly 1`] = `
-"AudioChatMessageContentRequest(
+"AudioChatMessageContent(
     src="https://example.com/audio.mp3",
     metadata={
         "key": "value",
@@ -28,8 +28,8 @@ exports[`ChatMessageContent > AUDIO > should write an audio content correctly 1`
 `;
 
 exports[`ChatMessageContent > FUNCTION_CALL > should write a function call content with id correctly 1`] = `
-"FunctionCallChatMessageContentRequest(
-    value=FunctionCallChatMessageContentValueRequest(
+"FunctionCallChatMessageContent(
+    value=FunctionCallChatMessageContentValue(
         id="123",
         name="get_weather",
         arguments={
@@ -42,8 +42,8 @@ exports[`ChatMessageContent > FUNCTION_CALL > should write a function call conte
 `;
 
 exports[`ChatMessageContent > FUNCTION_CALL > should write a function call content without id correctly 1`] = `
-"FunctionCallChatMessageContentRequest(
-    value=FunctionCallChatMessageContentValueRequest(
+"FunctionCallChatMessageContent(
+    value=FunctionCallChatMessageContentValue(
         name="get_weather",
         arguments={
             "location": "New York",
@@ -55,7 +55,7 @@ exports[`ChatMessageContent > FUNCTION_CALL > should write a function call conte
 `;
 
 exports[`ChatMessageContent > IMAGE > should write an image content correctly 1`] = `
-"ImageChatMessageContentRequest(
+"ImageChatMessageContent(
     src="https://example.com/image.png",
     metadata={
         "key": "value",
@@ -64,4 +64,4 @@ exports[`ChatMessageContent > IMAGE > should write an image content correctly 1`
 "
 `;
 
-exports[`ChatMessageContent > STRING > should write a string content correctly 1`] = `"StringChatMessageContentRequest(value="Hello, AI!")"`;
+exports[`ChatMessageContent > STRING > should write a string content correctly 1`] = `"StringChatMessageContent(value="Hello, AI!")"`;

@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`WorkflowProjectGenerator > inlude sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
-"from vellum import ArrayChatMessageContentRequest, StringChatMessageContentRequest
+"from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
 from vellum.workflows.sandbox import SandboxRunner
 
 from .inputs import Inputs
@@ -17,23 +17,23 @@ runner = SandboxRunner(
         Inputs(
             input="foo",
             chat=[
-                ChatMessageRequest(role="USER", text="foo"),
+                ChatMessage(role="USER", text="foo"),
             ],
         ),
         Inputs(
             input="bar",
             chat=[
-                ChatMessageRequest(role="USER", content=StringChatMessageContentRequest(value="bar")),
+                ChatMessage(role="USER", content=StringChatMessageContent(value="bar")),
             ],
         ),
         Inputs(
             input="hello",
             chat=[
-                ChatMessageRequest(
+                ChatMessage(
                     role="USER",
-                    content=ArrayChatMessageContentRequest(
+                    content=ArrayChatMessageContent(
                         value=[
-                            StringChatMessageContentRequest(value="hello"),
+                            StringChatMessageContent(value="hello"),
                         ]
                     ),
                 ),
