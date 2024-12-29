@@ -19,6 +19,7 @@ describe("VellumValue", () => {
       });
       stringValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(stringValue.getReferences()).toHaveLength(0);
     });
   });
 
@@ -32,6 +33,7 @@ describe("VellumValue", () => {
       });
       numberValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(numberValue.getReferences()).toHaveLength(0);
     });
   });
 
@@ -50,6 +52,7 @@ describe("VellumValue", () => {
       });
       chatHistoryValue.write(writer);
       expect(await writer.toString()).toMatchSnapshot();
+      expect(chatHistoryValue.getReferences()).toHaveLength(1);
     });
 
     it("should write a CHAT_HISTORY value with a string content", async () => {
@@ -66,6 +69,7 @@ describe("VellumValue", () => {
       });
       chatHistoryValue.write(writer);
       expect(await writer.toString()).toMatchSnapshot();
+      expect(chatHistoryValue.getReferences()).toHaveLength(2);
     });
   });
 
@@ -82,6 +86,7 @@ describe("VellumValue", () => {
       });
       jsonValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(jsonValue.getReferences()).toHaveLength(0);
     });
   });
 
@@ -98,6 +103,7 @@ describe("VellumValue", () => {
       });
       errorValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(errorValue.getReferences()).toHaveLength(1);
     });
   });
 
@@ -113,6 +119,7 @@ describe("VellumValue", () => {
       });
       imageValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(imageValue.getReferences()).toHaveLength(1);
     });
   });
 
@@ -132,6 +139,7 @@ describe("VellumValue", () => {
       });
       functionCallValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(functionCallValue.getReferences()).toHaveLength(1);
     });
   });
 
@@ -160,6 +168,7 @@ describe("VellumValue", () => {
       });
       arrayValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(arrayValue.getReferences()).toHaveLength(1);
     });
   });
 
@@ -175,6 +184,7 @@ describe("VellumValue", () => {
       });
       audioValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(audioValue.getReferences()).toHaveLength(1);
     });
   });
 

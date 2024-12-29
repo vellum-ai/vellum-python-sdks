@@ -16,6 +16,7 @@ describe("ChatMessageContent", () => {
       });
       chatMessageContent.write(writer);
       expect(await writer.toString()).toMatchSnapshot();
+      expect(chatMessageContent.getReferences()).toHaveLength(1);
     });
   });
 
@@ -36,6 +37,7 @@ describe("ChatMessageContent", () => {
       });
       chatMessageContent.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(chatMessageContent.getReferences()).toHaveLength(2);
     });
 
     it("should write a function call content without id correctly", async () => {
@@ -53,6 +55,7 @@ describe("ChatMessageContent", () => {
       });
       chatMessageContent.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(chatMessageContent.getReferences()).toHaveLength(2);
     });
   });
   describe("ARRAY", () => {
@@ -79,7 +82,7 @@ describe("ChatMessageContent", () => {
       });
       chatMessageContent.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
-      expect(chatMessageContent.getReferences()).toHaveLength(5);
+      expect(chatMessageContent.getReferences()).toHaveLength(4);
     });
   });
 
@@ -96,7 +99,7 @@ describe("ChatMessageContent", () => {
       });
       chatMessageContent.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
-      expect(chatMessageContent.getReferences()).toHaveLength(2);
+      expect(chatMessageContent.getReferences()).toHaveLength(1);
     });
   });
 
@@ -113,7 +116,7 @@ describe("ChatMessageContent", () => {
       });
       chatMessageContent.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
-      expect(chatMessageContent.getReferences()).toHaveLength(2);
+      expect(chatMessageContent.getReferences()).toHaveLength(1);
     });
   });
 });
