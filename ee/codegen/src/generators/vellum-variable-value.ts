@@ -19,38 +19,51 @@ import { Json } from "src/generators/json";
 import { assertUnreachable } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
-  private value: string;
+  private astNode: AstNode;
 
   public constructor(value: string) {
     super();
-    this.value = value;
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: string): AstNode {
+    return python.TypeInstantiation.str(value);
   }
 
   public write(writer: Writer): void {
-    python.TypeInstantiation.str(this.value).write(writer);
+    this.astNode.write(writer);
   }
 }
 
 class NumberVellumValue extends AstNode {
-  private value: number;
+  private astNode: AstNode;
 
   public constructor(value: number) {
     super();
-    this.value = value;
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: number): AstNode {
+    return python.TypeInstantiation.float(value);
   }
 
   public write(writer: Writer): void {
-    python.TypeInstantiation.float(this.value).write(writer);
+    this.astNode.write(writer);
   }
 }
 
 class JsonVellumValue extends AstNode {
-  private astNode: Json;
+  private astNode: AstNode;
 
   public constructor(value: unknown) {
     super();
-    this.astNode = new Json(value);
-    this.inheritReferences(this.astNode);
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: unknown): AstNode {
+    const astNode = new Json(value);
+    this.inheritReferences(astNode);
+    return astNode;
   }
 
   public write(writer: Writer): void {
@@ -59,9 +72,7 @@ class JsonVellumValue extends AstNode {
 }
 
 class ChatHistoryVellumValue extends AstNode {
-  private value: ChatMessageRequest[];
-  private isRequestType: boolean;
-  private contentsByIndex: Map<number, ChatMessageContent>;
+  private astNode: AstNode;
 
   public constructor({
     value,
@@ -71,32 +82,14 @@ class ChatHistoryVellumValue extends AstNode {
     isRequestType?: boolean;
   }) {
     super();
-    this.value = value;
-    this.isRequestType = isRequestType;
-    this.contentsByIndex = new Map();
-
-    this.setContentsByIndex();
+    this.astNode = this.generateAstNode(value, isRequestType);
   }
 
-  private setContentsByIndex(): void {
-    this.value.forEach((chatMessage, index) => {
-      if (chatMessage.content !== undefined) {
-        const content = new ChatMessageContent({
-          chatMessageContent: chatMessage.content,
-          isRequestType: this.isRequestType,
-        });
-
-        this.inheritReferences(content);
-
-        this.contentsByIndex.set(index, content);
-      }
-    });
-  }
-
-  public write(writer: Writer): void {
-    const chatHistoryValue = this.value;
-
-    const chatMessages = chatHistoryValue.map((chatMessage, index) => {
+  private generateAstNode(
+    value: ChatMessageRequest[],
+    isRequestType: boolean
+  ): AstNode {
+    const chatMessages = value.map((chatMessage) => {
       const arguments_ = [
         python.methodArgument({
           name: "role",
@@ -123,10 +116,10 @@ class ChatHistoryVellumValue extends AstNode {
       }
 
       if (chatMessage.content !== undefined) {
-        const content = this.contentsByIndex.get(index);
-        if (content === undefined) {
-          throw new Error("Content not found");
-        }
+        const content = new ChatMessageContent({
+          chatMessageContent: chatMessage.content,
+          isRequestType,
+        });
 
         arguments_.push(
           python.methodArgument({
@@ -138,16 +131,22 @@ class ChatHistoryVellumValue extends AstNode {
 
       return python.instantiateClass({
         classReference: python.reference({
-          name: "ChatMessage" + (this.isRequestType ? "Request" : ""),
+          name: "ChatMessage" + (isRequestType ? "Request" : ""),
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         }),
         arguments_: arguments_,
       });
     });
 
-    python.TypeInstantiation.list(chatMessages, { endWithComma: true }).write(
-      writer
-    );
+    const astNode = python.TypeInstantiation.list(chatMessages, {
+      endWithComma: true,
+    });
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
   }
 }
 
@@ -156,11 +155,11 @@ class ErrorVellumValue extends AstNode {
 
   public constructor(value: VellumError) {
     super();
-    this.astNode = this.generateVellumError(value);
+    this.astNode = this.generateAstNode(value);
   }
 
-  private generateVellumError({ message, code }: VellumError) {
-    const vellumErrorClass = python.instantiateClass({
+  private generateAstNode({ message, code }: VellumError) {
+    const astNode = python.instantiateClass({
       classReference: python.reference({
         name: "VellumError",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -176,8 +175,8 @@ class ErrorVellumValue extends AstNode {
         }),
       ],
     });
-    this.inheritReferences(vellumErrorClass);
-    return vellumErrorClass;
+    this.inheritReferences(astNode);
+    return astNode;
   }
 
   public write(writer: Writer): void {
@@ -186,39 +185,45 @@ class ErrorVellumValue extends AstNode {
 }
 
 class ImageVellumValue extends AstNode {
-  private value: VellumImage;
+  private astNode: AstNode;
 
   public constructor(value: VellumImage) {
     super();
-    this.value = value;
+    this.astNode = this.generateAstNode(value);
   }
 
-  public write(writer: Writer): void {
+  private generateAstNode(value: VellumImage): AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(this.value.src),
+        value: python.TypeInstantiation.str(value.src),
       }),
     ];
 
-    if (!isNil(this.value.metadata)) {
+    if (!isNil(value.metadata)) {
       arguments_.push(
         python.methodArgument({
           name: "metadata",
-          value: new Json(this.value.metadata),
+          value: new Json(value.metadata),
         })
       );
     }
 
-    python
-      .instantiateClass({
-        classReference: python.reference({
-          name: "VellumImage",
-          modulePath: VELLUM_CLIENT_MODULE_PATH,
-        }),
-        arguments_: arguments_,
-      })
-      .write(writer);
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "VellumImage",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
   }
 }
 
@@ -227,14 +232,21 @@ class ArrayVellumValue extends AstNode {
 
   public constructor(value: unknown) {
     super();
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: unknown): AstNode {
     if (!Array.isArray(value)) {
       throw new Error("Expected array value for ArrayVellumValue");
     }
-    this.astNode = python.TypeInstantiation.list(
+
+    const astNode = python.TypeInstantiation.list(
       value.map((item) => new VellumValue({ vellumValue: item })),
       { endWithComma: true }
     );
-    this.inheritReferences(this.astNode);
+
+    this.inheritReferences(astNode);
+    return astNode;
   }
 
   public write(writer: Writer): void {
@@ -243,81 +255,90 @@ class ArrayVellumValue extends AstNode {
 }
 
 class AudioVellumValue extends AstNode {
-  private value: VellumAudio;
+  private astNode: python.AstNode;
 
   public constructor(value: VellumAudio) {
     super();
-    this.value = value;
+    this.astNode = this.generateAstNode(value);
   }
 
-  public write(writer: Writer): void {
+  private generateAstNode(value: VellumAudio): AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(this.value.src),
+        value: python.TypeInstantiation.str(value.src),
       }),
     ];
 
-    if (!isNil(this.value.metadata)) {
+    if (!isNil(value.metadata)) {
       arguments_.push(
         python.methodArgument({
           name: "metadata",
-          value: new Json(this.value.metadata),
+          value: new Json(value.metadata),
         })
       );
     }
 
-    python
-      .instantiateClass({
-        classReference: python.reference({
-          name: "VellumAudio",
-          modulePath: VELLUM_CLIENT_MODULE_PATH,
-        }),
-        arguments_: arguments_,
-      })
-      .write(writer);
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "VellumAudio",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
   }
 }
 
 class FunctionCallVellumValue extends AstNode {
-  private value: FunctionCall;
+  private astNode: python.AstNode;
 
   public constructor(value: FunctionCall) {
     super();
-    this.value = value;
-    this.inheritReferences(new Json(this.value.arguments));
+    this.astNode = this.generateAstNode(value);
   }
 
-  public write(writer: Writer): void {
+  private generateAstNode(value: FunctionCall): AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "arguments",
-        value: new Json(this.value.arguments),
+        value: new Json(value.arguments),
       }),
       python.methodArgument({
         name: "name",
-        value: python.TypeInstantiation.str(this.value.name),
+        value: python.TypeInstantiation.str(value.name),
       }),
     ];
 
-    if (!isNil(this.value.id)) {
+    if (!isNil(value.id)) {
       arguments_.push(
         python.methodArgument({
           name: "id",
-          value: python.TypeInstantiation.str(this.value.id),
+          value: python.TypeInstantiation.str(value.id),
         })
       );
     }
 
-    python
-      .instantiateClass({
-        classReference: python.reference({
-          name: "FunctionCall",
-          modulePath: VELLUM_CLIENT_MODULE_PATH,
-        }),
-        arguments_: arguments_,
-      })
-      .write(writer);
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "FunctionCall",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
   }
 }
 
@@ -465,7 +486,7 @@ export class VellumValue extends AstNode {
 
   public write(writer: Writer): void {
     if (this.astNode === null) {
-      writer.write("None");
+      python.TypeInstantiation.none().write(writer);
       return;
     }
 
