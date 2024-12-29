@@ -20,97 +20,41 @@ export namespace ChatMessageContent {
 }
 
 export class ChatMessageContent extends AstNode {
-  private chatMessageContent:
-    | ChatMessageContentRequestType
-    | ChatMessageContentType;
-  private isRequestType: boolean;
+  private astNode: AstNode;
 
   public constructor({
     chatMessageContent,
     isRequestType = true,
   }: ChatMessageContent.Args) {
     super();
-    this.chatMessageContent = chatMessageContent;
-    this.isRequestType = isRequestType;
-    this.addReferences();
+    this.astNode = this.generateAstNode(chatMessageContent, isRequestType);
   }
 
-  private addReferences(): void {
-    if (this.chatMessageContent.type === "STRING") {
-      this.addReference(this.getStringChatMessageContentRef());
-    } else if (this.chatMessageContent.type === "FUNCTION_CALL") {
-      this.addReference(this.getFunctionCallChatMessageContentRef());
-      this.addReference(this.getFunctionCallChatMessageContentValueRef());
-    } else if (this.chatMessageContent.type === "ARRAY") {
-      this.addReference(this.getArrayChatMessageContentRef());
-    } else if (this.chatMessageContent.type === "IMAGE") {
-      this.addReference(this.getImageChatMessageContentRef());
-    } else if (this.chatMessageContent.type === "AUDIO") {
-      this.addReference(this.getAudioChatMessageContentRef());
-    }
-  }
+  private generateAstNode(
+    chatMessageContent: ChatMessageContentRequestType | ChatMessageContentType,
+    isRequestType: boolean
+  ): AstNode {
+    const contentType = chatMessageContent.type;
 
-  private getArrayChatMessageContentRef(): python.Reference {
-    return python.reference({
-      name: "ArrayChatMessageContent" + (this.isRequestType ? "Request" : ""),
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-  }
-
-  private getStringChatMessageContentRef(): python.Reference {
-    return python.reference({
-      name: "StringChatMessageContent" + (this.isRequestType ? "Request" : ""),
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-  }
-
-  private getFunctionCallChatMessageContentRef(): python.Reference {
-    return python.reference({
-      name:
-        "FunctionCallChatMessageContent" +
-        (this.isRequestType ? "Request" : ""),
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-  }
-
-  private getFunctionCallChatMessageContentValueRef(): python.Reference {
-    return python.reference({
-      name:
-        "FunctionCallChatMessageContentValue" +
-        (this.isRequestType ? "Request" : ""),
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-  }
-
-  private getAudioChatMessageContentRef(): python.Reference {
-    return python.reference({
-      name: "AudioChatMessageContent" + (this.isRequestType ? "Request" : ""),
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-  }
-
-  private getImageChatMessageContentRef(): python.Reference {
-    return python.reference({
-      name: "ImageChatMessageContent" + (this.isRequestType ? "Request" : ""),
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-  }
-
-  public write(writer: Writer): void {
-    const contentType = this.chatMessageContent.type;
+    let astNode: AstNode;
 
     if (contentType === "STRING") {
-      const stringContentValue = this.chatMessageContent.value;
+      const stringContentValue = chatMessageContent.value;
 
-      const stringChatMessageContentRequestRef =
-        this.getStringChatMessageContentRef();
-      stringChatMessageContentRequestRef.write(writer);
-      writer.write(`(value="${stringContentValue}")`);
-      return;
-    }
-
-    if (contentType === "FUNCTION_CALL") {
-      const functionCallChatMessageContentValue = this.chatMessageContent.value;
+      astNode = python.instantiateClass({
+        classReference: python.reference({
+          name: "StringChatMessageContent" + (isRequestType ? "Request" : ""),
+          modulePath: VELLUM_CLIENT_MODULE_PATH,
+        }),
+        arguments_: [
+          python.methodArgument({
+            name: "value",
+            value: python.TypeInstantiation.str(stringContentValue),
+          }),
+        ],
+      });
+    } else if (contentType === "FUNCTION_CALL") {
+      const functionCallChatMessageContentValue = chatMessageContent.value;
 
       const functionCallChatMessageContentValueArgs: MethodArgument[] = [];
 
@@ -143,8 +87,12 @@ export class ChatMessageContent extends AstNode {
         );
       }
 
-      const functionCallChatMessageContentValueRequestRef =
-        this.getFunctionCallChatMessageContentValueRef();
+      const functionCallChatMessageContentValueRequestRef = python.reference({
+        name:
+          "FunctionCallChatMessageContentValue" +
+          (isRequestType ? "Request" : ""),
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      });
 
       const functionCallChatMessageContentValueInstance =
         python.instantiateClass({
@@ -152,34 +100,32 @@ export class ChatMessageContent extends AstNode {
           arguments_: functionCallChatMessageContentValueArgs,
         });
 
-      const functionCallChatMessageContentRequestRef =
-        this.getFunctionCallChatMessageContentRef();
-
-      const functionCallChatMessageContentRequestInstance =
-        python.instantiateClass({
-          classReference: functionCallChatMessageContentRequestRef,
-          arguments_: [
-            new MethodArgument({
-              name: "value",
-              value: functionCallChatMessageContentValueInstance,
-            }),
-          ],
-        });
-
-      functionCallChatMessageContentRequestInstance.write(writer);
-      return;
-    }
-
-    if (contentType === "ARRAY") {
-      const arrayValue = this.chatMessageContent.value;
+      astNode = python.instantiateClass({
+        classReference: python.reference({
+          name:
+            "FunctionCallChatMessageContent" + (isRequestType ? "Request" : ""),
+          modulePath: VELLUM_CLIENT_MODULE_PATH,
+        }),
+        arguments_: [
+          new MethodArgument({
+            name: "value",
+            value: functionCallChatMessageContentValueInstance,
+          }),
+        ],
+      });
+    } else if (contentType === "ARRAY") {
+      const arrayValue = chatMessageContent.value;
       const arrayElements = arrayValue.map(
         (element) =>
           new ChatMessageContent({
             chatMessageContent: element as ChatMessageContentRequestType,
           })
       );
-      const instance = python.instantiateClass({
-        classReference: this.getArrayChatMessageContentRef(),
+      astNode = python.instantiateClass({
+        classReference: python.reference({
+          name: "ArrayChatMessageContent" + (isRequestType ? "Request" : ""),
+          modulePath: VELLUM_CLIENT_MODULE_PATH,
+        }),
         arguments_: [
           python.methodArgument({
             name: "value",
@@ -189,16 +135,13 @@ export class ChatMessageContent extends AstNode {
           }),
         ],
       });
-      this.inheritReferences(instance);
-      instance.write(writer);
-      return;
-    }
+    } else if (contentType === "IMAGE") {
+      const imageContentValue = chatMessageContent.value;
 
-    if (contentType === "IMAGE") {
-      const imageContentValue = this.chatMessageContent.value;
-
-      const imageChatMessageContentRequestRef =
-        this.getImageChatMessageContentRef();
+      const imageChatMessageContentRequestRef = python.reference({
+        name: "ImageChatMessageContent" + (isRequestType ? "Request" : ""),
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      });
 
       const arguments_ = [
         python.methodArgument({
@@ -217,20 +160,17 @@ export class ChatMessageContent extends AstNode {
         );
       }
 
-      const instance = python.instantiateClass({
+      astNode = python.instantiateClass({
         classReference: imageChatMessageContentRequestRef,
         arguments_: arguments_,
       });
-      this.inheritReferences(instance);
-      instance.write(writer);
-      return;
-    }
+    } else if (contentType === "AUDIO") {
+      const audioContentValue = chatMessageContent.value;
 
-    if (contentType === "AUDIO") {
-      const audioContentValue = this.chatMessageContent.value;
-
-      const audioChatMessageContentRequestRef =
-        this.getAudioChatMessageContentRef();
+      const audioChatMessageContentRequestRef = python.reference({
+        name: "AudioChatMessageContent" + (isRequestType ? "Request" : ""),
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      });
 
       const arguments_ = [
         python.methodArgument({
@@ -249,15 +189,20 @@ export class ChatMessageContent extends AstNode {
         );
       }
 
-      const instance = python.instantiateClass({
+      astNode = python.instantiateClass({
         classReference: audioChatMessageContentRequestRef,
         arguments_: arguments_,
       });
-      this.inheritReferences(instance);
-      instance.write(writer);
-      return;
+    } else {
+      assertUnreachable(contentType);
     }
 
-    assertUnreachable(contentType);
+    this.inheritReferences(astNode);
+
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
   }
 }
