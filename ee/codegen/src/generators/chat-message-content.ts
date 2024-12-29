@@ -292,7 +292,7 @@ export class ChatMessageContent extends AstNode {
 
   public constructor({
     chatMessageContent,
-    isRequestType = true,
+    isRequestType = false,
   }: ChatMessageContent.Args) {
     super();
     this.astNode = this.generateAstNode(chatMessageContent, isRequestType);

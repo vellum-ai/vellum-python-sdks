@@ -76,7 +76,7 @@ class ChatHistoryVellumValue extends AstNode {
 
   public constructor({
     value,
-    isRequestType = true,
+    isRequestType = false,
   }: {
     value: ChatMessageRequest[];
     isRequestType?: boolean;
