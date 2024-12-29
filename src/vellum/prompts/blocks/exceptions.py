@@ -1,2 +1,0 @@
-class PromptCompilationError(Exception):
-    pass

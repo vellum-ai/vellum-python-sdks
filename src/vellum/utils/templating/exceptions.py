@@ -1,2 +1,0 @@
-class JinjaTemplateError(Exception):
-    pass
