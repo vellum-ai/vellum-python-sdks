@@ -7,6 +7,8 @@ examples
 Makefile
 src/vellum/evaluations
 src/vellum/plugins
+src/vellum/prompts
+src/vellum/utils
 src/vellum/workflows
 scripts
 tests/workflows
