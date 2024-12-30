@@ -355,7 +355,3 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
 
     def __repr__(self) -> str:
         return str(self.__class__)
-
-
-class MyNode2(BaseNode):
-    pass
