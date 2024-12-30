@@ -46,3 +46,6 @@ test-raw:
 format:
 	poetry run black . \
 	&& poetry run isort .
+
+types:
+	poetry run mypy .
