@@ -1,4 +1,4 @@
-from typing import Generic, Sequence, Type
+from typing import Generic, Sequence
 
 import dotenv
 
@@ -10,7 +10,7 @@ from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 
 class SandboxRunner(Generic[WorkflowType]):
-    def __init__(self, workflow: Type[WorkflowType], inputs: Sequence[BaseInputs]):
+    def __init__(self, workflow: WorkflowType, inputs: Sequence[BaseInputs]):
         if not inputs:
             raise ValueError("Inputs are required to have at least one defined inputs")
 
@@ -30,8 +30,7 @@ class SandboxRunner(Generic[WorkflowType]):
 
         selected_inputs = self._inputs[index]
 
-        workflow = self._workflow()
-        events = workflow.stream(
+        events = self._workflow.stream(
             inputs=selected_inputs,
             event_filter=root_workflow_event_filter,
         )

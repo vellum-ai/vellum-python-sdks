@@ -49,7 +49,7 @@ def test_sandbox_runner__happy_path(mock_logger, run_kwargs, expected_last_log):
     ]
 
     # WHEN we run the sandbox
-    runner = SandboxRunner(workflow=Workflow, inputs=inputs)
+    runner = SandboxRunner(workflow=Workflow(), inputs=inputs)
     runner.run(**run_kwargs)
 
     # THEN we see the logs
