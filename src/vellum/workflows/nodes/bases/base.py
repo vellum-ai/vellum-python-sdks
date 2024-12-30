@@ -344,8 +344,8 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
         all_inputs = {}
         for key, value in inputs.items():
             path_parts = key.split(".")
-            node_attribute_discriptor = getattr(self.__class__, path_parts[0])
-            inputs_key = reduce(lambda acc, part: acc[part], path_parts[1:], node_attribute_discriptor)
+            node_attribute_descriptor = getattr(self.__class__, path_parts[0])
+            inputs_key = reduce(lambda acc, part: acc[part], path_parts[1:], node_attribute_descriptor)
             all_inputs[inputs_key] = value
 
         self._inputs = MappingProxyType(all_inputs)
