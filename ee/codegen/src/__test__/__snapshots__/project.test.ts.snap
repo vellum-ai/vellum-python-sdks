@@ -2,7 +2,7 @@
 
 exports[`WorkflowProjectGenerator > inlude sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
 "from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
-from vellum.workflows.sandbox import SandboxRunner
+from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
 from .workflow import Workflow
@@ -11,8 +11,8 @@ if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-runner = SandboxRunner(
-    workflow=Workflow,
+runner = WorkflowSandboxRunner(
+    workflow=Workflow(),
     inputs=[
         Inputs(
             input="foo",

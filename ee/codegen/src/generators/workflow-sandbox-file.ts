@@ -32,16 +32,19 @@ export class WorkflowSandboxFile extends BasePersistedFile {
       name: "runner",
       initializer: python.instantiateClass({
         classReference: python.reference({
-          name: "SandboxRunner",
+          name: "WorkflowSandboxRunner",
           modulePath:
             this.workflowContext.sdkModulePathNames.SANDBOX_RUNNER_MODULE_PATH,
         }),
         arguments_: [
           python.methodArgument({
             name: "workflow",
-            value: python.reference({
-              name: this.workflowContext.workflowClassName,
-              modulePath: this.workflowContext.modulePath,
+            value: python.instantiateClass({
+              classReference: python.reference({
+                name: this.workflowContext.workflowClassName,
+                modulePath: this.workflowContext.modulePath,
+              }),
+              arguments_: [],
             }),
           }),
           python.methodArgument({
