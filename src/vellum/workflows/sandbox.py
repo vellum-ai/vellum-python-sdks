@@ -9,7 +9,7 @@ from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 
-class SandboxRunner(Generic[WorkflowType]):
+class WorkflowSandboxRunner(Generic[WorkflowType]):
     def __init__(self, workflow: WorkflowType, inputs: Sequence[BaseInputs]):
         if not inputs:
             raise ValueError("Inputs are required to have at least one defined inputs")

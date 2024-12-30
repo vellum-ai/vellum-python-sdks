@@ -3,7 +3,7 @@ from typing import List
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.sandbox import SandboxRunner
+from vellum.workflows.sandbox import WorkflowSandboxRunner
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 
@@ -49,7 +49,7 @@ def test_sandbox_runner__happy_path(mock_logger, run_kwargs, expected_last_log):
     ]
 
     # WHEN we run the sandbox
-    runner = SandboxRunner(workflow=Workflow(), inputs=inputs)
+    runner = WorkflowSandboxRunner(workflow=Workflow(), inputs=inputs)
     runner.run(**run_kwargs)
 
     # THEN we see the logs
