@@ -1,3 +1,4 @@
+import json
 from typing import Any, Callable, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, Union, get_args
 
 from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS
@@ -86,6 +87,12 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
 
         if output_type is bool:
             return bool(rendered_template)
+
+        if output_type is Any:
+            try:
+                return json.loads(rendered_template)
+            except json.JSONDecodeError:
+                raise ValueError("Invalid JSON format for rendered_template")
 
         raise ValueError(f"Unsupported output type: {output_type}")
 
