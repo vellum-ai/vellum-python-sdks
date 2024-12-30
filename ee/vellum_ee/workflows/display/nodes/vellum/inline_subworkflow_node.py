@@ -61,6 +61,11 @@ class BaseInlineSubworkflowNodeDisplay(
         display_context: WorkflowDisplayContext,
     ) -> Tuple[List[NodeInput], List[VellumVariable]]:
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
+        subworkflow_entries = (
+            [(variable_name, variable_value) for variable_name, variable_value in subworkflow_inputs.items()]
+            if isinstance(subworkflow_inputs, dict)
+            else [(variable_ref.name, variable_value) for variable_ref, variable_value in subworkflow_inputs]
+        )
         node_inputs = [
             create_node_input(
                 node_id=node_id,
@@ -69,7 +74,7 @@ class BaseInlineSubworkflowNodeDisplay(
                 display_context=display_context,
                 input_id=self.workflow_input_ids_by_name.get(variable_name),
             )
-            for variable_name, variable_value in subworkflow_inputs.items()
+            for variable_name, variable_value in subworkflow_entries
         ]
         node_inputs_by_key = {node_input.key: node_input for node_input in node_inputs}
         workflow_inputs = [

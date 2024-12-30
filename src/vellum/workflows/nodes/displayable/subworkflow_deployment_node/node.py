@@ -17,12 +17,13 @@ from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.nodes.bases.base_subworkflow_node.node import BaseSubworkflowNode
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
+from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType
 
 
-class SubworkflowDeploymentNode(BaseSubworkflowNode[StateType], Generic[StateType]):
+class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
     """
     Used to execute a Workflow Deployment.
 
@@ -38,6 +39,7 @@ class SubworkflowDeploymentNode(BaseSubworkflowNode[StateType], Generic[StateTyp
 
     # Either the Workflow Deployment's UUID or its name.
     deployment: ClassVar[Union[UUID, str]]
+    subworkflow_inputs: ClassVar[EntityInputsInterface] = {}
 
     release_tag: str = LATEST_RELEASE_TAG
     external_id: Optional[str] = OMIT

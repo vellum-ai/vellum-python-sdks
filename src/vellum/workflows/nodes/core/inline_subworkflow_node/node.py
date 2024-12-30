@@ -1,12 +1,14 @@
-from typing import TYPE_CHECKING, Generic, Iterator, Optional, Set, Type, TypeVar
+from typing import TYPE_CHECKING, ClassVar, Generic, Iterator, Optional, Set, Type, TypeVar, Union
 
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.nodes.bases.base_subworkflow_node import BaseSubworkflowNode
+from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType, WorkflowInputsType
 
 if TYPE_CHECKING:
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 InnerStateType = TypeVar("InnerStateType", bound=BaseState)
 
 
-class InlineSubworkflowNode(BaseSubworkflowNode[StateType], Generic[StateType, WorkflowInputsType, InnerStateType]):
+class InlineSubworkflowNode(BaseNode[StateType], Generic[StateType, WorkflowInputsType, InnerStateType]):
     """
     Used to execute a Subworkflow defined inline.
 
@@ -24,6 +26,7 @@ class InlineSubworkflowNode(BaseSubworkflowNode[StateType], Generic[StateType, W
     """
 
     subworkflow: Type["BaseWorkflow[WorkflowInputsType, InnerStateType]"]
+    subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs]] = {}
 
     def run(self) -> Iterator[BaseOutput]:
         with execution_context(parent_context=get_parent_context() or self._context.parent_context):
@@ -66,4 +69,9 @@ class InlineSubworkflowNode(BaseSubworkflowNode[StateType], Generic[StateType, W
 
     def _compile_subworkflow_inputs(self) -> WorkflowInputsType:
         inputs_class = self.subworkflow.get_inputs_class()
-        return inputs_class(**self.subworkflow_inputs)
+        if isinstance(self.subworkflow_inputs, dict):
+            return inputs_class(**self.subworkflow_inputs)
+        elif isinstance(self.subworkflow_inputs, inputs_class):
+            return self.subworkflow_inputs
+        else:
+            raise ValueError(f"Invalid subworkflow inputs type: {type(self.subworkflow_inputs)}")
