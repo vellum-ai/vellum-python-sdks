@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { VellumVariableType } from "vellum-ai/api/types";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -32,6 +33,39 @@ describe("TemplatingNode", () => {
   describe("basic", () => {
     beforeEach(async () => {
       const nodeData = templatingNodeFactory();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TemplatingNodeContext;
+      workflowContext.addNodeContext(nodeContext);
+
+      node = new TemplatingNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDisplayFile", async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDefinition", () => {
+      expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with json output type", () => {
+    beforeEach(async () => {
+      const nodeData = templatingNodeFactory({
+        outputType: VellumVariableType.Json,
+      });
 
       const nodeContext = (await createNodeContext({
         workflowContext,

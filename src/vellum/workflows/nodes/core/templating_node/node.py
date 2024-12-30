@@ -8,7 +8,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.types.core import EntityInputsInterface
+from vellum.workflows.types.core import EntityInputsInterface, Json
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
 
@@ -88,7 +88,7 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
         if output_type is bool:
             return bool(rendered_template)
 
-        if output_type is Any:
+        if output_type is Json:
             try:
                 return json.loads(rendered_template)
             except json.JSONDecodeError:

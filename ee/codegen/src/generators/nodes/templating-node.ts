@@ -1,7 +1,8 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { VellumVariableType } from "vellum-ai/api/types";
 
-import { OUTPUTS_CLASS_NAME } from "src/constants";
+import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { BaseState } from "src/generators/base-state";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
@@ -17,7 +18,7 @@ export class TemplatingNode extends BaseSingleFileNode<
       workflowContext: this.workflowContext,
     });
 
-    const primitiveOutputType = getVellumVariablePrimitiveType(
+    const primitiveOutputType = this.generateOutputType(
       this.nodeData.data.outputType
     );
 
@@ -163,5 +164,21 @@ export class TemplatingNode extends BaseSingleFileNode<
 
   protected getErrorOutputId(): string | undefined {
     return this.nodeData.data.errorOutputId;
+  }
+
+  private generateOutputType(outputType: VellumVariableType): python.Type {
+    return outputType === VellumVariableType.Json
+      ? python.Type.reference(
+          python.reference({
+            name: "Json",
+            modulePath: [
+              ...VELLUM_CLIENT_MODULE_PATH,
+              "workflows",
+              "types",
+              "core",
+            ],
+          })
+        )
+      : getVellumVariablePrimitiveType(outputType);
   }
 }

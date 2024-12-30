@@ -1,9 +1,9 @@
 import json
-from typing import Any
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import Json
 
 
 def test_templating_node__dict_output():
@@ -74,7 +74,7 @@ def test_templating_node__bool_output():
 
 def test_templating_node__json_output():
     # GIVEN a templating node that outputs JSON
-    class JSONTemplateNode(TemplatingNode[BaseState, Any]):
+    class JSONTemplateNode(TemplatingNode[BaseState, Json]):
         template = "{{ data }}"
         inputs = {
             "data": {"key": "value"},
