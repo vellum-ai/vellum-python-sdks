@@ -188,6 +188,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
     def run(
         self,
         inputs: Optional[WorkflowInputsType] = None,
+        *,
         state: Optional[StateType] = None,
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
@@ -281,8 +282,9 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
     def stream(
         self,
-        event_filter: Optional[Callable[[Type["BaseWorkflow"], WorkflowEvent], bool]] = None,
         inputs: Optional[WorkflowInputsType] = None,
+        *,
+        event_filter: Optional[Callable[[Type["BaseWorkflow"], WorkflowEvent], bool]] = None,
         state: Optional[StateType] = None,
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
