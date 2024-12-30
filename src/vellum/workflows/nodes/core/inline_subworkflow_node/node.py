@@ -29,9 +29,7 @@ class InlineSubworkflowNode(BaseSubworkflowNode[StateType], Generic[StateType, W
         with execution_context(parent_context=get_parent_context() or self._context.parent_context):
             subworkflow = self.subworkflow(
                 parent_state=self.state,
-                context=WorkflowContext(
-                    _vellum_client=self._context._vellum_client,
-                ),
+                context=WorkflowContext(vellum_client=self._context.vellum_client),
             )
             subworkflow_stream = subworkflow.stream(
                 inputs=self._compile_subworkflow_inputs(),

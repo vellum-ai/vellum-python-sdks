@@ -121,10 +121,11 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
     def __init__(
         self,
+        *,
+        context: Optional[WorkflowContext] = None,
         parent_state: Optional[BaseState] = None,
         emitters: Optional[List[BaseWorkflowEmitter]] = None,
         resolvers: Optional[List[BaseWorkflowResolver]] = None,
-        context: Optional[WorkflowContext] = None,
     ):
         self._parent_state = parent_state
         self.emitters = emitters or (self.emitters if hasattr(self, "emitters") else [])

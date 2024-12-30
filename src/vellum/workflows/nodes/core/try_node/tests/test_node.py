@@ -103,7 +103,7 @@ def test_try_node__use_parent_execution_context():
     # WHEN the node is run with a custom vellum client
     node = TestNode(
         context=WorkflowContext(
-            _vellum_client=Vellum(api_key="test-key"),
+            vellum_client=Vellum(api_key="test-key"),
         )
     )
     outputs = list(node.run())

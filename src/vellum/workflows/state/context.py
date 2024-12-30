@@ -13,11 +13,12 @@ if TYPE_CHECKING:
 class WorkflowContext:
     def __init__(
         self,
-        _vellum_client: Optional[Vellum] = None,
-        _parent_context: Optional[ParentContext] = None,
+        *,
+        vellum_client: Optional[Vellum] = None,
+        parent_context: Optional[ParentContext] = None,
     ):
-        self._vellum_client = _vellum_client
-        self._parent_context = _parent_context
+        self._vellum_client = vellum_client
+        self._parent_context = parent_context
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
 
     @cached_property

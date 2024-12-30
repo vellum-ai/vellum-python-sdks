@@ -108,7 +108,7 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
             self._run_subworkflow(item=item, index=index)
 
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
-        context = WorkflowContext(_vellum_client=self._context._vellum_client)
+        context = WorkflowContext(vellum_client=self._context.vellum_client)
         subworkflow = self.subworkflow(parent_state=self.state, context=context)
         events = subworkflow.stream(
             inputs=self.SubworkflowInputs(index=index, item=item, all_items=self.items),

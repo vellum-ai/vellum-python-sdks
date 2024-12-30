@@ -61,7 +61,7 @@ def test_stream_workflow__happy_path_inital_context():
     assert initial_parent_context.parent is not None
     assert type(initial_parent_context.node_definition) is CodeResourceDefinition
 
-    workflow = TrivialWorkflow(context=WorkflowContext(_parent_context=initial_parent_context))
+    workflow = TrivialWorkflow(context=WorkflowContext(parent_context=initial_parent_context))
 
     events = list(workflow.stream(event_filter=root_workflow_event_filter))
 

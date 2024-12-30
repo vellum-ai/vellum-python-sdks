@@ -73,9 +73,7 @@ class TryNode(BaseNode[StateType], Generic[StateType], metaclass=_TryNodeMeta):
     def run(self) -> Iterator[BaseOutput]:
         subworkflow = self.subworkflow(
             parent_state=self.state,
-            context=WorkflowContext(
-                _vellum_client=self._context._vellum_client,
-            ),
+            context=WorkflowContext(vellum_client=self._context.vellum_client),
         )
         subworkflow_stream = subworkflow.stream(
             event_filter=all_workflow_event_filter,
