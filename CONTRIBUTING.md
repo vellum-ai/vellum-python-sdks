@@ -49,3 +49,10 @@ To actually run the tests:
 
 - `make test` - runs the test while spinning up Fern's mock server. Useful for running their tests specifically. Supports a `file` argument for running a specific file or directory.
 - `make test-raw` - runs the test just using poetry. Useful for running tests that don't require the mock server, such as all Workflows SDK tests. Supports a `file` argument for running a specific file or directory.
+
+### Backporting Changes to Generator Repository
+
+We have a [generator repository](https://github.com/vellum-ai/vellum-client-generator) that is responsible for generating files for all of our SDKs, managed by [Fern](https://buildwithfern.com/). Changes that are not covered by the `.fernignore` file should be backported to the generator repository so that they are not removed by subsequent generation runs. These typically include:
+- Changes to the `pyproject.toml`, include dependency additions.
+- Changes to the `.gitignore`
+- Changes needed within the `src/vellum/client` directory
