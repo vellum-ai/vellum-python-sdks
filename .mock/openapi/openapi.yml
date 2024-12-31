@@ -8092,13 +8092,13 @@ components:
           format: uuid
           nullable: true
           description: The ID of the index to search against. Must provide either
-            this or index_name.
+            this, index_name or document_index.
         index_name:
           type: string
           nullable: true
           minLength: 1
           description: The name of the index to search against. Must provide either
-            this or index_id.
+            this, index_id or document_index.
         query:
           type: string
           minLength: 1
@@ -8108,6 +8108,12 @@ components:
           - $ref: '#/components/schemas/SearchRequestOptionsRequest'
           nullable: true
           description: Configuration options for the search.
+        document_index:
+          type: string
+          nullable: true
+          minLength: 1
+          description: Either the index name or index ID to search against. Must provide
+            either this, index_id or index_name.
       required:
       - query
     SearchRequestOptionsRequest:
@@ -9941,6 +9947,27 @@ components:
       - EXTERNAL
       type: string
       description: '* `EXTERNAL` - EXTERNAL'
+    TestSuiteRunMetricArrayOutput:
+      type: object
+      description: Output for a test suite run metric that is of type ARRAY
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/VellumValue'
+          nullable: true
+        type:
+          $ref: '#/components/schemas/TestSuiteRunMetricArrayOutputTypeEnum'
+        name:
+          type: string
+      required:
+      - name
+      - value
+    TestSuiteRunMetricArrayOutputTypeEnum:
+      enum:
+      - ARRAY
+      type: string
+      description: '* `ARRAY` - ARRAY'
     TestSuiteRunMetricErrorOutput:
       type: object
       description: Output for a test suite run metric that is of type ERROR
@@ -10003,6 +10030,7 @@ components:
       - $ref: '#/components/schemas/TestSuiteRunMetricNumberOutput'
       - $ref: '#/components/schemas/TestSuiteRunMetricJSONOutput'
       - $ref: '#/components/schemas/TestSuiteRunMetricErrorOutput'
+      - $ref: '#/components/schemas/TestSuiteRunMetricArrayOutput'
       discriminator:
         propertyName: type
         mapping:
@@ -10010,6 +10038,7 @@ components:
           NUMBER: '#/components/schemas/TestSuiteRunMetricNumberOutput'
           JSON: '#/components/schemas/TestSuiteRunMetricJSONOutput'
           ERROR: '#/components/schemas/TestSuiteRunMetricErrorOutput'
+          ARRAY: '#/components/schemas/TestSuiteRunMetricArrayOutput'
     TestSuiteRunMetricStringOutput:
       type: object
       description: Output for a test suite run metric that is of type STRING
