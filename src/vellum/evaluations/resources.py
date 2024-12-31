@@ -12,7 +12,6 @@ from vellum.evaluations.constants import DEFAULT_MAX_POLLING_DURATION_MS, DEFAUL
 from vellum.evaluations.exceptions import TestSuiteRunResultsException
 from vellum.evaluations.utils.env import get_api_key
 from vellum.evaluations.utils.paginator import PaginatedResults, get_all_results
-from vellum.utils.uuid import is_valid_uuid
 from vellum.types import (
     ExternalTestCaseExecutionRequest,
     NamedTestCaseVariableValueRequest,
@@ -24,6 +23,7 @@ from vellum.types import (
     TestSuiteRunState,
 )
 from vellum.utils.typing import cast_not_optional
+from vellum.utils.uuid import is_valid_uuid
 
 logger = logging.getLogger(__name__)
 
