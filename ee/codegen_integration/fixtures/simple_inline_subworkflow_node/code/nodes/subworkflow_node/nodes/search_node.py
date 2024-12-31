@@ -6,7 +6,7 @@ from ....inputs import Inputs
 
 class SearchNode(BaseSearchNode):
     query = Inputs.query
-    document_index = "bb9a427f-23d4-4dc6-bd41-ad2b83727171"
+    document_index = "my-sweet-document"
     options = SearchRequestOptionsRequest(
         limit=8,
         weights=SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2),

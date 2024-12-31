@@ -25,13 +25,13 @@ describe("WorkflowProjectGenerator", () => {
     vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
       mockDocumentIndexFactory() as unknown as DocumentIndexRead
     );
+
     tempDir = makeTempDir("project-test");
     await mkdir(tempDir, { recursive: true });
   });
 
   afterEach(async () => {
     await rm(tempDir, { recursive: true, force: true });
-    vi.restoreAllMocks();
   });
 
   describe("generateCode", () => {
