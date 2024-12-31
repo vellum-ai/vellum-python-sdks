@@ -118,7 +118,8 @@ witness or missing person.\
 
     # AND we should have made the expected call to Vellum search
     vellum_search_client.assert_called_once_with(
-        document_index="vellum-trust-center-policies",
+        index_id=None,
+        index_name="vellum-trust-center-policies",
         query="How often is employee training?",
         options=SearchRequestOptionsRequest(
             limit=8,
