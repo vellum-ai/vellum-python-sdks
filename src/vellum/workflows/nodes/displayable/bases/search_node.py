@@ -12,6 +12,7 @@ from vellum import (
     SearchWeightsRequest,
 )
 from vellum.core import ApiError, RequestOptions
+from vellum.evaluations.utils.uuid import is_valid_uuid
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
@@ -73,11 +74,13 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
         results: List[SearchResult]
 
     def _perform_search(self) -> SearchResponse:
+        index_is_uuid = True if isinstance(self.document_index, UUID) else is_valid_uuid(self.document_index)
+
         try:
             return self._context.vellum_client.search(
                 query=self.query,
-                index_id=str(self.document_index) if isinstance(self.document_index, UUID) else None,
-                index_name=self.document_index if isinstance(self.document_index, str) else None,
+                index_id=str(self.document_index) if index_is_uuid else None,
+                index_name=str(self.document_index) if not index_is_uuid else None,
                 options=self.options,
             )
         except NotFoundError:
