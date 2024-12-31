@@ -913,7 +913,7 @@ client.search(
 <dl>
 <dd>
 
-**index_id:** `typing.Optional[str]` — The ID of the index to search against. Must provide either this or index_name.
+**index_id:** `typing.Optional[str]` — The ID of the index to search against. Must provide either this, index_name or document_index.
     
 </dd>
 </dl>
@@ -921,7 +921,7 @@ client.search(
 <dl>
 <dd>
 
-**index_name:** `typing.Optional[str]` — The name of the index to search against. Must provide either this or index_id.
+**index_name:** `typing.Optional[str]` — The name of the index to search against. Must provide either this, index_id or document_index.
     
 </dd>
 </dl>
@@ -930,6 +930,14 @@ client.search(
 <dd>
 
 **options:** `typing.Optional[SearchRequestOptionsRequest]` — Configuration options for the search.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**document_index:** `typing.Optional[str]` — Either the index name or index ID to search against. Must provide either this, index_id or index_name.
     
 </dd>
 </dl>

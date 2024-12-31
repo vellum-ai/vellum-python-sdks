@@ -661,15 +661,15 @@ service:
             index_id:
               type: optional<string>
               docs: >-
-                The ID of the index to search against. Must provide either this
-                or index_name.
+                The ID of the index to search against. Must provide either this,
+                index_name or document_index.
               validation:
                 format: uuid
             index_name:
               type: optional<string>
               docs: >-
                 The name of the index to search against. Must provide either
-                this or index_id.
+                this, index_id or document_index.
               validation:
                 minLength: 1
             query:
@@ -680,6 +680,13 @@ service:
             options:
               type: optional<SearchRequestOptionsRequest>
               docs: Configuration options for the search.
+            document_index:
+              type: optional<string>
+              docs: >-
+                Either the index name or index ID to search against. Must
+                provide either this, index_id or index_name.
+              validation:
+                minLength: 1
         content-type: application/json
       response:
         docs: ''
@@ -5225,6 +5232,17 @@ types:
   TestSuiteRunExternalExecConfigTypeEnum:
     type: literal<"EXTERNAL">
     docs: '* `EXTERNAL` - EXTERNAL'
+  TestSuiteRunMetricArrayOutput:
+    docs: Output for a test suite run metric that is of type ARRAY
+    properties:
+      value: optional<list<VellumValue>>
+      type: literal<"ARRAY">
+      name: string
+    source:
+      openapi: openapi/openapi.yml
+  TestSuiteRunMetricArrayOutputTypeEnum:
+    type: literal<"ARRAY">
+    docs: '* `ARRAY` - ARRAY'
   TestSuiteRunMetricErrorOutput:
     docs: Output for a test suite run metric that is of type ERROR
     properties:
@@ -5265,6 +5283,7 @@ types:
       - TestSuiteRunMetricNumberOutput
       - TestSuiteRunMetricJsonOutput
       - TestSuiteRunMetricErrorOutput
+      - TestSuiteRunMetricArrayOutput
     source:
       openapi: openapi/openapi.yml
   TestSuiteRunMetricStringOutput:
