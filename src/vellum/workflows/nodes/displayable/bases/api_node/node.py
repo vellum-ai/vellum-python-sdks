@@ -26,11 +26,11 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     url: str
     method: APIRequestMethod
     data: Optional[str] = None
-    json: Optional["Json"] = None
+    json: Optional[Json] = None
     headers: Optional[Dict[str, Union[str, VellumSecret]]] = None
 
     class Outputs(BaseOutputs):
-        json: Optional["Json"]
+        json: Optional[Json]
         headers: Dict[str, str]
         status_code: int
         text: str

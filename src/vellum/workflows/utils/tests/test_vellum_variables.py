@@ -2,6 +2,7 @@ import pytest
 from typing import List, Optional
 
 from vellum import ChatMessage, SearchResult
+from vellum.workflows.types.core import Json
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 
 
@@ -18,6 +19,8 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
         (Optional[List[ChatMessage]], "CHAT_HISTORY"),
         (List[SearchResult], "SEARCH_RESULTS"),
         (Optional[List[SearchResult]], "SEARCH_RESULTS"),
+        (Json, "JSON"),
+        (Optional[Json], "JSON"),
     ],
 )
 def test_primitive_type_to_vellum_variable_type(type_, expected):

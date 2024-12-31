@@ -35,23 +35,15 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
         if len(types) != 1:
             # Check explicitly for our internal JSON type.
             # Matches the type found at vellum.workflows.utils.vellum_variables.Json
-            actual_types_with_forward_ref = [
-                bool,
-                int,
-                float,
-                str,
-                typing.List[typing.ForwardRef("Json")],  # type: ignore [misc]
-                typing.Dict[str, typing.ForwardRef("Json")],  # type: ignore [misc]
-            ]
             actual_types_with_explicit_ref = [
                 bool,
                 int,
                 float,
                 str,
-                typing.List[Json],  # type: ignore [misc]
-                typing.Dict[str, Json],  # type: ignore [misc]
+                typing.List[Json],
+                typing.Dict[str, Json],
             ]
-            if types == actual_types_with_forward_ref or types == actual_types_with_explicit_ref:
+            if types == actual_types_with_explicit_ref:
                 return "JSON"
             raise ValueError(f"Expected Descriptor to only have one type, got {types}")
 
