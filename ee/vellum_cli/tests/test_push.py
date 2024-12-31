@@ -8,7 +8,7 @@ from uuid import uuid4
 from click.testing import CliRunner
 
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
-from vellum.evaluations.utils.uuid import is_valid_uuid
+from vellum.utils.uuid import is_valid_uuid
 from vellum_cli import main as cli_main
 
 
