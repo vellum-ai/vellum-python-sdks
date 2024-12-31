@@ -31,10 +31,14 @@ export class SearchNode extends BaseSingleFileNode<
       })
     );
 
+    const documentName = this.nodeContext.documentIndex?.name;
+
     bodyStatements.push(
       python.field({
         name: "document_index",
-        initializer: this.getNodeInputByName("document_index_id"),
+        initializer: documentName
+          ? python.TypeInstantiation.str(documentName)
+          : this.getNodeInputByName("document_index_id"),
       })
     );
 

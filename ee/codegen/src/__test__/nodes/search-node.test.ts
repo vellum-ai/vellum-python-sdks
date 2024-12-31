@@ -1,5 +1,7 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { beforeEach } from "vitest";
+import { DocumentIndexRead } from "vellum-ai/api";
+import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
+import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
@@ -13,7 +15,16 @@ describe("TextSearchNode", () => {
   let writer: Writer;
   let node: SearchNode;
 
+  const mockDocumentIndex = () => ({
+    id: "b6ef8809-346e-469c-beed-2e5c4e9844c5",
+    name: "my-sweet-document",
+  });
+
   beforeEach(() => {
+    vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
+      mockDocumentIndex() as unknown as DocumentIndexRead
+    );
+
     workflowContext = workflowContextFactory();
     writer = new Writer();
 

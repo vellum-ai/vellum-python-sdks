@@ -1,3 +1,5 @@
+import { DocumentIndexRead } from "vellum-ai/api";
+import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 
@@ -35,8 +37,26 @@ export async function createNodeContext(
   switch (nodeData.type) {
     case WorkflowNodeType.SEARCH: {
       const searchNodeData = nodeData;
+
+      // Grab the associated document index from api if available to always populate document_index field
+      // with name instead of ID. We can only do this if the document index input is a constant value.
+      let documentIndex: DocumentIndexRead | null = null;
+      const inputValue = searchNodeData.inputs.find(
+        (input) => input.id === searchNodeData.data.documentIndexNodeInputId
+      )?.value;
+
+      const rule = inputValue?.rules?.[0];
+      if (rule?.type === "CONSTANT_VALUE") {
+        if (rule.data.value?.toString()) {
+          documentIndex = await new DocumentIndexesClient({
+            apiKey: args.workflowContext.vellumApiKey,
+          }).retrieve(rule.data.value?.toString());
+        }
+      }
+
       return new TextSearchNodeContext({
         ...args,
+        documentIndex,
         nodeData: searchNodeData,
       });
     }
