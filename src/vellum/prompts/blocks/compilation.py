@@ -104,16 +104,16 @@ def compile_prompt_blocks(
                 chat_message_blocks = _compile_chat_messages_as_prompt_blocks(compiled_input.value)
                 compiled_blocks.extend(chat_message_blocks)
             else:
-                raise ValueError(f"Invalid input type for variable block: {compiled_input.type}")
+                raise PromptCompilationError(f"Invalid input type for variable block: {compiled_input.type}")
 
         elif block.block_type == "RICH_TEXT":
             value_block = _compile_rich_text_block_as_value_block(block=block, inputs=sanitized_inputs)
             compiled_blocks.append(value_block)
 
         elif block.block_type == "FUNCTION_DEFINITION":
-            raise ValueError("Function definitions shouldn't go through compilation process")
+            raise PromptCompilationError("Function definitions shouldn't go through compilation process")
         else:
-            raise ValueError(f"Unknown block_type: {block.block_type}")
+            raise PromptCompilationError(f"Unknown block_type: {block.block_type}")
 
     return compiled_blocks
 
@@ -172,7 +172,7 @@ def _compile_rich_text_block_as_value_block(
                     f"Input variable '{child_block.input_variable}' must be of type STRING or JSON"
                 )
         else:
-            raise ValueError(f"Invalid child block_type for RICH_TEXT: {child_block.block_type}")
+            raise PromptCompilationError(f"Invalid child block_type for RICH_TEXT: {child_block.block_type}")
 
     return CompiledValuePromptBlock(content=StringVellumValue(value=value), cache_config=block.cache_config)
 
