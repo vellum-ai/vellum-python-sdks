@@ -3,7 +3,9 @@ import * as fs from "node:fs";
 import { join } from "path";
 
 import { difference } from "lodash";
-import { expect } from "vitest";
+import { DocumentIndexRead } from "vellum-ai/api";
+import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
+import { expect, vi } from "vitest";
 
 import {
   getAllFilesInDir,
@@ -11,6 +13,7 @@ import {
 } from "./helpers/fixtures";
 import { makeTempDir } from "./helpers/temp-dir";
 
+import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { SpyMocks } from "src/__test__/utils/SpyMocks";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowProjectGenerator } from "src/project";
@@ -19,12 +22,16 @@ describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
 
   beforeEach(async () => {
+    vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
+      mockDocumentIndexFactory() as unknown as DocumentIndexRead
+    );
     tempDir = makeTempDir("project-test");
     await mkdir(tempDir, { recursive: true });
   });
 
   afterEach(async () => {
     await rm(tempDir, { recursive: true, force: true });
+    vi.restoreAllMocks();
   });
 
   describe("generateCode", () => {

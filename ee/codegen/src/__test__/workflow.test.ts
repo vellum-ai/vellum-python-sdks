@@ -1,4 +1,7 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { DocumentIndexRead } from "vellum-ai/api";
+import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
+import { afterEach, vi } from "vitest";
 
 import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
@@ -11,6 +14,7 @@ import {
   terminalNodeDataFactory,
 } from "./helpers/node-data-factories";
 
+import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { workflowOutputContextFactory } from "src/__test__/helpers/workflow-output-context-factory";
 import * as codegen from "src/codegen";
 import { createNodeContext, WorkflowContext } from "src/context";
@@ -23,6 +27,10 @@ describe("Workflow", () => {
   const entrypointNode = entrypointNodeDataFactory();
 
   beforeEach(async () => {
+    vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
+      mockDocumentIndexFactory() as unknown as DocumentIndexRead
+    );
+
     workflowContext = workflowContextFactory({
       workflowClassName: "TestWorkflow",
     });
@@ -37,6 +45,10 @@ describe("Workflow", () => {
     );
 
     writer = new Writer();
+  });
+
+  afterEach(async () => {
+    vi.restoreAllMocks();
   });
 
   describe("write", () => {

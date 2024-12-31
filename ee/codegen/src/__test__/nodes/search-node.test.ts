@@ -1,9 +1,10 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
-import { beforeEach, vi } from "vitest";
+import { afterEach, beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
+import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
@@ -15,14 +16,9 @@ describe("TextSearchNode", () => {
   let writer: Writer;
   let node: SearchNode;
 
-  const mockDocumentIndex = () => ({
-    id: "b6ef8809-346e-469c-beed-2e5c4e9844c5",
-    name: "my-sweet-document",
-  });
-
   beforeEach(() => {
     vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
-      mockDocumentIndex() as unknown as DocumentIndexRead
+      mockDocumentIndexFactory() as unknown as DocumentIndexRead
     );
 
     workflowContext = workflowContextFactory();
@@ -50,7 +46,9 @@ describe("TextSearchNode", () => {
       })
     );
   });
-
+  afterEach(async () => {
+    vi.restoreAllMocks();
+  });
   describe("basic", () => {
     beforeEach(async () => {
       const nodeData = searchNodeDataFactory();
