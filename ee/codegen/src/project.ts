@@ -555,7 +555,26 @@ ${errors.slice(0, 3).map((err) => {
           }),
         ]),
       });
-      rootNodesInitFileStatements.push(nodeInitFileAllField);
+      const nodeInitFileMapField = python.field({
+        name: "__identifiers",
+        initializer: python.TypeInstantiation.dict([
+          ...nodes.map((node) => {
+            return {
+              key: python.reference({
+                name: node.nodeContext.nodeClassName,
+                modulePath: node.nodeContext.nodeModulePath,
+              }),
+              value: python.TypeInstantiation.uuid(
+                node.nodeContext.getNodeId()
+              ),
+            };
+          }),
+        ]),
+      });
+      rootNodesInitFileStatements.push(
+        nodeInitFileAllField,
+        nodeInitFileMapField
+      );
 
       const nodeDisplayInitFileAllField = python.field({
         name: "__all__",
