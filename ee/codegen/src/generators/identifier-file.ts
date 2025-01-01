@@ -33,10 +33,6 @@ export class IdentifierFile extends BasePersistedFile {
       initializer: python.TypeInstantiation.dict([
         ...this.nodes.map((node) => {
           return {
-            // key: python.reference({
-            //   name: node.nodeContext.nodeClassName,
-            //   modulePath: node.nodeContext.nodeModulePath,
-            // }),
             key: python.TypeInstantiation.str(
               node.getNodeModulePath().join(".") + "." + node.getNodeClassName()
             ),
