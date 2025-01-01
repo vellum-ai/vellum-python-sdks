@@ -44,6 +44,7 @@ import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subwo
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
+import { IdentifierFile } from "src/generators/identifier-file";
 import { ApiNode } from "src/generators/nodes/api-node";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
@@ -195,6 +196,8 @@ ${errors.slice(0, 3).map((err) => {
       ...this.generateNodeFiles(nodes),
       // sandbox.py
       ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
+      // map.py
+      this.generateIdentifierFile(nodes).persist(),
     ]);
 
     // error.log - this gets generated separately from the other files because it
@@ -555,26 +558,7 @@ ${errors.slice(0, 3).map((err) => {
           }),
         ]),
       });
-      const nodeInitFileMapField = python.field({
-        name: "__identifiers",
-        initializer: python.TypeInstantiation.dict([
-          ...nodes.map((node) => {
-            return {
-              key: python.reference({
-                name: node.nodeContext.nodeClassName,
-                modulePath: node.nodeContext.nodeModulePath,
-              }),
-              value: python.TypeInstantiation.uuid(
-                node.nodeContext.getNodeId()
-              ),
-            };
-          }),
-        ]),
-      });
-      rootNodesInitFileStatements.push(
-        nodeInitFileAllField,
-        nodeInitFileMapField
-      );
+      rootNodesInitFileStatements.push(nodeInitFileAllField);
 
       const nodeDisplayInitFileAllField = python.field({
         name: "__all__",
@@ -652,6 +636,15 @@ ${errors.slice(0, 3).map((err) => {
     return codegen.workflowSandboxFile({
       workflowContext: this.workflowContext,
       sandboxInputs: this.sandboxInputs ?? [],
+    });
+  }
+
+  private generateIdentifierFile(
+    nodes: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[]
+  ): IdentifierFile {
+    return codegen.identifierFile({
+      workflowContext: this.workflowContext,
+      nodes: nodes,
     });
   }
 

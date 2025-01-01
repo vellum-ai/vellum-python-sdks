@@ -8,6 +8,7 @@ import {
   Workflow,
 } from "./generators";
 import { BasePersistedFile } from "./generators/base-persisted-file";
+import { IdentifierFile } from "./generators/identifier-file";
 import { WorkflowSandboxFile } from "./generators/workflow-sandbox-file";
 
 export function vellumVariable(args: VellumVariable.Args): VellumVariable {
@@ -42,4 +43,8 @@ export function workflowSandboxFile(
   args: WorkflowSandboxFile.Args
 ): WorkflowSandboxFile {
   return new WorkflowSandboxFile(args);
+}
+
+export function identifierFile(args: IdentifierFile.Args): IdentifierFile {
+  return new IdentifierFile(args);
 }
