@@ -2,6 +2,7 @@ from dataclasses import asdict, is_dataclass
 from datetime import datetime
 import enum
 from json import JSONEncoder
+from queue import Queue
 from uuid import UUID
 from typing import Any, Callable, Dict, Type
 
@@ -43,6 +44,9 @@ class DefaultStateEncoder(JSONEncoder):
 
         if isinstance(obj, enum.Enum):
             return obj.value
+
+        if isinstance(obj, Queue):
+            return list(obj.queue)
 
         if is_dataclass(obj):
             # Technically, obj is DataclassInstance | type[DataclassInstance], but asdict expects a DataclassInstance
