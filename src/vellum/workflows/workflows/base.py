@@ -194,6 +194,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
+        mocks: Optional[List[Outputs]] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -290,6 +291,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
+        mocks: Optional[List[Outputs]] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
