@@ -232,6 +232,31 @@ export class WorkflowContext {
     return inputVariableContext;
   }
 
+  public findInputVariableContextByRawName(
+    rawName: string
+  ): InputVariableContext | undefined {
+    const inputVariableContext = Array.from(
+      this.inputVariableContextsById.values()
+    ).find((inputContext) => inputContext.getRawName() === rawName);
+
+    return inputVariableContext;
+  }
+
+  public getInputVariableContextByRawName(
+    rawName: string
+  ): InputVariableContext {
+    const inputVariableContext =
+      this.findInputVariableContextByRawName(rawName);
+
+    if (!inputVariableContext) {
+      throw new Error(
+        `Input variable context not found for raw name: ${rawName}`
+      );
+    }
+
+    return inputVariableContext;
+  }
+
   public isOutputVariableNameUsed(outputVariableName: string): boolean {
     return this.outputVariableNames.has(outputVariableName);
   }

@@ -38,6 +38,10 @@ export class InputVariableContext {
     return this.inputVariableData;
   }
 
+  public getRawName(): string {
+    return this.inputVariableData.key;
+  }
+
   private generateSanitizedInputVariableName(): string {
     const defaultName = "input_";
     const rawInputVariableName = this.inputVariableData.key;

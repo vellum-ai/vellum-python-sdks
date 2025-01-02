@@ -1,6 +1,5 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
@@ -80,30 +79,17 @@ if __name__ != "__main__":
         name: "Inputs",
         modulePath: getGeneratedInputsModulePath(this.workflowContext),
       }),
-      arguments_: inputs.map((input) =>
-        python.methodArgument({
-          name: this.getName(input.name),
+      arguments_: inputs.map((input) => {
+        const inputVariableContext =
+          this.workflowContext.getInputVariableContextByRawName(input.name);
+
+        return python.methodArgument({
+          name: inputVariableContext.name,
           value: vellumValue({
             vellumValue: input,
           }),
-        })
-      ),
+        });
+      }),
     });
-  }
-
-  private getName(name: string): string {
-    // Check if the sandbox input name exists in the input variable names used for this workflow
-    // All input variables have been sanitized already and are all in snake casing
-    const sanitizedName = Array.from(
-      this.workflowContext.inputVariableContextsById.values()
-    ).find(
-      (inputContext) => inputContext.getInputVariableData().key === name
-    )?.name;
-    if (isNil(sanitizedName)) {
-      throw new Error(
-        `Invalid sandbox input name: ${name}: This name was not used for input variable generation.`
-      );
-    }
-    return sanitizedName;
   }
 }
