@@ -4,6 +4,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { WorkflowSandboxInputs } from "src/types/vellum";
+import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
 export declare namespace WorkflowSandboxFile {
@@ -81,12 +82,24 @@ if __name__ != "__main__":
       }),
       arguments_: inputs.map((input) =>
         python.methodArgument({
-          name: input.name,
+          name: this.getName(input.name),
           value: vellumValue({
             vellumValue: input,
           }),
         })
       ),
     });
+  }
+
+  private getName(name: string): string {
+    // Check if the sandbox input name exists in the input variable names used for this workflow
+    // All input variables have been sanitized already and are all in snake casing
+    const snakeCaseName = toPythonSafeSnakeCase(name);
+    if (!this.workflowContext.inputVariableNames.has(snakeCaseName)) {
+      throw new Error(
+        `Invalid sandbox input name: ${name}: This name was not used for input variable generation.`
+      );
+    }
+    return snakeCaseName;
   }
 }
