@@ -39,11 +39,8 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
 
         string_output = next((output for output in outputs if output.type == "STRING"), None)
         if not string_output or string_output.value is None:
-            output_types = {output.type for output in outputs}
-            is_plural = len(output_types) > 1
-            raise NodeException(
-                message=f"Expected to receive a non-null string output from Prompt. Only found outputs of type{'s' if is_plural else ''}: {', '.join(output_types)}",  # noqa: E501
-                code=WorkflowErrorCode.INTERNAL_ERROR,
-            )
+            value = ""
+        else:
+            value = string_output.value
 
-        yield BaseOutput(name="text", value=string_output.value)
+        yield BaseOutput(name="text", value=value)

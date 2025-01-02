@@ -12,7 +12,6 @@ from vellum.client.types.initiated_execute_prompt_event import InitiatedExecuteP
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.client.types.string_vellum_value import StringVellumValue
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.node import BaseInlinePromptNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 
 
@@ -74,7 +73,7 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
         pass
 
     # AND a prompt node with a accepting that function definition
-    class MyNode(BaseInlinePromptNode):
+    class MyNode(InlinePromptNode):
         ml_model = "gpt-4o"
         functions = [my_function]
         prompt_inputs = {}
