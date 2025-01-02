@@ -194,7 +194,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
-        mocks: Optional[List[Outputs]] = None,
+        mocks: Optional[List[BaseOutputs]] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -219,6 +219,9 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
+
+        mocks: Optional[List[Outputs]] = None
+            A list of Outputs to mock for Nodes during Workflow Execution.
         """
 
         events = WorkflowRunner(
@@ -228,6 +231,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
             cancel_signal=cancel_signal,
+            mocks=mocks,
             parent_context=self._context.parent_context,
         ).stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
@@ -291,7 +295,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
-        mocks: Optional[List[Outputs]] = None,
+        mocks: Optional[List[BaseOutputs]] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -317,6 +321,9 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
+
+        mocks: Optional[List[Outputs]] = None
+            A list of Outputs to mock for Nodes during Workflow Execution.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -327,6 +334,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
             cancel_signal=cancel_signal,
+            mocks=mocks,
             parent_context=self.context.parent_context,
         ).stream():
             if should_yield(self.__class__, event):

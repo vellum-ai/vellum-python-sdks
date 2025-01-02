@@ -4,7 +4,7 @@ import logging
 from queue import Empty, Queue
 from threading import Event as ThreadingEvent, Thread
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, List, Optional, Sequence, Set, Type, Union
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.context import execution_context, get_parent_context
@@ -72,6 +72,7 @@ class WorkflowRunner(Generic[StateType]):
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
+        mocks: Optional[List[BaseOutputs]] = None,
         parent_context: Optional[ParentContext] = None,
     ):
         if state and external_inputs:
@@ -123,6 +124,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._dependencies: Dict[Type[BaseNode], Set[Type[BaseNode]]] = defaultdict(set)
         self._state_forks: Set[StateType] = {self._initial_state}
+        self._mocks_by_node_outputs_class = {mock.__class__: mock for mock in mocks} if mocks else {}
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
@@ -178,8 +180,11 @@ class WorkflowRunner(Generic[StateType]):
                 node_definition=node.__class__,
                 parent=parent_context,
             )
-            with execution_context(parent_context=updated_parent_context):
-                node_run_response = node.run()
+            if node.Outputs not in self._mocks_by_node_outputs_class:
+                with execution_context(parent_context=updated_parent_context):
+                    node_run_response = node.run()
+            else:
+                node_run_response = self._mocks_by_node_outputs_class[node.Outputs]
             ports = node.Ports()
             if not isinstance(node_run_response, (BaseOutputs, Iterator)):
                 raise NodeException(
