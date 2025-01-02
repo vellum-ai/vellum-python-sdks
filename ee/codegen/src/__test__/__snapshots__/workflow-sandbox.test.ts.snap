@@ -41,24 +41,3 @@ runner = WorkflowSandboxRunner(
 runner.run()
 "
 `;
-
-exports[`Workflow Sandbox > write > should generate the same snapshot for snake and camel casing with unique contexts 1`] = `
-"from vellum.workflows.sandbox import WorkflowSandboxRunner
-from .workflow import Workflow
-from .inputs import Inputs
-
-if __name__ != "__main__":
-    raise Exception("This file is not meant to be imported")
-
-
-runner = WorkflowSandboxRunner(
-    workflow=Workflow(),
-    inputs=[
-        Inputs(some_foo="some-value"),
-        Inputs(some_bar="some-value"),
-    ],
-)
-
-runner.run()
-"
-`;

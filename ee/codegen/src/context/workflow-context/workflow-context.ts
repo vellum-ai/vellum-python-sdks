@@ -54,7 +54,7 @@ export class WorkflowContext {
 
   // Track what input variables names are used within this workflow so that we can ensure name uniqueness when adding
   // new input variables.
-  public readonly inputVariableNames: Set<string> = new Set();
+  private readonly inputVariableNames: Set<string> = new Set();
 
   // Maps node IDs to a mapping of output IDs to output names.
   // Tracks local and global contexts in the case of nested workflows.
