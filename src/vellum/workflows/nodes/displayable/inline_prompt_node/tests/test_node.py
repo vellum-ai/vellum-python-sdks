@@ -98,7 +98,7 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
     # WHEN the node is run
-    list(MyNode().run())
+    outputs = list(MyNode().run())
 
     # THEN the prompt is executed with the correct inputs
     mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
@@ -116,3 +116,15 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
             },
         ),
     ]
+    assert (
+        outputs[-1].value
+        == """{
+    "arguments": {
+        "foo": "hello",
+        "bar": 1
+    },
+    "id": null,
+    "name": "my_function",
+    "state": null
+}"""
+    )

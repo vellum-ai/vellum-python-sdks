@@ -1,3 +1,4 @@
+import json
 from typing import Iterator
 
 from vellum.workflows.errors import WorkflowErrorCode
@@ -37,10 +38,19 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
                 code=WorkflowErrorCode.INTERNAL_ERROR,
             )
 
-        string_output = next((output for output in outputs if output.type == "STRING"), None)
-        if not string_output or string_output.value is None:
-            value = ""
-        else:
-            value = string_output.value
+        string_outputs = []
+        for output in outputs:
+            if output.value is None:
+                continue
 
+            if output.type == "STRING":
+                string_outputs.append(output.value)
+            elif output.type == "JSON":
+                string_outputs.append(json.dumps(output.value, indent=4))
+            elif output.type == "FUNCTION_CALL":
+                string_outputs.append(output.value.model_dump_json(indent=4))
+            else:
+                string_outputs.append(output.value.message)
+
+        value = "\n".join(string_outputs)
         yield BaseOutput(name="text", value=value)
