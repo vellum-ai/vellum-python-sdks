@@ -7,7 +7,7 @@ import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
 export declare namespace GuardrailNodeContext {
   interface Args extends BaseNodeContext.Args<GuardrailNodeType> {
-    metricDefinitionsHistoryItem: MetricDefinitionHistoryItem;
+    metricDefinitionsHistoryItem: MetricDefinitionHistoryItem | undefined;
   }
 }
 
@@ -15,7 +15,9 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
   baseNodeClassName = "GuardrailNode";
   baseNodeDisplayClassName = "BaseGuardrailNodeDisplay";
 
-  public readonly metricDefinitionsHistoryItem: MetricDefinitionHistoryItem;
+  public readonly metricDefinitionsHistoryItem:
+    | MetricDefinitionHistoryItem
+    | undefined;
 
   constructor(args: GuardrailNodeContext.Args) {
     super(args);
@@ -24,6 +26,10 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
   }
 
   getNodeOutputNamesById(): Record<string, string> {
+    if (!this.metricDefinitionsHistoryItem) {
+      return {};
+    }
+
     return this.metricDefinitionsHistoryItem.outputVariables.reduce(
       (acc, variable) => {
         acc[variable.id] = variable.key;

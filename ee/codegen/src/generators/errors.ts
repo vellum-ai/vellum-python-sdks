@@ -3,7 +3,8 @@ export type CodegenErrorCode =
   | "NODE_ATTRIBUTE_GENERATION_ERROR"
   | "NODE_PORT_GENERATION_ERROR"
   | "NODE_NOT_FOUND_ERROR"
-  | "UNSUPPORTED_SANDBOX_INPUT_ERROR";
+  | "UNSUPPORTED_SANDBOX_INPUT_ERROR"
+  | "ENTITY_NOT_FOUND_ERROR";
 
 export abstract class BaseCodegenError extends Error {
   abstract code: CodegenErrorCode;
@@ -36,6 +37,13 @@ export class NodePortGenerationError extends BaseCodegenError {
  */
 export class NodeNotFoundError extends BaseCodegenError {
   code = "NODE_NOT_FOUND_ERROR" as const;
+}
+
+/**
+ * An error that raises when a vellum entity is not found.
+ */
+export class EntityNotFoundError extends BaseCodegenError {
+  code = "ENTITY_NOT_FOUND_ERROR" as const;
 }
 
 /**
