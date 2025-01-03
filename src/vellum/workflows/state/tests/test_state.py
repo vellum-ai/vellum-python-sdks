@@ -132,4 +132,4 @@ def test_state_json_serialization__with_queue():
     json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
 
     # THEN the state is serialized correctly with the queue turned into a list
-    assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": ['test1', 'test2']}
+    assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": ["test1", "test2"]}
