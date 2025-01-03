@@ -1,58 +1,18 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterator, Optional, Set, Tuple, Type
+from typing import Callable, Generic, Iterator, Optional, Set, Type
 
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.nodes.bases.base_adornable_node import BaseAdornableNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
-if TYPE_CHECKING:
-    from vellum.workflows import BaseWorkflow
 
-Subworkflow = Type["BaseWorkflow"]
-
-
-class _TryNodeMeta(BaseNodeMeta):
-    def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
-        node_class = super().__new__(cls, name, bases, dct)
-
-        subworkflow_attribute = dct.get("subworkflow")
-        if not subworkflow_attribute:
-            return node_class
-
-        subworkflow_outputs = getattr(subworkflow_attribute, "Outputs")
-        if not issubclass(subworkflow_outputs, BaseOutputs):
-            raise ValueError("subworkflow.Outputs must be a subclass of BaseOutputs")
-
-        outputs_class = dct.get("Outputs")
-        if not outputs_class:
-            raise ValueError("Outputs class not found in base classes")
-
-        if not issubclass(outputs_class, BaseNode.Outputs):
-            raise ValueError("Outputs class must be a subclass of BaseNode.Outputs")
-
-        for descriptor in subworkflow_outputs:
-            if descriptor.name == "error":
-                raise ValueError("`error` is a reserved name for TryNode.Outputs")
-
-            setattr(outputs_class, descriptor.name, descriptor)
-
-        return node_class
-
-    def __getattribute__(cls, name: str) -> Any:
-        try:
-            return super().__getattribute__(name)
-        except AttributeError:
-            if name != "__wrapped_node__" and issubclass(cls, TryNode):
-                return getattr(cls.__wrapped_node__, name)
-            raise
-
-
-class TryNode(BaseNode[StateType], Generic[StateType], metaclass=_TryNodeMeta):
+class TryNode(BaseAdornableNode[StateType], Generic[StateType]):
     """
     Used to execute a Subworkflow and handle errors.
 
@@ -60,9 +20,7 @@ class TryNode(BaseNode[StateType], Generic[StateType], metaclass=_TryNodeMeta):
     subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
-    __wrapped_node__: Optional[Type["BaseNode"]] = None
     on_error_code: Optional[WorkflowErrorCode] = None
-    subworkflow: Type["BaseWorkflow"]
 
     class Outputs(BaseNode.Outputs):
         error: Optional[WorkflowError] = None
@@ -127,3 +85,12 @@ Message: {event.error.message}""",
     @classmethod
     def wrap(cls, on_error_code: Optional[WorkflowErrorCode] = None) -> Callable[..., Type["TryNode"]]:
         return create_adornment(cls, attributes={"on_error_code": on_error_code})
+
+    @classmethod
+    def __annotate_outputs_class__(
+        cls, subworkflow_outputs_class: Type[BaseOutputs], reference: OutputReference
+    ) -> None:
+        if reference.name == "error":
+            raise ValueError("`error` is a reserved name for TryNode.Outputs")
+
+        setattr(subworkflow_outputs_class, reference.name, reference)
