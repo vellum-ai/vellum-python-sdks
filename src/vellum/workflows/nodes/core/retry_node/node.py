@@ -1,10 +1,12 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Optional, Type
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Optional, Tuple, Type
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.nodes.utils import create_adornment
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.generics import StateType
 
@@ -13,6 +15,37 @@ if TYPE_CHECKING:
 
 
 class _RetryNodeMeta(BaseNodeMeta):
+    def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
+        node_class = super().__new__(cls, name, bases, dct)
+
+        subworkflow_attribute = dct.get("subworkflow")
+        if not subworkflow_attribute:
+            return node_class
+
+        subworkflow_outputs = getattr(subworkflow_attribute, "Outputs")
+        if not issubclass(subworkflow_outputs, BaseOutputs):
+            raise ValueError("subworkflow.Outputs must be a subclass of BaseOutputs")
+
+        outputs_class = dct.get("Outputs")
+        if not outputs_class:
+            raise ValueError("Outputs class not found in base classes")
+
+        if not issubclass(outputs_class, BaseNode.Outputs):
+            raise ValueError("Outputs class must be a subclass of BaseNode.Outputs")
+
+        for descriptor in subworkflow_outputs:
+            setattr(outputs_class, descriptor.name, descriptor)
+
+        return node_class
+
+    def __getattribute__(cls, name: str) -> Any:
+        try:
+            return super().__getattribute__(name)
+        except AttributeError:
+            if name != "__wrapped_node__" and issubclass(cls, RetryNode):
+                return getattr(cls.__wrapped_node__, name)
+            raise
+
     @property
     def _localns(cls) -> Dict[str, Any]:
         return {
@@ -30,6 +63,7 @@ class RetryNode(BaseNode[StateType], Generic[StateType], metaclass=_RetryNodeMet
     subworkflow: Type["BaseWorkflow[SubworkflowInputs, BaseState]"] - The Subworkflow to execute
     """
 
+    __wrapped_node__: Optional[Type["BaseNode"]] = None
     max_attempts: int
     retry_on_error_code: Optional[WorkflowErrorCode] = None
     subworkflow: Type["BaseWorkflow[SubworkflowInputs, BaseState]"]
@@ -78,30 +112,6 @@ Message: {terminal_event.error.message}""",
     def wrap(
         cls, max_attempts: int, retry_on_error_code: Optional[WorkflowErrorCode] = None
     ) -> Callable[..., Type["RetryNode"]]:
-        _max_attempts = max_attempts
-        _retry_on_error_code = retry_on_error_code
-
-        def decorator(inner_cls: Type[BaseNode]) -> Type["RetryNode"]:
-            # Investigate how to use dependency injection to avoid circular imports
-            # https://app.shortcut.com/vellum/story/4116
-            from vellum.workflows import BaseWorkflow
-
-            class Subworkflow(BaseWorkflow[RetryNode.SubworkflowInputs, BaseState]):
-                graph = inner_cls
-
-                # mypy is wrong here, this works and is defined
-                class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
-                    pass
-
-            class WrappedNode(RetryNode[StateType]):
-                max_attempts = _max_attempts
-                retry_on_error_code = _retry_on_error_code
-
-                subworkflow = Subworkflow
-
-                class Outputs(Subworkflow.Outputs):
-                    pass
-
-            return WrappedNode
-
-        return decorator
+        return create_adornment(
+            cls, attributes={"max_attempts": max_attempts, "retry_on_error_code": retry_on_error_code}
+        )
