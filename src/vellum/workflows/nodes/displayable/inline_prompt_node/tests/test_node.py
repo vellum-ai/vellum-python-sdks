@@ -124,7 +124,6 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
         "bar": 1
     },
     "id": null,
-    "name": "my_function",
-    "state": null
+    "name": "my_function"
 }"""
     )
