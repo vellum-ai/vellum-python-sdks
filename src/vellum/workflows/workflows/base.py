@@ -2,10 +2,15 @@
 
 import importlib
 import inspect
+import os
+import re
+import sys
 
 from vellum.plugins.utils import load_runtime_plugins
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 load_runtime_plugins()
 
@@ -413,10 +418,9 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         return most_recent_state_snapshot
 
     @staticmethod
-    def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
+    def load_from_module(module_path: str) -> Tuple[Type["BaseWorkflow"], Dict[str, Any]]:
         workflow_path = f"{module_path}.workflow"
         module = importlib.import_module(workflow_path)
-
         workflows: List[Type[BaseWorkflow]] = []
         for name in dir(module):
             if name.startswith("__"):
@@ -435,8 +439,38 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             raise ValueError(f"No workflows found in {module_path}")
         elif len(workflows) > 1:
             raise ValueError(f"Multiple workflows found in {module_path}")
+        try:
+            # Import the nodes package
+            nodes_package = importlib.import_module(f"{module_path}.display.nodes")
 
-        return workflows[0]
+            # Use the loader to get the code
+            if hasattr(nodes_package, "__spec__") and nodes_package.__spec__.loader:
+                loader = nodes_package.__spec__.loader
+
+                # Check if the loader has a code attribute
+                if hasattr(loader, "code"):
+                    code = loader.code
+
+                    # Parse the code to find import statements
+                    import_lines = [line.strip() for line in code.splitlines() if line.startswith("from ")]
+
+                    # Import each module specified in the code
+                    for line in import_lines:
+                        try:
+                            # Extract module name from the import line
+                            module_name = line.split(" ")[1]
+                            full_module_path = f"{module_path}.display.nodes{module_name}"
+                            importlib.import_module(full_module_path)
+                        except Exception as e:
+                            continue
+
+            # Also import from workflow.py
+            importlib.import_module(f"{module_path}.display.workflow")
+
+            return workflows[0]
+
+        except Exception as e:
+            raise ImportError(f"Unable to import from '{module_path}.display' error: {e}")
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()
