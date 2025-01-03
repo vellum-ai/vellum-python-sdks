@@ -1,9 +1,8 @@
-from queue import Queue
-
 import pytest
 from collections import defaultdict
 from copy import deepcopy
 import json
+from queue import Queue
 from typing import Dict
 
 from vellum.workflows.nodes.bases import BaseNode
