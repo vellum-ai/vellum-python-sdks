@@ -1,3 +1,5 @@
+from queue import Queue
+
 import pytest
 from collections import defaultdict
 from copy import deepcopy
@@ -113,3 +115,21 @@ def test_state_json_serialization__with_node_output_updates():
 
     # THEN the state is serialized correctly
     assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": "hello"}
+
+
+def test_state_json_serialization__with_queue():
+    # GIVEN an initial state instance
+    state = MockState(foo="bar")
+
+    # AND we add a Node Output queue to state
+    queue: Queue[str] = Queue()
+    queue.put("test1")
+    queue.put("test2")
+
+    state.meta.node_outputs[MockNode.Outputs.baz] = queue
+
+    # WHEN we serialize the state
+    json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
+
+    # THEN the state is serialized correctly with the queue turned into a list
+    assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": ['test1', 'test2']}
