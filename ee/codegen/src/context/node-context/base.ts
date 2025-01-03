@@ -1,5 +1,6 @@
 import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
+import { NodeOutputNotFoundError } from "src/generators/errors";
 import { WorkflowDataNode, WorkflowNodeDefinition } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getNodeId, getNodeLabel } from "src/utils/nodes";
@@ -118,7 +119,9 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     const nodeOutputName = this.nodeOutputNamesById[outputId];
 
     if (!nodeOutputName) {
-      throw new Error(`Node output name not found for output ID: ${outputId}`);
+      throw new NodeOutputNotFoundError(
+        `Failed to find output with id '${outputId}'`
+      );
     }
 
     return toPythonSafeSnakeCase(nodeOutputName, "output");

@@ -17,12 +17,6 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
       nodeOutputPointerRuleData.outputId
     );
 
-    if (!nodeOutputName) {
-      throw new Error(
-        `Node output name not found for node ID: ${nodeOutputPointerRuleData.nodeId} and output ID: ${nodeOutputPointerRuleData.outputId}`
-      );
-    }
-
     return python.reference({
       name: nodeContext.nodeClassName,
       modulePath: nodeContext.nodeModulePath,
