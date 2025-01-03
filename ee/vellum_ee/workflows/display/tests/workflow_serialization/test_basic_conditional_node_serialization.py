@@ -1,5 +1,4 @@
 import pytest
-from unittest import mock
 
 from deepdiff import DeepDiff
 
@@ -21,7 +20,6 @@ from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -33,12 +31,7 @@ def test_serialize_workflow():
     # GIVEN a Workflow that uses a ConditionalNode
     # WHEN we serialize it
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=CategoryWorkflow)
-
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        serialized_workflow: dict = workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
     assert serialized_workflow.keys() == {
@@ -457,23 +450,14 @@ def test_serialize_workflow():
 
     assert not DeepDiff(
         [
-            {
-                "type": "MOCKED",
-            },
-            {
-                "type": "MOCKED",
-            },
-            {
-                "type": "MOCKED",
-            },
-            {
-                "type": "MOCKED",
-            },
-            {
-                "type": "MOCKED",
-            },
+            {"id": "148c61bd-e8b0-4d4b-8734-b043a72b90ed", "type": "GENERIC"},
+            {"id": "ed7caf01-9ae7-47a3-b15a-16697abaf486", "type": "GENERIC"},
+            {"id": "0d959311-c836-4641-a867-58f63df9dfea", "type": "GENERIC"},
+            {"id": "8df781b1-ff28-48a5-98a2-d7d796b932b0", "type": "GENERIC"},
+            {"id": "68c02b7c-5077-4087-803d-841474a8081f", "type": "GENERIC"},
         ],
         workflow_raw_data["nodes"][2:7],
+        ignore_order=True,
     )
 
     assert not DeepDiff(
@@ -917,12 +901,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
     workflow_cls = create_simple_workflow(descriptor)
 
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow_cls)
-
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        serialized_workflow: dict = workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
     assert serialized_workflow.keys() == {
@@ -1041,12 +1020,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
     workflow_cls = create_simple_workflow(descriptor)
 
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow_cls)
-
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        serialized_workflow: dict = workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
     assert serialized_workflow.keys() == {
@@ -1152,12 +1126,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
     workflow_cls = create_simple_workflow(descriptor)
 
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow_cls)
-
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        serialized_workflow: dict = workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
     assert serialized_workflow.keys() == {

@@ -1,8 +1,5 @@
-from unittest import mock
-
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -13,12 +10,7 @@ def test_serialize_workflow():
     # GIVEN a Workflow that uses a MapNode
     # WHEN we serialize it
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=SimpleMapExample)
-
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        serialized_workflow: dict = workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
     assert serialized_workflow.keys() == {
@@ -141,7 +133,7 @@ def test_serialize_workflow():
                                 "bases": [],
                             },
                         },
-                        {"type": "MOCKED"},
+                        {"id": "baf6d316-dc75-41e8-96c0-015aede96309", "type": "GENERIC"},
                         {
                             "id": "6f4883b2-70b1-4e1c-ae15-7d0f5aec810b",
                             "type": "TERMINAL",

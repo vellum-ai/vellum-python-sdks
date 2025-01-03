@@ -1,8 +1,5 @@
-from unittest import mock
-
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -15,12 +12,7 @@ def test_serialize_workflow__await_all():
     workflow_display = get_workflow_display(
         base_display_class=VellumWorkflowDisplay, workflow_class=AwaitAllPassingWorkflow
     )
-
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        serialized_workflow: dict = workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
     assert serialized_workflow.keys() == {
@@ -76,18 +68,12 @@ def test_serialize_workflow__await_all():
         },
     }
 
-    passthrough_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "MOCKED"]
+    passthrough_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC"]
     assert not DeepDiff(
         [
-            {
-                "type": "MOCKED",
-            },
-            {
-                "type": "MOCKED",
-            },
-            {
-                "type": "MOCKED",
-            },
+            {"id": "127ef456-91bc-43c6-bd8b-1772db5e3cb5", "type": "GENERIC"},
+            {"id": "59243c65-053f-4ea6-9157-3f3edb1477bf", "type": "GENERIC"},
+            {"id": "634f0202-9ea9-4c62-b152-1a58c595cffb", "type": "GENERIC"},
         ],
         passthrough_nodes,
         ignore_order=True,
