@@ -2208,7 +2208,6 @@ types:
         type: string
         validation:
           minLength: 1
-      state: optional<FulfilledEnum>
     source:
       openapi: openapi/openapi.yml
   FunctionCallChatMessageContent:
@@ -2278,7 +2277,6 @@ types:
         type: string
         validation:
           minLength: 1
-      state: optional<FulfilledEnum>
     source:
       openapi: openapi/openapi.yml
   FunctionCallVariableValue:
