@@ -444,7 +444,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             nodes_package = importlib.import_module(f"{module_path}.display.nodes")
 
             # Use the loader to get the code
-            if hasattr(nodes_package, "__spec__") and nodes_package.__spec__.loader:
+            if hasattr(nodes_package, "__spec__") and nodes_package.__spec__ and nodes_package.__spec__.loader:
                 loader = nodes_package.__spec__.loader
 
                 # Check if the loader has a code attribute
