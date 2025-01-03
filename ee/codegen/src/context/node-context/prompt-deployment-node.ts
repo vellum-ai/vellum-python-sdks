@@ -9,6 +9,10 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
   protected getNodeOutputNamesById(): Record<string, string> {
     return {
       [this.nodeData.data.outputId]: "text",
+      ...(this.nodeData.data.errorOutputId
+        ? { [this.nodeData.data.errorOutputId]: "error" }
+        : {}),
+      [this.nodeData.data.arrayOutputId]: "results",
     };
   }
 
