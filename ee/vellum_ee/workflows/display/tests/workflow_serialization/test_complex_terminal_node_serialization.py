@@ -1,9 +1,7 @@
 import pytest
-from unittest import mock
 
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -13,17 +11,12 @@ from tests.workflows.complex_final_output_node.missing_workflow_output import Mi
 
 def test_serialize_workflow__missing_final_output_node():
     # GIVEN a Workflow that is missing a Terminal Node
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay, workflow_class=MissingFinalOutputNodeWorkflow
+    )
 
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        workflow_display = get_workflow_display(
-            base_display_class=VellumWorkflowDisplay, workflow_class=MissingFinalOutputNodeWorkflow
-        )
-
-        # WHEN we serialize it
-        serialized_workflow: dict = workflow_display.serialize()
+    # WHEN we serialize it
+    serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
     assert serialized_workflow.keys() == {
@@ -97,9 +90,9 @@ def test_serialize_workflow__missing_final_output_node():
         },
     }
 
-    passthrough_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "MOCKED")
+    passthrough_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC")
     assert passthrough_node == {
-        "type": "MOCKED",
+        "type": "GENERIC",
     }
 
     final_output_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "TERMINAL"]
@@ -218,17 +211,12 @@ def test_serialize_workflow__missing_final_output_node():
 
 def test_serialize_workflow__missing_workflow_output():
     # GIVEN a Workflow that contains a terminal node that is unreferenced by the Workflow's Outputs
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay, workflow_class=MissingWorkflowOutputWorkflow
+    )
 
-    # TODO: Support serialization of BaseNode
-    # https://app.shortcut.com/vellum/story/4871/support-serialization-of-base-node
-    with mock.patch.object(BaseNodeVellumDisplay, "serialize") as mocked_serialize:
-        mocked_serialize.return_value = {"type": "MOCKED"}
-        workflow_display = get_workflow_display(
-            base_display_class=VellumWorkflowDisplay, workflow_class=MissingWorkflowOutputWorkflow
-        )
-
-        # WHEN we serialize it, it should throw an error
-        with pytest.raises(ValueError) as exc_info:
-            workflow_display.serialize()
+    # WHEN we serialize it, it should throw an error
+    with pytest.raises(ValueError) as exc_info:
+        workflow_display.serialize()
 
     assert exc_info.value.args[0] == "Unable to serialize terminal nodes that are not referenced by workflow outputs."
