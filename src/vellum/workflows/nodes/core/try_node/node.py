@@ -1,12 +1,10 @@
-import sys
-from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterator, Optional, Set, Tuple, Type
 
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
+from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
@@ -16,7 +14,6 @@ if TYPE_CHECKING:
     from vellum.workflows import BaseWorkflow
 
 Subworkflow = Type["BaseWorkflow"]
-_T = TypeVar("_T", bound=BaseOutputs)
 
 
 class _TryNodeMeta(BaseNodeMeta):
@@ -129,38 +126,4 @@ Message: {event.error.message}""",
 
     @classmethod
     def wrap(cls, on_error_code: Optional[WorkflowErrorCode] = None) -> Callable[..., Type["TryNode"]]:
-        _on_error_code = on_error_code
-
-        def decorator(inner_cls: Type[BaseNode]) -> Type["TryNode"]:
-            # Investigate how to use dependency injection to avoid circular imports
-            # https://app.shortcut.com/vellum/story/4116
-            from vellum.workflows import BaseWorkflow
-
-            inner_cls._is_wrapped_node = True
-
-            class Subworkflow(BaseWorkflow):
-                graph = inner_cls
-
-                # mypy is wrong here, this works and is defined
-                class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
-                    pass
-
-            dynamic_module = f"{inner_cls.__module__}.{inner_cls.__name__}.{ADORNMENT_MODULE_NAME}"
-            # This dynamic module allows calls to `type_hints` to work
-            sys.modules[dynamic_module] = ModuleType(dynamic_module)
-
-            # We use a dynamic wrapped node class to be uniquely tied to this `inner_cls` node during serialization
-            WrappedNode = type(
-                cls.__name__,
-                (TryNode,),
-                {
-                    "__wrapped_node__": inner_cls,
-                    "__module__": dynamic_module,
-                    "on_error_code": _on_error_code,
-                    "subworkflow": Subworkflow,
-                    "Ports": type("Ports", (TryNode.Ports,), {port.name: port.copy() for port in inner_cls.Ports}),
-                },
-            )
-            return WrappedNode
-
-        return decorator
+        return create_adornment(cls, attributes={"on_error_code": on_error_code})
