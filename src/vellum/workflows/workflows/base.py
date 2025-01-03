@@ -461,16 +461,16 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
                             module_name = line.split(" ")[1]
                             full_module_path = f"{module_path}.display.nodes{module_name}"
                             importlib.import_module(full_module_path)
-                        except Exception as e:
+                        except Exception:
                             continue
 
             # Also import from workflow.py
             importlib.import_module(f"{module_path}.display.workflow")
 
-            return workflows[0]
+        except ModuleNotFoundError:
+            pass
 
-        except Exception as e:
-            raise ImportError(f"Unable to import from '{module_path}.display' error: {e}")
+            return workflows[0]
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()
