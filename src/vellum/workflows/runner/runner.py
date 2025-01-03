@@ -72,7 +72,7 @@ class WorkflowRunner(Generic[StateType]):
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
-        mocks: Optional[List[BaseOutputs]] = None,
+        node_output_mocks: Optional[List[BaseOutputs]] = None,
         parent_context: Optional[ParentContext] = None,
     ):
         if state and external_inputs:
@@ -124,7 +124,9 @@ class WorkflowRunner(Generic[StateType]):
 
         self._dependencies: Dict[Type[BaseNode], Set[Type[BaseNode]]] = defaultdict(set)
         self._state_forks: Set[StateType] = {self._initial_state}
-        self._mocks_by_node_outputs_class = {mock.__class__: mock for mock in mocks} if mocks else {}
+        self._mocks_by_node_outputs_class = (
+            {mock.__class__: mock for mock in node_output_mocks} if node_output_mocks else {}
+        )
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal

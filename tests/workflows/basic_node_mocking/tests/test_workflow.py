@@ -7,7 +7,7 @@ def test_workflow__happy_path():
 
     # WHEN we run the workflow with a mock defined
     final_event = workflow.run(
-        mocks=[
+        node_output_mocks=[
             StartNode.Outputs(greeting="Hello"),
         ]
     )
