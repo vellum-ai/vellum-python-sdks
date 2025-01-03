@@ -5058,8 +5058,6 @@ components:
         name:
           type: string
           minLength: 1
-        state:
-          $ref: '#/components/schemas/FulfilledEnum'
       required:
       - arguments
       - name
@@ -5153,8 +5151,6 @@ components:
         name:
           type: string
           minLength: 1
-        state:
-          $ref: '#/components/schemas/FulfilledEnum'
       required:
       - arguments
       - name
