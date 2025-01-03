@@ -418,7 +418,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         return most_recent_state_snapshot
 
     @staticmethod
-    def load_from_module(module_path: str) -> Tuple[Type["BaseWorkflow"], Dict[str, Any]]:
+    def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
         workflow_path = f"{module_path}.workflow"
         module = importlib.import_module(workflow_path)
         workflows: List[Type[BaseWorkflow]] = []
