@@ -470,7 +470,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         except ModuleNotFoundError:
             pass
 
-            return workflows[0]
+        return workflows[0]
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()
