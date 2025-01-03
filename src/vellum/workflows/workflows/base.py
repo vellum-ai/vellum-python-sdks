@@ -435,37 +435,38 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         elif len(workflows) > 1:
             raise ValueError(f"Multiple workflows found in {module_path}")
         try:
-            # Import the nodes package
-            nodes_package = importlib.import_module(f"{module_path}.display.nodes")
-
-            # Use the loader to get the code
-            if hasattr(nodes_package, "__spec__") and nodes_package.__spec__ and nodes_package.__spec__.loader:
-                loader = nodes_package.__spec__.loader
-
-                # Check if the loader has a code attribute
-                if hasattr(loader, "code"):
-                    code = loader.code
-
-                    # Parse the code to find import statements
-                    import_lines = [line.strip() for line in code.splitlines() if line.startswith("from ")]
-
-                    # Import each module specified in the code
-                    for line in import_lines:
-                        try:
-                            # Extract module name from the import line
-                            module_name = line.split(" ")[1]
-                            full_module_path = f"{module_path}.display.nodes{module_name}"
-                            importlib.import_module(full_module_path)
-                        except Exception:
-                            continue
-
-            # Also import from workflow.py
-            importlib.import_module(f"{module_path}.display.workflow")
-
+            BaseWorkflow.import_node_display(module_path)
         except ModuleNotFoundError:
             pass
 
         return workflows[0]
+
+    @staticmethod
+    def import_node_display(module_path):
+        # Import the nodes package
+        nodes_package = importlib.import_module(f"{module_path}.display.nodes")
+        # Use the loader to get the code
+        if hasattr(nodes_package, "__spec__") and nodes_package.__spec__ and nodes_package.__spec__.loader:
+            loader = nodes_package.__spec__.loader
+
+            # Check if the loader has a code attribute
+            if hasattr(loader, "code"):
+                code = loader.code
+
+                # Parse the code to find import statements
+                import_lines = [line.strip() for line in code.splitlines() if line.startswith("from ")]
+
+                # Import each module specified in the code
+                for line in import_lines:
+                    try:
+                        # Extract module name from the import line
+                        module_name = line.split(" ")[1]
+                        full_module_path = f"{module_path}.display.nodes{module_name}"
+                        importlib.import_module(full_module_path)
+                    except Exception:
+                        continue
+        # Also import from workflow.py
+        importlib.import_module(f"{module_path}.display.workflow")
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()
