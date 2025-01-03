@@ -7,6 +7,7 @@ export function workflowContextFactory(
     workflowClassName,
     workflowRawEdges,
     codeExecutionNodeCodeRepresentationOverride,
+    strict = true,
   }: Partial<WorkflowContext.Args> = {
     codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
   }
@@ -18,7 +19,7 @@ export function workflowContextFactory(
     workflowClassName: workflowClassName || "Workflow",
     vellumApiKey: "<TEST_API_KEY>",
     workflowRawEdges: workflowRawEdges || [],
-    strict: true,
+    strict,
     codeExecutionNodeCodeRepresentationOverride,
   });
 }
