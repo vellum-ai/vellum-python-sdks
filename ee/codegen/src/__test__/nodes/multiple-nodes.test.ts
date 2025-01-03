@@ -81,6 +81,22 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
   let node: ConditionalNode;
+
+  const testCases = [
+    {
+      name: "takes output id",
+      id: "fa015382-7e5b-404e-b073-1c5f01832169",
+    },
+    {
+      name: "takes error output id",
+      id: "72cb22fc-e2f5-4df3-9428-40436d58e57a",
+    },
+    {
+      name: "takes array output id",
+      id: "4d257095-e908-4fc3-8159-a6ac0018e1f1",
+    },
+  ];
+
   beforeEach(async () => {
     workflowContext = workflowContextFactory();
     writer = new Writer();
@@ -95,9 +111,30 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
         workflowContext,
       })
     );
+  });
 
-    const outputId = "fa015382-7e5b-404e-b073-1c5f01832169";
-    const promptDeploymentNode = promptDeploymentNodeDataFactory();
+  it.each(testCases)("getNodeFile with $name", async ({ id }) => {
+    await setupNode(id);
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it.each(testCases)("getNodeDisplayFile with $name", async ({ id }) => {
+    await setupNode(id);
+    node.getNodeDisplayFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it.each(testCases)("getNodeDefinition with $name", async ({ id }) => {
+    await setupNode(id);
+    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
+  });
+
+  async function setupNode(outputId: string) {
+    const isErrorOutput = outputId === "72cb22fc-e2f5-4df3-9428-40436d58e57a";
+    const promptDeploymentNode = promptDeploymentNodeDataFactory({
+      errorOutputId: isErrorOutput ? outputId : undefined,
+    });
 
     const promptDeploymentNodeContext = (await createNodeContext({
       workflowContext,
@@ -120,19 +157,5 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
       workflowContext,
       nodeContext: conditionalNodeContext,
     });
-  });
-
-  it("getNodeFile", async () => {
-    node.getNodeFile().write(writer);
-    expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
-
-  it("getNodeDisplayFile", async () => {
-    node.getNodeDisplayFile().write(writer);
-    expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
-
-  it("getNodeDefinition", () => {
-    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
-  });
+  }
 });
