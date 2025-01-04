@@ -4,12 +4,12 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.bases.base_adornable_node import BaseAdornableNode
+from vellum.workflows.nodes.bases.base_adornable_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.types.generics import StateType
 
 
-class RetryNode(BaseAdornableNode[StateType], Generic[StateType]):
+class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     """
     Used to retry a Subworkflow a specified number of times.
 

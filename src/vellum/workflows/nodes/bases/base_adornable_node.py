@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from vellum.workflows import BaseWorkflow
 
 
-class BaseAdornableNodeMeta(BaseNodeMeta):
+class _BaseAdornmentNodeMeta(BaseNodeMeta):
     def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         node_class = super().__new__(cls, name, bases, dct)
 
@@ -17,7 +17,7 @@ class BaseAdornableNodeMeta(BaseNodeMeta):
         if not subworkflow_attribute:
             return node_class
 
-        if not issubclass(node_class, BaseAdornableNode):
+        if not issubclass(node_class, BaseAdornmentNode):
             raise ValueError("BaseAdornableNodeMeta can only be used on subclasses of BaseAdornableNode")
 
         subworkflow_outputs = getattr(subworkflow_attribute, "Outputs")
@@ -40,7 +40,7 @@ class BaseAdornableNodeMeta(BaseNodeMeta):
         try:
             return super().__getattribute__(name)
         except AttributeError:
-            if name != "__wrapped_node__" and issubclass(cls, BaseAdornableNode):
+            if name != "__wrapped_node__" and issubclass(cls, BaseAdornmentNode):
                 return getattr(cls.__wrapped_node__, name)
             raise
 
@@ -55,15 +55,14 @@ class BaseAdornableNodeMeta(BaseNodeMeta):
         }
 
 
-class BaseAdornableNode(
+class BaseAdornmentNode(
     BaseNode[StateType],
     Generic[StateType],
-    metaclass=BaseAdornableNodeMeta,
+    metaclass=_BaseAdornmentNodeMeta,
 ):
     """
-    A base node that makes the node "Adornable" - meaning it can wrap another node. The
-    wrapped node is stored in the `__wrapped_node__` attribute and is redefined as a single
-    node subworkflow.
+    A base node that enables the node to be used as an adornment - meaning it can wrap another node. The
+    wrapped node is stored in the `__wrapped_node__` attribute and is redefined as a single-node subworkflow.
     """
 
     __wrapped_node__: Optional[Type["BaseNode"]] = None

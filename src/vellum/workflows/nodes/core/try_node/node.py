@@ -3,7 +3,7 @@ from typing import Callable, Generic, Iterator, Optional, Set, Type
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.bases.base_adornable_node import BaseAdornableNode
+from vellum.workflows.nodes.bases.base_adornable_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.references.output import OutputReference
@@ -12,7 +12,7 @@ from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
-class TryNode(BaseAdornableNode[StateType], Generic[StateType]):
+class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     """
     Used to execute a Subworkflow and handle errors.
 
