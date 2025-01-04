@@ -1,6 +1,7 @@
 from uuid import UUID
 from typing import Optional
 
+from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -135,3 +136,15 @@ def test_base_node__default_id():
 
     # THEN it should equal the hash of `test_base_node__default_id.<locals>.MyNode`
     assert my_id == UUID("8e71bea7-ce68-492f-9abe-477c788e6273")
+
+
+def test_base_node__node_resolution__descriptor_in_fern_pydantic():
+    class State(BaseState):
+        foo: str
+
+    class SomeNode(BaseNode):
+        model = StringVellumValueRequest(value=State.foo)
+
+    node = SomeNode(state=State(foo="bar"))
+
+    assert node.model.value == "bar"
