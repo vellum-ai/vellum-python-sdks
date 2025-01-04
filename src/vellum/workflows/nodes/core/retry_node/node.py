@@ -6,6 +6,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
+from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
 
 
@@ -28,9 +29,10 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
         last_exception = Exception("max_attempts must be greater than 0")
         for index in range(self.max_attempts):
             attempt_number = index + 1
+            context = WorkflowContext(vellum_client=self._context.vellum_client)
             subworkflow = self.subworkflow(
                 parent_state=self.state,
-                context=self._context,
+                context=context,
             )
             terminal_event = subworkflow.run(
                 inputs=self.SubworkflowInputs(attempt_number=attempt_number),

@@ -10,6 +10,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType, WorkflowInputsType
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
@@ -36,6 +37,7 @@ class InlineSubworkflowNode(BaseNode[StateType], Generic[StateType, WorkflowInpu
             )
             subworkflow_stream = subworkflow.stream(
                 inputs=self._compile_subworkflow_inputs(),
+                event_filter=all_workflow_event_filter,
             )
 
         outputs: Optional[BaseOutputs] = None

@@ -127,7 +127,10 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
         context = WorkflowContext(vellum_client=self._context.vellum_client)
-        subworkflow = self.subworkflow(parent_state=self.state, context=context)
+        subworkflow = self.subworkflow(
+            parent_state=self.state,
+            context=context,
+        )
         events = subworkflow.stream(
             inputs=self.SubworkflowInputs(index=index, item=item, all_items=self.items),
             event_filter=all_workflow_event_filter,

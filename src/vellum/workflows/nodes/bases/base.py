@@ -214,6 +214,9 @@ class _BaseNodeExecutionMeta(type):
         return self_execution_class.node_class.__name__ == other_execution_class.node_class.__name__
 
 
+NodeRunResponse = Union[BaseOutputs, Iterator[BaseOutput]]
+
+
 class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
     state: StateType
@@ -350,7 +353,7 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
 
         self._inputs = MappingProxyType(all_inputs)
 
-    def run(self) -> Union[BaseOutputs, Iterator[BaseOutput]]:
+    def run(self) -> NodeRunResponse:
         return self.Outputs()
 
     def __repr__(self) -> str:

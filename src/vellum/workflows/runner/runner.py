@@ -44,6 +44,7 @@ from vellum.workflows.events.workflow import (
 )
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.bases.base import NodeRunResponse
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
@@ -181,6 +182,7 @@ class WorkflowRunner(Generic[StateType]):
                 node_definition=node.__class__,
                 parent=parent_context,
             )
+            node_run_response: NodeRunResponse
             if node.Outputs not in self._mocks_by_node_outputs_class:
                 with execution_context(parent_context=updated_parent_context):
                     node_run_response = node.run()
