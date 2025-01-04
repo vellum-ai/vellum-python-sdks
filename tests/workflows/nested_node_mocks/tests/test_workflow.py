@@ -1,4 +1,6 @@
-from tests.workflows.nested_node_mocks.workflow import NestedNodeMockWorkflow, NodeToMock
+from vellum.workflows.nodes.mocks import MockNodeExecution
+
+from tests.workflows.nested_node_mocks.workflow import MapFruitNode, NestedNodeMockWorkflow, NodeToMock
 
 
 def test_run_workflow__happy_path():
@@ -8,9 +10,18 @@ def test_run_workflow__happy_path():
     # WHEN the workflow is run with nested mocks
     terminal_event = workflow.run(
         node_output_mocks=[
-            NodeToMock.Outputs(result="date"),
-            NodeToMock.Outputs(result="eggplant"),
-            NodeToMock.Outputs(result="fig"),
+            MockNodeExecution(
+                when_condition=MapFruitNode.SubworkflowInputs.index.equals(0),
+                then_outputs=NodeToMock.Outputs(result="date"),
+            ),
+            MockNodeExecution(
+                when_condition=MapFruitNode.SubworkflowInputs.index.equals(1),
+                then_outputs=NodeToMock.Outputs(result="eggplant"),
+            ),
+            MockNodeExecution(
+                when_condition=MapFruitNode.SubworkflowInputs.index.equals(2),
+                then_outputs=NodeToMock.Outputs(result="fig"),
+            ),
         ]
     )
 
