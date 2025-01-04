@@ -9,21 +9,21 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import ParentContext
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
+from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs import BaseOutputs
-from vellum.workflows.state.base import BaseState
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.generics import NodeType, StateType
+from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
-    from vellum.workflows import BaseWorkflow
     from vellum.workflows.events.workflow import WorkflowEvent
 
 MapNodeItemType = TypeVar("MapNodeItemType")
 
 
-class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
+class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType]):
     """
     Used to map over a list of items and execute a Subworkflow on each iteration.
 
@@ -33,11 +33,10 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
     """
 
     items: List[MapNodeItemType]
-    subworkflow: Type["BaseWorkflow"]
     concurrency: Optional[int] = None
 
-    class Outputs(BaseOutputs):
-        mapped_items: list
+    class Outputs(BaseAdornmentNode.Outputs):
+        pass
 
     class SubworkflowInputs(BaseInputs):
         # TODO: Both type: ignore's below are believed to be incorrect and both have the following error:
@@ -98,7 +97,12 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
                     )
         except Empty:
             pass
-        return self.Outputs(**mapped_items)
+
+        outputs = self.Outputs()
+        for output_name, output_list in mapped_items.items():
+            setattr(outputs, output_name, output_list)
+
+        return outputs
 
     def _context_run_subworkflow(
         self, *, item: MapNodeItemType, index: int, parent_context: Optional[ParentContext] = None
@@ -134,37 +138,12 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
     def wrap(
         cls, items: Union[List[MapNodeItemType], BaseDescriptor[List[MapNodeItemType]]]
     ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]:
-        _items = items
+        return create_adornment(cls, attributes={"items": items})
 
-        def decorator(inner_cls: Type[NodeType]) -> Type["MapNode[StateType, MapNodeItemType]"]:
-            # Investigate how to use dependency injection to avoid circular imports
-            # https://app.shortcut.com/vellum/story/4116
-            from vellum.workflows import BaseWorkflow
+    @classmethod
+    def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
+        parameter_type = reference.types[0]
+        annotation = List[parameter_type]  # type: ignore[valid-type]
 
-            class Subworkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
-                graph = inner_cls
-
-                # mypy is wrong here, this works and is defined
-                class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
-                    pass
-
-            class WrappedNodeOutputs(BaseOutputs):
-                pass
-
-            WrappedNodeOutputs.__annotations__ = {
-                # TODO: We'll need to infer the type T of Subworkflow.Outputs[name] so we could do List[T] here
-                # https://app.shortcut.com/vellum/story/4119
-                descriptor.name: List
-                for descriptor in inner_cls.Outputs
-            }
-
-            class WrappedNode(MapNode[StateType, MapNodeItemType]):
-                items = _items
-                subworkflow = Subworkflow
-
-                class Outputs(WrappedNodeOutputs):
-                    pass
-
-            return WrappedNode
-
-        return decorator
+        previous_annotations = {prev: annotation for prev in outputs_class.__annotations__ if not prev.startswith("_")}
+        outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}

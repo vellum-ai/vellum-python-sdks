@@ -34,9 +34,6 @@ class MapFruitsNode(MapNode):
     items = Inputs.fruits
     subworkflow = IterationSubworkflow
 
-    class Outputs(BaseOutputs):
-        count: List[int]
-
 
 class SimpleMapExample(BaseWorkflow[Inputs, BaseState]):
     graph = MapFruitsNode

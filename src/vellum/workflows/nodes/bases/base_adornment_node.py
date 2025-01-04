@@ -69,9 +69,7 @@ class BaseAdornmentNode(
     subworkflow: Type["BaseWorkflow"]
 
     @classmethod
-    def __annotate_outputs_class__(
-        cls, subworkflow_outputs_class: Type[BaseOutputs], reference: OutputReference
-    ) -> None:
+    def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
         # Subclasses of BaseAdornableNode can override this method to provider their own
         # approach to annotating the outputs class based on the `subworkflow.Outputs`
-        setattr(subworkflow_outputs_class, reference.name, reference)
+        setattr(outputs_class, reference.name, reference)
