@@ -10,6 +10,7 @@ from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
 class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
@@ -39,6 +40,8 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
             )
             terminal_event = subworkflow.run(
                 inputs=self.SubworkflowInputs(attempt_number=attempt_number),
+                node_output_mocks=self._context._node_output_mocks_map.to_array(),
+                event_filter=all_workflow_event_filter,
             )
             if terminal_event.name == "workflow.execution.fulfilled":
                 node_outputs = self.Outputs()

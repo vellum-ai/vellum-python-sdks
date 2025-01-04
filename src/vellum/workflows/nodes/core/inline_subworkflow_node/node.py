@@ -39,6 +39,7 @@ class InlineSubworkflowNode(BaseNode[StateType], Generic[StateType, WorkflowInpu
             subworkflow_stream = subworkflow.stream(
                 inputs=self._compile_subworkflow_inputs(),
                 event_filter=all_workflow_event_filter,
+                node_output_mocks=self._context._node_output_mocks_map.to_array(),
             )
 
         outputs: Optional[BaseOutputs] = None

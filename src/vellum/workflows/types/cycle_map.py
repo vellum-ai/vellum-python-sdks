@@ -32,3 +32,6 @@ class CycleMap(Generic[_K, _T]):
 
     def __contains__(self, key: _K) -> bool:
         return key in self._items
+
+    def to_array(self) -> List[_T]:
+        return [item for items in self._items.values() for item in items]
