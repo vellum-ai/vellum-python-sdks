@@ -53,6 +53,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             mapped_items[output_descripter.name] = [None] * len(self.items)
 
         self._event_queue: Queue[Tuple[int, WorkflowEvent]] = Queue()
+        self._concurrency_queue: Queue[Thread] = Queue()
         fulfilled_iterations: List[bool] = []
         for index, item in enumerate(self.items):
             fulfilled_iterations.append(False)
@@ -65,11 +66,21 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                     "parent_context": parent_context,
                 },
             )
-            thread.start()
+            if self.concurrency is None:
+                thread.start()
+            else:
+                self._concurrency_queue.put(thread)
+
+        if self.concurrency is not None:
+            concurrency_count = 0
+            while concurrency_count < self.concurrency:
+                is_empty = self._start_thread()
+                if is_empty:
+                    break
+
+                concurrency_count += 1
 
         try:
-            # We should consolidate this logic with the logic workflow runner uses
-            # https://app.shortcut.com/vellum/story/4736
             while map_node_event := self._event_queue.get():
                 index = map_node_event[0]
                 terminal_event = map_node_event[1]
@@ -85,6 +96,9 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                     fulfilled_iterations[index] = True
                     if all(fulfilled_iterations):
                         break
+
+                    if self.concurrency is not None:
+                        self._start_thread()
                 elif terminal_event.name == "workflow.execution.paused":
                     raise NodeException(
                         code=WorkflowErrorCode.INVALID_OUTPUTS,
@@ -121,6 +135,14 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
         for event in events:
             self._event_queue.put((index, event))
+
+    def _start_thread(self) -> bool:
+        if self._concurrency_queue.empty():
+            return False
+
+        thread = self._concurrency_queue.get()
+        thread.start()
+        return True
 
     @overload
     @classmethod

@@ -9,16 +9,8 @@ from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state import BaseState
 
 
-class Inputs(BaseInputs):
-    fruits: List[str]
-
-
-class State(BaseState):
-    new_fruits: List[str] = []
-
-
-class Iteration(BaseNode[State]):
-    item = MapNode.SubworkflowInputs.item
+class Iteration(BaseNode[BaseState]):
+    item: str = MapNode.SubworkflowInputs.item
     index = MapNode.SubworkflowInputs.index
 
     class Outputs(BaseOutputs):
@@ -42,6 +34,14 @@ class IterationSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
 
     class Outputs(BaseOutputs):
         new_fruit = Iteration.Outputs.new_fruit
+
+
+class Inputs(BaseInputs):
+    fruits: List[str]
+
+
+class State(BaseState):
+    new_fruits: List[str] = []
 
 
 class MapFruitsNode(MapNode):
