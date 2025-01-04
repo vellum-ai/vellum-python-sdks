@@ -144,7 +144,6 @@ class WorkflowRunner(Generic[StateType]):
 
         self._dependencies: Dict[Type[BaseNode], Set[Type[BaseNode]]] = defaultdict(set)
         self._state_forks: Set[StateType] = {self._initial_state}
-        self._mocks_by_node_outputs_class = CycleMap(items=node_output_mocks or [], key_by=lambda mock: mock.__class__)
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
@@ -156,6 +155,9 @@ class WorkflowRunner(Generic[StateType]):
             lambda s: self._snapshot_state(s),
         )
         self.workflow.context._register_event_queue(self._workflow_event_inner_queue)
+        self.workflow.context._node_output_mocks_map = CycleMap(
+            items=node_output_mocks or [], key_by=lambda mock: mock.__class__
+        )
 
     def _snapshot_state(self, state: StateType) -> StateType:
         self._workflow_event_inner_queue.put(
@@ -201,11 +203,11 @@ class WorkflowRunner(Generic[StateType]):
                 parent=parent_context,
             )
             node_run_response: NodeRunResponse
-            if node.Outputs not in self._mocks_by_node_outputs_class:
+            if node.Outputs not in self.workflow.context._node_output_mocks_map:
                 with execution_context(parent_context=updated_parent_context):
                     node_run_response = node.run()
             else:
-                node_run_response = self._mocks_by_node_outputs_class[node.Outputs]
+                node_run_response = self.workflow.context._node_output_mocks_map[node.Outputs]
             ports = node.Ports()
             if not isinstance(node_run_response, (BaseOutputs, Iterator)):
                 raise NodeException(
