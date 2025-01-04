@@ -49,6 +49,7 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.cycle_map import CycleMap
 from vellum.workflows.types.generics import OutputsType, StateType, WorkflowInputsType
 
 if TYPE_CHECKING:
@@ -124,9 +125,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._dependencies: Dict[Type[BaseNode], Set[Type[BaseNode]]] = defaultdict(set)
         self._state_forks: Set[StateType] = {self._initial_state}
-        self._mocks_by_node_outputs_class = (
-            {mock.__class__: mock for mock in node_output_mocks} if node_output_mocks else {}
-        )
+        self._mocks_by_node_outputs_class = CycleMap(items=node_output_mocks or [], key_by=lambda mock: mock.__class__)
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
