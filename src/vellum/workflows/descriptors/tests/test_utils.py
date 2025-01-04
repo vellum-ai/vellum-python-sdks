@@ -2,7 +2,7 @@ import pytest
 
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.references.constant import ConstantReference
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.state.base import BaseState
 
 
@@ -74,7 +74,7 @@ class DummyNode(BaseNode[FixtureState]):
             True,
         ),
         (FixtureState.zeta["foo"], "bar"),
-        (ConstantReference(1), 1),
+        (ConstantValueReference(1), 1),
     ],
     ids=[
         "or",
@@ -118,7 +118,7 @@ class DummyNode(BaseNode[FixtureState]):
         "is_not_blank",
         "or_and",
         "accessor",
-        "constant_reference",
+        "constants",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):

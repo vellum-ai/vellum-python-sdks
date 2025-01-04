@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 _T = TypeVar("_T")
 
 
-class ConstantReference(BaseDescriptor[_T], Generic[_T]):
+class ConstantValueReference(BaseDescriptor[_T], Generic[_T]):
     def __init__(
         self,
         value: _T,
