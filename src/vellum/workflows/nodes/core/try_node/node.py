@@ -3,7 +3,7 @@ from typing import Callable, Generic, Iterator, Optional, Set, Type
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.bases.base_adornable_node import BaseAdornmentNode
+from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.references.output import OutputReference
@@ -87,10 +87,8 @@ Message: {event.error.message}""",
         return create_adornment(cls, attributes={"on_error_code": on_error_code})
 
     @classmethod
-    def __annotate_outputs_class__(
-        cls, subworkflow_outputs_class: Type[BaseOutputs], reference: OutputReference
-    ) -> None:
+    def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
         if reference.name == "error":
             raise ValueError("`error` is a reserved name for TryNode.Outputs")
 
-        setattr(subworkflow_outputs_class, reference.name, reference)
+        setattr(outputs_class, reference.name, reference)
