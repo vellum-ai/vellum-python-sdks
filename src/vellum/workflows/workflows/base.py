@@ -61,6 +61,7 @@ from vellum.workflows.events.workflow import (
 from vellum.workflows.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.runner import WorkflowRunner
@@ -187,7 +188,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
-        node_output_mocks: Optional[List[BaseOutputs]] = None,
+        node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
     ) -> TerminalWorkflowEvent:
         """
@@ -214,8 +215,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
 
-        node_output_mocks: Optional[List[Outputs]] = None
-            A list of Outputs to mock for Nodes during Workflow Execution.
+        node_output_mocks: Optional[MockNodeExecutionArg] = None
+            A list of Outputs to mock for Nodes during Workflow Execution. Each mock can include a `when_condition`
+            that must be met for the mock to be used.
 
         max_concurrency: Optional[int] = None
             The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run
@@ -295,7 +297,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
-        node_output_mocks: Optional[List[BaseOutputs]] = None,
+        node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
     ) -> WorkflowEventStream:
         """
@@ -323,8 +325,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
 
-        node_output_mocks: Optional[List[Outputs]] = None
-            A list of Outputs to mock for Nodes during Workflow Execution.
+        node_output_mocks: Optional[MockNodeExecutionArg] = None
+            A list of Outputs to mock for Nodes during Workflow Execution. Each mock can include a `when_condition`
+            that must be met for the mock to be used.
 
         max_concurrency: Optional[int] = None
             The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run

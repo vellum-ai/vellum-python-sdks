@@ -11,7 +11,6 @@ from typing import (
     Generic,
     Iterable,
     Iterator,
-    List,
     Optional,
     Sequence,
     Set,
@@ -59,12 +58,12 @@ from vellum.workflows.events.workflow import (
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import NodeRunResponse
+from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.types.cycle_map import CycleMap
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 if TYPE_CHECKING:
@@ -88,7 +87,7 @@ class WorkflowRunner(Generic[StateType]):
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
-        node_output_mocks: Optional[List[BaseOutputs]] = None,
+        node_output_mocks: Optional[MockNodeExecutionArg] = None,
         parent_context: Optional[ParentContext] = None,
         max_concurrency: Optional[int] = None,
     ):
@@ -155,9 +154,7 @@ class WorkflowRunner(Generic[StateType]):
             lambda s: self._snapshot_state(s),
         )
         self.workflow.context._register_event_queue(self._workflow_event_inner_queue)
-        self.workflow.context._node_output_mocks_map = CycleMap(
-            items=node_output_mocks or [], key_by=lambda mock: mock.__class__
-        )
+        self.workflow.context._register_node_output_mocks(node_output_mocks or [])
 
     def _snapshot_state(self, state: StateType) -> StateType:
         self._workflow_event_inner_queue.put(
@@ -203,11 +200,18 @@ class WorkflowRunner(Generic[StateType]):
                 parent=parent_context,
             )
             node_run_response: NodeRunResponse
-            if node.Outputs not in self.workflow.context._node_output_mocks_map:
+            was_mocked = False
+            mock_candidates = self.workflow.context.node_output_mocks_map.get(node.Outputs) or []
+            for mock_candidate in mock_candidates:
+                if mock_candidate.when_condition.resolve(node.state):
+                    node_run_response = mock_candidate.then_outputs
+                    was_mocked = True
+                    break
+
+            if not was_mocked:
                 with execution_context(parent_context=updated_parent_context):
                     node_run_response = node.run()
-            else:
-                node_run_response = self.workflow.context._node_output_mocks_map[node.Outputs]
+
             ports = node.Ports()
             if not isinstance(node_run_response, (BaseOutputs, Iterator)):
                 raise NodeException(

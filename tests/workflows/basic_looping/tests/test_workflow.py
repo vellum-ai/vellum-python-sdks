@@ -1,3 +1,5 @@
+from vellum.workflows.nodes.mocks import MockNodeExecution
+
 from tests.workflows.basic_looping.workflow import BasicLoopingWorkflow, StartNode
 
 
@@ -21,8 +23,14 @@ def test_workflow__happy_path_with_mocks():
     # WHEN we run the workflow
     terminal_event = workflow.run(
         node_output_mocks=[
-            StartNode.Outputs(final_value=5),
-            StartNode.Outputs(final_value=15),
+            MockNodeExecution(
+                when_condition=StartNode.Execution.count.equals(0),
+                then_outputs=StartNode.Outputs(final_value=5),
+            ),
+            MockNodeExecution(
+                when_condition=StartNode.Execution.count.equals(1),
+                then_outputs=StartNode.Outputs(final_value=15),
+            ),
         ]
     )
 
