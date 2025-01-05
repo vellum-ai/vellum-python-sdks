@@ -1,16 +1,7 @@
-# flake8: noqa: E402
-
-import importlib
-import inspect
-
-from vellum.plugins.utils import load_runtime_plugins
-from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum.workflows.workflows.event_filters import workflow_event_filter
-
-load_runtime_plugins()
-
 from datetime import datetime
 from functools import lru_cache
+import importlib
+import inspect
 from threading import Event as ThreadingEvent
 from uuid import UUID, uuid4
 from typing import (
@@ -79,6 +70,8 @@ from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.store import Store
 from vellum.workflows.types.generics import StateType, WorkflowInputsType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.workflows.event_filters import workflow_event_filter
 
 
 class _BaseWorkflowMeta(type):
