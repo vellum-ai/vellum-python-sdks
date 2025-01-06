@@ -443,7 +443,13 @@ export class GraphAttribute extends AstNode {
     newSetAst: GraphSet,
     targetNode: BaseNodeContext<WorkflowDataNode>
   ): GraphMutableAst | undefined {
-    if (this.canBranchBeSplitByTargetNode(targetNode, newSetAst)) {
+    if (
+      this.canBranchBeSplitByTargetNode({
+        targetNode,
+        mutableAst: newSetAst,
+        isRoot: true,
+      })
+    ) {
       const newLhs: GraphSet = {
         type: "set",
         values: [],
@@ -513,32 +519,49 @@ export class GraphAttribute extends AstNode {
    * to `isNodeInBranch`, but for sets requires that the target node is splittable
    * across all members
    */
-  private canBranchBeSplitByTargetNode(
-    targetNode: BaseNodeContext<WorkflowDataNode> | null,
-    mutableAst: GraphMutableAst
-  ): boolean {
+  private canBranchBeSplitByTargetNode({
+    targetNode,
+    mutableAst,
+    isRoot,
+  }: {
+    targetNode: BaseNodeContext<WorkflowDataNode> | null;
+    mutableAst: GraphMutableAst;
+    isRoot: boolean;
+  }): boolean {
     if (targetNode == null) {
       return false;
     }
     if (mutableAst.type === "set") {
       return mutableAst.values.every((value) =>
-        this.canBranchBeSplitByTargetNode(targetNode, value)
+        this.canBranchBeSplitByTargetNode({
+          targetNode,
+          mutableAst: value,
+          isRoot: true,
+        })
       );
     }
     if (
       mutableAst.type === "node_reference" &&
       mutableAst.reference === targetNode
     ) {
-      return true;
+      return !isRoot;
     }
     if (mutableAst.type === "right_shift") {
       return (
-        this.canBranchBeSplitByTargetNode(targetNode, mutableAst.lhs) ||
-        this.canBranchBeSplitByTargetNode(targetNode, mutableAst.rhs)
+        this.canBranchBeSplitByTargetNode({
+          targetNode,
+          mutableAst: mutableAst.lhs,
+          isRoot: false,
+        }) ||
+        this.canBranchBeSplitByTargetNode({
+          targetNode,
+          mutableAst: mutableAst.rhs,
+          isRoot: false,
+        })
       );
     }
     if (mutableAst.type === "port_reference") {
-      return mutableAst.reference.nodeContext === targetNode;
+      return mutableAst.reference.nodeContext === targetNode && !isRoot;
     }
     return false;
   }
