@@ -49,6 +49,9 @@ def workflows():
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
 @click.option("--release-tag", type=list, help="Release Tag for the Deployment", multiple=True)
+@click.option(
+    "--check", is_flag=True, help="Check the Workflow for errors and expected changes, without updating Vellum."
+)
 def workflows_push(
     module: Optional[str],
     deploy: Optional[bool],
@@ -56,6 +59,7 @@ def workflows_push(
     deployment_name: Optional[str],
     deployment_description: Optional[str],
     release_tag: Optional[List[str]],
+    check: Optional[bool],
 ) -> None:
     """
     Push Workflows to Vellum. If a module is provided, only the Workflow for that module will be pushed.
@@ -79,6 +83,9 @@ def workflows_push(
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
 @click.option("--release-tag", type=list, help="Release Tag for the Deployment", multiple=True)
+@click.option(
+    "--check", is_flag=True, help="Check the Workflow for errors and expected changes, without updating Vellum."
+)
 def push_module(
     ctx: click.Context,
     deploy: Optional[bool],
@@ -86,6 +93,7 @@ def push_module(
     deployment_name: Optional[str],
     deployment_description: Optional[str],
     release_tag: Optional[List[str]],
+    check: Optional[bool],
 ) -> None:
     """Push a specific module to Vellum"""
 
@@ -97,6 +105,7 @@ def push_module(
             deployment_name=deployment_name,
             deployment_description=deployment_description,
             release_tags=release_tag,
+            check=check,
         )
 
 

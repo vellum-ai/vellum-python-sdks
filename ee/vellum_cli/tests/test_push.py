@@ -182,13 +182,17 @@ def test_push__check_option_returns_report(mock_module, vellum_client):
     base_dir = os.path.join(temp_dir, *module.split("."))
     os.makedirs(base_dir, exist_ok=True)
     workflow_py_file_content = """\
+from typing import Dict
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import BaseNode
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 
 class NotSupportedNode(BaseNode):
     pass
 
 class NotSupportedNodeDisplay(BaseNodeDisplay[NotSupportedNode]):
-    pass
+    def serialize(self, display_context, **kwargs) -> Dict:
+        raise NotImplementedError(f"Serialization is not supported.")
 
 class ExampleWorkflow(BaseWorkflow):
     graph = NotSupportedNode
@@ -202,7 +206,7 @@ class ExampleWorkflow(BaseWorkflow):
     )
 
     # WHEN calling `vellum push`
-    runner = CliRunner()
+    runner = CliRunner(mix_stderr=True)
     result = runner.invoke(cli_main, ["push", module, "--check"])
 
     # THEN it should succeed
@@ -211,4 +215,25 @@ class ExampleWorkflow(BaseWorkflow):
     # AND we should have called the push API with the check option
     vellum_client.workflows.push.assert_called_once()
     call_args = vellum_client.workflows.push.call_args.kwargs
-    assert call_args["check"] is True
+    assert call_args["request_options"]["additional_body_parameters"]["check"] is True
+
+    # AND the report should be in the output
+    assert (
+        result.output
+        == """\x1b[38;20mLoading workflow from examples.mock\x1b[0m
+\x1b[38;20mRan check on Mock\x1b[0m
+"""
+    )
+
+
+# TODO: Implement in Vellum push `check` and output results
+# https://app.shortcut.com/vellum/story/5416
+#         == """# Workflow Push Report
+
+# ## Errors
+# - `NotSupportedNode`
+#     - Serialization is not supported.
+
+# ## Diffs
+# No diffs found.
+# """
