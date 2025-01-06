@@ -285,6 +285,21 @@ class TestWorkflow(BaseWorkflow):
 "
 `;
 
+exports[`Workflow > write > graph > should be correct for two branches from the same node 1`] = `
+"from vellum.workflows import BaseWorkflow
+from .nodes.templating_node import TemplatingNode
+from .nodes.merge_node import MergeNode
+from .nodes.templating_node_2 import TemplatingNode2
+
+
+class TestWorkflow(BaseWorkflow):
+    graph = TemplatingNode >> {
+        MergeNode,
+        TemplatingNode2 >> MergeNode,
+    }
+"
+`;
+
 exports[`Workflow > write > graph > should be correct for two branches merging from sets 1`] = `
 "from vellum.workflows import BaseWorkflow
 from .nodes.conditional_node import ConditionalNode
