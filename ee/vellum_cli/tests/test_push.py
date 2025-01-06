@@ -171,3 +171,44 @@ class ExampleWorkflow(BaseWorkflow):
 
     extracted_files = _extract_tar_gz(call_args["artifact"].read())
     assert extracted_files["workflow.py"] == workflow_py_file_content
+
+
+def test_push__check_option_returns_report(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    base_dir = os.path.join(temp_dir, *module.split("."))
+    os.makedirs(base_dir, exist_ok=True)
+    workflow_py_file_content = """\
+from vellum.workflows import BaseWorkflow
+
+class NotSupportedNode(BaseNode):
+    pass
+
+class NotSupportedNodeDisplay(BaseNodeDisplay[NotSupportedNode]):
+    pass
+
+class ExampleWorkflow(BaseWorkflow):
+    graph = NotSupportedNode
+"""
+    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
+        f.write(workflow_py_file_content)
+
+    # AND the push API call returns successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+    )
+
+    # WHEN calling `vellum push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module, "--check"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the check option
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert call_args["check"] is True
