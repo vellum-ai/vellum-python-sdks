@@ -54,7 +54,7 @@ more below](#workflows-sdk).
 
 ## Client SDK
 
-The Vellum Client SDK, found within `src/client` is a low-level client used to interact directly with the Vellum API.
+The Vellum Client SDK, found within `src/vellum/client` is a low-level client used to interact directly with the Vellum API.
 Learn more and get started by visiting the [Vellum Client SDK README](/src/vellum/client/README.md).
 
 ## Workflows SDK
