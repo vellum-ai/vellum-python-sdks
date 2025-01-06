@@ -235,5 +235,11 @@ class ExampleWorkflow(BaseWorkflow):
 #     - Serialization is not supported.
 
 # ## Diffs
-# No diffs found.
+# + `AddedNode`
+# ~ `ModifiedNode`
+#     + `ModifiedNode.added_attribute`
+#     ~ `ModifiedNode.modified_attribute`
+#         ~ "Hello, World" -> "Hello, World!"
+#     - `ModifiedNode.removed_attribute`
+# - `RemovedNode`
 # """
