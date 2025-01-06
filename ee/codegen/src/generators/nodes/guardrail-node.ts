@@ -102,37 +102,37 @@ export class GuardrailNode extends BaseSingleFileNode<
     return python.field({
       name: "output_display",
       initializer: python.TypeInstantiation.dict(
-        this.nodeContext.metricDefinitionsHistoryItem.outputVariables.map(
-          (output) => {
-            const name = this.nodeContext.getNodeOutputNameById(output.id);
+        (
+          this.nodeContext.metricDefinitionsHistoryItem?.outputVariables ?? []
+        ).map((output) => {
+          const name = this.nodeContext.getNodeOutputNameById(output.id);
 
-            return {
-              key: python.reference({
-                name: this.nodeContext.nodeClassName,
-                modulePath: this.nodeContext.nodeModulePath,
-                attribute: [OUTPUTS_CLASS_NAME, name],
+          return {
+            key: python.reference({
+              name: this.nodeContext.nodeClassName,
+              modulePath: this.nodeContext.nodeModulePath,
+              attribute: [OUTPUTS_CLASS_NAME, name],
+            }),
+            value: python.instantiateClass({
+              classReference: python.reference({
+                name: "NodeOutputDisplay",
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_TYPES_MODULE_PATH,
               }),
-              value: python.instantiateClass({
-                classReference: python.reference({
-                  name: "NodeOutputDisplay",
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .NODE_DISPLAY_TYPES_MODULE_PATH,
+              arguments_: [
+                python.methodArgument({
+                  name: "id",
+                  value: python.TypeInstantiation.uuid(output.id),
                 }),
-                arguments_: [
-                  python.methodArgument({
-                    name: "id",
-                    value: python.TypeInstantiation.uuid(output.id),
-                  }),
-                  python.methodArgument({
-                    name: "name",
-                    value: python.TypeInstantiation.str(output.key),
-                  }),
-                ],
-              }),
-            };
-          }
-        )
+                python.methodArgument({
+                  name: "name",
+                  value: python.TypeInstantiation.str(output.key),
+                }),
+              ],
+            }),
+          };
+        })
       ),
     });
   }

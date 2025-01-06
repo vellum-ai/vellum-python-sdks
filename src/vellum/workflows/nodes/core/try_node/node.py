@@ -1,61 +1,18 @@
-import sys
-from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar
+from typing import Callable, Generic, Iterator, Optional, Set, Type
 
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
+from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
+from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
-if TYPE_CHECKING:
-    from vellum.workflows import BaseWorkflow
 
-Subworkflow = Type["BaseWorkflow"]
-_T = TypeVar("_T", bound=BaseOutputs)
-
-
-class _TryNodeMeta(BaseNodeMeta):
-    def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
-        node_class = super().__new__(cls, name, bases, dct)
-
-        subworkflow_attribute = dct.get("subworkflow")
-        if not subworkflow_attribute:
-            return node_class
-
-        subworkflow_outputs = getattr(subworkflow_attribute, "Outputs")
-        if not issubclass(subworkflow_outputs, BaseOutputs):
-            raise ValueError("subworkflow.Outputs must be a subclass of BaseOutputs")
-
-        outputs_class = dct.get("Outputs")
-        if not outputs_class:
-            raise ValueError("Outputs class not found in base classes")
-
-        if not issubclass(outputs_class, BaseNode.Outputs):
-            raise ValueError("Outputs class must be a subclass of BaseNode.Outputs")
-
-        for descriptor in subworkflow_outputs:
-            if descriptor.name == "error":
-                raise ValueError("`error` is a reserved name for TryNode.Outputs")
-
-            setattr(outputs_class, descriptor.name, descriptor)
-
-        return node_class
-
-    def __getattribute__(cls, name: str) -> Any:
-        try:
-            return super().__getattribute__(name)
-        except AttributeError:
-            if name != "__wrapped_node__" and issubclass(cls, TryNode):
-                return getattr(cls.__wrapped_node__, name)
-            raise
-
-
-class TryNode(BaseNode[StateType], Generic[StateType], metaclass=_TryNodeMeta):
+class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     """
     Used to execute a Subworkflow and handle errors.
 
@@ -63,9 +20,7 @@ class TryNode(BaseNode[StateType], Generic[StateType], metaclass=_TryNodeMeta):
     subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
-    __wrapped_node__: Optional[Type["BaseNode"]] = None
     on_error_code: Optional[WorkflowErrorCode] = None
-    subworkflow: Type["BaseWorkflow"]
 
     class Outputs(BaseNode.Outputs):
         error: Optional[WorkflowError] = None
@@ -129,38 +84,11 @@ Message: {event.error.message}""",
 
     @classmethod
     def wrap(cls, on_error_code: Optional[WorkflowErrorCode] = None) -> Callable[..., Type["TryNode"]]:
-        _on_error_code = on_error_code
+        return create_adornment(cls, attributes={"on_error_code": on_error_code})
 
-        def decorator(inner_cls: Type[BaseNode]) -> Type["TryNode"]:
-            # Investigate how to use dependency injection to avoid circular imports
-            # https://app.shortcut.com/vellum/story/4116
-            from vellum.workflows import BaseWorkflow
+    @classmethod
+    def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
+        if reference.name == "error":
+            raise ValueError("`error` is a reserved name for TryNode.Outputs")
 
-            inner_cls._is_wrapped_node = True
-
-            class Subworkflow(BaseWorkflow):
-                graph = inner_cls
-
-                # mypy is wrong here, this works and is defined
-                class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
-                    pass
-
-            dynamic_module = f"{inner_cls.__module__}.{inner_cls.__name__}.{ADORNMENT_MODULE_NAME}"
-            # This dynamic module allows calls to `type_hints` to work
-            sys.modules[dynamic_module] = ModuleType(dynamic_module)
-
-            # We use a dynamic wrapped node class to be uniquely tied to this `inner_cls` node during serialization
-            WrappedNode = type(
-                cls.__name__,
-                (TryNode,),
-                {
-                    "__wrapped_node__": inner_cls,
-                    "__module__": dynamic_module,
-                    "on_error_code": _on_error_code,
-                    "subworkflow": Subworkflow,
-                    "Ports": type("Ports", (TryNode.Ports,), {port.name: port.copy() for port in inner_cls.Ports}),
-                },
-            )
-            return WrappedNode
-
-        return decorator
+        setattr(outputs_class, reference.name, reference)

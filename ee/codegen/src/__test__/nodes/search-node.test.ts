@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { VellumError } from "vellum-ai";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { afterEach, beforeEach, vi } from "vitest";
@@ -258,6 +259,40 @@ describe("TextSearchNode", () => {
     it("getNodeDisplayFile", async () => {
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("404 error handling", () => {
+    beforeEach(async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+
+      vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockImplementation(
+        () => {
+          throw new VellumError({ message: "test", statusCode: 404, body: {} });
+        }
+      );
+
+      const nodeData = searchNodeDataFactory();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+      workflowContext.addNodeContext(nodeContext);
+
+      node = new SearchNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile handles 404 error", async () => {
+      node.getNodeFile().write(writer);
+      await writer.toStringFormatted();
+
+      expect(workflowContext.getErrors()[0]?.message).toEqual(
+        'Document Index "d5beca61-aacb-4b22-a70c-776a1e025aa4" not found.'
+      );
     });
   });
 });

@@ -1,4 +1,5 @@
-import { DocumentIndexRead } from "vellum-ai/api";
+import { VellumError } from "vellum-ai";
+import { DocumentIndexRead, MetricDefinitionHistoryItem } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
@@ -21,6 +22,7 @@ import { NoteNodeContext } from "src/context/node-context/note-node";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
+import { EntityNotFoundError } from "src/generators/errors";
 import {
   InlinePromptNode,
   InlinePromptNodeData,
@@ -48,9 +50,21 @@ export async function createNodeContext(
       const rule = inputValue?.rules?.[0];
       if (rule?.type === "CONSTANT_VALUE") {
         if (rule.data.value?.toString()) {
-          documentIndex = await new DocumentIndexesClient({
-            apiKey: args.workflowContext.vellumApiKey,
-          }).retrieve(rule.data.value?.toString());
+          try {
+            documentIndex = await new DocumentIndexesClient({
+              apiKey: args.workflowContext.vellumApiKey,
+            }).retrieve(rule.data.value?.toString());
+          } catch (e) {
+            if (e instanceof VellumError && e.statusCode === 404) {
+              args.workflowContext.addError(
+                new EntityNotFoundError(
+                  `Document Index "${rule.data.value?.toString()}" not found.`
+                )
+              );
+            } else {
+              throw e;
+            }
+          }
         }
       }
 
@@ -109,12 +123,29 @@ export async function createNodeContext(
     }
     case WorkflowNodeType.METRIC: {
       const guardrailNodeData = nodeData;
-      const metricDefinitionsHistoryItem = await new MetricDefinitionsClient({
-        apiKey: args.workflowContext.vellumApiKey,
-      }).metricDefinitionHistoryItemRetrieve(
-        guardrailNodeData.data.releaseTag,
-        guardrailNodeData.data.metricDefinitionId
-      );
+      let metricDefinitionsHistoryItem:
+        | MetricDefinitionHistoryItem
+        | undefined = undefined;
+
+      try {
+        metricDefinitionsHistoryItem = await new MetricDefinitionsClient({
+          apiKey: args.workflowContext.vellumApiKey,
+        }).metricDefinitionHistoryItemRetrieve(
+          guardrailNodeData.data.releaseTag,
+          guardrailNodeData.data.metricDefinitionId
+        );
+      } catch (e) {
+        if (e instanceof VellumError && e.statusCode === 404) {
+          args.workflowContext.addError(
+            new EntityNotFoundError(
+              `Metric Definition "${guardrailNodeData.data.metricDefinitionId} ${guardrailNodeData.data.releaseTag}" not found.`
+            )
+          );
+        } else {
+          throw e;
+        }
+      }
+
       return new GuardrailNodeContext({
         ...args,
         nodeData: guardrailNodeData,

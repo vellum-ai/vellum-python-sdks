@@ -6,13 +6,15 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   conditionalNodeFactory,
   inlinePromptNodeDataInlineVariantFactory,
+  promptDeploymentNodeDataFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
+import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 
-describe("InlinePromptNode with Conditional Node", () => {
+describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
   let node: ConditionalNode;
@@ -73,4 +75,87 @@ describe("InlinePromptNode with Conditional Node", () => {
   it("getNodeDefinition", () => {
     expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
   });
+});
+
+describe("Prompt Deployment Node referenced by Conditional Node", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  const testCases = [
+    {
+      name: "takes output id",
+      id: "fa015382-7e5b-404e-b073-1c5f01832169",
+    },
+    {
+      name: "takes error output id",
+      id: "72cb22fc-e2f5-4df3-9428-40436d58e57a",
+    },
+    {
+      name: "takes array output id",
+      id: "4d257095-e908-4fc3-8159-a6ac0018e1f1",
+    },
+  ];
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "90c6afd3-06cc-430d-aed1-35937c062531",
+          key: "text",
+          type: "STRING",
+        },
+        workflowContext,
+      })
+    );
+  });
+
+  it.each(testCases)("getNodeFile with $name", async ({ id }) => {
+    await setupNode(id);
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it.each(testCases)("getNodeDisplayFile with $name", async ({ id }) => {
+    await setupNode(id);
+    node.getNodeDisplayFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it.each(testCases)("getNodeDefinition with $name", async ({ id }) => {
+    await setupNode(id);
+    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
+  });
+
+  async function setupNode(outputId: string) {
+    const isErrorOutput = outputId === "72cb22fc-e2f5-4df3-9428-40436d58e57a";
+    const promptDeploymentNode = promptDeploymentNodeDataFactory({
+      errorOutputId: isErrorOutput ? outputId : undefined,
+    });
+
+    const promptDeploymentNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: promptDeploymentNode,
+    })) as PromptDeploymentNodeContext;
+    workflowContext.addNodeContext(promptDeploymentNodeContext);
+
+    const conditionalNode = conditionalNodeFactory({
+      inputReferenceId: outputId,
+      inputReferenceNodeId: promptDeploymentNode.id,
+    });
+
+    const conditionalNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: conditionalNode,
+    })) as ConditionalNodeContext;
+    workflowContext.addNodeContext(conditionalNodeContext);
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext: conditionalNodeContext,
+    });
+  }
 });

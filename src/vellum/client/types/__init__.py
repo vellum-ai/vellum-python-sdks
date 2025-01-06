@@ -127,7 +127,6 @@ from .folder_entity_test_suite_data import FolderEntityTestSuiteData
 from .folder_entity_workflow_sandbox import FolderEntityWorkflowSandbox
 from .folder_entity_workflow_sandbox_data import FolderEntityWorkflowSandboxData
 from .fulfilled_ad_hoc_execute_prompt_event import FulfilledAdHocExecutePromptEvent
-from .fulfilled_enum import FulfilledEnum
 from .fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from .fulfilled_execute_prompt_response import FulfilledExecutePromptResponse
 from .fulfilled_execute_workflow_workflow_result_event import FulfilledExecuteWorkflowWorkflowResultEvent
@@ -642,7 +641,6 @@ __all__ = [
     "FolderEntityWorkflowSandbox",
     "FolderEntityWorkflowSandboxData",
     "FulfilledAdHocExecutePromptEvent",
-    "FulfilledEnum",
     "FulfilledExecutePromptEvent",
     "FulfilledExecutePromptResponse",
     "FulfilledExecuteWorkflowWorkflowResultEvent",

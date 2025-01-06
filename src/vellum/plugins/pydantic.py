@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 from pydantic.plugin import (
@@ -10,12 +11,20 @@ from pydantic.plugin import (
 )
 from pydantic_core import CoreSchema
 
-from vellum.workflows.descriptors.base import BaseDescriptor
+
+@lru_cache(maxsize=1)
+def import_base_descriptor():
+    """
+    We have to avoid importing from vellum.* in this file because it will cause a circular import.
+    """
+    from vellum.workflows.descriptors.base import BaseDescriptor
+
+    return BaseDescriptor
 
 
 # https://docs.pydantic.dev/2.8/concepts/plugins/#build-a-plugin
 class OnValidatePython(ValidatePythonHandlerProtocol):
-    tracked_descriptors: Dict[str, BaseDescriptor] = {}
+    tracked_descriptors: Dict[str, Any] = {}
 
     def on_enter(
         self,
@@ -31,6 +40,7 @@ class OnValidatePython(ValidatePythonHandlerProtocol):
             return
 
         self.tracked_descriptors = {}
+        BaseDescriptor = import_base_descriptor()
 
         for key, value in input.items():
             if isinstance(value, BaseDescriptor):

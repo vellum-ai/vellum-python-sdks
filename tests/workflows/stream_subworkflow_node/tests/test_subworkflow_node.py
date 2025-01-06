@@ -2,6 +2,7 @@ from vellum.workflows.events.types import VellumCodeResourceDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.stream_subworkflow_node.workflow import (
+    InnerNode,
     InnerWorkflow,
     Inputs,
     StreamingInlineSubworkflowExample,
@@ -53,7 +54,15 @@ def test_workflow_stream__happy_path():
         StreamingInlineSubworkflowExample
     )
     assert node_initiated_events[0].parent.parent is None
-    assert len(node_initiated_events) == 1
+
+    assert node_initiated_events[1].name == "node.execution.initiated"
+    assert node_initiated_events[1].node_definition == InnerNode
+    assert node_initiated_events[1].parent is not None
+    assert node_initiated_events[1].parent.type == "WORKFLOW"
+    assert node_initiated_events[1].parent.workflow_definition == VellumCodeResourceDefinition.encode(InnerWorkflow)
+    assert node_initiated_events[1].parent.parent is not None
+    assert node_initiated_events[1].parent.parent.parent == node_initiated_events[0].parent
+    assert len(node_initiated_events) == 2
 
     # inner node streaming events
     inner_node_streaming_events = [

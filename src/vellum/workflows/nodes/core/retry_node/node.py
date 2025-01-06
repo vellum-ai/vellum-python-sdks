@@ -1,27 +1,16 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Optional, Type
+from typing import Callable, Generic, Optional, Type
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.state.base import BaseState
+from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
+from vellum.workflows.nodes.utils import create_adornment
+from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
 
-if TYPE_CHECKING:
-    from vellum.workflows import BaseWorkflow
 
-
-class _RetryNodeMeta(BaseNodeMeta):
-    @property
-    def _localns(cls) -> Dict[str, Any]:
-        return {
-            **super()._localns,
-            "SubworkflowInputs": getattr(cls, "SubworkflowInputs"),
-        }
-
-
-class RetryNode(BaseNode[StateType], Generic[StateType], metaclass=_RetryNodeMeta):
+class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     """
     Used to retry a Subworkflow a specified number of times.
 
@@ -32,7 +21,6 @@ class RetryNode(BaseNode[StateType], Generic[StateType], metaclass=_RetryNodeMet
 
     max_attempts: int
     retry_on_error_code: Optional[WorkflowErrorCode] = None
-    subworkflow: Type["BaseWorkflow[SubworkflowInputs, BaseState]"]
 
     class SubworkflowInputs(BaseInputs):
         attempt_number: int
@@ -41,9 +29,10 @@ class RetryNode(BaseNode[StateType], Generic[StateType], metaclass=_RetryNodeMet
         last_exception = Exception("max_attempts must be greater than 0")
         for index in range(self.max_attempts):
             attempt_number = index + 1
+            context = WorkflowContext(vellum_client=self._context.vellum_client)
             subworkflow = self.subworkflow(
                 parent_state=self.state,
-                context=self._context,
+                context=context,
             )
             terminal_event = subworkflow.run(
                 inputs=self.SubworkflowInputs(attempt_number=attempt_number),
@@ -78,30 +67,6 @@ Message: {terminal_event.error.message}""",
     def wrap(
         cls, max_attempts: int, retry_on_error_code: Optional[WorkflowErrorCode] = None
     ) -> Callable[..., Type["RetryNode"]]:
-        _max_attempts = max_attempts
-        _retry_on_error_code = retry_on_error_code
-
-        def decorator(inner_cls: Type[BaseNode]) -> Type["RetryNode"]:
-            # Investigate how to use dependency injection to avoid circular imports
-            # https://app.shortcut.com/vellum/story/4116
-            from vellum.workflows import BaseWorkflow
-
-            class Subworkflow(BaseWorkflow[RetryNode.SubworkflowInputs, BaseState]):
-                graph = inner_cls
-
-                # mypy is wrong here, this works and is defined
-                class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
-                    pass
-
-            class WrappedNode(RetryNode[StateType]):
-                max_attempts = _max_attempts
-                retry_on_error_code = _retry_on_error_code
-
-                subworkflow = Subworkflow
-
-                class Outputs(Subworkflow.Outputs):
-                    pass
-
-            return WrappedNode
-
-        return decorator
+        return create_adornment(
+            cls, attributes={"max_attempts": max_attempts, "retry_on_error_code": retry_on_error_code}
+        )

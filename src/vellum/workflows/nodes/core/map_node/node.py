@@ -9,21 +9,21 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import ParentContext
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
+from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs import BaseOutputs
-from vellum.workflows.state.base import BaseState
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.generics import NodeType, StateType
+from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
-    from vellum.workflows import BaseWorkflow
     from vellum.workflows.events.workflow import WorkflowEvent
 
 MapNodeItemType = TypeVar("MapNodeItemType")
 
 
-class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
+class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType]):
     """
     Used to map over a list of items and execute a Subworkflow on each iteration.
 
@@ -33,11 +33,10 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
     """
 
     items: List[MapNodeItemType]
-    subworkflow: Type["BaseWorkflow"]
     concurrency: Optional[int] = None
 
-    class Outputs(BaseOutputs):
-        mapped_items: list
+    class Outputs(BaseAdornmentNode.Outputs):
+        pass
 
     class SubworkflowInputs(BaseInputs):
         # TODO: Both type: ignore's below are believed to be incorrect and both have the following error:
@@ -54,6 +53,7 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
             mapped_items[output_descripter.name] = [None] * len(self.items)
 
         self._event_queue: Queue[Tuple[int, WorkflowEvent]] = Queue()
+        self._concurrency_queue: Queue[Thread] = Queue()
         fulfilled_iterations: List[bool] = []
         for index, item in enumerate(self.items):
             fulfilled_iterations.append(False)
@@ -66,11 +66,21 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
                     "parent_context": parent_context,
                 },
             )
-            thread.start()
+            if self.concurrency is None:
+                thread.start()
+            else:
+                self._concurrency_queue.put(thread)
+
+        if self.concurrency is not None:
+            concurrency_count = 0
+            while concurrency_count < self.concurrency:
+                is_empty = self._start_thread()
+                if is_empty:
+                    break
+
+                concurrency_count += 1
 
         try:
-            # We should consolidate this logic with the logic workflow runner uses
-            # https://app.shortcut.com/vellum/story/4736
             while map_node_event := self._event_queue.get():
                 index = map_node_event[0]
                 terminal_event = map_node_event[1]
@@ -86,6 +96,9 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
                     fulfilled_iterations[index] = True
                     if all(fulfilled_iterations):
                         break
+
+                    if self.concurrency is not None:
+                        self._start_thread()
                 elif terminal_event.name == "workflow.execution.paused":
                     raise NodeException(
                         code=WorkflowErrorCode.INVALID_OUTPUTS,
@@ -98,7 +111,12 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
                     )
         except Empty:
             pass
-        return self.Outputs(**mapped_items)
+
+        outputs = self.Outputs()
+        for output_name, output_list in mapped_items.items():
+            setattr(outputs, output_name, output_list)
+
+        return outputs
 
     def _context_run_subworkflow(
         self, *, item: MapNodeItemType, index: int, parent_context: Optional[ParentContext] = None
@@ -109,7 +127,10 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
 
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
         context = WorkflowContext(vellum_client=self._context.vellum_client)
-        subworkflow = self.subworkflow(parent_state=self.state, context=context)
+        subworkflow = self.subworkflow(
+            parent_state=self.state,
+            context=context,
+        )
         events = subworkflow.stream(
             inputs=self.SubworkflowInputs(index=index, item=item, all_items=self.items),
             event_filter=all_workflow_event_filter,
@@ -117,6 +138,14 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
 
         for event in events:
             self._event_queue.put((index, event))
+
+    def _start_thread(self) -> bool:
+        if self._concurrency_queue.empty():
+            return False
+
+        thread = self._concurrency_queue.get()
+        thread.start()
+        return True
 
     @overload
     @classmethod
@@ -134,37 +163,12 @@ class MapNode(BaseNode, Generic[StateType, MapNodeItemType]):
     def wrap(
         cls, items: Union[List[MapNodeItemType], BaseDescriptor[List[MapNodeItemType]]]
     ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]:
-        _items = items
+        return create_adornment(cls, attributes={"items": items})
 
-        def decorator(inner_cls: Type[NodeType]) -> Type["MapNode[StateType, MapNodeItemType]"]:
-            # Investigate how to use dependency injection to avoid circular imports
-            # https://app.shortcut.com/vellum/story/4116
-            from vellum.workflows import BaseWorkflow
+    @classmethod
+    def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
+        parameter_type = reference.types[0]
+        annotation = List[parameter_type]  # type: ignore[valid-type]
 
-            class Subworkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
-                graph = inner_cls
-
-                # mypy is wrong here, this works and is defined
-                class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
-                    pass
-
-            class WrappedNodeOutputs(BaseOutputs):
-                pass
-
-            WrappedNodeOutputs.__annotations__ = {
-                # TODO: We'll need to infer the type T of Subworkflow.Outputs[name] so we could do List[T] here
-                # https://app.shortcut.com/vellum/story/4119
-                descriptor.name: List
-                for descriptor in inner_cls.Outputs
-            }
-
-            class WrappedNode(MapNode[StateType, MapNodeItemType]):
-                items = _items
-                subworkflow = Subworkflow
-
-                class Outputs(WrappedNodeOutputs):
-                    pass
-
-            return WrappedNode
-
-        return decorator
+        previous_annotations = {prev: annotation for prev in outputs_class.__annotations__ if not prev.startswith("_")}
+        outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}

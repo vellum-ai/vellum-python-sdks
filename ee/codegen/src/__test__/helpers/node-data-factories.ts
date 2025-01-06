@@ -592,7 +592,11 @@ export function inlinePromptNodeDataLegacyVariantFactory({
   return nodeData;
 }
 
-export function promptDeploymentNodeDataFactory(): PromptNode {
+export function promptDeploymentNodeDataFactory({
+  errorOutputId = undefined,
+}: {
+  errorOutputId?: string;
+} = {}): PromptNode {
   return {
     id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
     type: "PROMPT",
@@ -601,7 +605,7 @@ export function promptDeploymentNodeDataFactory(): PromptNode {
       label: "Prompt Deployment Node",
       outputId: "fa015382-7e5b-404e-b073-1c5f01832169",
       arrayOutputId: "4d257095-e908-4fc3-8159-a6ac0018e1f1",
-      errorOutputId: undefined,
+      errorOutputId: errorOutputId,
       sourceHandleId: "1539a6ed-6bf9-43a5-9e4a-f82ec5615ee3",
       targetHandleId: "e1f8a351-ab12-4167-93ee-d2dd72c8d15c",
       promptDeploymentId: "afd05488-7a25-4ff2-b87b-878e9552474e",

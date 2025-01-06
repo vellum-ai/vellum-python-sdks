@@ -1,16 +1,7 @@
-# flake8: noqa: E402
-
-import importlib
-import inspect
-
-from vellum.plugins.utils import load_runtime_plugins
-from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum.workflows.workflows.event_filters import workflow_event_filter
-
-load_runtime_plugins()
-
 from datetime import datetime
 from functools import lru_cache
+import importlib
+import inspect
 from threading import Event as ThreadingEvent
 from uuid import UUID, uuid4
 from typing import (
@@ -79,6 +70,8 @@ from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.store import Store
 from vellum.workflows.types.generics import StateType, WorkflowInputsType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.workflows.event_filters import workflow_event_filter
 
 
 class _BaseWorkflowMeta(type):
@@ -194,6 +187,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
+        node_output_mocks: Optional[List[BaseOutputs]] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -218,6 +212,9 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
+
+        node_output_mocks: Optional[List[Outputs]] = None
+            A list of Outputs to mock for Nodes during Workflow Execution.
         """
 
         events = WorkflowRunner(
@@ -227,6 +224,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
             cancel_signal=cancel_signal,
+            node_output_mocks=node_output_mocks,
             parent_context=self._context.parent_context,
         ).stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
@@ -290,6 +288,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
+        node_output_mocks: Optional[List[BaseOutputs]] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -315,6 +314,9 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
+
+        node_output_mocks: Optional[List[Outputs]] = None
+            A list of Outputs to mock for Nodes during Workflow Execution.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -325,6 +327,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
             cancel_signal=cancel_signal,
+            node_output_mocks=node_output_mocks,
             parent_context=self.context.parent_context,
         ).stream():
             if should_yield(self.__class__, event):
@@ -416,7 +419,6 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
         workflow_path = f"{module_path}.workflow"
         module = importlib.import_module(workflow_path)
-
         workflows: List[Type[BaseWorkflow]] = []
         for name in dir(module):
             if name.startswith("__"):
@@ -435,8 +437,39 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             raise ValueError(f"No workflows found in {module_path}")
         elif len(workflows) > 1:
             raise ValueError(f"Multiple workflows found in {module_path}")
+        try:
+            BaseWorkflow.import_node_display(module_path)
+        except ModuleNotFoundError:
+            pass
 
         return workflows[0]
+
+    @staticmethod
+    def import_node_display(module_path):
+        # Import the nodes package
+        nodes_package = importlib.import_module(f"{module_path}.display.nodes")
+        # Use the loader to get the code
+        if hasattr(nodes_package, "__spec__") and nodes_package.__spec__ and nodes_package.__spec__.loader:
+            loader = nodes_package.__spec__.loader
+
+            # Check if the loader has a code attribute
+            if hasattr(loader, "code"):
+                code = loader.code
+
+                # Parse the code to find import statements
+                import_lines = [line.strip() for line in code.splitlines() if line.startswith("from ")]
+
+                # Import each module specified in the code
+                for line in import_lines:
+                    try:
+                        # Extract module name from the import line
+                        module_name = line.split(" ")[1]
+                        full_module_path = f"{module_path}.display.nodes{module_name}"
+                        importlib.import_module(full_module_path)
+                    except Exception:
+                        continue
+        # Also import from workflow.py
+        importlib.import_module(f"{module_path}.display.workflow")
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()

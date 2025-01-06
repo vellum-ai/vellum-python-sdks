@@ -38,5 +38,48 @@ describe("BaseNode", () => {
         )
       );
     });
+
+    it("should throw the expected error when a input references an invalid output", async () => {
+      const workflowContext = workflowContextFactory();
+
+      const templatingNodeData = templatingNodeFactory();
+      const templatingNodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData: templatingNodeData,
+      })) as TemplatingNodeContext;
+      workflowContext.addNodeContext(templatingNodeContext);
+
+      const templatingNode2Data = templatingNodeFactory({
+        label: "TemplatingNode2",
+        id: "12345678-1234-5678-1234-567812345678",
+        sourceHandleId: "12345678-1234-5678-1234-567812345679",
+        targetHandleId: "12345678-1234-5678-1234-56781234567a",
+        inputRules: [
+          {
+            type: "NODE_OUTPUT",
+            data: {
+              nodeId: templatingNodeData.id,
+              outputId: "90abcdef-90ab-cdef-90ab-cdef90abcdef",
+            },
+          },
+        ],
+      });
+      const templatingNode2Context = (await createNodeContext({
+        workflowContext,
+        nodeData: templatingNode2Data,
+      })) as TemplatingNodeContext;
+      workflowContext.addNodeContext(templatingNode2Context);
+
+      expect(() => {
+        new TemplatingNode({
+          workflowContext,
+          nodeContext: templatingNode2Context,
+        });
+      }).toThrow(
+        new NodeAttributeGenerationError(
+          "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find output with id '90abcdef-90ab-cdef-90ab-cdef90abcdef'"
+        )
+      );
+    });
   });
 });
