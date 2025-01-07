@@ -130,6 +130,8 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
                     "workflow_sandbox_id": "87654321-0000-0000-0000-000000000000",
                     "ignore": None,
                     "deployments": [],
+                    "container_image_tag": None,
+                    "container_image_name": None,
                 }
             ],
         }
@@ -204,6 +206,8 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
                     "workflow_sandbox_id": None,
                     "ignore": None,
                     "deployments": [],
+                    "container_image_tag": None,
+                    "container_image_name": None,
                 }
             ],
         }
@@ -407,7 +411,17 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
     new_workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                    "metadata.json": '{"runner_config": { "container_image_name": "test", '
+                    '"container_image_tag": "1.0" } }',
+                }
+            )
+        ]
+    )
 
     # WHEN the user runs the pull command with the new workflow sandbox id
     runner = CliRunner()
@@ -433,12 +447,16 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                         "release_tags": None,
                     },
                 ],
+                "container_image_name": None,
+                "container_image_tag": None,
             },
             {
                 "module": "workflow_87654321",
                 "workflow_sandbox_id": new_workflow_sandbox_id,
                 "ignore": None,
                 "deployments": [],
+                "container_image_name": "test",
+                "container_image_tag": "1.0",
             },
         ]
 
