@@ -1,4 +1,5 @@
 import io
+import json
 import os
 from pathlib import Path
 from uuid import UUID
@@ -109,8 +110,10 @@ def pull_command(
     logger.info(f"Pulling workflow into {workflow_config.module}")
     client = create_vellum_client()
     query_parameters = {}
-    if include_json:
-        query_parameters["include_json"] = include_json
+
+    # Always include json so we can snake data off it but delete the file later if the flag
+    # is not set
+    query_parameters["include_json"] = True
     if exclude_code:
         query_parameters["exclude_code"] = exclude_code
     if strict:
@@ -163,11 +166,22 @@ def pull_command(
                 logger.info(f"Writing to {target_file}...")
                 target.write(content)
 
+    workspace_json_file = os.path.join(target_dir, "workflow.json")
+    with open(workspace_json_file) as workspace_file_data:
+        workspace_json = json.load(workspace_file_data)
+
+    workflow_config.container_image_name = workspace_json.get("runner_config", {}).get("container_image_name")
+    workflow_config.container_image_tag = workspace_json.get("runner_config", {}).get("container_image_tag")
+    if workflow_config.container_image_name and not workflow_config.container_image_tag:
+        workflow_config.container_image_tag = "latest"
+
     if include_json:
         logger.warning(
             """The pulled JSON representation of the Workflow should be used for debugging purposely only. \
 Its schema should be considered unstable and subject to change at any time."""
         )
+    else:
+        os.remove(workspace_json_file)
 
     if include_sandbox:
         if not workflow_config.ignore:

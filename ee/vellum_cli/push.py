@@ -51,8 +51,15 @@ def push_command(
     workflow = BaseWorkflow.load_from_module(workflow_config.module)
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow)
     exec_config = workflow_display.serialize()
+
+    container_tag = workflow_config.container_image_tag
+    if workflow_config.container_image_name and not workflow_config.container_image_tag:
+        container_tag = "latest"
+
     exec_config["runner_config"] = {
         "sdk_version": metadata.version("vellum-ai"),
+        "container_image_tag": container_tag,
+        "container_image_name": workflow_config.container_image_name,
     }
 
     label = snake_to_title_case(workflow_config.module.split(".")[-1])

@@ -35,6 +35,8 @@ class WorkflowConfig(UniversalBaseModel):
     workflow_sandbox_id: Optional[str] = None
     ignore: Optional[Union[str, List[str]]] = None
     deployments: List[WorkflowDeploymentConfig] = field(default_factory=list)
+    container_image_name: Optional[str] = None
+    container_image_tag: Optional[str] = None
 
     def merge(self, other: "WorkflowConfig") -> "WorkflowConfig":
         self_deployment_by_id = {
@@ -68,6 +70,8 @@ class WorkflowConfig(UniversalBaseModel):
             workflow_sandbox_id=self.workflow_sandbox_id or other.workflow_sandbox_id,
             ignore=self.ignore or other.ignore,
             deployments=merged_deployments,
+            container_image_tag=self.container_image_tag or other.container_image_tag,
+            container_image_name=self.container_image_name or other.container_image_name,
         )
 
 
