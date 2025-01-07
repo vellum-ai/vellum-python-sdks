@@ -6,8 +6,8 @@ environments:
   Production:
     urls:
       Default: https://api.vellum.ai
-      Documents: https://documents.vellum.ai
       Predict: https://predict.vellum.ai
+      Documents: https://documents.vellum.ai
 default-environment: Production
 auth-schemes:
   apiKeyAuth:

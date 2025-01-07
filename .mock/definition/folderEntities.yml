@@ -14,7 +14,7 @@ service:
     list:
       path: /v1/folder-entities
       method: GET
-      auth: false
+      auth: true
       docs: List all folder entities within a specified folder.
       source:
         openapi: openapi/openapi.yml
