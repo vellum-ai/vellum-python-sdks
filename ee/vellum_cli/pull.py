@@ -15,6 +15,7 @@ from vellum_cli.config import VellumCliConfig, WorkflowConfig, load_vellum_cli_c
 from vellum_cli.logger import load_cli_logger
 
 ERROR_LOG_FILE_NAME = "error.log"
+METADATA_FILE_NAME = "metadata.json"
 
 
 def _is_valid_uuid(val: Union[str, UUID, None]) -> bool:
@@ -111,9 +112,8 @@ def pull_command(
     client = create_vellum_client()
     query_parameters = {}
 
-    # Always include json so we can snake data off it but delete the file later if the flag
-    # is not set
-    query_parameters["include_json"] = True
+    if include_json:
+        query_parameters["include_json"] = include_json
     if exclude_code:
         query_parameters["exclude_code"] = exclude_code
     if strict:
@@ -131,6 +131,8 @@ def pull_command(
 
     target_dir = os.path.join(os.getcwd(), *workflow_config.module.split("."))
     error_content = ""
+    metadata_json: Optional[dict] = None
+
     with zipfile.ZipFile(zip_buffer) as zip_file:
         # Delete files in target_dir that aren't in the zip file
         if os.path.exists(target_dir):
@@ -155,33 +157,32 @@ def pull_command(
                     os.remove(file_path)
 
         for file_name in zip_file.namelist():
-            target_file = os.path.join(target_dir, file_name)
-            os.makedirs(os.path.dirname(target_file), exist_ok=True)
-            with zip_file.open(file_name) as source, open(target_file, "w") as target:
+            with zip_file.open(file_name) as source:
                 content = source.read().decode("utf-8")
                 if file_name == ERROR_LOG_FILE_NAME:
                     error_content = content
                     continue
+                if file_name == METADATA_FILE_NAME:
+                    metadata_json = json.loads(content)
+                    continue
 
-                logger.info(f"Writing to {target_file}...")
-                target.write(content)
+                target_file = os.path.join(target_dir, file_name)
+                os.makedirs(os.path.dirname(target_file), exist_ok=True)
+                with open(target_file, "w") as target:
+                    logger.info(f"Writing to {target_file}...")
+                    target.write(content)
 
-    workspace_json_file = os.path.join(target_dir, "workflow.json")
-    with open(workspace_json_file) as workspace_file_data:
-        workspace_json = json.load(workspace_file_data)
-
-    workflow_config.container_image_name = workspace_json.get("runner_config", {}).get("container_image_name")
-    workflow_config.container_image_tag = workspace_json.get("runner_config", {}).get("container_image_tag")
-    if workflow_config.container_image_name and not workflow_config.container_image_tag:
-        workflow_config.container_image_tag = "latest"
+    if metadata_json:
+        workflow_config.container_image_name = metadata_json.get("runner_config", {}).get("container_image_name")
+        workflow_config.container_image_tag = metadata_json.get("runner_config", {}).get("container_image_tag")
+        if workflow_config.container_image_name and not workflow_config.container_image_tag:
+            workflow_config.container_image_tag = "latest"
 
     if include_json:
         logger.warning(
             """The pulled JSON representation of the Workflow should be used for debugging purposely only. \
 Its schema should be considered unstable and subject to change at any time."""
         )
-    else:
-        os.remove(workspace_json_file)
 
     if include_sandbox:
         if not workflow_config.ignore:
