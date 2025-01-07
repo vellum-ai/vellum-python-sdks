@@ -15,9 +15,6 @@ service:
       path: /v1/workflows/{id}/pull
       method: GET
       auth: true
-      docs: >-
-        An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       source:
         openapi: openapi/openapi.yml
       path-parameters:
@@ -45,9 +42,6 @@ service:
       path: /v1/workflows/push
       method: POST
       auth: true
-      docs: >-
-        An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       source:
         openapi: openapi/openapi.yml
       request:
@@ -67,6 +61,7 @@ service:
                 format: uuid
             deployment_config: optional<root.WorkflowPushDeploymentConfigRequest>
             artifact: optional<file>
+            dry_run: optional<boolean>
         content-type: multipart/form-data
       response:
         docs: ''
@@ -81,6 +76,8 @@ service:
             body:
               workflow_sandbox_id: workflow_sandbox_id
               workflow_deployment_id: workflow_deployment_id
+              proposed_diffs:
+                key: value
       audiences:
         - internal
   source:

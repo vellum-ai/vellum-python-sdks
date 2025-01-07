@@ -35,8 +35,6 @@ class WorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[bytes]:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         id : str
@@ -102,11 +100,10 @@ class WorkflowsClient:
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
+        dry_run: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowPushResponse:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         exec_config : WorkflowPushExecConfig
@@ -120,6 +117,8 @@ class WorkflowsClient:
 
         artifact : typing.Optional[core.File]
             See core.File for more documentation
+
+        dry_run : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -150,6 +149,7 @@ class WorkflowsClient:
                 "label": label,
                 "workflow_sandbox_id": workflow_sandbox_id,
                 "deployment_config": deployment_config,
+                "dry_run": dry_run,
             },
             files={
                 "artifact": artifact,
@@ -188,8 +188,6 @@ class AsyncWorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[bytes]:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         id : str
@@ -255,11 +253,10 @@ class AsyncWorkflowsClient:
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
+        dry_run: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowPushResponse:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         exec_config : WorkflowPushExecConfig
@@ -273,6 +270,8 @@ class AsyncWorkflowsClient:
 
         artifact : typing.Optional[core.File]
             See core.File for more documentation
+
+        dry_run : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -311,6 +310,7 @@ class AsyncWorkflowsClient:
                 "label": label,
                 "workflow_sandbox_id": workflow_sandbox_id,
                 "deployment_config": deployment_config,
+                "dry_run": dry_run,
             },
             files={
                 "artifact": artifact,

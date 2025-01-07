@@ -13,8 +13,8 @@ def client() -> Vellum:
         api_key=os.getenv("ENV_API_KEY", "api_key"),
         environment=VellumEnvironment(
             default=os.getenv("TESTS_BASE_URL", "base_url"),
-            documents=os.getenv("TESTS_BASE_URL", "base_url"),
             predict=os.getenv("TESTS_BASE_URL", "base_url"),
+            documents=os.getenv("TESTS_BASE_URL", "base_url"),
         ),
     )
 
@@ -25,7 +25,7 @@ def async_client() -> AsyncVellum:
         api_key=os.getenv("ENV_API_KEY", "api_key"),
         environment=VellumEnvironment(
             default=os.getenv("TESTS_BASE_URL", "base_url"),
-            documents=os.getenv("TESTS_BASE_URL", "base_url"),
             predict=os.getenv("TESTS_BASE_URL", "base_url"),
+            documents=os.getenv("TESTS_BASE_URL", "base_url"),
         ),
     )

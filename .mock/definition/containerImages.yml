@@ -82,9 +82,6 @@ service:
       path: /v1/container-images/docker-service-token
       method: GET
       auth: true
-      docs: >-
-        An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       source:
         openapi: openapi/openapi.yml
       response:
@@ -104,9 +101,6 @@ service:
       path: /v1/container-images/push
       method: POST
       auth: true
-      docs: >-
-        An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       source:
         openapi: openapi/openapi.yml
       request:

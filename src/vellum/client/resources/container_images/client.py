@@ -134,8 +134,6 @@ class ContainerImagesClient:
 
     def docker_service_token(self, *, request_options: typing.Optional[RequestOptions] = None) -> DockerServiceToken:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -184,8 +182,6 @@ class ContainerImagesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContainerImageRead:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         name : str
@@ -378,8 +374,6 @@ class AsyncContainerImagesClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> DockerServiceToken:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -436,8 +430,6 @@ class AsyncContainerImagesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContainerImageRead:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         name : str

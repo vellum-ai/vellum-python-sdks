@@ -20,6 +20,7 @@ from .array_vellum_value import ArrayVellumValue
 from .array_vellum_value_request import ArrayVellumValueRequest
 from .audio_chat_message_content import AudioChatMessageContent
 from .audio_chat_message_content_request import AudioChatMessageContentRequest
+from .audio_prompt_block import AudioPromptBlock
 from .audio_variable_value import AudioVariableValue
 from .audio_vellum_value import AudioVellumValue
 from .audio_vellum_value_request import AudioVellumValueRequest
@@ -138,6 +139,7 @@ from .function_call_chat_message_content_request import FunctionCallChatMessageC
 from .function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from .function_call_chat_message_content_value_request import FunctionCallChatMessageContentValueRequest
 from .function_call_input import FunctionCallInput
+from .function_call_prompt_block import FunctionCallPromptBlock
 from .function_call_request import FunctionCallRequest
 from .function_call_variable_value import FunctionCallVariableValue
 from .function_call_vellum_value import FunctionCallVellumValue
@@ -166,6 +168,7 @@ from .hkunlp_instructor_xl_vectorizer import HkunlpInstructorXlVectorizer
 from .hkunlp_instructor_xl_vectorizer_request import HkunlpInstructorXlVectorizerRequest
 from .image_chat_message_content import ImageChatMessageContent
 from .image_chat_message_content_request import ImageChatMessageContentRequest
+from .image_prompt_block import ImagePromptBlock
 from .image_variable_value import ImageVariableValue
 from .image_vellum_value import ImageVellumValue
 from .image_vellum_value_request import ImageVellumValueRequest
@@ -542,6 +545,7 @@ __all__ = [
     "ArrayVellumValueRequest",
     "AudioChatMessageContent",
     "AudioChatMessageContentRequest",
+    "AudioPromptBlock",
     "AudioVariableValue",
     "AudioVellumValue",
     "AudioVellumValueRequest",
@@ -652,6 +656,7 @@ __all__ = [
     "FunctionCallChatMessageContentValue",
     "FunctionCallChatMessageContentValueRequest",
     "FunctionCallInput",
+    "FunctionCallPromptBlock",
     "FunctionCallRequest",
     "FunctionCallVariableValue",
     "FunctionCallVellumValue",
@@ -676,6 +681,7 @@ __all__ = [
     "HkunlpInstructorXlVectorizerRequest",
     "ImageChatMessageContent",
     "ImageChatMessageContentRequest",
+    "ImagePromptBlock",
     "ImageVariableValue",
     "ImageVellumValue",
     "ImageVellumValueRequest",

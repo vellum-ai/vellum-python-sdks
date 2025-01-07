@@ -6,12 +6,12 @@ from __future__ import annotations
 class VellumEnvironment:
     PRODUCTION: VellumEnvironment
 
-    def __init__(self, *, default: str, documents: str, predict: str):
+    def __init__(self, *, default: str, predict: str, documents: str):
         self.default = default
-        self.documents = documents
         self.predict = predict
+        self.documents = documents
 
 
 VellumEnvironment.PRODUCTION = VellumEnvironment(
-    default="https://api.vellum.ai", documents="https://documents.vellum.ai", predict="https://predict.vellum.ai"
+    default="https://api.vellum.ai", predict="https://predict.vellum.ai", documents="https://documents.vellum.ai"
 )

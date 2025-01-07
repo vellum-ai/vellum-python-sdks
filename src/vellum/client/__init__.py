@@ -154,8 +154,6 @@ class Vellum:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CodeExecutorResponse:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         code : str
@@ -203,7 +201,7 @@ class Vellum:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/execute-code",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "code": code,
@@ -1419,8 +1417,6 @@ class AsyncVellum:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CodeExecutorResponse:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         code : str
@@ -1476,7 +1472,7 @@ class AsyncVellum:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/execute-code",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "code": code,

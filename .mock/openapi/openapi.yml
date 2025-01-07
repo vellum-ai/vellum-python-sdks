@@ -40,8 +40,6 @@ paths:
   /v1/ad-hoc/execute-prompt-stream:
     post:
       operationId: adhoc_execute_prompt_stream
-      description: An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       tags:
       - ad-hoc
       requestBody:
@@ -81,6 +79,9 @@ paths:
       x-fern-availability: beta
       x-fern-audiences:
       - internal
+      servers:
+      - url: https://predict.vellum.ai
+        x-name: Predict
   /v1/container-images:
     get:
       operationId: container_images_list
@@ -148,8 +149,6 @@ paths:
   /v1/container-images/docker-service-token:
     get:
       operationId: docker-service-token
-      description: An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       tags:
       - container-images
       security:
@@ -167,8 +166,6 @@ paths:
   /v1/container-images/push:
     post:
       operationId: push_container_image
-      description: An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       tags:
       - container-images
       requestBody:
@@ -919,8 +916,6 @@ paths:
   /v1/execute-code:
     post:
       operationId: execute_code
-      description: An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       tags:
       - execute-code
       requestBody:
@@ -947,6 +942,9 @@ paths:
       x-fern-availability: beta
       x-fern-audiences:
       - internal
+      servers:
+      - url: https://predict.vellum.ai
+        x-name: Predict
   /v1/execute-prompt:
     post:
       operationId: execute_prompt
@@ -1195,6 +1193,8 @@ paths:
         required: true
       tags:
       - folder-entities
+      security:
+      - apiKeyAuth: []
       responses:
         '200':
           content:
@@ -1356,8 +1356,6 @@ paths:
   /v1/metric-definitions/{id}/execute:
     post:
       operationId: execute_metric_definition
-      description: An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       parameters:
       - in: path
         name: id
@@ -1385,6 +1383,9 @@ paths:
       x-fern-availability: beta
       x-fern-audiences:
       - internal
+      servers:
+      - url: https://predict.vellum.ai
+        x-name: Predict
   /v1/metric-definitions/{id}/history/{history_id_or_release_tag}:
     get:
       operationId: metric_definition_history_item_retrieve
@@ -2273,8 +2274,6 @@ paths:
   /v1/workflows/{id}/pull:
     get:
       operationId: workflows_pull
-      description: An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       parameters:
       - in: query
         name: exclude_code
@@ -2330,8 +2329,6 @@ paths:
   /v1/workflows/push:
     post:
       operationId: workflows_push
-      description: An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       tags:
       - workflows
       requestBody:
@@ -2747,6 +2744,30 @@ components:
       type: string
       enum:
       - AUDIO
+    AudioPromptBlock:
+      type: object
+      description: A block that represents an audio file in a prompt template.
+      properties:
+        block_type:
+          $ref: '#/components/schemas/AudioEnum'
+        state:
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
+        cache_config:
+          allOf:
+          - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
+          nullable: true
+        src:
+          type: string
+          minLength: 1
+        metadata:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - block_type
+      - src
     AudioVariableValue:
       type: object
       description: A base Vellum primitive value representing audio.
@@ -5137,6 +5158,34 @@ components:
       - name
       - type
       - value
+    FunctionCallPromptBlock:
+      type: object
+      description: A block that represents a function call in a prompt template.
+      properties:
+        block_type:
+          $ref: '#/components/schemas/FunctionCallEnum'
+        state:
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
+        cache_config:
+          allOf:
+          - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
+          nullable: true
+        id:
+          type: string
+          nullable: true
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        arguments:
+          type: object
+          additionalProperties: {}
+      required:
+      - arguments
+      - block_type
+      - name
     FunctionCallRequest:
       type: object
       description: The final resolved function call value.
@@ -5509,6 +5558,30 @@ components:
       type: string
       enum:
       - IMAGE
+    ImagePromptBlock:
+      type: object
+      description: A block that represents an image in a prompt template.
+      properties:
+        block_type:
+          $ref: '#/components/schemas/ImageEnum'
+        state:
+          allOf:
+          - $ref: '#/components/schemas/PromptBlockState'
+          default: ENABLED
+        cache_config:
+          allOf:
+          - $ref: '#/components/schemas/EphemeralPromptCacheConfig'
+          nullable: true
+        src:
+          type: string
+          minLength: 1
+        metadata:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - block_type
+      - src
     ImageVariableValue:
       type: object
       description: A base Vellum primitive value representing an image.
@@ -7409,6 +7482,9 @@ components:
       - $ref: '#/components/schemas/ChatMessagePromptBlock'
       - $ref: '#/components/schemas/VariablePromptBlock'
       - $ref: '#/components/schemas/RichTextPromptBlock'
+      - $ref: '#/components/schemas/AudioPromptBlock'
+      - $ref: '#/components/schemas/FunctionCallPromptBlock'
+      - $ref: '#/components/schemas/ImagePromptBlock'
       discriminator:
         propertyName: block_type
         mapping:
@@ -7416,6 +7492,9 @@ components:
           CHAT_MESSAGE: '#/components/schemas/ChatMessagePromptBlock'
           VARIABLE: '#/components/schemas/VariablePromptBlock'
           RICH_TEXT: '#/components/schemas/RichTextPromptBlock'
+          AUDIO: '#/components/schemas/AudioPromptBlock'
+          FUNCTION_CALL: '#/components/schemas/FunctionCallPromptBlock'
+          IMAGE: '#/components/schemas/ImagePromptBlock'
     PromptBlockState:
       enum:
       - ENABLED
@@ -11646,6 +11725,8 @@ components:
           type: string
           format: binary
           description: The contents of the artifact tar.gz file.
+        dry_run:
+          type: boolean
       required:
       - exec_config
       - label
@@ -11658,6 +11739,10 @@ components:
         workflow_deployment_id:
           type: string
           format: uuid
+          nullable: true
+        proposed_diffs:
+          type: object
+          additionalProperties: {}
           nullable: true
       required:
       - workflow_sandbox_id

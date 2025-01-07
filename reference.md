@@ -3,20 +3,6 @@
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-</dd>
-</dl>
-</dd>
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -1136,20 +1122,6 @@ client.submit_workflow_execution_actuals(
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-</dd>
-</dl>
-</dd>
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -1444,20 +1416,6 @@ client.container_images.retrieve(
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-</dd>
-</dl>
-</dd>
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -1503,20 +1461,6 @@ client.container_images.docker_service_token()
 <details><summary><code>client.container_images.<a href="src/vellum/resources/container_images/client.py">push_container_image</a>(...)</code></summary>
 <dl>
 <dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-</dd>
-</dl>
-</dd>
-</dl>
 
 #### 🔌 Usage
 
@@ -3636,20 +3580,6 @@ directory. Supported root directories include:
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-</dd>
-</dl>
-</dd>
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -5415,20 +5345,6 @@ client.workflow_sandboxes.deploy_workflow(
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-</dd>
-</dl>
-</dd>
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -5497,6 +5413,14 @@ client.workflows.push(
 **artifact:** `from __future__ import annotations
 
 typing.Optional[core.File]` — See core.File for more documentation
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**dry_run:** `typing.Optional[bool]` 
     
 </dd>
 </dl>

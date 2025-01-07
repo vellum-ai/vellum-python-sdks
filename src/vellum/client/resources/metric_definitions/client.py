@@ -30,8 +30,6 @@ class MetricDefinitionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> MetricDefinitionExecution:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         id : str
@@ -68,7 +66,7 @@ class MetricDefinitionsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/metric-definitions/{jsonable_encoder(id)}/execute",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -159,8 +157,6 @@ class AsyncMetricDefinitionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> MetricDefinitionExecution:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         id : str
@@ -205,7 +201,7 @@ class AsyncMetricDefinitionsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/metric-definitions/{jsonable_encoder(id)}/execute",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(

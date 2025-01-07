@@ -43,8 +43,6 @@ class AdHocClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[AdHocExecutePromptEvent]:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         ml_model : str
@@ -111,7 +109,7 @@ class AdHocClient:
         """
         with self._client_wrapper.httpx_client.stream(
             "v1/ad-hoc/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "ml_model": ml_model,
@@ -211,8 +209,6 @@ class AsyncAdHocClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AdHocExecutePromptEvent]:
         """
-        An internal-only endpoint that's subject to breaking changes without notice. Not intended for public use.
-
         Parameters
         ----------
         ml_model : str
@@ -287,7 +283,7 @@ class AsyncAdHocClient:
         """
         async with self._client_wrapper.httpx_client.stream(
             "v1/ad-hoc/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "ml_model": ml_model,
