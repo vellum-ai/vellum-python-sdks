@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from copy import deepcopy
+from copy import copy
 from functools import cached_property
 import logging
 from uuid import UUID
@@ -176,17 +176,17 @@ class BaseWorkflowDisplay(
 
         # If we're dealing with a nested workflow, then it should have access to the outputs of all nodes
         node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = (
-            deepcopy(self._parent_display_context.node_output_displays) if self._parent_display_context else {}
+            copy(self._parent_display_context.node_output_displays) if self._parent_display_context else {}
         )
 
         # If we're dealing with a nested workflow, then it should have access to all nodes
         node_displays: Dict[Type[BaseNode], NodeDisplayType] = (
-            deepcopy(self._parent_display_context.node_displays) if self._parent_display_context else {}
+            copy(self._parent_display_context.node_displays) if self._parent_display_context else {}
         )
 
         # If we're dealing with a nested workflow, then it should have access to all ports
         port_displays: Dict[Port, PortDisplay] = (
-            deepcopy(self._parent_display_context.port_displays) if self._parent_display_context else {}
+            copy(self._parent_display_context.port_displays) if self._parent_display_context else {}
         )
 
         # TODO: We should still serialize nodes that are in the workflow's directory but aren't used in the graph.
@@ -210,7 +210,7 @@ class BaseWorkflowDisplay(
 
         # If we're dealing with a nested workflow, then it should have access to the inputs of its parents.
         workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = (
-            deepcopy(self._parent_display_context.workflow_input_displays) if self._parent_display_context else {}
+            copy(self._parent_display_context.workflow_input_displays) if self._parent_display_context else {}
         )
         for workflow_input in self._workflow.get_inputs_class():
             if workflow_input in workflow_input_displays:
