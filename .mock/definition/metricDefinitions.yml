@@ -8,9 +8,6 @@ service:
       path: /v1/metric-definitions/{id}/execute
       method: POST
       auth: true
-      docs: >-
-        An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       source:
         openapi: openapi/openapi.yml
       path-parameters:
@@ -30,7 +27,7 @@ service:
       response:
         docs: ''
         type: root.MetricDefinitionExecution
-      url: Default
+      url: Predict
       availability: pre-release
       examples:
         - path-parameters:
