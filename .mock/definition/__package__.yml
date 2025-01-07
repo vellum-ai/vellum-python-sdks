@@ -42,9 +42,6 @@ service:
       path: /v1/execute-code
       method: POST
       auth: true
-      docs: >-
-        An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       source:
         openapi: openapi/openapi.yml
       request:
@@ -63,7 +60,7 @@ service:
       response:
         docs: ''
         type: CodeExecutorResponse
-      url: Default
+      url: Predict
       availability: pre-release
       errors:
         - BadRequestError
@@ -986,6 +983,19 @@ types:
     source:
       openapi: openapi/openapi.yml
   AudioEnum: literal<"AUDIO">
+  AudioPromptBlock:
+    docs: A block that represents an audio file in a prompt template.
+    properties:
+      block_type: literal<"AUDIO">
+      state: optional<PromptBlockState>
+      cache_config: optional<EphemeralPromptCacheConfig>
+      src:
+        type: string
+        validation:
+          minLength: 1
+      metadata: optional<map<string, unknown>>
+    source:
+      openapi: openapi/openapi.yml
   AudioVariableValue:
     docs: A base Vellum primitive value representing audio.
     properties:
@@ -2265,6 +2275,23 @@ types:
       value: FunctionCall
     source:
       openapi: openapi/openapi.yml
+  FunctionCallPromptBlock:
+    docs: A block that represents a function call in a prompt template.
+    properties:
+      block_type: literal<"FUNCTION_CALL">
+      state: optional<PromptBlockState>
+      cache_config: optional<EphemeralPromptCacheConfig>
+      id:
+        type: optional<string>
+        validation:
+          minLength: 1
+      name:
+        type: string
+        validation:
+          minLength: 1
+      arguments: map<string, unknown>
+    source:
+      openapi: openapi/openapi.yml
   FunctionCallRequest:
     docs: The final resolved function call value.
     properties:
@@ -2495,6 +2522,19 @@ types:
     source:
       openapi: openapi/openapi.yml
   ImageEnum: literal<"IMAGE">
+  ImagePromptBlock:
+    docs: A block that represents an image in a prompt template.
+    properties:
+      block_type: literal<"IMAGE">
+      state: optional<PromptBlockState>
+      cache_config: optional<EphemeralPromptCacheConfig>
+      src:
+        type: string
+        validation:
+          minLength: 1
+      metadata: optional<map<string, unknown>>
+    source:
+      openapi: openapi/openapi.yml
   ImageVariableValue:
     docs: A base Vellum primitive value representing an image.
     properties:
@@ -3621,6 +3661,9 @@ types:
       - ChatMessagePromptBlock
       - VariablePromptBlock
       - RichTextPromptBlock
+      - AudioPromptBlock
+      - FunctionCallPromptBlock
+      - ImagePromptBlock
     source:
       openapi: openapi/openapi.yml
   PromptBlockState:
@@ -6478,6 +6521,7 @@ types:
         type: optional<string>
         validation:
           format: uuid
+      proposed_diffs: optional<map<string, unknown>>
     source:
       openapi: openapi/openapi.yml
   WorkflowReleaseTagRead:

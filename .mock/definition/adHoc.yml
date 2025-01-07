@@ -8,9 +8,6 @@ service:
       path: /v1/ad-hoc/execute-prompt-stream
       method: POST
       auth: true
-      docs: >-
-        An internal-only endpoint that's subject to breaking changes without
-        notice. Not intended for public use.
       source:
         openapi: openapi/openapi.yml
       request:
@@ -33,7 +30,7 @@ service:
         docs: ''
         type: root.AdHocExecutePromptEvent
         format: json
-      url: Default
+      url: Predict
       availability: pre-release
       errors:
         - root.BadRequestError
