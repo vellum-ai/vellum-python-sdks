@@ -295,7 +295,7 @@ export class WorkflowContext {
   public getNodeContext<T extends WorkflowDataNode>(
     nodeId: string
   ): BaseNodeContext<T> {
-    const nodeContext = this.nodeContextsByNodeId.get(nodeId);
+    const nodeContext = this.globalNodeContextsByNodeId.get(nodeId);
 
     if (!nodeContext) {
       throw new NodeNotFoundError(`Failed to find node with id '${nodeId}'`);

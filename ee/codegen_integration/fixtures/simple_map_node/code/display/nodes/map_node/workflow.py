@@ -16,6 +16,7 @@ from vellum_ee.workflows.display.workflows.vellum_workflow_display import Vellum
 from ....nodes.map_node.inputs import Inputs
 from ....nodes.map_node.nodes.final_output import FinalOutput
 from ....nodes.map_node.nodes.search_node import SearchNode
+from ....nodes.map_node.nodes.templating_node import TemplatingNode
 from ....nodes.map_node.workflow import MapNodeWorkflow
 
 
@@ -40,15 +41,18 @@ class MapNodeWorkflowDisplay(VellumWorkflowDisplay[MapNodeWorkflow]):
         ),
     }
     entrypoint_displays = {
-        SearchNode: EntrypointVellumDisplayOverrides(
+        TemplatingNode: EntrypointVellumDisplayOverrides(
             id=UUID("79145e96-23c3-4763-ad7e-f3c6529fe535"),
             edge_display=EdgeVellumDisplayOverrides(id=UUID("09c7b24f-a133-4c71-971a-15b696abfe32")),
         )
     }
     edge_displays = {
-        (SearchNode.Ports.default, FinalOutput): EdgeVellumDisplayOverrides(
+        (TemplatingNode.Ports.default, SearchNode): EdgeVellumDisplayOverrides(
             id=UUID("d9cc06ea-07fb-413e-b11d-619e29dfbf84")
-        )
+        ),
+        (SearchNode.Ports.default, FinalOutput): EdgeVellumDisplayOverrides(
+            id=UUID("41499fe7-2ec8-4f35-9fd7-34cb26e57464")
+        ),
     }
     output_displays = {
         MapNodeWorkflow.Outputs.final_output: WorkflowOutputVellumDisplayOverrides(
@@ -59,6 +63,6 @@ class MapNodeWorkflowDisplay(VellumWorkflowDisplay[MapNodeWorkflow]):
             label="Final Output",
             target_handle_id=UUID("8ff89a09-6ff0-4b02-bba7-eb8456a9c865"),
             display_data=NodeDisplayData(position=NodeDisplayPosition(x=2750, y=210), width=463, height=234),
-            edge_id=UUID("d9cc06ea-07fb-413e-b11d-619e29dfbf84"),
+            edge_id=UUID("41499fe7-2ec8-4f35-9fd7-34cb26e57464"),
         )
     }

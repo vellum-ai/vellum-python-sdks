@@ -14,6 +14,7 @@ from vellum_ee.workflows.display.vellum import (
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 from ..inputs import Inputs
+from ..nodes.code_execution_node import CodeExecutionNode
 from ..nodes.final_output import FinalOutput
 from ..nodes.map_node import MapNode
 from ..workflow import Workflow
@@ -31,18 +32,24 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
     inputs_display = {
         Inputs.items: WorkflowInputsVellumDisplayOverrides(
             id=UUID("cdc4468f-45e7-46ce-bbe7-d1aa9ad86514"), name="items", required=True
-        )
+        ),
+        Inputs.test: WorkflowInputsVellumDisplayOverrides(
+            id=UUID("f245af7d-16af-4bdb-8602-e646cbff3407"), name="test", required=True
+        ),
     }
     entrypoint_displays = {
-        MapNode: EntrypointVellumDisplayOverrides(
+        CodeExecutionNode: EntrypointVellumDisplayOverrides(
             id=UUID("77325e35-b73e-4596-bfb0-3cf3ddf11a2e"),
-            edge_display=EdgeVellumDisplayOverrides(id=UUID("ea7f1340-eeb4-448c-91eb-8b0e36bef447")),
+            edge_display=EdgeVellumDisplayOverrides(id=UUID("ec1f1cb3-7221-4f7d-aaa2-0675665e201b")),
         )
     }
     edge_displays = {
+        (CodeExecutionNode.Ports.default, MapNode): EdgeVellumDisplayOverrides(
+            id=UUID("c1ed7a7c-b278-4a4e-a8d0-53366bfa4a3d")
+        ),
         (MapNode.Ports.default, FinalOutput): EdgeVellumDisplayOverrides(
             id=UUID("2e2e5cdc-94be-4df2-9e00-23467e2ea209")
-        )
+        ),
     }
     output_displays = {
         Workflow.Outputs.final_output: WorkflowOutputVellumDisplayOverrides(

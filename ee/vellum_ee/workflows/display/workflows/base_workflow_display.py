@@ -179,12 +179,21 @@ class BaseWorkflowDisplay(
             deepcopy(self._parent_display_context.node_output_displays) if self._parent_display_context else {}
         )
 
-        node_displays: Dict[Type[BaseNode], NodeDisplayType] = {}
-        port_displays: Dict[Port, PortDisplay] = {}
+        # If we're dealing with a nested workflow, then it should have access to all nodes
+        node_displays: Dict[Type[BaseNode], NodeDisplayType] = (
+            deepcopy(self._parent_display_context.node_displays) if self._parent_display_context else {}
+        )
+
+        # If we're dealing with a nested workflow, then it should have access to all ports
+        port_displays: Dict[Port, PortDisplay] = (
+            deepcopy(self._parent_display_context.port_displays) if self._parent_display_context else {}
+        )
 
         # TODO: We should still serialize nodes that are in the workflow's directory but aren't used in the graph.
         # https://app.shortcut.com/vellum/story/5394
         for node in self._workflow.get_nodes():
+            if node in node_displays:
+                continue
             node_display = self._get_node_display(node)
             node_displays[node] = node_display
 

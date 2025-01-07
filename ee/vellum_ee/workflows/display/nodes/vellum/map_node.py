@@ -33,6 +33,7 @@ class BaseMapNodeDisplay(BaseNodeVellumDisplay[_MapNodeType], Generic[_MapNodeTy
         subworkflow_display = get_workflow_display(
             base_display_class=display_context.workflow_display_class,
             workflow_class=subworkflow,
+            parent_display_context=display_context,
         )
         serialized_subworkflow = subworkflow_display.serialize()
 
