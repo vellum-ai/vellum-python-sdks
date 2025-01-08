@@ -50,7 +50,9 @@ def workflows():
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
 @click.option("--release-tag", type=list, help="Release Tag for the Deployment", multiple=True)
 @click.option(
-    "--dry-run", is_flag=True, help="Check the Workflow for errors and expected changes, without updating Vellum."
+    "--dry-run",
+    is_flag=True,
+    help="Check the Workflow for errors and expected changes, without updating its state in Vellum.",
 )
 def workflows_push(
     module: Optional[str],
@@ -85,7 +87,9 @@ def workflows_push(
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
 @click.option("--release-tag", type=list, help="Release Tag for the Deployment", multiple=True)
 @click.option(
-    "--dry-run", is_flag=True, help="Check the Workflow for errors and expected changes, without updating Vellum."
+    "--dry-run",
+    is_flag=True,
+    help="Check the Workflow for errors and expected changes, without updating its state in Vellum.",
 )
 def push_module(
     ctx: click.Context,
