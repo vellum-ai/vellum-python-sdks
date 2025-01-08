@@ -28,7 +28,7 @@ class InlineSubworkflowNode(BaseNode[StateType], Generic[StateType, WorkflowInpu
     """
 
     subworkflow: Type["BaseWorkflow[WorkflowInputsType, InnerStateType]"]
-    subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, UNDEF]] = UNDEF
+    subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[UNDEF]]] = UNDEF
 
     def run(self) -> Iterator[BaseOutput]:
         with execution_context(parent_context=get_parent_context() or self._context.parent_context):

@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, cast
 
 from vellum import VellumVariable
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
@@ -60,12 +61,25 @@ class BaseInlineSubworkflowNodeDisplay(
         node: Type[InlineSubworkflowNode],
         display_context: WorkflowDisplayContext,
     ) -> Tuple[List[NodeInput], List[VellumVariable]]:
+        subworkflow = raise_if_descriptor(node.subworkflow)
+        subworkflow_inputs_class = subworkflow.get_inputs_class()
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
-        subworkflow_entries = (
-            [(variable_name, variable_value) for variable_name, variable_value in subworkflow_inputs.items()]
-            if isinstance(subworkflow_inputs, dict)
-            else [(variable_ref.name, variable_value) for variable_ref, variable_value in subworkflow_inputs]
-        )
+
+        if isinstance(subworkflow_inputs, BaseInputs):
+            subworkflow_entries = [
+                (variable_ref.name, variable_value) for variable_ref, variable_value in subworkflow_inputs
+            ]
+        elif isinstance(subworkflow_inputs, dict):
+            subworkflow_entries = [
+                (variable_name, variable_value) for variable_name, variable_value in subworkflow_inputs.items()
+            ]
+        else:
+            subworkflow_entries = [
+                (descriptor.name, getattr(subworkflow_inputs_class, descriptor.name))
+                for descriptor in subworkflow_inputs_class
+                if hasattr(subworkflow_inputs_class, descriptor.name)
+            ]
+
         node_inputs = [
             create_node_input(
                 node_id=node_id,
@@ -83,7 +97,7 @@ class BaseInlineSubworkflowNodeDisplay(
                 key=descriptor.name,
                 type=infer_vellum_variable_type(descriptor),
             )
-            for descriptor in raise_if_descriptor(node.subworkflow).get_inputs_class()
+            for descriptor in subworkflow_inputs_class
         ]
 
         return node_inputs, workflow_inputs
