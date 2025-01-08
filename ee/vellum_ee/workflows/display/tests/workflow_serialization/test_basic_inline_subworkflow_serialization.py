@@ -150,6 +150,7 @@ def test_serialize_workflow():
                         },
                         {
                             "id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                            "label": "StartNode",
                             "type": "GENERIC",
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
                             "definition": {
@@ -159,8 +160,10 @@ def test_serialize_workflow():
                                     {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}
                                 ],
                             },
-                            "ports": [],
                             "trigger": {"id": "a95a34f2-e894-4fb6-a2c9-15d12c1e3135", "merge_behavior": "AWAIT_ANY"},
+                            "ports": [],
+                            "adornments": [],
+                            "attributes": [],
                         },
                         {
                             "id": "a773c3a5-78cb-4250-8d29-7282e8a579d3",

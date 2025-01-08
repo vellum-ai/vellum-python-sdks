@@ -18,14 +18,17 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
 
         return {
             "id": str(node_id),
+            "label": node.__qualname__,
             "type": "GENERIC",
             "display_data": self.get_display_data().dict(),
             "definition": self.get_definition().dict(),
-            "ports": [],
             "trigger": {
                 "id": str(uuid4_from_hash(f"{node_id}|trigger")),
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
+            "ports": [],
+            "adornments": [],
+            "attributes": [],
         }
 
     def get_display_data(self) -> GenericNodeDisplayData:
