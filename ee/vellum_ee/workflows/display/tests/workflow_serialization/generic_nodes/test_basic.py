@@ -3,12 +3,12 @@ from uuid import uuid4
 
 from deepdiff import DeepDiff
 
-from ee.vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
-from ee.vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
-from ee.vellum_ee.workflows.display.tests.workflow_serialization.generic_nodes.basic import BasicGenericNode
-from ee.vellum_ee.workflows.display.types import WorkflowDisplayContext
-from ee.vellum_ee.workflows.display.vellum import NodeDisplayData, WorkflowMetaVellumDisplay
-from ee.vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
+from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
+from vellum_ee.workflows.display.tests.workflow_serialization.generic_nodes.basic import BasicGenericNode
+from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.vellum import NodeDisplayData, WorkflowMetaVellumDisplay
+from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 @pytest.fixture()
