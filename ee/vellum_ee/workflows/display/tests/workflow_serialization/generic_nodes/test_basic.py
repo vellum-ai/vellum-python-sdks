@@ -17,7 +17,7 @@ def serialize_node():
         node_display_class = get_node_display_class(BaseNodeDisplay, node_class)
         node_display = node_display_class()
 
-        context = WorkflowDisplayContext(
+        context: WorkflowDisplayContext = WorkflowDisplayContext(
             workflow_display_class=VellumWorkflowDisplay,
             workflow_display=WorkflowMetaVellumDisplay(
                 entrypoint_node_id=uuid4(),
