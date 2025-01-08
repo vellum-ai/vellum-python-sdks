@@ -41,7 +41,8 @@
           "target_handle_id": "3a82ede9-4b1b-42fc-84a0-10e91de602dc",
           "code_input_id": "e5a9379e-871d-4a8f-88cd-b3ea832577dc",
           "runtime_input_id": "611d4cd9-dca8-4821-8d3b-899439c556bb",
-          "output_type": "STRING"
+          "output_type": "STRING",
+          "packages": []
         },
         "inputs": [
           {
@@ -68,7 +69,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "def main(arg1: str) -> str:\n    return arg1"
+                    "value": "def main(arg1: str) -> str:\n    return arg1\n"
                   }
                 }
               ],
@@ -97,8 +98,32 @@
             "x": 1855.8380935218793,
             "y": 384.6100572199606
           },
-          "width": 480.0,
-          "height": 224.0
+          "width": 480,
+          "height": 224
+        },
+        "definition": {
+          "bases": [
+            {
+              "module": [
+                "vellum",
+                "workflows",
+                "nodes",
+                "displayable",
+                "code_execution_node",
+                "node"
+              ],
+              "name": "CodeExecutionNode"
+            }
+          ],
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_map_node",
+            "code",
+            "nodes",
+            "code_execution_node"
+          ],
+          "name": "CodeExecutionNode"
         }
       },
       {
@@ -202,11 +227,35 @@
                     "x": 1998.7584158889226,
                     "y": 241.3446029681764
                   },
-                  "comment": null,
-                  "width": 480.0,
-                  "height": 278.0
+                  "width": 480,
+                  "height": 278
                 },
-                "definition": null
+                "definition": {
+                  "bases": [
+                    {
+                      "module": [
+                        "vellum",
+                        "workflows",
+                        "nodes",
+                        "core",
+                        "templating_node",
+                        "node"
+                      ],
+                      "name": "TemplatingNode"
+                    }
+                  ],
+                  "module": [
+                    "codegen_integration",
+                    "fixtures",
+                    "simple_map_node",
+                    "code",
+                    "nodes",
+                    "map_node",
+                    "nodes",
+                    "templating_node"
+                  ],
+                  "name": "TemplatingNode"
+                }
               },
               {
                 "id": "4b0a7578-e5ec-4d72-b396-62abdecbd101",

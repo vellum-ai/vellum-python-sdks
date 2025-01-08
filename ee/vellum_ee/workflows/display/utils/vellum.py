@@ -59,7 +59,7 @@ def create_node_input_value_pointer_rule(
 ) -> NodeInputValuePointerRule:
     if isinstance(value, OutputReference):
         upstream_node, output_display = display_context.node_output_displays[value]
-        upstream_node_display = display_context.node_displays[upstream_node]
+        upstream_node_display = display_context.global_node_displays[upstream_node]
         return NodeOutputPointer(
             data=NodeOutputData(node_id=str(upstream_node_display.node_id), output_id=str(output_display.id)),
         )

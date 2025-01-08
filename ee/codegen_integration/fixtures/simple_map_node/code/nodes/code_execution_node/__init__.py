@@ -10,4 +10,4 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
         "arg1": Inputs.test,
     }
     runtime = "PYTHON_3_11_6"
-    packages = None
+    packages = []

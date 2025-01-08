@@ -102,7 +102,7 @@ def test_create_node_input_value_pointer_rules(
                     NodeOutputDisplay(id=UUID("4b16a629-11a1-4b3f-a965-a57b872d13b8"), name="output"),
                 ),
             },
-            node_displays={
+            global_node_displays={
                 MyNodeA: MyNodeADisplay(),
             },
         ),
