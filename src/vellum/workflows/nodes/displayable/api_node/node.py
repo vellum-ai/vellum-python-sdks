@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.nodes.displayable.bases.api_node import BaseAPINode
-from vellum.workflows.references.vellum_secret import VellumSecretReference
+from vellum.workflows.types.core import VellumSecret
 
 
 class APINode(BaseAPINode):
@@ -24,8 +24,8 @@ class APINode(BaseAPINode):
 
     authorization_type: Optional[AuthorizationType] = None
     api_key_header_key: Optional[str] = None
-    api_key_header_value: Optional[Union[str, VellumSecretReference]] = None
-    bearer_token_value: Optional[Union[str, VellumSecretReference]] = None
+    api_key_header_value: Optional[Union[str, VellumSecret]] = None
+    bearer_token_value: Optional[Union[str, VellumSecret]] = None
 
     def run(self) -> BaseAPINode.Outputs:
         headers = self.headers or {}
