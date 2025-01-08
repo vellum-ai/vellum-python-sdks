@@ -173,10 +173,13 @@ def pull_command(
                     target.write(content)
 
     if metadata_json:
-        workflow_config.container_image_name = metadata_json.get("runner_config", {}).get("container_image_name")
-        workflow_config.container_image_tag = metadata_json.get("runner_config", {}).get("container_image_tag")
-        if workflow_config.container_image_name and not workflow_config.container_image_tag:
-            workflow_config.container_image_tag = "latest"
+        runner_config = metadata_json.get("runner_config")
+
+        if runner_config:
+            workflow_config.container_image_name = runner_config.get("container_image_name")
+            workflow_config.container_image_tag = runner_config.get("container_image_tag")
+            if workflow_config.container_image_name and not workflow_config.container_image_tag:
+                workflow_config.container_image_tag = "latest"
 
     if include_json:
         logger.warning(
