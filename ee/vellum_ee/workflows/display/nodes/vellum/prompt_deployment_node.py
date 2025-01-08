@@ -38,8 +38,8 @@ class BasePromptDeploymentNodeDisplay(
             for variable_name, variable_value in prompt_inputs.items()
         ]
 
-        _, output_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.text)]
-        _, array_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.results)]
+        _, output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
+        _, array_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.results)]
 
         # TODO: Pass through the name instead of retrieving the ID
         # https://app.shortcut.com/vellum/story/4702

@@ -176,7 +176,7 @@ class BaseWorkflowDisplay(
 
         # If we're dealing with a nested workflow, then it should have access to the outputs of all nodes
         node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = (
-            copy(self._parent_display_context.node_output_displays) if self._parent_display_context else {}
+            copy(self._parent_display_context.global_node_output_displays) if self._parent_display_context else {}
         )
 
         node_displays: Dict[Type[BaseNode], NodeDisplayType] = {}
@@ -215,7 +215,7 @@ class BaseWorkflowDisplay(
         workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {}
         # If we're dealing with a nested workflow, then it should have access to the inputs of its parents.
         global_workflow_input_displays = (
-            copy(self._parent_display_context.local_input_displays) if self._parent_display_context else {}
+            copy(self._parent_display_context.workflow_input_displays) if self._parent_display_context else {}
         )
         for workflow_input in self._workflow.get_inputs_class():
             workflow_input_display_overrides = self.inputs_display.get(workflow_input)
@@ -265,10 +265,10 @@ class BaseWorkflowDisplay(
 
         return WorkflowDisplayContext(
             workflow_display=workflow_display,
-            local_input_displays=workflow_input_displays,
-            workflow_input_displays=global_workflow_input_displays,
+            workflow_input_displays=workflow_input_displays,
+            global_workflow_input_displays=global_workflow_input_displays,
             node_displays=node_displays,
-            node_output_displays=node_output_displays,
+            global_node_output_displays=node_output_displays,
             global_node_displays=global_node_displays,
             entrypoint_displays=entrypoint_displays,
             workflow_output_displays=workflow_output_displays,

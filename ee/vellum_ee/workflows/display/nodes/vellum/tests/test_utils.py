@@ -91,12 +91,12 @@ def test_create_node_input_value_pointer_rules(
                 entrypoint_node_source_handle_id=uuid4(),
                 entrypoint_node_display=NodeDisplayData(),
             ),
-            workflow_input_displays={
+            global_workflow_input_displays={
                 cast(WorkflowInputReference, Inputs.example_workflow_input): WorkflowInputsVellumDisplayOverrides(
                     id=UUID("a154c29d-fac0-4cd0-ba88-bc52034f5470"),
                 ),
             },
-            node_output_displays={
+            global_node_output_displays={
                 cast(OutputReference, MyNodeA.Outputs.output): (
                     MyNodeA,
                     NodeOutputDisplay(id=UUID("4b16a629-11a1-4b3f-a965-a57b872d13b8"), name="output"),

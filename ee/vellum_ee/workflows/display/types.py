@@ -35,11 +35,13 @@ class WorkflowDisplayContext(
 ):
     workflow_display_class: Type["BaseWorkflowDisplay"]
     workflow_display: WorkflowMetaDisplayType
-    local_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(default_factory=dict)
     workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(default_factory=dict)
+    global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(
+        default_factory=dict
+    )
     node_displays: Dict[Type[BaseNode], "NodeDisplayType"] = field(default_factory=dict)
     global_node_displays: Dict[Type[BaseNode], NodeDisplayType] = field(default_factory=dict)
-    node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], "NodeOutputDisplay"]] = field(
+    global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], "NodeOutputDisplay"]] = field(
         default_factory=dict
     )
     entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = field(default_factory=dict)

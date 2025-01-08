@@ -58,13 +58,13 @@ def create_node_input_value_pointer_rule(
     value: Any, display_context: WorkflowDisplayContext
 ) -> NodeInputValuePointerRule:
     if isinstance(value, OutputReference):
-        upstream_node, output_display = display_context.node_output_displays[value]
+        upstream_node, output_display = display_context.global_node_output_displays[value]
         upstream_node_display = display_context.global_node_displays[upstream_node]
         return NodeOutputPointer(
             data=NodeOutputData(node_id=str(upstream_node_display.node_id), output_id=str(output_display.id)),
         )
     if isinstance(value, WorkflowInputReference):
-        workflow_input_display = display_context.workflow_input_displays[value]
+        workflow_input_display = display_context.global_workflow_input_displays[value]
         return InputVariablePointer(data=InputVariableData(input_variable_id=str(workflow_input_display.id)))
     if isinstance(value, VellumSecretReference):
         # TODO: Pass through the name instead of retrieving the ID

@@ -55,7 +55,7 @@ class VellumWorkflowDisplay(
 
     def serialize(self, raise_errors: bool = True) -> JsonObject:
         input_variables: JsonArray = []
-        for workflow_input, workflow_input_display in self.display_context.local_input_displays.items():
+        for workflow_input, workflow_input_display in self.display_context.workflow_input_displays.items():
             default = primitive_to_vellum_value(workflow_input.instance) if workflow_input.instance else None
             required = (
                 workflow_input_display.required
