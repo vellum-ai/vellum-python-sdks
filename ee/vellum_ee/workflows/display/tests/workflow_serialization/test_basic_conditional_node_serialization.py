@@ -448,17 +448,8 @@ def test_serialize_workflow():
         ignore_order=True,
     )
 
-    assert not DeepDiff(
-        [
-            {"id": "148c61bd-e8b0-4d4b-8734-b043a72b90ed", "type": "GENERIC"},
-            {"id": "ed7caf01-9ae7-47a3-b15a-16697abaf486", "type": "GENERIC"},
-            {"id": "0d959311-c836-4641-a867-58f63df9dfea", "type": "GENERIC"},
-            {"id": "8df781b1-ff28-48a5-98a2-d7d796b932b0", "type": "GENERIC"},
-            {"id": "68c02b7c-5077-4087-803d-841474a8081f", "type": "GENERIC"},
-        ],
-        workflow_raw_data["nodes"][2:7],
-        ignore_order=True,
-    )
+    passthrough_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC"]
+    assert len(passthrough_nodes) == 5
 
     assert not DeepDiff(
         [

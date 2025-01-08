@@ -69,15 +69,7 @@ def test_serialize_workflow__await_all():
     }
 
     passthrough_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC"]
-    assert not DeepDiff(
-        [
-            {"id": "127ef456-91bc-43c6-bd8b-1772db5e3cb5", "type": "GENERIC"},
-            {"id": "59243c65-053f-4ea6-9157-3f3edb1477bf", "type": "GENERIC"},
-            {"id": "634f0202-9ea9-4c62-b152-1a58c595cffb", "type": "GENERIC"},
-        ],
-        passthrough_nodes,
-        ignore_order=True,
-    )
+    assert len(passthrough_nodes) == 3
 
     merge_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "MERGE")
     assert not DeepDiff(

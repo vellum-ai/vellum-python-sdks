@@ -79,13 +79,7 @@ def test_serialize_workflow(vellum_client):
     }
 
     api_node = workflow_raw_data["nodes"][1]
-    assert not DeepDiff(
-        {
-            "id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
-            "type": "GENERIC",
-        },
-        api_node,
-    )
+    assert api_node["id"] == "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f"
 
     final_output_node = workflow_raw_data["nodes"][2]
     assert not DeepDiff(

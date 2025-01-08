@@ -91,10 +91,7 @@ def test_serialize_workflow__missing_final_output_node():
     }
 
     passthrough_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC")
-    assert passthrough_node == {
-        "id": "32d88cab-e9fa-4a56-9bc2-fb6e1fd0897f",
-        "type": "GENERIC",
-    }
+    assert passthrough_node["id"] == "32d88cab-e9fa-4a56-9bc2-fb6e1fd0897f"
 
     final_output_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "TERMINAL"]
     assert not DeepDiff(

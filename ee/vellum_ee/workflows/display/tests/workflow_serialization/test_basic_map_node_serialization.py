@@ -133,7 +133,20 @@ def test_serialize_workflow():
                                 "bases": [],
                             },
                         },
-                        {"id": "baf6d316-dc75-41e8-96c0-015aede96309", "type": "GENERIC"},
+                        {
+                            "id": "baf6d316-dc75-41e8-96c0-015aede96309",
+                            "type": "GENERIC",
+                            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                            "definition": {
+                                "name": "Iteration",
+                                "module": ["tests", "workflows", "basic_map_node", "workflow"],
+                                "bases": [
+                                    {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}
+                                ],
+                            },
+                            "ports": [],
+                            "trigger": {"id": "01324747-9bc0-4ecd-a8ab-40dca5a94e2e", "merge_behavior": "AWAIT_ANY"},
+                        },
                         {
                             "id": "6f4883b2-70b1-4e1c-ae15-7d0f5aec810b",
                             "type": "TERMINAL",

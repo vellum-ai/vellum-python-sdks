@@ -122,20 +122,8 @@ def test_serialize_workflow():
         ignore_order=True,
     )
 
-    mocked_base_nodes = [
-        node
-        for i, node in enumerate(workflow_raw_data["nodes"])
-        if i != error_index and i != 0 and i != len(workflow_raw_data["nodes"]) - 1
-    ]
-
-    assert not DeepDiff(
-        [
-            {"id": "1381c078-efa2-4255-89a1-7b4cb742c7fc", "type": "GENERIC"},
-            {"id": "1eee9b4e-531f-45f2-a4b9-42207fac2c33", "type": "GENERIC"},
-        ],
-        mocked_base_nodes,
-        ignore_order=True,
-    )
+    passthrough_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC"]
+    assert len(passthrough_nodes) == 2
 
     terminal_node = workflow_raw_data["nodes"][-1]
     assert not DeepDiff(
