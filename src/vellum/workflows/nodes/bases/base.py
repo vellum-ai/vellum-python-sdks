@@ -324,6 +324,10 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
             if not descriptor.instance:
                 continue
 
+            if any(isinstance(t, type) and issubclass(t, BaseDescriptor) for t in descriptor.types):
+                # We don't want to resolve attributes that are _meant_ to be descriptors
+                continue
+
             resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs)
             setattr(self, descriptor.name, resolved_value)
 

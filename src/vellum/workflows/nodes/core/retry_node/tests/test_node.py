@@ -111,6 +111,9 @@ def test_retry_node__condition_arg_successfully_retries():
             value: str
 
         def run(self) -> Outputs:
+            if not isinstance(self.state.meta.parent, State):
+                raise NodeException(message="Failed to resolve parent state")
+
             self.state.meta.parent.count += 1
             raise NodeException(message=f"This is failure attempt {self.attempt_number}")
 
@@ -120,7 +123,11 @@ def test_retry_node__condition_arg_successfully_retries():
         node.run()
 
     # THEN the exception raised is the last one
-    assert exc_info.value.message == "This is failure attempt 3"
+    assert (
+        exc_info.value.message
+        == """Rejection failed on attempt 3: INTERNAL_ERROR.
+Message: This is failure attempt 3"""
+    )
 
     # AND the state was updated each time
     assert node.state.count == 3

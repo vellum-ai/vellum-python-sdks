@@ -1,6 +1,7 @@
 from typing import Callable, Generic, Optional, Type
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
@@ -22,6 +23,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
     max_attempts: int
     retry_on_error_code: Optional[WorkflowErrorCode] = None
+    retry_on_condition: Optional[BaseDescriptor] = None
 
     class SubworkflowInputs(BaseInputs):
         attempt_number: int
@@ -59,8 +61,18 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 Message: {terminal_event.error.message}""",
                 )
                 break
+            elif self.retry_on_condition and not resolve_value(self.retry_on_condition, self.state):
+                last_exception = NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message=f"""Rejection failed on attempt {attempt_number}: {terminal_event.error.code.value}.
+Message: {terminal_event.error.message}""",
+                )
+                break
             else:
-                last_exception = Exception(terminal_event.error.message)
+                last_exception = NodeException(
+                    terminal_event.error.message,
+                    code=terminal_event.error.code,
+                )
 
         raise last_exception
 
