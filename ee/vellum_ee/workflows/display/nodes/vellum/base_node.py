@@ -26,7 +26,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
             "ports": [],
-            "adornments": [],
+            "adornments": None,
             "attributes": [],
         }
 

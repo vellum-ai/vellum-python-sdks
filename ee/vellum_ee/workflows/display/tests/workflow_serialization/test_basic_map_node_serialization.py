@@ -147,7 +147,7 @@ def test_serialize_workflow():
                             },
                             "trigger": {"id": "01324747-9bc0-4ecd-a8ab-40dca5a94e2e", "merge_behavior": "AWAIT_ANY"},
                             "ports": [],
-                            "adornments": [],
+                            "adornments": None,
                             "attributes": [],
                         },
                         {
