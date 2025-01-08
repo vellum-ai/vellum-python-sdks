@@ -38,6 +38,10 @@ class NodeDisplayData(UniversalBaseModel):
     comment: Optional[NodeDisplayComment] = None
 
 
+class GenericNodeDisplayData(UniversalBaseModel):
+    position: NodeDisplayPosition = Field(default_factory=NodeDisplayPosition)
+
+
 class CodeResourceDefinition(UniversalBaseModel):
     name: str
     module: List[str]

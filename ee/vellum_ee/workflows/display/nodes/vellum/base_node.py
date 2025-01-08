@@ -6,6 +6,8 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
+from ee.vellum_ee.workflows.display.vellum import GenericNodeDisplayData
+
 _BaseNodeType = TypeVar("_BaseNodeType", bound=BaseNode)
 
 
@@ -25,3 +27,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
         }
+
+    def get_display_data(self) -> GenericNodeDisplayData:
+        explicit_value = self._get_explicit_node_display_attr("display_data", GenericNodeDisplayData)
+        return explicit_value if explicit_value else GenericNodeDisplayData()
