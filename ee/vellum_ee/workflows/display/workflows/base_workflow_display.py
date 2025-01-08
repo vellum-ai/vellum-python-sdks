@@ -110,7 +110,7 @@ class BaseWorkflowDisplay(
     def node_display_base_class(self) -> Type[NodeDisplayType]:
         pass
 
-    def _enrich_node_output_displays(
+    def _enrich_global_node_output_displays(
         self,
         node: Type[BaseNode],
         node_display: NodeDisplayType,
@@ -126,7 +126,7 @@ class BaseWorkflowDisplay(
                 inner_node = get_wrapped_node(node)
                 if inner_node._is_wrapped_node:
                     inner_node_display = self._get_node_display(inner_node)
-                    self._enrich_node_output_displays(inner_node, inner_node_display, node_output_displays)
+                    self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
 
             # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
             # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
@@ -174,22 +174,17 @@ class BaseWorkflowDisplay(
     ]:
         workflow_display = self._generate_workflow_meta_display()
 
-        # If we're dealing with a nested workflow, then it should have access to the outputs of all nodes
-        node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = (
+        global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = (
             copy(self._parent_display_context.global_node_output_displays) if self._parent_display_context else {}
         )
 
         node_displays: Dict[Type[BaseNode], NodeDisplayType] = {}
 
-        # If we're dealing with a nested workflow, then it should have access to all nodes
         global_node_displays: Dict[Type[BaseNode], NodeDisplayType] = (
             copy(self._parent_display_context.global_node_displays) if self._parent_display_context else {}
         )
 
-        # If we're dealing with a nested workflow, then it should have access to all ports
-        port_displays: Dict[Port, PortDisplay] = (
-            copy(self._parent_display_context.port_displays) if self._parent_display_context else {}
-        )
+        port_displays: Dict[Port, PortDisplay] = {}
 
         # TODO: We should still serialize nodes that are in the workflow's directory but aren't used in the graph.
         # https://app.shortcut.com/vellum/story/5394
@@ -209,7 +204,7 @@ class BaseWorkflowDisplay(
                     node_displays[inner_node] = inner_node_display
                     global_node_displays[inner_node] = inner_node_display
 
-            self._enrich_node_output_displays(node, node_display, node_output_displays)
+            self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
             self._enrich_node_port_displays(node, node_display, port_displays)
 
         workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {}
@@ -268,7 +263,7 @@ class BaseWorkflowDisplay(
             workflow_input_displays=workflow_input_displays,
             global_workflow_input_displays=global_workflow_input_displays,
             node_displays=node_displays,
-            global_node_output_displays=node_output_displays,
+            global_node_output_displays=global_node_output_displays,
             global_node_displays=global_node_displays,
             entrypoint_displays=entrypoint_displays,
             workflow_output_displays=workflow_output_displays,
