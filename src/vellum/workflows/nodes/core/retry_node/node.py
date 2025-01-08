@@ -1,5 +1,6 @@
 from typing import Callable, Generic, Optional, Type
 
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
@@ -65,8 +66,16 @@ Message: {terminal_event.error.message}""",
 
     @classmethod
     def wrap(
-        cls, max_attempts: int, retry_on_error_code: Optional[WorkflowErrorCode] = None
+        cls,
+        max_attempts: int,
+        retry_on_error_code: Optional[WorkflowErrorCode] = None,
+        retry_on_condition: Optional[BaseDescriptor] = None,
     ) -> Callable[..., Type["RetryNode"]]:
         return create_adornment(
-            cls, attributes={"max_attempts": max_attempts, "retry_on_error_code": retry_on_error_code}
+            cls,
+            attributes={
+                "max_attempts": max_attempts,
+                "retry_on_error_code": retry_on_error_code,
+                "retry_on_condition": retry_on_condition,
+            },
         )

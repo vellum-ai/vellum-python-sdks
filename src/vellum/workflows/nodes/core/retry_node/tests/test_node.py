@@ -6,6 +6,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState, StateMeta
 
 
@@ -91,3 +92,35 @@ def test_retry_node__use_parent_inputs_and_state():
 
     # THEN the data is used successfully
     assert outputs.value == "foo bar"
+
+
+def test_retry_node__condition_arg_successfully_retries():
+    # GIVEN workflow Inputs and State
+    class State(BaseState):
+        count = 0
+
+    # AND a retry node that retries on a condition
+    @RetryNode.wrap(
+        max_attempts=5,
+        retry_on_condition=LazyReference(lambda: State.count.less_than(3)),
+    )
+    class TestNode(BaseNode[State]):
+        attempt_number = RetryNode.SubworkflowInputs.attempt_number
+
+        class Outputs(BaseOutputs):
+            value: str
+
+        def run(self) -> Outputs:
+            self.state.meta.parent.count += 1
+            raise NodeException(message=f"This is failure attempt {self.attempt_number}")
+
+    # WHEN the node is run
+    node = TestNode(state=State())
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # THEN the exception raised is the last one
+    assert exc_info.value.message == "This is failure attempt 3"
+
+    # AND the state was updated each time
+    assert node.state.count == 3
