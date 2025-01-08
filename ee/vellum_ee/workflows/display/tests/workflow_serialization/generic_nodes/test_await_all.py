@@ -41,7 +41,6 @@ def test_serialize_node__basic(serialize_node):
             "definition": {
                 "name": "AwaitAllGenericNode",
                 "module": [
-                    "ee",
                     "vellum_ee",
                     "workflows",
                     "display",
