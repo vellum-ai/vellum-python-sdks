@@ -110,13 +110,17 @@ class ExampleWorkflow(BaseWorkflow):
     # THEN it should succeed
     assert result.exit_code == 0
 
+    # Get the last part of the module path and format it
+    expected_label = mock_module.module.split(".")[-1].replace("_", " ").title()
+    expected_artifact_name = f"{mock_module.module.replace('.', '__')}.tar.gz"
+
     # AND we should have called the push API with the correct args
     vellum_client.workflows.push.assert_called_once()
     call_args = vellum_client.workflows.push.call_args.kwargs
     assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
-    assert call_args["label"] == "Mock"
+    assert call_args["label"] == expected_label
     assert is_valid_uuid(call_args["workflow_sandbox_id"])
-    assert call_args["artifact"].name == "examples__mock.tar.gz"
+    assert call_args["artifact"].name == expected_artifact_name
     assert "deplyment_config" not in call_args
 
     extracted_files = _extract_tar_gz(call_args["artifact"].read())
@@ -160,13 +164,17 @@ class ExampleWorkflow(BaseWorkflow):
     # THEN it should succeed
     assert result.exit_code == 0
 
+    # Get the last part of the module path and format it
+    expected_label = mock_module.module.split(".")[-1].replace("_", " ").title()
+    expected_artifact_name = f"{mock_module.module.replace('.', '__')}.tar.gz"
+
     # AND we should have called the push API with the correct args
     vellum_client.workflows.push.assert_called_once()
     call_args = vellum_client.workflows.push.call_args.kwargs
     assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
-    assert call_args["label"] == "Mock"
+    assert call_args["label"] == expected_label
     assert is_valid_uuid(call_args["workflow_sandbox_id"])
-    assert call_args["artifact"].name == "examples__mock.tar.gz"
+    assert call_args["artifact"].name == expected_artifact_name
     assert call_args["deployment_config"] == "{}"
 
     extracted_files = _extract_tar_gz(call_args["artifact"].read())
@@ -231,6 +239,6 @@ class ExampleWorkflow(BaseWorkflow):
 
     # AND the report should be in the output
     assert "## Errors" in result.output
-    # assert "Serialization is not supported." in result.output
+    assert "Serialization is not supported." in result.output
     assert "## Proposed Diffs" in result.output
     assert "iterable_item_added" in result.output

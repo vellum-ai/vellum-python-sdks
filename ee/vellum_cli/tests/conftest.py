@@ -18,11 +18,13 @@ class MockModuleResult:
 
 
 @pytest.fixture
-def mock_module() -> Generator[MockModuleResult, None, None]:
+def mock_module(request) -> Generator[MockModuleResult, None, None]:
     current_dir = os.getcwd()
     temp_dir = tempfile.mkdtemp()
     os.chdir(temp_dir)
-    module = "examples.mock"
+
+    # Use the test name to create a unique module path
+    module = f"examples.mock.{request.node.name}"
     workflow_sandbox_id = str(uuid4())
 
     def set_pyproject_toml(vellum_config: Dict[str, Any]) -> None:
