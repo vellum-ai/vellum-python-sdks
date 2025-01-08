@@ -27,7 +27,7 @@ def push_command(
     deployment_name: Optional[str] = None,
     deployment_description: Optional[str] = None,
     release_tags: Optional[List[str]] = None,
-    check: Optional[bool] = None,
+    dry_run: Optional[bool] = None,
 ) -> None:
     load_dotenv()
     logger = load_cli_logger()
@@ -50,8 +50,12 @@ def push_command(
     # Remove this once we could serialize using the artifact in Vembda
     # https://app.shortcut.com/vellum/story/5585
     workflow = BaseWorkflow.load_from_module(workflow_config.module)
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow)
-    exec_config = workflow_display.serialize(raise_errors=not check)
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=workflow,
+        dry_run=dry_run or False,
+    )
+    exec_config = workflow_display.serialize()
 
     container_tag = workflow_config.container_image_tag
     if workflow_config.container_image_name and not workflow_config.container_image_tag:
@@ -115,13 +119,23 @@ def push_command(
         # We should check with fern if we could auto-serialize typed object fields for us
         # https://app.shortcut.com/vellum/story/5568
         deployment_config=deployment_config_serialized,  # type: ignore[arg-type]
-        request_options={"additional_body_parameters": {"check": check}},
+        dry_run=dry_run,
     )
 
-    if check:
-        # TODO: Implement in Vellum push `check` and log `response.expected_diffs` to the console
-        # https://app.shortcut.com/vellum/story/5416
-        logger.info(f"Ran check on {label}")  # type: ignore[attr-defined]
+    if dry_run:
+        error_messages = [str(e) for e in workflow_display.errors]
+        error_message = "\n".join(error_messages) if error_messages else "No errors found."
+        logger.info(
+            f"""\
+# Workflow Push Report
+
+## Errors
+{error_message}
+
+## Proposed Diffs
+{json.dumps(response.proposed_diffs, indent=2)}
+"""
+        )  # type: ignore[attr-defined]
     else:
         logger.info(
             f"""Successfully pushed {label} to Vellum!

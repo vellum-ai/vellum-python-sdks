@@ -3,7 +3,7 @@ from copy import copy
 from functools import cached_property
 import logging
 from uuid import UUID
-from typing import Any, Dict, Generic, Optional, Tuple, Type, get_args
+from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, get_args
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
@@ -71,6 +71,10 @@ class BaseWorkflowDisplay(
     # Used to store the mapping between workflows and their display classes
     _workflow_display_registry: Dict[Type[WorkflowType], Type["BaseWorkflowDisplay"]] = {}
 
+    _errors: List[Exception]
+
+    _dry_run: bool
+
     def __init__(
         self,
         workflow: Type[WorkflowType],
@@ -85,12 +89,15 @@ class BaseWorkflowDisplay(
                 EdgeDisplayType,
             ]
         ] = None,
+        dry_run: bool = False,
     ):
         self._workflow = workflow
         self._parent_display_context = parent_display_context
+        self._errors: List[Exception] = []
+        self._dry_run = dry_run
 
     @abstractmethod
-    def serialize(self, raise_errors: bool = True) -> JsonObject:
+    def serialize(self) -> JsonObject:
         pass
 
     @classmethod
@@ -109,6 +116,17 @@ class BaseWorkflowDisplay(
     @abstractmethod
     def node_display_base_class(self) -> Type[NodeDisplayType]:
         pass
+
+    def add_error(self, error: Exception) -> None:
+        if self._dry_run:
+            self._errors.append(error)
+            return
+
+        raise error
+
+    @property
+    def errors(self) -> Iterator[Exception]:
+        return iter(self._errors)
 
     def _enrich_global_node_output_displays(
         self,

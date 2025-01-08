@@ -173,7 +173,7 @@ class ExampleWorkflow(BaseWorkflow):
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
-def test_push__check_option_returns_report(mock_module, vellum_client):
+def test_push__dry_run_option_returns_report(mock_module, vellum_client):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
     module = mock_module.module
@@ -203,43 +203,34 @@ class ExampleWorkflow(BaseWorkflow):
     # AND the push API call returns successfully
     vellum_client.workflows.push.return_value = WorkflowPushResponse(
         workflow_sandbox_id=str(uuid4()),
+        proposed_diffs={
+            "iterable_item_added": {
+                "root['raw_data']['nodes'][0]": {
+                    "id": str(uuid4()),
+                    "type": "GENERIC",
+                    "definition": None,
+                    "display_data": None,
+                    "trigger": {"id": str(uuid4()), "merge_behavior": "AWAIT_ATTRIBUTES"},
+                    "ports": [{"id": str(uuid4()), "name": "default", "type": "DEFAULT"}],
+                },
+            },
+        },
     )
 
     # WHEN calling `vellum push`
     runner = CliRunner(mix_stderr=True)
-    result = runner.invoke(cli_main, ["push", module, "--check"])
+    result = runner.invoke(cli_main, ["push", module, "--dry-run"])
 
     # THEN it should succeed
     assert result.exit_code == 0
 
-    # AND we should have called the push API with the check option
+    # AND we should have called the push API with the dry-run option
     vellum_client.workflows.push.assert_called_once()
     call_args = vellum_client.workflows.push.call_args.kwargs
-    assert call_args["request_options"]["additional_body_parameters"]["check"] is True
+    assert call_args["dry_run"] is True
 
     # AND the report should be in the output
-    assert (
-        result.output
-        == """\x1b[38;20mLoading workflow from examples.mock\x1b[0m
-\x1b[38;20mRan check on Mock\x1b[0m
-"""
-    )
-
-
-# TODO: Implement in Vellum push `check` and output results
-# https://app.shortcut.com/vellum/story/5416
-#         == """# Workflow Push Report
-
-# ## Errors
-# - `NotSupportedNode`
-#     - Serialization is not supported.
-
-# ## Diffs
-# + `AddedNode`
-# ~ `ModifiedNode`
-#     + `ModifiedNode.added_attribute`
-#     ~ `ModifiedNode.modified_attribute`
-#         ~ "Hello, World" -> "Hello, World!"
-#     - `ModifiedNode.removed_attribute`
-# - `RemovedNode`
-# """
+    assert "## Errors" in result.output
+    # assert "Serialization is not supported." in result.output
+    assert "## Proposed Diffs" in result.output
+    assert "iterable_item_added" in result.output

@@ -53,7 +53,7 @@ class VellumWorkflowDisplay(
 ):
     node_display_base_class = BaseNodeVellumDisplay
 
-    def serialize(self, raise_errors: bool = True) -> JsonObject:
+    def serialize(self) -> JsonObject:
         input_variables: JsonArray = []
         for workflow_input, workflow_input_display in self.display_context.workflow_input_displays.items():
             default = primitive_to_vellum_value(workflow_input.instance) if workflow_input.instance else None
@@ -106,12 +106,9 @@ class VellumWorkflowDisplay(
 
             try:
                 serialized_node = node_display.serialize(self.display_context)
-            except NotImplementedError:
-                logger.warning("Unable to serialize node", extra={"node": node.__name__})
-                if raise_errors:
-                    raise
-                else:
-                    continue
+            except NotImplementedError as e:
+                self.add_error(e)
+                continue
 
             nodes.append(serialized_node)
 
@@ -205,7 +202,9 @@ class VellumWorkflowDisplay(
         # If there are terminal nodes with no workflow output reference,
         # raise a serialization error
         if len(unreferenced_final_output_node_outputs) > 0:
-            raise ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
+            self.add_error(
+                ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
+            )
 
         # Add an edge for each edge in the workflow
         all_edge_displays: List[EdgeVellumDisplay] = [
