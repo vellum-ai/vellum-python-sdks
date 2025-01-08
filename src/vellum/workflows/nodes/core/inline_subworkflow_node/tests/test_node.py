@@ -39,3 +39,19 @@ def test_inline_subworkflow_node__inputs(inputs):
     assert events == [
         BaseOutput(name="out", value="bar"),
     ]
+
+
+def test_inline_subworkflow_node__support_inputs_as_attributes():
+    # GIVEN a node setup with subworkflow inputs
+    class MyNode(InlineSubworkflowNode):
+        subworkflow = MySubworkflow
+        foo = "bar"
+
+    # WHEN the node is run
+    node = MyNode()
+    events = list(node.run())
+
+    # THEN the output is as expected
+    assert events == [
+        BaseOutput(name="out", value="bar"),
+    ]

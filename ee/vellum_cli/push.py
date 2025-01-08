@@ -27,6 +27,7 @@ def push_command(
     deployment_name: Optional[str] = None,
     deployment_description: Optional[str] = None,
     release_tags: Optional[List[str]] = None,
+    dry_run: Optional[bool] = None,
 ) -> None:
     load_dotenv()
     logger = load_cli_logger()
@@ -49,7 +50,11 @@ def push_command(
     # Remove this once we could serialize using the artifact in Vembda
     # https://app.shortcut.com/vellum/story/5585
     workflow = BaseWorkflow.load_from_module(workflow_config.module)
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow)
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=workflow,
+        dry_run=dry_run or False,
+    )
     exec_config = workflow_display.serialize()
 
     container_tag = workflow_config.container_image_tag
@@ -114,11 +119,28 @@ def push_command(
         # We should check with fern if we could auto-serialize typed object fields for us
         # https://app.shortcut.com/vellum/story/5568
         deployment_config=deployment_config_serialized,  # type: ignore[arg-type]
+        dry_run=dry_run,
     )
-    logger.info(
-        f"""Successfully pushed {label} to Vellum!
+
+    if dry_run:
+        error_messages = [str(e) for e in workflow_display.errors]
+        error_message = "\n".join(error_messages) if error_messages else "No errors found."
+        logger.info(
+            f"""\
+# Workflow Push Report
+
+## Errors
+{error_message}
+
+## Proposed Diffs
+{json.dumps(response.proposed_diffs, indent=2)}
+"""
+        )  # type: ignore[attr-defined]
+    else:
+        logger.info(
+            f"""Successfully pushed {label} to Vellum!
 Visit at: https://app.vellum.ai/workflow-sandboxes/{response.workflow_sandbox_id}"""
-    )
+        )
 
     requires_save = False
     if not workflow_config.workflow_sandbox_id:

@@ -5,3 +5,4 @@ from vellum.workflows.inputs import BaseInputs
 
 class Inputs(BaseInputs):
     items: Any
+    test: str

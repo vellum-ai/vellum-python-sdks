@@ -171,3 +171,66 @@ class ExampleWorkflow(BaseWorkflow):
 
     extracted_files = _extract_tar_gz(call_args["artifact"].read())
     assert extracted_files["workflow.py"] == workflow_py_file_content
+
+
+def test_push__dry_run_option_returns_report(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    base_dir = os.path.join(temp_dir, *module.split("."))
+    os.makedirs(base_dir, exist_ok=True)
+    workflow_py_file_content = """\
+from typing import Dict
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import BaseNode
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+
+class NotSupportedNode(BaseNode):
+    pass
+
+class NotSupportedNodeDisplay(BaseNodeDisplay[NotSupportedNode]):
+    def serialize(self, display_context, **kwargs) -> Dict:
+        raise NotImplementedError(f"Serialization is not supported.")
+
+class ExampleWorkflow(BaseWorkflow):
+    graph = NotSupportedNode
+"""
+    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
+        f.write(workflow_py_file_content)
+
+    # AND the push API call returns successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        proposed_diffs={
+            "iterable_item_added": {
+                "root['raw_data']['nodes'][0]": {
+                    "id": str(uuid4()),
+                    "type": "GENERIC",
+                    "definition": None,
+                    "display_data": None,
+                    "trigger": {"id": str(uuid4()), "merge_behavior": "AWAIT_ATTRIBUTES"},
+                    "ports": [{"id": str(uuid4()), "name": "default", "type": "DEFAULT"}],
+                },
+            },
+        },
+    )
+
+    # WHEN calling `vellum push`
+    runner = CliRunner(mix_stderr=True)
+    result = runner.invoke(cli_main, ["push", module, "--dry-run"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the dry-run option
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert call_args["dry_run"] is True
+
+    # AND the report should be in the output
+    assert "## Errors" in result.output
+    # assert "Serialization is not supported." in result.output
+    assert "## Proposed Diffs" in result.output
+    assert "iterable_item_added" in result.output

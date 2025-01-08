@@ -1,9 +1,9 @@
 from abc import abstractmethod
-from copy import deepcopy
+from copy import copy
 from functools import cached_property
 import logging
 from uuid import UUID
-from typing import Any, Dict, Generic, Optional, Tuple, Type, get_args
+from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, get_args
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
@@ -71,6 +71,10 @@ class BaseWorkflowDisplay(
     # Used to store the mapping between workflows and their display classes
     _workflow_display_registry: Dict[Type[WorkflowType], Type["BaseWorkflowDisplay"]] = {}
 
+    _errors: List[Exception]
+
+    _dry_run: bool
+
     def __init__(
         self,
         workflow: Type[WorkflowType],
@@ -85,12 +89,15 @@ class BaseWorkflowDisplay(
                 EdgeDisplayType,
             ]
         ] = None,
+        dry_run: bool = False,
     ):
         self._workflow = workflow
         self._parent_display_context = parent_display_context
+        self._errors: List[Exception] = []
+        self._dry_run = dry_run
 
     @abstractmethod
-    def serialize(self, raise_errors: bool = True) -> JsonObject:
+    def serialize(self) -> JsonObject:
         pass
 
     @classmethod
@@ -110,7 +117,18 @@ class BaseWorkflowDisplay(
     def node_display_base_class(self) -> Type[NodeDisplayType]:
         pass
 
-    def _enrich_node_output_displays(
+    def add_error(self, error: Exception) -> None:
+        if self._dry_run:
+            self._errors.append(error)
+            return
+
+        raise error
+
+    @property
+    def errors(self) -> Iterator[Exception]:
+        return iter(self._errors)
+
+    def _enrich_global_node_output_displays(
         self,
         node: Type[BaseNode],
         node_display: NodeDisplayType,
@@ -126,7 +144,7 @@ class BaseWorkflowDisplay(
                 inner_node = get_wrapped_node(node)
                 if inner_node._is_wrapped_node:
                     inner_node_display = self._get_node_display(inner_node)
-                    self._enrich_node_output_displays(inner_node, inner_node_display, node_output_displays)
+                    self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
 
             # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
             # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
@@ -174,19 +192,26 @@ class BaseWorkflowDisplay(
     ]:
         workflow_display = self._generate_workflow_meta_display()
 
-        # If we're dealing with a nested workflow, then it should have access to the outputs of all nodes
-        node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = (
-            deepcopy(self._parent_display_context.node_output_displays) if self._parent_display_context else {}
+        global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = (
+            copy(self._parent_display_context.global_node_output_displays) if self._parent_display_context else {}
         )
 
         node_displays: Dict[Type[BaseNode], NodeDisplayType] = {}
+
+        global_node_displays: Dict[Type[BaseNode], NodeDisplayType] = (
+            copy(self._parent_display_context.global_node_displays) if self._parent_display_context else {}
+        )
+
         port_displays: Dict[Port, PortDisplay] = {}
 
         # TODO: We should still serialize nodes that are in the workflow's directory but aren't used in the graph.
         # https://app.shortcut.com/vellum/story/5394
         for node in self._workflow.get_nodes():
+            if node in global_node_displays:
+                continue
             node_display = self._get_node_display(node)
             node_displays[node] = node_display
+            global_node_displays[node] = node_display
 
             # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
             if has_wrapped_node(node):
@@ -195,22 +220,23 @@ class BaseWorkflowDisplay(
 
                 if inner_node._is_wrapped_node:
                     node_displays[inner_node] = inner_node_display
+                    global_node_displays[inner_node] = inner_node_display
 
-            self._enrich_node_output_displays(node, node_display, node_output_displays)
+            self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
             self._enrich_node_port_displays(node, node_display, port_displays)
 
+        workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {}
         # If we're dealing with a nested workflow, then it should have access to the inputs of its parents.
-        workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = (
-            deepcopy(self._parent_display_context.workflow_input_displays) if self._parent_display_context else {}
+        global_workflow_input_displays = (
+            copy(self._parent_display_context.workflow_input_displays) if self._parent_display_context else {}
         )
         for workflow_input in self._workflow.get_inputs_class():
-            if workflow_input in workflow_input_displays:
-                continue
-
             workflow_input_display_overrides = self.inputs_display.get(workflow_input)
-            workflow_input_displays[workflow_input] = self._generate_workflow_input_display(
+            input_display = self._generate_workflow_input_display(
                 workflow_input, overrides=workflow_input_display_overrides
             )
+            workflow_input_displays[workflow_input] = input_display
+            global_workflow_input_displays[workflow_input] = input_display
 
         entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = {}
         for entrypoint in self._workflow.get_entrypoints():
@@ -253,8 +279,10 @@ class BaseWorkflowDisplay(
         return WorkflowDisplayContext(
             workflow_display=workflow_display,
             workflow_input_displays=workflow_input_displays,
+            global_workflow_input_displays=global_workflow_input_displays,
             node_displays=node_displays,
-            node_output_displays=node_output_displays,
+            global_node_output_displays=global_node_output_displays,
+            global_node_displays=global_node_displays,
             entrypoint_displays=entrypoint_displays,
             workflow_output_displays=workflow_output_displays,
             edge_displays=edge_displays,

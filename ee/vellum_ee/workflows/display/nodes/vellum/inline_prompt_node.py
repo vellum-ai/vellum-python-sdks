@@ -29,8 +29,8 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
         node_inputs, prompt_inputs = self._generate_node_and_prompt_inputs(node_id, node, display_context)
         input_variable_id_by_name = {prompt_input.key: prompt_input.id for prompt_input in prompt_inputs}
 
-        _, output_display = display_context.node_output_displays[node.Outputs.text]
-        _, array_display = display_context.node_output_displays[node.Outputs.results]
+        _, output_display = display_context.global_node_output_displays[node.Outputs.text]
+        _, array_display = display_context.global_node_output_displays[node.Outputs.results]
         node_blocks = raise_if_descriptor(node.blocks)
 
         return {

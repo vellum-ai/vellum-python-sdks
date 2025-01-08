@@ -23,6 +23,7 @@ import {
   ConditionalNodeConditionData,
   NodeOutputData,
   NodeInput,
+  MapNode,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -1369,4 +1370,113 @@ export function finalOutputNodeFactory(): FinalOutputNode {
     },
   };
   return nodeData;
+}
+
+export function mapNodeDataFactory(): MapNode {
+  return {
+    id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
+    type: "MAP",
+    data: {
+      variant: "INLINE",
+      label: "Map Node",
+      workflowRawData: {
+        nodes: [
+          {
+            id: "817b520f-a6f6-40c9-8e98-68a4586360d6",
+            type: "TEMPLATING",
+            data: {
+              label: "Templating Node with Reference",
+              outputId: "db5bcad3-d9f9-4314-a198-8748f4a824a2",
+              sourceHandleId: "7ac839c3-e443-4eee-8897-aeb4c82531c2",
+              targetHandleId: "d85e6190-3353-4e1e-9098-97f828eef712",
+              templateNodeInputId: "3211e289-efce-451f-a12a-311f05f3dbf0",
+              outputType: "STRING",
+            },
+            inputs: [
+              {
+                id: "4271329e-f375-4245-9b62-3d300b9b5cfa",
+                key: "example_var_1",
+                value: {
+                  rules: [],
+                  combinator: "OR",
+                },
+              },
+              {
+                id: "1a11b7c8-7b04-43bf-a9b3-a9669464b6d0",
+                key: "template",
+                value: {
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "{{ example_var_1 }}",
+                      },
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              },
+            ],
+            displayData: {
+              position: {
+                x: 405.85703120354856,
+                y: 140.63171864439244,
+              },
+              width: 480.0,
+              height: 224.0,
+            },
+          },
+        ],
+        edges: [],
+      },
+      inputVariables: [
+        {
+          id: "83e669a8-e1c0-480c-b1d6-9467dd0021b1",
+          key: "items",
+          type: "JSON",
+        },
+        {
+          id: "8e8f462c-8f07-4f5f-80dd-a33eb2cd6061",
+          key: "item",
+          type: "JSON",
+        },
+        {
+          id: "95236886-08a8-4b38-8595-f330cb515698",
+          key: "index",
+          type: "NUMBER",
+        },
+      ],
+      outputVariables: [
+        {
+          id: "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb",
+          key: "final-output",
+          type: "STRING",
+        },
+      ],
+      concurrency: 4,
+      sourceHandleId: "4878f525-d4a3-4e3d-9221-e146f282a96a",
+      targetHandleId: "3fe4b4a6-5ed2-4307-ac1c-02389337c4f2",
+      itemsInputId: "83e669a8-e1c0-480c-b1d6-9467dd0021b1",
+      itemInputId: "8e8f462c-8f07-4f5f-80dd-a33eb2cd6061",
+      indexInputId: "95236886-08a8-4b38-8595-f330cb515698",
+    },
+    inputs: [
+      {
+        id: "f34872c2-5c0e-45a3-b204-3af22d1028d3",
+        key: "items",
+        value: {
+          rules: [
+            {
+              type: "INPUT_VARIABLE",
+              data: {
+                inputVariableId: "ce97c6fd-4a41-40c4-bd4b-9b264c58d2d1",
+              },
+            },
+          ],
+          combinator: "OR",
+        },
+      },
+    ],
+  };
 }

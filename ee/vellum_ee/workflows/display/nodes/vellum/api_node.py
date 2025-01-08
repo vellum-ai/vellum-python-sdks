@@ -161,9 +161,9 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
         ]
         inputs.extend(additional_header_inputs)
 
-        _, text_output_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.text)]
-        _, json_output_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.json)]
-        _, status_code_output_display = display_context.node_output_displays[
+        _, text_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
+        _, json_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.json)]
+        _, status_code_output_display = display_context.global_node_output_displays[
             cast(OutputReference, node.Outputs.status_code)
         ]
 

@@ -39,8 +39,10 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
         node_id = self.node_id
         node_inputs = self._generate_search_node_inputs(node_id, node, display_context)
 
-        _, results_output_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.results)]
-        _, text_output_display = display_context.node_output_displays[cast(OutputReference, node.Outputs.text)]
+        _, results_output_display = display_context.global_node_output_displays[
+            cast(OutputReference, node.Outputs.results)
+        ]
+        _, text_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
 
         return {
             "id": str(node_id),
