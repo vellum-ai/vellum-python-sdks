@@ -122,4 +122,4 @@ def test_templating_node__pydantic_to_json():
     outputs = node.run()
 
     # THEN the output is the expected JSON
-    assert outputs.result == {"name": "test", "arguments": {"key": "value"}}
+    assert outputs.result == {"name": "test", "arguments": {"key": "value"}, "id": None}

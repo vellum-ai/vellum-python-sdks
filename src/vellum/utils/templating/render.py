@@ -28,6 +28,9 @@ def render_sandboxed_jinja_template(
             keep_trailing_newline=True,
             finalize=finalize,
         )
+        environment.policies["json.dumps_kwargs"] = {
+            "cls": DefaultStateEncoder,
+        }
 
         if jinja_custom_filters:
             environment.filters.update(jinja_custom_filters)
