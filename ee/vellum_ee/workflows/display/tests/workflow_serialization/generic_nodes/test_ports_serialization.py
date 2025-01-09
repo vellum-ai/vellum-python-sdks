@@ -1,8 +1,12 @@
+from uuid import uuid4
+
 from deepdiff import DeepDiff
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
+
+from ee.vellum_ee.workflows.display.base import WorkflowInputsDisplay
 
 
 class Inputs(BaseInputs):
@@ -55,11 +59,15 @@ class IfGenericNode(BaseNode):
         output = Inputs.input
 
     class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input == "hello")
+        if_branch = Port.on_if(Inputs.input.equals("hello"))
 
 
 def test_serialize_node__if(serialize_node):
-    serialized_node = serialize_node(IfGenericNode)
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=IfGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
+    )
+
     assert not DeepDiff(
         {
             "id": "31da54ae-1abb-4e9e-8a7d-6f4f30a78c72",
@@ -84,6 +92,21 @@ def test_serialize_node__if(serialize_node):
                 {
                     "id": "7605b4c0-a432-4517-b759-5858045a5146",
                     "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": str(input_id),
+                        },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "STRING",
+                                "value": "hello",
+                            },
+                        },
+                    },
                 }
             ],
             "adornments": None,

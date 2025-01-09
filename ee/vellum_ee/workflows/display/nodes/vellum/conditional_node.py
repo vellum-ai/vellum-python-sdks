@@ -4,34 +4,16 @@ from typing import Any, ClassVar, Dict, Generic, List, Optional, Tuple, TypeVar,
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.and_ import AndExpression
-from vellum.workflows.expressions.begins_with import BeginsWithExpression
 from vellum.workflows.expressions.between import BetweenExpression
-from vellum.workflows.expressions.contains import ContainsExpression
-from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
-from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
-from vellum.workflows.expressions.does_not_end_with import DoesNotEndWithExpression
-from vellum.workflows.expressions.does_not_equal import DoesNotEqualExpression
-from vellum.workflows.expressions.ends_with import EndsWithExpression
-from vellum.workflows.expressions.equals import EqualsExpression
-from vellum.workflows.expressions.greater_than import GreaterThanExpression
-from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
-from vellum.workflows.expressions.in_ import InExpression
-from vellum.workflows.expressions.is_nil import IsNilExpression
-from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
 from vellum.workflows.expressions.is_not_null import IsNotNullExpression
-from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
-from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
-from vellum.workflows.expressions.less_than import LessThanExpression
-from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
-from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.displayable import ConditionalNode
 from vellum.workflows.types.core import ConditionType, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
-from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
+from vellum_ee.workflows.display.nodes.vellum.utils import convert_descriptor_to_operator, create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.vellum import NodeInput
 
@@ -113,7 +95,7 @@ but the defined conditions have length {len(condition_ids)}"""
                 )
                 node_inputs.append(expression_node_input)
                 field_node_input_id = expression_node_input.id
-                operator = self._convert_descriptor_to_operator(descriptor)
+                operator = convert_descriptor_to_operator(descriptor)
 
             elif isinstance(descriptor, (BetweenExpression, NotBetweenExpression)):
                 field_node_input = create_node_input(
@@ -127,7 +109,7 @@ but the defined conditions have length {len(condition_ids)}"""
                     value_node_input_id,
                 )
                 node_inputs.extend([field_node_input, value_node_input])
-                operator = self._convert_descriptor_to_operator(descriptor)
+                operator = convert_descriptor_to_operator(descriptor)
                 field_node_input_id = field_node_input.id
                 value_node_input_id = value_node_input.id
 
@@ -147,7 +129,7 @@ but the defined conditions have length {len(condition_ids)}"""
                     node_inputs.append(rhs_node_input)
                     value_node_input_id = rhs_node_input.id
 
-                operator = self._convert_descriptor_to_operator(descriptor)
+                operator = convert_descriptor_to_operator(descriptor)
                 field_node_input_id = lhs_node_input.id
 
             return {
@@ -220,46 +202,6 @@ but the defined conditions have length {len(condition_ids)}"""
             "display_data": self.get_display_data().dict(),
             "definition": self.get_definition().dict(),
         }
-
-    def _convert_descriptor_to_operator(self, descriptor: BaseDescriptor) -> str:
-        if isinstance(descriptor, EqualsExpression):
-            return "="
-        elif isinstance(descriptor, DoesNotEqualExpression):
-            return "!="
-        elif isinstance(descriptor, LessThanExpression):
-            return "<"
-        elif isinstance(descriptor, GreaterThanExpression):
-            return ">"
-        elif isinstance(descriptor, LessThanOrEqualToExpression):
-            return "<="
-        elif isinstance(descriptor, GreaterThanOrEqualToExpression):
-            return ">="
-        elif isinstance(descriptor, ContainsExpression):
-            return "contains"
-        elif isinstance(descriptor, BeginsWithExpression):
-            return "beginsWith"
-        elif isinstance(descriptor, EndsWithExpression):
-            return "endsWith"
-        elif isinstance(descriptor, DoesNotContainExpression):
-            return "doesNotContain"
-        elif isinstance(descriptor, DoesNotBeginWithExpression):
-            return "doesNotBeginWith"
-        elif isinstance(descriptor, DoesNotEndWithExpression):
-            return "doesNotEndWith"
-        elif isinstance(descriptor, (IsNullExpression, IsNilExpression, IsUndefinedExpression)):
-            return "null"
-        elif isinstance(descriptor, (IsNotNullExpression, IsNotNilExpression, IsNotUndefinedExpression)):
-            return "notNull"
-        elif isinstance(descriptor, InExpression):
-            return "in"
-        elif isinstance(descriptor, NotInExpression):
-            return "notIn"
-        elif isinstance(descriptor, BetweenExpression):
-            return "between"
-        elif isinstance(descriptor, NotBetweenExpression):
-            return "notBetween"
-        else:
-            raise ValueError(f"Unsupported descriptor type: {descriptor}")
 
     def get_nested_rule_details_by_path(
         self, rule_ids: List[RuleIdMap], path: List[int]
