@@ -29,20 +29,18 @@ def test_base_class_dynamic_import(files):
     """
     namespace = str(uuid4())  # Create a unique namespace
     sys.meta_path.append(VirtualFileFinder(files, namespace))  # Use virtual file loader
-
-    # Identify the module containing the base class
     base_class_module_path = "base_class.py"
 
-    # Validate that the required file exists in `local_files`
+    # When given a valid module path
     assert base_class_module_path in files, f"{base_class_module_path} is missing from local_files"
 
-    # Expected fully qualified module name for the base class
+    # fully qualified module name for the base class
     full_module_name = f"{namespace}.base_class"
 
-    # Track sys.modules keys before import
+    # sys.modules keys before import
     existing_modules = set(sys.modules.keys())
 
-    # Import the base module (should implicitly load its dependencies)
+    # If we import the base module (should implicitly load its dependencies)
     base_class_module = importlib.import_module(full_module_name)
     assert base_class_module, f"Failed to import module: {full_module_name}"
 
@@ -56,11 +54,10 @@ def test_base_class_dynamic_import(files):
             break
 
     assert baseclass
-    # Check for required modules by comparing sys.modules
+    # Then we should import all required files
     new_modules = set(sys.modules.keys()) - existing_modules
     assert new_modules
 
-    # Example check (validate specific dependencies if known)
     required_modules = [
         "uuid",
         f"{namespace}",
