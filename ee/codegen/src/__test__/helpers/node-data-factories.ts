@@ -644,6 +644,7 @@ export function templatingNodeFactory({
   outputType = VellumVariableType.String,
   inputReferenceId,
   inputReferenceNodeId,
+  template,
 }: {
   id?: string;
   label?: string;
@@ -654,7 +655,16 @@ export function templatingNodeFactory({
   outputType?: VellumVariableType;
   inputReferenceId?: string;
   inputReferenceNodeId?: string;
+  template?: NodeInputValuePointerRule;
 } = {}): TemplatingNode {
+  const defaultTemplate: NodeInputValuePointerRule = {
+    type: "CONSTANT_VALUE",
+    data: {
+      type: "STRING",
+      value: "Hello, World!",
+    },
+  };
+
   const nodeData: TemplatingNode = {
     id: id ?? "46e221ab-a749-41a2-9242-b1f5bf31f3a5",
     type: WorkflowNodeType.TEMPLATING,
@@ -699,15 +709,7 @@ export function templatingNodeFactory({
         id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
         key: "template",
         value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "{{ output[0].type }}",
-              },
-            },
-          ],
+          rules: [template ?? defaultTemplate],
           combinator: "OR",
         },
       },

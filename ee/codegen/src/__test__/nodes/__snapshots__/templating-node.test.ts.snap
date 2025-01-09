@@ -64,7 +64,7 @@ from vellum.workflows.state import BaseState
 
 
 class TemplatingNode(BaseTemplatingNode[BaseState, str]):
-    template = """{{ output[0].type }}"""
+    template = """Hello, World!"""
     inputs = {
         "text": "Hello, world!",
     }
@@ -136,7 +136,7 @@ from vellum.workflows.types.core import Json
 
 
 class TemplatingNode(BaseTemplatingNode[BaseState, Json]):
-    template = """{{ output[0].type }}"""
+    template = """Hello, World!"""
     inputs = {
         "text": "Hello, world!",
     }
@@ -191,7 +191,7 @@ from vellum.workflows.nodes.core import TryNode
 
 @TryNode.wrap()
 class TemplatingNode(BaseTemplatingNode[BaseState, str]):
-    template = """{{ output[0].type }}"""
+    template = """Hello, World!"""
     inputs = {
         "text": "Hello, world!",
     }

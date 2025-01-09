@@ -16,6 +16,7 @@ import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-dep
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import {ConstantValuePointer} from "src/types/vellum";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
@@ -181,9 +182,18 @@ describe("InlinePromptNode referenced by Templating Node", () => {
     })) as InlinePromptNodeContext;
     workflowContext.addNodeContext(promptNodeContext);
 
+    const template: ConstantValuePointer = {
+      type: "CONSTANT_VALUE",
+      data: {
+        type: "STRING",
+        value: "{{ output[0].type }}",
+      },
+    };
+
     const templatingNode = templatingNodeFactory({
       inputReferenceId: promptNode.data.arrayOutputId,
       inputReferenceNodeId: promptNode.id,
+      template: template,
     });
 
     const templatingNodeContext = (await createNodeContext({
