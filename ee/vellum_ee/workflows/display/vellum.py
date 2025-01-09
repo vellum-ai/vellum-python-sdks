@@ -47,12 +47,6 @@ class CodeResourceDefinition(UniversalBaseModel):
     module: List[str]
 
 
-class NodeDefinition(UniversalBaseModel):
-    name: str
-    module: List[str]
-    bases: List[CodeResourceDefinition]
-
-
 class WorkflowDisplayDataViewport(UniversalBaseModel):
     x: float = 0.0
     y: float = 0.0
@@ -248,7 +242,8 @@ class BaseWorkflowNode(UniversalBaseModel):
     inputs: List[NodeInput]
     type: str
     display_data: Optional[NodeDisplayData] = None
-    definition: Optional[NodeDefinition] = None
+    base: CodeResourceDefinition
+    definition: CodeResourceDefinition
 
 
 class EntrypointNodeData(UniversalBaseModel):

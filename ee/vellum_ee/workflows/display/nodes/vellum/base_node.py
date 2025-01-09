@@ -52,6 +52,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             "label": node.__qualname__,
             "type": "GENERIC",
             "display_data": self.get_generic_node_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
             "trigger": {
                 "id": str(uuid4_from_hash(f"{node_id}|trigger")),

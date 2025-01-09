@@ -92,5 +92,6 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
                 "log_output_id": str(self.log_output_id) if self.log_output_id else str(log_output_display.id),
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }

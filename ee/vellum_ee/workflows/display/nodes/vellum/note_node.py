@@ -26,5 +26,6 @@ class BaseNoteNodeDisplay(BaseNodeVellumDisplay[_NoteNodeType], Generic[_NoteNod
                 "style": json.dumps(self.style) if self.style else None,
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }

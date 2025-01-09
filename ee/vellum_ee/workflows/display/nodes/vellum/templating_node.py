@@ -73,5 +73,6 @@ class BaseTemplatingNodeDisplay(BaseNodeVellumDisplay[_TemplatingNodeType], Gene
                 "output_type": inferred_output_type,
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }

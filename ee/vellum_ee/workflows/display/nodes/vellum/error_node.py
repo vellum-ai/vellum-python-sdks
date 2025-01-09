@@ -44,5 +44,6 @@ class BaseErrorNodeDisplay(BaseNodeVellumDisplay[_ErrorNodeType], Generic[_Error
                 "error_output_id": str(self.error_output_id),
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }

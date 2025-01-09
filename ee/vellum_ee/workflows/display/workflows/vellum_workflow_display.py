@@ -81,7 +81,6 @@ class VellumWorkflowDisplay(
         base_node_definition: JsonObject = {
             "name": BaseNode.__name__,
             "module": cast(JsonArray, BaseNode.__module__.split(".")),
-            "bases": [],
         }
         nodes.append(
             {
@@ -93,7 +92,8 @@ class VellumWorkflowDisplay(
                     "source_handle_id": str(self.display_context.workflow_display.entrypoint_node_source_handle_id),
                 },
                 "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
-                "definition": base_node_definition,
+                "base": None,
+                "definition": None,
             },
         )
 

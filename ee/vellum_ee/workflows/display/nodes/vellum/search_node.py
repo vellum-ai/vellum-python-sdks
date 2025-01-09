@@ -65,6 +65,7 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
                 "metadata_filters_node_input_id": str(node_inputs["metadata_filters"].id),
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }
 
