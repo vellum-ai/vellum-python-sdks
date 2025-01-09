@@ -14,22 +14,6 @@ class BasicGenericNode(BaseNode):
         output = Inputs.input
 
 
-class AwaitAnyGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
-
-
-class AwaitAllGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
-
 def test_serialize_node__basic(serialize_node):
     serialized_node = serialize_node(BasicGenericNode)
     assert not DeepDiff(
@@ -61,6 +45,14 @@ def test_serialize_node__basic(serialize_node):
     )
 
 
+class AwaitAnyGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
+
+
 def test_serialize_node__await_any(serialize_node):
     serialized_node = serialize_node(AwaitAnyGenericNode)
     assert not DeepDiff(
@@ -90,6 +82,14 @@ def test_serialize_node__await_any(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+class AwaitAllGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
 
 def test_serialize_node__await_all(serialize_node):
