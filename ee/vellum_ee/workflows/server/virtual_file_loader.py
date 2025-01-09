@@ -26,13 +26,13 @@ class VirtualFileFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
         key_name = "__init__" if fullname == self.namespace else fullname.replace(f"{self.namespace}.", "")
 
         files_key = f"{key_name.replace('.', '/')}.py"
-        if not self.files.get(files_key):
+        if self.files.get(files_key) is None:
             files_key = f"{key_name.replace('.', '/')}/__init__.py"
 
         file = self.files.get(files_key)
         is_package = "__init__" in files_key
 
-        if file:
+        if file is not None:
             return importlib.machinery.ModuleSpec(
                 prefixed_name,
                 VirtualFileLoader(file, is_package),
