@@ -22,7 +22,9 @@ def test_templating_node__dict_output():
     outputs = node.run()
 
     # THEN the output is json serializable
-    assert json.loads(outputs.result) == {"key": "value"}
+    # https://app.shortcut.com/vellum/story/6132
+    dump: str = outputs.result  # type: ignore[assignment]
+    assert json.loads(dump) == {"key": "value"}
 
 
 def test_templating_node__int_output():
