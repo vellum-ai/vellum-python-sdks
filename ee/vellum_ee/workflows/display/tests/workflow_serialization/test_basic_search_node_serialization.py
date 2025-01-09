@@ -50,7 +50,8 @@ def test_serialize_workflow():
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "df80b4aa-2ba1-49a2-8375-fb1f78eee31f"},
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []},
+        "base": None,
+        "definition": None,
     }
 
     search_node = workflow_raw_data["nodes"][1]

@@ -17,7 +17,8 @@
             "y": 330
           }
         },
-        "definition": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
+        "base": null,
+        "definition": null
       },
       {
         "id": "8c6d5fe5-e955-4598-9c35-0cd6f5eca47e",
@@ -41,7 +42,8 @@
                     "y": 330
                   }
                 },
-                "definition": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
+                "base": null,
+                "definition": null
               },
               {
                 "id": "e413adc6-40f8-4772-8b28-769954d68d26",
@@ -202,7 +204,30 @@
                     "y": 240.84267524293904
                   }
                 },
-                "definition": {"name": "SearchNode", "module": ["codegen_integration", "fixtures", "simple_inline_subworkflow_node", "code", "nodes", "subworkflow_node", "nodes", "search_node"], "bases": [{"name": "SearchNode", "module": ["vellum", "workflows", "nodes", "displayable", "search_node", "node"]}]}
+                "base": {
+                  "name": "SearchNode",
+                  "module": [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "displayable",
+                    "search_node",
+                    "node"
+                  ]
+                },
+                "definition": {
+                  "name": "SearchNode",
+                  "module": [
+                    "codegen_integration",
+                    "fixtures",
+                    "simple_inline_subworkflow_node",
+                    "code",
+                    "nodes",
+                    "subworkflow_node",
+                    "nodes",
+                    "search_node"
+                  ]
+                }
               },
               {
                 "id": "f3fe1e6e-5a4a-42d8-9cfe-9ecbcb935f72",
@@ -241,7 +266,30 @@
                     "y": 208.7778595317725
                   }
                 },
-                "definition": {"name": "FinalOutput", "module": ["codegen_integration", "fixtures", "simple_inline_subworkflow_node", "code", "nodes", "subworkflow_node", "nodes", "final_output"], "bases": [{"name": "FinalOutputNode", "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"]}]}
+                "base": {
+                  "name": "FinalOutputNode",
+                  "module": [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "displayable",
+                    "final_output_node",
+                    "node"
+                  ]
+                },
+                "definition": {
+                  "name": "FinalOutput",
+                  "module": [
+                    "codegen_integration",
+                    "fixtures",
+                    "simple_inline_subworkflow_node",
+                    "code",
+                    "nodes",
+                    "subworkflow_node",
+                    "nodes",
+                    "final_output"
+                  ]
+                }
               }
             ],
             "edges": [
@@ -269,7 +317,18 @@
                 "zoom": 0.8182365497236056
               }
             },
-            "definition": {"name": "SubworkflowNodeWorkflow", "module": ["codegen_integration", "fixtures", "simple_inline_subworkflow_node", "code", "nodes", "subworkflow_node", "workflow"]}
+            "definition": {
+              "name": "SubworkflowNodeWorkflow",
+              "module": [
+                "codegen_integration",
+                "fixtures",
+                "simple_inline_subworkflow_node",
+                "code",
+                "nodes",
+                "subworkflow_node",
+                "workflow"
+              ]
+            }
           },
           "input_variables": [],
           "output_variables": [
@@ -294,7 +353,28 @@
             "y": 178.94753425793772
           }
         },
-        "definition": {"name": "SubworkflowNode", "module": ["codegen_integration", "fixtures", "simple_inline_subworkflow_node", "code", "nodes", "subworkflow_node"], "bases": [{"name": "InlineSubworkflowNode", "module": ["vellum", "workflows", "nodes", "core", "inline_subworkflow_node", "node"]}]}
+        "base": {
+          "name": "InlineSubworkflowNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "inline_subworkflow_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "SubworkflowNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_inline_subworkflow_node",
+            "code",
+            "nodes",
+            "subworkflow_node"
+          ]
+        }
       },
       {
         "id": "075932b7-c6ba-4c3a-8c8f-d6b043f8fe48",
@@ -333,7 +413,28 @@
             "y": 210
           }
         },
-        "definition": {"name": "FinalOutput", "module": ["codegen_integration", "fixtures", "simple_inline_subworkflow_node", "code", "nodes", "final_output"], "bases": [{"name": "FinalOutputNode", "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"]}]}
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "FinalOutput",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_inline_subworkflow_node",
+            "code",
+            "nodes",
+            "final_output"
+          ]
+        }
       }
     ],
     "edges": [
@@ -363,7 +464,13 @@
     },
     "definition": {
       "name": "Workflow",
-      "module": ["codegen_integration", "fixtures", "simple_inline_subworkflow_node", "code", "workflow"]
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "simple_inline_subworkflow_node",
+        "code",
+        "workflow"
+      ]
     }
   },
   "input_variables": [
@@ -373,7 +480,9 @@
       "type": "STRING",
       "required": true,
       "default": null,
-      "extensions": { "color": null }
+      "extensions": {
+        "color": null
+      }
     }
   ],
   "output_variables": [

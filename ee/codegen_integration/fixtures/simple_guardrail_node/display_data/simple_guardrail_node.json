@@ -13,11 +13,12 @@
           "width": 124,
           "height": 48,
           "position": {
-            "x": 1545.0,
-            "y": 330.0
+            "x": 1545,
+            "y": 330
           }
         },
-        "definition": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
+        "base": null,
+        "definition": null
       },
       {
         "id": "c207b440-6aac-4047-a37c-e25fcb5b9cfb",
@@ -70,7 +71,28 @@
             "y": 180.75743992606283
           }
         },
-        "definition": {"name": "GuardrailNode", "module": ["codegen_integration", "fixtures", "simple_guardrail_node", "code", "nodes", "guardrail_node"], "bases": [{"name": "GuardrailNode", "module": ["vellum", "workflows", "nodes", "displayable", "guardrail_node", "node"]}]}
+        "base": {
+          "name": "GuardrailNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "guardrail_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_guardrail_node",
+            "code",
+            "nodes",
+            "guardrail_node"
+          ],
+          "name": "GuardrailNode"
+        }
       },
       {
         "id": "a9455dc7-85f5-43a9-8be7-f131bc5f08e2",
@@ -91,7 +113,10 @@
               "rules": [
                 {
                   "type": "NODE_OUTPUT",
-                  "data": {"node_id": "c207b440-6aac-4047-a37c-e25fcb5b9cfb", "output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"}
+                  "data": {
+                    "node_id": "c207b440-6aac-4047-a37c-e25fcb5b9cfb",
+                    "output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"
+                  }
                 }
               ],
               "combinator": "OR"
@@ -102,11 +127,32 @@
           "width": 458,
           "height": 234,
           "position": {
-            "x": 2750.0,
-            "y": 210.0
+            "x": 2750,
+            "y": 210
           }
         },
-        "definition": {"name": "FinalOutput", "module": ["codegen_integration", "fixtures", "simple_guardrail_node", "code", "nodes", "final_output"], "bases": [{"name": "FinalOutputNode", "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"]}]}
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_guardrail_node",
+            "code",
+            "nodes",
+            "final_output"
+          ],
+          "name": "FinalOutput"
+        }
       }
     ],
     "edges": [
@@ -134,7 +180,16 @@
         "zoom": 0.59148308095993
       }
     },
-    "definition": {"name": "Workflow", "module": ["codegen_integration", "fixtures", "simple_guardrail_node", "code", "workflow"]}
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "simple_guardrail_node",
+        "code",
+        "workflow"
+      ]
+    }
   },
   "input_variables": [
     {
@@ -143,7 +198,9 @@
       "type": "STRING",
       "required": true,
       "default": null,
-      "extensions": { "color": null }
+      "extensions": {
+        "color": null
+      }
     },
     {
       "id": "1472503c-1662-4da9-beb9-73026be90c68",
@@ -151,7 +208,9 @@
       "type": "STRING",
       "required": true,
       "default": null,
-      "extensions": { "color": null }
+      "extensions": {
+        "color": null
+      }
     }
   ],
   "output_variables": [

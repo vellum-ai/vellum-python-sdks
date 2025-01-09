@@ -60,7 +60,8 @@ def test_serialize_workflow():
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "34069190-0942-4e0c-8700-b33b9dea4ea0"},
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []},
+        "base": None,
+        "definition": None,
     }
 
     templating_node = workflow_raw_data["nodes"][1]

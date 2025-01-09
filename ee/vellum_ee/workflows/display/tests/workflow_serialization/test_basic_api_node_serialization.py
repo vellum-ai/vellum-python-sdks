@@ -349,7 +349,7 @@ def test_serialize_workflow(vellum_client):
                     }
                 ],
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                "definition": {
+                "base": {
                     "name": "FinalOutputNode",
                     "module": [
                         "vellum",
@@ -359,20 +359,8 @@ def test_serialize_workflow(vellum_client):
                         "final_output_node",
                         "node",
                     ],
-                    "bases": [
-                        {
-                            "name": "BaseNode",
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "bases": [],
-                        }
-                    ],
                 },
+                "definition": None,
             },
         ],
         final_output_nodes,
