@@ -78,17 +78,8 @@ def test_serialize_workflow():
     assert entrypoint_node == {
         "id": "6358dcfe-b162-4e19-99ca-401d1ada9bdc",
         "type": "ENTRYPOINT",
-        "definition": {
-            "bases": [],
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "name": "BaseNode",
-        },
+        "base": None,
+        "definition": None,
         "inputs": [],
         "data": {
             "label": "Entrypoint Node",
@@ -136,29 +127,18 @@ def test_serialize_workflow():
                                 "source_handle_id": "9914a6a0-9a99-430d-8ddd-f7c13847fe1a",
                             },
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                            "definition": {
-                                "name": "BaseNode",
-                                "module": [
-                                    "vellum",
-                                    "workflows",
-                                    "nodes",
-                                    "bases",
-                                    "base",
-                                ],
-                                "bases": [],
-                            },
+                            "base": None,
+                            "definition": None,
                         },
                         {
                             "id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
                             "label": "StartNode",
                             "type": "GENERIC",
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
                             "definition": {
                                 "name": "StartNode",
                                 "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
-                                "bases": [
-                                    {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}
-                                ],
                             },
                             "trigger": {"id": "a95a34f2-e894-4fb6-a2c9-15d12c1e3135", "merge_behavior": "AWAIT_ANY"},
                             "ports": [{"id": "4a62dea3-6a4a-4390-88d8-4af5d2c81474", "type": "DEFAULT"}],
@@ -195,7 +175,7 @@ def test_serialize_workflow():
                                 }
                             ],
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                            "definition": {
+                            "base": {
                                 "name": "FinalOutputNode",
                                 "module": [
                                     "vellum",
@@ -205,20 +185,8 @@ def test_serialize_workflow():
                                     "final_output_node",
                                     "node",
                                 ],
-                                "bases": [
-                                    {
-                                        "name": "BaseNode",
-                                        "module": [
-                                            "vellum",
-                                            "workflows",
-                                            "nodes",
-                                            "bases",
-                                            "base",
-                                        ],
-                                        "bases": [],
-                                    }
-                                ],
                             },
+                            "definition": None,
                         },
                         {
                             "id": "570f4d12-69ff-49f1-ba98-ade6283dd7c2",
@@ -250,7 +218,7 @@ def test_serialize_workflow():
                                 }
                             ],
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                            "definition": {
+                            "base": {
                                 "name": "FinalOutputNode",
                                 "module": [
                                     "vellum",
@@ -260,20 +228,8 @@ def test_serialize_workflow():
                                     "final_output_node",
                                     "node",
                                 ],
-                                "bases": [
-                                    {
-                                        "name": "BaseNode",
-                                        "module": [
-                                            "vellum",
-                                            "workflows",
-                                            "nodes",
-                                            "bases",
-                                            "base",
-                                        ],
-                                        "bases": [],
-                                    }
-                                ],
                             },
+                            "definition": None,
                         },
                     ],
                     "edges": [
@@ -320,27 +276,13 @@ def test_serialize_workflow():
                 ],
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "InlineSubworkflowNode",
+                "module": ["vellum", "workflows", "nodes", "core", "inline_subworkflow_node", "node"],
+            },
             "definition": {
                 "name": "ExampleInlineSubworkflowNode",
-                "module": [
-                    "tests",
-                    "workflows",
-                    "basic_inline_subworkflow",
-                    "workflow",
-                ],
-                "bases": [
-                    {
-                        "name": "InlineSubworkflowNode",
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "core",
-                            "inline_subworkflow_node",
-                            "node",
-                        ],
-                    }
-                ],
+                "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
             },
         },
         subworkflow_node,
@@ -358,20 +300,7 @@ def test_serialize_workflow():
         {
             "id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
             "type": "TERMINAL",
-            "definition": {
-                "bases": [
-                    {
-                        "bases": [],
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "bases",
-                            "base",
-                        ],
-                        "name": "BaseNode",
-                    },
-                ],
+            "base": {
                 "module": [
                     "vellum",
                     "workflows",
@@ -382,6 +311,7 @@ def test_serialize_workflow():
                 ],
                 "name": "FinalOutputNode",
             },
+            "definition": None,
             "data": {
                 "label": "Final Output",
                 "name": "reasoning",
@@ -421,20 +351,7 @@ def test_serialize_workflow():
         {
             "id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
             "type": "TERMINAL",
-            "definition": {
-                "bases": [
-                    {
-                        "bases": [],
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "bases",
-                            "base",
-                        ],
-                        "name": "BaseNode",
-                    },
-                ],
+            "base": {
                 "module": [
                     "vellum",
                     "workflows",
@@ -445,6 +362,7 @@ def test_serialize_workflow():
                 ],
                 "name": "FinalOutputNode",
             },
+            "definition": None,
             "data": {
                 "label": "Final Output",
                 "name": "temperature",

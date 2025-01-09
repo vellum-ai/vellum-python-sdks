@@ -25,6 +25,7 @@ def test_serialize_node__basic(serialize_node):
             "label": "BasicGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "BasicGenericNode",
                 "module": [
@@ -36,7 +37,6 @@ def test_serialize_node__basic(serialize_node):
                     "generic_nodes",
                     "test_ports_serialization",
                 ],
-                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ANY"},
             "ports": [
@@ -73,6 +73,7 @@ def test_serialize_node__if(serialize_node):
             "label": "IfGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "IfGenericNode",
                 "module": [
@@ -84,7 +85,6 @@ def test_serialize_node__if(serialize_node):
                     "generic_nodes",
                     "test_ports_serialization",
                 ],
-                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "a8afaebc-7333-4e3f-b221-24452b4a1d47", "merge_behavior": "AWAIT_ANY"},
             "ports": [
@@ -137,6 +137,7 @@ def test_serialize_node__if_else(serialize_node):
             "label": "IfElseGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "IfElseGenericNode",
                 "module": [
@@ -148,7 +149,6 @@ def test_serialize_node__if_else(serialize_node):
                     "generic_nodes",
                     "test_ports_serialization",
                 ],
-                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "5b4f6553-69ca-4844-bbe4-9e5594bc8cae", "merge_behavior": "AWAIT_ANY"},
             "ports": [
@@ -207,6 +207,7 @@ def test_serialize_node__if_elif_else(serialize_node):
             "label": "IfElifElseGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "IfElifElseGenericNode",
                 "module": [
@@ -218,7 +219,6 @@ def test_serialize_node__if_elif_else(serialize_node):
                     "generic_nodes",
                     "test_ports_serialization",
                 ],
-                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "22d55b5b-3545-4498-8658-9d0464202e78", "merge_behavior": "AWAIT_ANY"},
             "ports": [

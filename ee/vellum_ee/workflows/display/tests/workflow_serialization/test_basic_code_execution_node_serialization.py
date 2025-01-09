@@ -110,12 +110,7 @@ def test_serialize_workflow_with_filepath():
             "name": "CodeExecutionNode",
         },
         "definition": {
-            "module": [
-                "tests",
-                "workflows",
-                "basic_code_execution_node",
-                "workflow",
-            ],
+            "module": ["tests", "workflows", "basic_code_execution_node", "workflow"],
             "name": "SimpleCodeExecutionNode",
         },
     }
@@ -187,13 +182,11 @@ def test_serialize_workflow_with_filepath():
                     }
                 ],
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                "definition": {
+                "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-                    "bases": [
-                        {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
-                    ],
                 },
+                "definition": None,
             },
         ],
         workflow_raw_data["nodes"][2:],
@@ -345,15 +338,13 @@ def test_serialize_workflow_with_code():
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "base": {
+            "name": "CodeExecutionNode",
+            "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],
+        },
         "definition": {
             "name": "SimpleCodeExecutionNode",
             "module": ["tests", "workflows", "basic_code_execution_node", "workflow_with_code"],
-            "bases": [
-                {
-                    "name": "CodeExecutionNode",
-                    "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],
-                }
-            ],
         },
     }
     assert not DeepDiff(
@@ -388,13 +379,11 @@ def test_serialize_workflow_with_code():
                     }
                 ],
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                "definition": {
+                "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-                    "bases": [
-                        {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
-                    ],
                 },
+                "definition": None,
             },
             {
                 "id": "eccf97c7-e766-471f-9703-4d2595800e66",
@@ -426,13 +415,11 @@ def test_serialize_workflow_with_code():
                     }
                 ],
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                "definition": {
+                "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-                    "bases": [
-                        {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
-                    ],
                 },
+                "definition": None,
             },
         ],
         workflow_raw_data["nodes"][2:],
@@ -537,17 +524,8 @@ def test_serialize_workflow__try_wrapped():
             "label": "Entrypoint Node",
             "source_handle_id": "8cd1e612-39aa-4471-88cf-f7999b713fa6",
         },
-        "definition": {
-            "bases": [],
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "name": "BaseNode",
-        },
+        "base": None,
+        "definition": None,
         "display_data": {
             "position": {"x": 0.0, "y": 0.0},
         },
@@ -593,20 +571,18 @@ def test_serialize_workflow__try_wrapped():
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {
-            "bases": [
-                {
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "code_execution_node",
-                        "node",
-                    ],
-                    "name": "CodeExecutionNode",
-                }
+        "base": {
+            "module": [
+                "vellum",
+                "workflows",
+                "nodes",
+                "displayable",
+                "code_execution_node",
+                "node",
             ],
+            "name": "CodeExecutionNode",
+        },
+        "definition": {
             "module": [
                 "tests",
                 "workflows",
@@ -668,20 +644,7 @@ def test_serialize_workflow__try_wrapped():
             {
                 "id": "4cbfa5f7-fc12-4ab2-81cb-168c5caef4f0",
                 "type": "TERMINAL",
-                "definition": {
-                    "bases": [
-                        {
-                            "bases": [],
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "name": "BaseNode",
-                        },
-                    ],
+                "base": {
                     "module": [
                         "vellum",
                         "workflows",
@@ -692,6 +655,7 @@ def test_serialize_workflow__try_wrapped():
                     ],
                     "name": "FinalOutputNode",
                 },
+                "definition": None,
                 "data": {
                     "label": "Final Output",
                     "name": "result",

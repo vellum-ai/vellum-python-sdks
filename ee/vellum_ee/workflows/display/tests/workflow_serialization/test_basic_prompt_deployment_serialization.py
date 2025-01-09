@@ -86,17 +86,8 @@ def test_serialize_workflow(vellum_client):
         "id": "d680afbd-de64-4cf6-aa50-912686c48c64",
         "type": "ENTRYPOINT",
         "inputs": [],
-        "definition": {
-            "bases": [],
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "name": "BaseNode",
-        },
+        "base": None,
+        "definition": None,
         "data": {
             "label": "Entrypoint Node",
             "source_handle_id": "7065a943-1cab-4afd-9690-e678c5b74a2f",
@@ -159,26 +150,12 @@ def test_serialize_workflow(vellum_client):
                 "y": 0.0,
             },
         },
+        "base": {
+            "module": ["vellum", "workflows", "nodes", "displayable", "prompt_deployment_node", "node"],
+            "name": "PromptDeploymentNode",
+        },
         "definition": {
-            "bases": [
-                {
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "prompt_deployment_node",
-                        "node",
-                    ],
-                    "name": "PromptDeploymentNode",
-                }
-            ],
-            "module": [
-                "tests",
-                "workflows",
-                "basic_text_prompt_deployment",
-                "workflow",
-            ],
+            "module": ["tests", "workflows", "basic_text_prompt_deployment", "workflow"],
             "name": "ExamplePromptDeploymentNode",
         },
     }
@@ -187,20 +164,7 @@ def test_serialize_workflow(vellum_client):
     assert final_output_node == {
         "id": "64ff72c7-8ffc-4e1f-b7a7-e7cd0697f576",
         "type": "TERMINAL",
-        "definition": {
-            "bases": [
-                {
-                    "bases": [],
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "bases",
-                        "base",
-                    ],
-                    "name": "BaseNode",
-                },
-            ],
+        "base": {
             "module": [
                 "vellum",
                 "workflows",
@@ -211,6 +175,7 @@ def test_serialize_workflow(vellum_client):
             ],
             "name": "FinalOutputNode",
         },
+        "definition": None,
         "inputs": [
             {
                 "id": "5f0fdd0f-63fe-4437-bc1b-cd6a84bb84c5",

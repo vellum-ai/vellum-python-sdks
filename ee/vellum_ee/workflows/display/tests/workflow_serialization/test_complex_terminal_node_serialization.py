@@ -77,17 +77,8 @@ def test_serialize_workflow__missing_final_output_node():
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "943ac183-d107-4604-aed1-619bd7fef09c"},
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {
-            "name": "BaseNode",
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "bases": [],
-        },
+        "base": None,
+        "definition": None,
     }
 
     passthrough_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC")
@@ -123,27 +114,13 @@ def test_serialize_workflow__missing_final_output_node():
                     }
                 ],
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "base": {
+                    "name": "FinalOutputNode",
+                    "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
+                },
                 "definition": {
                     "name": "FirstFinalOutputNode",
-                    "module": [
-                        "tests",
-                        "workflows",
-                        "complex_final_output_node",
-                        "missing_final_output_node",
-                    ],
-                    "bases": [
-                        {
-                            "name": "FinalOutputNode",
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "displayable",
-                                "final_output_node",
-                                "node",
-                            ],
-                        }
-                    ],
+                    "module": ["tests", "workflows", "complex_final_output_node", "missing_final_output_node"],
                 },
             },
             {
@@ -176,7 +153,7 @@ def test_serialize_workflow__missing_final_output_node():
                     }
                 ],
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                "definition": {
+                "base": {
                     "name": "FinalOutputNode",
                     "module": [
                         "vellum",
@@ -186,20 +163,8 @@ def test_serialize_workflow__missing_final_output_node():
                         "final_output_node",
                         "node",
                     ],
-                    "bases": [
-                        {
-                            "name": "BaseNode",
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "bases": [],
-                        }
-                    ],
                 },
+                "definition": None,
             },
         ],
         final_output_nodes,

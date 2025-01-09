@@ -104,17 +104,8 @@ def test_serialize_workflow():
     assert entrypoint_node == {
         "id": "089b3201-537a-4ed7-8d15-2524a00e8534",
         "type": "ENTRYPOINT",
-        "definition": {
-            "bases": [],
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "name": "BaseNode",
-        },
+        "base": None,
+        "definition": None,
         "inputs": [],
         "data": {
             "label": "Entrypoint Node",
@@ -426,22 +417,13 @@ def test_serialize_workflow():
                 "version": "2",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "ConditionalNode",
+                "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],
+            },
             "definition": {
                 "name": "CategoryConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow"],
-                "bases": [
-                    {
-                        "name": "ConditionalNode",
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "displayable",
-                            "conditional_node",
-                            "node",
-                        ],
-                    }
-                ],
             },
         },
         conditional_node,
@@ -456,20 +438,7 @@ def test_serialize_workflow():
             {
                 "id": "9c22ee47-01da-4e4e-863d-b4a6874bed66",
                 "type": "TERMINAL",
-                "definition": {
-                    "bases": [
-                        {
-                            "bases": [],
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "name": "BaseNode",
-                        },
-                    ],
+                "base": {
                     "module": [
                         "vellum",
                         "workflows",
@@ -480,6 +449,7 @@ def test_serialize_workflow():
                     ],
                     "name": "FinalOutputNode",
                 },
+                "definition": None,
                 "data": {
                     "label": "Final Output",
                     "name": "statement",
@@ -511,20 +481,7 @@ def test_serialize_workflow():
             {
                 "id": "47f0931c-41f6-4b84-bf39-0c486941f599",
                 "type": "TERMINAL",
-                "definition": {
-                    "bases": [
-                        {
-                            "bases": [],
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "name": "BaseNode",
-                        },
-                    ],
+                "base": {
                     "module": [
                         "vellum",
                         "workflows",
@@ -535,6 +492,7 @@ def test_serialize_workflow():
                     ],
                     "name": "FinalOutputNode",
                 },
+                "definition": None,
                 "data": {
                     "label": "Final Output",
                     "name": "compliment",
@@ -566,20 +524,7 @@ def test_serialize_workflow():
             {
                 "id": "e3d29229-f746-4125-819e-f847acbed307",
                 "type": "TERMINAL",
-                "definition": {
-                    "bases": [
-                        {
-                            "bases": [],
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "name": "BaseNode",
-                        },
-                    ],
+                "base": {
                     "module": [
                         "vellum",
                         "workflows",
@@ -590,6 +535,7 @@ def test_serialize_workflow():
                     ],
                     "name": "FinalOutputNode",
                 },
+                "definition": None,
                 "data": {
                     "label": "Final Output",
                     "name": "complaint",
@@ -621,20 +567,7 @@ def test_serialize_workflow():
             {
                 "id": "6efa7b45-0580-406d-85aa-439117ba8021",
                 "type": "TERMINAL",
-                "definition": {
-                    "bases": [
-                        {
-                            "bases": [],
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "name": "BaseNode",
-                        },
-                    ],
+                "base": {
                     "module": [
                         "vellum",
                         "workflows",
@@ -645,6 +578,7 @@ def test_serialize_workflow():
                     ],
                     "name": "FinalOutputNode",
                 },
+                "definition": None,
                 "data": {
                     "label": "Final Output",
                     "name": "fallthrough",
@@ -676,20 +610,7 @@ def test_serialize_workflow():
             {
                 "id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
                 "type": "TERMINAL",
-                "definition": {
-                    "bases": [
-                        {
-                            "bases": [],
-                            "module": [
-                                "vellum",
-                                "workflows",
-                                "nodes",
-                                "bases",
-                                "base",
-                            ],
-                            "name": "BaseNode",
-                        },
-                    ],
+                "base": {
                     "module": [
                         "vellum",
                         "workflows",
@@ -700,6 +621,7 @@ def test_serialize_workflow():
                     ],
                     "name": "FinalOutputNode",
                 },
+                "definition": None,
                 "data": {
                     "label": "Final Output",
                     "name": "question",
@@ -977,27 +899,13 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 "version": "2",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "ConditionalNode",
+                "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],
+            },
             "definition": {
                 "name": "SimpleConditionalNode",
-                "module": [
-                    "tests",
-                    "workflows",
-                    "basic_conditional_node",
-                    "workflow_with_only_one_conditional_node",
-                ],
-                "bases": [
-                    {
-                        "name": "ConditionalNode",
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "displayable",
-                            "conditional_node",
-                            "node",
-                        ],
-                    }
-                ],
+                "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
         },
         conditional_node,
@@ -1083,27 +991,13 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                 "version": "2",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "ConditionalNode",
+                "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],
+            },
             "definition": {
                 "name": "SimpleConditionalNode",
-                "module": [
-                    "tests",
-                    "workflows",
-                    "basic_conditional_node",
-                    "workflow_with_only_one_conditional_node",
-                ],
-                "bases": [
-                    {
-                        "name": "ConditionalNode",
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "displayable",
-                            "conditional_node",
-                            "node",
-                        ],
-                    }
-                ],
+                "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
         },
         conditional_node,
@@ -1202,27 +1096,13 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                 "version": "2",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "ConditionalNode",
+                "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],
+            },
             "definition": {
                 "name": "SimpleConditionalNode",
-                "module": [
-                    "tests",
-                    "workflows",
-                    "basic_conditional_node",
-                    "workflow_with_only_one_conditional_node",
-                ],
-                "bases": [
-                    {
-                        "name": "ConditionalNode",
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "displayable",
-                            "conditional_node",
-                            "node",
-                        ],
-                    }
-                ],
+                "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
         },
         conditional_node,

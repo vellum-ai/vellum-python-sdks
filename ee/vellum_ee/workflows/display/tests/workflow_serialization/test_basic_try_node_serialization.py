@@ -55,17 +55,8 @@ def test_serialize_workflow():
         "id": "c238508d-85ab-4644-8cbb-88eae457fe12",
         "type": "ENTRYPOINT",
         "inputs": [],
-        "definition": {
-            "bases": [],
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "name": "BaseNode",
-        },
+        "base": None,
+        "definition": None,
         "data": {
             "label": "Entrypoint Node",
             "source_handle_id": "04da0bb6-5b42-4dd1-a4e4-08f3ab03e1a3",
