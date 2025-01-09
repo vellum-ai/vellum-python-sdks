@@ -4,6 +4,7 @@ from typing import Callable, Dict, List, Optional, Set, Type
 from mypy.nodes import (
     AssignmentStmt,
     CallExpr,
+    ClassDef,
     Decorator,
     MemberExpr,
     NameExpr,
@@ -198,13 +199,27 @@ class VellumMypyPlugin(Plugin):
             return
 
         current_node_outputs = node_info.names.get("Outputs")
-        if not current_node_outputs:
+        if not current_node_outputs and isinstance(base_node_outputs.node, TypeInfo):
             node_info.names["Outputs"] = base_node_outputs.copy()
-            new_outputs_sym = node_info.names["Outputs"].node
-            if isinstance(new_outputs_sym, TypeInfo):
-                result_sym = new_outputs_sym.names[attribute_name].node
-                if isinstance(result_sym, Var):
-                    result_sym.type = base_node_resolved_type
+
+            new_outputs_fullname = f"{node_info.fullname}.Outputs"
+            new_outputs_defn_raw = base_node_outputs.node.defn.serialize()
+            new_outputs_defn_raw["fullname"] = new_outputs_fullname
+            new_outputs_defn = ClassDef.deserialize(new_outputs_defn_raw)
+            new_outputs_sym = TypeInfo(
+                names=base_node_outputs.node.names.copy(),
+                defn=new_outputs_defn,
+                module_name=node_info.module_name,
+            )
+
+            base_result_sym = base_node_outputs.node.names[attribute_name].node
+            if isinstance(base_result_sym, Var):
+                new_result_sym = Var.deserialize(base_result_sym.serialize())
+                new_result_sym._fullname = f"{new_outputs_fullname}.{attribute_name}"
+                new_result_sym.type = base_node_resolved_type
+                new_outputs_sym.names[attribute_name].node = new_result_sym
+                new_outputs_sym.bases.append(Instance(base_node_outputs.node, []))
+                node_info.names["Outputs"].node = new_outputs_sym
 
     def _base_node_class_hook(self, ctx: ClassDefContext) -> None:
         """
@@ -472,10 +487,22 @@ class VellumMypyPlugin(Plugin):
 
     def _run_method_hook(self, ctx: MethodContext) -> MypyType:
         """
-        We use this to target `Workflow.run()` so that the WorkflowExecutionFulfilledEvent is properly typed
-        using the `Outputs` class defined on the user-defined subclass of `Workflow`.
+        We use this to target:
+        - `BaseWorkflow.run()`, so that the WorkflowExecutionFulfilledEvent is properly typed
+           using the `Outputs` class defined on the user-defined subclass of `Workflow`.
+        - `BaseNode.run()`, so that the `Outputs` class defined on the user-defined subclass of `Node`
+          is properly typed.
         """
 
+        if isinstance(ctx.default_return_type, TypeAliasType):
+            return self._workflow_run_method_hook(ctx)
+
+        if isinstance(ctx.default_return_type, Instance):
+            return self._node_run_method_hook(ctx)
+
+        return ctx.default_return_type
+
+    def _workflow_run_method_hook(self, ctx: MethodContext) -> MypyType:
         if not isinstance(ctx.default_return_type, TypeAliasType):
             return ctx.default_return_type
 
@@ -494,7 +521,7 @@ class VellumMypyPlugin(Plugin):
         if fulfilled_event.type.fullname != "vellum.workflows.events.workflow.WorkflowExecutionFulfilledEvent":
             return ctx.default_return_type
 
-        outputs_node = self._get_outputs_node(ctx)
+        outputs_node = self._get_workflow_outputs_type_info(ctx)
         if not outputs_node:
             return ctx.default_return_type
 
@@ -512,6 +539,19 @@ class VellumMypyPlugin(Plugin):
             line=ctx.default_return_type.line,
             column=ctx.default_return_type.column,
         )
+
+    def _node_run_method_hook(self, ctx: MethodContext) -> MypyType:
+        if not isinstance(ctx.default_return_type, Instance):
+            return ctx.default_return_type
+
+        if not _is_subclass(ctx.default_return_type.type, "vellum.workflows.nodes.bases.base.BaseNode.Outputs"):
+            return ctx.default_return_type
+
+        outputs_node = self._get_node_outputs_type_info(ctx)
+        if not outputs_node:
+            return ctx.default_return_type
+
+        return Instance(outputs_node, [])
 
     def _stream_method_hook(self, ctx: MethodContext) -> MypyType:
         """
@@ -557,7 +597,7 @@ class VellumMypyPlugin(Plugin):
         if fulfilled_event_index == -1 or not fulfilled_event:
             return ctx.default_return_type
 
-        outputs_node = self._get_outputs_node(ctx)
+        outputs_node = self._get_workflow_outputs_type_info(ctx)
         if not outputs_node:
             return ctx.default_return_type
 
@@ -594,7 +634,7 @@ class VellumMypyPlugin(Plugin):
             column=ctx.default_return_type.column,
         )
 
-    def _get_outputs_node(self, ctx: MethodContext) -> Optional[TypeInfo]:
+    def _get_workflow_outputs_type_info(self, ctx: MethodContext) -> Optional[TypeInfo]:
         if not isinstance(ctx.context, CallExpr):
             return None
 
@@ -623,6 +663,35 @@ class VellumMypyPlugin(Plugin):
             return None
 
         return resolved_outputs_node.node
+
+    def _get_node_outputs_type_info(self, ctx: MethodContext) -> Optional[TypeInfo]:
+        if not isinstance(ctx.context, CallExpr):
+            return None
+
+        if not isinstance(ctx.context.callee, MemberExpr):
+            return None
+
+        expr = ctx.context.callee.expr
+        instance = ctx.api.get_expression_type(expr)
+        if not isinstance(instance, Instance) or not _is_subclass(
+            instance.type, "vellum.workflows.nodes.bases.base.BaseNode"
+        ):
+            return None
+
+        outputs_node = instance.type.names.get("Outputs")
+
+        if (
+            not outputs_node
+            or not isinstance(outputs_node.node, TypeInfo)
+            or not _is_subclass(outputs_node.node, "vellum.workflows.outputs.base.BaseOutputs")
+        ):
+            return None
+
+        # TODO: For some reason, returning the correct Outputs type info is causing `result` to not
+        # be found. `test_templating_node.py` is the best place to test this.
+        # https://app.shortcut.com/vellum/story/6132
+        # return outputs_node.node
+        return None
 
     def _resolve_descriptors_in_outputs(self, type_info: SymbolTableNode) -> SymbolTableNode:
         new_type_info = type_info.copy()
