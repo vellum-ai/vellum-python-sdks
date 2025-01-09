@@ -1,10 +1,10 @@
 import pytest
 from uuid import uuid4
-from typing import Dict
+from typing import Dict, Type
 
-from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.generics import NodeType
 from vellum_ee.workflows.display.base import WorkflowInputsDisplayType
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
@@ -16,7 +16,7 @@ from vellum_ee.workflows.display.workflows.vellum_workflow_display import Vellum
 @pytest.fixture()
 def serialize_node():
     def _serialize_node(
-        node_class: BaseNode,
+        node_class: Type[NodeType],
         global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {},
     ) -> JsonObject:
         node_display_class = get_node_display_class(BaseNodeDisplay, node_class)

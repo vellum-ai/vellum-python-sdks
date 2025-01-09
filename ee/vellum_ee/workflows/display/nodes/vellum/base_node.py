@@ -9,7 +9,7 @@ from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.workflow_input import WorkflowInputReference
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import convert_descriptor_to_operator
@@ -25,7 +25,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         node = self._node
         node_id = self.node_id
 
-        ports = []
+        ports: JsonArray = []
         for idx, port in enumerate(node.Ports):
             id = str(uuid4_from_hash(f"{node_id}|{idx}"))
 
@@ -68,11 +68,11 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
 
     def serialize_condition(self, display_context: WorkflowDisplayContext, condition: BaseDescriptor) -> JsonObject:
         if isinstance(condition, (AndExpression, OrExpression)):
-            pass
+            return {}
         elif isinstance(condition, (IsNullExpression, IsNotNullExpression)):
-            pass
+            return {}
         elif isinstance(condition, (BetweenExpression, NotBetweenExpression)):
-            pass
+            return {}
         else:
             lhs = self.serialize_value(display_context, condition._lhs)  # type: ignore[attr-defined]
             rhs = self.serialize_value(display_context, condition._rhs)  # type: ignore[attr-defined]
@@ -98,3 +98,5 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "type": "CONSTANT_VALUE",
                 "value": vellum_value.dict(),
             }
+
+        raise ValueError(f"Unsupported descriptor type: {value.__class__.__name__}")
