@@ -5,8 +5,7 @@ from deepdiff import DeepDiff
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
-
-from ee.vellum_ee.workflows.display.base import WorkflowInputsDisplay
+from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 
 
 class Inputs(BaseInputs):
