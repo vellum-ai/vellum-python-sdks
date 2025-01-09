@@ -642,6 +642,8 @@ export function templatingNodeFactory({
   errorOutputId,
   inputRules,
   outputType = VellumVariableType.String,
+  inputReferenceId,
+  inputReferenceNodeId,
 }: {
   id?: string;
   label?: string;
@@ -650,30 +652,59 @@ export function templatingNodeFactory({
   errorOutputId?: string;
   inputRules?: NodeInputValuePointerRule[];
   outputType?: VellumVariableType;
+  inputReferenceId?: string;
+  inputReferenceNodeId?: string;
 } = {}): TemplatingNode {
   const nodeData: TemplatingNode = {
-    id: id ?? "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
+    id: id ?? "46e221ab-a749-41a2-9242-b1f5bf31f3a5",
     type: WorkflowNodeType.TEMPLATING,
     data: {
       label: label ?? "Templating Node",
       outputId: "2d4f1826-de75-499a-8f84-0a690c8136ad",
       errorOutputId,
-      sourceHandleId: sourceHandleId ?? "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
-      targetHandleId: targetHandleId ?? "3feb7e71-ec63-4d58-82ba-c3df829a2948",
+      sourceHandleId: sourceHandleId ?? "6ee2c814-d0a5-4ec9-83b6-45156e2f22c4",
+      targetHandleId: targetHandleId ?? "3960c8e1-9baa-4b9c-991d-e399d16a45aa",
       templateNodeInputId: "7b8af68b-cf60-4fca-9c57-868042b5b616",
       outputType: outputType,
     },
     inputs: [
       {
-        id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+        id: "9feb7b5e-5947-496d-b56f-1e2627730796",
         key: "text",
         value: {
-          rules: inputRules ?? [
+          rules:
+            inputReferenceId && inputReferenceNodeId
+              ? [
+                  {
+                    type: "NODE_OUTPUT",
+                    data: {
+                      nodeId: inputReferenceNodeId,
+                      outputId: inputReferenceId,
+                    },
+                  },
+                ]
+              : inputRules ?? [
+                  {
+                    type: "CONSTANT_VALUE",
+                    data: {
+                      type: "STRING",
+                      value: "Hello, world!",
+                    },
+                  },
+                ],
+          combinator: "OR",
+        },
+      },
+      {
+        id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+        key: "template",
+        value: {
+          rules: [
             {
               type: "CONSTANT_VALUE",
               data: {
                 type: "STRING",
-                value: "Hello, world!",
+                value: "{{ output[0].type }}",
               },
             },
           ],
