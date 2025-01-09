@@ -16,7 +16,7 @@ import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-dep
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
-import {ConstantValuePointer} from "src/types/vellum";
+import { ConstantValuePointer } from "src/types/vellum";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
