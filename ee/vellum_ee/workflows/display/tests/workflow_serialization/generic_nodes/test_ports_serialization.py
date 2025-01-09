@@ -122,12 +122,16 @@ class IfElseGenericNode(BaseNode):
         output = Inputs.input
 
     class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input == "hello")
+        if_branch = Port.on_if(Inputs.input.equals("hello"))
         else_branch = Port.on_else()
 
 
 def test_serialize_node__if_else(serialize_node):
-    serialized_node = serialize_node(IfElseGenericNode)
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=IfElseGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
+    )
+
     assert not DeepDiff(
         {
             "id": "1f499f82-8cc0-4060-bf4d-d20ac409d4aa",
@@ -152,10 +156,26 @@ def test_serialize_node__if_else(serialize_node):
                 {
                     "id": "3eeb7f03-7d65-45aa-b0e5-c7a453f5cbdf",
                     "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": str(input_id),
+                        },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "STRING",
+                                "value": "hello",
+                            },
+                        },
+                    },
                 },
                 {
                     "id": "b8472c77-74d5-4432-bf8b-6cd65d3dde06",
                     "type": "ELSE",
+                    "expression": None,
                 },
             ],
             "adornments": None,
@@ -171,13 +191,17 @@ class IfElifElseGenericNode(BaseNode):
         output = Inputs.input
 
     class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input == "hello")
-        elif_branch = Port.on_elif(Inputs.input == "world")
+        if_branch = Port.on_if(Inputs.input.equals("hello"))
+        elif_branch = Port.on_elif(Inputs.input.equals("world"))
         else_branch = Port.on_else()
 
 
 def test_serialize_node__if_elif_else(serialize_node):
-    serialized_node = serialize_node(IfElifElseGenericNode)
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=IfElifElseGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
     assert not DeepDiff(
         {
             "id": "21c49bfb-a90c-4565-a4e6-8eb5187e81ca",
@@ -202,14 +226,45 @@ def test_serialize_node__if_elif_else(serialize_node):
                 {
                     "id": "f6e0a2c0-192d-452f-bde4-32fb938e91bc",
                     "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": str(input_id),
+                        },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "STRING",
+                                "value": "hello",
+                            },
+                        },
+                    },
                 },
                 {
                     "id": "7e44de04-e816-4da8-9251-cf389442a5d6",
                     "type": "ELIF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": str(input_id),
+                        },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "STRING",
+                                "value": "world",
+                            },
+                        },
+                    },
                 },
                 {
                     "id": "00db3698-ddf5-413b-8408-fff664c212d7",
                     "type": "ELSE",
+                    "expression": None,
                 },
             ],
             "adornments": None,
