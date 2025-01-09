@@ -15,6 +15,25 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         node = self._node
         node_id = self.node_id
 
+        ports = []
+        for idx, port in enumerate(node.Ports):
+            id = str(uuid4_from_hash(f"{node_id}|{idx}"))
+
+            if port._condition_type:
+                ports.append(
+                    {
+                        "id": id,
+                        "type": port._condition_type.value,
+                    }
+                )
+            else:
+                ports.append(
+                    {
+                        "id": id,
+                        "type": "DEFAULT",
+                    }
+                )
+
         return {
             "id": str(node_id),
             "label": node.__qualname__,
@@ -25,7 +44,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "id": str(uuid4_from_hash(f"{node_id}|trigger")),
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
-            "ports": [],
+            "ports": ports,
             "adornments": None,
             "attributes": [],
         }
