@@ -435,10 +435,6 @@ export class SearchNodeMetadataFilters extends AstNode {
       }),
       arguments_: [
         python.methodArgument({
-          name: "type",
-          value: python.TypeInstantiation.str("LOGICAL_CONDITION_GROUP"),
-        }),
-        python.methodArgument({
           name: "combinator",
           value: python.TypeInstantiation.str(data.combinator),
         }),
@@ -475,10 +471,6 @@ export class SearchNodeMetadataFilters extends AstNode {
         modulePath: [...VELLUM_CLIENT_MODULE_PATH, "types"],
       }),
       arguments_: [
-        python.methodArgument({
-          name: "type",
-          value: python.TypeInstantiation.str("LOGICAL_CONDITION"),
-        }),
         python.methodArgument({
           name: "lhs_variable",
           value: lhs,

@@ -15,15 +15,14 @@ class SearchNode(BaseSearchNode):
         filters=SearchFiltersRequest(
             external_ids=None,
             metadata=VellumValueLogicalConditionGroupRequest(
-                type="LOGICAL_CONDITION_GROUP",
                 combinator="AND",
                 negated=False,
                 conditions=[
                     VellumValueLogicalConditionRequest(
-                        type="LOGICAL_CONDITION", lhs_variable=Inputs.var1, operator="=", rhs_variable=Inputs.var1
+                        lhs_variable=Inputs.var1, operator="=", rhs_variable=Inputs.var1
                     ),
                     VellumValueLogicalConditionRequest(
-                        type="LOGICAL_CONDITION", lhs_variable=Inputs.var1, operator="=", rhs_variable=Inputs.var1
+                        lhs_variable=Inputs.var1, operator="=", rhs_variable=Inputs.var1
                     ),
                 ],
             ),
