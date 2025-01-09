@@ -67,6 +67,8 @@ def test_base_class_dynamic_import(files):
         f"{namespace}.base_class",
         f"{namespace}.inner_files",
         f"{namespace}.inner_files.inner_class",
+        f"{namespace}.display",
+        f"{namespace}.display.display",
     ]
     for module in required_modules:
         assert module in sys.modules, f"Module '{module}' was not loaded as expected"
