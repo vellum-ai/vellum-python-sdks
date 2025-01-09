@@ -1,5 +1,6 @@
 import json
 
+from vellum.client.types.function_call import FunctionCall
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.state import BaseState
@@ -106,3 +107,19 @@ def test_templating_node__execution_count_reference():
 
     # THEN the output is just the total
     assert outputs.result == "0"
+
+
+def test_templating_node__pydantic_to_json():
+    # GIVEN a templating node that uses tojson on a pydantic model
+    class JSONTemplateNode(TemplatingNode[BaseState, Json]):
+        template = "{{ function_call | tojson }}"
+        inputs = {
+            "function_call": FunctionCall(name="test", arguments={"key": "value"}),
+        }
+
+    # WHEN the node is run
+    node = JSONTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected JSON
+    assert outputs.result == {"name": "test", "arguments": {"key": "value"}}
