@@ -74,9 +74,24 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         if isinstance(condition, (AndExpression, OrExpression)):
             return {}
         elif isinstance(condition, (IsNullExpression, IsNotNullExpression)):
-            return {}
+            lhs = self.serialize_value(display_context, condition._lhs)  # type: ignore[attr-defined]
+            return {
+                "type": "UNARY_EXPRESSION",
+                "lhs": condition._expression,
+                "operator": convert_descriptor_to_operator(condition),
+            }
         elif isinstance(condition, (BetweenExpression, NotBetweenExpression)):
-            return {}
+            base = self.serialize_value(display_context, condition._value)  # type: ignore[attr-defined]
+            lhs = self.serialize_value(display_context, condition._start)  # type: ignore[attr-defined]
+            rhs = self.serialize_value(display_context, condition._end)  # type: ignore[attr-defined]
+
+            return {
+                "type": "TERNARY_EXPRESSION",
+                "base": base,
+                "operator": convert_descriptor_to_operator(condition),
+                "lhs": lhs,
+                "rhs": rhs,
+            }
         else:
             lhs = self.serialize_value(display_context, condition._lhs)  # type: ignore[attr-defined]
             rhs = self.serialize_value(display_context, condition._rhs)  # type: ignore[attr-defined]

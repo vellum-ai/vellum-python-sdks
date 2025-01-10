@@ -488,3 +488,78 @@ def test_serialize_node__execution_count_reference(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+class IntegerInputs(BaseInputs):
+    input: int
+
+
+class BetweenGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = IntegerInputs.input
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(IntegerInputs.input.between(1, 10))
+
+
+def test_serialize_node__between(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=BetweenGenericNode,
+        global_workflow_input_displays={IntegerInputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "31da54ae-1abb-4e9e-8a7d-6f4f30a78c72",
+            "label": "BetweenGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "BetweenGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "a8afaebc-7333-4e3f-b221-24452b4a1d47", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "7605b4c0-a432-4517-b759-5858045a5146",
+                    "type": "IF",
+                    "expression": {
+                        "type": "TERNARY_EXPRESSION",
+                        "base": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": str(input_id),
+                        },
+                        "operator": "between",
+                        "lhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "NUMBER",
+                                "value": 1,
+                            },
+                        },
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "NUMBER",
+                                "value": 10,
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
