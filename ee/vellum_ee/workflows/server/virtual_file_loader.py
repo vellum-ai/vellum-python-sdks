@@ -10,7 +10,7 @@ class VirtualFileLoader(importlib.abc.Loader):
         return None  # use default module creation
 
     def exec_module(self, module):
-        if not self.is_package or self.is_package and self.code:
+        if not self.is_package or self.code:
             exec(self.code, module.__dict__)
 
 
