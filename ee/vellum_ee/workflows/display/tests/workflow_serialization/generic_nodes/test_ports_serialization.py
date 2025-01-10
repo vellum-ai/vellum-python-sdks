@@ -5,6 +5,7 @@ from deepdiff import DeepDiff
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
@@ -336,6 +337,67 @@ def test_serialize_node__node_output_reference(serialize_node):
                             "node_id": "cd954d76-0b0a-4d9b-9bdf-347179c38cb6",
                             "node_output_id": str(node_output_id),
                         },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "STRING",
+                                "value": "hello",
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class GenericNodeReferencingSecret(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(VellumSecretReference(name="hello").equals("hello"))
+
+
+def test_serialize_node__vellum_secret_reference(serialize_node):
+    workflow_input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=GenericNodeReferencingSecret,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=workflow_input_id)},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "88272edd-fc81-403b-bb87-a116ef8f269e",
+            "label": "GenericNodeReferencingSecret",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "definition": {
+                "name": "GenericNodeReferencingSecret",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "trigger": {"id": "2709539b-352d-455a-bb86-dba070b59aa1", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "a353d3f6-2a1f-457c-b8d1-13db5b45be8f",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {"type": "VELLUM_SECRET", "vellum_secret_name": "hello"},
                         "operator": "=",
                         "rhs": {
                             "type": "CONSTANT_VALUE",
