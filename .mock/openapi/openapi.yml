@@ -1447,6 +1447,22 @@ paths:
       x-fern-availability: beta
       x-fern-audiences:
       - internal
+  /v1/organizations/identity:
+    get:
+      operationId: organization_identity
+      description: Retrieves information about the active Organization
+      tags:
+      - organizations
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationRead'
+          description: ''
+      x-fern-availability: beta
+      x-fern-audiences:
+      - internal
   /v1/sandboxes/{id}/prompts/{prompt_variant_id}/deploy:
     post:
       operationId: deploy_prompt
@@ -2406,6 +2422,22 @@ paths:
       x-fern-availability: beta
       x-fern-audiences:
       - customers
+  /v1/workspaces/identity:
+    get:
+      operationId: workspace_identity
+      description: Retrieves information about the active Workspace
+      tags:
+      - workspaces
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceRead'
+          description: ''
+      x-fern-availability: beta
+      x-fern-audiences:
+      - internal
 components:
   schemas:
     AdHocExecutePromptEvent:
@@ -2652,44 +2684,6 @@ components:
       - name
       - type
       - value
-    ArrayVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          type: array
-          items:
-            $ref: '#/components/schemas/ArrayVariableValueItem'
-          nullable: true
-      required:
-      - type
-      - value
-    ArrayVariableValueItem:
-      oneOf:
-      - $ref: '#/components/schemas/StringVariableValue'
-      - $ref: '#/components/schemas/NumberVariableValue'
-      - $ref: '#/components/schemas/JsonVariableValue'
-      - $ref: '#/components/schemas/ErrorVariableValue'
-      - $ref: '#/components/schemas/FunctionCallVariableValue'
-      - $ref: '#/components/schemas/ImageVariableValue'
-      - $ref: '#/components/schemas/AudioVariableValue'
-      - $ref: '#/components/schemas/ChatHistoryVariableValue'
-      - $ref: '#/components/schemas/SearchResultsVariableValue'
-      - $ref: '#/components/schemas/ArrayVariableValue'
-      discriminator:
-        propertyName: type
-        mapping:
-          STRING: '#/components/schemas/StringVariableValue'
-          NUMBER: '#/components/schemas/NumberVariableValue'
-          JSON: '#/components/schemas/JsonVariableValue'
-          ERROR: '#/components/schemas/ErrorVariableValue'
-          FUNCTION_CALL: '#/components/schemas/FunctionCallVariableValue'
-          IMAGE: '#/components/schemas/ImageVariableValue'
-          AUDIO: '#/components/schemas/AudioVariableValue'
-          CHAT_HISTORY: '#/components/schemas/ChatHistoryVariableValue'
-          SEARCH_RESULTS: '#/components/schemas/SearchResultsVariableValue'
-          ARRAY: '#/components/schemas/ArrayVariableValue'
     ArrayVellumValue:
       type: object
       description: A value representing an array of Vellum variable values.
@@ -2768,19 +2762,6 @@ components:
       required:
       - block_type
       - src
-    AudioVariableValue:
-      type: object
-      description: A base Vellum primitive value representing audio.
-      properties:
-        type:
-          $ref: '#/components/schemas/AudioEnum'
-        value:
-          allOf:
-          - $ref: '#/components/schemas/VellumAudio'
-          nullable: true
-      required:
-      - type
-      - value
     AudioVellumValue:
       type: object
       description: A base Vellum primitive value representing audio.
@@ -2917,19 +2898,6 @@ components:
             $ref: '#/components/schemas/ChatMessageRequest'
       required:
       - name
-      - type
-      - value
-    ChatHistoryVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChatMessage'
-          nullable: true
-      required:
       - type
       - value
     ChatHistoryVellumValue:
@@ -4134,18 +4102,6 @@ components:
       - name
       - type
       - value
-    ErrorVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          allOf:
-          - $ref: '#/components/schemas/VellumError'
-          nullable: true
-      required:
-      - type
-      - value
     ErrorVellumValue:
       type: object
       description: A value representing an Error.
@@ -5203,18 +5159,6 @@ components:
       required:
       - arguments
       - name
-    FunctionCallVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          allOf:
-          - $ref: '#/components/schemas/FunctionCall'
-          nullable: true
-      required:
-      - type
-      - value
     FunctionCallVellumValue:
       type: object
       description: A value representing a Function Call.
@@ -5582,19 +5526,6 @@ components:
       required:
       - block_type
       - src
-    ImageVariableValue:
-      type: object
-      description: A base Vellum primitive value representing an image.
-      properties:
-        type:
-          $ref: '#/components/schemas/ImageEnum'
-        value:
-          allOf:
-          - $ref: '#/components/schemas/VellumImage'
-          nullable: true
-      required:
-      - type
-      - value
     ImageVellumValue:
       type: object
       description: A base Vellum primitive value representing an image.
@@ -5862,16 +5793,6 @@ components:
       type: string
       enum:
       - JSON
-    JsonVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          nullable: true
-      required:
-      - type
-      - value
     JsonVellumValue:
       type: object
       description: A value representing a JSON object.
@@ -6602,6 +6523,16 @@ components:
           ERROR: '#/components/schemas/NamedTestCaseErrorVariableValueRequest'
           FUNCTION_CALL: '#/components/schemas/NamedTestCaseFunctionCallVariableValueRequest'
           ARRAY: '#/components/schemas/NamedTestCaseArrayVariableValueRequest'
+    NewMemberJoinBehaviorEnum:
+      enum:
+      - AUTO_ACCEPT_FROM_SHARED_DOMAIN
+      - ALLOW_REQUESTS_FROM_SHARED_DOMAIN
+      - REQUIRE_EXPLICIT_INVITE
+      type: string
+      description: |-
+        * `AUTO_ACCEPT_FROM_SHARED_DOMAIN` - Auto-Accept from Shared Domain
+        * `ALLOW_REQUESTS_FROM_SHARED_DOMAIN` - Allows Requests from Shared Domains
+        * `REQUIRE_EXPLICIT_INVITE` - Require Explicit Invite
     NodeInputCompiledArrayValue:
       type: object
       properties:
@@ -6989,18 +6920,6 @@ components:
       - name
       - type
       - value
-    NumberVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          type: number
-          format: double
-          nullable: true
-      required:
-      - type
-      - value
     NumberVellumValue:
       type: object
       description: A value representing a number.
@@ -7109,6 +7028,24 @@ components:
       required:
       - config
       - model_name
+    OrganizationRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        allow_staff_access:
+          type: boolean
+        new_member_join_behavior:
+          $ref: '#/components/schemas/NewMemberJoinBehaviorEnum'
+      required:
+      - id
+      - name
+      - new_member_join_behavior
     PaginatedContainerImageReadList:
       type: object
       properties:
@@ -8402,19 +8339,6 @@ components:
       - name
       - type
       - value
-    SearchResultsVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchResult'
-          nullable: true
-      required:
-      - type
-      - value
     SearchResultsVellumValue:
       type: object
       description: A value representing Search Results.
@@ -8894,17 +8818,6 @@ components:
           type: string
       required:
       - name
-      - type
-      - value
-    StringVariableValue:
-      type: object
-      properties:
-        type:
-          type: string
-        value:
-          type: string
-          nullable: true
-      required:
       - type
       - value
     StringVellumValue:
@@ -11941,7 +11854,7 @@ components:
         value:
           type: array
           items:
-            $ref: '#/components/schemas/ArrayVariableValueItem'
+            $ref: '#/components/schemas/VellumValue'
           nullable: true
       required:
       - delta
@@ -12190,6 +12103,29 @@ components:
         mapping:
           WORKFLOW: '#/components/schemas/WorkflowExecutionWorkflowResultEvent'
           NODE: '#/components/schemas/WorkflowExecutionNodeResultEvent'
+    WorkspaceRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          description: The name of the Workspace.
+          maxLength: 150
+        label:
+          type: string
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - id
+      - label
+      - name
     WorkspaceSecretRead:
       type: object
       properties:
