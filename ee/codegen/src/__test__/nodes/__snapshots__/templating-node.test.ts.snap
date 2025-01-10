@@ -2,17 +2,6 @@
 
 exports[`TemplatingNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "core",
-      ],
-      "name": "TemplatingNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -68,17 +57,6 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 
 exports[`TemplatingNode > basic with json output type > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "core",
-      ],
-      "name": "TemplatingNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

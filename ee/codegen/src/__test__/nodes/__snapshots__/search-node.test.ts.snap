@@ -2,17 +2,6 @@
 
 exports[`TextSearchNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "SearchNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

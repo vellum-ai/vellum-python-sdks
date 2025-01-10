@@ -2,17 +2,6 @@
 
 exports[`ConditionalNode > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "ConditionalNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -114,17 +103,6 @@ class ConditionalNode(BaseConditionalNode):
 
 exports[`ConditionalNode with invalid uuid for field and value node input ids > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "ConditionalNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -203,17 +181,6 @@ class ConditionalNode(BaseConditionalNode):
 
 exports[`ConditionalNode with null operator > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "ConditionalNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

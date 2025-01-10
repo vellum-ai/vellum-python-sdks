@@ -2,17 +2,6 @@
 
 exports[`GenericNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "BaseNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

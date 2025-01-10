@@ -37,7 +37,6 @@ describe("getGeneratedNodeModuleInfo", () => {
         nodeDefinition: {
           module: ["my_project", "nodes", "my_node"],
           name: "MyNode",
-          bases: [],
         },
       },
       {
@@ -53,7 +52,6 @@ describe("getGeneratedNodeModuleInfo", () => {
         nodeDefinition: {
           module: ["my_project", "nodes", "my_node", "MyNode", "<adornment>"],
           name: "TryNode",
-          bases: [],
         },
       },
       {

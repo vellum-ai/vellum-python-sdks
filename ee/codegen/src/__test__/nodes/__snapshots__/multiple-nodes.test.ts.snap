@@ -2,17 +2,6 @@
 
 exports[`InlinePromptNode referenced by Conditional Node > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "ConditionalNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -95,17 +84,6 @@ class ConditionalNode(BaseConditionalNode):
 
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefinition with 'takes array output id' 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "ConditionalNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -117,17 +95,6 @@ exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefiniti
 
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefinition with 'takes error output id' 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "ConditionalNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -139,17 +106,6 @@ exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefiniti
 
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefinition with 'takes output id' 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "ConditionalNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

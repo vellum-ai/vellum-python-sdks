@@ -2,17 +2,6 @@
 
 exports[`InlinePromptNode > CHAT_MESSAGE block type > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "InlinePromptNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -300,17 +289,6 @@ Summarize the following text:
 
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "InlinePromptNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -529,17 +507,6 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > JINJA block type > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "InlinePromptNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -755,17 +722,6 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > RICH_TEXT block type > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "InlinePromptNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
@@ -999,17 +955,6 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > VARIABLE block type > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "InlinePromptNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

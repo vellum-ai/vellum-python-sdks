@@ -2,17 +2,6 @@
 
 exports[`NoteNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "NoteNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
