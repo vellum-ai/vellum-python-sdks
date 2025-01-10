@@ -1,0 +1,29 @@
+imports:
+  root: __package__.yml
+service:
+  auth: false
+  base-path: ''
+  endpoints:
+    workspace_identity:
+      path: /v1/workspaces/identity
+      method: GET
+      auth: false
+      docs: Retrieves information about the active Workspace
+      source:
+        openapi: openapi/openapi.yml
+      response:
+        docs: ''
+        type: root.WorkspaceRead
+      url: Default
+      availability: pre-release
+      examples:
+        - response:
+            body:
+              id: id
+              name: name
+              label: label
+              created: '2024-01-15T09:30:00Z'
+      audiences:
+        - internal
+  source:
+    openapi: openapi/openapi.yml

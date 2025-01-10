@@ -3790,6 +3790,67 @@ client.ml_models.retrieve(
 </dl>
 </details>
 
+## Organizations
+<details><summary><code>client.organizations.<a href="src/vellum/resources/organizations/client.py">organization_identity</a>()</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves information about the active Organization
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.organizations.organization_identity()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Sandboxes
 <details><summary><code>client.sandboxes.<a href="src/vellum/resources/sandboxes/client.py">deploy_prompt</a>(...)</code></summary>
 <dl>
@@ -5581,6 +5642,67 @@ client.workspace_secrets.partial_update(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Workspaces
+<details><summary><code>client.workspaces.<a href="src/vellum/resources/workspaces/client.py">workspace_identity</a>()</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves information about the active Workspace
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.workspaces.workspace_identity()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
 
 <dl>
 <dd>
