@@ -25,11 +25,12 @@ from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
+from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
 from vellum.workflows.references import NodeReference, OutputReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.vellum import create_node_input_value_pointer_rule, primitive_to_vellum_value
+from vellum_ee.workflows.display.utils.vellum import create_node_input_value_pointer_rule
 from vellum_ee.workflows.display.vellum import (
     ConstantValuePointer,
     ExecutionCounterData,

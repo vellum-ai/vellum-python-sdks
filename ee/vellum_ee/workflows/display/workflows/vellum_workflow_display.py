@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Type, cast
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node, has_wrapped_node
 from vellum.workflows.ports import Port
@@ -16,7 +17,7 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
-from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type, primitive_to_vellum_value
+from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import (
     EdgeVellumDisplay,
     EdgeVellumDisplayOverrides,

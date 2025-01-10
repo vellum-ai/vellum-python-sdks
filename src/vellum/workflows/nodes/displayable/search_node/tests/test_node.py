@@ -6,12 +6,12 @@ from vellum.client.types.search_weights_request import SearchWeightsRequest
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.client.types.vellum_value_logical_condition_group_request import VellumValueLogicalConditionGroupRequest
 from vellum.client.types.vellum_value_logical_condition_request import VellumValueLogicalConditionRequest
-from vellum.workflows.nodes.displayable.search_node.node import SearchNode
-from vellum.workflows.nodes.displayable.search_node.types import (
+from vellum.workflows.nodes.displayable.bases.types import (
     MetadataLogicalCondition,
     MetadataLogicalConditionGroup,
     SearchFilters,
 )
+from vellum.workflows.nodes.displayable.search_node.node import SearchNode
 
 
 def test_run_workflow__happy_path(vellum_client):
