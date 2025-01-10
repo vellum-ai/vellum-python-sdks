@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`GuardrailNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "guardrail_node",
-  ],
-  "name": "GuardrailNode",
-}
-`;
-
 exports[`GuardrailNode > basic > getNodeDisplayFile - multiple output variables 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from ...nodes.guardrail_node import GuardrailNode

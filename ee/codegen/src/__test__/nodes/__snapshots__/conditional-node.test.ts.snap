@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ConditionalNode > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "conditional_node",
-  ],
-  "name": "ConditionalNode",
-}
-`;
-
 exports[`ConditionalNode > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from ...nodes.conditional_node import ConditionalNode
@@ -101,17 +90,6 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
-exports[`ConditionalNode with invalid uuid for field and value node input ids > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "conditional_node",
-  ],
-  "name": "ConditionalNode",
-}
-`;
-
 exports[`ConditionalNode with invalid uuid for field and value node input ids > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from ...nodes.conditional_node import ConditionalNode
@@ -177,17 +155,6 @@ class ConditionalNode(BaseConditionalNode):
         branch_1 = Port.on_if(Inputs.field.equals(Inputs.field))
         branch_2 = Port.on_else()
 "
-`;
-
-exports[`ConditionalNode with null operator > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "conditional_node",
-  ],
-  "name": "ConditionalNode",
-}
 `;
 
 exports[`ConditionalNode with null operator > getNodeDisplayFile 1`] = `

@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`CodeExecutionNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "code_execution_node",
-  ],
-  "name": "CodeExecutionNode",
-}
-`;
-
 exports[`CodeExecutionNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseCodeExecutionNodeDisplay
 from ...nodes.code_execution_node import CodeExecutionNode

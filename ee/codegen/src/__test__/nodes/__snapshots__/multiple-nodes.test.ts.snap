@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`InlinePromptNode referenced by Conditional Node > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "conditional_node",
-  ],
-  "name": "ConditionalNode",
-}
-`;
-
 exports[`InlinePromptNode referenced by Conditional Node > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from ...nodes.conditional_node import ConditionalNode
@@ -82,17 +71,6 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
-exports[`InlinePromptNode referenced by Templating Node > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "templating_node",
-  ],
-  "name": "TemplatingNode",
-}
-`;
-
 exports[`InlinePromptNode referenced by Templating Node > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from ...nodes.templating_node import TemplatingNode
@@ -141,39 +119,6 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
         "text": PromptNode.Outputs.results,
     }
 "
-`;
-
-exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefinition with 'takes array output id' 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "conditional_node",
-  ],
-  "name": "ConditionalNode",
-}
-`;
-
-exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefinition with 'takes error output id' 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "conditional_node",
-  ],
-  "name": "ConditionalNode",
-}
-`;
-
-exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDefinition with 'takes output id' 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "conditional_node",
-  ],
-  "name": "ConditionalNode",
-}
 `;
 
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDisplayFile with 'takes array output id' 1`] = `
