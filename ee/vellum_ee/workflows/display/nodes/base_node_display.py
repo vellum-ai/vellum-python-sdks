@@ -25,7 +25,7 @@ from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.vellum import CodeResourceDefinition, NodeDefinition
+from vellum_ee.workflows.display.vellum import CodeResourceDefinition
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -54,18 +54,25 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
         raise NotImplementedError(f"Serialization for nodes of type {self._node.__name__} is not supported.")
 
-    def get_definition(self) -> NodeDefinition:
+    def get_base(self) -> CodeResourceDefinition:
         node = self._node
-        node_definition = NodeDefinition(
+
+        base_node_classes = [base for base in node.__bases__ if issubclass(base, BaseNode)]
+        if len(base_node_classes) != 1:
+            raise ValueError(f"Node {node.__name__} must extend from exactly one parent node class.")
+
+        base_node_class = base_node_classes[0]
+
+        return CodeResourceDefinition(
+            name=base_node_class.__name__,
+            module=base_node_class.__module__.split("."),
+        )
+
+    def get_definition(self) -> CodeResourceDefinition:
+        node = self._node
+        node_definition = CodeResourceDefinition(
             name=node.__name__,
             module=node.__module__.split("."),
-            bases=[
-                CodeResourceDefinition(
-                    name=base.__name__,
-                    module=base.__module__.split("."),
-                )
-                for base in node.__bases__
-            ],
         )
         return node_definition
 

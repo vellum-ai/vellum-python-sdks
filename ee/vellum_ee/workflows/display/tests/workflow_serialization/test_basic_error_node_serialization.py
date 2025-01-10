@@ -72,11 +72,8 @@ def test_serialize_workflow():
             "source_handle_id": "7d86498b-84ed-4feb-8e62-2188058c2c4e",
         },
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {
-            "name": "BaseNode",
-            "module": ["vellum", "workflows", "nodes", "bases", "base"],
-            "bases": [],
-        },
+        "base": None,
+        "definition": None,
     }
 
     error_node, error_index = next(
@@ -100,22 +97,13 @@ def test_serialize_workflow():
                 "error_output_id": "None",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "ErrorNode",
+                "module": ["vellum", "workflows", "nodes", "core", "error_node", "node"],
+            },
             "definition": {
                 "name": "FailNode",
                 "module": ["tests", "workflows", "basic_error_node", "workflow"],
-                "bases": [
-                    {
-                        "name": "ErrorNode",
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "core",
-                            "error_node",
-                            "node",
-                        ],
-                    }
-                ],
             },
         },
         error_node,
@@ -157,7 +145,7 @@ def test_serialize_workflow():
                 }
             ],
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "definition": {
+            "base": {
                 "name": "FinalOutputNode",
                 "module": [
                     "vellum",
@@ -167,14 +155,8 @@ def test_serialize_workflow():
                     "final_output_node",
                     "node",
                 ],
-                "bases": [
-                    {
-                        "name": "BaseNode",
-                        "module": ["vellum", "workflows", "nodes", "bases", "base"],
-                        "bases": [],
-                    }
-                ],
             },
+            "definition": None,
         },
         terminal_node,
     )

@@ -12,6 +12,7 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
       ...(this.nodeData.data.errorOutputId
         ? { [this.nodeData.data.errorOutputId]: "error" }
         : {}),
+      [this.nodeData.data.arrayOutputId]: "results",
     };
   }
 

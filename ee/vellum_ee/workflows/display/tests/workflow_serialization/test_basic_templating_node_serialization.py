@@ -60,7 +60,8 @@ def test_serialize_workflow():
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "34069190-0942-4e0c-8700-b33b9dea4ea0"},
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []},
+        "base": None,
+        "definition": None,
     }
 
     templating_node = workflow_raw_data["nodes"][1]
@@ -106,15 +107,13 @@ def test_serialize_workflow():
                 "output_type": "JSON",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "TemplatingNode",
+                "module": ["vellum", "workflows", "nodes", "core", "templating_node", "node"],
+            },
             "definition": {
                 "name": "ExampleTemplatingNode",
                 "module": ["tests", "workflows", "basic_templating_node", "workflow_with_json_input"],
-                "bases": [
-                    {
-                        "name": "TemplatingNode",
-                        "module": ["vellum", "workflows", "nodes", "core", "templating_node", "node"],
-                    }
-                ],
             },
         },
         templating_node,
@@ -152,13 +151,11 @@ def test_serialize_workflow():
                 }
             ],
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "definition": {
+            "base": {
                 "name": "FinalOutputNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-                "bases": [
-                    {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
-                ],
             },
+            "definition": None,
         },
         final_output_node,
         ignore_order=True,

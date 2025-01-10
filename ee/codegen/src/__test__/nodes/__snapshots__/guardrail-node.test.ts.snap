@@ -2,17 +2,6 @@
 
 exports[`GuardrailNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "GuardrailNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

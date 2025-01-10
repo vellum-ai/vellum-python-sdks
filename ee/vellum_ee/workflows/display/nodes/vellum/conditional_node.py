@@ -200,6 +200,7 @@ but the defined conditions have length {len(condition_ids)}"""
                 "version": "2",
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }
 

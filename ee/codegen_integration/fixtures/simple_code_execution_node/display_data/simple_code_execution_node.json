@@ -8,17 +8,8 @@
           "label": "Entrypoint Node",
           "source_handle_id": "08d78489-ce80-4743-a22d-2d5f62b575ac"
         },
-        "definition": {
-          "bases": [],
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "bases",
-            "base"
-          ],
-          "name": "BaseNode"
-        },
+        "base": null,
+        "definition": null,
         "inputs": [],
         "display_data": {
           "width": 124,
@@ -42,7 +33,34 @@
           "code_input_id": "19b05769-cee3-4659-80d1-66fcae4e27c3",
           "runtime_input_id": "ebcd1dc6-b0cc-4e67-af67-a42993cf038b",
           "output_type": "STRING",
-          "packages": [{ "name": "requests", "version": "2.26.0" }]
+          "packages": [
+            {
+              "name": "requests",
+              "version": "2.26.0"
+            }
+          ]
+        },
+        "base": {
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "code_execution_node",
+            "node"
+          ],
+          "name": "CodeExecutionNode"
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_code_execution_node",
+            "code",
+            "nodes",
+            "code_execution_node"
+          ],
+          "name": "CodeExecutionNode"
         },
         "inputs": [
           {
@@ -100,30 +118,6 @@
             "x": 1816.3157894736842,
             "y": 213.93599376731305
           }
-        },
-        "definition": {
-          "bases": [
-            {
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "code_execution_node",
-                "node"
-              ],
-              "name": "CodeExecutionNode"
-            }
-          ],
-          "module": [
-            "codegen_integration",
-            "fixtures",
-            "simple_code_execution_node",
-            "code",
-            "nodes",
-            "code_execution_node"
-          ],
-          "name": "CodeExecutionNode"
         }
       },
       {
@@ -136,6 +130,28 @@
           "output_id": "87760362-25b9-4dcb-8034-b49dc9e033ab",
           "output_type": "STRING",
           "node_input_id": "d3b9060a-40b5-492c-a628-f2d3c912cf44"
+        },
+        "base": {
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ],
+          "name": "FinalOutputNode"
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_code_execution_node",
+            "code",
+            "nodes",
+            "final_output"
+          ],
+          "name": "FinalOutput"
         },
         "inputs": [
           {
@@ -162,30 +178,6 @@
             "x": 2392.5396121883655,
             "y": 235.35180055401668
           }
-        },
-        "definition": {
-          "bases": [
-            {
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "final_output_node",
-                "node"
-              ],
-              "name": "FinalOutputNode"
-            }
-          ],
-          "module": [
-            "codegen_integration",
-            "fixtures",
-            "simple_code_execution_node",
-            "code",
-            "nodes",
-            "final_output"
-          ],
-          "name": "FinalOutput"
         }
       }
     ],

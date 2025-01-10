@@ -1,6 +1,6 @@
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context/workflow-context";
-import { WorkflowNodeDefinition } from "src/types/vellum";
+import { CodeResourceDefinition } from "src/types/vellum";
 import { getGeneratedNodeModuleInfo } from "src/utils/paths";
 
 describe("getGeneratedNodeModuleInfo", () => {
@@ -12,7 +12,7 @@ describe("getGeneratedNodeModuleInfo", () => {
 
   const testCases: [
     {
-      nodeDefinition?: WorkflowNodeDefinition | undefined;
+      nodeDefinition?: CodeResourceDefinition | undefined;
       nodeLabel: string;
     },
     {
@@ -37,7 +37,6 @@ describe("getGeneratedNodeModuleInfo", () => {
         nodeDefinition: {
           module: ["my_project", "nodes", "my_node"],
           name: "MyNode",
-          bases: [],
         },
       },
       {
@@ -53,7 +52,6 @@ describe("getGeneratedNodeModuleInfo", () => {
         nodeDefinition: {
           module: ["my_project", "nodes", "my_node", "MyNode", "<adornment>"],
           name: "TryNode",
-          bases: [],
         },
       },
       {

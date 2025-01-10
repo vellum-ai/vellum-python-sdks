@@ -78,11 +78,6 @@ class VellumWorkflowDisplay(
         edges: JsonArray = []
 
         # Add a single synthetic node for the workflow entrypoint
-        base_node_definition: JsonObject = {
-            "name": BaseNode.__name__,
-            "module": cast(JsonArray, BaseNode.__module__.split(".")),
-            "bases": [],
-        }
         nodes.append(
             {
                 "id": str(self.display_context.workflow_display.entrypoint_node_id),
@@ -93,7 +88,8 @@ class VellumWorkflowDisplay(
                     "source_handle_id": str(self.display_context.workflow_display.entrypoint_node_source_handle_id),
                 },
                 "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
-                "definition": base_node_definition,
+                "base": None,
+                "definition": None,
             },
         )
 
@@ -119,10 +115,9 @@ class VellumWorkflowDisplay(
         ]
         final_output_node_outputs = {node.Outputs.value for node in final_output_nodes}
         unreferenced_final_output_node_outputs = final_output_node_outputs.copy()
-        final_output_node_definition: JsonObject = {
+        final_output_node_base: JsonObject = {
             "name": FinalOutputNode.__name__,
             "module": cast(JsonArray, FinalOutputNode.__module__.split(".")),
-            "bases": [base_node_definition],
         }
 
         # Add a synthetic Terminal Node and track the Workflow's output variables for each Workflow output
@@ -171,7 +166,8 @@ class VellumWorkflowDisplay(
                         },
                         "inputs": [node_input.dict()],
                         "display_data": workflow_output_display.display_data.dict(),
-                        "definition": final_output_node_definition,
+                        "base": final_output_node_base,
+                        "definition": None,
                     }
                 )
 

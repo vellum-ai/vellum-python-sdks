@@ -68,17 +68,9 @@ def test_serialize_workflow():
             "label": "Entrypoint Node",
             "source_handle_id": "844d992e-60ab-4af2-a8ff-52cd858386f7",
         },
-        "definition": {
-            "bases": [],
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "name": "BaseNode",
-        },
+        "base": None,
+        "base": None,
+        "definition": None,
         "display_data": {
             "position": {"x": 0.0, "y": 0.0},
         },
@@ -121,29 +113,21 @@ def test_serialize_workflow():
                                 "source_handle_id": "520d3616-8369-4e79-9da5-3febae299c2a",
                             },
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                            "definition": {
-                                "name": "BaseNode",
-                                "module": [
-                                    "vellum",
-                                    "workflows",
-                                    "nodes",
-                                    "bases",
-                                    "base",
-                                ],
-                                "bases": [],
-                            },
+                            "base": None,
+                            "definition": None,
                         },
                         {
                             "id": "baf6d316-dc75-41e8-96c0-015aede96309",
                             "label": "Iteration",
                             "type": "GENERIC",
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                            "base": {
+                                "name": "BaseNode",
+                                "module": ["vellum", "workflows", "nodes", "bases", "base"],
+                            },
                             "definition": {
                                 "name": "Iteration",
                                 "module": ["tests", "workflows", "basic_map_node", "workflow"],
-                                "bases": [
-                                    {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}
-                                ],
                             },
                             "trigger": {"id": "01324747-9bc0-4ecd-a8ab-40dca5a94e2e", "merge_behavior": "AWAIT_ANY"},
                             "ports": [{"id": "36791877-95b0-4390-a794-10accd8f548e", "type": "DEFAULT"}],
@@ -180,7 +164,7 @@ def test_serialize_workflow():
                                 }
                             ],
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                            "definition": {
+                            "base": {
                                 "name": "FinalOutputNode",
                                 "module": [
                                     "vellum",
@@ -190,20 +174,8 @@ def test_serialize_workflow():
                                     "final_output_node",
                                     "node",
                                 ],
-                                "bases": [
-                                    {
-                                        "name": "BaseNode",
-                                        "module": [
-                                            "vellum",
-                                            "workflows",
-                                            "nodes",
-                                            "bases",
-                                            "base",
-                                        ],
-                                        "bases": [],
-                                    }
-                                ],
                             },
+                            "definition": None,
                         },
                     ],
                     "edges": [
@@ -268,27 +240,13 @@ def test_serialize_workflow():
                 "index_input_id": "17e7ca49-668f-450d-a792-e1f97d13db67",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "MapNode",
+                "module": ["vellum", "workflows", "nodes", "core", "map_node", "node"],
+            },
             "definition": {
                 "name": "MapFruitsNode",
-                "module": [
-                    "tests",
-                    "workflows",
-                    "basic_map_node",
-                    "workflow",
-                ],
-                "bases": [
-                    {
-                        "name": "MapNode",
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "core",
-                            "map_node",
-                            "node",
-                        ],
-                    }
-                ],
+                "module": ["tests", "workflows", "basic_map_node", "workflow"],
             },
         },
         map_node,
@@ -326,20 +284,7 @@ def test_serialize_workflow():
                 }
             ],
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "definition": {
-                "bases": [
-                    {
-                        "bases": [],
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "bases",
-                            "base",
-                        ],
-                        "name": "BaseNode",
-                    },
-                ],
+            "base": {
                 "module": [
                     "vellum",
                     "workflows",
@@ -350,6 +295,7 @@ def test_serialize_workflow():
                 ],
                 "name": "FinalOutputNode",
             },
+            "definition": None,
         },
         workflow_raw_data["nodes"][2],
         # TODO: Fix output ID not referencing map node workflow output

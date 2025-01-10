@@ -17,17 +17,8 @@
             "y": 151.5
           }
         },
-        "definition": {
-          "name": "BaseNode",
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "bases",
-            "base"
-          ],
-          "bases": []
-        }
+        "base": null,
+        "definition": null
       },
       {
         "id": "cdec50ed-5cfc-418e-ad1f-45ef7a0abe4b",
@@ -101,20 +92,18 @@
           "width": 480,
           "height": 224
         },
-        "definition": {
-          "bases": [
-            {
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "code_execution_node",
-                "node"
-              ],
-              "name": "CodeExecutionNode"
-            }
+        "base": {
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "code_execution_node",
+            "node"
           ],
+          "name": "CodeExecutionNode"
+        },
+        "definition": {
           "module": [
             "codegen_integration",
             "fixtures",
@@ -149,17 +138,8 @@
                     "y": 330
                   }
                 },
-                "definition": {
-                  "name": "BaseNode",
-                  "module": [
-                    "vellum",
-                    "workflows",
-                    "nodes",
-                    "bases",
-                    "base"
-                  ],
-                  "bases": []
-                }
+                "base": null,
+                "definition": null
               },
               {
                 "id": "24153572-e27b-4cea-a541-4d9e82f28b4e",
@@ -230,20 +210,18 @@
                   "width": 480,
                   "height": 278
                 },
-                "definition": {
-                  "bases": [
-                    {
-                      "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "core",
-                        "templating_node",
-                        "node"
-                      ],
-                      "name": "TemplatingNode"
-                    }
+                "base": {
+                  "module": [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "core",
+                    "templating_node",
+                    "node"
                   ],
+                  "name": "TemplatingNode"
+                },
+                "definition": {
                   "module": [
                     "codegen_integration",
                     "fixtures",
@@ -416,6 +394,17 @@
                     "y": 212.0475201437282
                   }
                 },
+                "base": {
+                  "name": "SearchNode",
+                  "module": [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "displayable",
+                    "search_node",
+                    "node"
+                  ]
+                },
                 "definition": {
                   "name": "SearchNode",
                   "module": [
@@ -427,19 +416,6 @@
                     "map_node",
                     "nodes",
                     "search_node"
-                  ],
-                  "bases": [
-                    {
-                      "name": "SearchNode",
-                      "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "search_node",
-                        "node"
-                      ]
-                    }
                   ]
                 }
               },
@@ -480,6 +456,17 @@
                     "y": 210
                   }
                 },
+                "base": {
+                  "name": "FinalOutputNode",
+                  "module": [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "displayable",
+                    "final_output_node",
+                    "node"
+                  ]
+                },
                 "definition": {
                   "name": "FinalOutput",
                   "module": [
@@ -491,19 +478,6 @@
                     "map_node",
                     "nodes",
                     "final_output"
-                  ],
-                  "bases": [
-                    {
-                      "name": "FinalOutputNode",
-                      "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "final_output_node",
-                        "node"
-                      ]
-                    }
                   ]
                 }
               }
@@ -627,6 +601,17 @@
             "y": 0
           }
         },
+        "base": {
+          "name": "MapNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "map_node",
+            "node"
+          ]
+        },
         "definition": {
           "name": "MapNode",
           "module": [
@@ -636,19 +621,6 @@
             "code",
             "nodes",
             "map_node"
-          ],
-          "bases": [
-            {
-              "name": "MapNode",
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "core",
-                "map_node",
-                "node"
-              ]
-            }
           ]
         }
       },
@@ -689,6 +661,17 @@
             "y": 58.5
           }
         },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
         "definition": {
           "name": "FinalOutput",
           "module": [
@@ -698,19 +681,6 @@
             "code",
             "nodes",
             "final_output"
-          ],
-          "bases": [
-            {
-              "name": "FinalOutputNode",
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "final_output_node",
-                "node"
-              ]
-            }
           ]
         }
       }

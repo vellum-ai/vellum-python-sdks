@@ -2,17 +2,6 @@
 
 exports[`MergeNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "MergeNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

@@ -13,21 +13,12 @@
           "width": 124,
           "height": 48,
           "position": {
-            "x": 1545.0,
-            "y": 330.0
+            "x": 1545,
+            "y": 330
           }
         },
-        "definition": {
-          "name": "BaseNode",
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "bases",
-            "base"
-          ],
-          "bases": []
-        }
+        "base": null,
+        "definition": null
       },
       {
         "id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871",
@@ -67,20 +58,18 @@
             "y": 296.65438885041556
           }
         },
-        "definition": {
-          "bases": [
-            {
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "core",
-                "templating_node",
-                "node"
-              ],
-              "name": "TemplatingNode"
-            }
+        "base": {
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "templating_node",
+            "node"
           ],
+          "name": "TemplatingNode"
+        },
+        "definition": {
           "module": [
             "codegen_integration",
             "fixtures",
@@ -125,23 +114,21 @@
           "height": 234,
           "position": {
             "x": 2752.5214681440443,
-            "y": 210.0
+            "y": 210
           }
         },
-        "definition": {
-          "bases": [
-            {
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "final_output_node",
-                "node"
-              ],
-              "name": "FinalOutputNode"
-            }
+        "base": {
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
           ],
+          "name": "FinalOutputNode"
+        },
+        "definition": {
           "module": [
             "codegen_integration",
             "fixtures",
@@ -190,8 +177,7 @@
       ]
     }
   },
-  "input_variables": [
-  ],
+  "input_variables": [],
   "output_variables": [
     {
       "id": "b0961a8d-f702-4922-b410-2aecf7d34b68",

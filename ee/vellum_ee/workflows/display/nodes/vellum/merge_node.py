@@ -45,6 +45,7 @@ class BaseMergeNodeDisplay(BaseNodeVellumDisplay[_MergeNodeType], Generic[_Merge
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }
 

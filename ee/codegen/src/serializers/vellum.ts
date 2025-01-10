@@ -70,7 +70,6 @@ import {
   WorkflowDisplayDataViewport,
   WorkflowEdge,
   WorkflowNode,
-  WorkflowNodeDefinition,
   WorkflowRawData,
   WorkflowVersionExecConfig,
   WorkspaceSecretPointer,
@@ -507,23 +506,6 @@ export declare namespace CodeResourceDefinitionSerializer {
   }
 }
 
-export const WorkflowNodeDefinitionSerializer: ObjectSchema<
-  WorkflowNodeDefinitionSerializer.Raw,
-  WorkflowNodeDefinition
-> = objectSchema({
-  name: stringSchema(),
-  module: listSchema(stringSchema()),
-  bases: listSchema(CodeResourceDefinitionSerializer),
-});
-
-export declare namespace WorkflowNodeDefinitionSerializer {
-  interface Raw {
-    name: string;
-    module: string[];
-    bases: CodeResourceDefinitionSerializer.Raw[];
-  }
-}
-
 export const PromptTemplateBlockDataSerializer: ObjectSchema<
   PromptTemplateBlockDataSerializer.Raw,
   PromptTemplateBlockData
@@ -633,7 +615,8 @@ export declare namespace NodeDisplayDataSerializer {
 
 export declare namespace BaseWorkflowNodeSerializer {
   interface Raw {
-    definition?: WorkflowNodeDefinitionSerializer.Raw | null;
+    base?: CodeResourceDefinitionSerializer.Raw | null;
+    definition?: CodeResourceDefinitionSerializer.Raw | null;
   }
 }
 
@@ -659,7 +642,8 @@ export const EntrypointNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace EntrypointNodeSerializer {
@@ -753,7 +737,8 @@ export const SubworkflowNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace SubworkflowNodeSerializer {
@@ -949,7 +934,8 @@ export const PromptNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace PromptNodeSerializer {
@@ -1059,7 +1045,8 @@ export const MapNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace MapNodeSerializer {
@@ -1086,7 +1073,8 @@ export const GuardrailNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace GuardrailNodeSerializer {
@@ -1159,7 +1147,8 @@ export const CodeExecutionNodeSerializer: ObjectSchema<
   data: CodeExecutionNodeDataSerializer,
   inputs: listSchema(NodeInputSerializer),
   displayData: propertySchema("display_data", anySchema().optional()),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace CodeExecutionNodeSerializer {
@@ -1233,7 +1222,8 @@ export const SearchNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace SearchNodeSerializer {
@@ -1322,7 +1312,8 @@ export const ConditionalNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace ConditionalNodeSerializer {
@@ -1353,7 +1344,8 @@ export const TemplatingNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace TemplatingNodeSerializer {
@@ -1388,7 +1380,8 @@ export const FinalOutputNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace FinalOutputNodeSerializer {
@@ -1442,7 +1435,8 @@ export const MergeNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace MergeNodeSerializer {
@@ -1513,7 +1507,8 @@ export const ApiNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace ApiNodeSerializer {
@@ -1553,7 +1548,8 @@ export const NoteNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace NoteNodeSerializer {
@@ -1584,7 +1580,8 @@ export const ErrorNodeSerializer: ObjectSchema<
     "display_data",
     NodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace ErrorNodeSerializer {
@@ -1620,11 +1617,13 @@ export const GenericNodeSerializer: ObjectSchema<
     "display_data",
     GenericNodeDisplayDataSerializer.optional()
   ),
-  definition: WorkflowNodeDefinitionSerializer.optional(),
+  base: CodeResourceDefinitionSerializer,
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace GenericNodeSerializer {
   interface Raw extends BaseWorkflowNodeSerializer.Raw {
+    base: CodeResourceDefinitionSerializer.Raw;
     display_data?: {
       position?: {
         x: number;

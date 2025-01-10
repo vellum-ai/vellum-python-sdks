@@ -47,17 +47,8 @@ def test_serialize_workflow__await_all():
     assert entrypoint_node == {
         "id": "dc8aecd0-49ba-4464-a45f-29d3bfd686e4",
         "type": "ENTRYPOINT",
-        "definition": {
-            "bases": [],
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "name": "BaseNode",
-        },
+        "base": None,
+        "definition": None,
         "inputs": [],
         "data": {
             "label": "Entrypoint Node",
@@ -87,26 +78,12 @@ def test_serialize_workflow__await_all():
                 "source_handle_id": "3bbc469f-0fb0-4b3d-a28b-746fefec2818",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "module": ["vellum", "workflows", "nodes", "displayable", "merge_node", "node"],
+                "name": "MergeNode",
+            },
             "definition": {
-                "bases": [
-                    {
-                        "module": [
-                            "vellum",
-                            "workflows",
-                            "nodes",
-                            "displayable",
-                            "merge_node",
-                            "node",
-                        ],
-                        "name": "MergeNode",
-                    }
-                ],
-                "module": [
-                    "tests",
-                    "workflows",
-                    "basic_merge_node",
-                    "await_all_workflow",
-                ],
+                "module": ["tests", "workflows", "basic_merge_node", "await_all_workflow"],
                 "name": "AwaitAllMergeNode",
             },
         },
@@ -126,20 +103,7 @@ def test_serialize_workflow__await_all():
             "output_type": "STRING",
             "node_input_id": "7f950be4-2fab-44e0-87a3-b1631aadd0e3",
         },
-        "definition": {
-            "bases": [
-                {
-                    "bases": [],
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "bases",
-                        "base",
-                    ],
-                    "name": "BaseNode",
-                },
-            ],
+        "base": {
             "module": [
                 "vellum",
                 "workflows",
@@ -150,6 +114,7 @@ def test_serialize_workflow__await_all():
             ],
             "name": "FinalOutputNode",
         },
+        "definition": None,
         "inputs": [
             {
                 "id": "7f950be4-2fab-44e0-87a3-b1631aadd0e3",

@@ -2,17 +2,6 @@
 
 exports[`ErrorNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "core",
-      ],
-      "name": "ErrorNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

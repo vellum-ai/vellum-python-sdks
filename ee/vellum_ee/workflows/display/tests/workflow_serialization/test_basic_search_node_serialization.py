@@ -50,7 +50,8 @@ def test_serialize_workflow():
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "df80b4aa-2ba1-49a2-8375-fb1f78eee31f"},
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []},
+        "base": None,
+        "definition": None,
     }
 
     search_node = workflow_raw_data["nodes"][1]
@@ -223,12 +224,13 @@ def test_serialize_workflow():
             "metadata_filters_node_input_id": "855d3f57-e633-467e-a348-a394360247df",
         },
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "base": {
+            "name": "SearchNode",
+            "module": ["vellum", "workflows", "nodes", "displayable", "search_node", "node"],
+        },
         "definition": {
             "name": "SimpleSearchNode",
             "module": ["tests", "workflows", "basic_search_node", "workflow"],
-            "bases": [
-                {"name": "SearchNode", "module": ["vellum", "workflows", "nodes", "displayable", "search_node", "node"]}
-            ],
         },
     }
 
@@ -263,11 +265,11 @@ def test_serialize_workflow():
             }
         ],
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {
+        "base": {
             "name": "FinalOutputNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-            "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}],
         },
+        "definition": None,
     }
 
     # AND each edge should be serialized correctly

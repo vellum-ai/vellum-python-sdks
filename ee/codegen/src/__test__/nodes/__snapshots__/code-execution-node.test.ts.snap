@@ -2,17 +2,6 @@
 
 exports[`CodeExecutionNode > basic > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "displayable",
-      ],
-      "name": "CodeExecutionNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",

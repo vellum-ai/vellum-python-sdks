@@ -22,6 +22,7 @@ def test_serialize_node__basic(serialize_node):
             "label": "BasicGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "BasicGenericNode",
                 "module": [
@@ -33,7 +34,6 @@ def test_serialize_node__basic(serialize_node):
                     "generic_nodes",
                     "test_trigger_serialization",
                 ],
-                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ANY"},
             "ports": [
@@ -66,6 +66,7 @@ def test_serialize_node__await_any(serialize_node):
             "label": "AwaitAnyGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "AwaitAnyGenericNode",
                 "module": [
@@ -77,7 +78,6 @@ def test_serialize_node__await_any(serialize_node):
                     "generic_nodes",
                     "test_trigger_serialization",
                 ],
-                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "ffa72187-9a18-453f-ae55-b77aad332630", "merge_behavior": "AWAIT_ANY"},
             "ports": [
@@ -110,6 +110,7 @@ def test_serialize_node__await_all(serialize_node):
             "label": "AwaitAllGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "AwaitAllGenericNode",
                 "module": [
@@ -121,7 +122,6 @@ def test_serialize_node__await_all(serialize_node):
                     "generic_nodes",
                     "test_trigger_serialization",
                 ],
-                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "62074276-c817-476d-b59d-da523ae3f218", "merge_behavior": "AWAIT_ALL"},
             "ports": [

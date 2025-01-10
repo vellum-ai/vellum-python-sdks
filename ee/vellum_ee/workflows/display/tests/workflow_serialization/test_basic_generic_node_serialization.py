@@ -65,17 +65,8 @@ def test_serialize_workflow(vellum_client):
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "40201804-8beb-43ad-8873-a027759512f1"},
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "definition": {
-            "name": "BaseNode",
-            "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "bases",
-                "base",
-            ],
-            "bases": [],
-        },
+        "base": None,
+        "definition": None,
     }
 
     api_node = workflow_raw_data["nodes"][1]
@@ -113,13 +104,11 @@ def test_serialize_workflow(vellum_client):
                 }
             ],
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "definition": {
+            "base": {
                 "name": "FinalOutputNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-                "bases": [
-                    {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"], "bases": []}
-                ],
             },
+            "definition": None,
         },
         final_output_node,
         ignore_order=True,

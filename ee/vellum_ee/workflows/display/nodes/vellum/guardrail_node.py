@@ -45,5 +45,6 @@ class BaseGuardrailNodeDisplay(BaseNodeVellumDisplay[_GuardrailNodeType], Generi
                 "release_tag": raise_if_descriptor(node.release_tag),
             },
             "display_data": self.get_display_data().dict(),
+            "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }
