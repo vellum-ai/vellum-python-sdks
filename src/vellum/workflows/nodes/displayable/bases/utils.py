@@ -26,6 +26,20 @@ from vellum.client.types.search_results_vellum_value_request import SearchResult
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.client.types.vellum_value import VellumValue
+from vellum.client.types.vellum_value_request import VellumValueRequest
+
+VELLUM_VALUE_REQUEST_TUPLE = (
+    StringVellumValueRequest,
+    NumberVellumValueRequest,
+    JsonVellumValueRequest,
+    ImageVellumValueRequest,
+    AudioVellumValueRequest,
+    FunctionCallVellumValueRequest,
+    ErrorVellumValueRequest,
+    ArrayVellumValueRequest,
+    ChatHistoryVellumValueRequest,
+    SearchResultsVellumValueRequest,
+)
 
 
 def primitive_to_vellum_value(value: Any) -> VellumValue:
@@ -67,18 +81,7 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return value
     elif isinstance(
         value,
-        (
-            StringVellumValueRequest,
-            NumberVellumValueRequest,
-            JsonVellumValueRequest,
-            ImageVellumValueRequest,
-            AudioVellumValueRequest,
-            FunctionCallVellumValueRequest,
-            ErrorVellumValueRequest,
-            ArrayVellumValueRequest,
-            ChatHistoryVellumValueRequest,
-            SearchResultsVellumValueRequest,
-        ),
+        VELLUM_VALUE_REQUEST_TUPLE,
     ):
         # This type ignore is safe because consumers of this function won't care the difference between
         # XVellumValue and XVellumValueRequest. Hopefully in the near future, neither will we
@@ -90,3 +93,16 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         raise ValueError(f"Unsupported variable type: {value.__class__.__name__}")
 
     return JsonVellumValue(value=json.loads(json_value))
+
+
+def primitive_to_vellum_value_request(value: Any) -> VellumValueRequest:
+    vellum_value = primitive_to_vellum_value(value)
+    vellum_value_request_class = next(
+        (
+            vellum_value_request_class
+            for vellum_value_request_class in VELLUM_VALUE_REQUEST_TUPLE
+            if vellum_value_request_class.__name__.startswith(vellum_value.__class__.__name__)
+        ),
+        None,
+    )
+    return vellum_value_request_class.model_validate(vellum_value.model_dump())

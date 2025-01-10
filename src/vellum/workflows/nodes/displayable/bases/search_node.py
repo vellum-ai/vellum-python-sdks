@@ -95,7 +95,7 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
             return self._context.vellum_client.search(
                 query=self.query,
                 document_index=str(self.document_index),
-                options=self.options,
+                options=self._get_options_request(),
             )
         except NotFoundError:
             raise NodeException(

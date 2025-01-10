@@ -5,7 +5,7 @@ from vellum.client.types.condition_combinator import ConditionCombinator
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.client.types.vellum_value_logical_condition_group_request import VellumValueLogicalConditionGroupRequest
 from vellum.client.types.vellum_value_logical_condition_request import VellumValueLogicalConditionRequest
-from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
+from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value_request
 
 
 class MetadataLogicalConditionGroup(UniversalBaseModel):
@@ -28,9 +28,9 @@ class MetadataLogicalCondition(UniversalBaseModel):
 
     def to_request(self) -> VellumValueLogicalConditionRequest:
         return VellumValueLogicalConditionRequest(
-            lhs_variable=primitive_to_vellum_value(self.lhs_variable),
+            lhs_variable=primitive_to_vellum_value_request(self.lhs_variable),
             operator=self.operator,
-            rhs_variable=primitive_to_vellum_value(self.rhs_variable),
+            rhs_variable=primitive_to_vellum_value_request(self.rhs_variable),
         )
 
 
