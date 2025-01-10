@@ -15,6 +15,7 @@ from vellum.core import ApiError, RequestOptions
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.displayable.bases.types import SearchFilters
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.types.generics import StateType
 
@@ -33,7 +34,11 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
     document_index: Union[UUID, str] - Either the UUID or name of the Vellum Document Index that you'd like to search
         against
     query: str - The query to search for
-    options: Optional[SearchRequestOptionsRequest] = None - Runtime configuration for the search
+    limit: Optional[int] = None - The maximum number of results to return.
+    weights: Optional[SearchWeightsRequest] = None - The weights to use for the search. Must add up to 1.0.
+    result_merging: Optional[SearchResultMergingRequest] = None - The configuration for merging results.
+    filters: Optional[SearchFiltersRequest] = None - The filters to apply to the search.
+    options: Optional[SearchRequestOptionsRequest] = None - [DEPRECATED] Runtime configuration for the search
     request_options: Optional[RequestOptions] = None - The request options to use for the search
     """
 
@@ -43,11 +48,24 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
     # The Document Index to Search against. Identified by either its UUID or its name.
     document_index: ClassVar[Union[UUID, str]]
 
+    # The maximum number of results to return.
+    limit: ClassVar[Optional[int]] = None
+
+    # The weights to use for the search. Must add up to 1.0.
+    weights: ClassVar[Optional[SearchWeightsRequest]] = None
+
+    # The configuration for merging results.
+    result_merging: ClassVar[Optional[SearchResultMergingRequest]] = None
+
+    # The filters to apply to the search.
+    filters: ClassVar[Optional[SearchFilters]] = None
+
     # Ideally we could reuse node descriptors to derive other node descriptor values. Two action items are
     # blocking us from doing so in this use case:
     # 1. Node Descriptor resolution during runtime - https://app.shortcut.com/vellum/story/4781
     # 2. Math operations between descriptors - https://app.shortcut.com/vellum/story/4782
     # search_weights = DEFAULT_SEARCH_WEIGHTS
+    # Deprecated: Use the top level `limit`, `weights`, `result_merging`, and `filters` attributesinstead
     options = SearchRequestOptionsRequest(
         limit=DEFAULT_SEARCH_LIMIT,
         weights=SearchWeightsRequest(
@@ -89,6 +107,23 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
                 message=f"An error occurred while searching against Document Index '{self.document_index}'",  # noqa: E501
                 code=WorkflowErrorCode.INTERNAL_ERROR,
             )
+
+    def _get_options_request(self) -> SearchRequestOptionsRequest:
+        return SearchRequestOptionsRequest(
+            limit=self.limit if self.limit is not None else self.options.limit,
+            weights=self.weights if self.weights is not None else self.options.weights,
+            result_merging=self.result_merging if self.result_merging is not None else self.options.result_merging,
+            filters=self._get_filters_request(),
+        )
+
+    def _get_filters_request(self) -> Optional[SearchFiltersRequest]:
+        if self.filters is None:
+            return self.options.filters
+
+        return SearchFiltersRequest(
+            external_ids=self.filters.external_ids,
+            metadata=self.filters.metadata.to_request() if self.filters.metadata is not None else None,
+        )
 
     def run(self) -> Outputs:
         response = self._perform_search()

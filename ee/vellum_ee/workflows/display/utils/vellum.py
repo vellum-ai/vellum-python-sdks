@@ -4,6 +4,27 @@ import typing
 from typing import Any, List, Union, cast
 
 from vellum import ChatMessage, SearchResult, SearchResultRequest, VellumVariableType
+from vellum.client.types.array_vellum_value import ArrayVellumValue
+from vellum.client.types.array_vellum_value_request import ArrayVellumValueRequest
+from vellum.client.types.audio_vellum_value import AudioVellumValue
+from vellum.client.types.audio_vellum_value_request import AudioVellumValueRequest
+from vellum.client.types.chat_history_vellum_value import ChatHistoryVellumValue
+from vellum.client.types.chat_history_vellum_value_request import ChatHistoryVellumValueRequest
+from vellum.client.types.error_vellum_value import ErrorVellumValue
+from vellum.client.types.error_vellum_value_request import ErrorVellumValueRequest
+from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
+from vellum.client.types.function_call_vellum_value_request import FunctionCallVellumValueRequest
+from vellum.client.types.image_vellum_value import ImageVellumValue
+from vellum.client.types.image_vellum_value_request import ImageVellumValueRequest
+from vellum.client.types.json_vellum_value import JsonVellumValue
+from vellum.client.types.json_vellum_value_request import JsonVellumValueRequest
+from vellum.client.types.number_vellum_value import NumberVellumValue
+from vellum.client.types.number_vellum_value_request import NumberVellumValueRequest
+from vellum.client.types.search_results_vellum_value import SearchResultsVellumValue
+from vellum.client.types.search_results_vellum_value_request import SearchResultsVellumValueRequest
+from vellum.client.types.string_vellum_value import StringVellumValue
+from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
+from vellum.client.types.vellum_value import VellumValue
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
@@ -13,20 +34,14 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.vellum import (
-    ChatHistoryVellumValue,
     ConstantValuePointer,
     ExecutionCounterData,
     ExecutionCounterPointer,
     InputVariableData,
     InputVariablePointer,
-    JsonVellumValue,
     NodeInputValuePointerRule,
     NodeOutputData,
     NodeOutputPointer,
-    NumberVellumValue,
-    SearchResultsVellumValue,
-    StringVellumValue,
-    VellumValue,
     WorkspaceSecretData,
     WorkspaceSecretPointer,
 )
@@ -93,7 +108,7 @@ def create_node_input_value_pointer_rule(
 
 
 def primitive_to_vellum_value(value: Any) -> VellumValue:
-    """Converts a python primitive to a VellumVariableValue"""
+    """Converts a python primitive to a VellumValue"""
 
     if isinstance(value, str):
         return StringVellumValue(value=value)
@@ -113,6 +128,40 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
     ):
         search_results = cast(Union[List[SearchResultRequest], List[SearchResult]], value)
         return SearchResultsVellumValue(value=search_results)
+    elif isinstance(
+        value,
+        (
+            StringVellumValue,
+            NumberVellumValue,
+            JsonVellumValue,
+            ImageVellumValue,
+            AudioVellumValue,
+            FunctionCallVellumValue,
+            ErrorVellumValue,
+            ArrayVellumValue,
+            ChatHistoryVellumValue,
+            SearchResultsVellumValue,
+        ),
+    ):
+        return value
+    elif isinstance(
+        value,
+        (
+            StringVellumValueRequest,
+            NumberVellumValueRequest,
+            JsonVellumValueRequest,
+            ImageVellumValueRequest,
+            AudioVellumValueRequest,
+            FunctionCallVellumValueRequest,
+            ErrorVellumValueRequest,
+            ArrayVellumValueRequest,
+            ChatHistoryVellumValueRequest,
+            SearchResultsVellumValueRequest,
+        ),
+    ):
+        # This type ignore is safe because consumers of this function won't care the difference between
+        # XVellumValue and XVellumValueRequest. Hopefully in the near future, neither will we
+        return value  # type: ignore
 
     try:
         json_value = json.dumps(value)
