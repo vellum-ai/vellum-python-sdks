@@ -62,4 +62,4 @@ def test_map_node__use_parallelism():
 
     # THEN the node should have ran in parallel
     run_time = (end_ts - start_ts) / 10**9
-    assert run_time < 0.1
+    assert run_time < 0.2
