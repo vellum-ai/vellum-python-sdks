@@ -511,7 +511,7 @@ def test_serialize_node__between(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "31da54ae-1abb-4e9e-8a7d-6f4f30a78c72",
+            "id": "3ef33a2a-6ad5-415c-be75-f38cc1403dfc",
             "label": "BetweenGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -528,10 +528,10 @@ def test_serialize_node__between(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "a8afaebc-7333-4e3f-b221-24452b4a1d47", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "086a355e-d9ef-4039-af35-9f1211497b32", "merge_behavior": "AWAIT_ANY"},
             "ports": [
                 {
-                    "id": "7605b4c0-a432-4517-b759-5858045a5146",
+                    "id": "a86bd19f-a9f7-45c3-80ff-73330b1b75af",
                     "type": "IF",
                     "expression": {
                         "type": "TERNARY_EXPRESSION",
