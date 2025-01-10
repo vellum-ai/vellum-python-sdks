@@ -4,7 +4,7 @@ import {
   GENERATED_NODES_MODULE_NAME,
 } from "src/constants";
 import { WorkflowContext } from "src/context";
-import { WorkflowNodeDefinition } from "src/types/vellum";
+import { CodeResourceDefinition } from "src/types/vellum";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 export function getGeneratedInputsModulePath(
@@ -45,7 +45,7 @@ export function getGeneratedNodeModuleInfo({
   nodeLabel,
 }: {
   workflowContext: WorkflowContext;
-  nodeDefinition: WorkflowNodeDefinition | undefined;
+  nodeDefinition: CodeResourceDefinition | undefined;
   nodeLabel: string;
 }): { moduleName: string; nodeClassName: string; modulePath: string[] } {
   const modulePathLeaf =

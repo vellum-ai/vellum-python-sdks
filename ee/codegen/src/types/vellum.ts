@@ -169,15 +169,9 @@ export interface CodeResourceDefinition {
   module: string[];
 }
 
-export interface WorkflowNodeDefinition {
-  name: string;
-  module: string[];
-  bases: CodeResourceDefinition[];
-}
-
 export interface BaseWorkflowNode {
   type: string;
-  definition?: WorkflowNodeDefinition;
+  definition?: CodeResourceDefinition;
 }
 
 export interface BaseDisplayableWorkflowNode extends BaseWorkflowNode {
@@ -185,7 +179,7 @@ export interface BaseDisplayableWorkflowNode extends BaseWorkflowNode {
   inputs: NodeInput[];
   type: string;
   displayData?: NodeDisplayData;
-  definition?: WorkflowNodeDefinition;
+  base?: CodeResourceDefinition;
 }
 
 export interface EntrypointNodeData {
@@ -618,6 +612,7 @@ export interface GenericNodeDisplayData {
 export interface GenericNode extends BaseWorkflowNode {
   type: "GENERIC";
   displayData?: GenericNodeDisplayData;
+  base: CodeResourceDefinition;
 }
 
 export type WorkflowDataNode =

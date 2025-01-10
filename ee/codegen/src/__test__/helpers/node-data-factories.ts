@@ -1316,15 +1316,13 @@ export function genericNodeFactory(
 ): GenericNode {
   const nodeData: GenericNode = {
     type: WorkflowNodeType.GENERIC,
+    base: {
+      module: ["vellum", "workflows", "nodes", "bases", "base"],
+      name: "BaseNode",
+    },
     definition: {
       name,
       module: ["my_nodes", "my_custom_node"],
-      bases: [
-        {
-          module: ["vellum", "workflows", "nodes", "bases", "base"],
-          name: "BaseNode",
-        },
-      ],
     },
   };
   return nodeData;

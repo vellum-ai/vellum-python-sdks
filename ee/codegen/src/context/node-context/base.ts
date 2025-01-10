@@ -1,7 +1,7 @@
 import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
 import { NodeOutputNotFoundError } from "src/generators/errors";
-import { WorkflowDataNode, WorkflowNodeDefinition } from "src/types/vellum";
+import { CodeResourceDefinition, WorkflowDataNode } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getNodeId, getNodeLabel } from "src/utils/nodes";
 import {
@@ -92,21 +92,10 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     return getNodeLabel(this.nodeData);
   }
 
-  public getNodeDefinition(): WorkflowNodeDefinition {
+  public getNodeDefinition(): CodeResourceDefinition {
     return {
       name: this.nodeClassName,
       module: this.nodeModulePath,
-      bases: [
-        {
-          name: this.baseNodeClassName,
-          module: [
-            ...(this.isCore
-              ? this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH
-              : this.workflowContext.sdkModulePathNames
-                  .DISPLAYABLE_NODES_MODULE_PATH),
-          ],
-        },
-      ],
     };
   }
 
