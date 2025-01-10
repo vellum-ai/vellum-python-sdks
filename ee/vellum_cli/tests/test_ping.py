@@ -12,13 +12,13 @@ def test_ping__happy_path(vellum_client):
     runner = CliRunner()
 
     # AND a valid response from both the workflow and organization API calls
-    vellum_client.workflows.identify.return_value = WorkspaceRead(
+    vellum_client.workspaces.workspace_identity.return_value = WorkspaceRead(
         id="1234567890",
         name="Test Workspace",
         label="Test Workspace",
         created=datetime.now(),
     )
-    vellum_client.organizations.identify.return_value = OrganizationRead(
+    vellum_client.organizations.organization_identity.return_value = OrganizationRead(
         id="1234567890",
         name="Test Organization",
         new_member_join_behavior="AUTO_ACCEPT_FROM_SHARED_DOMAIN",
@@ -32,17 +32,16 @@ def test_ping__happy_path(vellum_client):
     assert result.exit_code == 0
     assert (
         result.output
-        == """\
+        == """\x1b[38;20m\
 Successfully authenticated to Vellum!
 
 Organization:
-    Name: test-organization
     ID: 1234567890
-    Plan: free
+    Name: Test Organization
 
 Workspace:
-    Name: test-workspace
     ID: 1234567890
-    Plan: free
+    Name: Test Workspace
+\x1b[0m
 """
     )
