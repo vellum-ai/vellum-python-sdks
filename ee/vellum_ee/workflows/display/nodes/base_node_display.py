@@ -57,14 +57,16 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     def get_base(self) -> CodeResourceDefinition:
         node = self._node
 
-        bases = [
-            CodeResourceDefinition(
-                name=base.__name__,
-                module=base.__module__.split("."),
-            )
-            for base in node.__bases__
-        ]
-        return bases[0]
+        base_node_classes = [base for base in node.__bases__ if issubclass(base, BaseNode)]
+        if len(base_node_classes) != 1:
+            raise ValueError(f"Node {node.__name__} must extend from exactly one parent node class.")
+
+        base_node_class = base_node_classes[0]
+
+        return CodeResourceDefinition(
+            name=base_node_class.__name__,
+            module=base_node_class.__module__.split("."),
+        )
 
     def get_definition(self) -> CodeResourceDefinition:
         node = self._node
