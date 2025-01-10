@@ -1,0 +1,29 @@
+imports:
+  root: __package__.yml
+service:
+  auth: false
+  base-path: ''
+  endpoints:
+    organization_identity:
+      path: /v1/organizations/identity
+      method: GET
+      auth: false
+      docs: Retrieves information about the active Organization
+      source:
+        openapi: openapi/openapi.yml
+      response:
+        docs: ''
+        type: root.OrganizationRead
+      url: Default
+      availability: pre-release
+      examples:
+        - response:
+            body:
+              id: id
+              name: name
+              allow_staff_access: true
+              new_member_join_behavior: AUTO_ACCEPT_FROM_SHARED_DOMAIN
+      audiences:
+        - internal
+  source:
+    openapi: openapi/openapi.yml

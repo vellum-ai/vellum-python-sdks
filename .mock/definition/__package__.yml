@@ -933,27 +933,6 @@ types:
       value: list<VellumValue>
     source:
       openapi: openapi/openapi.yml
-  ArrayVariableValue:
-    properties:
-      type: literal<"ARRAY">
-      value: optional<list<ArrayVariableValueItem>>
-    source:
-      openapi: openapi/openapi.yml
-  ArrayVariableValueItem:
-    discriminated: false
-    union:
-      - StringVariableValue
-      - NumberVariableValue
-      - JsonVariableValue
-      - ErrorVariableValue
-      - FunctionCallVariableValue
-      - ImageVariableValue
-      - AudioVariableValue
-      - ChatHistoryVariableValue
-      - SearchResultsVariableValue
-      - ArrayVariableValue
-    source:
-      openapi: openapi/openapi.yml
   ArrayVellumValue:
     docs: A value representing an array of Vellum variable values.
     properties:
@@ -994,13 +973,6 @@ types:
         validation:
           minLength: 1
       metadata: optional<map<string, unknown>>
-    source:
-      openapi: openapi/openapi.yml
-  AudioVariableValue:
-    docs: A base Vellum primitive value representing audio.
-    properties:
-      type: literal<"AUDIO">
-      value: optional<VellumAudio>
     source:
       openapi: openapi/openapi.yml
   AudioVellumValue:
@@ -1082,12 +1054,6 @@ types:
           minLength: 1
       type: literal<"CHAT_HISTORY">
       value: list<ChatMessageRequest>
-    source:
-      openapi: openapi/openapi.yml
-  ChatHistoryVariableValue:
-    properties:
-      type: literal<"CHAT_HISTORY">
-      value: optional<list<ChatMessage>>
     source:
       openapi: openapi/openapi.yml
   ChatHistoryVellumValue:
@@ -1794,12 +1760,6 @@ types:
       value: VellumError
     source:
       openapi: openapi/openapi.yml
-  ErrorVariableValue:
-    properties:
-      type: literal<"ERROR">
-      value: optional<VellumError>
-    source:
-      openapi: openapi/openapi.yml
   ErrorVellumValue:
     docs: A value representing an Error.
     properties:
@@ -2306,12 +2266,6 @@ types:
           minLength: 1
     source:
       openapi: openapi/openapi.yml
-  FunctionCallVariableValue:
-    properties:
-      type: literal<"FUNCTION_CALL">
-      value: optional<FunctionCall>
-    source:
-      openapi: openapi/openapi.yml
   FunctionCallVellumValue:
     docs: A value representing a Function Call.
     properties:
@@ -2535,13 +2489,6 @@ types:
       metadata: optional<map<string, unknown>>
     source:
       openapi: openapi/openapi.yml
-  ImageVariableValue:
-    docs: A base Vellum primitive value representing an image.
-    properties:
-      type: literal<"IMAGE">
-      value: optional<VellumImage>
-    source:
-      openapi: openapi/openapi.yml
   ImageVellumValue:
     docs: A base Vellum primitive value representing an image.
     properties:
@@ -2715,12 +2662,6 @@ types:
     source:
       openapi: openapi/openapi.yml
   JsonEnum: literal<"JSON">
-  JsonVariableValue:
-    properties:
-      type: literal<"JSON">
-      value: unknown
-    source:
-      openapi: openapi/openapi.yml
   JsonVellumValue:
     docs: A value representing a JSON object.
     properties:
@@ -3193,6 +3134,20 @@ types:
       - NamedTestCaseArrayVariableValueRequest
     source:
       openapi: openapi/openapi.yml
+  NewMemberJoinBehaviorEnum:
+    enum:
+      - AUTO_ACCEPT_FROM_SHARED_DOMAIN
+      - ALLOW_REQUESTS_FROM_SHARED_DOMAIN
+      - REQUIRE_EXPLICIT_INVITE
+    docs: >-
+      * `AUTO_ACCEPT_FROM_SHARED_DOMAIN` - Auto-Accept from Shared Domain
+
+      * `ALLOW_REQUESTS_FROM_SHARED_DOMAIN` - Allows Requests from Shared
+      Domains
+
+      * `REQUIRE_EXPLICIT_INVITE` - Require Explicit Invite
+    source:
+      openapi: openapi/openapi.yml
   NodeInputCompiledArrayValue:
     properties:
       node_input_id: string
@@ -3382,12 +3337,6 @@ types:
       value: double
     source:
       openapi: openapi/openapi.yml
-  NumberVariableValue:
-    properties:
-      type: literal<"NUMBER">
-      value: optional<double>
-    source:
-      openapi: openapi/openapi.yml
   NumberVellumValue:
     docs: A value representing a number.
     properties:
@@ -3454,6 +3403,20 @@ types:
     properties:
       config: OpenAiVectorizerConfigRequest
       model_name: literal<"text-embedding-ada-002">
+    source:
+      openapi: openapi/openapi.yml
+  OrganizationRead:
+    properties:
+      id:
+        type: string
+        validation:
+          format: uuid
+      name:
+        type: string
+        validation:
+          maxLength: 150
+      allow_staff_access: optional<boolean>
+      new_member_join_behavior: NewMemberJoinBehaviorEnum
     source:
       openapi: openapi/openapi.yml
   PaginatedContainerImageReadList:
@@ -4237,12 +4200,6 @@ types:
       value: list<SearchResult>
     source:
       openapi: openapi/openapi.yml
-  SearchResultsVariableValue:
-    properties:
-      type: literal<"SEARCH_RESULTS">
-      value: optional<list<SearchResult>>
-    source:
-      openapi: openapi/openapi.yml
   SearchResultsVellumValue:
     docs: A value representing Search Results.
     properties:
@@ -4601,12 +4558,6 @@ types:
           minLength: 1
       type: literal<"STRING">
       value: string
-    source:
-      openapi: openapi/openapi.yml
-  StringVariableValue:
-    properties:
-      type: literal<"STRING">
-      value: optional<string>
     source:
       openapi: openapi/openapi.yml
   StringVellumValue:
@@ -6652,7 +6603,7 @@ types:
           The newly output string value. Only relevant for string outputs with a
           state of STREAMING.
       type: literal<"ARRAY">
-      value: optional<list<ArrayVariableValueItem>>
+      value: optional<list<VellumValue>>
     source:
       openapi: openapi/openapi.yml
   WorkflowResultEventOutputDataChatHistory:
@@ -6797,6 +6748,21 @@ types:
     union:
       - WorkflowExecutionWorkflowResultEvent
       - WorkflowExecutionNodeResultEvent
+    source:
+      openapi: openapi/openapi.yml
+  WorkspaceRead:
+    properties:
+      id:
+        type: string
+        validation:
+          format: uuid
+      name:
+        type: string
+        docs: The name of the Workspace.
+        validation:
+          maxLength: 150
+      label: string
+      created: datetime
     source:
       openapi: openapi/openapi.yml
   WorkspaceSecretRead:

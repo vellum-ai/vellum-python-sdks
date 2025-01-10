@@ -14,14 +14,11 @@ from .array_chat_message_content_item import ArrayChatMessageContentItem
 from .array_chat_message_content_item_request import ArrayChatMessageContentItemRequest
 from .array_chat_message_content_request import ArrayChatMessageContentRequest
 from .array_input import ArrayInput
-from .array_variable_value import ArrayVariableValue
-from .array_variable_value_item import ArrayVariableValueItem
 from .array_vellum_value import ArrayVellumValue
 from .array_vellum_value_request import ArrayVellumValueRequest
 from .audio_chat_message_content import AudioChatMessageContent
 from .audio_chat_message_content_request import AudioChatMessageContentRequest
 from .audio_prompt_block import AudioPromptBlock
-from .audio_variable_value import AudioVariableValue
 from .audio_vellum_value import AudioVellumValue
 from .audio_vellum_value_request import AudioVellumValueRequest
 from .basic_vectorizer_intfloat_multilingual_e_5_large import BasicVectorizerIntfloatMultilingualE5Large
@@ -40,7 +37,6 @@ from .basic_vectorizer_sentence_transformers_multi_qa_mpnet_base_dot_v_1_request
 )
 from .chat_history_input import ChatHistoryInput
 from .chat_history_input_request import ChatHistoryInputRequest
-from .chat_history_variable_value import ChatHistoryVariableValue
 from .chat_history_vellum_value import ChatHistoryVellumValue
 from .chat_history_vellum_value_request import ChatHistoryVellumValueRequest
 from .chat_message import ChatMessage
@@ -97,7 +93,6 @@ from .environment_enum import EnvironmentEnum
 from .ephemeral_prompt_cache_config import EphemeralPromptCacheConfig
 from .ephemeral_prompt_cache_config_type_enum import EphemeralPromptCacheConfigTypeEnum
 from .error_input import ErrorInput
-from .error_variable_value import ErrorVariableValue
 from .error_vellum_value import ErrorVellumValue
 from .error_vellum_value_request import ErrorVellumValueRequest
 from .execute_prompt_event import ExecutePromptEvent
@@ -141,7 +136,6 @@ from .function_call_chat_message_content_value_request import FunctionCallChatMe
 from .function_call_input import FunctionCallInput
 from .function_call_prompt_block import FunctionCallPromptBlock
 from .function_call_request import FunctionCallRequest
-from .function_call_variable_value import FunctionCallVariableValue
 from .function_call_vellum_value import FunctionCallVellumValue
 from .function_call_vellum_value_request import FunctionCallVellumValueRequest
 from .function_definition import FunctionDefinition
@@ -169,7 +163,6 @@ from .hkunlp_instructor_xl_vectorizer_request import HkunlpInstructorXlVectorize
 from .image_chat_message_content import ImageChatMessageContent
 from .image_chat_message_content_request import ImageChatMessageContentRequest
 from .image_prompt_block import ImagePromptBlock
-from .image_variable_value import ImageVariableValue
 from .image_vellum_value import ImageVellumValue
 from .image_vellum_value_request import ImageVellumValueRequest
 from .indexing_config_vectorizer import IndexingConfigVectorizer
@@ -185,7 +178,6 @@ from .iteration_state_enum import IterationStateEnum
 from .jinja_prompt_block import JinjaPromptBlock
 from .json_input import JsonInput
 from .json_input_request import JsonInputRequest
-from .json_variable_value import JsonVariableValue
 from .json_vellum_value import JsonVellumValue
 from .json_vellum_value_request import JsonVellumValueRequest
 from .logical_operator import LogicalOperator
@@ -226,6 +218,7 @@ from .named_test_case_string_variable_value import NamedTestCaseStringVariableVa
 from .named_test_case_string_variable_value_request import NamedTestCaseStringVariableValueRequest
 from .named_test_case_variable_value import NamedTestCaseVariableValue
 from .named_test_case_variable_value_request import NamedTestCaseVariableValueRequest
+from .new_member_join_behavior_enum import NewMemberJoinBehaviorEnum
 from .node_input_compiled_array_value import NodeInputCompiledArrayValue
 from .node_input_compiled_chat_history_value import NodeInputCompiledChatHistoryValue
 from .node_input_compiled_error_value import NodeInputCompiledErrorValue
@@ -247,7 +240,6 @@ from .node_output_compiled_value import NodeOutputCompiledValue
 from .normalized_log_probs import NormalizedLogProbs
 from .normalized_token_log_probs import NormalizedTokenLogProbs
 from .number_input import NumberInput
-from .number_variable_value import NumberVariableValue
 from .number_vellum_value import NumberVellumValue
 from .number_vellum_value_request import NumberVellumValueRequest
 from .open_ai_vectorizer_config import OpenAiVectorizerConfig
@@ -258,6 +250,7 @@ from .open_ai_vectorizer_text_embedding_3_small import OpenAiVectorizerTextEmbed
 from .open_ai_vectorizer_text_embedding_3_small_request import OpenAiVectorizerTextEmbedding3SmallRequest
 from .open_ai_vectorizer_text_embedding_ada_002 import OpenAiVectorizerTextEmbeddingAda002
 from .open_ai_vectorizer_text_embedding_ada_002_request import OpenAiVectorizerTextEmbeddingAda002Request
+from .organization_read import OrganizationRead
 from .paginated_container_image_read_list import PaginatedContainerImageReadList
 from .paginated_deployment_release_tag_read_list import PaginatedDeploymentReleaseTagReadList
 from .paginated_document_index_read_list import PaginatedDocumentIndexReadList
@@ -321,7 +314,6 @@ from .search_result_meta import SearchResultMeta
 from .search_result_meta_request import SearchResultMetaRequest
 from .search_result_request import SearchResultRequest
 from .search_results_input import SearchResultsInput
-from .search_results_variable_value import SearchResultsVariableValue
 from .search_results_vellum_value import SearchResultsVellumValue
 from .search_results_vellum_value_request import SearchResultsVellumValueRequest
 from .search_weights_request import SearchWeightsRequest
@@ -342,7 +334,6 @@ from .string_chat_message_content import StringChatMessageContent
 from .string_chat_message_content_request import StringChatMessageContentRequest
 from .string_input import StringInput
 from .string_input_request import StringInputRequest
-from .string_variable_value import StringVariableValue
 from .string_vellum_value import StringVellumValue
 from .string_vellum_value_request import StringVellumValueRequest
 from .submit_completion_actual_request import SubmitCompletionActualRequest
@@ -522,6 +513,7 @@ from .workflow_result_event_output_data_number import WorkflowResultEventOutputD
 from .workflow_result_event_output_data_search_results import WorkflowResultEventOutputDataSearchResults
 from .workflow_result_event_output_data_string import WorkflowResultEventOutputDataString
 from .workflow_stream_event import WorkflowStreamEvent
+from .workspace_read import WorkspaceRead
 from .workspace_secret_read import WorkspaceSecretRead
 
 __all__ = [
@@ -539,14 +531,11 @@ __all__ = [
     "ArrayChatMessageContentItemRequest",
     "ArrayChatMessageContentRequest",
     "ArrayInput",
-    "ArrayVariableValue",
-    "ArrayVariableValueItem",
     "ArrayVellumValue",
     "ArrayVellumValueRequest",
     "AudioChatMessageContent",
     "AudioChatMessageContentRequest",
     "AudioPromptBlock",
-    "AudioVariableValue",
     "AudioVellumValue",
     "AudioVellumValueRequest",
     "BasicVectorizerIntfloatMultilingualE5Large",
@@ -557,7 +546,6 @@ __all__ = [
     "BasicVectorizerSentenceTransformersMultiQaMpnetBaseDotV1Request",
     "ChatHistoryInput",
     "ChatHistoryInputRequest",
-    "ChatHistoryVariableValue",
     "ChatHistoryVellumValue",
     "ChatHistoryVellumValueRequest",
     "ChatMessage",
@@ -614,7 +602,6 @@ __all__ = [
     "EphemeralPromptCacheConfig",
     "EphemeralPromptCacheConfigTypeEnum",
     "ErrorInput",
-    "ErrorVariableValue",
     "ErrorVellumValue",
     "ErrorVellumValueRequest",
     "ExecutePromptEvent",
@@ -658,7 +645,6 @@ __all__ = [
     "FunctionCallInput",
     "FunctionCallPromptBlock",
     "FunctionCallRequest",
-    "FunctionCallVariableValue",
     "FunctionCallVellumValue",
     "FunctionCallVellumValueRequest",
     "FunctionDefinition",
@@ -682,7 +668,6 @@ __all__ = [
     "ImageChatMessageContent",
     "ImageChatMessageContentRequest",
     "ImagePromptBlock",
-    "ImageVariableValue",
     "ImageVellumValue",
     "ImageVellumValueRequest",
     "IndexingConfigVectorizer",
@@ -698,7 +683,6 @@ __all__ = [
     "JinjaPromptBlock",
     "JsonInput",
     "JsonInputRequest",
-    "JsonVariableValue",
     "JsonVellumValue",
     "JsonVellumValueRequest",
     "LogicalOperator",
@@ -739,6 +723,7 @@ __all__ = [
     "NamedTestCaseStringVariableValueRequest",
     "NamedTestCaseVariableValue",
     "NamedTestCaseVariableValueRequest",
+    "NewMemberJoinBehaviorEnum",
     "NodeInputCompiledArrayValue",
     "NodeInputCompiledChatHistoryValue",
     "NodeInputCompiledErrorValue",
@@ -760,7 +745,6 @@ __all__ = [
     "NormalizedLogProbs",
     "NormalizedTokenLogProbs",
     "NumberInput",
-    "NumberVariableValue",
     "NumberVellumValue",
     "NumberVellumValueRequest",
     "OpenAiVectorizerConfig",
@@ -771,6 +755,7 @@ __all__ = [
     "OpenAiVectorizerTextEmbedding3SmallRequest",
     "OpenAiVectorizerTextEmbeddingAda002",
     "OpenAiVectorizerTextEmbeddingAda002Request",
+    "OrganizationRead",
     "PaginatedContainerImageReadList",
     "PaginatedDeploymentReleaseTagReadList",
     "PaginatedDocumentIndexReadList",
@@ -834,7 +819,6 @@ __all__ = [
     "SearchResultMetaRequest",
     "SearchResultRequest",
     "SearchResultsInput",
-    "SearchResultsVariableValue",
     "SearchResultsVellumValue",
     "SearchResultsVellumValueRequest",
     "SearchWeightsRequest",
@@ -855,7 +839,6 @@ __all__ = [
     "StringChatMessageContentRequest",
     "StringInput",
     "StringInputRequest",
-    "StringVariableValue",
     "StringVellumValue",
     "StringVellumValueRequest",
     "SubmitCompletionActualRequest",
@@ -1019,5 +1002,6 @@ __all__ = [
     "WorkflowResultEventOutputDataSearchResults",
     "WorkflowResultEventOutputDataString",
     "WorkflowStreamEvent",
+    "WorkspaceRead",
     "WorkspaceSecretRead",
 ]

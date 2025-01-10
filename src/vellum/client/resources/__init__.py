@@ -9,6 +9,7 @@ from . import (
     folder_entities,
     metric_definitions,
     ml_models,
+    organizations,
     sandboxes,
     test_suite_runs,
     test_suites,
@@ -16,6 +17,7 @@ from . import (
     workflow_sandboxes,
     workflows,
     workspace_secrets,
+    workspaces,
 )
 from .deployments import DeploymentsListRequestStatus, ListDeploymentReleaseTagsRequestSource
 from .document_indexes import DocumentIndexesListRequestStatus
@@ -39,6 +41,7 @@ __all__ = [
     "folder_entities",
     "metric_definitions",
     "ml_models",
+    "organizations",
     "sandboxes",
     "test_suite_runs",
     "test_suites",
@@ -46,4 +49,5 @@ __all__ = [
     "workflow_sandboxes",
     "workflows",
     "workspace_secrets",
+    "workspaces",
 ]

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from ..core.pydantic_utilities import UniversalBaseModel
-from .array_variable_value import ArrayVariableValue
 from .array_vellum_value import ArrayVellumValue
 from .workflow_node_result_event_state import WorkflowNodeResultEventState
 import datetime as dt
@@ -35,5 +34,4 @@ class WorkflowResultEvent(UniversalBaseModel):
             extra = pydantic.Extra.allow
 
 
-update_forward_refs(ArrayVariableValue, WorkflowResultEvent=WorkflowResultEvent)
 update_forward_refs(ArrayVellumValue, WorkflowResultEvent=WorkflowResultEvent)

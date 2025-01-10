@@ -12,6 +12,7 @@ from .resources.documents.client import DocumentsClient
 from .resources.folder_entities.client import FolderEntitiesClient
 from .resources.metric_definitions.client import MetricDefinitionsClient
 from .resources.ml_models.client import MlModelsClient
+from .resources.organizations.client import OrganizationsClient
 from .resources.sandboxes.client import SandboxesClient
 from .resources.test_suite_runs.client import TestSuiteRunsClient
 from .resources.test_suites.client import TestSuitesClient
@@ -19,6 +20,7 @@ from .resources.workflow_deployments.client import WorkflowDeploymentsClient
 from .resources.workflow_sandboxes.client import WorkflowSandboxesClient
 from .resources.workflows.client import WorkflowsClient
 from .resources.workspace_secrets.client import WorkspaceSecretsClient
+from .resources.workspaces.client import WorkspacesClient
 from .types.code_execution_runtime import CodeExecutionRuntime
 from .types.code_executor_input import CodeExecutorInput
 from .types.code_execution_package import CodeExecutionPackage
@@ -61,6 +63,7 @@ from .resources.documents.client import AsyncDocumentsClient
 from .resources.folder_entities.client import AsyncFolderEntitiesClient
 from .resources.metric_definitions.client import AsyncMetricDefinitionsClient
 from .resources.ml_models.client import AsyncMlModelsClient
+from .resources.organizations.client import AsyncOrganizationsClient
 from .resources.sandboxes.client import AsyncSandboxesClient
 from .resources.test_suite_runs.client import AsyncTestSuiteRunsClient
 from .resources.test_suites.client import AsyncTestSuitesClient
@@ -68,6 +71,7 @@ from .resources.workflow_deployments.client import AsyncWorkflowDeploymentsClien
 from .resources.workflow_sandboxes.client import AsyncWorkflowSandboxesClient
 from .resources.workflows.client import AsyncWorkflowsClient
 from .resources.workspace_secrets.client import AsyncWorkspaceSecretsClient
+from .resources.workspaces.client import AsyncWorkspacesClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -120,15 +124,11 @@ class Vellum:
         self._client_wrapper = SyncClientWrapper(
             environment=environment,
             api_key=api_key,
-            httpx_client=(
-                httpx_client
-                if httpx_client is not None
-                else (
-                    httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-                    if follow_redirects is not None
-                    else httpx.Client(timeout=_defaulted_timeout)
-                )
-            ),
+            httpx_client=httpx_client
+            if httpx_client is not None
+            else httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+            if follow_redirects is not None
+            else httpx.Client(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
         self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
@@ -139,6 +139,7 @@ class Vellum:
         self.folder_entities = FolderEntitiesClient(client_wrapper=self._client_wrapper)
         self.metric_definitions = MetricDefinitionsClient(client_wrapper=self._client_wrapper)
         self.ml_models = MlModelsClient(client_wrapper=self._client_wrapper)
+        self.organizations = OrganizationsClient(client_wrapper=self._client_wrapper)
         self.sandboxes = SandboxesClient(client_wrapper=self._client_wrapper)
         self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = TestSuitesClient(client_wrapper=self._client_wrapper)
@@ -146,6 +147,7 @@ class Vellum:
         self.workflow_sandboxes = WorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = WorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = WorkspaceSecretsClient(client_wrapper=self._client_wrapper)
+        self.workspaces = WorkspacesClient(client_wrapper=self._client_wrapper)
 
     def execute_code(
         self,
@@ -1387,15 +1389,11 @@ class AsyncVellum:
         self._client_wrapper = AsyncClientWrapper(
             environment=environment,
             api_key=api_key,
-            httpx_client=(
-                httpx_client
-                if httpx_client is not None
-                else (
-                    httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-                    if follow_redirects is not None
-                    else httpx.AsyncClient(timeout=_defaulted_timeout)
-                )
-            ),
+            httpx_client=httpx_client
+            if httpx_client is not None
+            else httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+            if follow_redirects is not None
+            else httpx.AsyncClient(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
         self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
@@ -1406,6 +1404,7 @@ class AsyncVellum:
         self.folder_entities = AsyncFolderEntitiesClient(client_wrapper=self._client_wrapper)
         self.metric_definitions = AsyncMetricDefinitionsClient(client_wrapper=self._client_wrapper)
         self.ml_models = AsyncMlModelsClient(client_wrapper=self._client_wrapper)
+        self.organizations = AsyncOrganizationsClient(client_wrapper=self._client_wrapper)
         self.sandboxes = AsyncSandboxesClient(client_wrapper=self._client_wrapper)
         self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = AsyncTestSuitesClient(client_wrapper=self._client_wrapper)
@@ -1413,6 +1412,7 @@ class AsyncVellum:
         self.workflow_sandboxes = AsyncWorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = AsyncWorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = AsyncWorkspaceSecretsClient(client_wrapper=self._client_wrapper)
+        self.workspaces = AsyncWorkspacesClient(client_wrapper=self._client_wrapper)
 
     async def execute_code(
         self,
