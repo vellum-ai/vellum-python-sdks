@@ -6,6 +6,8 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
 
 
 class Inputs(BaseInputs):
@@ -265,6 +267,85 @@ def test_serialize_node__if_elif_else(serialize_node):
                     "type": "ELSE",
                     "expression": None,
                 },
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class NodeWithOutput(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+
+class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
+    pass
+
+
+class GenericNodeReferencingOutput(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = NodeWithOutput.Outputs.output
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(NodeWithOutput.Outputs.output.equals("hello"))
+
+
+def test_serialize_node__node_output_reference(serialize_node):
+    workflow_input_id = uuid4()
+    node_output_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=GenericNodeReferencingOutput,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=workflow_input_id)},
+        global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
+        global_node_output_displays={
+            NodeWithOutput.Outputs.output: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="output"))
+        },
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "c1e2ce60-ac3a-4b17-915e-abe861734e03",
+            "label": "GenericNodeReferencingOutput",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "definition": {
+                "name": "GenericNodeReferencingOutput",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+                "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
+            },
+            "trigger": {"id": "449072ba-f7b6-4314-ac96-682123f225e5", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "ec9a79b8-65c3-4de8-bd29-42c914d72d4f",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "NODE_OUTPUT",
+                            "node_id": "cd954d76-0b0a-4d9b-9bdf-347179c38cb6",
+                            "node_output_id": str(node_output_id),
+                        },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "STRING",
+                                "value": "hello",
+                            },
+                        },
+                    },
+                }
             ],
             "adornments": None,
             "attributes": [],
