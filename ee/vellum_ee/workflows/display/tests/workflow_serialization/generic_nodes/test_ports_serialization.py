@@ -415,3 +415,76 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+class NodeWithExecutions(BaseNode):
+    pass
+
+
+class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
+    pass
+
+
+class GenericNodeReferencingExecutions(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = NodeWithExecutions.Execution.count
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(NodeWithExecutions.Execution.count.equals(5))
+
+
+def test_serialize_node__execution_count_reference(serialize_node):
+    workflow_input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=GenericNodeReferencingExecutions,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=workflow_input_id)},
+        global_node_displays={NodeWithExecutions: NodeWithExecutionsDisplay()},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "6e4d2fb7-891e-492e-97a1-adf44693f518",
+            "label": "GenericNodeReferencingExecutions",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "definition": {
+                "name": "GenericNodeReferencingExecutions",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "trigger": {"id": "68a91426-4c30-4194-a4c0-cff224d3c0f3", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "1794c2eb-5cab-49fe-9354-dfc29f11b374",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "EXECUTION_COUNTER",
+                            "node_id": "c09bd5a6-dc04-4036-90d4-580acd43c71f",
+                        },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "NUMBER",
+                                "value": 5,
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )

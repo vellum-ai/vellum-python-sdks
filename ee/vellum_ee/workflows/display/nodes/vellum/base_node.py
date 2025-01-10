@@ -113,7 +113,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             }
 
         if isinstance(value, ExecutionCountReference):
-            node_class_display = display_context.node_displays[value.node_class]
+            node_class_display = display_context.global_node_displays[value.node_class]
 
             return {
                 "type": "EXECUTION_COUNTER",
