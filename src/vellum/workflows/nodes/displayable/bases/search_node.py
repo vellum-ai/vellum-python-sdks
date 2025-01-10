@@ -65,7 +65,7 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
     # 1. Node Descriptor resolution during runtime - https://app.shortcut.com/vellum/story/4781
     # 2. Math operations between descriptors - https://app.shortcut.com/vellum/story/4782
     # search_weights = DEFAULT_SEARCH_WEIGHTS
-    # Deprecated: Use the top level `limit`, `weights`, `result_merging`, and `filters` attributesinstead
+    # Deprecated: Use the top level `limit`, `weights`, `result_merging`, and `filters` attributes instead
     options = SearchRequestOptionsRequest(
         limit=DEFAULT_SEARCH_LIMIT,
         weights=SearchWeightsRequest(

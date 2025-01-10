@@ -2,6 +2,7 @@ import pytest
 from uuid import UUID, uuid4
 from typing import List, cast
 
+from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -19,7 +20,6 @@ from vellum_ee.workflows.display.vellum import (
     NodeInputValuePointerRule,
     NodeOutputData,
     NodeOutputPointer,
-    StringVellumValue,
     WorkflowInputsVellumDisplayOverrides,
     WorkflowMetaVellumDisplay,
 )
@@ -74,7 +74,7 @@ class MyNodeB(BaseNode):
                     type="INPUT_VARIABLE",
                     data=InputVariableData(input_variable_id="a154c29d-fac0-4cd0-ba88-bc52034f5470"),
                 ),
-                ConstantValuePointer(type="CONSTANT_VALUE", data=StringVellumValue(type="STRING", value="fallback")),
+                ConstantValuePointer(type="CONSTANT_VALUE", data=StringVellumValue(value="fallback")),
             ],
         ),
     ],

@@ -105,4 +105,8 @@ def primitive_to_vellum_value_request(value: Any) -> VellumValueRequest:
         ),
         None,
     )
+
+    if vellum_value_request_class is None:
+        raise ValueError(f"Unsupported variable type: {vellum_value.__class__.__name__}")
+
     return vellum_value_request_class.model_validate(vellum_value.model_dump())
