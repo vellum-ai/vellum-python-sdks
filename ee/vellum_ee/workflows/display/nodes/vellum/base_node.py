@@ -142,4 +142,6 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "value": vellum_value.dict(),
             }
 
-        raise ValueError(f"Unsupported descriptor type: {value.__class__.__name__}")
+        # If it's not any of the references we know about,
+        # then try to serialize it as a nested value
+        return self.serialize_condition(display_context, value)
