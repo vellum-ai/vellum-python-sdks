@@ -84,17 +84,6 @@ class ConditionalNode(BaseConditionalNode):
 
 exports[`InlinePromptNode referenced by Templating Node > getNodeDefinition 1`] = `
 {
-  "bases": [
-    {
-      "module": [
-        "vellum",
-        "workflows",
-        "nodes",
-        "core",
-      ],
-      "name": "TemplatingNode",
-    },
-  ],
   "module": [
     "code",
     "nodes",
