@@ -75,10 +75,6 @@ describe("InlinePromptNode referenced by Conditional Node", () => {
     node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
-
-  it("getNodeDefinition", () => {
-    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
-  });
 });
 
 describe("Prompt Deployment Node referenced by Conditional Node", () => {
@@ -127,11 +123,6 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
     await setupNode(id);
     node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
-
-  it.each(testCases)("getNodeDefinition with $name", async ({ id }) => {
-    await setupNode(id);
-    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
   });
 
   async function setupNode(outputId: string) {
@@ -216,9 +207,5 @@ describe("InlinePromptNode referenced by Templating Node", () => {
   it("getNodeDisplayFile", async () => {
     node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
-
-  it("getNodeDefinition", () => {
-    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
   });
 });

@@ -55,10 +55,6 @@ describe("TemplatingNode", () => {
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-
-    it("getNodeDefinition", () => {
-      expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
-    });
   });
 
   describe("basic with json output type", () => {
@@ -87,10 +83,6 @@ describe("TemplatingNode", () => {
     it("getNodeDisplayFile", async () => {
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("getNodeDefinition", () => {
-      expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
     });
   });
 

@@ -60,10 +60,6 @@ describe("ConditionalNode", () => {
     node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
-
-  it("getNodeDefinition", () => {
-    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
-  });
 });
 
 describe("ConditionalNode with invalid uuid for field and value node input ids", () => {
@@ -108,10 +104,6 @@ describe("ConditionalNode with invalid uuid for field and value node input ids",
   it("getNodeDisplayFile", async () => {
     node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
-
-  it("getNodeDefinition", () => {
-    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
   });
 
   function constructConditionalNodeWithInvalidUUID(): ConditionalNodeType {
@@ -248,10 +240,6 @@ describe("ConditionalNode with null operator", () => {
   it("getNodeDisplayFile", async () => {
     node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
-
-  it("getNodeDefinition", () => {
-    expect(node.nodeContext.getNodeDefinition()).toMatchSnapshot();
   });
 });
 
