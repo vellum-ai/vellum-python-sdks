@@ -8,6 +8,9 @@ from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.execution_count import ExecutionCountReference
+from vellum.workflows.references.output import OutputReference
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -87,9 +90,34 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
     def serialize_value(self, display_context: WorkflowDisplayContext, value: BaseDescriptor) -> JsonObject:
         if isinstance(value, WorkflowInputReference):
             workflow_input_display = display_context.global_workflow_input_displays[value]
+
             return {
                 "type": "WORKFLOW_INPUT",
                 "input_variable_id": str(workflow_input_display.id),
+            }
+
+        if isinstance(value, OutputReference):
+            upstream_node, output_display = display_context.global_node_output_displays[value]
+            upstream_node_display = display_context.global_node_displays[upstream_node]
+
+            return {
+                "type": "NODE_OUTPUT",
+                "node_id": str(upstream_node_display.node_id),
+                "node_output_id": str(output_display.id),
+            }
+
+        if isinstance(value, VellumSecretReference):
+            return {
+                "type": "VELLUM_SECRET",
+                "vellum_secret_name": value.name,
+            }
+
+        if isinstance(value, ExecutionCountReference):
+            node_class_display = display_context.node_displays[value.node_class]
+
+            return {
+                "type": "EXECUTION_COUNTER",
+                "node_id": str(node_class_display.node_id),
             }
 
         if not isinstance(value, BaseDescriptor):
