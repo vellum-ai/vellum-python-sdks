@@ -27,7 +27,6 @@ def test_text_prompt_deployment_node__basic(vellum_client):
 
     class MyPromptDeploymentNode(PromptDeploymentNode):
         deployment = "my-deployment"
-        prompt_inputs = {}
 
     # AND a known response from invoking a deployed prompt
     expected_outputs: List[PromptOutput] = [

@@ -13,7 +13,7 @@ from vellum.workflows.types.generics import StateType
 
 class BasePromptNode(BaseNode, Generic[StateType]):
     # Inputs that are passed to the Prompt
-    prompt_inputs: ClassVar[EntityInputsInterface]
+    prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
 
     request_options: Optional[RequestOptions] = None
 

@@ -74,6 +74,9 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
         node_inputs: List[NodeInput] = []
         prompt_inputs: List[VellumVariable] = []
 
+        if not value:
+            return node_inputs, prompt_inputs
+
         for variable_name, variable_value in value.items():
             node_input = create_node_input(
                 node_id=node_id,

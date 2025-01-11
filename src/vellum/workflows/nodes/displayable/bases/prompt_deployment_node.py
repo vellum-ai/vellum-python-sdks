@@ -74,6 +74,9 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
 
         compiled_inputs: List[PromptDeploymentInputRequest] = []
 
+        if not self.prompt_inputs:
+            return compiled_inputs
+
         for input_name, input_value in self.prompt_inputs.items():
             if isinstance(input_value, str):
                 compiled_inputs.append(
