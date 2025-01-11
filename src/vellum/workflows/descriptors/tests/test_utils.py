@@ -19,6 +19,7 @@ class FixtureState(BaseState):
     }
 
     eta = None
+    theta = ["baz"]
 
 
 class DummyNode(BaseNode[FixtureState]):
@@ -75,6 +76,7 @@ class DummyNode(BaseNode[FixtureState]):
         ),
         (FixtureState.zeta["foo"], "bar"),
         (ConstantValueReference(1), 1),
+        (FixtureState.theta[0], "baz"),
     ],
     ids=[
         "or",
@@ -119,6 +121,7 @@ class DummyNode(BaseNode[FixtureState]):
         "or_and",
         "accessor",
         "constants",
+        "list_index",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):

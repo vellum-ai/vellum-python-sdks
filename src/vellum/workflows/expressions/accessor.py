@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 import dataclasses
-from typing import Any, Sequence, Type, TypeVar
+from typing import Any, Sequence, Type, TypeVar, Union
 
 from pydantic import BaseModel, GetCoreSchemaHandler
 from pydantic_core import core_schema
@@ -17,7 +17,7 @@ class AccessorExpression(BaseDescriptor[Any]):
         self,
         *,
         base: BaseDescriptor[LHS],
-        field: str,
+        field: Union[str, int],
     ) -> None:
         super().__init__(
             name=f"{base.name}.{field}",
@@ -31,9 +31,15 @@ class AccessorExpression(BaseDescriptor[Any]):
         base = resolve_value(self._base, state)
 
         if dataclasses.is_dataclass(base):
+            if isinstance(self._field, int):
+                raise ValueError("Cannot access field by index on a dataclass")
+
             return getattr(base, self._field)
 
         if isinstance(base, BaseModel):
+            if isinstance(self._field, int):
+                raise ValueError("Cannot access field by index on a BaseModel")
+
             return getattr(base, self._field)
 
         if isinstance(base, Mapping):
