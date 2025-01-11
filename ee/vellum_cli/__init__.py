@@ -18,8 +18,8 @@ def main() -> None:
 @main.command
 def ping() -> None:
     """
-    Ping Vellum to check if the user is authenticated and return information about the user's Workspace
-    and Organization
+    Ping Vellum to confirm that requests are correctly authenticated and to return information about the active
+    Workspace/Organization
     """
     ping_command()
 

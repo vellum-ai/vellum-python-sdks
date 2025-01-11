@@ -33,7 +33,7 @@ def test_ping__happy_path(vellum_client):
     assert (
         result.output
         == """\x1b[38;20m\
-Successfully authenticated to Vellum!
+Successfully authenticated with Vellum!
 
 Organization:
     ID: 1234567890

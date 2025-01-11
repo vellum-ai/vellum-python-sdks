@@ -15,7 +15,7 @@ def ping_command():
 
     logger.info(
         f"""\
-Successfully authenticated to Vellum!
+Successfully authenticated with Vellum!
 
 Organization:
     ID: {organization.id}
