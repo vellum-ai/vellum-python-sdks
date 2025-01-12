@@ -1,9 +1,10 @@
-from typing import Sequence, Union
+from typing import Sequence, Type, Union
 
 from pydantic import ConfigDict
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
 
 
@@ -15,3 +16,7 @@ class MockNodeExecution(UniversalBaseModel):
 
 
 MockNodeExecutionArg = Sequence[Union[BaseOutputs, MockNodeExecution]]
+
+
+def mock_node(node: Type[BaseNode]) -> None:
+    pass

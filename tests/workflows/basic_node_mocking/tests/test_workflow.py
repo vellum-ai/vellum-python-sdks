@@ -1,3 +1,5 @@
+from vellum.workflows.nodes.mocks import mock_node
+
 from tests.workflows.basic_node_mocking.workflow import MockedNodeWorkflow, StartNode
 
 
@@ -6,12 +8,13 @@ def test_workflow__happy_path():
     workflow = MockedNodeWorkflow()
 
     # AND we mock the node's output
-    StartNode.Outputs._mock_return_value(
-        greeting="Hello",
-    )
+    with mock_node(StartNode) as mocked_start_node:
+        mocked_start_node.outputs = StartNode.Outputs(
+            greeting="Hello",
+        )
 
-    # WHEN we run the workflow with a mock defined
-    final_event = workflow.run()
+        # WHEN we run the workflow with a mock defined
+        final_event = workflow.run()
 
     # THEN the workflow should succeed
     assert final_event.name == "workflow.execution.fulfilled", final_event
