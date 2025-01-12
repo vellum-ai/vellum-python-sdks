@@ -149,21 +149,27 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     @overload
     @classmethod
-    def wrap(cls, items: List[MapNodeItemType]) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]: ...
+    def wrap(
+        cls, items: List[MapNodeItemType], concurrency: Optional[int] = None
+    ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]: ...
 
     # TODO: We should be able to do this overload automatically as we do with node attributes
     # https://app.shortcut.com/vellum/story/5289
     @overload
     @classmethod
     def wrap(
-        cls, items: BaseDescriptor[List[MapNodeItemType]]
+        cls,
+        items: BaseDescriptor[List[MapNodeItemType]],
+        concurrency: Optional[int] = None,
     ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]: ...
 
     @classmethod
     def wrap(
-        cls, items: Union[List[MapNodeItemType], BaseDescriptor[List[MapNodeItemType]]]
+        cls,
+        items: Union[List[MapNodeItemType], BaseDescriptor[List[MapNodeItemType]]],
+        concurrency: Optional[int] = None,
     ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]:
-        return create_adornment(cls, attributes={"items": items})
+        return create_adornment(cls, attributes={"items": items, "concurrency": concurrency})
 
     @classmethod
     def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
