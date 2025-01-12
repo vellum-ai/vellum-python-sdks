@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import datetime
 import importlib
+from types import GenericAlias
 from typing import (
     Any,
     ClassVar,
@@ -77,6 +78,9 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
                 return (type_hint,)
             if isinstance(type_hint, SpecialGenericAlias):
                 return (type_hint,)
+            if isinstance(type_hint, GenericAlias):
+                # In future versions of python, list[str] will be a `GenericAlias`
+                return (cast(Type, type_hint),)
             if isinstance(type_hint, TypeVar):
                 if type_hint in type_var_mapping:
                     return (type_var_mapping[type_hint],)
