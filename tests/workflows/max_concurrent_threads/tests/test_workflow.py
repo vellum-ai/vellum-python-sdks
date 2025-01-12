@@ -8,7 +8,7 @@ def test_run_workflow__happy_path():
     workflow = MaxConcurrentThreadsExample()
 
     # WHEN the workflow is run
-    stream = workflow.stream(concurrency=1)
+    stream = workflow.stream(max_concurrency=1)
     events = list(stream)
 
     # THEN the workflow should complete successfully

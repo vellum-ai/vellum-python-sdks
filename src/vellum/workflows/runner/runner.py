@@ -90,7 +90,7 @@ class WorkflowRunner(Generic[StateType]):
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[List[BaseOutputs]] = None,
         parent_context: Optional[ParentContext] = None,
-        concurrency: Optional[int] = None,
+        max_concurrency: Optional[int] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -135,7 +135,7 @@ class WorkflowRunner(Generic[StateType]):
         # This queue is responsible for sending events from the inner worker threads to WorkflowRunner
         self._workflow_event_inner_queue: Queue[WorkflowEvent] = Queue()
 
-        self._concurrency = concurrency
+        self._max_concurrency = max_concurrency
         self._concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[Edge]]] = Queue()
 
         # This queue is responsible for sending events from WorkflowRunner to the background thread
@@ -368,13 +368,13 @@ class WorkflowRunner(Generic[StateType]):
                 else:
                     next_state = state
 
-                if self._concurrency:
+                if self._max_concurrency:
                     self._concurrency_queue.put((next_state, edge.to_node, edge))
                 else:
                     self._run_node_if_ready(next_state, edge.to_node, edge)
 
-        if self._concurrency:
-            num_nodes_to_run = self._concurrency - len(self._active_nodes_by_execution_id)
+        if self._max_concurrency:
+            num_nodes_to_run = self._max_concurrency - len(self._active_nodes_by_execution_id)
             for _ in range(num_nodes_to_run):
                 if self._concurrency_queue.empty():
                     break
@@ -543,7 +543,7 @@ class WorkflowRunner(Generic[StateType]):
         )
         for node_cls in self._entrypoints:
             try:
-                if not self._concurrency or len(self._active_nodes_by_execution_id) < self._concurrency:
+                if not self._max_concurrency or len(self._active_nodes_by_execution_id) < self._max_concurrency:
                     with execution_context(parent_context=current_parent):
                         self._run_node_if_ready(self._initial_state, node_cls)
                 else:
