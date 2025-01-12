@@ -29,11 +29,11 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     items: List[MapNodeItemType] - The items to map over
     subworkflow: Type["BaseWorkflow[SubworkflowInputs, BaseState]"] - The Subworkflow to execute on each iteration
-    concurrency: Optional[int] = None - The maximum number of concurrent subworkflow executions
+    max_concurrency: Optional[int] = None - The maximum number of concurrent subworkflow executions
     """
 
     items: List[MapNodeItemType]
-    concurrency: Optional[int] = None
+    max_concurrency: Optional[int] = None
 
     class Outputs(BaseAdornmentNode.Outputs):
         pass
@@ -66,14 +66,14 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                     "parent_context": parent_context,
                 },
             )
-            if self.concurrency is None:
+            if self.max_concurrency is None:
                 thread.start()
             else:
                 self._concurrency_queue.put(thread)
 
-        if self.concurrency is not None:
+        if self.max_concurrency is not None:
             concurrency_count = 0
-            while concurrency_count < self.concurrency:
+            while concurrency_count < self.max_concurrency:
                 is_empty = self._start_thread()
                 if is_empty:
                     break
@@ -97,7 +97,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                     if all(fulfilled_iterations):
                         break
 
-                    if self.concurrency is not None:
+                    if self.max_concurrency is not None:
                         self._start_thread()
                 elif terminal_event.name == "workflow.execution.paused":
                     raise NodeException(
@@ -150,7 +150,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
     @overload
     @classmethod
     def wrap(
-        cls, items: List[MapNodeItemType], concurrency: Optional[int] = None
+        cls, items: List[MapNodeItemType], max_concurrency: Optional[int] = None
     ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]: ...
 
     # TODO: We should be able to do this overload automatically as we do with node attributes
@@ -160,16 +160,16 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
     def wrap(
         cls,
         items: BaseDescriptor[List[MapNodeItemType]],
-        concurrency: Optional[int] = None,
+        max_concurrency: Optional[int] = None,
     ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]: ...
 
     @classmethod
     def wrap(
         cls,
         items: Union[List[MapNodeItemType], BaseDescriptor[List[MapNodeItemType]]],
-        concurrency: Optional[int] = None,
+        max_concurrency: Optional[int] = None,
     ) -> Callable[..., Type["MapNode[StateType, MapNodeItemType]"]]:
-        return create_adornment(cls, attributes={"items": items, "concurrency": concurrency})
+        return create_adornment(cls, attributes={"items": items, "max_concurrency": max_concurrency})
 
     @classmethod
     def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:

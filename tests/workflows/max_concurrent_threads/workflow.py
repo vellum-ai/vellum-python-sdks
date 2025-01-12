@@ -32,7 +32,7 @@ class BottomNode(BaseNode[State]):
 class MaxConcurrentThreadsExample(BaseWorkflow[BaseInputs, State]):
     """
     This workflow demonstrates how we get a different result when we run the workflow in serial
-    vs. parallel, using the `concurrency` parameter.
+    vs. parallel, using the `max_concurrency` parameter.
     """
 
     graph = {

@@ -52,7 +52,7 @@ export class MapNode extends BaseNestedWorkflowNode<
 
     if (!isNil(this.nodeData.data.concurrency)) {
       const concurrencyField = python.field({
-        name: "concurrency",
+        name: "max_concurrency",
         initializer: python.TypeInstantiation.int(
           this.nodeData.data.concurrency
         ),

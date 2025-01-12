@@ -45,7 +45,7 @@ class State(BaseState):
 
 
 class MapFruitsNode(MapNode):
-    concurrency = 1
+    max_concurrency = 1
     items = Inputs.fruits
     subworkflow = IterationSubworkflow
 
