@@ -216,6 +216,10 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         node_output_mocks: Optional[List[Outputs]] = None
             A list of Outputs to mock for Nodes during Workflow Execution.
+
+        concurrency: Optional[int] = None
+            The number of concurrent threads to run the Workflow with. If not provided, the Workflow will run without
+            limiting concurrency.
         """
 
         events = WorkflowRunner(
@@ -227,6 +231,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             parent_context=self._context.parent_context,
+            concurrency=concurrency,
         ).stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
         last_event = None
@@ -319,6 +324,10 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         node_output_mocks: Optional[List[Outputs]] = None
             A list of Outputs to mock for Nodes during Workflow Execution.
+
+        concurrency: Optional[int] = None
+            The number of concurrent threads to run the Workflow with. If not provided, the Workflow will run without
+            limiting concurrency.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -331,6 +340,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             parent_context=self.context.parent_context,
+            concurrency=concurrency,
         ).stream():
             if should_yield(self.__class__, event):
                 yield event
