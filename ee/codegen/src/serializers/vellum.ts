@@ -106,6 +106,8 @@ import {
   ElifConditionNodePort,
   ElseConditionNodePort,
   WorkflowValueDescriptor,
+  NodeAttribute,
+  AdornmentNode,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -1798,6 +1800,42 @@ export declare namespace GenericNodeDisplayDataSerializer {
   }
 }
 
+export const NodeAttributeSerializer: ObjectSchema<
+  NodeAttributeSerializer.Raw,
+  NodeAttribute
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  value: WorkflowValueDescriptorSerializer,
+});
+
+export declare namespace NodeAttributeSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    value: WorkflowValueDescriptorSerializer.Raw;
+  }
+}
+
+export const AdornmentNodeSerializer: ObjectSchema<
+  AdornmentNodeSerializer.Raw,
+  AdornmentNode
+> = objectSchema({
+  id: stringSchema(),
+  label: stringSchema(),
+  base: CodeResourceDefinitionSerializer,
+  attributes: listSchema(NodeAttributeSerializer),
+});
+
+export declare namespace AdornmentNodeSerializer {
+  interface Raw {
+    id: string;
+    label: string;
+    base: CodeResourceDefinitionSerializer.Raw;
+    attributes: NodeAttributeSerializer.Raw[];
+  }
+}
+
 export const GenericNodeSerializer: ObjectSchema<
   GenericNodeSerializer.Raw,
   Omit<GenericNode, "type">
@@ -1810,6 +1848,7 @@ export const GenericNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   trigger: NodeTriggerSerializer,
   ports: NodePortSerializer,
+  adornments: AdornmentNodeSerializer.optional(),
 });
 
 export declare namespace GenericNodeSerializer {
@@ -1824,6 +1863,7 @@ export declare namespace GenericNodeSerializer {
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     trigger: NodeTriggerSerializer.Raw;
     ports: NodePortSerializer.Raw;
+    adornments: AdornmentNodeSerializer.Raw | null;
   }
 }
 
