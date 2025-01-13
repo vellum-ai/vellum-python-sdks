@@ -1,6 +1,7 @@
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
 
 export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType> {
@@ -50,7 +51,7 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
         runtimeNodeInputRule.type !== "CONSTANT_VALUE" ||
         runtimeNodeInputRule.data.type !== "STRING"
       ) {
-        throw new Error(
+        throw new NodeAttributeGenerationError(
           "Expected runtime node input to be a constant string value"
         );
       }
@@ -62,7 +63,9 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
       } else if (runtime?.includes("TYPESCRIPT")) {
         filetype = "ts";
       } else {
-        throw new Error(`Unsupported runtime: ${runtime}`);
+        throw new NodeAttributeGenerationError(
+          `Unsupported runtime: ${runtime}`
+        );
       }
       filePath = `./script.${filetype}`;
     }

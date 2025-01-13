@@ -10,6 +10,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { InitFile } from "src/generators";
 import { BaseState } from "src/generators/base-state";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
@@ -227,7 +228,9 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       codeInputRule.type !== "CONSTANT_VALUE" ||
       codeInputRule.data.type !== "STRING"
     ) {
-      throw new Error("Expected to find code input with constant string value");
+      throw new NodeAttributeGenerationError(
+        "Expected to find code input with constant string value"
+      );
     }
 
     const scriptFileContents = codeInputRule.data.value ?? "";

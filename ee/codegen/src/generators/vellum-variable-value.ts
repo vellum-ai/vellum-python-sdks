@@ -13,6 +13,7 @@ import {
 } from "vellum-ai/api";
 
 import { ChatMessageContent } from "./chat-message-content";
+import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
@@ -237,7 +238,9 @@ class ArrayVellumValue extends AstNode {
 
   private generateAstNode(value: unknown): AstNode {
     if (!Array.isArray(value)) {
-      throw new Error("Expected array value for ArrayVellumValue");
+      throw new ValueGenerationError(
+        "Expected array value for ArrayVellumValue"
+      );
     }
 
     const astNode = python.TypeInstantiation.list(

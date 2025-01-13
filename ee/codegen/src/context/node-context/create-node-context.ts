@@ -22,7 +22,10 @@ import { NoteNodeContext } from "src/context/node-context/note-node";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
-import { EntityNotFoundError } from "src/generators/errors";
+import {
+  EntityNotFoundError,
+  NodeDefinitionGenerationError,
+} from "src/generators/errors";
 import {
   InlinePromptNode,
   InlinePromptNodeData,
@@ -116,7 +119,7 @@ export async function createNodeContext(
           nodeData: mapNodeData,
         });
       } else {
-        throw new Error(
+        throw new NodeDefinitionGenerationError(
           `MapNode only supports INLINE variant. Received: ${variant}`
         );
       }
@@ -177,7 +180,9 @@ export async function createNodeContext(
           const promptVersionData =
             legacyNodeData.sandboxRoutingConfig.promptVersionData;
           if (!promptVersionData) {
-            throw new Error(`Prompt version data not found`);
+            throw new NodeDefinitionGenerationError(
+              `Prompt version data not found`
+            );
           }
 
           // Dynamically fetch the ML Model's name via API
@@ -266,6 +271,8 @@ export async function createNodeContext(
       });
     }
     default:
-      throw new Error(`Unsupported node type: ${args.nodeData.type}`);
+      throw new NodeDefinitionGenerationError(
+        `Unsupported node type: ${args.nodeData.type}`
+      );
   }
 }

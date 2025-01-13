@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { MapNodeContext } from "src/context/node-context/map-node";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
 import {
@@ -18,7 +19,7 @@ export class MapNode extends BaseNestedWorkflowNode<
 > {
   getInnerWorkflowData(): WorkflowRawData {
     if (this.nodeData.data.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `MapNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     }
@@ -132,7 +133,7 @@ export class MapNode extends BaseNestedWorkflowNode<
 
   protected getNestedWorkflowProject(): WorkflowProjectGenerator {
     if (this.nodeData.data.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `MapNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     }
@@ -156,7 +157,7 @@ export class MapNode extends BaseNestedWorkflowNode<
   protected getOutputDisplay(): python.Field {
     let nodeData: InlineMapNodeData;
     if (this.nodeData.data.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `MapNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     } else {

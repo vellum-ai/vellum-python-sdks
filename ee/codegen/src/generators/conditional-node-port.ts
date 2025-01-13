@@ -5,7 +5,10 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
-import { NodePortGenerationError } from "./errors";
+import {
+  NodeAttributeGenerationError,
+  NodePortGenerationError,
+} from "./errors";
 
 import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
@@ -138,7 +141,7 @@ export class ConditionalNodePort extends AstNode {
     const lhsKey = this.inputFieldKeysByRuleId.get(ruleId);
     let rhsKey;
     if (isNil(lhsKey)) {
-      throw new Error(
+      throw new NodeAttributeGenerationError(
         `Could not find input field key given ruleId: ${ruleId} on rule index: ${ruleIdx} on condition index: ${this.conditionalNodeDataIndex} for node: ${this.nodeLabel}`
       );
     }

@@ -6,6 +6,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { BasePersistedFile } from "./base-persisted-file";
+import { WorkflowGenerationError } from "./errors";
 import { GraphAttribute } from "./graph-attribute";
 import { WorkflowOutput } from "./workflow-output";
 
@@ -482,7 +483,7 @@ export class Workflow {
               });
 
               if (!edge) {
-                throw new Error(
+                throw new WorkflowGenerationError(
                   `Could not find edge for terminal node ${terminalNodeData.id}`
                 );
               }

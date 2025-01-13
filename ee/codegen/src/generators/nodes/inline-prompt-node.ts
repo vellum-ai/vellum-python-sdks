@@ -4,6 +4,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { FunctionDefinition } from "src/generators/function-definition";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { PromptBlock } from "src/generators/prompt-block";
@@ -22,7 +23,7 @@ export class InlinePromptNode extends BaseSingleFileNode<
     const statements: AstNode[] = [];
 
     if (this.nodeData.data.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeAttributeGenerationError(
         `InlinePromptNode only supports INLINE variant. Received ${this.nodeData.data.variant}`
       );
     }

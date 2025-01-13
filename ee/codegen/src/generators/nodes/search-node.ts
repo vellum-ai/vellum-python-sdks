@@ -10,6 +10,7 @@ import {
 } from "src/constants";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import { NodeInput } from "src/generators";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
@@ -91,7 +92,7 @@ export class SearchNode extends BaseSingleFileNode<
     const weightsRule =
       this.findNodeInputByName("weights")?.nodeInputData?.value.rules[0];
     if (!weightsRule || weightsRule.type !== "CONSTANT_VALUE") {
-      throw new Error("weights input is required");
+      throw new NodeAttributeGenerationError("weights input is required");
     }
 
     // TODO: Determine what we want to cast JSON values to
@@ -102,11 +103,15 @@ export class SearchNode extends BaseSingleFileNode<
       unknown
     >;
     if (typeof semantic_similarity !== "number") {
-      throw new Error("semantic_similarity weight must be a number");
+      throw new NodeAttributeGenerationError(
+        "semantic_similarity weight must be a number"
+      );
     }
 
     if (typeof keywords !== "number") {
-      throw new Error("keywords weight must be a number");
+      throw new NodeAttributeGenerationError(
+        "keywords weight must be a number"
+      );
     }
 
     const searchWeightsRequest = python.instantiateClass({
@@ -133,12 +138,16 @@ export class SearchNode extends BaseSingleFileNode<
     const resultMergingRule = this.findNodeInputByName("result_merging_enabled")
       ?.nodeInputData?.value.rules[0];
     if (!resultMergingRule || resultMergingRule.type !== "CONSTANT_VALUE") {
-      throw new Error("result_merging_enabled input is required");
+      throw new NodeAttributeGenerationError(
+        "result_merging_enabled input is required"
+      );
     }
 
     const resultMergingEnabled = resultMergingRule.data.value;
     if (typeof resultMergingEnabled !== "string") {
-      throw new Error("result_merging_enabled must be a boolean");
+      throw new NodeAttributeGenerationError(
+        "result_merging_enabled must be a boolean"
+      );
     }
 
     return python.instantiateClass({
@@ -210,7 +219,7 @@ export class SearchNode extends BaseSingleFileNode<
       VellumValueLogicalExpressionSerializer.parse(metadataFilters);
 
     if (!parsedData.ok) {
-      throw new Error(
+      throw new NodeAttributeGenerationError(
         `Failed to parse metadata filter JSON: ${JSON.stringify(
           parsedData.errors
         )}`
@@ -291,12 +300,12 @@ export class SearchNode extends BaseSingleFileNode<
           logicalExpression.rhsVariableId
         )?.nodeInputData?.id;
         if (!lhsQueryInput) {
-          throw new Error(
+          throw new NodeAttributeGenerationError(
             `Could not find node input for id ${logicalExpression.lhsVariableId}`
           );
         }
         if (!rhsQueryInput) {
-          throw new Error(
+          throw new NodeAttributeGenerationError(
             `Could not find node input for id ${logicalExpression.rhsVariableId}`
           );
         }
@@ -457,13 +466,17 @@ export class SearchNodeMetadataFilters extends AstNode {
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
     if (!lhs) {
-      throw new Error(`Could not find node input for id ${lhsId}`);
+      throw new NodeAttributeGenerationError(
+        `Could not find node input for id ${lhsId}`
+      );
     }
 
     const rhsId = data.rhsVariableId;
     const rhs = this.nodeInputsById.get(rhsId);
     if (!rhs) {
-      throw new Error(`Could not find node input for id ${rhsId}`);
+      throw new NodeAttributeGenerationError(
+        `Could not find node input for id ${rhsId}`
+      );
     }
 
     return python.instantiateClass({

@@ -1,6 +1,7 @@
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
 
 export class InlineSubworkflowNodeContext extends BaseNodeContext<SubworkflowNodeType> {
@@ -11,7 +12,7 @@ export class InlineSubworkflowNodeContext extends BaseNodeContext<SubworkflowNod
   getNodeOutputNamesById(): Record<string, string> {
     const subworkflowNodeData = this.nodeData.data;
     if (subworkflowNodeData.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `SubworkflowNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     }

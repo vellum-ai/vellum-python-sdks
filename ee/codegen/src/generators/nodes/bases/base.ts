@@ -113,7 +113,7 @@ export abstract class BaseNode<
   protected getNodeInputByName(name: string): NodeInput {
     const nodeInput = this.findNodeInputByName(name);
     if (!nodeInput) {
-      throw new Error(`No input found named "${name}"`);
+      throw new NodeAttributeGenerationError(`No input found named "${name}"`);
     }
 
     return nodeInput;

@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { DeploymentPromptNodeData, PromptNode } from "src/types/vellum";
 
@@ -14,7 +15,7 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
     const statements: AstNode[] = [];
 
     if (this.nodeData.data.variant !== "DEPLOYMENT") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `PromptDeploymentNode only supports DEPLOYMENT variant. Received ${this.nodeData.data.variant}`
       );
     }

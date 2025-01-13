@@ -7,7 +7,14 @@ import { PortContext } from "src/context/port-context";
 import { generateSdkModulePaths } from "src/context/workflow-context/sdk-module-paths";
 import { SDK_MODULE_PATHS } from "src/context/workflow-context/types";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
-import { BaseCodegenError, NodeNotFoundError } from "src/generators/errors";
+import {
+  BaseCodegenError,
+  NodeDefinitionGenerationError,
+  NodeNotFoundError,
+  NodePortGenerationError,
+  WorkflowGenerationError,
+  WorkflowInputGenerationError,
+} from "src/generators/errors";
 import { BaseNode } from "src/generators/nodes/bases";
 import {
   EntrypointNode,
@@ -170,7 +177,7 @@ export class WorkflowContext {
 
   public addEntrypointNode(entrypointNode: EntrypointNode): void {
     if (this.entrypointNode) {
-      throw new Error("Entrypoint node already exists");
+      throw new WorkflowGenerationError("Entrypoint node already exists");
     }
 
     this.entrypointNode = entrypointNode;
@@ -178,7 +185,7 @@ export class WorkflowContext {
 
   public getEntrypointNode(): EntrypointNode {
     if (!this.entrypointNode) {
-      throw new Error("Entrypoint node not found");
+      throw new WorkflowGenerationError("Entrypoint node not found");
     }
 
     return this.entrypointNode;
@@ -198,7 +205,7 @@ export class WorkflowContext {
     const inputVariableId = inputVariableContext.getInputVariableId();
 
     if (this.globalInputVariableContextsById.get(inputVariableId)) {
-      throw new Error(
+      throw new WorkflowInputGenerationError(
         `Input variable context already exists for input variable ID: ${inputVariableId}`
       );
     }
@@ -224,7 +231,7 @@ export class WorkflowContext {
       this.findInputVariableContextById(inputVariableId);
 
     if (!inputVariableContext) {
-      throw new Error(
+      throw new WorkflowInputGenerationError(
         `Input variable context not found for ID: ${inputVariableId}`
       );
     }
@@ -249,7 +256,7 @@ export class WorkflowContext {
       this.findInputVariableContextByRawName(rawName);
 
     if (!inputVariableContext) {
-      throw new Error(
+      throw new WorkflowInputGenerationError(
         `Input variable context not found for raw name: ${rawName}`
       );
     }
@@ -284,7 +291,9 @@ export class WorkflowContext {
     const nodeId = nodeContext.getNodeId();
 
     if (this.globalNodeContextsByNodeId.get(nodeId)) {
-      throw new Error(`Node context already exists for node ID: ${nodeId}`);
+      throw new NodeDefinitionGenerationError(
+        `Node context already exists for node ID: ${nodeId}`
+      );
     }
 
     this.nodeContextsByNodeId.set(nodeId, nodeContext);
@@ -308,7 +317,9 @@ export class WorkflowContext {
     const portId = portContext.portId;
 
     if (this.portContextById.get(portId)) {
-      throw new Error(`Port context already exists for port id: ${portId}`);
+      throw new NodePortGenerationError(
+        `Port context already exists for port id: ${portId}`
+      );
     }
     this.portContextById.set(portId, portContext);
   }
@@ -318,7 +329,9 @@ export class WorkflowContext {
       this.portContextById.get(portId);
 
     if (!portContext) {
-      throw new Error(`Port context not found for port id: ${portId}`);
+      throw new NodePortGenerationError(
+        `Port context not found for port id: ${portId}`
+      );
     }
 
     return portContext;

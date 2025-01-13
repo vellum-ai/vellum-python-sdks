@@ -2,6 +2,7 @@ import { BaseNode } from "./base";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode, WorkflowRawData } from "src/types/vellum";
 import { createPythonClassName } from "src/utils/casing";
@@ -41,7 +42,7 @@ export abstract class BaseNestedWorkflowNode<
     const nestedWorkflowContext = this.nestedWorkflowContextsByName.get(name);
 
     if (!nestedWorkflowContext) {
-      throw new Error(
+      throw new NodeAttributeGenerationError(
         `Nested workflow context not found for attribute name: ${name}`
       );
     }

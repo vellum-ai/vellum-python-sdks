@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
 import {
@@ -16,7 +17,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
 > {
   getInnerWorkflowData(): WorkflowRawData {
     if (this.nodeData.data.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `InlineSubworkflowNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     }
@@ -161,7 +162,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
 
   protected getNestedWorkflowProject(): WorkflowProjectGenerator {
     if (this.nodeData.data.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `SubworkflowNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     }

@@ -1,11 +1,16 @@
 export type CodegenErrorCode =
   | "PROJECT_SERIALIZATION_ERROR"
+  | "WORKFLOW_GENERATION_ERROR"
+  | "WORKFLOW_INPUT_GENERATION_ERROR"
+  | "NODE_DEFINITION_GENERATION_ERROR"
   | "NODE_ATTRIBUTE_GENERATION_ERROR"
   | "NODE_PORT_GENERATION_ERROR"
   | "NODE_NOT_FOUND_ERROR"
   | "NODE_OUTPUT_NOT_FOUND_ERROR"
   | "UNSUPPORTED_SANDBOX_INPUT_ERROR"
-  | "ENTITY_NOT_FOUND_ERROR";
+  | "ENTITY_NOT_FOUND_ERROR"
+  | "POST_PROCESSING_ERROR"
+  | "VALUE_GENERATION_ERROR";
 
 export abstract class BaseCodegenError extends Error {
   abstract code: CodegenErrorCode;
@@ -17,6 +22,29 @@ export abstract class BaseCodegenError extends Error {
  */
 export class ProjectSerializationError extends BaseCodegenError {
   code = "PROJECT_SERIALIZATION_ERROR" as const;
+}
+
+/**
+ * An error that raises when the Workflow definition fails to
+ * generate.
+ */
+export class WorkflowGenerationError extends BaseCodegenError {
+  code = "WORKFLOW_GENERATION_ERROR" as const;
+}
+
+/**
+ * An error that raises when the Workflow Inpus fail to
+ * generate.
+ */
+export class WorkflowInputGenerationError extends BaseCodegenError {
+  code = "WORKFLOW_INPUT_GENERATION_ERROR" as const;
+}
+
+/**
+ * An error that raises when the Node definition fails to generate
+ */
+export class NodeDefinitionGenerationError extends BaseCodegenError {
+  code = "NODE_DEFINITION_GENERATION_ERROR" as const;
 }
 
 /**
@@ -59,4 +87,18 @@ export class UnsupportedSandboxInputError extends BaseCodegenError {
  */
 export class NodeOutputNotFoundError extends BaseCodegenError {
   code = "NODE_OUTPUT_NOT_FOUND_ERROR" as const;
+}
+
+/**
+ * An error that raises when the code fails to post process
+ */
+export class PostProcessingError extends BaseCodegenError {
+  code = "POST_PROCESSING_ERROR" as const;
+}
+
+/**
+ * An error that raises when a value fails to generate
+ */
+export class ValueGenerationError extends BaseCodegenError {
+  code = "VALUE_GENERATION_ERROR" as const;
 }

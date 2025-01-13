@@ -5,6 +5,7 @@ import { VellumVariableType } from "vellum-ai/api/types";
 import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { BaseState } from "src/generators/base-state";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
@@ -98,24 +99,28 @@ export class TemplatingNode extends BaseSingleFileNode<
       (input) => input.id === this.nodeData.data.templateNodeInputId
     );
     if (!templatingInput) {
-      throw new Error("Templating input not found");
+      throw new NodeAttributeGenerationError("Templating input not found");
     }
 
     const templateRule = templatingInput.value.rules[0];
     if (!templateRule) {
-      throw new Error("Templating input rule not found");
+      throw new NodeAttributeGenerationError("Templating input rule not found");
     }
 
     if (templateRule.type !== "CONSTANT_VALUE") {
-      throw new Error("Templating input rule is not a constant value");
+      throw new NodeAttributeGenerationError(
+        "Templating input rule is not a constant value"
+      );
     }
 
     if (templateRule.data.type !== "STRING") {
-      throw new Error("Templating input rule is not a string");
+      throw new NodeAttributeGenerationError(
+        "Templating input rule is not a string"
+      );
     }
 
     if (!templateRule.data.value) {
-      throw new Error(
+      throw new NodeAttributeGenerationError(
         "Templating input rule value must be defined and nonempty"
       );
     }

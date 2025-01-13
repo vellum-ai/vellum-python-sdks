@@ -17,7 +17,12 @@ import {
 import { createNodeContext, WorkflowContext } from "./context";
 import { InputVariableContext } from "./context/input-variable-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "./generators";
-import { ProjectSerializationError } from "./generators/errors";
+import {
+  NodeDefinitionGenerationError,
+  PostProcessingError,
+  ProjectSerializationError,
+  WorkflowGenerationError,
+} from "./generators/errors";
 import { BaseNode } from "./generators/nodes/bases";
 import { GuardrailNode } from "./generators/nodes/guardrail-node";
 import { InlineSubworkflowNode } from "./generators/nodes/inline-subworkflow-node";
@@ -334,7 +339,9 @@ ${errors.slice(0, 3).map((err) => {
             );
           } else if (nodeData.type === "ENTRYPOINT") {
             if (entrypointNode) {
-              throw new Error("Multiple entrypoint nodes found");
+              throw new WorkflowGenerationError(
+                "Multiple entrypoint nodes found"
+              );
             }
             entrypointNode = nodeData;
             return;
@@ -351,7 +358,7 @@ ${errors.slice(0, 3).map((err) => {
       )
     );
     if (!entrypointNode) {
-      throw new Error("Entrypoint node not found");
+      throw new WorkflowGenerationError("Entrypoint node not found");
     }
     this.workflowContext.addEntrypointNode(entrypointNode);
 
@@ -428,7 +435,9 @@ ${errors.slice(0, 3).map((err) => {
                 });
                 break;
               case "DEPLOYMENT":
-                throw new Error(`DEPLOYMENT variant not yet supported`);
+                throw new NodeDefinitionGenerationError(
+                  `DEPLOYMENT variant not yet supported`
+                );
               default: {
                 assertUnreachable(mapNodeVariant);
               }
@@ -466,7 +475,7 @@ ${errors.slice(0, 3).map((err) => {
                 });
                 break;
               case "LEGACY":
-                throw new Error(
+                throw new NodeDefinitionGenerationError(
                   `LEGACY variant should have been converted to INLINE variant by this point.`
                 );
               default: {
@@ -530,7 +539,9 @@ ${errors.slice(0, 3).map((err) => {
             });
             break;
           default: {
-            throw new Error(`Unsupported node type: ${nodeType}`);
+            throw new NodeDefinitionGenerationError(
+              `Unsupported node type: ${nodeType}`
+            );
           }
         }
 
@@ -683,6 +694,6 @@ ${errors.slice(0, 3).map((err) => {
       return rootDirSetupCfgPath;
     }
 
-    throw new Error("No isort Config file found");
+    throw new PostProcessingError("No isort Config file found");
   }
 }

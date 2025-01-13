@@ -1,10 +1,13 @@
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { WorkflowNode } from "src/types/vellum";
 
 export function getNodeId(nodeData: WorkflowNode): string {
   switch (nodeData.type) {
     case "GENERIC": {
       if (!nodeData.definition) {
-        throw new Error("Generic node missing definition");
+        throw new NodeDefinitionGenerationError(
+          "Generic node missing definition"
+        );
       }
       const syntheticId = [
         ...nodeData.definition.module,

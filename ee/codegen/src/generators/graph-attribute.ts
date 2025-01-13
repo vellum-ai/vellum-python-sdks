@@ -3,6 +3,8 @@ import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { WorkflowGenerationError } from "./errors";
+
 import { PORTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -385,7 +387,7 @@ export class GraphAttribute extends AstNode {
           const newRhs = addEdgeToGraph(mutableAst.rhs, lhsTerminal.reference);
           if (newRhs) {
             if (lhsTerminals.length > 1 && newRhs.type === "set") {
-              throw new Error(
+              throw new WorkflowGenerationError(
                 "Adding an edge between two sets is not supported"
               );
             }

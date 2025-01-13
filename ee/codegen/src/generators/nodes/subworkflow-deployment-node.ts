@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
@@ -15,7 +16,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     const statements: AstNode[] = [];
 
     if (this.nodeData.data.variant !== "DEPLOYMENT") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `SubworkflowDeploymentNode only supports DEPLOYMENT variant. Received ${this.nodeData.data.variant}`
       );
     }

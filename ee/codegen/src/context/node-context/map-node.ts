@@ -1,6 +1,7 @@
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { MapNode as MapNodeType } from "src/types/vellum";
 
 export class MapNodeContext extends BaseNodeContext<MapNodeType> {
@@ -11,7 +12,7 @@ export class MapNodeContext extends BaseNodeContext<MapNodeType> {
   getNodeOutputNamesById(): Record<string, string> {
     const subworkflowNodeData = this.nodeData.data;
     if (subworkflowNodeData.variant !== "INLINE") {
-      throw new Error(
+      throw new NodeDefinitionGenerationError(
         `MapNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     }

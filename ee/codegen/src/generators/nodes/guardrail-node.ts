@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
@@ -14,7 +15,9 @@ export class GuardrailNode extends BaseSingleFileNode<
     const statements: AstNode[] = [];
 
     if (!this.nodeData.data.metricDefinitionId) {
-      throw new Error("metric_definition_id is required");
+      throw new NodeAttributeGenerationError(
+        "metric_definition_id is required"
+      );
     }
 
     statements.push(
@@ -42,7 +45,7 @@ export class GuardrailNode extends BaseSingleFileNode<
     );
 
     if (!this.nodeData.data.releaseTag) {
-      throw new Error("release_tag is required");
+      throw new NodeAttributeGenerationError("release_tag is required");
     }
 
     statements.push(

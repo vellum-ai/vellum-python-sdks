@@ -2,6 +2,8 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { ValueGenerationError } from "./errors";
+
 export class Json extends AstNode {
   private readonly astNode: python.AstNode;
 
@@ -12,7 +14,7 @@ export class Json extends AstNode {
     try {
       JSON.stringify(value);
     } catch {
-      throw new Error("Value is not JSON serializable");
+      throw new ValueGenerationError("Value is not JSON serializable");
     }
 
     this.astNode = this.generateAstNode(value);
@@ -67,7 +69,9 @@ export class Json extends AstNode {
       });
     }
 
-    throw new Error(`Unsupported JSON value type: ${typeof value}`);
+    throw new ValueGenerationError(
+      `Unsupported JSON value type: ${typeof value}`
+    );
   }
 
   public write(writer: Writer): void {

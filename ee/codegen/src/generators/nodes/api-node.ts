@@ -5,6 +5,7 @@ import { isNil } from "lodash";
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";
 
@@ -14,7 +15,9 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
 
     const urlInput = this.nodeInputsByKey.get("url");
     if (!urlInput) {
-      throw new Error('Node input "url" is required but not found.');
+      throw new NodeAttributeGenerationError(
+        'Node input "url" is required but not found.'
+      );
     }
 
     statements.push(
@@ -56,7 +59,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
               );
 
               if (!keyInput || !valueInput) {
-                throw new Error(
+                throw new NodeAttributeGenerationError(
                   `Input not found for header: ${JSON.stringify(header)}`
                 );
               }
@@ -87,13 +90,15 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
         (input) => input.id === this.nodeData.data.apiKeyHeaderKeyInputId
       );
       if (!keyInput) {
-        throw new Error(
+        throw new NodeAttributeGenerationError(
           `No inputs have api header key id of ${this.nodeData.data.apiKeyHeaderKeyInputId}`
         );
       }
       const key = this.nodeInputsByKey.get(keyInput.key);
       if (!key) {
-        throw new Error(`No inputs have key of ${keyInput.key}`);
+        throw new NodeAttributeGenerationError(
+          `No inputs have key of ${keyInput.key}`
+        );
       }
       statements.push(
         python.field({
@@ -118,13 +123,15 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
         (input) => input.id === this.nodeData.data.apiKeyHeaderValueInputId
       );
       if (!valueInput) {
-        throw new Error(
+        throw new NodeAttributeGenerationError(
           `No inputs have api header value id of ${this.nodeData.data.apiKeyHeaderValueInputId}`
         );
       }
       const value = this.nodeInputsByKey.get(valueInput.key);
       if (!value) {
-        throw new Error(`No inputs have key of ${valueInput.key}`);
+        throw new NodeAttributeGenerationError(
+          `No inputs have key of ${valueInput.key}`
+        );
       }
       statements.push(
         python.field({
@@ -139,13 +146,15 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
         (input) => input.id === this.nodeData.data.bearerTokenValueInputId
       );
       if (!valueInput) {
-        throw new Error(
+        throw new NodeAttributeGenerationError(
           `No inputs have bearer token header value id of ${this.nodeData.data.bearerTokenValueInputId}`
         );
       }
       const value = this.nodeInputsByKey.get(valueInput.key);
       if (!value) {
-        throw new Error(`No inputs have key of ${valueInput.key}`);
+        throw new NodeAttributeGenerationError(
+          `No inputs have key of ${valueInput.key}`
+        );
       }
       statements.push(
         python.field({
@@ -272,7 +281,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
               );
 
               if (!nodeInput) {
-                throw new Error(
+                throw new NodeAttributeGenerationError(
                   `Node input with ID ${header.headerKeyInputId} not found`
                 );
               }
@@ -302,7 +311,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
               );
 
               if (!nodeInput) {
-                throw new Error(
+                throw new NodeAttributeGenerationError(
                   `Node input with ID ${header.headerKeyInputId} not found`
                 );
               }
@@ -425,7 +434,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       ) as ConstantValuePointer;
 
     if (!methodValue) {
-      throw new Error(
+      throw new NodeAttributeGenerationError(
         `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`
       );
     }
@@ -450,7 +459,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       ) as ConstantValuePointer;
 
     if (!authValue) {
-      throw new Error(
+      throw new NodeAttributeGenerationError(
         `No auth type input found for input id ${this.nodeData.data.authorizationTypeInputId} and of type "CONSTANT_VALUE"`
       );
     }
