@@ -1,3 +1,4 @@
+from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -89,7 +90,7 @@ def test_inline_text_prompt_node__basic(vellum_adhoc_prompt_client):
             logit_bias=None,
             custom_parameters=None,
         ),
-        request_options=None,
+        request_options=mock.ANY,
     )
 
 

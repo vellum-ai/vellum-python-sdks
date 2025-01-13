@@ -1,3 +1,4 @@
+from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -88,7 +89,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
         ],
         expand_meta=OMIT,
         functions=None,
-        request_options=None,
+        request_options=mock.ANY,
     )
 
 
