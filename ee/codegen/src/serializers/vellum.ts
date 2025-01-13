@@ -97,6 +97,7 @@ import {
   VellumLogicalExpression,
   VellumLogicalCondition,
   VellumLogicalConditionGroup,
+  NodeTrigger,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -1596,6 +1597,29 @@ export declare namespace ErrorNodeSerializer {
   }
 }
 
+export const NodeTriggerSerializer: ObjectSchema<
+  NodeTriggerSerializer.Raw,
+  NodeTrigger
+> = objectSchema({
+  id: stringSchema(),
+  mergeBehavior: propertySchema(
+    "merge_behavior",
+    undiscriminatedUnionSchema([
+      stringLiteralSchema("AWAIT_ATTRIBUTES"),
+      stringLiteralSchema("AWAIT_ALL"),
+      stringLiteralSchema("AWAIT_ANY"),
+      stringLiteralSchema("CUSTOM"),
+    ])
+  ),
+});
+
+export declare namespace NodeTriggerSerializer {
+  interface Raw {
+    id: string;
+    merge_behavior: "AWAIT_ATTRIBUTES" | "AWAIT_ALL" | "AWAIT_ANY" | "CUSTOM";
+  }
+}
+
 export const GenericNodeDisplayDataSerializer: ObjectSchema<
   GenericNodeDisplayDataSerializer.Raw,
   GenericNodeDisplayData
@@ -1619,6 +1643,7 @@ export const GenericNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer,
   definition: CodeResourceDefinitionSerializer.optional(),
+  trigger: NodeTriggerSerializer,
 });
 
 export declare namespace GenericNodeSerializer {
@@ -1630,6 +1655,8 @@ export declare namespace GenericNodeSerializer {
         y: number;
       } | null;
     } | null;
+    definition?: CodeResourceDefinitionSerializer.Raw | null;
+    trigger: NodeTriggerSerializer.Raw;
   }
 }
 

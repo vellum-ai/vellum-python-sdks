@@ -169,6 +169,56 @@ export interface CodeResourceDefinition {
   module: string[];
 }
 
+export type MergeBehavior =
+  | "AWAIT_ATTRIBUTES"
+  | "AWAIT_ALL"
+  | "AWAIT_ANY"
+  | "CUSTOM";
+
+export interface NodeTrigger {
+  id: string;
+  mergeBehavior: MergeBehavior;
+}
+
+export enum NodePortType {
+  DEFAULT = "DEFAULT",
+  IF = "IF",
+  ELIF = "ELIF",
+  ELSE = "ELSE",
+}
+
+export interface DefaultNodePort {
+  type: NodePortType.DEFAULT;
+  id: string;
+  name: string;
+}
+
+export interface IfConditionNodePort {
+  type: NodePortType.IF;
+  id: string;
+  name: string;
+  expression?: WorkflowValueDescriptor;
+}
+
+export interface ElifConditionNodePort {
+  type: NodePortType.ELIF;
+  id: string;
+  name: string;
+  expression?: WorkflowValueDescriptor;
+}
+
+export interface ElseConditionNodePort {
+  type: NodePortType.ELSE;
+  id: string;
+  name: string;
+}
+
+export type NodePort =
+  | DefaultNodePort
+  | IfConditionNodePort
+  | ElifConditionNodePort
+  | ElseConditionNodePort;
+
 export interface BaseWorkflowNode {
   type: string;
   definition?: CodeResourceDefinition;
@@ -613,6 +663,12 @@ export interface GenericNode extends BaseWorkflowNode {
   type: "GENERIC";
   displayData?: GenericNodeDisplayData;
   base: CodeResourceDefinition;
+  definition?: CodeResourceDefinition;
+  trigger: NodeTrigger;
+  //ports: NodePort;
+  // adornments?: AdornmentNode;
+  // attributes: NodeAttribute;
+  // TODO: Fill in outputs field when data model gets updated
 }
 
 export type WorkflowDataNode =
@@ -677,3 +733,53 @@ type WorkflowSandboxInput =
   | ChatHistoryInput
   | NumberInput;
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
+
+export enum WorkflowDescriptorType {
+  UNARY_EXPRESSION = "UNARY_EXPRESSION",
+  BINARY_EXPRESSION = "BINARY_EXPRESSION",
+  TERNARY_EXPRESSION = "TERNARY_EXPRESSION",
+}
+
+export interface UnaryWorkflowExpression {
+  type: WorkflowDescriptorType.UNARY_EXPRESSION;
+  lhs: WorkflowValueDescriptor;
+  operator: LogicalOperator;
+}
+
+export interface BinaryWorkflowExpression {
+  type: WorkflowDescriptorType.BINARY_EXPRESSION;
+  lhs: WorkflowValueDescriptor;
+  operator: LogicalOperator;
+  rhs: WorkflowValueDescriptor;
+}
+
+export interface TernaryWorkflowExpression {
+  type: WorkflowDescriptorType.TERNARY_EXPRESSION;
+  base: WorkflowValueDescriptor;
+  operator: LogicalOperator;
+  lhs: WorkflowValueDescriptor;
+  rhs: WorkflowValueDescriptor;
+}
+
+export type WorkflowValueDescriptor =
+  | UnaryWorkflowExpression
+  | BinaryWorkflowExpression
+  | TernaryWorkflowExpression
+  | NodeOutputPointer
+  | InputVariablePointer
+  | ConstantValuePointer
+  | WorkspaceSecretPointer
+  | ExecutionCounterPointer;
+
+export interface NodeAttribute {
+  id: string;
+  name: string;
+  value: WorkflowValueDescriptor;
+}
+
+export interface AdornmentNode {
+  id: string;
+  label: string;
+  base: CodeResourceDefinition;
+  attributes: NodeAttribute[];
+}
