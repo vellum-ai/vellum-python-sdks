@@ -1357,6 +1357,26 @@ export function genericNodeFactory(
       name,
       module: ["my_nodes", "my_custom_node"],
     },
+    trigger: {
+      id: "trigger-1",
+      mergeBehavior: "AWAIT_ALL",
+    },
+    ports: {
+      type: "DEFAULT",
+      id: "port-1",
+      name: "default-port",
+    },
+    attributes: {
+      id: "attr-1",
+      name: "default-attribute",
+      value: {
+        type: "CONSTANT_VALUE",
+        data: {
+          type: "STRING",
+          value: "default-value",
+        },
+      },
+    },
   };
   return nodeData;
 }
