@@ -98,6 +98,14 @@ import {
   VellumLogicalCondition,
   VellumLogicalConditionGroup,
   NodeTrigger,
+  DefaultNodePort,
+  IfConditionNodePort,
+  BinaryWorkflowExpression,
+  TernaryWorkflowExpression,
+  UnaryWorkflowExpression,
+  ElifConditionNodePort,
+  ElseConditionNodePort,
+  WorkflowValueDescriptor,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -1597,6 +1605,163 @@ export declare namespace ErrorNodeSerializer {
   }
 }
 
+export const UnaryWorkflowExpressionSerializer: ObjectSchema<
+  UnaryWorkflowExpressionSerializer.Raw,
+  Omit<UnaryWorkflowExpression, "type">
+> = objectSchema({
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+  operator: LogicalOperatorSerializer,
+});
+
+export declare namespace UnaryWorkflowExpressionSerializer {
+  interface Raw {
+    lhs: WorkflowValueDescriptorSerializer.Raw;
+    operator: LogicalOperatorSerializer.Raw;
+  }
+}
+
+export const BinaryWorkflowExpressionSerializer: ObjectSchema<
+  BinaryWorkflowExpressionSerializer.Raw,
+  Omit<BinaryWorkflowExpression, "type">
+> = objectSchema({
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+  operator: LogicalOperatorSerializer,
+  rhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+});
+
+export declare namespace BinaryWorkflowExpressionSerializer {
+  interface Raw {
+    lhs: WorkflowValueDescriptorSerializer.Raw;
+    operator: LogicalOperatorSerializer.Raw;
+    rhs: WorkflowValueDescriptorSerializer.Raw;
+  }
+}
+
+export const TernaryWorkflowExpressionSerializer: ObjectSchema<
+  TernaryWorkflowExpressionSerializer.Raw,
+  Omit<TernaryWorkflowExpression, "type">
+> = objectSchema({
+  base: lazySchema(() => WorkflowValueDescriptorSerializer),
+  operator: LogicalOperatorSerializer,
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+  rhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+});
+
+export declare namespace TernaryWorkflowExpressionSerializer {
+  interface Raw {
+    base: WorkflowValueDescriptorSerializer.Raw;
+    operator: LogicalOperatorSerializer.Raw;
+    lhs: WorkflowValueDescriptorSerializer.Raw;
+    rhs: WorkflowValueDescriptorSerializer.Raw;
+  }
+}
+
+export const WorkflowValueDescriptorSerializer: Schema<
+  WorkflowValueDescriptorSerializer.Raw,
+  WorkflowValueDescriptor
+> = unionSchema("type", {
+  UNARY_EXPRESSION: UnaryWorkflowExpressionSerializer,
+  BINARY_EXPRESSION: BinaryWorkflowExpressionSerializer,
+  TERNARY_EXPRESSION: TernaryWorkflowExpressionSerializer,
+  NODE_OUTPUT: NodeOutputPointerSerializer,
+  INPUT_VARIABLE: InputVariablePointerSerializer,
+  CONSTANT_VALUE: ConstantValuePointerSerializer,
+  WORKSPACE_SECRET: WorkspaceSecretPointerSerializer,
+  EXECUTION_COUNTER: ExecutionCounterPointerSerializer,
+});
+
+export declare namespace WorkflowValueDescriptorSerializer {
+  type Raw =
+    | UnaryWorkflowExpressionSerializer.Raw
+    | BinaryWorkflowExpressionSerializer.Raw
+    | TernaryWorkflowExpressionSerializer.Raw
+    | NodeOutputPointerSerializer.Raw
+    | InputVariablePointerSerializer.Raw
+    | ConstantValuePointerSerializer.Raw
+    | WorkspaceSecretPointerSerializer.Raw
+    | ExecutionCounterPointerSerializer.Raw;
+}
+
+export const DefaultConditionNodePortSerializer: ObjectSchema<
+  DefaultConditionNodePortSerializer.Raw,
+  Omit<DefaultNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+});
+
+export declare namespace DefaultConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    expression?: WorkflowValueDescriptorSerializer.Raw;
+  }
+}
+
+export const IfConditionNodePortSerializer: ObjectSchema<
+  IfConditionNodePortSerializer.Raw,
+  Omit<IfConditionNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  expression: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace IfConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    expression?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+export const ElifConditionNodePortSerializer: ObjectSchema<
+  ElifConditionNodePortSerializer.Raw,
+  Omit<ElifConditionNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  expression: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace ElifConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    expression?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+export const ElseConditionNodePortSerializer: ObjectSchema<
+  ElseConditionNodePortSerializer.Raw,
+  Omit<ElseConditionNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+});
+
+export declare namespace ElseConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+  }
+}
+
+const NodePortSerializer = unionSchema("type", {
+  DEFAULT: DefaultConditionNodePortSerializer,
+  IF: IfConditionNodePortSerializer,
+  ELIF: ElifConditionNodePortSerializer,
+  ELSE: ElseConditionNodePortSerializer,
+});
+
+export declare namespace NodePortSerializer {
+  type Raw =
+    | DefaultConditionNodePortSerializer.Raw
+    | IfConditionNodePortSerializer.Raw
+    | ElifConditionNodePortSerializer.Raw
+    | ElseConditionNodePortSerializer.Raw;
+}
+
 export const NodeTriggerSerializer: ObjectSchema<
   NodeTriggerSerializer.Raw,
   NodeTrigger
@@ -1644,6 +1809,7 @@ export const GenericNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer,
   definition: CodeResourceDefinitionSerializer.optional(),
   trigger: NodeTriggerSerializer,
+  ports: NodePortSerializer,
 });
 
 export declare namespace GenericNodeSerializer {
@@ -1657,6 +1823,7 @@ export declare namespace GenericNodeSerializer {
     } | null;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     trigger: NodeTriggerSerializer.Raw;
+    ports: NodePortSerializer.Raw;
   }
 }
 

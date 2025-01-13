@@ -180,35 +180,28 @@ export interface NodeTrigger {
   mergeBehavior: MergeBehavior;
 }
 
-export enum NodePortType {
-  DEFAULT = "DEFAULT",
-  IF = "IF",
-  ELIF = "ELIF",
-  ELSE = "ELSE",
-}
-
 export interface DefaultNodePort {
-  type: NodePortType.DEFAULT;
+  type: "DEFAULT";
   id: string;
   name: string;
 }
 
 export interface IfConditionNodePort {
-  type: NodePortType.IF;
+  type: "IF";
   id: string;
   name: string;
   expression?: WorkflowValueDescriptor;
 }
 
 export interface ElifConditionNodePort {
-  type: NodePortType.ELIF;
+  type: "ELIF";
   id: string;
   name: string;
   expression?: WorkflowValueDescriptor;
 }
 
 export interface ElseConditionNodePort {
-  type: NodePortType.ELSE;
+  type: "ELSE";
   id: string;
   name: string;
 }
@@ -665,7 +658,7 @@ export interface GenericNode extends BaseWorkflowNode {
   base: CodeResourceDefinition;
   definition?: CodeResourceDefinition;
   trigger: NodeTrigger;
-  //ports: NodePort;
+  ports: NodePort;
   // adornments?: AdornmentNode;
   // attributes: NodeAttribute;
   // TODO: Fill in outputs field when data model gets updated
@@ -734,27 +727,21 @@ type WorkflowSandboxInput =
   | NumberInput;
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
 
-export enum WorkflowDescriptorType {
-  UNARY_EXPRESSION = "UNARY_EXPRESSION",
-  BINARY_EXPRESSION = "BINARY_EXPRESSION",
-  TERNARY_EXPRESSION = "TERNARY_EXPRESSION",
-}
-
 export interface UnaryWorkflowExpression {
-  type: WorkflowDescriptorType.UNARY_EXPRESSION;
+  type: "UNARY_EXPRESSION";
   lhs: WorkflowValueDescriptor;
   operator: LogicalOperator;
 }
 
 export interface BinaryWorkflowExpression {
-  type: WorkflowDescriptorType.BINARY_EXPRESSION;
+  type: "BINARY_EXPRESSION";
   lhs: WorkflowValueDescriptor;
   operator: LogicalOperator;
   rhs: WorkflowValueDescriptor;
 }
 
 export interface TernaryWorkflowExpression {
-  type: WorkflowDescriptorType.TERNARY_EXPRESSION;
+  type: "TERNARY_EXPRESSION";
   base: WorkflowValueDescriptor;
   operator: LogicalOperator;
   lhs: WorkflowValueDescriptor;
