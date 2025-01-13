@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Any, List, Optional, Type, Union, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.expressions.and_ import AndExpression
 from vellum.workflows.expressions.begins_with import BeginsWithExpression
 from vellum.workflows.expressions.between import BetweenExpression
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
@@ -25,6 +26,7 @@ from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
+from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
 from vellum.workflows.references import NodeReference, OutputReference
@@ -171,5 +173,9 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> str:
         return "between"
     elif isinstance(descriptor, NotBetweenExpression):
         return "notBetween"
+    elif isinstance(descriptor, AndExpression):
+        return "and"
+    elif isinstance(descriptor, OrExpression):
+        return "or"
     else:
         raise ValueError(f"Unsupported descriptor type: {descriptor}")

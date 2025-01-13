@@ -1,12 +1,10 @@
 from typing import Any, Generic, TypeVar
 
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.expressions.and_ import AndExpression
 from vellum.workflows.expressions.between import BetweenExpression
 from vellum.workflows.expressions.is_not_null import IsNotNullExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
-from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.output import OutputReference
@@ -71,9 +69,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         return explicit_value if explicit_value else GenericNodeDisplayData()
 
     def serialize_condition(self, display_context: WorkflowDisplayContext, condition: BaseDescriptor) -> JsonObject:
-        if isinstance(condition, (AndExpression, OrExpression)):
-            return {}
-        elif isinstance(condition, (IsNullExpression, IsNotNullExpression)):
+        if isinstance(condition, (IsNullExpression, IsNotNullExpression)):
             lhs = self.serialize_value(display_context, condition._expression)  # type: ignore[attr-defined]
             return {
                 "type": "UNARY_EXPRESSION",

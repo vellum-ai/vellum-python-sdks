@@ -619,3 +619,85 @@ def test_serialize_node__between(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+class OrGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(Inputs.input.equals("hello") | Inputs.input.equals("world"))
+
+
+def test_serialize_node__or(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=OrGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "63900268-b9d0-4285-8ea4-7c478f4abf88",
+            "label": "OrGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "OrGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "dc245f37-9be7-4097-a50a-4f7196e24313", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "652a42f9-f4e7-4791-8167-8903ff839520",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": str(input_id),
+                            },
+                            "operator": "=",
+                            "rhs": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {
+                                    "type": "STRING",
+                                    "value": "hello",
+                                },
+                            },
+                        },
+                        "operator": "or",
+                        "rhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": str(input_id),
+                            },
+                            "operator": "=",
+                            "rhs": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {
+                                    "type": "STRING",
+                                    "value": "world",
+                                },
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
