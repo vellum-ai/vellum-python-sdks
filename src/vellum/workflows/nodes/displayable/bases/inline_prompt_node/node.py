@@ -77,7 +77,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             blocks=self.blocks,
             functions=normalized_functions,
             expand_meta=self.expand_meta,
-            request_options=self.request_options,
+            request_options=request_options,
         )
 
     def _compile_prompt_inputs(self) -> Tuple[List[VellumVariable], List[PromptRequestInput]]:
