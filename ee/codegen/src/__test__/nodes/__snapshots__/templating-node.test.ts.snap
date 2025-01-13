@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`TemplatingNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "templating_node",
-  ],
-  "name": "TemplatingNode",
-}
-`;
-
 exports[`TemplatingNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from ...nodes.templating_node import TemplatingNode
@@ -58,17 +47,6 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
         "text": "Hello, world!",
     }
 "
-`;
-
-exports[`TemplatingNode > basic with json output type > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "templating_node",
-  ],
-  "name": "TemplatingNode",
-}
 `;
 
 exports[`TemplatingNode > basic with json output type > getNodeDisplayFile 1`] = `

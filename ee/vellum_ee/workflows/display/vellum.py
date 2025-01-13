@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from uuid import UUID
-from typing import Any, List, Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import Field
 
-from vellum import ChatMessage, PromptParameters, SearchResult, SearchResultRequest, VellumVariable, VellumVariableType
+from vellum import PromptParameters, VellumVariable, VellumVariableType
+from vellum.client.types.array_vellum_value import ArrayVellumValue
+from vellum.client.types.vellum_value import VellumValue
 from vellum.core import UniversalBaseModel
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
@@ -140,43 +142,12 @@ class WorkflowNodeType(str, Enum):
     ERROR = "ERROR"
 
 
-class StringVellumValue(UniversalBaseModel):
-    type: Literal["STRING"] = "STRING"
-    value: str
-
-
-class NumberVellumValue(UniversalBaseModel):
-    type: Literal["NUMBER"] = "NUMBER"
-    value: Union[int, float]
-
-
-class ChatHistoryVellumValue(UniversalBaseModel):
-    type: Literal["CHAT_HISTORY"] = "CHAT_HISTORY"
-    value: Union[List[ChatMessage], List[ChatMessage]]
-
-
-class SearchResultsVellumValue(UniversalBaseModel):
-    type: Literal["SEARCH_RESULTS"] = "SEARCH_RESULTS"
-    value: Union[List[SearchResultRequest], List[SearchResult]]
-
-
-class JsonVellumValue(UniversalBaseModel):
-    type: Literal["JSON"] = "JSON"
-    value: Optional[Any] = None
-
-
-VellumValue = Union[
-    StringVellumValue,
-    NumberVellumValue,
-    ChatHistoryVellumValue,
-    SearchResultsVellumValue,
-    JsonVellumValue,
-]
-
-
 class ConstantValuePointer(UniversalBaseModel):
     type: Literal["CONSTANT_VALUE"] = "CONSTANT_VALUE"
     data: VellumValue
+
+
+ArrayVellumValue.model_rebuild()
 
 
 class NodeOutputData(UniversalBaseModel):

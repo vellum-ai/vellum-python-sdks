@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SubworkflowDeploymentNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "subworkflow_node",
-  ],
-  "name": "SubworkflowNode",
-}
-`;
-
 exports[`SubworkflowDeploymentNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseSubworkflowDeploymentNodeDisplay
 from ...nodes.subworkflow_node import SubworkflowNode

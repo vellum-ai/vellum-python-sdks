@@ -37,4 +37,3 @@ class PromptNode19(InlinePromptNode):
         logit_bias={},
         custom_parameters=None,
     )
-    prompt_inputs = {}

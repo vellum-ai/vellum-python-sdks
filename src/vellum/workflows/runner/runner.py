@@ -4,7 +4,21 @@ import logging
 from queue import Empty, Queue
 from threading import Event as ThreadingEvent, Thread
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, List, Optional, Sequence, Set, Type, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.context import execution_context, get_parent_context
@@ -76,6 +90,7 @@ class WorkflowRunner(Generic[StateType]):
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[List[BaseOutputs]] = None,
         parent_context: Optional[ParentContext] = None,
+        max_concurrency: Optional[int] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -119,6 +134,9 @@ class WorkflowRunner(Generic[StateType]):
 
         # This queue is responsible for sending events from the inner worker threads to WorkflowRunner
         self._workflow_event_inner_queue: Queue[WorkflowEvent] = Queue()
+
+        self._max_concurrency = max_concurrency
+        self._concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[Edge]]] = Queue()
 
         # This queue is responsible for sending events from WorkflowRunner to the background thread
         # for user defined emitters
@@ -350,7 +368,19 @@ class WorkflowRunner(Generic[StateType]):
                 else:
                     next_state = state
 
-                self._run_node_if_ready(next_state, edge.to_node, edge)
+                if self._max_concurrency:
+                    self._concurrency_queue.put((next_state, edge.to_node, edge))
+                else:
+                    self._run_node_if_ready(next_state, edge.to_node, edge)
+
+        if self._max_concurrency:
+            num_nodes_to_run = self._max_concurrency - len(self._active_nodes_by_execution_id)
+            for _ in range(num_nodes_to_run):
+                if self._concurrency_queue.empty():
+                    break
+
+                next_state, node_class, invoked_edge = self._concurrency_queue.get()
+                self._run_node_if_ready(next_state, node_class, invoked_edge)
 
     def _run_node_if_ready(
         self,
@@ -513,8 +543,11 @@ class WorkflowRunner(Generic[StateType]):
         )
         for node_cls in self._entrypoints:
             try:
-                with execution_context(parent_context=current_parent):
-                    self._run_node_if_ready(self._initial_state, node_cls)
+                if not self._max_concurrency or len(self._active_nodes_by_execution_id) < self._max_concurrency:
+                    with execution_context(parent_context=current_parent):
+                        self._run_node_if_ready(self._initial_state, node_cls)
+                else:
+                    self._concurrency_queue.put((self._initial_state, node_cls, None))
             except NodeException as e:
                 self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error))
                 return

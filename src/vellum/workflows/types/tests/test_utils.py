@@ -21,6 +21,7 @@ class ExampleClass:
     zeta: ClassVar[str]
     eta: List[str]
     kappa: Any
+    mu: list[str]
 
 
 T = TypeVar("T")
@@ -56,6 +57,7 @@ class ExampleNode(BaseNode):
         (ExampleInheritedClass, "beta", (int,)),
         (ExampleNode.Outputs, "iota", (str,)),
         (ExampleClass, "kappa", (Any,)),
+        (ExampleClass, "mu", (list[str],)),
     ],
     ids=[
         "str",
@@ -71,6 +73,7 @@ class ExampleNode(BaseNode):
         "inherited_parent_class_var",
         "try_node_output",
         "any",
+        "list_str_generic",
     ],
 )
 def test_infer_types(cls, attr_name, expected_type):
@@ -80,9 +83,9 @@ def test_infer_types(cls, attr_name, expected_type):
 @pytest.mark.parametrize(
     "cls, expected_attr_names",
     [
-        (ExampleClass, {"alpha", "beta", "gamma", "epsilon", "zeta", "eta", "kappa"}),
+        (ExampleClass, {"alpha", "beta", "gamma", "epsilon", "zeta", "eta", "kappa", "mu"}),
         (ExampleGenericClass, {"delta"}),
-        (ExampleInheritedClass, {"alpha", "beta", "gamma", "epsilon", "zeta", "eta", "theta", "kappa"}),
+        (ExampleInheritedClass, {"alpha", "beta", "gamma", "epsilon", "zeta", "eta", "theta", "kappa", "mu"}),
     ],
 )
 def test_class_attr_names(cls, expected_attr_names):

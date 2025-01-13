@@ -4,6 +4,7 @@ import click
 
 from vellum_cli.aliased_group import ClickAliasedGroup
 from vellum_cli.image_push import image_push_command
+from vellum_cli.ping import ping_command
 from vellum_cli.pull import pull_command
 from vellum_cli.push import push_command
 
@@ -12,6 +13,15 @@ from vellum_cli.push import push_command
 def main() -> None:
     """Vellum SDK CLI"""
     pass
+
+
+@main.command
+def ping() -> None:
+    """
+    Ping Vellum to confirm that requests are correctly authenticated and to return information about the active
+    Workspace/Organization
+    """
+    ping_command()
 
 
 class PushGroup(ClickAliasedGroup):

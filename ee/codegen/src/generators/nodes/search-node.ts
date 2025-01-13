@@ -3,7 +3,11 @@ import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import {
+  OUTPUTS_CLASS_NAME,
+  VELLUM_CLIENT_MODULE_PATH,
+  VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
+} from "src/constants";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import { NodeInput } from "src/generators";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
@@ -42,37 +46,34 @@ export class SearchNode extends BaseSingleFileNode<
       })
     );
 
-    const options = python.instantiateClass({
-      classReference: python.reference({
-        name: "SearchRequestOptionsRequest",
-        modulePath: VELLUM_CLIENT_MODULE_PATH,
-      }),
-      arguments_: [
-        python.methodArgument({
+    const limitInput = this.findNodeInputByName("limit");
+    if (limitInput) {
+      bodyStatements.push(
+        python.field({
           name: "limit",
-          value:
-            this.findNodeInputByName("limit") ??
-            python.TypeInstantiation.none(),
-        }),
-        python.methodArgument({
-          name: "weights",
-          value: this.getSearchWeightsRequest(),
-        }),
-        python.methodArgument({
-          name: "result_merging",
-          value: this.getResultMerging(),
-        }),
-        python.methodArgument({
-          name: "filters",
-          value: this.searchFiltersConfig(),
-        }),
-      ],
-    });
+          initializer: limitInput,
+        })
+      );
+    }
 
     bodyStatements.push(
       python.field({
-        name: "options",
-        initializer: options,
+        name: "weights",
+        initializer: this.getSearchWeightsRequest(),
+      })
+    );
+
+    bodyStatements.push(
+      python.field({
+        name: "result_merging",
+        initializer: this.getResultMerging(),
+      })
+    );
+
+    bodyStatements.push(
+      python.field({
+        name: "filters",
+        initializer: this.searchFiltersConfig(),
       })
     );
 
@@ -163,8 +164,8 @@ export class SearchNode extends BaseSingleFileNode<
 
     return python.instantiateClass({
       classReference: python.reference({
-        name: "SearchFiltersRequest",
-        modulePath: VELLUM_CLIENT_MODULE_PATH,
+        name: "SearchFilters",
+        modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
       arguments_: [
         python.methodArgument({
@@ -430,8 +431,8 @@ export class SearchNodeMetadataFilters extends AstNode {
 
     return python.instantiateClass({
       classReference: python.reference({
-        name: "VellumValueLogicalConditionGroupRequest",
-        modulePath: [...VELLUM_CLIENT_MODULE_PATH, "types"],
+        name: "MetadataLogicalConditionGroup",
+        modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
       arguments_: [
         python.methodArgument({
@@ -467,8 +468,8 @@ export class SearchNodeMetadataFilters extends AstNode {
 
     return python.instantiateClass({
       classReference: python.reference({
-        name: "VellumValueLogicalConditionRequest",
-        modulePath: [...VELLUM_CLIENT_MODULE_PATH, "types"],
+        name: "MetadataLogicalCondition",
+        modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
       arguments_: [
         python.methodArgument({

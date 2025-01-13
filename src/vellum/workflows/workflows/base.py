@@ -188,6 +188,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[List[BaseOutputs]] = None,
+        max_concurrency: Optional[int] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -215,6 +216,11 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         node_output_mocks: Optional[List[Outputs]] = None
             A list of Outputs to mock for Nodes during Workflow Execution.
+
+        max_concurrency: Optional[int] = None
+            The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run
+            without limiting concurrency. This configuration only applies to the current Workflow and not to any
+            subworkflows or nodes that utilizes threads.
         """
 
         events = WorkflowRunner(
@@ -226,6 +232,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             parent_context=self._context.parent_context,
+            max_concurrency=max_concurrency,
         ).stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
         last_event = None
@@ -289,6 +296,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[List[BaseOutputs]] = None,
+        max_concurrency: Optional[int] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -317,6 +325,11 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         node_output_mocks: Optional[List[Outputs]] = None
             A list of Outputs to mock for Nodes during Workflow Execution.
+
+        max_concurrency: Optional[int] = None
+            The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run
+            without limiting concurrency. This configuration only applies to the current Workflow and not to any
+            subworkflows or nodes that utilizes threads.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -329,6 +342,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             parent_context=self.context.parent_context,
+            max_concurrency=max_concurrency,
         ).stream():
             if should_yield(self.__class__, event):
                 yield event

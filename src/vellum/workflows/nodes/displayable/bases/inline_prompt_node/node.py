@@ -84,6 +84,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         input_variables: List[VellumVariable] = []
         input_values: List[PromptRequestInput] = []
 
+        if not self.prompt_inputs:
+            return input_variables, input_values
+
         for input_name, input_value in self.prompt_inputs.items():
             if isinstance(input_value, str):
                 input_variables.append(

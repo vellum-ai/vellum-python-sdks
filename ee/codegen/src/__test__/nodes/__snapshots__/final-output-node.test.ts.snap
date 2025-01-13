@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`FinalOutputNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "final_output_node",
-  ],
-  "name": "FinalOutputNode",
-}
-`;
-
 exports[`FinalOutputNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from ...nodes.final_output_node import FinalOutputNode

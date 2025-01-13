@@ -69,7 +69,7 @@ class BaseMapNodeDisplay(BaseNodeVellumDisplay[_MapNodeType], Generic[_MapNodeTy
                 "workflow_raw_data": serialized_subworkflow["workflow_raw_data"],
                 "input_variables": cast(JsonObject, renamed_input_variables),
                 "output_variables": serialized_subworkflow["output_variables"],
-                "concurrency": raise_if_descriptor(node.concurrency),
+                "concurrency": raise_if_descriptor(node.max_concurrency),
                 "items_input_id": items_workflow_input_id,
                 "item_input_id": item_workflow_input_id,
                 "index_input_id": index_workflow_input_id,

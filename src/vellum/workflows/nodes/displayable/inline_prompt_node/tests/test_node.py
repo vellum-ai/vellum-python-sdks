@@ -76,7 +76,6 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
     class MyNode(InlinePromptNode):
         ml_model = "gpt-4o"
         functions = [my_function]
-        prompt_inputs = {}
         blocks = []
 
     # AND a known response from invoking an inline prompt

@@ -1,6 +1,13 @@
 /* Module paths */
 export const VELLUM_CLIENT_MODULE_PATH = ["vellum"] as const;
-
+export const VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH = [
+  "vellum",
+  "workflows",
+  "nodes",
+  "displayable",
+  "bases",
+  "types",
+] as const;
 /* Class names */
 export const OUTPUTS_CLASS_NAME = "Outputs";
 export const PORTS_CLASS_NAME = "Ports";

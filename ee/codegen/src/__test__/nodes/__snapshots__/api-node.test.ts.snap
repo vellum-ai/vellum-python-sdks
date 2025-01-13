@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ApiNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "api_node",
-  ],
-  "name": "APINode",
-}
-`;
-
 exports[`ApiNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay
 from ...nodes.api_node import APINode

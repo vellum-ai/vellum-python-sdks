@@ -18,7 +18,7 @@ class Iteration(BaseNode[BaseState]):
 
     def run(self) -> Outputs:
         if self.index == 0:
-            time.sleep(1)
+            time.sleep(0.01)
 
         new_fruit = self.item + " " + self.item
         parent_state = self.state.meta.parent
@@ -45,7 +45,7 @@ class State(BaseState):
 
 
 class MapFruitsNode(MapNode):
-    concurrency = 1
+    max_concurrency = 1
     items = Inputs.fruits
     subworkflow = IterationSubworkflow
 

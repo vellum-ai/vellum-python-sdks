@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`TextSearchNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "search_node",
-  ],
-  "name": "SearchNode",
-}
-`;
-
 exports[`TextSearchNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from ...nodes.search_node import SearchNode
@@ -72,44 +61,38 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
 exports[`TextSearchNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from ..inputs import Inputs
-from vellum import (
-    SearchRequestOptionsRequest,
-    SearchWeightsRequest,
-    SearchResultMergingRequest,
-    SearchFiltersRequest,
-)
-from vellum.types import (
-    VellumValueLogicalConditionGroupRequest,
-    VellumValueLogicalConditionRequest,
+from vellum import SearchWeightsRequest, SearchResultMergingRequest
+from vellum.workflows.nodes.displayable.bases.types import (
+    SearchFilters,
+    MetadataLogicalConditionGroup,
+    MetadataLogicalCondition,
 )
 
 
 class SearchNode(BaseSearchNode):
     query = Inputs.query
     document_index = "my-sweet-document"
-    options = SearchRequestOptionsRequest(
-        limit=8,
-        weights=SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2),
-        result_merging=SearchResultMergingRequest(enabled=True),
-        filters=SearchFiltersRequest(
-            external_ids=None,
-            metadata=VellumValueLogicalConditionGroupRequest(
-                combinator="AND",
-                negated=False,
-                conditions=[
-                    VellumValueLogicalConditionGroupRequest(
-                        combinator="AND",
-                        negated=False,
-                        conditions=[
-                            VellumValueLogicalConditionRequest(
-                                lhs_variable=Inputs.var1,
-                                operator="=",
-                                rhs_variable=Inputs.var1,
-                            )
-                        ],
-                    )
-                ],
-            ),
+    limit = 8
+    weights = SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2)
+    result_merging = SearchResultMergingRequest(enabled=True)
+    filters = SearchFilters(
+        external_ids=None,
+        metadata=MetadataLogicalConditionGroup(
+            combinator="AND",
+            negated=False,
+            conditions=[
+                MetadataLogicalConditionGroup(
+                    combinator="AND",
+                    negated=False,
+                    conditions=[
+                        MetadataLogicalCondition(
+                            lhs_variable=Inputs.var1,
+                            operator="=",
+                            rhs_variable=Inputs.var1,
+                        )
+                    ],
+                )
+            ],
         ),
     )
     chunk_separator = "\\n\\n#####\\n\\n"
@@ -192,42 +175,36 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
 exports[`TextSearchNode > metadata filters > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from ..inputs import Inputs
-from vellum import (
-    SearchRequestOptionsRequest,
-    SearchWeightsRequest,
-    SearchResultMergingRequest,
-    SearchFiltersRequest,
-)
-from vellum.types import (
-    VellumValueLogicalConditionGroupRequest,
-    VellumValueLogicalConditionRequest,
+from vellum import SearchWeightsRequest, SearchResultMergingRequest
+from vellum.workflows.nodes.displayable.bases.types import (
+    SearchFilters,
+    MetadataLogicalConditionGroup,
+    MetadataLogicalCondition,
 )
 
 
 class SearchNode(BaseSearchNode):
     query = Inputs.query
     document_index = "my-sweet-document"
-    options = SearchRequestOptionsRequest(
-        limit=8,
-        weights=SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2),
-        result_merging=SearchResultMergingRequest(enabled=True),
-        filters=SearchFiltersRequest(
-            external_ids=None,
-            metadata=VellumValueLogicalConditionGroupRequest(
-                combinator="AND",
-                negated=False,
-                conditions=[
-                    VellumValueLogicalConditionRequest(
-                        lhs_variable="TYPE", operator="=", rhs_variable="VENDOR"
-                    ),
-                    VellumValueLogicalConditionRequest(
-                        lhs_variable="STATUS", operator="=", rhs_variable="1"
-                    ),
-                    VellumValueLogicalConditionRequest(
-                        lhs_variable="DELETED_AT", operator="null", rhs_variable="true"
-                    ),
-                ],
-            ),
+    limit = 8
+    weights = SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2)
+    result_merging = SearchResultMergingRequest(enabled=True)
+    filters = SearchFilters(
+        external_ids=None,
+        metadata=MetadataLogicalConditionGroup(
+            combinator="AND",
+            negated=False,
+            conditions=[
+                MetadataLogicalCondition(
+                    lhs_variable="TYPE", operator="=", rhs_variable="VENDOR"
+                ),
+                MetadataLogicalCondition(
+                    lhs_variable="STATUS", operator="=", rhs_variable="1"
+                ),
+                MetadataLogicalCondition(
+                    lhs_variable="DELETED_AT", operator="null", rhs_variable="true"
+                ),
+            ],
         ),
     )
     chunk_separator = "\\n\\n#####\\n\\n"
@@ -297,15 +274,11 @@ exports[`TextSearchNode > reject on error enabled > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from vellum.workflows.nodes.core import TryNode
 from ..inputs import Inputs
-from vellum import (
-    SearchRequestOptionsRequest,
-    SearchWeightsRequest,
-    SearchResultMergingRequest,
-    SearchFiltersRequest,
-)
-from vellum.types import (
-    VellumValueLogicalConditionGroupRequest,
-    VellumValueLogicalConditionRequest,
+from vellum import SearchWeightsRequest, SearchResultMergingRequest
+from vellum.workflows.nodes.displayable.bases.types import (
+    SearchFilters,
+    MetadataLogicalConditionGroup,
+    MetadataLogicalCondition,
 )
 
 
@@ -313,29 +286,27 @@ from vellum.types import (
 class SearchNode(BaseSearchNode):
     query = Inputs.query
     document_index = "my-sweet-document"
-    options = SearchRequestOptionsRequest(
-        limit=8,
-        weights=SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2),
-        result_merging=SearchResultMergingRequest(enabled=True),
-        filters=SearchFiltersRequest(
-            external_ids=None,
-            metadata=VellumValueLogicalConditionGroupRequest(
-                combinator="AND",
-                negated=False,
-                conditions=[
-                    VellumValueLogicalConditionGroupRequest(
-                        combinator="AND",
-                        negated=False,
-                        conditions=[
-                            VellumValueLogicalConditionRequest(
-                                lhs_variable=Inputs.var1,
-                                operator="=",
-                                rhs_variable=Inputs.var1,
-                            )
-                        ],
-                    )
-                ],
-            ),
+    limit = 8
+    weights = SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2)
+    result_merging = SearchResultMergingRequest(enabled=True)
+    filters = SearchFilters(
+        external_ids=None,
+        metadata=MetadataLogicalConditionGroup(
+            combinator="AND",
+            negated=False,
+            conditions=[
+                MetadataLogicalConditionGroup(
+                    combinator="AND",
+                    negated=False,
+                    conditions=[
+                        MetadataLogicalCondition(
+                            lhs_variable=Inputs.var1,
+                            operator="=",
+                            rhs_variable=Inputs.var1,
+                        )
+                    ],
+                )
+            ],
         ),
     )
     chunk_separator = "\\n\\n#####\\n\\n"

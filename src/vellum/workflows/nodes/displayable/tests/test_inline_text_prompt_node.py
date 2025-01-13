@@ -33,7 +33,6 @@ def test_inline_text_prompt_node__basic(vellum_adhoc_prompt_client):
 
     class MyInlinePromptNode(InlinePromptNode):
         ml_model = "gpt-4o"
-        prompt_inputs = {}
         blocks = []
 
     # AND a known response from invoking an inline prompt
@@ -107,7 +106,6 @@ def test_inline_text_prompt_node__catch_provider_error(vellum_adhoc_prompt_clien
     @TryNode.wrap(on_error_code=WorkflowErrorCode.PROVIDER_ERROR)
     class MyInlinePromptNode(InlinePromptNode):
         ml_model = "gpt-4o"
-        prompt_inputs = {}
         blocks = []
 
     # AND a known response from invoking an inline prompt that fails

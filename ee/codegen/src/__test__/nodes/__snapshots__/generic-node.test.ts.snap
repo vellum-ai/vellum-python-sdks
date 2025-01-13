@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`GenericNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "my_custom_node",
-  ],
-  "name": "MyCustomNode",
-}
-`;
-
 exports[`GenericNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from ...nodes.my_custom_node import MyCustomNode

@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`InlinePromptNode > CHAT_MESSAGE block type > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "prompt_node",
-  ],
-  "name": "PromptNode",
-}
-`;
-
 exports[`InlinePromptNode > CHAT_MESSAGE block type > basic > getNodeDisplayFile for CHAT_MESSAGE block type 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from ...nodes.prompt_node import PromptNode
@@ -287,17 +276,6 @@ Summarize the following text:
 "
 `;
 
-exports[`InlinePromptNode > FUNCTION_DEFINITION block type > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "prompt_node",
-  ],
-  "name": "PromptNode",
-}
-`;
-
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > basic > getNodeDisplayFile for FUNCTION_DEFINITION block type 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from ...nodes.prompt_node import PromptNode
@@ -505,17 +483,6 @@ class PromptNode(InlinePromptNode):
 "
 `;
 
-exports[`InlinePromptNode > JINJA block type > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "prompt_node",
-  ],
-  "name": "PromptNode",
-}
-`;
-
 exports[`InlinePromptNode > JINJA block type > basic > getNodeDisplayFile for JINJA block type 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from ...nodes.prompt_node import PromptNode
@@ -718,17 +685,6 @@ class PromptNode(InlinePromptNode):
         custom_parameters={},
     )
 "
-`;
-
-exports[`InlinePromptNode > RICH_TEXT block type > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "prompt_node",
-  ],
-  "name": "PromptNode",
-}
 `;
 
 exports[`InlinePromptNode > RICH_TEXT block type > basic > getNodeDisplayFile for RICH_TEXT block type 1`] = `
@@ -951,17 +907,6 @@ class PromptNode(InlinePromptNode):
         custom_parameters={},
     )
 "
-`;
-
-exports[`InlinePromptNode > VARIABLE block type > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "prompt_node",
-  ],
-  "name": "PromptNode",
-}
 `;
 
 exports[`InlinePromptNode > VARIABLE block type > basic > getNodeDisplayFile for VARIABLE block type 1`] = `

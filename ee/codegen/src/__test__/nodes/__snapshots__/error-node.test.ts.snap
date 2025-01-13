@@ -1,16 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ErrorNode > basic > getNodeDefinition 1`] = `
-{
-  "module": [
-    "code",
-    "nodes",
-    "error_node",
-  ],
-  "name": "ErrorNode",
-}
-`;
-
 exports[`ErrorNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseErrorNodeDisplay
 from ...nodes.error_node import ErrorNode

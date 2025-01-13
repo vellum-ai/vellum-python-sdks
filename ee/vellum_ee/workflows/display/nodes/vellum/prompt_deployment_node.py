@@ -27,16 +27,20 @@ class BasePromptDeploymentNodeDisplay(
         node_id = self.node_id
 
         prompt_inputs = raise_if_descriptor(node.prompt_inputs)
-        node_inputs = [
-            create_node_input(
-                node_id=node_id,
-                input_name=variable_name,
-                value=variable_value,
-                display_context=display_context,
-                input_id=self.prompt_input_ids_by_name.get(variable_name),
-            )
-            for variable_name, variable_value in prompt_inputs.items()
-        ]
+        node_inputs = (
+            [
+                create_node_input(
+                    node_id=node_id,
+                    input_name=variable_name,
+                    value=variable_value,
+                    display_context=display_context,
+                    input_id=self.prompt_input_ids_by_name.get(variable_name),
+                )
+                for variable_name, variable_value in prompt_inputs.items()
+            ]
+            if prompt_inputs
+            else []
+        )
 
         _, output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
         _, array_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.results)]
