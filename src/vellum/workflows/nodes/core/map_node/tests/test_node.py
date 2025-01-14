@@ -3,7 +3,7 @@ import time
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.map_node.node import MapNode
-from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
 
 
@@ -35,10 +35,10 @@ def test_map_node__use_parent_inputs_and_state():
             meta=StateMeta(workflow_inputs=Inputs(foo="foo")),
         )
     )
-    outputs = node.run()
+    outputs = list(node.run())
 
     # THEN the data is used successfully
-    assert outputs.value == ["foo bar 1", "foo bar 2", "foo bar 3"]
+    assert outputs[-1] == BaseOutput(name="value", value=["foo bar 1", "foo bar 2", "foo bar 3"])
 
 
 def test_map_node__use_parallelism():
