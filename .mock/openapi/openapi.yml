@@ -5847,6 +5847,8 @@ components:
       - notBlank
       - coalesce
       - accessField
+      - and
+      - or
       type: string
       description: |-
         * `=` - EQUALS
@@ -5871,6 +5873,8 @@ components:
         * `notBlank` - NOT_BLANK
         * `coalesce` - COALESCE
         * `accessField` - ACCESS_FIELD
+        * `and` - AND
+        * `or` - OR
       x-fern-enum:
         '=':
           name: EQUALS
@@ -11639,6 +11643,8 @@ components:
           format: binary
           description: The contents of the artifact tar.gz file.
         dry_run:
+          type: boolean
+        strict:
           type: boolean
       required:
       - exec_config
