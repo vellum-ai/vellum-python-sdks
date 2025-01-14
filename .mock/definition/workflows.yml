@@ -62,6 +62,7 @@ service:
             deployment_config: optional<root.WorkflowPushDeploymentConfigRequest>
             artifact: optional<file>
             dry_run: optional<boolean>
+            strict: optional<boolean>
         content-type: multipart/form-data
       response:
         docs: ''
