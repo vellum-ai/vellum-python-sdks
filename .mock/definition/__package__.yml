@@ -2738,6 +2738,8 @@ types:
       - notBlank
       - coalesce
       - accessField
+      - and
+      - or
     docs: |-
       * `=` - EQUALS
       * `!=` - DOES_NOT_EQUAL
@@ -2761,6 +2763,8 @@ types:
       * `notBlank` - NOT_BLANK
       * `coalesce` - COALESCE
       * `accessField` - ACCESS_FIELD
+      * `and` - AND
+      * `or` - OR
     source:
       openapi: openapi/openapi.yml
   LogprobsEnum:
