@@ -2,7 +2,7 @@ from vellum.workflows.events import NodeExecutionFulfilledEvent
 from vellum.workflows.events.types import NodeParentContext, VellumCodeResourceDefinition, WorkflowParentContext
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
-from tests.workflows.basic_map_node.workflow import Inputs, IterationSubworkflow, SimpleMapExample
+from tests.workflows.basic_map_node.workflow import Inputs, Iteration, IterationSubworkflow, SimpleMapExample
 
 
 def test_run_workflow__happy_path():
@@ -60,12 +60,14 @@ def test_map_node_streaming_events():
     assert node_initiated[0].parent is not None
     assert node_initiated[0].parent.type == "WORKFLOW"
     assert node_initiated[0].parent.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
+    first_iteration_span_id = next(e.span_id for e in node_initiated if e.inputs.get(Iteration.index) == 0)
+    second_iteration_span_id = next(e.span_id for e in node_initiated if e.inputs.get(Iteration.index) == 1)
 
     # Node fulfilled events
     assert len(node_fulfilled) == 3
 
     # Check first iteration
-    first_event = next(e for e in node_fulfilled if e.span_id == node_initiated[1].span_id)
+    first_event = next(e for e in node_fulfilled if e.span_id == first_iteration_span_id)
     assert isinstance(first_event, NodeExecutionFulfilledEvent)
     assert first_event.outputs.count == len("apple")  # 5
     assert first_event.parent is not None
@@ -85,7 +87,7 @@ def test_map_node_streaming_events():
     assert parent_workflow.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
     # Check second iteration
-    second_event = next(e for e in node_fulfilled if e.span_id == node_initiated[2].span_id)
+    second_event = next(e for e in node_fulfilled if e.span_id == second_iteration_span_id)
     assert isinstance(second_event, NodeExecutionFulfilledEvent)
     assert second_event.outputs.count == len("banana") + 1
     assert second_event.parent is not None
@@ -113,20 +115,35 @@ def test_map_node_streaming_events():
     assert len(workflow_snapshotted_events) > 0
 
     # Node streaming events
-    assert len(node_streaming) == 5  # 2 for each item, 1 for the fulfilled output
+    assert len(node_streaming) == 6  # 1 for the output initiating, 2 for each item, 1 for the fulfilled output
 
     assert node_streaming[0].output.is_initiated
     assert node_streaming[0].output.name == "count"
+
+    assert node_streaming[1].output.is_streaming
+    assert node_streaming[1].output.name == "count"
     assert node_streaming[2].output.is_streaming
     assert node_streaming[2].output.name == "count"
-    assert node_streaming[2].output.delta == (5, 0)
+    assert {
+        node_streaming[1].output.delta,
+        node_streaming[2].output.delta,
+    } == {
+        (None, 0, "INITIATED"),
+        (None, 1, "INITIATED"),
+    }
 
-    assert node_streaming[1].output.is_initiated
-    assert node_streaming[1].output.name == "count"
     assert node_streaming[3].output.is_streaming
     assert node_streaming[3].output.name == "count"
-    assert node_streaming[3].output.delta == (7, 1)
-
-    assert node_streaming[4].output.is_fulfilled
+    assert node_streaming[4].output.is_streaming
     assert node_streaming[4].output.name == "count"
-    assert node_streaming[4].output.value == [5, 7]
+    assert {
+        node_streaming[3].output.delta,
+        node_streaming[4].output.delta,
+    } == {
+        (5, 0, "FULFILLED"),
+        (7, 1, "FULFILLED"),
+    }
+
+    assert node_streaming[5].output.is_fulfilled
+    assert node_streaming[5].output.name == "count"
+    assert node_streaming[5].output.value == [5, 7]

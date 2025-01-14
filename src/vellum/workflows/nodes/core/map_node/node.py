@@ -102,7 +102,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
                 if subworkflow_event.name == "workflow.execution.initiated":
                     for output_name in mapped_items.keys():
-                        yield BaseOutput(name=output_name)
+                        yield BaseOutput(name=output_name, delta=(None, index, "INITIATED"))
 
                 elif subworkflow_event.name == "workflow.execution.fulfilled":
                     workflow_output_vars = vars(subworkflow_event.outputs)
@@ -112,7 +112,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                         output_mapped_items[index] = workflow_output_vars[output_name]
                         yield BaseOutput(
                             name=output_name,
-                            delta=(output_mapped_items[index], index),
+                            delta=(output_mapped_items[index], index, "FULFILLED"),
                         )
 
                     fulfilled_iterations[index] = True
