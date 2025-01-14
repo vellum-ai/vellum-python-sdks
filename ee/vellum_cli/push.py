@@ -9,6 +9,7 @@ from typing import List, Optional
 
 from dotenv import load_dotenv
 
+from vellum.client.core.api_error import ApiError
 from vellum.resources.workflows.client import OMIT
 from vellum.types import WorkflowPushDeploymentConfigRequest
 from vellum.workflows.utils.names import snake_to_title_case
@@ -28,6 +29,7 @@ def push_command(
     deployment_description: Optional[str] = None,
     release_tags: Optional[List[str]] = None,
     dry_run: Optional[bool] = None,
+    strict: Optional[bool] = None,
 ) -> None:
     load_dotenv()
     logger = load_cli_logger()
@@ -109,18 +111,66 @@ def push_command(
     artifact.seek(0)
     artifact.name = f"{workflow_config.module.replace('.', '__')}.tar.gz"
 
-    response = client.workflows.push(
-        # Remove this once we could serialize using the artifact in Vembda
-        # https://app.shortcut.com/vellum/story/5585
-        exec_config=json.dumps(exec_config),
-        label=label,
-        workflow_sandbox_id=workflow_config.workflow_sandbox_id,
-        artifact=artifact,
-        # We should check with fern if we could auto-serialize typed object fields for us
-        # https://app.shortcut.com/vellum/story/5568
-        deployment_config=deployment_config_serialized,  # type: ignore[arg-type]
-        dry_run=dry_run,
-    )
+    try:
+        response = client.workflows.push(
+            # Remove this once we could serialize using the artifact in Vembda
+            # https://app.shortcut.com/vellum/story/5585
+            exec_config=json.dumps(exec_config),
+            label=label,
+            workflow_sandbox_id=workflow_config.workflow_sandbox_id,
+            artifact=artifact,
+            # We should check with fern if we could auto-serialize typed object fields for us
+            # https://app.shortcut.com/vellum/story/5568
+            deployment_config=deployment_config_serialized,  # type: ignore[arg-type]
+            dry_run=dry_run,
+            strict=strict,
+        )
+    except ApiError as e:
+        if e.status_code == 400 and isinstance(e.body, dict) and "diffs" in e.body:
+            diffs: dict = e.body["diffs"]
+            generated_only = diffs.get("generated_only", [])
+            generated_only_str = (
+                "\n".join(
+                    ["Files that were generated but not found in the original project:"]
+                    + [f"- {file}" for file in generated_only]
+                )
+                if generated_only
+                else ""
+            )
+
+            original_only = diffs.get("original_only", [])
+            original_only_str = (
+                "\n".join(
+                    ["Files that were found in the original project but not generated:"]
+                    + [f"- {file}" for file in original_only]
+                )
+                if original_only
+                else ""
+            )
+
+            modified = diffs.get("modified", {})
+            modified_str = (
+                "\n\n".join(
+                    ["Files that were different between the original project and the generated artifact:"]
+                    + ["\n".join(line.strip() for line in lines) for lines in modified.values()]
+                )
+                if modified
+                else ""
+            )
+
+            reported_diffs = f"""\
+{e.body.get("detail")}
+
+{generated_only_str}
+
+{original_only_str}
+
+{modified_str}
+"""
+            logger.error(reported_diffs)
+            return
+
+        raise e
 
     if dry_run:
         error_messages = [str(e) for e in workflow_display.errors]

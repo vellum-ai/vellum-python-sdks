@@ -64,6 +64,11 @@ def workflows():
     is_flag=True,
     help="Check the Workflow for errors and expected changes, without updating its state in Vellum.",
 )
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="Raises an error if we detect an unexpected discrepancy in the generated artifact.",
+)
 def workflows_push(
     module: Optional[str],
     deploy: Optional[bool],
@@ -72,6 +77,7 @@ def workflows_push(
     deployment_description: Optional[str],
     release_tag: Optional[List[str]],
     dry_run: Optional[bool],
+    strict: Optional[bool],
 ) -> None:
     """
     Push Workflows to Vellum. If a module is provided, only the Workflow for that module will be pushed.
@@ -86,6 +92,7 @@ def workflows_push(
         deployment_description=deployment_description,
         release_tags=release_tag,
         dry_run=dry_run,
+        strict=strict,
     )
 
 
@@ -101,6 +108,11 @@ def workflows_push(
     is_flag=True,
     help="Check the Workflow for errors and expected changes, without updating its state in Vellum.",
 )
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="Raises an error if we detect an unexpected discrepancy in the generated artifact.",
+)
 def push_module(
     ctx: click.Context,
     deploy: Optional[bool],
@@ -109,6 +121,7 @@ def push_module(
     deployment_description: Optional[str],
     release_tag: Optional[List[str]],
     dry_run: Optional[bool],
+    strict: Optional[bool],
 ) -> None:
     """Push a specific module to Vellum"""
 
@@ -121,6 +134,7 @@ def push_module(
             deployment_description=deployment_description,
             release_tags=release_tag,
             dry_run=dry_run,
+            strict=strict,
         )
 
 

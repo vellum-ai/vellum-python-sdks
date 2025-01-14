@@ -6,8 +6,8 @@ import tarfile
 from uuid import uuid4
 
 from click.testing import CliRunner
-from httpx import HTTPStatusError
 
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
 from vellum.utils.uuid import is_valid_uuid
 from vellum_cli import main as cli_main
@@ -247,12 +247,25 @@ class ExampleWorkflow(BaseWorkflow):
 
 def test_push__strict_option_returns_diffs(mock_module, vellum_client):
     # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
     module = mock_module.module
 
+    # AND a workflow exists in the module successfully
+    base_dir = os.path.join(temp_dir, *module.split("."))
+    os.makedirs(base_dir, exist_ok=True)
+    workflow_py_file_content = """\
+from vellum.workflows import BaseWorkflow
+
+class ExampleWorkflow(BaseWorkflow):
+    pass
+"""
+    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
+        f.write(workflow_py_file_content)
+
     # AND the push API call returns a 4xx response with diffs
-    vellum_client.workflows.push.side_effect = HTTPStatusError(
+    vellum_client.workflows.push.side_effect = ApiError(
         status_code=400,
-        response={
+        body={
             "detail": "Failed to push workflow due to unexpected detected differences in the generated artifact.",
             "diffs": {
                 "generated_only": ["state.py"],
@@ -286,7 +299,8 @@ def test_push__strict_option_returns_diffs(mock_module, vellum_client):
     assert (
         result.output
         == """\
-Failed to push workflow due to unexpected detected differences in the generated artifact.
+\x1b[38;20mLoading workflow from examples.mock.test_push__strict_option_returns_diffs\x1b[0m
+\x1b[31;20mFailed to push workflow due to unexpected detected differences in the generated artifact.
 
 Files that were generated but not found in the original project:
 - state.py
@@ -295,10 +309,12 @@ Files that were found in the original project but not generated:
 - inputs.py
 
 Files that were different between the original project and the generated artifact:
+
 --- a/workflow.py
 +++ b/workflow.py
 @@ -1 +1 @@
 -print('hello')
 +print('foo')
+\x1b[0m
 """
     )
