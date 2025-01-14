@@ -1,7 +1,20 @@
 from collections import defaultdict
 from queue import Empty, Queue
 from threading import Thread
-from typing import TYPE_CHECKING, Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union, overload
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Dict,
+    Generic,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -12,6 +25,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
@@ -47,7 +61,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         index: int
         all_items: List[MapNodeItemType]  # type: ignore[valid-type]
 
-    def run(self) -> Outputs:
+    def run(self) -> Iterator[BaseOutput]:
         mapped_items: Dict[str, List] = defaultdict(list)
         for output_descripter in self.subworkflow.Outputs:
             mapped_items[output_descripter.name] = [None] * len(self.items)
@@ -83,15 +97,23 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         try:
             while map_node_event := self._event_queue.get():
                 index = map_node_event[0]
-                terminal_event = map_node_event[1]
-                self._context._emit_subworkflow_event(terminal_event)
+                subworkflow_event = map_node_event[1]
+                self._context._emit_subworkflow_event(subworkflow_event)
 
-                if terminal_event.name == "workflow.execution.fulfilled":
-                    workflow_output_vars = vars(terminal_event.outputs)
+                if subworkflow_event.name == "workflow.execution.initiated":
+                    for output_name in mapped_items.keys():
+                        yield BaseOutput(name=output_name)
+
+                elif subworkflow_event.name == "workflow.execution.fulfilled":
+                    workflow_output_vars = vars(subworkflow_event.outputs)
 
                     for output_name in workflow_output_vars:
                         output_mapped_items = mapped_items[output_name]
                         output_mapped_items[index] = workflow_output_vars[output_name]
+                        yield BaseOutput(
+                            name=output_name,
+                            delta=(output_mapped_items[index], index),
+                        )
 
                     fulfilled_iterations[index] = True
                     if all(fulfilled_iterations):
@@ -99,24 +121,21 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
                     if self.max_concurrency is not None:
                         self._start_thread()
-                elif terminal_event.name == "workflow.execution.paused":
+                elif subworkflow_event.name == "workflow.execution.paused":
                     raise NodeException(
                         code=WorkflowErrorCode.INVALID_OUTPUTS,
                         message=f"Subworkflow unexpectedly paused on iteration {index}",
                     )
-                elif terminal_event.name == "workflow.execution.rejected":
+                elif subworkflow_event.name == "workflow.execution.rejected":
                     raise NodeException(
-                        f"Subworkflow failed on iteration {index} with error: {terminal_event.error.message}",
-                        code=terminal_event.error.code,
+                        f"Subworkflow failed on iteration {index} with error: {subworkflow_event.error.message}",
+                        code=subworkflow_event.error.code,
                     )
         except Empty:
             pass
 
-        outputs = self.Outputs()
         for output_name, output_list in mapped_items.items():
-            setattr(outputs, output_name, output_list)
-
-        return outputs
+            yield BaseOutput(name=output_name, value=output_list)
 
     def _context_run_subworkflow(
         self, *, item: MapNodeItemType, index: int, parent_context: Optional[ParentContext] = None

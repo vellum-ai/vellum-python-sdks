@@ -65,7 +65,7 @@ def test_map_node_streaming_events():
     assert len(node_fulfilled) == 3
 
     # Check first iteration
-    first_event = node_fulfilled[0]
+    first_event = next(e for e in node_fulfilled if e.span_id == node_initiated[1].span_id)
     assert isinstance(first_event, NodeExecutionFulfilledEvent)
     assert first_event.outputs.count == len("apple")  # 5
     assert first_event.parent is not None
@@ -85,7 +85,7 @@ def test_map_node_streaming_events():
     assert parent_workflow.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
     # Check second iteration
-    second_event = node_fulfilled[1]
+    second_event = next(e for e in node_fulfilled if e.span_id == node_initiated[2].span_id)
     assert isinstance(second_event, NodeExecutionFulfilledEvent)
     assert second_event.outputs.count == len("banana") + 1
     assert second_event.parent is not None
@@ -113,12 +113,20 @@ def test_map_node_streaming_events():
     assert len(workflow_snapshotted_events) > 0
 
     # Node streaming events
-    assert len(node_streaming) == 4  # 2 for each item
+    assert len(node_streaming) == 5  # 2 for each item, 1 for the fulfilled output
 
     assert node_streaming[0].output.is_initiated
-    assert node_streaming[1].output.is_fulfilled
-    assert node_streaming[1].output.value == "apple"
+    assert node_streaming[0].output.name == "count"
+    assert node_streaming[2].output.is_streaming
+    assert node_streaming[2].output.name == "count"
+    assert node_streaming[2].output.delta == (5, 0)
 
-    assert node_streaming[2].output.is_initiated
-    assert node_streaming[3].output.is_fulfilled
-    assert node_streaming[3].output.value == "banana"
+    assert node_streaming[1].output.is_initiated
+    assert node_streaming[1].output.name == "count"
+    assert node_streaming[3].output.is_streaming
+    assert node_streaming[3].output.name == "count"
+    assert node_streaming[3].output.delta == (7, 1)
+
+    assert node_streaming[4].output.is_fulfilled
+    assert node_streaming[4].output.name == "count"
+    assert node_streaming[4].output.value == [5, 7]
