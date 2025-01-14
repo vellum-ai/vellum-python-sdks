@@ -35,7 +35,9 @@ def test_map_node_streaming_events():
 
     # THEN we see the expected events in the correct relative order
     workflow_initiated_events = [e for e in events if e.name == "workflow.execution.initiated"]
-    node_events = [e for e in events if e.name.startswith("node.")]
+    node_initiated = [e for e in events if e.name == "node.execution.initiated"]
+    node_fulfilled = [e for e in events if e.name == "node.execution.fulfilled"]
+    node_streaming = [e for e in events if e.name == "node.execution.streaming"]
     workflow_fulfilled_events = [e for e in events if e.name == "workflow.execution.fulfilled"]
     workflow_snapshotted_events = [e for e in events if e.name == "workflow.execution.snapshotted"]
 
@@ -53,24 +55,15 @@ def test_map_node_streaming_events():
         assert event.parent.parent.type == "WORKFLOW"
         assert event.parent.parent.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
-    # Node events
-    assert len(node_events) == 6  # 2 initiated + 2 fulfilled + 2 others
-
     # Node initiated events
-    node_initiated = [e for e in node_events if e.name == "node.execution.initiated"]
+    assert len(node_initiated) == 3
     assert node_initiated[0].parent is not None
     assert node_initiated[0].parent.type == "WORKFLOW"
     assert node_initiated[0].parent.workflow_definition == VellumCodeResourceDefinition.encode(SimpleMapExample)
 
     # Node fulfilled events
-    node_fulfilled = [e for e in node_events if e.name == "node.execution.fulfilled"]
-    node_fulfilled = sorted(
-        node_fulfilled,
-        key=lambda output: (
-            sum(output.outputs.count) if isinstance(output.outputs.count, list) else output.outputs.count
-        ),
-    )
     assert len(node_fulfilled) == 3
+
     # Check first iteration
     first_event = node_fulfilled[0]
     assert isinstance(first_event, NodeExecutionFulfilledEvent)
@@ -118,3 +111,14 @@ def test_map_node_streaming_events():
 
     # Workflow snapshotted events
     assert len(workflow_snapshotted_events) > 0
+
+    # Node streaming events
+    assert len(node_streaming) == 4  # 2 for each item
+
+    assert node_streaming[0].output.is_initiated
+    assert node_streaming[1].output.is_fulfilled
+    assert node_streaming[1].output.value == "apple"
+
+    assert node_streaming[2].output.is_initiated
+    assert node_streaming[3].output.is_fulfilled
+    assert node_streaming[3].output.value == "banana"
