@@ -656,7 +656,7 @@ export interface NodeOutput {
   id: string;
   name: string;
   type: VellumVariableType;
-  value: WorkflowValueDescriptor;
+  value?: WorkflowValueDescriptor;
 }
 
 export interface GenericNode extends BaseWorkflowNode {

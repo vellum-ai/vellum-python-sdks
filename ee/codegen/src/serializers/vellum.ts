@@ -1844,7 +1844,7 @@ export const NodeOutputSerializer: ObjectSchema<
   id: stringSchema(),
   name: stringSchema(),
   type: VellumVariableTypeSerializer,
-  value: WorkflowValueDescriptorSerializer,
+  value: WorkflowValueDescriptorSerializer.optional(),
 });
 
 export declare namespace NodeOutputSerializer {
@@ -1852,7 +1852,7 @@ export declare namespace NodeOutputSerializer {
     id: string;
     name: string;
     type: VellumVariableTypeSerializer.Raw;
-    value: WorkflowValueDescriptorSerializer.Raw;
+    value?: WorkflowValueDescriptorSerializer.Raw | null;
   }
 }
 
