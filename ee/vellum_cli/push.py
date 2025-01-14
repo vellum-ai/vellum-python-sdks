@@ -126,39 +126,41 @@ def push_command(
             strict=strict,
         )
     except ApiError as e:
-        if e.status_code == 400 and isinstance(e.body, dict) and "diffs" in e.body:
-            diffs: dict = e.body["diffs"]
-            generated_only = diffs.get("generated_only", [])
-            generated_only_str = (
-                "\n".join(
-                    ["Files that were generated but not found in the original project:"]
-                    + [f"- {file}" for file in generated_only]
-                )
-                if generated_only
-                else ""
-            )
+        if e.status_code != 400 or not isinstance(e.body, dict) or "diffs" not in e.body:
+            raise e
 
-            original_only = diffs.get("original_only", [])
-            original_only_str = (
-                "\n".join(
-                    ["Files that were found in the original project but not generated:"]
-                    + [f"- {file}" for file in original_only]
-                )
-                if original_only
-                else ""
+        diffs: dict = e.body["diffs"]
+        generated_only = diffs.get("generated_only", [])
+        generated_only_str = (
+            "\n".join(
+                ["Files that were generated but not found in the original project:"]
+                + [f"- {file}" for file in generated_only]
             )
+            if generated_only
+            else ""
+        )
 
-            modified = diffs.get("modified", {})
-            modified_str = (
-                "\n\n".join(
-                    ["Files that were different between the original project and the generated artifact:"]
-                    + ["\n".join(line.strip() for line in lines) for lines in modified.values()]
-                )
-                if modified
-                else ""
+        original_only = diffs.get("original_only", [])
+        original_only_str = (
+            "\n".join(
+                ["Files that were found in the original project but not generated:"]
+                + [f"- {file}" for file in original_only]
             )
+            if original_only
+            else ""
+        )
 
-            reported_diffs = f"""\
+        modified = diffs.get("modified", {})
+        modified_str = (
+            "\n\n".join(
+                ["Files that were different between the original project and the generated artifact:"]
+                + ["\n".join(line.strip() for line in lines) for lines in modified.values()]
+            )
+            if modified
+            else ""
+        )
+
+        reported_diffs = f"""\
 {e.body.get("detail")}
 
 {generated_only_str}
@@ -167,10 +169,8 @@ def push_command(
 
 {modified_str}
 """
-            logger.error(reported_diffs)
-            return
-
-        raise e
+        logger.error(reported_diffs)
+        return
 
     if dry_run:
         error_messages = [str(e) for e in workflow_display.errors]
