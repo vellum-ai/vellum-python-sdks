@@ -265,16 +265,18 @@ class VellumWorkflowDisplay(
         self, workflow_input: WorkflowInputReference, overrides: Optional[WorkflowInputsVellumDisplayOverrides] = None
     ) -> WorkflowInputsVellumDisplay:
         workflow_input_id: UUID
+        name = None
         required = None
         color = None
         if overrides:
             workflow_input_id = overrides.id
+            name = overrides.name
             required = overrides.required
             color = overrides.color
         else:
             workflow_input_id = uuid4_from_hash(f"{self.workflow_id}|inputs|id|{workflow_input.name}")
 
-        return WorkflowInputsVellumDisplay(id=workflow_input_id, required=required, color=color)
+        return WorkflowInputsVellumDisplay(id=workflow_input_id, name=name, required=required, color=color)
 
     def _generate_entrypoint_display(
         self,

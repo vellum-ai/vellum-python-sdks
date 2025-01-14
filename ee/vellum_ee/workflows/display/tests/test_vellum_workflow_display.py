@@ -1,4 +1,10 @@
+from uuid import UUID
+
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import BaseNode
+from vellum.workflows.state import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplayOverrides
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
@@ -40,3 +46,45 @@ def test_vellum_workflow_display__serialize_empty_workflow():
             ],
         },
     }
+
+
+def test_vellum_workflow_display__serialize_input_variables_with_capitalized_variable_override():
+    # GIVEN a workflow with input variables
+    class Inputs(BaseInputs):
+        foo: str
+
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output = Inputs.foo
+
+    class ExampleWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = StartNode
+
+    class ExampleWorkflowDisplay(VellumWorkflowDisplay[ExampleWorkflow]):
+        inputs_display = {
+            Inputs.foo: WorkflowInputsVellumDisplayOverrides(
+                id=UUID("97b63d71-5413-417f-9cf5-49e1b4fd56e4"), name="Foo", required=True
+            )
+        }
+
+    display = get_workflow_display(
+        base_display_class=ExampleWorkflowDisplay,
+        workflow_class=ExampleWorkflow,
+    )
+
+    # WHEN serializing the workflow
+    exec_config = display.serialize()
+
+    # THEN the input variables are what we expect
+    input_variables = exec_config["input_variables"]
+
+    assert input_variables == [
+        {
+            "id": "97b63d71-5413-417f-9cf5-49e1b4fd56e4",
+            "key": "Foo",
+            "type": "STRING",
+            "default": None,
+            "required": True,
+            "extensions": {"color": None},
+        }
+    ]
