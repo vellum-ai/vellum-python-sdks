@@ -1377,6 +1377,18 @@ export function genericNodeFactory(
         },
       },
     },
+    outputs: {
+      id: "output-1",
+      name: "output",
+      type: "STRING",
+      value: {
+        type: "CONSTANT_VALUE",
+        data: {
+          type: "STRING",
+          value: "default-value",
+        },
+      },
+    },
   };
   return nodeData;
 }

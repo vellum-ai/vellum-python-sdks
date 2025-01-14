@@ -652,6 +652,13 @@ export interface GenericNodeDisplayData {
   position?: { x: number; y: number };
 }
 
+export interface NodeOutput {
+  id: string;
+  name: string;
+  type: VellumVariableType;
+  value: WorkflowValueDescriptor;
+}
+
 export interface GenericNode extends BaseWorkflowNode {
   type: "GENERIC";
   displayData?: GenericNodeDisplayData;
@@ -661,7 +668,7 @@ export interface GenericNode extends BaseWorkflowNode {
   ports: NodePort;
   adornments?: AdornmentNode;
   attributes: NodeAttribute;
-  // TODO: Fill in outputs field when data model gets updated
+  outputs: NodeOutput;
 }
 
 export type WorkflowDataNode =

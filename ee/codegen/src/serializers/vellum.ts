@@ -108,6 +108,7 @@ import {
   WorkflowValueDescriptor,
   NodeAttribute,
   AdornmentNode,
+  NodeOutput,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -1836,6 +1837,25 @@ export declare namespace AdornmentNodeSerializer {
   }
 }
 
+export const NodeOutputSerializer: ObjectSchema<
+  NodeOutputSerializer.Raw,
+  NodeOutput
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  type: VellumVariableTypeSerializer,
+  value: WorkflowValueDescriptorSerializer,
+});
+
+export declare namespace NodeOutputSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    type: VellumVariableTypeSerializer.Raw;
+    value: WorkflowValueDescriptorSerializer.Raw;
+  }
+}
+
 export const GenericNodeSerializer: ObjectSchema<
   GenericNodeSerializer.Raw,
   Omit<GenericNode, "type">
@@ -1850,6 +1870,7 @@ export const GenericNodeSerializer: ObjectSchema<
   ports: NodePortSerializer,
   adornments: AdornmentNodeSerializer.optional(),
   attributes: NodeAttributeSerializer,
+  outputs: NodeOutputSerializer,
 });
 
 export declare namespace GenericNodeSerializer {
@@ -1866,6 +1887,7 @@ export declare namespace GenericNodeSerializer {
     ports: NodePortSerializer.Raw;
     adornments?: AdornmentNodeSerializer.Raw | null;
     attributes: NodeAttributeSerializer.Raw;
+    outputs: NodeOutputSerializer.Raw;
   }
 }
 
