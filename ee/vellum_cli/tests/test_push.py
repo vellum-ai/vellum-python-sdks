@@ -6,6 +6,7 @@ import tarfile
 from uuid import uuid4
 
 from click.testing import CliRunner
+from httpx import HTTPStatusError
 
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
 from vellum.utils.uuid import is_valid_uuid
@@ -242,3 +243,62 @@ class ExampleWorkflow(BaseWorkflow):
     assert "Serialization is not supported." in result.output
     assert "## Proposed Diffs" in result.output
     assert "iterable_item_added" in result.output
+
+
+def test_push__strict_option_returns_diffs(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    module = mock_module.module
+
+    # AND the push API call returns a 4xx response with diffs
+    vellum_client.workflows.push.side_effect = HTTPStatusError(
+        status_code=400,
+        response={
+            "detail": "Failed to push workflow due to unexpected detected differences in the generated artifact.",
+            "diffs": {
+                "generated_only": ["state.py"],
+                "modified": {
+                    "workflow.py": [
+                        "--- a/workflow.py\n",
+                        "+++ b/workflow.py\n",
+                        "@@ -1 +1 @@\n",
+                        "-print('hello')",
+                        "+print('foo')",
+                    ]
+                },
+                "original_only": ["inputs.py"],
+            },
+        },
+    )
+
+    # WHEN calling `vellum push` on strict mode
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module, "--strict"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the strict option
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert call_args["strict"] is True
+
+    # AND the report should be in the output
+    assert (
+        result.output
+        == """\
+Failed to push workflow due to unexpected detected differences in the generated artifact.
+
+Files that were generated but not found in the original project:
+- state.py
+
+Files that were found in the original project but not generated:
+- inputs.py
+
+Files that were different between the original project and the generated artifact:
+--- a/workflow.py
++++ b/workflow.py
+@@ -1 +1 @@
+-print('hello')
++print('foo')
+"""
+    )
