@@ -1697,7 +1697,6 @@ export declare namespace DefaultConditionNodePortSerializer {
   interface Raw {
     id: string;
     name: string;
-    expression?: WorkflowValueDescriptorSerializer.Raw;
   }
 }
 
