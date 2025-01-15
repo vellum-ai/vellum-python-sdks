@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.between import BetweenExpression
@@ -34,7 +34,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 {
                     "id": id,
                     "name": attribute.name,
-                    "value": self.serialize_value(display_context, attribute.instance),
+                    "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
                 }
             )
 
