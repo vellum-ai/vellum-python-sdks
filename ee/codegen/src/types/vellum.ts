@@ -716,8 +716,8 @@ export interface WorkflowRawData {
 }
 
 export interface RunnerConfig {
-  containerImageName: string;
-  containerImageTag: string;
+  containerImageName?: string;
+  containerImageTag?: string;
 }
 
 export interface WorkflowVersionExecConfig {

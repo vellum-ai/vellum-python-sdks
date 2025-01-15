@@ -1995,9 +1995,12 @@ export const WorkflowVersionExecConfigSerializer: ObjectSchema<
     objectSchema({
       containerImageName: propertySchema(
         "container_image_name",
-        stringSchema()
+        stringSchema().optional()
       ),
-      containerImageTag: propertySchema("container_image_tag", stringSchema()),
+      containerImageTag: propertySchema(
+        "container_image_tag",
+        stringSchema().optional()
+      ),
     }).optional()
   ),
 });
@@ -2008,8 +2011,8 @@ export declare namespace WorkflowVersionExecConfigSerializer {
     input_variables: VellumVariableSerializer.Raw[];
     output_variables: VellumVariableSerializer.Raw[];
     runner_config?: {
-      container_image_name: string;
-      container_image_tag: string;
+      container_image_name?: string | null;
+      container_image_tag?: string | null;
     } | null;
   }
 }
