@@ -66,7 +66,7 @@ const main = async () => {
     .map((dep) => {
       const version = dep.replace("@vellum-ai/vellum-codegen-", "");
       return `  if (version === "${version}") {
-    return import("@vellum-ai/vellum-codegen-${version}/lib/src/project");
+    return import("@vellum-ai/vellum-codegen-${version}/lib/src");
   }`;
     })
     .join("\n");
