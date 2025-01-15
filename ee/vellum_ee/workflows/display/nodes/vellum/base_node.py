@@ -27,8 +27,8 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         node_id = self.node_id
 
         attributes: JsonArray = []
-        for name in node.__annotations__.keys():
-            if name not in BaseNode.__annotations__:
+        for name in node.__dict__.keys():
+            if name not in BaseNode.__dict__:
                 id = str(uuid4_from_hash(f"{node_id}|{name}"))
 
                 attributes.append(
