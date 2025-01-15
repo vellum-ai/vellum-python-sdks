@@ -10,8 +10,7 @@ class Inputs(BaseInputs):
 
 
 class BasicGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
+    pass
 
 
 def test_serialize_node__basic(serialize_node):
@@ -53,9 +52,6 @@ def test_serialize_node__basic(serialize_node):
 
 
 class AwaitAnyGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
@@ -99,9 +95,6 @@ def test_serialize_node__await_any(serialize_node):
 
 
 class AwaitAllGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
 
