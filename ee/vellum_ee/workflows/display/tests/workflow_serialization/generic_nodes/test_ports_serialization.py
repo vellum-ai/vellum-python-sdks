@@ -16,8 +16,7 @@ class Inputs(BaseInputs):
 
 
 class BasicGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
+    pass
 
 
 def test_serialize_node__basic(serialize_node):
@@ -59,9 +58,6 @@ def test_serialize_node__basic(serialize_node):
 
 
 class IfGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(Inputs.input.equals("hello"))
 
@@ -124,9 +120,6 @@ def test_serialize_node__if(serialize_node):
 
 
 class IfElseGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(Inputs.input.equals("hello"))
         else_branch = Port.on_else()
@@ -196,9 +189,6 @@ def test_serialize_node__if_else(serialize_node):
 
 
 class IfElifElseGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(Inputs.input.equals("hello"))
         elif_branch = Port.on_elif(Inputs.input.equals("world"))
@@ -298,9 +288,6 @@ class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
 
 
 class GenericNodeReferencingOutput(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = NodeWithOutput.Outputs.output
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(NodeWithOutput.Outputs.output.equals("hello"))
 
@@ -370,9 +357,6 @@ def test_serialize_node__node_output_reference(serialize_node):
 
 
 class GenericNodeReferencingSecret(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(VellumSecretReference(name="hello").equals("hello"))
 
@@ -441,9 +425,6 @@ class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
 
 
 class GenericNodeReferencingExecutions(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = NodeWithExecutions.Execution.count
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(NodeWithExecutions.Execution.count.equals(5))
 
@@ -508,9 +489,6 @@ def test_serialize_node__execution_count_reference(serialize_node):
 
 
 class NullGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(Inputs.input.is_null())
 
@@ -570,9 +548,6 @@ class IntegerInputs(BaseInputs):
 
 
 class BetweenGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = IntegerInputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(IntegerInputs.input.between(1, 10))
 
@@ -643,9 +618,6 @@ def test_serialize_node__between(serialize_node):
 
 
 class OrGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(Inputs.input.equals("hello") | Inputs.input.equals("world"))
 
@@ -727,9 +699,6 @@ def test_serialize_node__or(serialize_node):
 
 
 class AndThenOrGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(
             Inputs.input.equals("hello") & Inputs.input.equals("then") | Inputs.input.equals("world")
@@ -833,9 +802,6 @@ def test_serialize_node__and_then_or(serialize_node):
 
 
 class ParenthesizedAndThenOrGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(
             Inputs.input.equals("hello") & (Inputs.input.equals("then") | Inputs.input.equals("world"))
@@ -939,9 +905,6 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
 
 
 class OrThenAndGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
     class Ports(BaseNode.Ports):
         if_branch = Port.on_if(
             Inputs.input.equals("hello") | Inputs.input.equals("then") & Inputs.input.equals("world")
