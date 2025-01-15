@@ -163,7 +163,20 @@ def test_serialize_workflow():
                                     },
                                 },
                             ],
-                            "outputs": [],
+                            "outputs": [
+                                {
+                                    "id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
+                                    "name": "temperature",
+                                    "type": "NUMBER",
+                                    "value": None,
+                                },
+                                {
+                                    "id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                    "name": "reasoning",
+                                    "type": "STRING",
+                                    "value": None,
+                                },
+                            ],
                         },
                         {
                             "id": "a773c3a5-78cb-4250-8d29-7282e8a579d3",

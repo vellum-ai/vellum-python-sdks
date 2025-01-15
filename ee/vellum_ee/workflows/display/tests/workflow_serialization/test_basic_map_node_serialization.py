@@ -152,7 +152,14 @@ def test_serialize_workflow():
                                     },
                                 },
                             ],
-                            "outputs": [],
+                            "outputs": [
+                                {
+                                    "id": "a7bcb362-a2b8-4476-b0de-a361efeec204",
+                                    "name": "count",
+                                    "type": "NUMBER",
+                                    "value": None,
+                                }
+                            ],
                         },
                         {
                             "id": "6f4883b2-70b1-4e1c-ae15-7d0f5aec810b",
