@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NodeTrigger > basic > generates correct trigger class 1`] = `
+"class NodeTrigger(BaseNode.Trigger):
+    merge_behavior = "AWAIT_ALL"
+"
+`;

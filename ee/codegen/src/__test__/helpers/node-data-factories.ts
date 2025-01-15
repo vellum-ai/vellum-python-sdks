@@ -24,6 +24,7 @@ import {
   NodeOutputData,
   NodeInput,
   MapNode,
+  NodeTrigger,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -1345,7 +1346,9 @@ export function errorNodeDataFactory(): ErrorNode {
 }
 
 export function genericNodeFactory(
-  { name }: { name: string } = { name: "MyCustomNode" }
+  { name, nodeTrigger }: { name: string; nodeTrigger?: NodeTrigger } = {
+    name: "MyCustomNode",
+  }
 ): GenericNode {
   const nodeData: GenericNode = {
     type: WorkflowNodeType.GENERIC,
@@ -1357,7 +1360,7 @@ export function genericNodeFactory(
       name,
       module: ["my_nodes", "my_custom_node"],
     },
-    trigger: {
+    trigger: nodeTrigger ?? {
       id: "trigger-1",
       mergeBehavior: "AWAIT_ALL",
     },

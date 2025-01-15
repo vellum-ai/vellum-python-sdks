@@ -15,7 +15,7 @@ export class GenericNode extends BaseSingleFileNode<
     statements.push(
       new NodeTrigger({
         nodeTrigger: this.nodeData.trigger,
-        baseClassRef: this.getNodeBaseClass(),
+        nodeContext: this.nodeContext,
       })
     );
     return statements;
@@ -23,7 +23,6 @@ export class GenericNode extends BaseSingleFileNode<
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
-    statements.push();
     return statements;
   }
 

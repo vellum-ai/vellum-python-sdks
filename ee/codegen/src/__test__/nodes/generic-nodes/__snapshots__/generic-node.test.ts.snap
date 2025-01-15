@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`GenericNode > basic > getNodeDisplayFile 1`] = `
+"from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from ...nodes.my_custom_node import MyCustomNode
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+
+class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
+    node_input_ids_by_name = {}
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`GenericNode > basic > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import BaseNode
+
+
+class MyCustomNode(BaseNode):
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+"
+`;

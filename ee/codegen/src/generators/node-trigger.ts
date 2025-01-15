@@ -2,36 +2,43 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { NodeTrigger as NodeTriggerType } from "src/types/vellum";
 
 export declare namespace NodeTrigger {
   export interface Args {
     nodeTrigger: NodeTriggerType;
-    baseClassRef: python.Reference;
+    nodeContext: GenericNodeContext;
   }
 }
 
 export class NodeTrigger extends AstNode {
-  private nodeTrigger: NodeTriggerType;
-  private baseClassRef: python.Reference;
   private astNode: AstNode;
 
   public constructor(args: NodeTrigger.Args) {
     super();
 
-    this.nodeTrigger = args.nodeTrigger;
-    this.baseClassRef = args.baseClassRef;
-    this.astNode = this.constructNodeTrigger();
+    this.astNode = this.constructNodeTrigger(
+      args.nodeTrigger,
+      args.nodeContext
+    );
   }
 
-  private constructNodeTrigger(): AstNode {
+  private constructNodeTrigger(
+    nodeTrigger: NodeTriggerType,
+    nodeContext: GenericNodeContext
+  ): AstNode {
+    const baseNodeClassNameAlias =
+      nodeContext.baseNodeClassName === nodeContext.nodeClassName
+        ? `Base${nodeContext.baseNodeClassName}`
+        : undefined;
     const clazz = python.class_({
       name: "NodeTrigger",
       extends_: [
         python.reference({
-          name: this.baseClassRef.name,
-          modulePath: this.baseClassRef.modulePath,
-          alias: this.baseClassRef.alias,
+          name: nodeContext.baseNodeClassName,
+          modulePath: nodeContext.baseNodeClassModulePath,
+          alias: baseNodeClassNameAlias,
           attribute: ["Trigger"],
         }),
       ],
@@ -40,9 +47,7 @@ export class NodeTrigger extends AstNode {
     clazz.add(
       python.field({
         name: "merge_behavior",
-        initializer: python.TypeInstantiation.str(
-          this.nodeTrigger.mergeBehavior
-        ),
+        initializer: python.TypeInstantiation.str(nodeTrigger.mergeBehavior),
       })
     );
     return clazz;
