@@ -17,9 +17,6 @@ class Inputs(BaseInputs):
 class ConstantValueGenericNode(BaseNode):
     attr: str = "hello"
 
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
 
 def test_serialize_node__constant_value(serialize_node):
     input_id = uuid4()
@@ -63,14 +60,7 @@ def test_serialize_node__constant_value(serialize_node):
                     },
                 }
             ],
-            "outputs": [
-                {
-                    "id": "50e9fde6-d593-40ee-89b9-e2779a76f0cc",
-                    "name": "output",
-                    "type": "STRING",
-                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
-                }
-            ],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -79,9 +69,6 @@ def test_serialize_node__constant_value(serialize_node):
 
 class WorkflowInputGenericNode(BaseNode):
     attr: str = Inputs.input
-
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
 
 
 def test_serialize_node__workflow_input(serialize_node):
@@ -122,14 +109,7 @@ def test_serialize_node__workflow_input(serialize_node):
                     },
                 }
             ],
-            "outputs": [
-                {
-                    "id": "2c4a85c0-b017-4cea-a261-e8e8498570c9",
-                    "name": "output",
-                    "type": "STRING",
-                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
-                }
-            ],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -147,9 +127,6 @@ class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
 
 class GenericNodeReferencingOutput(BaseNode):
     attr = NodeWithOutput.Outputs.output
-
-    class Outputs(BaseNode.Outputs):
-        output = NodeWithOutput.Outputs.output
 
 
 def test_serialize_node__node_output(serialize_node):
@@ -197,18 +174,7 @@ def test_serialize_node__node_output(serialize_node):
                     },
                 }
             ],
-            "outputs": [
-                {
-                    "id": "db010db3-7076-4df9-ae1b-069caa16fa20",
-                    "name": "output",
-                    "type": "STRING",
-                    "value": {
-                        "type": "NODE_OUTPUT",
-                        "node_id": "cd954d76-0b0a-4d9b-9bdf-347179c38cb6",
-                        "node_output_id": str(node_output_id),
-                    },
-                }
-            ],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -217,9 +183,6 @@ def test_serialize_node__node_output(serialize_node):
 
 class VellumSecretGenericNode(BaseNode):
     attr = VellumSecretReference(name="hello")
-
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
 
 
 def test_serialize_node__vellum_secret(serialize_node):
@@ -257,14 +220,7 @@ def test_serialize_node__vellum_secret(serialize_node):
                     "value": {"type": "VELLUM_SECRET", "vellum_secret_name": "hello"},
                 }
             ],
-            "outputs": [
-                {
-                    "id": "9336587d-14e2-4126-864c-c36da48885e3",
-                    "name": "output",
-                    "type": "STRING",
-                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
-                }
-            ],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -281,9 +237,6 @@ class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
 
 class GenericNodeReferencingExecutions(BaseNode):
     attr: int = NodeWithExecutions.Execution.count
-
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
 
 
 def test_serialize_node__node_execution(serialize_node):
@@ -326,14 +279,7 @@ def test_serialize_node__node_execution(serialize_node):
                     },
                 }
             ],
-            "outputs": [
-                {
-                    "id": "5bea09e6-5284-462c-a192-ab7222cb75f7",
-                    "name": "output",
-                    "type": "STRING",
-                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(workflow_input_id)},
-                }
-            ],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
