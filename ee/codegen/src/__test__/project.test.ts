@@ -425,4 +425,82 @@ Encountered 1 error(s) while generating code:
       expect(fs.readFileSync(sandboxPath, "utf-8")).toMatchSnapshot();
     });
   });
+  describe("runner config with no container image", () => {
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: "templating-node",
+            type: "TEMPLATING",
+            data: {
+              label: "Templating Node",
+              template_node_input_id: "template",
+              output_id: "output",
+              output_type: "STRING",
+              source_handle_id: "template_source",
+              target_handle_id: "template_target",
+            },
+            inputs: [
+              {
+                id: "template",
+                key: "template",
+                value: {
+                  combinator: "OR",
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "hello",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: "templating-node",
+            target_handle_id: "template_target",
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+        ],
+      },
+      input_variables: [],
+      output_variables: [],
+      runner_config: {},
+    };
+    it("should handle a runner config with no container image", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      const workflowPath = join(
+        tempDir,
+        project.getModuleName(),
+        "workflow.py"
+      );
+      expect(fs.existsSync(workflowPath)).toBe(true);
+    });
+  });
 });
