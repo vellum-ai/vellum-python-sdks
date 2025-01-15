@@ -39,11 +39,13 @@ def test_serialize_node__basic(serialize_node):
             "ports": [
                 {
                     "id": "4fbf0fff-a42e-4410-852a-238b5059198e",
+                    "name": "default",
                     "type": "DEFAULT",
                 }
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -83,11 +85,13 @@ def test_serialize_node__await_any(serialize_node):
             "ports": [
                 {
                     "id": "3e219c0a-e5f8-443a-ac78-1a458b189009",
+                    "name": "default",
                     "type": "DEFAULT",
                 }
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -127,11 +131,13 @@ def test_serialize_node__await_all(serialize_node):
             "ports": [
                 {
                     "id": "9797e93f-9fe6-48b2-a48e-476abbd20e32",
+                    "name": "default",
                     "type": "DEFAULT",
                 }
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,

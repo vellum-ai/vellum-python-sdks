@@ -34,6 +34,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 ports.append(
                     {
                         "id": id,
+                        "name": port.name,
                         "type": port._condition_type.value,
                         "expression": (
                             self.serialize_condition(display_context, port._condition) if port._condition else None
@@ -44,6 +45,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 ports.append(
                     {
                         "id": id,
+                        "name": port.name,
                         "type": "DEFAULT",
                     }
                 )
@@ -62,6 +64,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             "ports": ports,
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         }
 
     def get_generic_node_display_data(self) -> GenericNodeDisplayData:

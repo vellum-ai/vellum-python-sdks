@@ -45,11 +45,13 @@ def test_serialize_node__basic(serialize_node):
             "ports": [
                 {
                     "id": "4fbf0fff-a42e-4410-852a-238b5059198e",
+                    "name": "default",
                     "type": "DEFAULT",
                 }
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -94,6 +96,7 @@ def test_serialize_node__if(serialize_node):
                 {
                     "id": "7605b4c0-a432-4517-b759-5858045a5146",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -113,6 +116,7 @@ def test_serialize_node__if(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -158,6 +162,7 @@ def test_serialize_node__if_else(serialize_node):
                 {
                     "id": "3eeb7f03-7d65-45aa-b0e5-c7a453f5cbdf",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -177,11 +182,13 @@ def test_serialize_node__if_else(serialize_node):
                 {
                     "id": "b8472c77-74d5-4432-bf8b-6cd65d3dde06",
                     "type": "ELSE",
+                    "name": "else_branch",
                     "expression": None,
                 },
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -228,6 +235,7 @@ def test_serialize_node__if_elif_else(serialize_node):
                 {
                     "id": "f6e0a2c0-192d-452f-bde4-32fb938e91bc",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -247,6 +255,7 @@ def test_serialize_node__if_elif_else(serialize_node):
                 {
                     "id": "7e44de04-e816-4da8-9251-cf389442a5d6",
                     "type": "ELIF",
+                    "name": "elif_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -267,10 +276,12 @@ def test_serialize_node__if_elif_else(serialize_node):
                     "id": "00db3698-ddf5-413b-8408-fff664c212d7",
                     "type": "ELSE",
                     "expression": None,
+                    "name": "else_branch",
                 },
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -330,6 +341,7 @@ def test_serialize_node__node_output_reference(serialize_node):
                 {
                     "id": "ec9a79b8-65c3-4de8-bd29-42c914d72d4f",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -350,6 +362,7 @@ def test_serialize_node__node_output_reference(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -395,6 +408,7 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
                 {
                     "id": "a353d3f6-2a1f-457c-b8d1-13db5b45be8f",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {"type": "VELLUM_SECRET", "vellum_secret_name": "hello"},
@@ -411,6 +425,7 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -465,6 +480,7 @@ def test_serialize_node__execution_count_reference(serialize_node):
                 {
                     "id": "1794c2eb-5cab-49fe-9354-dfc29f11b374",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -484,6 +500,7 @@ def test_serialize_node__execution_count_reference(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -528,6 +545,7 @@ def test_serialize_node__null(serialize_node):
                 {
                     "id": "51932d23-492e-4b3b-8b03-6ad7303a80c9",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "UNARY_EXPRESSION",
                         "lhs": {
@@ -540,6 +558,7 @@ def test_serialize_node__null(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -589,6 +608,7 @@ def test_serialize_node__between(serialize_node):
                 {
                     "id": "a86bd19f-a9f7-45c3-80ff-73330b1b75af",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "TERNARY_EXPRESSION",
                         "base": {
@@ -615,6 +635,7 @@ def test_serialize_node__between(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -659,6 +680,7 @@ def test_serialize_node__or(serialize_node):
                 {
                     "id": "652a42f9-f4e7-4791-8167-8903ff839520",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -697,6 +719,7 @@ def test_serialize_node__or(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -744,6 +767,7 @@ def test_serialize_node__and_then_or(serialize_node):
                 {
                     "id": "42c89e95-6bbf-4e85-8f26-d4b6fc55d99c",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -801,6 +825,7 @@ def test_serialize_node__and_then_or(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -848,6 +873,7 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
                 {
                     "id": "cc07394b-f20b-4370-8a5b-af90e847a73f",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -905,6 +931,7 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,
@@ -952,6 +979,7 @@ def test_serialize_node__or_then_and(serialize_node):
                 {
                     "id": "daaff604-da1e-45e6-b3df-5bc8de8d55fe",
                     "type": "IF",
+                    "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
@@ -1009,6 +1037,7 @@ def test_serialize_node__or_then_and(serialize_node):
             ],
             "adornments": None,
             "attributes": [],
+            "outputs": [],
         },
         serialized_node,
         ignore_order=True,

@@ -141,9 +141,12 @@ def test_serialize_workflow():
                                 "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
                             },
                             "trigger": {"id": "a95a34f2-e894-4fb6-a2c9-15d12c1e3135", "merge_behavior": "AWAIT_ANY"},
-                            "ports": [{"id": "4a62dea3-6a4a-4390-88d8-4af5d2c81474", "type": "DEFAULT"}],
+                            "ports": [
+                                {"id": "4a62dea3-6a4a-4390-88d8-4af5d2c81474", "type": "DEFAULT", "name": "default"}
+                            ],
                             "adornments": None,
                             "attributes": [],
+                            "outputs": [],
                         },
                         {
                             "id": "a773c3a5-78cb-4250-8d29-7282e8a579d3",
