@@ -127,7 +127,7 @@ class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
 
 
 class GenericNodeReferencingOutput(BaseNode):
-    attr: str = NodeWithOutput.Outputs.output
+    attr = NodeWithOutput.Outputs.output
 
     class Outputs(BaseNode.Outputs):
         output = NodeWithOutput.Outputs.output
@@ -186,7 +186,7 @@ def test_serialize_node__node_output(serialize_node):
 
 
 class VellumSecretGenericNode(BaseNode):
-    attr: str = VellumSecretReference(name="hello")
+    attr = VellumSecretReference(name="hello")
 
     class Outputs(BaseNode.Outputs):
         output = Inputs.input
