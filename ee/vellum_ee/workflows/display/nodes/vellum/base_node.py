@@ -12,6 +12,7 @@ from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import convert_descriptor_to_operator
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -62,6 +63,20 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                     }
                 )
 
+        outputs: JsonArray = []
+        for output in node.Outputs:
+            type = primitive_type_to_vellum_variable_type(output)
+            value = self.serialize_value(display_context, output.instance) if output.instance is not None else None
+
+            outputs.append(
+                {
+                    "id": str(uuid4_from_hash(f"{node_id}|{output.name}")),
+                    "name": output.name,
+                    "type": type,
+                    "value": value,
+                }
+            )
+
         return {
             "id": str(node_id),
             "label": node.__qualname__,
@@ -76,7 +91,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             "ports": ports,
             "adornments": None,
             "attributes": attributes,
-            "outputs": [],
+            "outputs": outputs,
         }
 
     def get_generic_node_display_data(self) -> GenericNodeDisplayData:

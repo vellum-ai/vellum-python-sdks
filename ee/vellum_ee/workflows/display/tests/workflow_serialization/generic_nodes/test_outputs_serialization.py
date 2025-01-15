@@ -1,29 +1,38 @@
+from uuid import uuid4
+
 from deepdiff import DeepDiff
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+
+from ee.vellum_ee.workflows.display.base import WorkflowInputsDisplay
 
 
 class Inputs(BaseInputs):
     input: str
 
 
-class BasicGenericNode(BaseNode):
+class WorkflowInputGenericNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         output = Inputs.input
 
 
-def test_serialize_node__constant_value(serialize_node):
-    serialized_node = serialize_node(BasicGenericNode)
+def test_serialize_node__workflow_input(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=WorkflowInputGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
     assert not DeepDiff(
         {
-            "id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
-            "label": "BasicGenericNode",
+            "id": "ddfa947f-0830-476b-b07e-ac573968f9a7",
+            "label": "WorkflowInputGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
-                "name": "BasicGenericNode",
+                "name": "WorkflowInputGenericNode",
                 "module": [
                     "vellum_ee",
                     "workflows",
@@ -34,18 +43,18 @@ def test_serialize_node__constant_value(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ANY"},
-            "ports": [{"id": "4fbf0fff-a42e-4410-852a-238b5059198e", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "b1a5d749-bac0-4f11-8427-191febb2198e", "merge_behavior": "AWAIT_ANY"},
+            "ports": [{"id": "f013bf3f-49f6-41cd-ac13-7439b71a304a", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
                 {
-                    "id": "4cbbfd98-9ab6-41a8-bf4e-ae65f0eafe47",
+                    "id": "2c4a85c0-b017-4cea-a261-e8e8498570c9",
                     "name": "output",
                     "type": "STRING",
                     "value": {
                         "type": "WORKFLOW_INPUT",
-                        "input_variable_id": "lol",
+                        "input_variable_id": str(input_id),
                     },
                 }
             ],
