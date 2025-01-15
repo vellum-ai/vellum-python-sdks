@@ -4,6 +4,7 @@ from deepdiff import DeepDiff
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
@@ -174,6 +175,117 @@ def test_serialize_node__node_output(serialize_node):
                         "type": "NODE_OUTPUT",
                         "node_id": "cd954d76-0b0a-4d9b-9bdf-347179c38cb6",
                         "node_output_id": str(node_output_id),
+                    },
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class VellumSecretGenericNode(BaseNode):
+    attr: str = VellumSecretReference(name="hello")
+
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+
+def test_serialize_node__vellum_secret(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=VellumSecretGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+    assert not DeepDiff(
+        {
+            "id": "89aa6faa-b533-4179-8912-70a048bf0712",
+            "label": "VellumSecretGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "VellumSecretGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "3ea0305d-d8ea-45fe-8cf1-f6c1c85e6979", "merge_behavior": "AWAIT_ANY"},
+            "ports": [{"id": "69e49322-8f8a-42d2-b36f-3fbe53dad616", "type": "DEFAULT", "name": "default"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "8edd27da-eec1-4539-8bec-629b5ef7a9f9",
+                    "name": "attr",
+                    "value": {"type": "VELLUM_SECRET", "vellum_secret_name": "hello"},
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class NodeWithExecutions(BaseNode):
+    pass
+
+
+class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
+    pass
+
+
+class GenericNodeReferencingExecutions(BaseNode):
+    attr: int = NodeWithExecutions.Execution.count
+
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+
+def test_serialize_node__node_execution(serialize_node):
+    workflow_input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=GenericNodeReferencingExecutions,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=workflow_input_id)},
+        global_node_displays={NodeWithExecutions: NodeWithExecutionsDisplay()},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "6e4d2fb7-891e-492e-97a1-adf44693f518",
+            "label": "GenericNodeReferencingExecutions",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "GenericNodeReferencingExecutions",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "68a91426-4c30-4194-a4c0-cff224d3c0f3", "merge_behavior": "AWAIT_ANY"},
+            "ports": [{"id": "1794c2eb-5cab-49fe-9354-dfc29f11b374", "type": "DEFAULT", "name": "default"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "090e18d7-d5b9-4d5f-9aec-0f562e4b33a8",
+                    "name": "attr",
+                    "value": {
+                        "type": "EXECUTION_COUNTER",
+                        "node_id": "c09bd5a6-dc04-4036-90d4-580acd43c71f",
                     },
                 }
             ],
