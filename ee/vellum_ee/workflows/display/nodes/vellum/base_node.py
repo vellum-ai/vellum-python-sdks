@@ -27,16 +27,17 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         node_id = self.node_id
 
         attributes: JsonArray = []
-        for attr_name in node.__annotations__.keys():
-            id = uuid4_from_hash(f"{node_id}|{attr_name}")
+        for name in node.__annotations__.keys():
+            if name not in BaseNode.__annotations__:
+                id = str(uuid4_from_hash(f"{node_id}|{name}"))
 
-            attributes.append(
-                {
-                    "id": str(id),
-                    "name": attr_name,
-                    "value": self.serialize_value(display_context, node.__dict__[attr_name]),
-                }
-            )
+                attributes.append(
+                    {
+                        "id": id,
+                        "name": name,
+                        "value": self.serialize_value(display_context, node.__dict__[name]),
+                    }
+                )
 
         ports: JsonArray = []
         for idx, port in enumerate(node.Ports):
