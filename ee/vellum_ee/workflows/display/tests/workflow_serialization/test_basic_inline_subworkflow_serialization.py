@@ -145,7 +145,24 @@ def test_serialize_workflow():
                                 {"id": "4a62dea3-6a4a-4390-88d8-4af5d2c81474", "type": "DEFAULT", "name": "default"}
                             ],
                             "adornments": None,
-                            "attributes": [],
+                            "attributes": [
+                                {
+                                    "id": "b0ac6b50-22a8-42ba-a707-1aa09a653205",
+                                    "name": "metro",
+                                    "value": {
+                                        "type": "WORKFLOW_INPUT",
+                                        "input_variable_id": "f2f5da15-026d-4905-bfe7-7d16bda20eed",
+                                    },
+                                },
+                                {
+                                    "id": "c5f2d66c-5bb6-4d2a-8e4d-5356318cd3ba",
+                                    "name": "date",
+                                    "value": {
+                                        "type": "WORKFLOW_INPUT",
+                                        "input_variable_id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
+                                    },
+                                },
+                            ],
                             "outputs": [],
                         },
                         {
