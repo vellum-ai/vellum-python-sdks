@@ -1,5 +1,6 @@
 from typing import Any, Generic, TypeVar, cast
 
+from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.between import BetweenExpression
 from vellum.workflows.expressions.is_not_null import IsNotNullExpression
@@ -66,7 +67,11 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         outputs: JsonArray = []
         for output in node.Outputs:
             type = primitive_type_to_vellum_variable_type(output)
-            value = self.serialize_value(display_context, output.instance) if output.instance is not None else None
+            value = (
+                self.serialize_value(display_context, output.instance)
+                if output.instance is not None and output.instance != UNDEF
+                else None
+            )
 
             outputs.append(
                 {
