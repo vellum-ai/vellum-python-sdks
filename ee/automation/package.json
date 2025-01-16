@@ -1,7 +1,16 @@
 {
   "name": "vellum-automation",
   "version": "0.0.1",
+  "type": "module",
   "scripts": {
-    "create-release": "echo 'TODO: Implement src/create-release.ts'"
+    "create-release": "ts-node-esm ./src/create-release.ts"
+  },
+  "devDependencies": {
+    "@octokit/auth-app": "^7.1.4",
+    "@octokit/rest": "^21.1.0",
+    "@types/node": "^22.10.7",
+    "dotenv": "^16.4.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }
