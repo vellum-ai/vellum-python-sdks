@@ -1,5 +1,7 @@
 import json
+from typing import List
 
+from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.function_call import FunctionCall
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
@@ -125,3 +127,17 @@ def test_templating_node__pydantic_to_json():
 
     # THEN the output is the expected JSON
     assert outputs.result == {"name": "test", "arguments": {"key": "value"}, "id": None}
+
+
+def test_templating_node__chat_history_output():
+    # GIVEN a templating node that outputs a chat history
+    class ChatHistoryTemplateNode(TemplatingNode[BaseState, List[ChatMessage]]):
+        template = '[{"role": "USER", "text": "Hello"}]'
+        inputs = {}
+
+    # WHEN the node is run
+    node = ChatHistoryTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected chat history
+    assert outputs.result == [ChatMessage(role="USER", text="Hello")]
