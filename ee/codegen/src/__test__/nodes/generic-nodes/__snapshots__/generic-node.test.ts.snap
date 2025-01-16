@@ -21,5 +21,8 @@ exports[`GenericNode > basic > getNodeFile 1`] = `
 class MyCustomNode(BaseNode):
     class NodeTrigger(BaseNode.Trigger):
         merge_behavior = "AWAIT_ALL"
+
+    class Ports(BaseNode.Ports):
+        default_port = Port.on_else(None)
 "
 `;

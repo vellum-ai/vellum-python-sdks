@@ -1866,7 +1866,7 @@ export const GenericNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer,
   definition: CodeResourceDefinitionSerializer.optional(),
   trigger: NodeTriggerSerializer,
-  ports: NodePortSerializer,
+  ports: listSchema(NodePortSerializer),
   adornments: AdornmentNodeSerializer.optional(),
   attributes: NodeAttributeSerializer,
   outputs: NodeOutputSerializer,
@@ -1883,7 +1883,7 @@ export declare namespace GenericNodeSerializer {
     } | null;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     trigger: NodeTriggerSerializer.Raw;
-    ports: NodePortSerializer.Raw;
+    ports: NodePortSerializer.Raw[];
     adornments?: AdornmentNodeSerializer.Raw | null;
     attributes: NodeAttributeSerializer.Raw;
     outputs: NodeOutputSerializer.Raw;

@@ -665,7 +665,7 @@ export interface GenericNode extends BaseWorkflowNode {
   base: CodeResourceDefinition;
   definition?: CodeResourceDefinition;
   trigger: NodeTrigger;
-  ports: NodePort;
+  ports: NodePort[];
   adornments?: AdornmentNode;
   attributes: NodeAttribute;
   outputs: NodeOutput;

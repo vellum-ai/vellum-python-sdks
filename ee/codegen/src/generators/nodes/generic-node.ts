@@ -2,6 +2,7 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { NodePorts } from "src/generators/node-port";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { GenericNode as GenericNodeType } from "src/types/vellum";
@@ -16,6 +17,11 @@ export class GenericNode extends BaseSingleFileNode<
       new NodeTrigger({
         nodeTrigger: this.nodeData.trigger,
         nodeContext: this.nodeContext,
+      }),
+      new NodePorts({
+        nodePorts: this.nodeData.ports,
+        nodeContext: this.nodeContext,
+        workflowContext: this.workflowContext,
       })
     );
     return statements;

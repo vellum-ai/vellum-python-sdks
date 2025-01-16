@@ -25,6 +25,7 @@ import {
   NodeInput,
   MapNode,
   NodeTrigger,
+  NodePort,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -1346,7 +1347,11 @@ export function errorNodeDataFactory(): ErrorNode {
 }
 
 export function genericNodeFactory(
-  { name, nodeTrigger }: { name: string; nodeTrigger?: NodeTrigger } = {
+  {
+    name,
+    nodeTrigger,
+    nodePorts,
+  }: { name: string; nodeTrigger?: NodeTrigger; nodePorts?: NodePort[] } = {
     name: "MyCustomNode",
   }
 ): GenericNode {
@@ -1364,11 +1369,13 @@ export function genericNodeFactory(
       id: "trigger-1",
       mergeBehavior: "AWAIT_ALL",
     },
-    ports: {
-      type: "DEFAULT",
-      id: "port-1",
-      name: "default-port",
-    },
+    ports: nodePorts ?? [
+      {
+        type: "DEFAULT",
+        id: "port-1",
+        name: "default-port",
+      },
+    ],
     attributes: {
       id: "attr-1",
       name: "default-attribute",
