@@ -2,7 +2,6 @@
 
 exports[`NodePorts > basic > generates correct ports class 1`] = `
 "class Ports(BaseNode.Ports):
-    default_port = Port.on_else(None)
     if_port = Port.on_if(None)
     else_port = Port.on_else(None)
 "

@@ -23,6 +23,6 @@ class MyCustomNode(BaseNode):
         merge_behavior = "AWAIT_ALL"
 
     class Ports(BaseNode.Ports):
-        default_port = Port.on_else(None)
+        pass
 "
 `;

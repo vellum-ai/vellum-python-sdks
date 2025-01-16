@@ -4,7 +4,10 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
-import { NodePort as NodePortType } from "src/types/vellum";
+import {
+  NodePort as NodePortType,
+  WorkflowValueDescriptor,
+} from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -48,12 +51,15 @@ export class NodePorts extends AstNode {
     });
 
     nodePorts.forEach((port) => {
-      clazz.add(
-        python.field({
-          name: toPythonSafeSnakeCase(port.name),
-          initializer: this.generateNodePortExpression(port),
-        })
-      );
+      const portExpression = this.generateNodePortExpression(port);
+      if (portExpression) {
+        clazz.add(
+          python.field({
+            name: toPythonSafeSnakeCase(port.name),
+            initializer: portExpression,
+          })
+        );
+      }
     });
 
     return clazz;
@@ -63,8 +69,10 @@ export class NodePorts extends AstNode {
     this.astNode.write(writer);
   }
 
-  private getPortAttribute(type: string): string {
+  private getPortAttribute(type: NodePortType["type"]): string | undefined {
     switch (type) {
+      case "DEFAULT":
+        return undefined;
       case "IF":
         return "on_if";
       case "ELIF":
@@ -75,11 +83,15 @@ export class NodePorts extends AstNode {
   }
 
   private generateNodePortExpression(nodePort: NodePortType) {
+    const attribute = this.getPortAttribute(nodePort.type);
+    if (!attribute) {
+      return undefined;
+    }
     return python.invokeMethod({
       methodReference: python.reference({
         name: "Port",
         modulePath: this.workflowContext.sdkModulePathNames.PORTS_MODULE_PATH,
-        attribute: [this.getPortAttribute(nodePort.type)],
+        attribute: [attribute],
       }),
       arguments_: [
         python.methodArgument({
@@ -91,18 +103,20 @@ export class NodePorts extends AstNode {
 
   // TODO: Fill this method in a fast follow
   private buildDescriptor(nodePort: NodePortType): AstNode {
-    const expression = (() => {
-      switch (nodePort.type) {
-        case "IF":
-        case "ELIF":
-          return nodePort.expression;
-        case "ELSE":
-        case "DEFAULT":
-          return undefined;
-        default:
-          assertUnreachable(nodePort);
-      }
-    })();
+    let expression: WorkflowValueDescriptor | undefined;
+
+    switch (nodePort.type) {
+      case "IF":
+      case "ELIF":
+        expression = nodePort.expression;
+        break;
+      case "ELSE":
+      case "DEFAULT":
+        expression = undefined;
+        break;
+      default:
+        assertUnreachable(nodePort);
+    }
 
     if (!expression) {
       return python.TypeInstantiation.none();

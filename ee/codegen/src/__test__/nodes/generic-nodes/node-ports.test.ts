@@ -22,11 +22,6 @@ describe("NodePorts", () => {
     beforeEach(async () => {
       const nodePortsData: NodePort[] = [
         {
-          type: "DEFAULT",
-          id: "port-1",
-          name: "default_port",
-        },
-        {
           type: "IF",
           id: "port-2",
           name: "if_port",
