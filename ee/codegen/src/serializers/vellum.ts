@@ -1868,8 +1868,8 @@ export const GenericNodeSerializer: ObjectSchema<
   trigger: NodeTriggerSerializer,
   ports: listSchema(NodePortSerializer),
   adornments: AdornmentNodeSerializer.optional(),
-  attributes: NodeAttributeSerializer,
-  outputs: NodeOutputSerializer,
+  attributes: listSchema(NodeAttributeSerializer),
+  outputs: listSchema(NodeOutputSerializer),
 });
 
 export declare namespace GenericNodeSerializer {
@@ -1885,8 +1885,8 @@ export declare namespace GenericNodeSerializer {
     trigger: NodeTriggerSerializer.Raw;
     ports: NodePortSerializer.Raw[];
     adornments?: AdornmentNodeSerializer.Raw | null;
-    attributes: NodeAttributeSerializer.Raw;
-    outputs: NodeOutputSerializer.Raw;
+    attributes: NodeAttributeSerializer.Raw[];
+    outputs: NodeOutputSerializer.Raw[];
   }
 }
 

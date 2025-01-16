@@ -1376,29 +1376,33 @@ export function genericNodeFactory(
         name: "default-port",
       },
     ],
-    attributes: {
-      id: "attr-1",
-      name: "default-attribute",
-      value: {
-        type: "CONSTANT_VALUE",
-        data: {
-          type: "STRING",
-          value: "default-value",
+    attributes: [
+      {
+        id: "attr-1",
+        name: "default-attribute",
+        value: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "default-value",
+          },
         },
       },
-    },
-    outputs: {
-      id: "output-1",
-      name: "output",
-      type: "STRING",
-      value: {
-        type: "CONSTANT_VALUE",
-        data: {
-          type: "STRING",
-          value: "default-value",
+    ],
+    outputs: [
+      {
+        id: "output-1",
+        name: "output",
+        type: "STRING",
+        value: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "default-value",
+          },
         },
       },
-    },
+    ],
   };
   return nodeData;
 }

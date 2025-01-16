@@ -667,8 +667,8 @@ export interface GenericNode extends BaseWorkflowNode {
   trigger: NodeTrigger;
   ports: NodePort[];
   adornments?: AdornmentNode;
-  attributes: NodeAttribute;
-  outputs: NodeOutput;
+  attributes: NodeAttribute[];
+  outputs: NodeOutput[];
 }
 
 export type WorkflowDataNode =
