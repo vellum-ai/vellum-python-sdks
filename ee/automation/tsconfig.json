@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "lib",
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "isolatedModules": true,
+    "baseUrl": "./src",
+    "paths": {
+      "src/*": ["*"]
+    },
+    "declaration": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "types": ["node"]
+  },
+  "include": ["./src/**/*"],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
+}
