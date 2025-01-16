@@ -141,3 +141,17 @@ def test_templating_node__chat_history_output():
 
     # THEN the output is the expected chat history
     assert outputs.result == [ChatMessage(role="USER", text="Hello")]
+
+
+def test_templating_node__function_call_output():
+    # GIVEN a templating node that outputs a function call
+    class FunctionCallTemplateNode(TemplatingNode[BaseState, FunctionCall]):
+        template = '{"name": "test", "arguments": {"key": "value"}}'
+        inputs = {}
+
+    # WHEN the node is run
+    node = FunctionCallTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected function call
+    assert outputs.result == FunctionCall(name="test", arguments={"key": "value"})
