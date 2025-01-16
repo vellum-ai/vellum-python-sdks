@@ -73,6 +73,7 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
         original_base = get_original_base(self.__class__)
         all_args = get_args(original_base)
 
+        output_type: Any
         if len(all_args) < 2 or isinstance(all_args[1], TypeVar):
             output_type = str
         else:
@@ -110,6 +111,14 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
                 return json.loads(rendered_template)
             except json.JSONDecodeError:
                 raise ValueError("Invalid JSON format for rendered_template")
+
+        if issubclass(output_type, BaseModel):
+            try:
+                data = json.loads(rendered_template)
+            except json.JSONDecodeError:
+                raise ValueError("Invalid JSON format for rendered_template")
+
+            return output_type.model_validate(data)
 
         raise ValueError(f"Unsupported output type: {output_type}")
 
