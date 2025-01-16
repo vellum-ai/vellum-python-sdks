@@ -7531,6 +7531,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/MLModelUsage'
           nullable: true
+        cost:
+          allOf:
+          - $ref: '#/components/schemas/Price'
+          nullable: true
+        model_name:
+          type: string
+          nullable: true
     PromptNodeResult:
       type: object
       description: A Node Result Event emitted from a Prompt Node.
@@ -11332,6 +11339,16 @@ components:
           nullable: true
           description: If enabled, the Prompt Node FULFILLED events will include model
             host usage tracking. This may increase latency for some model hosts.
+        cost:
+          type: boolean
+          nullable: true
+          description: If enabled, the Prompt Node FULFILLED events will include model
+            host cost tracking. This may increase latency for some model hosts.
+        model_name:
+          type: boolean
+          nullable: true
+          description: If enabled,  the Prompt Node FULFILLED events will include
+            model host name
     WorkflowNodeResultData:
       oneOf:
       - $ref: '#/components/schemas/PromptNodeResult'
