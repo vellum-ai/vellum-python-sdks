@@ -1,5 +1,7 @@
 import json
-from typing import Any, Callable, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, Union, get_args
+from typing import Any, Callable, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, Union, get_args, get_origin
+
+from pydantic import BaseModel
 
 from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS
 from vellum.utils.templating.exceptions import JinjaTemplateError
@@ -87,6 +89,21 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
 
         if output_type is bool:
             return bool(rendered_template)
+
+        if get_origin(output_type) is list:
+            try:
+                data = json.loads(rendered_template)
+            except json.JSONDecodeError:
+                raise ValueError("Invalid JSON Array format for rendered_template")
+
+            if not isinstance(data, list):
+                raise ValueError(f"Expected a list of items for rendered_template, received {data.__class__.__name__}")
+
+            inner_type = get_args(output_type)[0]
+            if issubclass(inner_type, BaseModel):
+                return [inner_type.model_validate(item) for item in data]
+            else:
+                return data
 
         if output_type is Json:
             try:
