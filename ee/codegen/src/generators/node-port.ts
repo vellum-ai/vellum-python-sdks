@@ -9,7 +9,7 @@ import {
   WorkflowValueDescriptor,
 } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
-import { assertUnreachable } from "src/utils/typing";
+import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace NodePorts {
   export interface Args {
@@ -22,21 +22,43 @@ export declare namespace NodePorts {
 export class NodePorts extends AstNode {
   private nodeContext: GenericNodeContext;
   private workflowContext: WorkflowContext;
-  private astNode: AstNode;
+  private astNode: AstNode | undefined = undefined;
 
   public constructor(args: NodePorts.Args) {
     super();
 
     this.nodeContext = args.nodeContext;
     this.workflowContext = args.workflowContext;
-    this.astNode = this.constructNodePorts(args.nodePorts);
+    const nodePorts = this.constructNodePorts(args.nodePorts);
+
+    if (nodePorts) {
+      this.astNode = nodePorts;
+    }
   }
 
-  private constructNodePorts(nodePorts: NodePortType[]): AstNode {
+  private constructNodePorts(nodePorts: NodePortType[]): AstNode | undefined {
     const baseNodeClassNameAlias =
       this.nodeContext.baseNodeClassName === this.nodeContext.nodeClassName
         ? `Base${this.nodeContext.baseNodeClassName}`
         : undefined;
+
+    const fields: AstNode[] = [];
+
+    nodePorts.forEach((port) => {
+      const portExpression = this.generateNodePortExpression(port);
+      if (portExpression) {
+        fields.push(
+          python.field({
+            name: toPythonSafeSnakeCase(port.name),
+            initializer: portExpression,
+          })
+        );
+      }
+    });
+
+    if (isNilOrEmpty(fields)) {
+      return undefined;
+    }
 
     const clazz = python.class_({
       name: "Ports",
@@ -50,23 +72,15 @@ export class NodePorts extends AstNode {
       ],
     });
 
-    nodePorts.forEach((port) => {
-      const portExpression = this.generateNodePortExpression(port);
-      if (portExpression) {
-        clazz.add(
-          python.field({
-            name: toPythonSafeSnakeCase(port.name),
-            initializer: portExpression,
-          })
-        );
-      }
-    });
+    fields.forEach((field) => clazz.add(field));
 
     return clazz;
   }
 
   write(writer: Writer): void {
-    this.astNode.write(writer);
+    if (this.astNode) {
+      this.astNode.write(writer);
+    }
   }
 
   private getPortAttribute(type: NodePortType["type"]): string | undefined {
