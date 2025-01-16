@@ -3709,6 +3709,8 @@ types:
       the request opted into with `expand_meta`.
     properties:
       usage: optional<MlModelUsage>
+      cost: optional<Price>
+      model_name: optional<string>
     source:
       openapi: openapi/openapi.yml
   PromptNodeResult:
@@ -6265,6 +6267,16 @@ types:
         docs: >-
           If enabled, the Prompt Node FULFILLED events will include model host
           usage tracking. This may increase latency for some model hosts.
+      cost:
+        type: optional<boolean>
+        docs: >-
+          If enabled, the Prompt Node FULFILLED events will include model host
+          cost tracking. This may increase latency for some model hosts.
+      model_name:
+        type: optional<boolean>
+        docs: >-
+          If enabled,  the Prompt Node FULFILLED events will include model host
+          name
     source:
       openapi: openapi/openapi.yml
   WorkflowNodeResultData:
