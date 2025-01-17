@@ -460,11 +460,15 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         }
         display_meta["node_displays"] = {}
         for node in node_displays:
-            outputs = node_displays[node].output_display
+            current_node = node_displays[node]
+            outputs = current_node.output_display
             node_display_meta = {}
             for output in outputs:
                 node_display_meta[output.name] = outputs[output].__dict__  # type: ignore[attr-defined]
-            display_meta["node_displays"][node] = {**node_display_meta, **node_displays[node].__dict__}
+            display_meta["node_displays"][node] = {
+                "node_inputs_by_name": current_node.node_input_ids_by_name,
+                "output_display": node_display_meta,
+            }
 
         return display_meta
 
