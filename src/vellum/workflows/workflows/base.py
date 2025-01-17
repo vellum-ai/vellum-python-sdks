@@ -433,7 +433,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
     @staticmethod
     def gather_display_meta(
         display_class: Type[BaseWorkflowDisplay], workflow_class: Type["BaseWorkflow"]
-    ) -> Dict[str, Any]:
+    ) -> Dict[Any, Any]:
         display_context = display_class(workflow_class).display_context
         display_meta = {}
         temp_outputs = {
@@ -455,13 +455,15 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             global_workflow_input.name: display_context.global_workflow_input_displays[global_workflow_input].__dict__
             for global_workflow_input in display_context.global_workflow_input_displays
         }
-        node_displays = {node.__id__: display_context.node_displays[node] for node in display_context.node_displays}
+        node_displays = {
+            str(node.__id__): display_context.node_displays[node] for node in display_context.node_displays
+        }
         display_meta["node_displays"] = {}
         for node in node_displays:
             outputs = node_displays[node].output_display
             node_display_meta = {}
             for output in outputs:
-                node_display_meta[output.name] = outputs[output].__dict__
+                node_display_meta[output.name] = outputs[output].__dict__  # type: ignore[attr-defined]
             display_meta["node_displays"][node] = {**node_display_meta, **node_displays[node].__dict__}
 
         return display_meta
