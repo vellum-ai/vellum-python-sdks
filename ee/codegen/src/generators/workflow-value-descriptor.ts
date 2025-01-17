@@ -10,7 +10,10 @@ import {
 } from "src/generators/errors";
 import { Expression } from "src/generators/expression";
 import { NodeInputValuePointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/node-input-value-pointer-rule";
-import { WorkflowValueDescriptor as WorkflowValueDescriptorType } from "src/types/vellum";
+import {
+  OperatorMapping,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
+} from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
 export namespace WorkflowValueDescriptor {
@@ -47,7 +50,7 @@ export class WorkflowValueDescriptor extends AstNode {
     workflowValueDescriptor: WorkflowValueDescriptorType
   ): AstNode {
     // Base case
-    if (this.isPointer(workflowValueDescriptor)) {
+    if (this.isReference(workflowValueDescriptor)) {
       return new NodeInputValuePointerRule({
         workflowContext: this.workflowContext,
         nodeInputValuePointerRuleData: workflowValueDescriptor,
@@ -92,12 +95,10 @@ export class WorkflowValueDescriptor extends AstNode {
 
   private convertOperatorType(
     workflowValueDescriptor: WorkflowValueDescriptorType
-  ): string {
+  ): OperatorMapping {
     if (this.isExpression(workflowValueDescriptor)) {
       const operator = workflowValueDescriptor.operator;
-
-      const isNodeOutput = workflowValueDescriptor.lhs.type === "NODE_OUTPUT";
-      const operatorMappings: { [key: string]: string } = {
+      const operatorMappings: Record<string, OperatorMapping> = {
         "=": "equals",
         "!=": "does_not_equal",
         "<": "less_than",
@@ -110,8 +111,8 @@ export class WorkflowValueDescriptor extends AstNode {
         doesNotContain: "does_not_contain",
         doesNotBeginWith: "does_not_begin_with",
         doesNotEndWith: "does_not_end_with",
-        null: isNodeOutput ? "is_nil" : "is_null",
-        notNull: isNodeOutput ? "is_not_nil" : "is_not_null",
+        null: "is_null",
+        notNull: "is_not_null",
         in: "in",
         notIn: "not_in",
         between: "between",
@@ -139,7 +140,7 @@ export class WorkflowValueDescriptor extends AstNode {
     );
   }
 
-  private isPointer(workflowValueDescriptor: WorkflowValueDescriptorType) {
+  private isReference(workflowValueDescriptor: WorkflowValueDescriptorType) {
     return (
       workflowValueDescriptor.type === "NODE_OUTPUT" ||
       workflowValueDescriptor.type === "INPUT_VARIABLE" ||

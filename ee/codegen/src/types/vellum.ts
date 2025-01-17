@@ -777,3 +777,23 @@ export interface AdornmentNode {
   base: CodeResourceDefinition;
   attributes: NodeAttribute[];
 }
+
+export type OperatorMapping =
+  | "equals"
+  | "does_not_equal"
+  | "less_than"
+  | "greater_than"
+  | "less_than_or_equal_to"
+  | "greater_than_or_equal_to"
+  | "contains"
+  | "begins_with"
+  | "ends_with"
+  | "does_not_contain"
+  | "does_not_begin_with"
+  | "does_not_end_with"
+  | "is_null"
+  | "is_not_null"
+  | "in"
+  | "not_in"
+  | "between"
+  | "not_between";
