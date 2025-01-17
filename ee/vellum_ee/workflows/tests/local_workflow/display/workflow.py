@@ -1,0 +1,58 @@
+from uuid import UUID
+
+from vellum_ee.workflows.display.vellum import (
+    EdgeVellumDisplayOverrides,
+    EntrypointVellumDisplayOverrides,
+    NodeDisplayData,
+    NodeDisplayPosition,
+    WorkflowDisplayData,
+    WorkflowDisplayDataViewport,
+    WorkflowInputsVellumDisplayOverrides,
+    WorkflowMetaVellumDisplayOverrides,
+    WorkflowOutputVellumDisplayOverrides,
+)
+from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+
+from ..inputs import Inputs
+from ..nodes.final_output import FinalOutput
+from ..nodes.templating_node import TemplatingNode
+from ..workflow import Workflow
+
+
+class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+    workflow_display = WorkflowMetaVellumDisplayOverrides(
+        entrypoint_node_id=UUID("0bf86989-13f2-438c-ab9c-d172e5771d31"),
+        entrypoint_node_source_handle_id=UUID("23448f09-81ad-4378-abbd-1cccff350627"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=1545, y=330), width=124, height=48),
+        display_data=WorkflowDisplayData(
+            viewport=WorkflowDisplayDataViewport(x=-1137.2395104895104, y=110.60314685314688, zoom=0.7779720279720279)
+        ),
+    )
+    inputs_display = {
+        Inputs.input_value: WorkflowInputsVellumDisplayOverrides(
+            id=UUID("2268a996-bd17-4832-b3ff-f5662d54b306"), name="input-value", required=True
+        )
+    }
+    entrypoint_displays = {
+        TemplatingNode: EntrypointVellumDisplayOverrides(
+            id=UUID("0bf86989-13f2-438c-ab9c-d172e5771d31"),
+            edge_display=EdgeVellumDisplayOverrides(id=UUID("38532a0e-9432-4ed2-8a34-48a29fd6984d")),
+        )
+    }
+    edge_displays = {
+        (TemplatingNode.Ports.default, FinalOutput): EdgeVellumDisplayOverrides(
+            id=UUID("417c56a4-cdc1-4f9d-a10c-b535163f51e8")
+        )
+    }
+    output_displays = {
+        Workflow.Outputs.final_output: WorkflowOutputVellumDisplayOverrides(
+            id=UUID("5469b810-6ea6-4362-9e79-e360d44a1405"),
+            node_id=UUID("f3ef4b2b-fec9-4026-9cc6-e5eac295307f"),
+            node_input_id=UUID("fe6cba85-2423-4b5e-8f85-06311a8be5fb"),
+            name="final-output",
+            label="Final Output",
+            target_handle_id=UUID("3ec34f6e-da48-40d5-a65b-a48fefa75763"),
+            display_data=NodeDisplayData(position=NodeDisplayPosition(x=2750, y=210), width=459, height=234),
+            edge_id=UUID("417c56a4-cdc1-4f9d-a10c-b535163f51e8"),
+        )
+    }
