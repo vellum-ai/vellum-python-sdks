@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WorkflowValueDescriptor > expressions > generates binary expression with nested workflow value descriptors 1`] = `
+"TestNode.Outputs.my_output.equals("expected-value").equals("another-expected-value")
+"
+`;
+
+exports[`WorkflowValueDescriptor > expressions > generates binary expression with node output and constant 1`] = `
+"TestNode.Outputs.my_output.equals("expected-value")
+"
+`;
+
+exports[`WorkflowValueDescriptor > expressions > generates ternary expression with input variables 1`] = `
+"Inputs.count.between(1, 10)
+"
+`;
+
+exports[`WorkflowValueDescriptor > expressions > generates unary expression with input variable 1`] = `
+"Inputs.count.is_null()
+"
+`;
