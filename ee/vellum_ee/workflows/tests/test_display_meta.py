@@ -45,10 +45,10 @@ def test_base_class_dynamic_import(files):
             }
         },
         "node_displays": {
-            UUID("533c6bd8-6088-4abc-a168-8c1758abcd33"): {
+            "533c6bd8-6088-4abc-a168-8c1758abcd33": {
                 "result": {"id": UUID("423bc529-1a1a-4f72-af4d-cbdb5f0a5929"), "name": "result"}
             },
-            UUID("f3ef4b2b-fec9-4026-9cc6-e5eac295307f"): {
+            "f3ef4b2b-fec9-4026-9cc6-e5eac295307f": {
                 "value": {"id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"), "name": "value"}
             },
         },
