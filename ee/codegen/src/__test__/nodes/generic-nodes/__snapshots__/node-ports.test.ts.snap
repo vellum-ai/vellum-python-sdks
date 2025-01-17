@@ -2,7 +2,19 @@
 
 exports[`NodePorts > basic > generates correct ports class 1`] = `
 "class Ports(BaseNode.Ports):
-    if_port = Port.on_if(None)
+    if_port = Port.on_if(Inputs.count.is_null())
+    else_port = Port.on_else(None)
+"
+`;
+
+exports[`NodePorts > basic with nested expression in port > generates correct ports class 1`] = `
+"class Ports(BaseNode.Ports):
+    if_port = Port.on_if(Inputs.count.is_null())
+    elif_port = Port.on_elif(
+        TestNode.Outputs.my_output.equals("expected-value").equals(
+            "another-expected-value"
+        )
+    )
     else_port = Port.on_else(None)
 "
 `;

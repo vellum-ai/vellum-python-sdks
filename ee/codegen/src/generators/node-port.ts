@@ -4,9 +4,10 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   NodePort as NodePortType,
-  WorkflowValueDescriptor,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
@@ -33,6 +34,7 @@ export class NodePorts extends AstNode {
 
     if (nodePorts) {
       this.astNode = nodePorts;
+      this.inheritReferences(this.astNode);
     }
   }
 
@@ -115,9 +117,8 @@ export class NodePorts extends AstNode {
     });
   }
 
-  // TODO: Fill this method in a fast follow
   private buildDescriptor(nodePort: NodePortType): AstNode {
-    let expression: WorkflowValueDescriptor | undefined;
+    let expression: WorkflowValueDescriptorType | undefined;
 
     switch (nodePort.type) {
       case "IF":
@@ -135,18 +136,9 @@ export class NodePorts extends AstNode {
     if (!expression) {
       return python.TypeInstantiation.none();
     }
-    switch (expression.type) {
-      case "UNARY_EXPRESSION":
-      case "BINARY_EXPRESSION":
-      case "TERNARY_EXPRESSION":
-      case "NODE_OUTPUT":
-      case "INPUT_VARIABLE":
-      case "CONSTANT_VALUE":
-      case "WORKSPACE_SECRET":
-      case "EXECUTION_COUNTER":
-        return python.TypeInstantiation.none();
-      default:
-        assertUnreachable(expression);
-    }
+    return new WorkflowValueDescriptor({
+      workflowValueDescriptor: expression,
+      workflowContext: this.workflowContext,
+    });
   }
 }
