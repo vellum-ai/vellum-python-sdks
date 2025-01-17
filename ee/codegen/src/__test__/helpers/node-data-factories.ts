@@ -1388,6 +1388,16 @@ export function genericNodeFactory(
           },
         },
       },
+      {
+        id: "attr-2",
+        name: "default-attribute-2",
+        value: {
+          type: "INPUT_VARIABLE",
+          data: {
+            inputVariableId: "input-1",
+          },
+        },
+      },
     ],
     outputs: [
       {

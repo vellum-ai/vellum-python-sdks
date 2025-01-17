@@ -2,10 +2,13 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
+import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
+import {BaseNodeContext} from "src/context/node-context/base";
+import {WorkflowDataNode} from "src/types/vellum";
 
 describe("GenericNode", () => {
   let workflowContext: WorkflowContext;
@@ -15,6 +18,17 @@ describe("GenericNode", () => {
   beforeEach(() => {
     workflowContext = workflowContextFactory();
     writer = new Writer();
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "input-1",
+          key: "count",
+          type: "NUMBER",
+        },
+        workflowContext,
+      })
+    );
   });
 
   describe("basic", () => {

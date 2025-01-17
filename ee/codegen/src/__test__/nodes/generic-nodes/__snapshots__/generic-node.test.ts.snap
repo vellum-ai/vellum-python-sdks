@@ -16,9 +16,13 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
 
 exports[`GenericNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import BaseNode
+from ..inputs import Inputs
 
 
 class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.count
+
     class NodeTrigger(BaseNode.Trigger):
         merge_behavior = "AWAIT_ALL"
 "
