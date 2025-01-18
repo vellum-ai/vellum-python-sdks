@@ -3,6 +3,7 @@ from functools import lru_cache
 import importlib
 import inspect
 from threading import Event as ThreadingEvent
+from types import ModuleType
 from uuid import UUID, uuid4
 from typing import (
     Any,
@@ -72,7 +73,6 @@ from vellum.workflows.types.generics import StateType, WorkflowInputsType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
-from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 
 class _BaseWorkflowMeta(type):
@@ -431,70 +431,10 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         return most_recent_state_snapshot
 
     @staticmethod
-    def gather_display_meta(
-        display_class: Type[BaseWorkflowDisplay], workflow_class: Type["BaseWorkflow"]
-    ) -> Dict[Any, Any]:
-        display_context = display_class(workflow_class).display_context
-        display_meta = {}
-        temp_outputs = {
-            output.name: display_context.workflow_output_displays[output].__dict__
-            for output in display_context.workflow_output_displays
-        }
-        for output in temp_outputs:
-            temp_outputs[output].pop("display_data")
-        display_meta["workflow_outputs"] = temp_outputs
-        display_meta["workflow_inputs"] = {
-            input.name: display_context.workflow_input_displays[input].__dict__
-            for input in display_context.workflow_input_displays
-        }
-        display_meta["global_node_output_displays"] = {
-            node_output.name: display_context.global_node_output_displays[node_output][1].__dict__
-            for node_output in display_context.global_node_output_displays
-        }
-        display_meta["global_workflow_input_displays"] = {
-            global_workflow_input.name: display_context.global_workflow_input_displays[global_workflow_input].__dict__
-            for global_workflow_input in display_context.global_workflow_input_displays
-        }
-        node_displays = {
-            str(node.__id__): display_context.node_displays[node] for node in display_context.node_displays
-        }
-        display_meta["node_displays"] = {}
-        for node in node_displays:
-            current_node = node_displays[node]
-            outputs = current_node.output_display
-            node_display_meta = {}
-            for output in outputs:
-                node_display_meta[output.name] = outputs[output].__dict__  # type: ignore[attr-defined]
-            display_meta["node_displays"][node] = {
-                "node_inputs_by_name": current_node.node_input_ids_by_name,
-                "output_display": node_display_meta,
-            }
-
-        return display_meta
-
-    @staticmethod
-    def get_workflow_display(module_path: str) -> Union[Type[BaseWorkflowDisplay], None]:
+    def get_workflow_display(module_path: str) -> Union[ModuleType, None]:
         workflow_display_module = f"{module_path}.display.workflow"
         try:
-            module = importlib.import_module(workflow_display_module)
-            workflow_displays: List[Type[BaseWorkflowDisplay]] = []
-            for name in dir(module):
-                if name.startswith("__"):
-                    continue
-
-                attr = getattr(module, name)
-                if (
-                    inspect.isclass(attr)
-                    and issubclass(attr, BaseWorkflowDisplay)
-                    and attr != BaseWorkflowDisplay
-                    and attr.__module__ == workflow_display_module
-                ):
-                    workflow_displays.append(attr)
-            if len(workflow_displays) == 0:
-                raise ValueError(f"No workflows found in {module_path}")
-            elif len(workflow_displays) > 1:
-                raise ValueError(f"Multiple workflows found in {module_path}")
-            return workflow_displays[0]
+            return importlib.import_module(workflow_display_module)
         except ModuleNotFoundError:
             return None
 

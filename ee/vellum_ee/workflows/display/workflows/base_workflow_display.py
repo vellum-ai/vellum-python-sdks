@@ -5,6 +5,7 @@ import logging
 from uuid import UUID
 from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, get_args
 
+from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
@@ -29,7 +30,7 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
+from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext, WorkflowDisplayMeta
 
 logger = logging.getLogger(__name__)
 
@@ -333,3 +334,9 @@ class BaseWorkflowDisplay(
 
         workflow_class = get_args(cls.__orig_bases__[0])[0]  # type: ignore [attr-defined]
         cls._workflow_display_registry[workflow_class] = cls
+
+    @staticmethod
+    def gather_display_meta(
+        display_class: Type["BaseWorkflowDisplay"], workflow_class: Type[BaseWorkflow]
+    ) -> WorkflowDisplayMeta:
+        return display_class(workflow_class).display_context.build_meta()

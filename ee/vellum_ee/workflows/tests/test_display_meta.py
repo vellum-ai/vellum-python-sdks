@@ -4,6 +4,7 @@ import sys
 from uuid import UUID, uuid4
 
 from vellum.workflows import BaseWorkflow
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
 
@@ -28,8 +29,8 @@ def test_base_class_dynamic_import(files):
     sys.meta_path.append(VirtualFileFinder(files, namespace))
 
     Workflow = BaseWorkflow.load_from_module(namespace)
-    WorkflowDisplay = BaseWorkflow.get_workflow_display(namespace)
-    display_meta = BaseWorkflow.gather_display_meta(WorkflowDisplay, Workflow) if WorkflowDisplay else {}
+    display = BaseWorkflow.get_workflow_display(namespace)
+    display_meta = BaseWorkflowDisplay.gather_display_meta(display.WorkflowDisplay, Workflow)
 
     expected_result = {
         "global_node_output_displays": {
@@ -67,6 +68,7 @@ def test_base_class_dynamic_import(files):
         },
         "workflow_outputs": {
             "final_output": {
+                "display_data": {"height": 234, "position": {"x": 2750.0, "y": 210.0}, "width": 459},
                 "edge_id": UUID("417c56a4-cdc1-4f9d-a10c-b535163f51e8"),
                 "id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"),
                 "label": "Final Output",
@@ -77,4 +79,5 @@ def test_base_class_dynamic_import(files):
             }
         },
     }
-    assert display_meta == expected_result
+    assert display_meta
+    assert display_meta.dict() == expected_result
