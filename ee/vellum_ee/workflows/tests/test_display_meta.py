@@ -30,6 +30,8 @@ def test_base_class_dynamic_import(files):
 
     Workflow = BaseWorkflow.load_from_module(namespace)
     display = BaseWorkflow.get_workflow_display(namespace)
+    assert display
+
     display_meta = BaseWorkflowDisplay.gather_display_meta(display.WorkflowDisplay, Workflow)
 
     expected_result = {

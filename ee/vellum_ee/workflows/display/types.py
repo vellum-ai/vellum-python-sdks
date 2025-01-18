@@ -92,7 +92,7 @@ class WorkflowDisplayContext(
             for output in outputs:
                 node_display_meta[output.name] = outputs[output]  # type: ignore[attr-defined]
             temp_node_displays[node] = {
-                "node_inputs_by_name": current_node.node_input_ids_by_name,
+                "node_inputs_by_name": current_node.node_input_ids_by_name,  # type: ignore[attr-defined]
                 "output_display": node_display_meta,
             }
         display_meta = WorkflowDisplayMeta(
