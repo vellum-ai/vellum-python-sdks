@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NodeOutput > basic > generates output class with number type 1`] = `
+"class Outputs(BaseNode.Outputs):
+    output: float
+"
+`;
+
+exports[`NodeOutput > node output reference > generates correct output class with node output reference 1`] = `
+"class Outputs(BaseNode.Outputs):
+    output: str = TestNode.Outputs.my_output
+"
+`;
+
+exports[`NodeOutput > workflow input output > generates correct output class with workflow input reference 1`] = `
+"class Outputs(BaseNode.Outputs):
+    output: str = None
+"
+`;

@@ -25,6 +25,9 @@ class MyCustomNode(BaseNode):
 
     class NodeTrigger(BaseNode.Trigger):
         merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output: str = "default-value"
 "
 `;
 
@@ -52,5 +55,8 @@ class MyCustomNode(BaseNode):
 
     class NodeTrigger(BaseNode.Trigger):
         merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output: str = "default-value"
 "
 `;
