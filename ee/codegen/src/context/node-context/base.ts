@@ -108,4 +108,12 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
 
     return toPythonSafeSnakeCase(nodeOutputName, "output");
   }
+
+  /**
+   * Extend this class to perform any additional property generation asynchronously
+   * after the node context has been created.
+   */
+  public buildProperties(): Promise<void> {
+    return Promise.resolve();
+  }
 }

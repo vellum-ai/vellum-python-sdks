@@ -54,11 +54,12 @@ describe("TextSearchNode", () => {
     beforeEach(async () => {
       const nodeData = searchNodeDataFactory();
 
-      const nodeContext = (await createNodeContext({
+      const nodeContext = createNodeContext({
         workflowContext,
         nodeData,
-      })) as TextSearchNodeContext;
+      }) as TextSearchNodeContext;
       workflowContext.addNodeContext(nodeContext);
+      await nodeContext.buildProperties();
 
       node = new SearchNode({
         workflowContext: workflowContext,
@@ -83,11 +84,12 @@ describe("TextSearchNode", () => {
         errorOutputId: "af589f73-effe-4a80-b48f-fb912ac6ce67",
       });
 
-      const nodeContext = (await createNodeContext({
+      const nodeContext = createNodeContext({
         workflowContext,
         nodeData,
-      })) as TextSearchNodeContext;
+      }) as TextSearchNodeContext;
       workflowContext.addNodeContext(nodeContext);
+      await nodeContext.buildProperties();
 
       node = new SearchNode({
         workflowContext: workflowContext,
@@ -219,11 +221,12 @@ describe("TextSearchNode", () => {
         },
       });
 
-      const nodeContext = (await createNodeContext({
+      const nodeContext = createNodeContext({
         workflowContext,
         nodeData,
-      })) as TextSearchNodeContext;
+      }) as TextSearchNodeContext;
       workflowContext.addNodeContext(nodeContext);
+      await nodeContext.buildProperties();
 
       node = new SearchNode({
         workflowContext: workflowContext,
@@ -254,11 +257,12 @@ describe("TextSearchNode", () => {
 
       const nodeData = searchNodeDataFactory();
 
-      const nodeContext = (await createNodeContext({
+      const nodeContext = createNodeContext({
         workflowContext,
         nodeData,
-      })) as TextSearchNodeContext;
+      }) as TextSearchNodeContext;
       workflowContext.addNodeContext(nodeContext);
+      await nodeContext.buildProperties();
 
       node = new SearchNode({
         workflowContext: workflowContext,

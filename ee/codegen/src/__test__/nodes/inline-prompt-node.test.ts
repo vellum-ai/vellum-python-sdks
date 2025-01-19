@@ -48,11 +48,12 @@ describe("InlinePromptNode", () => {
           blockType,
         });
 
-        const nodeContext = (await createNodeContext({
+        const nodeContext = createNodeContext({
           workflowContext,
           nodeData,
-        })) as InlinePromptNodeContext;
+        }) as InlinePromptNodeContext;
         workflowContext.addNodeContext(nodeContext);
+        await nodeContext.buildProperties();
 
         node = new InlinePromptNode({
           workflowContext,
@@ -78,11 +79,12 @@ describe("InlinePromptNode", () => {
           errorOutputId: "e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f",
         });
 
-        const nodeContext = (await createNodeContext({
+        const nodeContext = createNodeContext({
           workflowContext,
           nodeData,
-        })) as InlinePromptNodeContext;
+        }) as InlinePromptNodeContext;
         workflowContext.addNodeContext(nodeContext);
+        await nodeContext.buildProperties();
 
         node = new InlinePromptNode({
           workflowContext,
@@ -111,11 +113,12 @@ describe("InlinePromptNode", () => {
           "gpt-4o-mini"
         );
 
-        const nodeContext = (await createNodeContext({
+        const nodeContext = createNodeContext({
           workflowContext,
           nodeData,
-        })) as InlinePromptNodeContext;
+        }) as InlinePromptNodeContext;
         workflowContext.addNodeContext(nodeContext);
+        await nodeContext.buildProperties();
 
         node = new InlinePromptNode({
           workflowContext,

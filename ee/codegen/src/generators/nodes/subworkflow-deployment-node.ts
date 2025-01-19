@@ -21,6 +21,12 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
       );
     }
 
+    if (!this.nodeContext.workflowDeploymentHistoryItem) {
+      throw new NodeDefinitionGenerationError(
+        "Workflow Deployment History Item is not set"
+      );
+    }
+
     statements.push(
       python.field({
         name: "deployment",
@@ -60,6 +66,12 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
   }
 
   private generateOutputsClass(): python.Class {
+    if (!this.nodeContext.workflowDeploymentHistoryItem) {
+      throw new NodeDefinitionGenerationError(
+        "Workflow Deployment History Item is not set"
+      );
+    }
+
     const nodeBaseClassRef = this.getNodeBaseClass();
     const outputsClass = python.class_({
       name: OUTPUTS_CLASS_NAME,
@@ -117,6 +129,12 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
   }
 
   protected getOutputDisplay(): python.Field {
+    if (!this.nodeContext.workflowDeploymentHistoryItem) {
+      throw new NodeDefinitionGenerationError(
+        "Workflow Deployment History Item is not set"
+      );
+    }
+
     return python.field({
       name: "output_display",
       initializer: python.TypeInstantiation.dict(
