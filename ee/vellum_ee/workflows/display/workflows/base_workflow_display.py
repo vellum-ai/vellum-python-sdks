@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from copy import copy
 from functools import cached_property
+import importlib
 import logging
 from uuid import UUID
-from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, get_args
+from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, Union, get_args
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -336,7 +337,10 @@ class BaseWorkflowDisplay(
         cls._workflow_display_registry[workflow_class] = cls
 
     @staticmethod
-    def gather_display_meta(
-        display_class: Type["BaseWorkflowDisplay"], workflow_class: Type[BaseWorkflow]
-    ) -> WorkflowDisplayMeta:
-        return display_class(workflow_class).display_context.build_meta()
+    def gather_display_meta(module_path: str, workflow_class: Type[BaseWorkflow]) -> Union[WorkflowDisplayMeta, None]:
+        workflow_display_module = f"{module_path}.display.workflow"
+        try:
+            display_class = importlib.import_module(workflow_display_module)
+        except ModuleNotFoundError:
+            return None
+        return display_class.WorkflowDisplay(workflow_class).display_context.build_meta()

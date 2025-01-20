@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, Generic, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Dict, Generic, Tuple, Type, TypeVar
 
 from vellum.client.core import UniversalBaseModel
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -14,7 +14,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplayType,
     WorkflowOutputDisplayType,
 )
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplay, WorkflowOutputVellumDisplay
 
 if TYPE_CHECKING:
@@ -25,20 +25,16 @@ NodeDisplayType = TypeVar("NodeDisplayType", bound="BaseNodeDisplay")
 WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
 
 
-class Identifiers(UniversalBaseModel):
-    id: UUID
-    name: str
-
-
 class NodeDisplay(UniversalBaseModel):
-    node_inputs_by_name: Dict[str, UUID]
-    output_display: Dict[str, Identifiers]
+    input_display: Dict[str, UUID]
+    output_display: Dict[str, NodeOutputDisplay]
+    port_display: Dict[str, PortDisplayOverrides]
 
 
 class WorkflowDisplayMeta(UniversalBaseModel):
     global_node_output_displays: Dict[str, NodeOutputDisplay]
     global_workflow_input_displays: Dict[str, WorkflowInputsVellumDisplay]
-    node_displays: Dict[str, Any]
+    node_displays: Dict[str, NodeDisplay]
     workflow_inputs: Dict[str, WorkflowInputsVellumDisplay]
     workflow_outputs: Dict[str, WorkflowOutputVellumDisplay]
 
@@ -90,11 +86,17 @@ class WorkflowDisplayContext(
             outputs = current_node.output_display
             node_display_meta = {}
             for output in outputs:
-                node_display_meta[output.name] = outputs[output]  # type: ignore[attr-defined]
-            temp_node_displays[node] = {
-                "node_inputs_by_name": current_node.node_input_ids_by_name,  # type: ignore[attr-defined]
-                "output_display": node_display_meta,
-            }
+                node_display_meta[output.name] = outputs[output]
+            ports = current_node.port_displays
+            port_display_meta = {}
+            for port in ports:
+                port_display_meta[port.name] = ports[port]
+
+            temp_node_displays[node] = NodeDisplay(
+                input_display=current_node.node_input_ids_by_name,  # type: ignore[attr-defined]
+                output_display=node_display_meta,
+                port_display=port_display_meta,
+            )
         display_meta = WorkflowDisplayMeta(
             workflow_outputs=workflow_outputs,
             workflow_inputs=workflow_inputs,

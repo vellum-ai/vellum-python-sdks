@@ -29,10 +29,7 @@ def test_base_class_dynamic_import(files):
     sys.meta_path.append(VirtualFileFinder(files, namespace))
 
     Workflow = BaseWorkflow.load_from_module(namespace)
-    display = BaseWorkflow.get_workflow_display(namespace)
-    assert display
-
-    display_meta = BaseWorkflowDisplay.gather_display_meta(display.WorkflowDisplay, Workflow)
+    display_meta = BaseWorkflowDisplay.gather_display_meta(namespace, Workflow)
 
     expected_result = {
         "global_node_output_displays": {
@@ -49,15 +46,17 @@ def test_base_class_dynamic_import(files):
         },
         "node_displays": {
             "533c6bd8-6088-4abc-a168-8c1758abcd33": {
-                "node_inputs_by_name": {
+                "input_display": {
                     "example_var_1": UUID("a0d1d7cf-242a-4bd9-a437-d308a7ced9b3"),
                     "template": UUID("f97d721a-e685-498e-90c3-9c3d9358fdad"),
                 },
                 "output_display": {"result": {"id": UUID("423bc529-1a1a-4f72-af4d-cbdb5f0a5929"), "name": "result"}},
+                "port_display": {"default": {"id": UUID("afda9a19-0618-42e1-9b63-5d0db2a88f62")}},
             },
             "f3ef4b2b-fec9-4026-9cc6-e5eac295307f": {
-                "node_inputs_by_name": {"node_input": UUID("fe6cba85-2423-4b5e-8f85-06311a8be5fb")},
+                "input_display": {"node_input": UUID("fe6cba85-2423-4b5e-8f85-06311a8be5fb")},
                 "output_display": {"value": {"id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"), "name": "value"}},
+                "port_display": {},
             },
         },
         "workflow_inputs": {

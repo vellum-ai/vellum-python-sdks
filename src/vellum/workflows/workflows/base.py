@@ -3,7 +3,6 @@ from functools import lru_cache
 import importlib
 import inspect
 from threading import Event as ThreadingEvent
-from types import ModuleType
 from uuid import UUID, uuid4
 from typing import (
     Any,
@@ -429,14 +428,6 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             return self.get_default_state()
 
         return most_recent_state_snapshot
-
-    @staticmethod
-    def get_workflow_display(module_path: str) -> Union[ModuleType, None]:
-        workflow_display_module = f"{module_path}.display.workflow"
-        try:
-            return importlib.import_module(workflow_display_module)
-        except ModuleNotFoundError:
-            return None
 
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
