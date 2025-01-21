@@ -73,10 +73,10 @@ class WorkflowDisplayContext(
         temp_node_displays = {}
         for node in node_displays:
             current_node = node_displays[node]
-            outputs = current_node.output_display
-            node_display_meta = {output.name: outputs[output].id for output in outputs}
-            ports = current_node.port_displays
-            port_display_meta = {port.name: ports[port].id for port in ports}
+            node_display_meta = {
+                output.name: current_node.output_display[output].id for output in current_node.output_display
+            }
+            port_display_meta = {port.name: current_node.port_displays[port].id for port in current_node.port_displays}
 
             temp_node_displays[node] = NodeDisplay(
                 input_display=current_node.node_input_ids_by_name,  # type: ignore[attr-defined]
