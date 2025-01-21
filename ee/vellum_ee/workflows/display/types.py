@@ -27,11 +27,8 @@ WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay"
 class OutputDisplay(UniversalBaseModel):
     id: UUID
     name: str
-    label: str
     node_id: UUID
     node_input_id: UUID
-    target_handle_id: UUID
-    edge_id: UUID
 
 
 class InputDisplay(UniversalBaseModel):
@@ -87,11 +84,8 @@ class WorkflowDisplayContext(
             workflow_outputs[output.name] = OutputDisplay(
                 id=current_output.id,  # type: ignore[attr-defined]
                 name=current_output.name,  # type: ignore[attr-defined]
-                label=current_output.label,  # type: ignore[attr-defined]
                 node_id=current_output.node_id,  # type: ignore[attr-defined]
                 node_input_id=current_output.node_input_id,  # type: ignore[attr-defined]
-                target_handle_id=current_output.target_handle_id,  # type: ignore[attr-defined]
-                edge_id=current_output.edge_id,  # type: ignore[attr-defined]
             )
         workflow_inputs = {}
         for input in self.workflow_input_displays:
