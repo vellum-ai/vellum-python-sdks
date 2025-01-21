@@ -75,7 +75,7 @@ class WorkflowDisplayContext(
             current_node = node_displays[node]
             input_display = {}
             if issubclass(current_node.__class__, BaseNodeVellumDisplay):
-                input_display = current_node.node_input_ids_by_name
+                input_display = current_node.node_input_ids_by_name  # type: ignore[attr-defined]
             node_display_meta = {
                 output.name: current_node.output_display[output].id for output in current_node.output_display
             }
