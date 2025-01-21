@@ -49,7 +49,6 @@ def test_base_class_dynamic_import(files):
         },
         "workflow_inputs": {
             "input_value": {
-                "color": None,
                 "id": UUID("2268a996-bd17-4832-b3ff-f5662d54b306"),
                 "name": "input-value",
                 "required": True,
@@ -57,7 +56,6 @@ def test_base_class_dynamic_import(files):
         },
         "workflow_outputs": {
             "final_output": {
-                "display_data": {"height": 234, "position": {"x": 2750.0, "y": 210.0}, "width": 459},
                 "edge_id": UUID("417c56a4-cdc1-4f9d-a10c-b535163f51e8"),
                 "id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"),
                 "label": "Final Output",
