@@ -27,7 +27,7 @@ class MyCustomNode(BaseNode):
         merge_behavior = "AWAIT_ALL"
 
     class Outputs(BaseNode.Outputs):
-        output: str = "default-value"
+        output = "default-value"
 "
 `;
 
@@ -57,6 +57,6 @@ class MyCustomNode(BaseNode):
         merge_behavior = "AWAIT_ALL"
 
     class Outputs(BaseNode.Outputs):
-        output: str = "default-value"
+        output = "default-value"
 "
 `;

@@ -2,11 +2,12 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
+import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
-import { NodeOutput } from "src/generators/node-output";
+import { NodeOutputs } from "src/generators/node-outputs";
 import {
   NodeOutput as NodeOutputType,
   WorkflowDataNode,
@@ -15,7 +16,7 @@ import {
 describe("NodeOutput", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
-  let nodeOutput: NodeOutput;
+  let nodeOutput: NodeOutputs;
 
   beforeEach(() => {
     workflowContext = workflowContextFactory();
@@ -42,7 +43,7 @@ describe("NodeOutput", () => {
       })) as GenericNodeContext;
       workflowContext.addNodeContext(nodeContext);
 
-      nodeOutput = new NodeOutput({
+      nodeOutput = new NodeOutputs({
         nodeOutputs: nodeOutputData,
         nodeContext,
         workflowContext,
@@ -65,7 +66,7 @@ describe("NodeOutput", () => {
           value: {
             type: "INPUT_VARIABLE",
             data: {
-              inputVariableId: "some-uuid",
+              inputVariableId: "some-id",
             },
           },
         },
@@ -75,13 +76,24 @@ describe("NodeOutput", () => {
         nodeOutputs: nodeOutputData,
       });
 
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "some-id",
+            key: "count",
+            type: "NUMBER",
+          },
+          workflowContext,
+        })
+      );
+
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
       workflowContext.addNodeContext(nodeContext);
 
-      nodeOutput = new NodeOutput({
+      nodeOutput = new NodeOutputs({
         nodeOutputs: nodeOutputData,
         nodeContext,
         workflowContext,
@@ -127,7 +139,7 @@ describe("NodeOutput", () => {
       })) as GenericNodeContext;
       workflowContext.addNodeContext(nodeContext);
 
-      nodeOutput = new NodeOutput({
+      nodeOutput = new NodeOutputs({
         nodeOutputs: nodeOutputData,
         nodeContext,
         workflowContext,

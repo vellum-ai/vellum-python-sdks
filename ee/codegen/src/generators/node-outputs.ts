@@ -8,7 +8,7 @@ import { WorkflowValueDescriptor } from "src/generators/workflow-value-descripto
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
-export declare namespace NodeOutput {
+export declare namespace NodeOutputs {
   export interface Args {
     nodeOutputs: NodeOutputType[];
     nodeContext: GenericNodeContext;
@@ -16,10 +16,10 @@ export declare namespace NodeOutput {
   }
 }
 
-export class NodeOutput extends AstNode {
+export class NodeOutputs extends AstNode {
   private astNode: AstNode;
 
-  public constructor(args: NodeOutput.Args) {
+  public constructor(args: NodeOutputs.Args) {
     super();
 
     this.astNode = this.constructNodeOutputs(
@@ -56,7 +56,6 @@ export class NodeOutput extends AstNode {
       const field = output.value
         ? python.field({
             name: output.name,
-            type: type,
             initializer: new WorkflowValueDescriptor({
               workflowValueDescriptor: output.value,
               workflowContext: workflowContext,

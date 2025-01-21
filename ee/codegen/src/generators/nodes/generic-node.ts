@@ -3,7 +3,7 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
-import { NodeOutput } from "src/generators/node-output";
+import { NodeOutputs } from "src/generators/node-outputs";
 import { NodePorts } from "src/generators/node-port";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
@@ -39,7 +39,7 @@ export class GenericNode extends BaseSingleFileNode<
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
       }),
-      new NodeOutput({
+      new NodeOutputs({
         nodeOutputs: this.nodeData.outputs,
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
