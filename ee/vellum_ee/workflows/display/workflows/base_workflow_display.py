@@ -207,11 +207,13 @@ class BaseWorkflowDisplay(
         # TODO: We should still serialize nodes that are in the workflow's directory but aren't used in the graph.
         # https://app.shortcut.com/vellum/story/5394
         for node in self._workflow.get_nodes():
-            if node in global_node_displays:
-                continue
             node_display = self._get_node_display(node)
-            node_displays[node] = node_display
-            global_node_displays[node] = node_display
+
+            if node not in node_displays:
+                node_displays[node] = node_display
+
+            if node not in global_node_displays:
+                global_node_displays[node] = node_display
 
             # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
             if has_wrapped_node(node):
