@@ -32,8 +32,6 @@ class NodeDisplay(UniversalBaseModel):
 
 
 class WorkflowDisplayMeta(UniversalBaseModel):
-    global_node_output_displays: Dict[str, NodeOutputDisplay]
-    global_workflow_input_displays: Dict[str, WorkflowInputsVellumDisplay]
     node_displays: Dict[str, NodeDisplay]
     workflow_inputs: Dict[str, WorkflowInputsVellumDisplay]
     workflow_outputs: Dict[str, WorkflowOutputVellumDisplay]
@@ -71,14 +69,6 @@ class WorkflowDisplayContext(
             output.name: self.workflow_output_displays[output] for output in self.workflow_output_displays
         }
         workflow_inputs = {input.name: self.workflow_input_displays[input] for input in self.workflow_input_displays}
-        global_node_output_displays = {
-            node_output.name: self.global_node_output_displays[node_output][1]
-            for node_output in self.global_node_output_displays
-        }
-        global_workflow_input_displays = {
-            global_workflow_input.name: self.global_workflow_input_displays[global_workflow_input]
-            for global_workflow_input in self.global_workflow_input_displays
-        }
         node_displays = {str(node.__id__): self.node_displays[node] for node in self.node_displays}
         temp_node_displays = {}
         for node in node_displays:
@@ -100,8 +90,6 @@ class WorkflowDisplayContext(
         display_meta = WorkflowDisplayMeta(
             workflow_outputs=workflow_outputs,
             workflow_inputs=workflow_inputs,
-            global_node_output_displays=global_node_output_displays,
-            global_workflow_input_displays=global_workflow_input_displays,
             node_displays=temp_node_displays,
         )
         return display_meta
