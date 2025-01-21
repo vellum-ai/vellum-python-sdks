@@ -56,13 +56,10 @@ def test_base_class_dynamic_import(files):
         },
         "workflow_outputs": {
             "final_output": {
-                "edge_id": UUID("417c56a4-cdc1-4f9d-a10c-b535163f51e8"),
                 "id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"),
-                "label": "Final Output",
                 "name": "final-output",
                 "node_id": UUID("f3ef4b2b-fec9-4026-9cc6-e5eac295307f"),
                 "node_input_id": UUID("fe6cba85-2423-4b5e-8f85-06311a8be5fb"),
-                "target_handle_id": UUID("3ec34f6e-da48-40d5-a65b-a48fefa75763"),
             }
         },
     }
