@@ -6275,7 +6275,7 @@ types:
       model_name:
         type: optional<boolean>
         docs: >-
-          If enabled,  the Prompt Node FULFILLED events will include model host
+          If enabled, the Prompt Node FULFILLED events will include model host
           name
     source:
       openapi: openapi/openapi.yml
