@@ -14,7 +14,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplayType,
     WorkflowOutputDisplayType,
 )
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -24,29 +24,16 @@ NodeDisplayType = TypeVar("NodeDisplayType", bound="BaseNodeDisplay")
 WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
 
 
-class OutputDisplay(UniversalBaseModel):
-    id: UUID
-    name: str
-    node_id: UUID
-    node_input_id: UUID
-
-
-class InputDisplay(UniversalBaseModel):
-    id: UUID
-    name: str
-    required: bool
-
-
 class NodeDisplay(UniversalBaseModel):
     input_display: Dict[str, UUID]
-    output_display: Dict[str, NodeOutputDisplay]
-    port_display: Dict[str, PortDisplayOverrides]
+    output_display: Dict[str, UUID]
+    port_display: Dict[str, UUID]
 
 
 class WorkflowEventDisplayContext(UniversalBaseModel):
     node_displays: Dict[str, NodeDisplay]
-    workflow_inputs: Dict[str, InputDisplay]
-    workflow_outputs: Dict[str, OutputDisplay]
+    workflow_inputs: Dict[str, UUID]
+    workflow_outputs: Dict[str, UUID]
 
 
 @dataclass
@@ -81,20 +68,11 @@ class WorkflowDisplayContext(
         workflow_outputs = {}
         for output in self.workflow_output_displays:
             current_output = self.workflow_output_displays[output]
-            workflow_outputs[output.name] = OutputDisplay(
-                id=current_output.id,  # type: ignore[attr-defined]
-                name=current_output.name,  # type: ignore[attr-defined]
-                node_id=current_output.node_id,  # type: ignore[attr-defined]
-                node_input_id=current_output.node_input_id,  # type: ignore[attr-defined]
-            )
+            workflow_outputs[output.name] = current_output.id
         workflow_inputs = {}
         for input in self.workflow_input_displays:
             current_inputs = self.workflow_input_displays[input]
-            workflow_inputs[input.name] = InputDisplay(
-                id=current_inputs.id,
-                name=current_inputs.name,  # type: ignore[attr-defined]
-                required=current_inputs.required,  # type: ignore[attr-defined]
-            )
+            workflow_inputs[input.name] = current_inputs.id
         node_displays = {str(node.__id__): self.node_displays[node] for node in self.node_displays}
         temp_node_displays = {}
         for node in node_displays:
@@ -102,11 +80,11 @@ class WorkflowDisplayContext(
             outputs = current_node.output_display
             node_display_meta = {}
             for output in outputs:
-                node_display_meta[output.name] = outputs[output]
+                node_display_meta[output.name] = outputs[output].id
             ports = current_node.port_displays
             port_display_meta = {}
             for port in ports:
-                port_display_meta[port.name] = ports[port]
+                port_display_meta[port.name] = ports[port].id
 
             temp_node_displays[node] = NodeDisplay(
                 input_display=current_node.node_input_ids_by_name,  # type: ignore[attr-defined]

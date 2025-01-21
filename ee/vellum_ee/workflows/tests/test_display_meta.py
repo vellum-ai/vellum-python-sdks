@@ -38,30 +38,17 @@ def test_base_class_dynamic_import(files):
                     "example_var_1": UUID("a0d1d7cf-242a-4bd9-a437-d308a7ced9b3"),
                     "template": UUID("f97d721a-e685-498e-90c3-9c3d9358fdad"),
                 },
-                "output_display": {"result": {"id": UUID("423bc529-1a1a-4f72-af4d-cbdb5f0a5929"), "name": "result"}},
-                "port_display": {"default": {"id": UUID("afda9a19-0618-42e1-9b63-5d0db2a88f62")}},
+                "output_display": {"result": UUID("423bc529-1a1a-4f72-af4d-cbdb5f0a5929")},
+                "port_display": {"default": UUID("afda9a19-0618-42e1-9b63-5d0db2a88f62")},
             },
             "f3ef4b2b-fec9-4026-9cc6-e5eac295307f": {
                 "input_display": {"node_input": UUID("fe6cba85-2423-4b5e-8f85-06311a8be5fb")},
-                "output_display": {"value": {"id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"), "name": "value"}},
+                "output_display": {"value": UUID("5469b810-6ea6-4362-9e79-e360d44a1405")},
                 "port_display": {},
             },
         },
-        "workflow_inputs": {
-            "input_value": {
-                "id": UUID("2268a996-bd17-4832-b3ff-f5662d54b306"),
-                "name": "input-value",
-                "required": True,
-            }
-        },
-        "workflow_outputs": {
-            "final_output": {
-                "id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"),
-                "name": "final-output",
-                "node_id": UUID("f3ef4b2b-fec9-4026-9cc6-e5eac295307f"),
-                "node_input_id": UUID("fe6cba85-2423-4b5e-8f85-06311a8be5fb"),
-            }
-        },
+        "workflow_inputs": {"input_value": UUID("2268a996-bd17-4832-b3ff-f5662d54b306")},
+        "workflow_outputs": {"final_output": UUID("5469b810-6ea6-4362-9e79-e360d44a1405")},
     }
     assert display_meta
     assert display_meta.dict() == expected_result
