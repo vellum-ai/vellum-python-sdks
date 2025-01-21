@@ -80,23 +80,26 @@ class WorkflowDisplayContext(
     port_displays: Dict[Port, "PortDisplay"] = field(default_factory=dict)
 
     def build_meta(self) -> WorkflowDisplayMeta:
+        # type ignores due to bound types mapping to values there
         workflow_outputs = {}
         for output in self.workflow_output_displays:
             current_output = self.workflow_output_displays[output]
             workflow_outputs[output.name] = OutputDisplay(
-                id=current_output.id,
-                name=current_output.name,
-                label=current_output.label,
-                node_id=current_output.node_id,
-                node_input_id=current_output.node_input_id,
-                target_handle_id=current_output.target_handle_id,
-                edge_id=current_output.edge_id,
+                id=current_output.id,  # type: ignore[attr-defined]
+                name=current_output.name,  # type: ignore[attr-defined]
+                label=current_output.label,  # type: ignore[attr-defined]
+                node_id=current_output.node_id,  # type: ignore[attr-defined]
+                node_input_id=current_output.node_input_id,  # type: ignore[attr-defined]
+                target_handle_id=current_output.target_handle_id,  # type: ignore[attr-defined]
+                edge_id=current_output.edge_id,  # type: ignore[attr-defined]
             )
         workflow_inputs = {}
         for input in self.workflow_input_displays:
             current_inputs = self.workflow_input_displays[input]
             workflow_inputs[input.name] = InputDisplay(
-                id=current_inputs.id, name=current_inputs.name, required=current_inputs.required
+                id=current_inputs.id,
+                name=current_inputs.name,  # type: ignore[attr-defined]
+                required=current_inputs.required,  # type: ignore[attr-defined]
             )
         node_displays = {str(node.__id__): self.node_displays[node] for node in self.node_displays}
         temp_node_displays = {}
