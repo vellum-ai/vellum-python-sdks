@@ -65,14 +65,10 @@ class WorkflowDisplayContext(
 
     def build_meta(self) -> WorkflowEventDisplayContext:
         # type ignores due to bound types mapping to values there
-        workflow_outputs = {}
-        for output in self.workflow_output_displays:
-            current_output = self.workflow_output_displays[output]
-            workflow_outputs[output.name] = current_output.id
-        workflow_inputs = {}
-        for input in self.workflow_input_displays:
-            current_inputs = self.workflow_input_displays[input]
-            workflow_inputs[input.name] = current_inputs.id
+        workflow_outputs = {
+            output.name: self.workflow_output_displays[output].id for output in self.workflow_output_displays
+        }
+        workflow_inputs = {input.name: self.workflow_input_displays[input].id for input in self.workflow_input_displays}
         node_displays = {str(node.__id__): self.node_displays[node] for node in self.node_displays}
         temp_node_displays = {}
         for node in node_displays:
