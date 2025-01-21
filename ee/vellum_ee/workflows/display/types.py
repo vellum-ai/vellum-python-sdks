@@ -46,7 +46,7 @@ class NodeDisplay(UniversalBaseModel):
     port_display: Dict[str, PortDisplayOverrides]
 
 
-class WorkflowDisplayMeta(UniversalBaseModel):
+class WorkflowEventDisplayContext(UniversalBaseModel):
     node_displays: Dict[str, NodeDisplay]
     workflow_inputs: Dict[str, InputDisplay]
     workflow_outputs: Dict[str, OutputDisplay]
@@ -79,7 +79,7 @@ class WorkflowDisplayContext(
     edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplayType] = field(default_factory=dict)
     port_displays: Dict[Port, "PortDisplay"] = field(default_factory=dict)
 
-    def build_meta(self) -> WorkflowDisplayMeta:
+    def build_meta(self) -> WorkflowEventDisplayContext:
         # type ignores due to bound types mapping to values there
         workflow_outputs = {}
         for output in self.workflow_output_displays:
@@ -119,7 +119,7 @@ class WorkflowDisplayContext(
                 output_display=node_display_meta,
                 port_display=port_display_meta,
             )
-        display_meta = WorkflowDisplayMeta(
+        display_meta = WorkflowEventDisplayContext(
             workflow_outputs=workflow_outputs,
             workflow_inputs=workflow_inputs,
             node_displays=temp_node_displays,

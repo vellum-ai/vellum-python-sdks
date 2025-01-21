@@ -31,7 +31,7 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext, WorkflowDisplayMeta
+from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext, WorkflowEventDisplayContext
 
 logger = logging.getLogger(__name__)
 
@@ -337,7 +337,9 @@ class BaseWorkflowDisplay(
         cls._workflow_display_registry[workflow_class] = cls
 
     @staticmethod
-    def gather_display_meta(module_path: str, workflow_class: Type[BaseWorkflow]) -> Union[WorkflowDisplayMeta, None]:
+    def gather_display_meta(
+        module_path: str, workflow_class: Type[BaseWorkflow]
+    ) -> Union[WorkflowEventDisplayContext, None]:
         workflow_display_module = f"{module_path}.display.workflow"
         try:
             display_class = importlib.import_module(workflow_display_module)
