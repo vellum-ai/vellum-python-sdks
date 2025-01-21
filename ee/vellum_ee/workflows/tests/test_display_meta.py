@@ -32,18 +32,6 @@ def test_base_class_dynamic_import(files):
     display_meta = BaseWorkflowDisplay.gather_display_meta(namespace, Workflow)
 
     expected_result = {
-        "global_node_output_displays": {
-            "result": {"id": UUID("423bc529-1a1a-4f72-af4d-cbdb5f0a5929"), "name": "result"},
-            "value": {"id": UUID("5469b810-6ea6-4362-9e79-e360d44a1405"), "name": "value"},
-        },
-        "global_workflow_input_displays": {
-            "input_value": {
-                "color": None,
-                "id": UUID("2268a996-bd17-4832-b3ff-f5662d54b306"),
-                "name": "input-value",
-                "required": True,
-            }
-        },
         "node_displays": {
             "533c6bd8-6088-4abc-a168-8c1758abcd33": {
                 "input_display": {
