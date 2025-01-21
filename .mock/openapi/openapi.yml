@@ -11347,8 +11347,8 @@ components:
         model_name:
           type: boolean
           nullable: true
-          description: If enabled,  the Prompt Node FULFILLED events will include
-            model host name
+          description: If enabled, the Prompt Node FULFILLED events will include model
+            host name
     WorkflowNodeResultData:
       oneOf:
       - $ref: '#/components/schemas/PromptNodeResult'
