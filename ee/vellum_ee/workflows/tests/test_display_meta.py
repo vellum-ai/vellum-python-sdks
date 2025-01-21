@@ -29,7 +29,7 @@ def test_base_class_dynamic_import(files):
     sys.meta_path.append(VirtualFileFinder(files, namespace))
 
     Workflow = BaseWorkflow.load_from_module(namespace)
-    display_meta = BaseWorkflowDisplay.gather_display_meta(namespace, Workflow)
+    display_meta = BaseWorkflowDisplay.gather_event_display_context(namespace, Workflow)
 
     expected_result = {
         "node_displays": {

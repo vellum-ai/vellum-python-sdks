@@ -14,6 +14,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplayType,
     WorkflowOutputDisplayType,
 )
+from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
 
 if TYPE_CHECKING:
@@ -63,8 +64,7 @@ class WorkflowDisplayContext(
     edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplayType] = field(default_factory=dict)
     port_displays: Dict[Port, "PortDisplay"] = field(default_factory=dict)
 
-    def build_meta(self) -> WorkflowEventDisplayContext:
-        # type ignores due to bound types mapping to values there
+    def build_event_display_context(self) -> WorkflowEventDisplayContext:
         workflow_outputs = {
             output.name: self.workflow_output_displays[output].id for output in self.workflow_output_displays
         }
@@ -73,13 +73,16 @@ class WorkflowDisplayContext(
         temp_node_displays = {}
         for node in node_displays:
             current_node = node_displays[node]
+            input_display = {}
+            if issubclass(current_node.__class__, BaseNodeVellumDisplay):
+                input_display = current_node.node_input_ids_by_name
             node_display_meta = {
                 output.name: current_node.output_display[output].id for output in current_node.output_display
             }
             port_display_meta = {port.name: current_node.port_displays[port].id for port in current_node.port_displays}
 
             temp_node_displays[node] = NodeDisplay(
-                input_display=current_node.node_input_ids_by_name,  # type: ignore[attr-defined]
+                input_display=input_display,
                 output_display=node_display_meta,
                 port_display=port_display_meta,
             )

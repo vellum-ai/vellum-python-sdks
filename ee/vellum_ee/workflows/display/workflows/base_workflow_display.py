@@ -337,7 +337,7 @@ class BaseWorkflowDisplay(
         cls._workflow_display_registry[workflow_class] = cls
 
     @staticmethod
-    def gather_display_meta(
+    def gather_event_display_context(
         module_path: str, workflow_class: Type[BaseWorkflow]
     ) -> Union[WorkflowEventDisplayContext, None]:
         workflow_display_module = f"{module_path}.display.workflow"
@@ -345,4 +345,4 @@ class BaseWorkflowDisplay(
             display_class = importlib.import_module(workflow_display_module)
         except ModuleNotFoundError:
             return None
-        return display_class.WorkflowDisplay(workflow_class).display_context.build_meta()
+        return display_class.WorkflowDisplay(workflow_class).display_context.build_event_display_context()
