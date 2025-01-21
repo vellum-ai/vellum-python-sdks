@@ -17,7 +17,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
-            "c539a2e2-0873-43b0-ae21-81790bb1c4cb"
+            "a6322ca2-8b65-4d26-b3a1-f926dcada0fa"
         ),
         UUID("c539a2e2-0873-43b0-ae21-81790bb1c4cb"): UUID(
             "c539a2e2-0873-43b0-ae21-81790bb1c4cb"
@@ -116,22 +116,19 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("500ce391-ee26-4588-a5a0-2dfa6b70add5"): UUID(
-            "3321686c-b131-4651-a18c-3e578252abf4"
+            "500ce391-ee26-4588-a5a0-2dfa6b70add5"
         ),
         UUID("3321686c-b131-4651-a18c-3e578252abf4"): UUID(
             "3321686c-b131-4651-a18c-3e578252abf4"
         ),
         UUID("28682e34-ef0c-47fd-a32e-8228a53360b0"): UUID(
-            "65a90810-f26b-4848-9c7f-29f324450e07"
+            "28682e34-ef0c-47fd-a32e-8228a53360b0"
         ),
         UUID("65a90810-f26b-4848-9c7f-29f324450e07"): UUID(
             "65a90810-f26b-4848-9c7f-29f324450e07"
         ),
         UUID("4f88fdee-4bee-40d8-a998-bbbc7255029c"): UUID(
-            "dc1b9237-5fde-4d9f-9648-792475e02cfa"
-        ),
-        UUID("dc1b9237-5fde-4d9f-9648-792475e02cfa"): UUID(
-            "dc1b9237-5fde-4d9f-9648-792475e02cfa"
+            "4f88fdee-4bee-40d8-a998-bbbc7255029c"
         ),
     }
     node_input_ids_by_name = {
@@ -150,7 +147,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             "65a90810-f26b-4848-9c7f-29f324450e07"
         ),
         "vellum-query-builder-variable-4f88fdee-4bee-40d8-a998-bbbc7255029c": UUID(
-            "dc1b9237-5fde-4d9f-9648-792475e02cfa"
+            "4f88fdee-4bee-40d8-a998-bbbc7255029c"
         ),
     }
     output_display = {
@@ -201,9 +198,7 @@ class SearchNode(BaseSearchNode):
                 MetadataLogicalCondition(
                     lhs_variable="STATUS", operator="=", rhs_variable="1"
                 ),
-                MetadataLogicalCondition(
-                    lhs_variable="DELETED_AT", operator="null", rhs_variable="true"
-                ),
+                MetadataLogicalCondition(lhs_variable="DELETED_AT", operator="null"),
             ],
         ),
     )
@@ -229,7 +224,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
-            "c539a2e2-0873-43b0-ae21-81790bb1c4cb"
+            "a6322ca2-8b65-4d26-b3a1-f926dcada0fa"
         ),
         UUID("c539a2e2-0873-43b0-ae21-81790bb1c4cb"): UUID(
             "c539a2e2-0873-43b0-ae21-81790bb1c4cb"

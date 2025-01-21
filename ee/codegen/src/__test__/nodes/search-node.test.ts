@@ -191,22 +191,6 @@ describe("TextSearchNode", () => {
               combinator: "OR",
             },
           },
-          {
-            id: "dc1b9237-5fde-4d9f-9648-792475e02cfa",
-            key: "vellum-query-builder-variable-4f88fdee-4bee-40d8-a998-bbbc7255029c",
-            value: {
-              rules: [
-                {
-                  type: "CONSTANT_VALUE",
-                  data: {
-                    type: "STRING",
-                    value: "true",
-                  },
-                },
-              ],
-              combinator: "OR",
-            },
-          },
         ],
         metadataFilters: {
           type: "LOGICAL_CONDITION_GROUP",

@@ -21,6 +21,7 @@ import {
   VellumLogicalExpression as VellumLogicalExpressionType,
   VellumLogicalExpression,
 } from "src/types/vellum";
+import { isUnaryOperator } from "src/utils/nodes";
 
 export class SearchNode extends BaseSingleFileNode<
   SearchNodeType,
@@ -301,17 +302,20 @@ export class SearchNode extends BaseSingleFileNode<
         )?.nodeInputData?.id;
         if (!lhsQueryInput) {
           throw new NodeAttributeGenerationError(
-            `Could not find node input for id ${logicalExpression.lhsVariableId}`
+            `Could not find search node query input for id ${logicalExpression.lhsVariableId}`
           );
         }
-        if (!rhsQueryInput) {
+        if (!isUnaryOperator(logicalExpression.operator) && !rhsQueryInput) {
           throw new NodeAttributeGenerationError(
-            `Could not find node input for id ${logicalExpression.rhsVariableId}`
+            `Could not find search node query input for id ${logicalExpression.rhsVariableId}`
           );
         }
 
-        result.set(logicalExpression.lhsVariableId, rhsQueryInput);
-        result.set(logicalExpression.rhsVariableId, rhsQueryInput);
+        result.set(logicalExpression.lhsVariableId, lhsQueryInput);
+
+        if (rhsQueryInput) {
+          result.set(logicalExpression.rhsVariableId, rhsQueryInput);
+        }
       } else if (logicalExpression.type === "LOGICAL_CONDITION_GROUP") {
         logicalExpression.conditions.forEach((condition) =>
           traverse(condition)
@@ -463,19 +467,41 @@ export class SearchNodeMetadataFilters extends AstNode {
   private generateLogicalConditionArguments(
     data: VellumLogicalConditionType
   ): python.ClassInstantiation {
+    const args: python.MethodArgument[] = [];
+
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
     if (!lhs) {
       throw new NodeAttributeGenerationError(
-        `Could not find node input for id ${lhsId}`
+        `Could not find search node input for id ${lhsId}`
       );
     }
 
+    args.push(
+      python.methodArgument({
+        name: "lhs_variable",
+        value: lhs,
+      }),
+      python.methodArgument({
+        name: "operator",
+        value: python.TypeInstantiation.str(data.operator),
+      })
+    );
+
     const rhsId = data.rhsVariableId;
     const rhs = this.nodeInputsById.get(rhsId);
-    if (!rhs) {
+    if (!isUnaryOperator(data.operator) && !rhs) {
       throw new NodeAttributeGenerationError(
-        `Could not find node input for id ${rhsId}`
+        `Could not find search node input for id ${rhsId}`
+      );
+    }
+
+    if (rhs) {
+      args.push(
+        python.methodArgument({
+          name: "rhs_variable",
+          value: rhs,
+        })
       );
     }
 
@@ -484,20 +510,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         name: "MetadataLogicalCondition",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
-      arguments_: [
-        python.methodArgument({
-          name: "lhs_variable",
-          value: lhs,
-        }),
-        python.methodArgument({
-          name: "operator",
-          value: python.TypeInstantiation.str(data.operator),
-        }),
-        python.methodArgument({
-          name: "rhs_variable",
-          value: rhs,
-        }),
-      ],
+      arguments_: args,
     });
   }
 
