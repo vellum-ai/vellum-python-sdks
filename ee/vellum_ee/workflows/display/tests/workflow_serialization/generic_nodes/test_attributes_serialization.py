@@ -44,7 +44,7 @@ def test_serialize_node__constant_value(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "279e8228-9b82-43a3-8c31-affc036e3a0b", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "279e8228-9b82-43a3-8c31-affc036e3a0b", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "e6cf13b0-5590-421c-84f2-5a0b169677e1", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
@@ -96,7 +96,7 @@ def test_serialize_node__workflow_input(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "b1a5d749-bac0-4f11-8427-191febb2198e", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "b1a5d749-bac0-4f11-8427-191febb2198e", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "f013bf3f-49f6-41cd-ac13-7439b71a304a", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
@@ -160,7 +160,7 @@ def test_serialize_node__node_output(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "449072ba-f7b6-4314-ac96-682123f225e5", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "449072ba-f7b6-4314-ac96-682123f225e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "ec9a79b8-65c3-4de8-bd29-42c914d72d4f", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
@@ -210,7 +210,7 @@ def test_serialize_node__vellum_secret(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "3ea0305d-d8ea-45fe-8cf1-f6c1c85e6979", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "3ea0305d-d8ea-45fe-8cf1-f6c1c85e6979", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "69e49322-8f8a-42d2-b36f-3fbe53dad616", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
@@ -266,7 +266,7 @@ def test_serialize_node__node_execution(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "68a91426-4c30-4194-a4c0-cff224d3c0f3", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "68a91426-4c30-4194-a4c0-cff224d3c0f3", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "1794c2eb-5cab-49fe-9354-dfc29f11b374", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [

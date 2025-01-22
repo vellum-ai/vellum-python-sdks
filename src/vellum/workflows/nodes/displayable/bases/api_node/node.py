@@ -8,7 +8,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
-from vellum.workflows.types.core import Json, VellumSecret
+from vellum.workflows.types.core import Json, MergeBehavior, VellumSecret
 from vellum.workflows.types.generics import StateType
 
 
@@ -22,6 +22,9 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     json: Optional["JsonObject"] - The JSON data to send in the request body.
     headers: Optional[Dict[str, Union[str, VellumSecret]]] - The headers to send in the request.
     """
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     url: str
     method: APIRequestMethod

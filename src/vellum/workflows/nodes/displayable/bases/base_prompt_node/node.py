@@ -7,7 +7,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode, vellum_error_to_wor
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
-from vellum.workflows.types.core import EntityInputsInterface
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -16,6 +16,9 @@ class BasePromptNode(BaseNode, Generic[StateType]):
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
 
     request_options: Optional[RequestOptions] = None
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseOutputs):
         results: List[PromptOutput]

@@ -17,6 +17,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.types import SearchFilters
 from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 DEFAULT_SEARCH_WEIGHTS = 0.8
@@ -80,6 +81,9 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
     )
 
     request_options: Optional[RequestOptions] = None
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseOutputs):
         """

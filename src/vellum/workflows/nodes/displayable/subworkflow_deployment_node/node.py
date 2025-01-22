@@ -19,7 +19,7 @@ from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
-from vellum.workflows.types.core import EntityInputsInterface
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -48,6 +48,9 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
     metadata: Optional[Dict[str, Optional[Any]]] = OMIT
 
     request_options: Optional[RequestOptions] = None
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     def _compile_subworkflow_inputs(self) -> List[WorkflowRequestInputRequest]:
         # TODO: We may want to consolidate with prompt deployment input compilation

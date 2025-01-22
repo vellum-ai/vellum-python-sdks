@@ -22,12 +22,14 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import ParentContext
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
@@ -48,6 +50,9 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     items: List[MapNodeItemType]
     max_concurrency: Optional[int] = None
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseAdornmentNode.Outputs):
         pass

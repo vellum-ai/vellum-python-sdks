@@ -2,6 +2,7 @@ from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args
 
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
 
@@ -40,6 +41,9 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
     Used to directly reference the output of another node.
     This provides backward compatibility with Vellum's Final Output Node.
     """
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseNode.Outputs):
         # We use our mypy plugin to override the _OutputType with the actual output type

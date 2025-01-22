@@ -8,6 +8,7 @@ from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
@@ -21,6 +22,9 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     """
 
     on_error_code: Optional[WorkflowErrorCode] = None
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseNode.Outputs):
         error: Optional[WorkflowError] = None

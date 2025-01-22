@@ -34,7 +34,7 @@ def test_serialize_node__basic(serialize_node):
                     "test_trigger_serialization",
                 ],
             },
-            "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "4fbf0fff-a42e-4410-852a-238b5059198e",
