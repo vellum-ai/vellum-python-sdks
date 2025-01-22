@@ -2,8 +2,10 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
-import { IterableConfig } from "src/generators/vellum-variable-value";
-import { NodeInputValuePointerRule as NodeInputValuePointerRuleType } from "src/types/vellum";
+import {
+  IterableConfig,
+  NodeInputValuePointerRule as NodeInputValuePointerRuleType,
+} from "src/types/vellum";
 
 export declare namespace BaseNodeInputValuePointerRule {
   export interface Args<T extends NodeInputValuePointerRuleType> {

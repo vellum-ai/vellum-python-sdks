@@ -1426,7 +1426,7 @@ export function genericNodeFactory(
         },
       },
     ],
-    adornments: adornments ?? undefined,
+    adornments: adornments,
   };
   return nodeData;
 }

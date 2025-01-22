@@ -10,8 +10,8 @@ import {
 } from "src/generators/errors";
 import { Expression } from "src/generators/expression";
 import { NodeInputValuePointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/node-input-value-pointer-rule";
-import { IterableConfig } from "src/generators/vellum-variable-value";
 import {
+  IterableConfig,
   OperatorMapping,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";

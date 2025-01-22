@@ -9,8 +9,10 @@ import { NodeOutputPointerRule } from "./node-output-pointer";
 import { WorkflowContext } from "src/context";
 import { ExecutionCounterPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/execution-counter-pointer";
 import { WorkspaceSecretPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/workspace-secret-pointer";
-import { IterableConfig } from "src/generators/vellum-variable-value";
-import { NodeInputValuePointerRule as NodeInputValuePointerRuleType } from "src/types/vellum";
+import {
+  IterableConfig,
+  NodeInputValuePointerRule as NodeInputValuePointerRuleType,
+} from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
 export declare namespace NodeInputValuePointerRule {

@@ -3,8 +3,7 @@ import { BaseNodeInputValuePointerRule } from "./base";
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
 import { VellumValue } from "src/generators";
-import { IterableConfig } from "src/generators/vellum-variable-value";
-import { ConstantValuePointer } from "src/types/vellum";
+import { ConstantValuePointer, IterableConfig } from "src/types/vellum";
 
 export declare namespace ConstantValuePointerRule {
   interface Args {

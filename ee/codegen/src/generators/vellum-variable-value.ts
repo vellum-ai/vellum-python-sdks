@@ -17,6 +17,7 @@ import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
+import { IterableConfig } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
@@ -503,8 +504,4 @@ export class VellumValue extends AstNode {
 
     this.astNode.write(writer);
   }
-}
-
-export interface IterableConfig {
-  endWithComma?: boolean;
 }
