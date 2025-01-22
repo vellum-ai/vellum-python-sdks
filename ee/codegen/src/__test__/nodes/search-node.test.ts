@@ -291,12 +291,45 @@ describe("TextSearchNode", () => {
       });
     });
 
+    it("should throw ValueGenerationError when trying to parse non-integer string", async () => {
+      await expect(async () => {
+        node.getNodeFile().write(writer);
+        await writer.toStringFormatted();
+      }).rejects.toThrow(
+        'Failed to parse search node limit value "not-a-number" as an integer'
+      );
+    });
+  });
+
+  describe("limit param should throw exception if not a constant value of type number", () => {
+    beforeEach(async () => {
+      const nodeData = searchNodeDataFactory({
+        limitInput: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "JSON",
+            value: "{}",
+          },
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
     it("should throw NodeAttributeGenerationError when trying to parse non-integer string", async () => {
       await expect(async () => {
         node.getNodeFile().write(writer);
         await writer.toStringFormatted();
       }).rejects.toThrow(
-        'Failed to parse search node limit value "not-a-number" to integer'
+        "Limit param input should be a CONSTANT_VALUE and of type NUMBER, got JSON instead"
       );
     });
   });

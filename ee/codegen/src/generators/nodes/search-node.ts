@@ -62,7 +62,7 @@ export class SearchNode extends BaseSingleFileNode<
           const parsedInt = parseInt(limitValue.data.value);
           if (isNaN(parsedInt)) {
             throw new ValueGenerationError(
-              `Failed to parse search node limit value "${limitValue.data.value}" to integer`
+              `Failed to parse search node limit value "${limitValue.data.value}" as an integer`
             );
           }
           bodyStatements.push(
@@ -72,6 +72,13 @@ export class SearchNode extends BaseSingleFileNode<
             })
           );
         }
+      } else if (
+        limitValue?.type === "CONSTANT_VALUE" &&
+        limitValue.data.type !== "NUMBER"
+      ) {
+        throw new NodeAttributeGenerationError(
+          `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`
+        );
       } else {
         bodyStatements.push(
           python.field({
