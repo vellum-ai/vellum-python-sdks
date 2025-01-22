@@ -10,6 +10,10 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
+import {
+  NodeAttributeGenerationError,
+  ValueGenerationError,
+} from "src/generators/errors";
 import { SearchNode } from "src/generators/nodes/search-node";
 
 describe("TextSearchNode", () => {
@@ -291,12 +295,14 @@ describe("TextSearchNode", () => {
       });
     });
 
-    it("should throw ValueGenerationError when trying to parse non-integer string", async () => {
+    it("should throw ValueGenerationError", async () => {
       await expect(async () => {
         node.getNodeFile().write(writer);
         await writer.toStringFormatted();
       }).rejects.toThrow(
-        'Failed to parse search node limit value "not-a-number" as an integer'
+        new ValueGenerationError(
+          'Failed to parse search node limit value "not-a-number" as an integer'
+        )
       );
     });
   });
@@ -324,12 +330,14 @@ describe("TextSearchNode", () => {
       });
     });
 
-    it("should throw NodeAttributeGenerationError when trying to parse non-integer string", async () => {
+    it("should throw NodeAttributeGenerationError", async () => {
       await expect(async () => {
         node.getNodeFile().write(writer);
         await writer.toStringFormatted();
       }).rejects.toThrow(
-        "Limit param input should be a CONSTANT_VALUE and of type NUMBER, got JSON instead"
+        new NodeAttributeGenerationError(
+          "Limit param input should be a CONSTANT_VALUE and of type NUMBER, got JSON instead"
+        )
       );
     });
   });
