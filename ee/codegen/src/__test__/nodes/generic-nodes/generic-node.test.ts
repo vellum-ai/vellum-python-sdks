@@ -183,10 +183,9 @@ describe("GenericNode", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new GenericNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
