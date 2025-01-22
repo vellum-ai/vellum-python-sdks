@@ -15,6 +15,33 @@ export class GenericNode extends BaseSingleFileNode<
   GenericNodeType,
   GenericNodeContext
 > {
+  getNodeDecorators(): python.Decorator[] | undefined {
+    if (!this.nodeData.adornments) {
+      return [];
+    }
+    return this.nodeData.adornments.map((adornment) =>
+      python.decorator({
+        callable: python.invokeMethod({
+          methodReference: python.reference({
+            name: adornment.base.name,
+            attribute: ["wrap"],
+            modulePath: adornment.base.module,
+          }),
+          arguments_: adornment.attributes.map((attr) =>
+            python.methodArgument({
+              name: attr.name,
+              value: new WorkflowValueDescriptor({
+                workflowValueDescriptor: attr.value,
+                workflowContext: this.workflowContext,
+                iterableConfig: { endWithComma: false },
+              }),
+            })
+          ),
+        }),
+      })
+    );
+  }
+
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
     this.nodeData.attributes.forEach((attribute) => {

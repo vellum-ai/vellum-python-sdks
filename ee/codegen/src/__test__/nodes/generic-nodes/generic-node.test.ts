@@ -11,7 +11,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
-import { NodeAttribute } from "src/types/vellum";
+import { AdornmentNode, NodeAttribute } from "src/types/vellum";
 
 describe("GenericNode", () => {
   let workflowContext: WorkflowContext;
@@ -90,6 +90,97 @@ describe("GenericNode", () => {
       const nodeData = genericNodeFactory({
         name: "MyCustomNode",
         nodeAttributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+      workflowContext.addNodeContext(nodeContext);
+
+      node = new GenericNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDisplayFile", async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with adornments", () => {
+    beforeEach(async () => {
+      const adornments: AdornmentNode[] = [
+        {
+          id: "adornment-1",
+          label: "TryNodeLabel",
+          base: {
+            name: "TryNode",
+            module: ["vellum", "workflows", "nodes", "core"],
+          },
+          attributes: [
+            {
+              id: "attr-1",
+              name: "max_attempts",
+              value: {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "NUMBER",
+                  value: 3,
+                },
+              },
+            },
+          ],
+        },
+        {
+          id: "adornment-2",
+          label: "MapNodeLabel",
+          base: {
+            name: "MapNode",
+            module: [
+              "vellum",
+              "workflows",
+              "nodes",
+              "core",
+              "map_node",
+              "node",
+            ],
+          },
+          attributes: [
+            {
+              id: "attr-1",
+              name: "items",
+              value: {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "ARRAY",
+                  value: [
+                    {
+                      type: "NUMBER",
+                      value: 1,
+                    },
+                    {
+                      type: "NUMBER",
+                      value: 2,
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      const nodeData = genericNodeFactory({
+        name: "MyCustomNode",
+        adornments: adornments,
       });
 
       const nodeContext = (await createNodeContext({

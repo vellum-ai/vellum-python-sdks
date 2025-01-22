@@ -218,6 +218,25 @@ export abstract class BaseNode<
     });
   }
 
+  protected getNodeDecorators(): python.Decorator[] | undefined {
+    return this.errorOutputId
+      ? [
+          python.decorator({
+            callable: python.invokeMethod({
+              methodReference: python.reference({
+                name: "TryNode",
+                attribute: ["wrap"],
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .CORE_NODES_MODULE_PATH,
+              }),
+              arguments_: [],
+            }),
+          }),
+        ]
+      : undefined;
+  }
+
   public generateNodeClass(): python.Class {
     const nodeContext = this.nodeContext;
 
@@ -235,22 +254,7 @@ export abstract class BaseNode<
     const nodeClass = python.class_({
       name: nodeContext.nodeClassName,
       extends_: [nodeBaseClass],
-      decorators: this.errorOutputId
-        ? [
-            python.decorator({
-              callable: python.invokeMethod({
-                methodReference: python.reference({
-                  name: "TryNode",
-                  attribute: ["wrap"],
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .CORE_NODES_MODULE_PATH,
-                }),
-                arguments_: [],
-              }),
-            }),
-          ]
-        : undefined,
+      decorators: this.getNodeDecorators(),
     });
 
     this.getNodeClassBodyStatements().forEach((statement) =>

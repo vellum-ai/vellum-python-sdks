@@ -10,6 +10,7 @@ import {
 } from "src/generators/errors";
 import { Expression } from "src/generators/expression";
 import { NodeInputValuePointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/node-input-value-pointer-rule";
+import { IterableConfig } from "src/generators/vellum-variable-value";
 import {
   OperatorMapping,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
@@ -20,17 +21,20 @@ export namespace WorkflowValueDescriptor {
   export interface Args {
     workflowValueDescriptor: WorkflowValueDescriptorType;
     workflowContext: WorkflowContext;
+    iterableConfig?: IterableConfig;
   }
 }
 
 export class WorkflowValueDescriptor extends AstNode {
   private workflowContext: WorkflowContext;
+  private iterableConfig?: IterableConfig;
   private astNode: AstNode;
 
   public constructor(args: WorkflowValueDescriptor.Args) {
     super();
 
     this.workflowContext = args.workflowContext;
+    this.iterableConfig = args.iterableConfig;
     this.astNode = this.generateWorkflowValueDescriptor(
       args.workflowValueDescriptor
     );
@@ -54,6 +58,7 @@ export class WorkflowValueDescriptor extends AstNode {
       return new NodeInputValuePointerRule({
         workflowContext: this.workflowContext,
         nodeInputValuePointerRuleData: workflowValueDescriptor,
+        iterableConfig: this.iterableConfig,
       });
     }
 

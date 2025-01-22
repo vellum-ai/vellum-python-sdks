@@ -28,6 +28,7 @@ import {
   NodePort,
   NodeAttribute,
   NodeOutput,
+  AdornmentNode,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -1355,12 +1356,14 @@ export function genericNodeFactory(
     nodePorts,
     nodeAttributes,
     nodeOutputs,
+    adornments,
   }: {
     name: string;
     nodeTrigger?: NodeTrigger;
     nodePorts?: NodePort[];
     nodeAttributes?: NodeAttribute[];
     nodeOutputs?: NodeOutput[];
+    adornments?: AdornmentNode[];
   } = {
     name: "MyCustomNode",
   }
@@ -1423,6 +1426,7 @@ export function genericNodeFactory(
         },
       },
     ],
+    adornments: adornments ?? undefined,
   };
   return nodeData;
 }

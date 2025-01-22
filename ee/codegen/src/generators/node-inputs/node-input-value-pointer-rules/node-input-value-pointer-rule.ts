@@ -9,6 +9,7 @@ import { NodeOutputPointerRule } from "./node-output-pointer";
 import { WorkflowContext } from "src/context";
 import { ExecutionCounterPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/execution-counter-pointer";
 import { WorkspaceSecretPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/workspace-secret-pointer";
+import { IterableConfig } from "src/generators/vellum-variable-value";
 import { NodeInputValuePointerRule as NodeInputValuePointerRuleType } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -16,6 +17,7 @@ export declare namespace NodeInputValuePointerRule {
   export interface Args {
     workflowContext: WorkflowContext;
     nodeInputValuePointerRuleData: NodeInputValuePointerRuleType;
+    iterableConfig?: IterableConfig;
   }
 }
 
@@ -23,11 +25,13 @@ export class NodeInputValuePointerRule extends AstNode {
   private workflowContext: WorkflowContext;
   private astNode: BaseNodeInputValuePointerRule<NodeInputValuePointerRuleType>;
   public readonly ruleType: NodeInputValuePointerRuleType["type"];
+  private iterableConfig?: IterableConfig;
 
   public constructor(args: NodeInputValuePointerRule.Args) {
     super();
     this.workflowContext = args.workflowContext;
     this.ruleType = args.nodeInputValuePointerRuleData.type;
+    this.iterableConfig = args.iterableConfig;
 
     this.astNode = this.getAstNode(args.nodeInputValuePointerRuleData);
     this.inheritReferences(this.astNode);
@@ -43,6 +47,7 @@ export class NodeInputValuePointerRule extends AstNode {
         return new ConstantValuePointerRule({
           workflowContext: this.workflowContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
+          iterableConfig: this.iterableConfig,
         });
       case "NODE_OUTPUT":
         return new NodeOutputPointerRule({

@@ -31,6 +31,41 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with adornments > getNodeDisplayFile 1`] = `
+"from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from ...nodes.my_custom_node import MyCustomNode
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+
+class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
+    node_input_ids_by_name = {}
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`GenericNode > basic with adornments > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import BaseNode
+from vellum.workflows.nodes.core import TryNode
+from vellum.workflows.nodes.core.map_node.node import MapNode
+from ..inputs import Inputs
+
+
+@TryNode.wrap(max_attempts=3)
+@MapNode.wrap(items=[1, 2])
+class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.count
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from ...nodes.my_custom_node import MyCustomNode
