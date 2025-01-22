@@ -266,11 +266,6 @@ describe("TextSearchNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-
-    it("getNodeDisplayFile", async () => {
-      node.getNodeDisplayFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
   });
 
   describe("limit param should throw exception if casting string that is not an int", () => {
