@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, List, TypeVar, cast
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -7,6 +7,8 @@ from vellum.workflows.expressions.is_not_null import IsNotNullExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
+from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
@@ -24,9 +26,19 @@ _BaseNodeType = TypeVar("_BaseNodeType", bound=BaseNode)
 
 
 class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeType]):
-    def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
+    def serialize(
+        self, display_context: WorkflowDisplayContext, adornment_nodes: List[BaseAdornmentNode] = [], **kwargs: Any
+    ) -> JsonObject:
         node = self._node
         node_id = self.node_id
+
+        if has_wrapped_node(node):
+            wrapped_node = get_wrapped_node(node)
+
+            class WrappedBaseNodeDisplay(BaseNodeDisplay[wrapped_node]):
+                pass
+
+            return WrappedBaseNodeDisplay().serialize(display_context, adornment_nodes=adornment_nodes + [node])
 
         attributes: JsonArray = []
         for attribute in node:
@@ -82,6 +94,11 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 }
             )
 
+        # convert adornments
+        adornments = []
+        for adornment_node in adornment_nodes:
+            pass
+
         return {
             "id": str(node_id),
             "label": node.__qualname__,
@@ -94,7 +111,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
             "ports": ports,
-            "adornments": None,
+            "adornments": adornments,
             "attributes": attributes,
             "outputs": outputs,
         }
