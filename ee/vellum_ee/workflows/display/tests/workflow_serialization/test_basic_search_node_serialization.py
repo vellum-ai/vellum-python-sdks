@@ -84,7 +84,12 @@ def test_serialize_workflow():
                 "id": "983f2b7f-ad86-45cf-b04b-08724af27236",
                 "key": "weights",
                 "value": {
-                    "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": None}}],
+                    "rules": [
+                        {
+                            "type": "CONSTANT_VALUE",
+                            "data": {"type": "JSON", "value": {"keywords": 0.45, "semantic_similarity": 0.55}},
+                        }
+                    ],
                     "combinator": "OR",
                 },
             },

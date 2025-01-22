@@ -97,7 +97,8 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
         result_merging = options.result_merging if options else None
         result_merging_enabled = True if result_merging and result_merging.enabled else False
 
-        weights = options.weights if options else None
+        raw_weights = raise_if_descriptor(node.weights)
+        weights = raw_weights if raw_weights is not None else options.weights if options is not None else None
 
         node_input_names_and_values = [
             ("query", node.query),
