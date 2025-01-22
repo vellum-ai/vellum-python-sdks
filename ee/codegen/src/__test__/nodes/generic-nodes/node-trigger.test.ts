@@ -33,7 +33,6 @@ describe("NodeTrigger", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       nodeTrigger = new NodeTrigger({
         nodeTrigger: nodeTriggerData,

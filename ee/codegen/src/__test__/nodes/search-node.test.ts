@@ -54,15 +54,13 @@ describe("TextSearchNode", () => {
     beforeEach(async () => {
       const nodeData = searchNodeDataFactory();
 
-      const nodeContext = createNodeContext({
+      const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
-      }) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
-      await nodeContext.buildProperties();
+      })) as TextSearchNodeContext;
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -84,15 +82,13 @@ describe("TextSearchNode", () => {
         errorOutputId: "af589f73-effe-4a80-b48f-fb912ac6ce67",
       });
 
-      const nodeContext = createNodeContext({
+      const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
-      }) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
-      await nodeContext.buildProperties();
+      })) as TextSearchNodeContext;
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -221,15 +217,13 @@ describe("TextSearchNode", () => {
         },
       });
 
-      const nodeContext = createNodeContext({
+      const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
-      }) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
-      await nodeContext.buildProperties();
+      })) as TextSearchNodeContext;
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -257,15 +251,13 @@ describe("TextSearchNode", () => {
 
       const nodeData = searchNodeDataFactory();
 
-      const nodeContext = createNodeContext({
+      const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
-      }) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
-      await nodeContext.buildProperties();
+      })) as TextSearchNodeContext;
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });

@@ -38,10 +38,9 @@ describe("TemplatingNode", () => {
         workflowContext,
         nodeData,
       })) as TemplatingNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new TemplatingNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -67,10 +66,9 @@ describe("TemplatingNode", () => {
         workflowContext,
         nodeData,
       })) as TemplatingNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new TemplatingNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -96,10 +94,9 @@ describe("TemplatingNode", () => {
         workflowContext,
         nodeData,
       })) as TemplatingNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new TemplatingNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });

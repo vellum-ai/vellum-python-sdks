@@ -34,12 +34,10 @@ describe("SubworkflowDeploymentNode", () => {
 
       const nodeData = subworkflowDeploymentNodeDataFactory();
 
-      const nodeContext = createNodeContext({
+      const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
-      }) as SubworkflowDeploymentNodeContext;
-      workflowContext.addNodeContext(nodeContext);
-      await nodeContext.buildProperties();
+      })) as SubworkflowDeploymentNodeContext;
 
       node = new SubworkflowDeploymentNode({
         workflowContext,

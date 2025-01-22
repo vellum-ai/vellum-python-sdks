@@ -24,7 +24,7 @@ import {
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
-export function createNodeContext(
+function buildNodeContext(
   args: BaseNodeContext.Args<WorkflowDataNode>
 ): BaseNodeContext<WorkflowDataNode> {
   const nodeData = args.nodeData;
@@ -178,4 +178,13 @@ export function createNodeContext(
         `Unsupported node type: ${args.nodeData.type}`
       );
   }
+}
+
+export async function createNodeContext(
+  args: BaseNodeContext.Args<WorkflowDataNode>
+): Promise<BaseNodeContext<WorkflowDataNode>> {
+  const nodeContext = buildNodeContext(args);
+  args.workflowContext.addNodeContext(nodeContext);
+  await nodeContext.buildProperties();
+  return nodeContext;
 }

@@ -25,7 +25,6 @@ describe("ErrorNode", () => {
         workflowContext,
         nodeData,
       })) as ErrorNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new ErrorNode({
         workflowContext,

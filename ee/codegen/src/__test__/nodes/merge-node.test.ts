@@ -25,10 +25,9 @@ describe("MergeNode", () => {
         workflowContext,
         nodeData,
       })) as MergeNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new MergeNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });

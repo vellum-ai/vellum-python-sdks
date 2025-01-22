@@ -9,7 +9,6 @@ import {
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
-import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
 import { NodeAttribute } from "src/types/vellum";
 
@@ -42,10 +41,9 @@ describe("GenericNode", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new GenericNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -67,11 +65,10 @@ describe("GenericNode", () => {
         blockType: "JINJA",
       });
 
-      const referencedNodeContext = (await createNodeContext({
+      await createNodeContext({
         workflowContext,
         nodeData: referencedNode,
-      })) as InlinePromptNodeContext;
-      workflowContext.addNodeContext(referencedNodeContext);
+      });
 
       const nodeAttributes: NodeAttribute[] = [
         {
@@ -96,10 +93,9 @@ describe("GenericNode", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new GenericNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });

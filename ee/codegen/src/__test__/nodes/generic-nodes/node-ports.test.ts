@@ -71,7 +71,6 @@ describe("NodePorts", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       nodePorts = new NodePorts({
         nodePorts: nodePortsData,
@@ -154,7 +153,6 @@ describe("NodePorts", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       nodePorts = new NodePorts({
         nodePorts: nodePortsData,

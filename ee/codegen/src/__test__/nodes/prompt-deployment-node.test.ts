@@ -25,7 +25,6 @@ describe("PromptDeploymentNode", () => {
         workflowContext,
         nodeData,
       })) as PromptDeploymentNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new PromptDeploymentNode({
         workflowContext,

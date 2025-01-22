@@ -25,10 +25,9 @@ describe("FinalOutputNode", () => {
         workflowContext,
         nodeData,
       })) as FinalOutputNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new FinalOutputNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });

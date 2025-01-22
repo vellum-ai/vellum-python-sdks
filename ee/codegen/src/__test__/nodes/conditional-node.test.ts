@@ -43,7 +43,6 @@ describe("ConditionalNode", () => {
       workflowContext,
       nodeData,
     })) as ConditionalNodeContext;
-    workflowContext.addNodeContext(nodeContext);
 
     node = new ConditionalNode({
       workflowContext,
@@ -88,7 +87,6 @@ describe("ConditionalNode with invalid uuid for field and value node input ids",
       workflowContext,
       nodeData,
     })) as ConditionalNodeContext;
-    workflowContext.addNodeContext(nodeContext);
 
     node = new ConditionalNode({
       workflowContext,
@@ -214,17 +212,15 @@ describe("ConditionalNode with null operator", () => {
       })
     );
 
-    const upstreamNodeContext = (await createNodeContext({
+    (await createNodeContext({
       workflowContext,
       nodeData: templatingNode,
     })) as TemplatingNodeContext;
-    workflowContext.addNodeContext(upstreamNodeContext);
 
     const nodeContext = (await createNodeContext({
       workflowContext,
       nodeData,
     })) as ConditionalNodeContext;
-    workflowContext.addNodeContext(nodeContext);
 
     node = new ConditionalNode({
       workflowContext,
@@ -269,7 +265,6 @@ describe("ConditionalNode with incorrect rule id references", () => {
       workflowContext,
       nodeData: invalidNodeData,
     })) as ConditionalNodeContext;
-    workflowContext.addNodeContext(nodeContext);
 
     node = new ConditionalNode({
       workflowContext,

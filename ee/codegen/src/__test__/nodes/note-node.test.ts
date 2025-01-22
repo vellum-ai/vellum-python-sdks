@@ -25,10 +25,9 @@ describe("NoteNode", () => {
         workflowContext,
         nodeData,
       })) as NoteNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new NoteNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });

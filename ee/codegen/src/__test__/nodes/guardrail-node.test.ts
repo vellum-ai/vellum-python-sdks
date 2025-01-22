@@ -79,15 +79,13 @@ describe("GuardrailNode", () => {
     );
     const nodeData = guardrailNodeDataFactory({ errorOutputId });
 
-    const nodeContext = createNodeContext({
+    const nodeContext = (await createNodeContext({
       workflowContext,
       nodeData,
-    }) as GuardrailNodeContext;
-    workflowContext.addNodeContext(nodeContext);
-    await nodeContext.buildProperties();
+    })) as GuardrailNodeContext;
 
     return new GuardrailNode({
-      workflowContext: workflowContext,
+      workflowContext,
       nodeContext,
     });
   };
