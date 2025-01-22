@@ -1453,6 +1453,8 @@ paths:
       description: Retrieves information about the active Organization
       tags:
       - organizations
+      security:
+      - apiKeyAuth: []
       responses:
         '200':
           content:
@@ -2428,6 +2430,8 @@ paths:
       description: Retrieves information about the active Workspace
       tags:
       - workspaces
+      security:
+      - apiKeyAuth: []
       responses:
         '200':
           content:

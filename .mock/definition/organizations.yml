@@ -7,7 +7,7 @@ service:
     organization_identity:
       path: /v1/organizations/identity
       method: GET
-      auth: false
+      auth: true
       docs: Retrieves information about the active Organization
       source:
         openapi: openapi/openapi.yml
