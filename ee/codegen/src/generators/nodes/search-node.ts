@@ -10,7 +10,10 @@ import {
 } from "src/constants";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import { NodeInput } from "src/generators";
-import { NodeAttributeGenerationError } from "src/generators/errors";
+import {
+  NodeAttributeGenerationError,
+  ValueGenerationError,
+} from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
@@ -50,12 +53,33 @@ export class SearchNode extends BaseSingleFileNode<
 
     const limitInput = this.findNodeInputByName("limit");
     if (limitInput) {
-      bodyStatements.push(
-        python.field({
-          name: "limit",
-          initializer: limitInput,
-        })
-      );
+      const limitValue = limitInput.nodeInputData?.value.rules[0];
+      if (
+        limitValue?.type === "CONSTANT_VALUE" &&
+        limitValue.data.type === "STRING"
+      ) {
+        if (limitValue.data.value != null) {
+          const parsedInt = parseInt(limitValue.data.value);
+          if (isNaN(parsedInt)) {
+            throw new ValueGenerationError(
+              `Failed to parse search node limit value "${limitValue.data.value}" to integer`
+            );
+          }
+          bodyStatements.push(
+            python.field({
+              name: "limit",
+              initializer: python.TypeInstantiation.int(parsedInt),
+            })
+          );
+        }
+      } else {
+        bodyStatements.push(
+          python.field({
+            name: "limit",
+            initializer: limitInput,
+          })
+        );
+      }
     }
 
     bodyStatements.push(

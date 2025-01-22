@@ -239,6 +239,73 @@ describe("TextSearchNode", () => {
     });
   });
 
+  describe("limit param should cast string to int", () => {
+    beforeEach(async () => {
+      const nodeData = searchNodeDataFactory({
+        limitInput: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "8",
+          },
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDisplayFile", async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("limit param should throw exception if casting string that is not an int", () => {
+    beforeEach(async () => {
+      const nodeData = searchNodeDataFactory({
+        limitInput: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "not-a-number",
+          },
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should throw NodeAttributeGenerationError when trying to parse non-integer string", async () => {
+      await expect(async () => {
+        node.getNodeFile().write(writer);
+        await writer.toStringFormatted();
+      }).rejects.toThrow(
+        'Failed to parse search node limit value "not-a-number" to integer'
+      );
+    });
+  });
+
   describe("404 error handling", () => {
     beforeEach(async () => {
       workflowContext = workflowContextFactory({ strict: false });
