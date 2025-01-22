@@ -48,7 +48,16 @@ export class MergeNode extends BaseSingleFileNode<
   }
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
-    const statements: AstNode[] = [];
+    const statements: AstNode[] = [
+      python.field({
+        name: "label",
+        initializer: python.TypeInstantiation.str(this.nodeData.data.label),
+      }),
+      python.field({
+        name: "node_id",
+        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
+      }),
+    ];
 
     const targetHandleIds = python.TypeInstantiation.list(
       this.nodeData.data.targetHandles.map((targetHandle) =>

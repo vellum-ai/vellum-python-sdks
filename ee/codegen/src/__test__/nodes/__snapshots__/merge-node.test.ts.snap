@@ -9,6 +9,8 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 
 
 class MergeNodeDisplay(BaseMergeNodeDisplay[MergeNode]):
+    label = "Merge Node"
+    node_id = UUID("merge-node-1")
     target_handle_ids = [UUID("target-handle-id-1"), UUID("target-handle-id-2")]
     node_input_ids_by_name = {}
     port_displays = {
