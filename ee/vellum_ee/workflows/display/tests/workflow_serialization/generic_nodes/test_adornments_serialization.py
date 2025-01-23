@@ -8,9 +8,8 @@ from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
-
-from ee.vellum_ee.workflows.display.base import WorkflowInputsDisplay
 
 
 class Inputs(BaseInputs):
