@@ -9,8 +9,7 @@ from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
-
-from ee.vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
 
 
 class Inputs(BaseInputs):

@@ -7,8 +7,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-
-from ee.vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
 
 
 class Inputs(BaseInputs):

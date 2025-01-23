@@ -13,9 +13,8 @@ from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeV
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
+from vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-
-from ee.vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
 
 _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
 
