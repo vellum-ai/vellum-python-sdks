@@ -24,7 +24,7 @@ class MetadataLogicalConditionGroup(UniversalBaseModel):
 class MetadataLogicalCondition(UniversalBaseModel):
     lhs_variable: Any
     operator: LogicalOperator
-    rhs_variable: Any
+    rhs_variable: Any = None
 
     def to_request(self) -> VellumValueLogicalConditionRequest:
         return VellumValueLogicalConditionRequest(
