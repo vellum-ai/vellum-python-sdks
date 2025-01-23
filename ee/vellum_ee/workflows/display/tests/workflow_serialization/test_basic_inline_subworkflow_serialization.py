@@ -140,7 +140,10 @@ def test_serialize_workflow():
                                 "name": "StartNode",
                                 "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
                             },
-                            "trigger": {"id": "a95a34f2-e894-4fb6-a2c9-15d12c1e3135", "merge_behavior": "AWAIT_ANY"},
+                            "trigger": {
+                                "id": "a95a34f2-e894-4fb6-a2c9-15d12c1e3135",
+                                "merge_behavior": "AWAIT_ATTRIBUTES",
+                            },
                             "ports": [
                                 {"id": "4a62dea3-6a4a-4390-88d8-4af5d2c81474", "type": "DEFAULT", "name": "default"}
                             ],

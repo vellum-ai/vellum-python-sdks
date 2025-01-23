@@ -9,7 +9,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
+from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType, WorkflowInputsType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
@@ -29,9 +29,6 @@ class InlineSubworkflowNode(BaseNode[StateType], Generic[StateType, WorkflowInpu
 
     subworkflow: Type["BaseWorkflow[WorkflowInputsType, InnerStateType]"]
     subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[UNDEF]]] = UNDEF
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
 
     def run(self) -> Iterator[BaseOutput]:
         with execution_context(parent_context=get_parent_context() or self._context.parent_context):

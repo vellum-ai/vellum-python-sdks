@@ -9,7 +9,6 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -25,9 +24,6 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     max_attempts: int
     retry_on_error_code: Optional[WorkflowErrorCode] = None
     retry_on_condition: Optional[BaseDescriptor] = None
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class SubworkflowInputs(BaseInputs):
         attempt_number: int

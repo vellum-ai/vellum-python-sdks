@@ -1,6 +1,7 @@
 from typing import ClassVar
 
 from vellum.workflows.nodes.displayable.bases import BaseSearchNode as BaseSearchNode
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -17,6 +18,9 @@ class SearchNode(BaseSearchNode[StateType]):
     """
 
     chunk_separator: ClassVar[str] = "\n\n#####\n\n"
+
+    class Trigger(BaseSearchNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseSearchNode.Outputs):
         """

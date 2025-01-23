@@ -5,6 +5,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BaseInlinePromptNode as BaseInlinePromptNode
 from vellum.workflows.outputs import BaseOutput
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -20,6 +21,9 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
     expand_meta: Optional[AdHocExpandMeta] - Expandable execution fields to include in the response
     request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution
     """
+
+    class Trigger(BaseInlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseInlinePromptNode.Outputs):
         """

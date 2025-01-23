@@ -4,6 +4,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BasePromptDeploymentNode as BasePromptDeploymentNode
 from vellum.workflows.outputs import BaseOutput
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -22,6 +23,9 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
     metadata: Optional[Dict[str, Optional[Any]]] - The metadata to use for the Prompt Execution
     request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution
     """
+
+    class Trigger(BasePromptDeploymentNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BasePromptDeploymentNode.Outputs):
         """
