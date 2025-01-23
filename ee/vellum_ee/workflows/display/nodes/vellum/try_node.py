@@ -27,13 +27,7 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
         node = self._node
 
         inner_node = get_wrapped_node(node)
-        if inner_node:
-
-            class TryBaseNodeDisplay(GenericNodeDisplay[node]):
-                pass
-
-            return TryBaseNodeDisplay().serialize(display_context)
-        else:
+        if not inner_node:
             subworkflow = raise_if_descriptor(node.subworkflow)
             if not isinstance(subworkflow.graph, type) or not issubclass(subworkflow.graph, BaseNode):
                 raise NotImplementedError(
@@ -41,6 +35,12 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
                 )
 
             inner_node = subworkflow.graph
+        elif inner_node.__bases__[0] is BaseNode:
+            # If the wrapped node is a generic node, we let generic node do adornment handling
+            class TryBaseNodeDisplay(GenericNodeDisplay[node]):
+                pass
+
+            return TryBaseNodeDisplay().serialize(display_context)
 
         # We need the node display class of the underlying node because
         # it contains the logic for serializing the node and potential display overrides
