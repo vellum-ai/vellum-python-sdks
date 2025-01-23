@@ -138,14 +138,14 @@ class BaseWorkflowDisplay(
     ):
         """This method recursively adds nodes wrapped in decorators to the node_output_displays dictionary."""
 
+        if has_wrapped_node(node):
+            inner_node = get_wrapped_node(node)
+            inner_node_display = self._get_node_display(inner_node)
+            self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
+
         for node_output in node.Outputs:
             if node_output in node_output_displays:
                 continue
-
-            if has_wrapped_node(node):
-                inner_node = get_wrapped_node(node)
-                inner_node_display = self._get_node_display(inner_node)
-                self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
 
             # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
             # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
@@ -159,14 +159,14 @@ class BaseWorkflowDisplay(
     ):
         """This method recursively adds nodes wrapped in decorators to the port_displays dictionary."""
 
+        if has_wrapped_node(node):
+            inner_node = get_wrapped_node(node)
+            inner_node_display = self._get_node_display(inner_node)
+            self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
+
         for port in node.Ports:
             if port in port_displays:
                 continue
-
-            if has_wrapped_node(node):
-                inner_node = get_wrapped_node(node)
-                inner_node_display = self._get_node_display(inner_node)
-                self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
 
             port_displays[port] = node_display.get_node_port_display(port)
 
