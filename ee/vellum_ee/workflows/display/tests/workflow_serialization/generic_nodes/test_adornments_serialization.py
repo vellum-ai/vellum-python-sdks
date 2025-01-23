@@ -10,6 +10,7 @@ from vellum.workflows.outputs.base import BaseOutputs
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 
 
 class Inputs(BaseInputs):
@@ -115,7 +116,8 @@ class InnerTryGenericNode(BaseNode):
         output: str
 
 
-class InnerTryGenericNodeDisplay(BaseNodeDisplay[InnerTryGenericNode.__wrapped_node__]):  # type: ignore
+@BaseTryNodeDisplay.wrap()
+class InnerTryGenericNodeDisplay(BaseNodeDisplay[InnerTryGenericNode]):
     pass
 
 
