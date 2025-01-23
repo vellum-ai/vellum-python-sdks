@@ -4,6 +4,8 @@ from vellum.workflows.references import VellumSecretReference
 
 
 class ApiNode(APINode):
+    """This is my API Node"""
+
     url = "https://www.testing.com"
     method = APIRequestMethod.POST
     json = '"hii"'

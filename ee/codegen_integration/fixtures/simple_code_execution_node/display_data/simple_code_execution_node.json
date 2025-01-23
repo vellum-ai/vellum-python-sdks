@@ -117,6 +117,9 @@
           "position": {
             "x": 1816.3157894736842,
             "y": 213.93599376731305
+          },
+          "comment": {
+            "value": "This is my code execution node"
           }
         }
       },

@@ -6,6 +6,8 @@ from ...inputs import Inputs
 
 
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    """This is my code execution node"""
+
     filepath = "./script.py"
     code_inputs = {
         "arg": Inputs.input,

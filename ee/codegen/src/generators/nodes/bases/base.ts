@@ -14,7 +14,7 @@ import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowProjectGenerator } from "src/project";
-import { WorkflowDataNode } from "src/types/vellum";
+import { NodeDisplayComment, WorkflowDataNode } from "src/types/vellum";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -256,6 +256,7 @@ export abstract class BaseNode<
     const nodeClass = python.class_({
       name: nodeContext.nodeClassName,
       extends_: [nodeBaseClass],
+      docs: this.generateNodeComment(),
       decorators: this.getNodeDecorators(),
     });
 
@@ -329,5 +330,20 @@ export abstract class BaseNode<
     nodeClass.add(this.getDisplayData());
 
     return [nodeClass];
+  }
+
+  private getNodeComment(): NodeDisplayComment | undefined {
+    return this.nodeData.displayData && "comment" in this.nodeData.displayData
+      ? this.nodeData.displayData.comment
+      : undefined;
+  }
+
+  private generateNodeComment(): string | undefined {
+    const nodeComment = this.getNodeComment();
+
+    if (nodeComment && nodeComment.value) {
+      return nodeComment.value;
+    }
+    return undefined;
   }
 }

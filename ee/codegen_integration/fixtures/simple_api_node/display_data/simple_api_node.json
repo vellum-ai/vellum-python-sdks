@@ -233,7 +233,11 @@
             "y": 236.61265174506826
           },
           "width": 467,
-          "height": 288
+          "height": 288,
+          "comment": {
+            "value": "This is my API Node",
+            "expanded": true
+          }
         },
         "base": {
           "module": [
