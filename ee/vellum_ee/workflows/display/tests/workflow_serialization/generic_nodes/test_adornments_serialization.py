@@ -6,8 +6,6 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.outputs.base import BaseOutputs
-from vellum.workflows.state.base import BaseState
-from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
 
@@ -24,7 +22,7 @@ class InnerRetryGenericNode(BaseNode):
         output: str
 
 
-class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode.__wrapped_node__]):
+class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode.__wrapped_node__]):  # type: ignore
     pass
 
 
@@ -32,15 +30,15 @@ class OuterRetryNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode]):
     pass
 
 
-class InnerRetryGenericNodeWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-    graph = {InnerRetryGenericNode}
-
-
 def test_serialize_node__retry(serialize_node):
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=InnerRetryGenericNode,
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+        global_node_displays={
+            InnerRetryGenericNode.__wrapped_node__: InnerRetryGenericNodeDisplay,
+            InnerRetryGenericNode: OuterRetryNodeDisplay,
+        },
     )
 
     assert not DeepDiff(

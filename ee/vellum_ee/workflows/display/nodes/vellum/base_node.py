@@ -18,6 +18,7 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.vellum.utils import convert_descriptor_to_operator
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import primitive_to_vellum_value
@@ -50,11 +51,9 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
 
         if has_wrapped_node(node):
             wrapped_node = get_wrapped_node(node)
+            display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
 
-            class WrappedBaseNodeDisplay(BaseNodeDisplay[wrapped_node]):
-                pass
-
-            adornment = {
+            adornment: JsonObject = {
                 "id": str(node_id),
                 "label": node.__qualname__,
                 "base": self.get_base().dict(),
@@ -62,7 +61,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             }
 
             existing_adornments = adornments if adornments is not None else []
-            return WrappedBaseNodeDisplay().serialize(display_context, adornments=existing_adornments + [adornment])
+            return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
 
         ports: JsonArray = []
         for idx, port in enumerate(node.Ports):
