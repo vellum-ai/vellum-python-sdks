@@ -222,7 +222,6 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
     _inputs: MappingProxyType[NodeReference, Any]
-    _is_wrapped_node: bool = False
 
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference

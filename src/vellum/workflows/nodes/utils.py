@@ -57,8 +57,6 @@ def create_adornment(
         # https://app.shortcut.com/vellum/story/4116
         from vellum.workflows import BaseWorkflow
 
-        inner_cls._is_wrapped_node = True
-
         class Subworkflow(BaseWorkflow):
             graph = inner_cls
 

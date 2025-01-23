@@ -144,9 +144,8 @@ class BaseWorkflowDisplay(
 
             if has_wrapped_node(node):
                 inner_node = get_wrapped_node(node)
-                if inner_node._is_wrapped_node:
-                    inner_node_display = self._get_node_display(inner_node)
-                    self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
+                inner_node_display = self._get_node_display(inner_node)
+                self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
 
             # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
             # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
@@ -166,9 +165,8 @@ class BaseWorkflowDisplay(
 
             if has_wrapped_node(node):
                 inner_node = get_wrapped_node(node)
-                if inner_node._is_wrapped_node:
-                    inner_node_display = self._get_node_display(inner_node)
-                    self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
+                inner_node_display = self._get_node_display(inner_node)
+                self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
 
             port_displays[port] = node_display.get_node_port_display(port)
 
@@ -219,10 +217,8 @@ class BaseWorkflowDisplay(
             if has_wrapped_node(node):
                 inner_node = get_wrapped_node(node)
                 inner_node_display = self._get_node_display(inner_node)
-
-                if inner_node._is_wrapped_node:
-                    node_displays[inner_node] = inner_node_display
-                    global_node_displays[inner_node] = inner_node_display
+                node_displays[inner_node] = inner_node_display
+                global_node_displays[inner_node] = inner_node_display
 
             self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
             self._enrich_node_port_displays(node, node_display, port_displays)

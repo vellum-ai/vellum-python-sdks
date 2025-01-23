@@ -95,11 +95,8 @@ class VellumWorkflowDisplay(
         )
 
         # Add all the nodes in the workflow
-        for node, node_display in self.display_context.node_displays.items():
-            if getattr(node, "_is_wrapped_node") is True:
-                # Nodes that are wrapped or decorated by other nodes are not serialized here
-                # They are instead serialized by the wrapper node
-                continue
+        for node in self._workflow.get_nodes():
+            node_display = self.display_context.node_displays[node]
 
             try:
                 serialized_node = node_display.serialize(self.display_context)
@@ -296,9 +293,7 @@ class VellumWorkflowDisplay(
         )
 
         if has_wrapped_node(entrypoint):
-            wrapped_node = get_wrapped_node(entrypoint)
-            if wrapped_node._is_wrapped_node:
-                entrypoint = wrapped_node
+            entrypoint = get_wrapped_node(entrypoint)
 
         target_node_id = node_displays[entrypoint].node_id
         target_handle_id = node_displays[entrypoint].get_target_handle_id()
