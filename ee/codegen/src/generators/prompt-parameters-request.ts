@@ -79,11 +79,9 @@ export class PromptParameters extends AstNode {
       })
     );
 
-    const topKValue = isNil(this.promptParametersRequest.presencePenalty)
+    const topKValue = isNil(this.promptParametersRequest.topK)
       ? python.TypeInstantiation.none()
-      : python.TypeInstantiation.float(
-          this.promptParametersRequest.presencePenalty
-        );
+      : python.TypeInstantiation.float(this.promptParametersRequest.topK);
     classArgs.push(
       new MethodArgument({
         name: "top_k",
