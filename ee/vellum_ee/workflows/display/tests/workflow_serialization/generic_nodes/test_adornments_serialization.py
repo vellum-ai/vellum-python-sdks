@@ -60,7 +60,7 @@ def test_serialize_node__retry(serialize_node):
                     "test_adornments_serialization",
                 ],
             },
-            "trigger": {"id": "af9ba01c-4cde-4632-9aa1-7673b42e7bd8", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "af9ba01c-4cde-4632-9aa1-7673b42e7bd8", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "55d46900-e558-4264-8802-a5c5fe7226fe", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {

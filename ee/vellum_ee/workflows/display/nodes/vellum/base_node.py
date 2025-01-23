@@ -12,7 +12,7 @@ from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
+from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
@@ -53,8 +53,8 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 }
             )
 
-        if has_wrapped_node(node):
-            wrapped_node = get_wrapped_node(node)
+        wrapped_node = get_wrapped_node(node)
+        if wrapped_node is not None:
             display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
 
             adornment: JsonObject = {
