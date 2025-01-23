@@ -13,7 +13,7 @@ from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeV
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
-from vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay as GenericBaseNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
@@ -36,7 +36,7 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
             inner_node = subworkflow.graph
         elif inner_node.__bases__[0] is BaseNode:
             # If the wrapped node is a generic node, we let generic node do adornment handling
-            class TryBaseNodeDisplay(GenericNodeDisplay[node]):  # type: ignore[valid-type]
+            class TryBaseNodeDisplay(GenericBaseNodeDisplay[node]):  # type: ignore[valid-type]
                 pass
 
             return TryBaseNodeDisplay().serialize(display_context)

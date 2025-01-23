@@ -31,7 +31,7 @@ from vellum_ee.workflows.display.vellum import GenericNodeDisplayData
 _BaseNodeType = TypeVar("_BaseNodeType", bound=BaseNode)
 
 
-class GenericNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeType]):
+class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeType]):
     def serialize(
         self, display_context: WorkflowDisplayContext, adornments: Optional[JsonArray] = None, **kwargs: Any
     ) -> JsonObject:
@@ -55,7 +55,7 @@ class GenericNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNode
 
         wrapped_node = get_wrapped_node(node)
         if wrapped_node is not None:
-            display_class = get_node_display_class(GenericNodeDisplay, wrapped_node)
+            display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
 
             adornment: JsonObject = {
                 "id": str(node_id),

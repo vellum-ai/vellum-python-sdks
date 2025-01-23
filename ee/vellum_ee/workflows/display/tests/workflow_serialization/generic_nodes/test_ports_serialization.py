@@ -8,7 +8,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
 
 
 class Inputs(BaseInputs):
@@ -283,7 +283,7 @@ class NodeWithOutput(BaseNode):
         output = Inputs.input
 
 
-class NodeWithOutputDisplay(GenericNodeDisplay[NodeWithOutput]):
+class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
     pass
 
 
@@ -420,7 +420,7 @@ class NodeWithExecutions(BaseNode):
     pass
 
 
-class NodeWithExecutionsDisplay(GenericNodeDisplay[NodeWithExecutions]):
+class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
     pass
 
 

@@ -10,7 +10,7 @@ from vellum.workflows.types.generics import NodeType
 from vellum_ee.workflows.display.base import WorkflowInputsDisplayType
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.nodes.vellum.generic_node import GenericNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
 from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
 from vellum_ee.workflows.display.vellum import NodeDisplayData, WorkflowMetaVellumDisplay
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
@@ -20,7 +20,7 @@ from vellum_ee.workflows.display.workflows.vellum_workflow_display import Vellum
 def serialize_node():
     def _serialize_node(
         node_class: Type[NodeType],
-        base_class: type[GenericNodeDisplay[Any]] = GenericNodeDisplay,
+        base_class: type[BaseNodeDisplay[Any]] = BaseNodeDisplay,
         global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {},
         global_node_displays: Dict[Type[BaseNode], NodeDisplayType] = {},
         global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = {},

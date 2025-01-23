@@ -194,12 +194,12 @@ def test_push__dry_run_option_returns_report(mock_module, vellum_client):
 from typing import Dict
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
-from vellum_ee.workflows.display.nodes import GenericNodeDisplay
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 
 class NotSupportedNode(BaseNode):
     pass
 
-class NotSupportedNodeDisplay(GenericNodeDisplay[NotSupportedNode]):
+class NotSupportedNodeDisplay(BaseNodeDisplay[NotSupportedNode]):
     def serialize(self, display_context, **kwargs) -> Dict:
         raise NotImplementedError(f"Serialization is not supported.")
 
