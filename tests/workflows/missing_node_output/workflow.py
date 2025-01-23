@@ -11,9 +11,6 @@ class StartNode(BaseNode):
         found_value: Optional[str]
         missing_value: Optional[str]
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
-
     def run(self) -> Iterator[BaseOutput]:
         yield BaseOutput(name="found_value", value="hello")
 
