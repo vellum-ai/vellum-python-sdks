@@ -1112,3 +1112,36 @@ class PromptNode(InlinePromptNode):
     )
 "
 `;
+
+exports[`InlinePromptNode > should generate prompt parameters correctly 1`] = `
+"from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum import JinjaPromptBlock, PromptParameters
+from ..inputs import Inputs
+
+
+class PromptNode(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
+    ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
+    parameters = PromptParameters(
+        stop=["foo", "bar"],
+        temperature=0.12,
+        max_tokens=345,
+        top_p=0.67,
+        top_k=8,
+        frequency_penalty=0.9,
+        presence_penalty=0.11,
+        logit_bias={
+            "foo": 0.1,
+            "bar": 0.2,
+        },
+        custom_parameters={
+            "foo": "bar",
+        },
+    )
+"
+`;

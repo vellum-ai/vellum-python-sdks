@@ -1,4 +1,4 @@
-import { VellumVariableType } from "vellum-ai/api";
+import { VellumVariableType, PromptParameters } from "vellum-ai/api";
 
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
@@ -468,11 +468,13 @@ const generateBlockGivenType = (blockType: string): PromptTemplateBlock => {
 export function inlinePromptNodeDataInlineVariantFactory({
   blockType,
   errorOutputId,
+  parameters,
 }: {
-  blockType: string;
+  blockType?: string;
   errorOutputId?: string;
+  parameters?: PromptParameters;
 }): PromptNode {
-  const block = generateBlockGivenType(blockType);
+  const block = generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
     id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
     type: WorkflowNodeType.PROMPT,
@@ -485,7 +487,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
       sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
       targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
       execConfig: {
-        parameters: {
+        parameters: parameters ?? {
           temperature: 0.0,
           maxTokens: 1000,
           topP: 1.0,

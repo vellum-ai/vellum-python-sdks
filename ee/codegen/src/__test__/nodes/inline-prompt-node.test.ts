@@ -131,4 +131,37 @@ describe("InlinePromptNode", () => {
       });
     });
   });
+
+  it("should generate prompt parameters correctly", async () => {
+    const nodeData = inlinePromptNodeDataInlineVariantFactory({
+      parameters: {
+        temperature: 0.12,
+        maxTokens: 345,
+        topP: 0.67,
+        topK: 8,
+        frequencyPenalty: 0.9,
+        presencePenalty: 0.11,
+        stop: ["foo", "bar"],
+        logitBias: {
+          foo: 0.1,
+          bar: 0.2,
+        },
+        customParameters: {
+          foo: "bar",
+        },
+      },
+    });
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as InlinePromptNodeContext;
+
+    const node = new InlinePromptNode({
+      workflowContext,
+      nodeContext,
+    });
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
 });
