@@ -55,7 +55,7 @@ def test_try_node_display__serialize_with_error_output() -> None:
             {
                 "data": {
                     "node_id": str(MyNode.__wrapped_node__.__id__),
-                    "output_id": "bd5a9f78-a635-4415-a818-ebcfe504c3b5",
+                    "output_id": "efe6e307-3ea4-4862-a26f-4c4416bb4537",
                 },
                 "type": "NODE_OUTPUT",
             }

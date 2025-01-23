@@ -21,9 +21,6 @@ _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
 class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeType]):
     error_output_id: ClassVar[Optional[UUID]] = None
 
-    def _get_error_output_id(self) -> UUID:
-        return self.error_output_id or uuid4_from_hash(f"{self.node_id}|error_output_id")
-
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
 
@@ -67,12 +64,15 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
         if not inner_node:
             return super().get_node_output_display(output)
 
-        if output.name == "error":
-            return inner_node, NodeOutputDisplay(id=self._get_error_output_id(), name="error")
-
-        inner_output = getattr(inner_node.Outputs, output.name)
         node_display_class = get_node_display_class(BaseNodeVellumDisplay, inner_node)
         node_display = node_display_class()
+        if output.name == "error":
+            return inner_node, NodeOutputDisplay(
+                id=self.error_output_id or uuid4_from_hash(f"{node_display.node_id}|error_output_id"),
+                name="error",
+            )
+
+        inner_output = getattr(inner_node.Outputs, output.name)
         return node_display.get_node_output_display(inner_output)
 
     @classmethod
