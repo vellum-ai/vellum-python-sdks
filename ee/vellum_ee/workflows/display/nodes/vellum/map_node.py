@@ -47,16 +47,13 @@ class BaseMapNodeDisplay(BaseNodeVellumDisplay[_MapNodeType], Generic[_MapNodeTy
 
         # Note: This must match the items input ID for the map node's node input
         items_workflow_input_id = next(
-            (input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "items"),
-            None,
+            input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "items"
         )
         item_workflow_input_id = next(
-            (input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "item"),
-            None,
+            input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "item"
         )
         index_workflow_input_id = next(
-            (input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "index"),
-            None,
+            input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "index"
         )
 
         return {
