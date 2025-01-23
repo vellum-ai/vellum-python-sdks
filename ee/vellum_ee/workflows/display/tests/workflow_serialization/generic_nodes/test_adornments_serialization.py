@@ -132,7 +132,7 @@ def test_serialize_node__try(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "f20d49eb-299f-481d-90db-bfa9d1e9d3de",
+            "id": str(InnerTryGenericNode.__wrapped_node__.__id__),
             "label": "InnerTryGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
