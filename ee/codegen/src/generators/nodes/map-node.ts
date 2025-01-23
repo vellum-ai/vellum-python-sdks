@@ -30,11 +30,14 @@ export class MapNode extends BaseNestedWorkflowNode<
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    const itemsField = python.field({
-      name: "items",
-      initializer: this.getNodeInputByName("items"),
-    });
-    statements.push(itemsField);
+    const items = this.getNodeInputByName("items");
+    if (items) {
+      const itemsField = python.field({
+        name: "items",
+        initializer: items,
+      });
+      statements.push(itemsField);
+    }
 
     const nestedWorkflowContext = this.getNestedWorkflowContextByName(
       BaseNestedWorkflowNode.subworkflowNestedProjectName

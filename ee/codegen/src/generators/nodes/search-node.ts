@@ -33,21 +33,24 @@ export class SearchNode extends BaseSingleFileNode<
   getNodeClassBodyStatements(): AstNode[] {
     const bodyStatements: AstNode[] = [];
 
-    bodyStatements.push(
-      python.field({
-        name: "query",
-        initializer: this.getNodeInputByName("query"),
-      })
-    );
+    const query = this.getNodeInputByName("query");
+    if (query) {
+      bodyStatements.push(
+        python.field({
+          name: "query",
+          initializer: query,
+        })
+      );
+    }
 
     const documentName = this.nodeContext.documentIndex?.name;
-
+    const documentIndex = this.getNodeInputByName("document_index_id");
     bodyStatements.push(
       python.field({
         name: "document_index",
         initializer: documentName
           ? python.TypeInstantiation.str(documentName)
-          : this.getNodeInputByName("document_index_id"),
+          : documentIndex ?? python.TypeInstantiation.none(),
       })
     );
 
@@ -110,13 +113,16 @@ export class SearchNode extends BaseSingleFileNode<
       })
     );
 
-    bodyStatements.push(
-      python.field({
-        name: "chunk_separator",
-        initializer: this.getNodeInputByName("separator"),
-      })
-    );
+    const separator = this.findNodeInputByName("separator");
 
+    if (separator) {
+      bodyStatements.push(
+        python.field({
+          name: "chunk_separator",
+          initializer: separator,
+        })
+      );
+    }
     return bodyStatements;
   }
 

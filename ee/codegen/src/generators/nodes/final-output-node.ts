@@ -42,12 +42,15 @@ export class FinalOutputNode extends BaseSingleFileNode<
       ],
     });
 
-    const outputField = python.field({
-      name: "value",
-      initializer: this.getNodeInputByName("node_input"),
-    });
+    const nodeInput = this.getNodeInputByName("node_input");
 
-    outputsClass.add(outputField);
+    if (nodeInput) {
+      const outputField = python.field({
+        name: "value",
+        initializer: nodeInput,
+      });
+      outputsClass.add(outputField);
+    }
 
     return outputsClass;
   }

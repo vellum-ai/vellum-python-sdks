@@ -110,10 +110,12 @@ export abstract class BaseNode<
     return this.nodeInputsByKey.get(name);
   }
 
-  protected getNodeInputByName(name: string): NodeInput {
+  protected getNodeInputByName(name: string): NodeInput | undefined {
     const nodeInput = this.findNodeInputByName(name);
     if (!nodeInput) {
-      throw new NodeAttributeGenerationError(`No input found named "${name}"`);
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(`No input found named "${name}"`)
+      );
     }
 
     return nodeInput;
