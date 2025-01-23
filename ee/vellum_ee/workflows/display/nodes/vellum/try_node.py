@@ -36,7 +36,7 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
             inner_node = subworkflow.graph
         elif inner_node.__bases__[0] is BaseNode:
             # If the wrapped node is a generic node, we let generic node do adornment handling
-            class TryBaseNodeDisplay(GenericNodeDisplay[node]):
+            class TryBaseNodeDisplay(GenericNodeDisplay[node]):  # type: ignore[valid-type]
                 pass
 
             return TryBaseNodeDisplay().serialize(display_context)

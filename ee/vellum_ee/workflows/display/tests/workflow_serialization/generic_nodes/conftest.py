@@ -1,6 +1,6 @@
 import pytest
 from uuid import uuid4
-from typing import Dict, Tuple, Type
+from typing import Any, Dict, Tuple, Type
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.output import OutputReference
@@ -20,7 +20,7 @@ from vellum_ee.workflows.display.workflows.vellum_workflow_display import Vellum
 def serialize_node():
     def _serialize_node(
         node_class: Type[NodeType],
-        base_class: Type[NodeDisplayType] = GenericNodeDisplay,
+        base_class: type[GenericNodeDisplay[Any]] = GenericNodeDisplay,
         global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {},
         global_node_displays: Dict[Type[BaseNode], NodeDisplayType] = {},
         global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = {},
