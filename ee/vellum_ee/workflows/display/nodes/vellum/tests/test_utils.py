@@ -1,13 +1,12 @@
 import pytest
 from uuid import UUID, uuid4
-from typing import List, cast
+from typing import List
 
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
-from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input_value_pointer_rules
@@ -92,12 +91,12 @@ def test_create_node_input_value_pointer_rules(
                 entrypoint_node_display=NodeDisplayData(),
             ),
             global_workflow_input_displays={
-                cast(WorkflowInputReference, Inputs.example_workflow_input): WorkflowInputsVellumDisplayOverrides(
+                Inputs.example_workflow_input: WorkflowInputsVellumDisplayOverrides(
                     id=UUID("a154c29d-fac0-4cd0-ba88-bc52034f5470"),
                 ),
             },
             global_node_output_displays={
-                cast(OutputReference, MyNodeA.Outputs.output): (
+                MyNodeA.Outputs.output: (
                     MyNodeA,
                     NodeOutputDisplay(id=UUID("4b16a629-11a1-4b3f-a965-a57b872d13b8"), name="output"),
                 ),

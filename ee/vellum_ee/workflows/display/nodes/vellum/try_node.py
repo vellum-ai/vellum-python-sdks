@@ -1,15 +1,17 @@
 from uuid import UUID
-from typing import Any, Callable, ClassVar, Generic, Optional, Type, TypeVar, cast
+from typing import Any, Callable, ClassVar, Generic, Optional, Tuple, Type, TypeVar, cast
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME, get_wrapped_node
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
@@ -18,6 +20,9 @@ _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
 
 class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeType]):
     error_output_id: ClassVar[Optional[UUID]] = None
+
+    def _get_error_output_id(self) -> UUID:
+        return self.error_output_id or uuid4_from_hash(f"{self.node_id}|error_output_id")
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
@@ -56,6 +61,19 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
                 serialized_node_definition["name"] = node.__name__
 
         return serialized_node
+
+    def get_node_output_display(self, output: OutputReference) -> Tuple[Type[BaseNode], NodeOutputDisplay]:
+        inner_node = self._node.__wrapped_node__
+        if not inner_node:
+            return super().get_node_output_display(output)
+
+        if output.name == "error":
+            return inner_node, NodeOutputDisplay(id=self._get_error_output_id(), name="error")
+
+        inner_output = getattr(inner_node.Outputs, output.name)
+        node_display_class = get_node_display_class(BaseNodeVellumDisplay, inner_node)
+        node_display = node_display_class()
+        return node_display.get_node_output_display(inner_output)
 
     @classmethod
     def wrap(cls, error_output_id: Optional[UUID] = None) -> Callable[..., Type["BaseTryNodeDisplay"]]:

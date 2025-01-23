@@ -28,8 +28,7 @@ from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
-from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
-from vellum.workflows.references import NodeReference, OutputReference
+from vellum.workflows.references import NodeReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import create_node_input_value_pointer_rule
@@ -56,15 +55,6 @@ def create_node_input(
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = ConstantValuePointer,
 ) -> NodeInput:
     input_id = str(input_id) if input_id else str(uuid4_from_hash(f"{node_id}|{input_name}"))
-    if (
-        isinstance(value, OutputReference)
-        and value.outputs_class._node_class
-        and has_wrapped_node(value.outputs_class._node_class)
-    ):
-        wrapped_node = get_wrapped_node(value.outputs_class._node_class)
-        if wrapped_node._is_wrapped_node:
-            value = getattr(wrapped_node.Outputs, value.name)
-
     rules = create_node_input_value_pointer_rules(value, display_context, pointer_type=pointer_type)
     return NodeInput(
         id=input_id,

@@ -685,8 +685,7 @@ def test_serialize_workflow__try_wrapped():
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
             },
         ],
-        final_output_nodes,
-        ignore_order=True,
+        sorted(final_output_nodes, key=lambda x: x["id"], reverse=True),
     )
 
     # AND each edge should be serialized correctly

@@ -1,3 +1,5 @@
+from typing import Any, Dict, cast
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
@@ -27,11 +29,35 @@ def test_try_node_display__serialize_with_error_output() -> None:
 
     # WHEN we serialize the workflow
     workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=MyWorkflow)
-    serialized_workflow = workflow_display.serialize()
+    serialized_workflow = cast(Dict[str, Any], workflow_display.serialize())
 
     # THEN the correct inputs should be serialized on the node
-    serialized_node = next(node for node in serialized_workflow["nodes"] if node["id"] == str(OtherNode.__id__))
-    hello_input_value = next(input["value"] for input in serialized_node["data"]["inputs"] if input["name"] == "hello")
-    error_input_value = next(input["value"] for input in serialized_node["data"]["inputs"] if input["name"] == "error")
-    assert hello_input_value == {"type": "node_output", "node_id": "my_node", "output_name": "hello"}
-    assert error_input_value == {"type": "node_output", "node_id": "my_node", "output_name": "error"}
+    serialized_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(OtherNode.__id__)
+    )
+    hello_input_value = next(input["value"] for input in serialized_node["inputs"] if input["key"] == "hello")
+    error_input_value = next(input["value"] for input in serialized_node["inputs"] if input["key"] == "error")
+    assert hello_input_value == {
+        "combinator": "OR",
+        "rules": [
+            {
+                "data": {
+                    "node_id": str(MyNode.__wrapped_node__.__id__),
+                    "output_id": "c8fbe459-c9ee-4639-a82d-961180cf9411",
+                },
+                "type": "NODE_OUTPUT",
+            }
+        ],
+    }
+    assert error_input_value == {
+        "combinator": "OR",
+        "rules": [
+            {
+                "data": {
+                    "node_id": str(MyNode.__wrapped_node__.__id__),
+                    "output_id": "bd5a9f78-a635-4415-a818-ebcfe504c3b5",
+                },
+                "type": "NODE_OUTPUT",
+            }
+        ],
+    }

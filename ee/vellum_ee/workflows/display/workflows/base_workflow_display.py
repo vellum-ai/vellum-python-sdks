@@ -150,7 +150,7 @@ class BaseWorkflowDisplay(
 
             # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
             # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
-            node_output_displays[node_output] = node, node_display.get_node_output_display(node_output)
+            node_output_displays[node_output] = node_display.get_node_output_display(node_output)
 
     def _enrich_node_port_displays(
         self,
