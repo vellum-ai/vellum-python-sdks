@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, Optional, TypeVar, cast
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -28,7 +28,7 @@ _BaseNodeType = TypeVar("_BaseNodeType", bound=BaseNode)
 
 class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeType]):
     def serialize(
-        self, display_context: WorkflowDisplayContext, adornments: JsonArray = [], **kwargs: Any
+        self, display_context: WorkflowDisplayContext, adornments: Optional[JsonArray] = None, **kwargs: Any
     ) -> JsonObject:
         node = self._node
         node_id = self.node_id
@@ -61,7 +61,8 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "attributes": attributes,
             }
 
-            return WrappedBaseNodeDisplay().serialize(display_context, adornments=adornments + [adornment])
+            existing_adornments = adornments if adornments is not None else []
+            return WrappedBaseNodeDisplay().serialize(display_context, adornments=existing_adornments + [adornment])
 
         ports: JsonArray = []
         for idx, port in enumerate(node.Ports):
