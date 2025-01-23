@@ -20,7 +20,7 @@ class NextNode(BaseNode):
     missing_value = StartNode.Outputs.missing_value
 
     class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         final_value: str
