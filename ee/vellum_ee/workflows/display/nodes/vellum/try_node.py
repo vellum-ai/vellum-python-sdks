@@ -24,9 +24,8 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
 
-        try:
-            inner_node = get_wrapped_node(node)
-        except AttributeError:
+        inner_node = get_wrapped_node(node)
+        if not inner_node:
             subworkflow = raise_if_descriptor(node.subworkflow)
             if not isinstance(subworkflow.graph, type) or not issubclass(subworkflow.graph, BaseNode):
                 raise NotImplementedError(

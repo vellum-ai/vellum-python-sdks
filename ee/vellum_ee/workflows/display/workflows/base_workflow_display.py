@@ -11,7 +11,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
+from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
@@ -138,8 +138,8 @@ class BaseWorkflowDisplay(
     ):
         """This method recursively adds nodes wrapped in decorators to the node_output_displays dictionary."""
 
-        if has_wrapped_node(node):
-            inner_node = get_wrapped_node(node)
+        inner_node = get_wrapped_node(node)
+        if inner_node:
             inner_node_display = self._get_node_display(inner_node)
             self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
 
@@ -159,8 +159,8 @@ class BaseWorkflowDisplay(
     ):
         """This method recursively adds nodes wrapped in decorators to the port_displays dictionary."""
 
-        if has_wrapped_node(node):
-            inner_node = get_wrapped_node(node)
+        inner_node = get_wrapped_node(node)
+        if inner_node:
             inner_node_display = self._get_node_display(inner_node)
             self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
 
@@ -214,8 +214,8 @@ class BaseWorkflowDisplay(
             global_node_displays[node] = node_display
 
             # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
-            if has_wrapped_node(node):
-                inner_node = get_wrapped_node(node)
+            inner_node = get_wrapped_node(node)
+            if inner_node:
                 inner_node_display = self._get_node_display(inner_node)
                 node_displays[inner_node] = inner_node_display
                 global_node_displays[inner_node] = inner_node_display

@@ -7,7 +7,7 @@ from vellum.workflows.edges import Edge
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
-from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node, has_wrapped_node
+from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port
 from vellum.workflows.ports import Port
 from vellum.workflows.references import WorkflowInputReference
 from vellum.workflows.references.output import OutputReference
@@ -292,11 +292,9 @@ class VellumWorkflowDisplay(
             else uuid4_from_hash(f"{self.workflow_id}|id|{entrypoint_node_id}")
         )
 
-        if has_wrapped_node(entrypoint):
-            entrypoint = get_wrapped_node(entrypoint)
-
-        target_node_id = node_displays[entrypoint].node_id
-        target_handle_id = node_displays[entrypoint].get_target_handle_id()
+        entrypoint_target = get_unadorned_node(entrypoint)
+        target_node_id = node_displays[entrypoint_target].node_id
+        target_handle_id = node_displays[entrypoint_target].get_target_handle_id()
 
         edge_display = self._generate_edge_display_from_source(
             entrypoint_node_id, source_handle_id, target_node_id, target_handle_id, overrides=edge_display_overrides
