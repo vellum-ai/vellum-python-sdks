@@ -83,10 +83,9 @@ describe("GuardrailNode", () => {
       workflowContext,
       nodeData,
     })) as GuardrailNodeContext;
-    workflowContext.addNodeContext(nodeContext);
 
     return new GuardrailNode({
-      workflowContext: workflowContext,
+      workflowContext,
       nodeContext,
     });
   };

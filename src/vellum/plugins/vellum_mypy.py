@@ -19,6 +19,7 @@ from mypy.plugin import AttributeContext, ClassDefContext, FunctionSigContext, M
 from mypy.types import AnyType, CallableType, FunctionLike, Instance, Type as MypyType, TypeAliasType, UnionType
 
 TypeResolver = Callable[[str, List[MypyType]], MypyType]
+NODE_ATTRIBUTE_REGEX = r"^[a-z].*$"
 
 DESCRIPTOR_PATHS: list[tuple[str, str, str]] = [
     (
@@ -49,7 +50,7 @@ DESCRIPTOR_PATHS: list[tuple[str, str, str]] = [
     (
         "vellum.workflows.nodes.bases.base.BaseNode",
         "vellum.workflows.references.node.NodeReference",
-        r"^[a-z].*$",
+        NODE_ATTRIBUTE_REGEX,
     ),
 ]
 
@@ -239,8 +240,11 @@ class VellumMypyPlugin(Plugin):
         the original defined type, and the descriptor version of the type.
         """
 
-        for sym in ctx.cls.info.names.values():
+        for key, sym in ctx.cls.info.names.items():
             if not isinstance(sym.node, Var):
+                continue
+
+            if not re.match(NODE_ATTRIBUTE_REGEX, key):
                 continue
 
             type_ = sym.node.type

@@ -1,4 +1,5 @@
 from vellum import SearchResponse, SearchResult, SearchResultDocument
+from vellum.client.types.json_vellum_value_request import JsonVellumValueRequest
 from vellum.client.types.search_filters_request import SearchFiltersRequest
 from vellum.client.types.search_request_options_request import SearchRequestOptionsRequest
 from vellum.client.types.search_result_merging_request import SearchResultMergingRequest
@@ -39,7 +40,11 @@ def test_run_workflow__happy_path(vellum_client):
                         lhs_variable="TYPE",
                         operator="=",
                         rhs_variable="COMPANY",
-                    )
+                    ),
+                    MetadataLogicalCondition(
+                        lhs_variable="NAME",
+                        operator="notNull",
+                    ),
                 ],
             ),
         )
@@ -81,7 +86,12 @@ def test_run_workflow__happy_path(vellum_client):
                         lhs_variable=StringVellumValueRequest(value="TYPE"),
                         operator="=",
                         rhs_variable=StringVellumValueRequest(value="COMPANY"),
-                    )
+                    ),
+                    VellumValueLogicalConditionRequest(
+                        lhs_variable=StringVellumValueRequest(value="NAME"),
+                        operator="notNull",
+                        rhs_variable=JsonVellumValueRequest(value=None),
+                    ),
                 ],
             ),
         ),

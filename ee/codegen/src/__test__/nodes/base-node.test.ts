@@ -25,7 +25,6 @@ describe("BaseNode", () => {
         workflowContext,
         nodeData: templatingNodeData,
       })) as TemplatingNodeContext;
-      workflowContext.addNodeContext(templatingNodeContext);
 
       expect(() => {
         new TemplatingNode({
@@ -43,11 +42,10 @@ describe("BaseNode", () => {
       const workflowContext = workflowContextFactory();
 
       const templatingNodeData = templatingNodeFactory();
-      const templatingNodeContext = (await createNodeContext({
+      await createNodeContext({
         workflowContext,
         nodeData: templatingNodeData,
-      })) as TemplatingNodeContext;
-      workflowContext.addNodeContext(templatingNodeContext);
+      });
 
       const templatingNode2Data = templatingNodeFactory({
         label: "TemplatingNode2",
@@ -68,7 +66,6 @@ describe("BaseNode", () => {
         workflowContext,
         nodeData: templatingNode2Data,
       })) as TemplatingNodeContext;
-      workflowContext.addNodeContext(templatingNode2Context);
 
       expect(() => {
         new TemplatingNode({

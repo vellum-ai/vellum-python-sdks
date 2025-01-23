@@ -4,8 +4,12 @@ from typing import Any, Generic, Optional, TypeVar, cast
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.between import BetweenExpression
+from vellum.workflows.expressions.is_nil import IsNilExpression
+from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
 from vellum.workflows.expressions.is_not_null import IsNotNullExpression
+from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
+from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
@@ -127,17 +131,27 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
         return explicit_value if explicit_value else GenericNodeDisplayData()
 
     def serialize_condition(self, display_context: WorkflowDisplayContext, condition: BaseDescriptor) -> JsonObject:
-        if isinstance(condition, (IsNullExpression, IsNotNullExpression)):
-            lhs = self.serialize_value(display_context, condition._expression)  # type: ignore[attr-defined]
+        if isinstance(
+            condition,
+            (
+                IsNullExpression,
+                IsNotNullExpression,
+                IsNilExpression,
+                IsNotNilExpression,
+                IsUndefinedExpression,
+                IsNotUndefinedExpression,
+            ),
+        ):
+            lhs = self.serialize_value(display_context, condition._expression)
             return {
                 "type": "UNARY_EXPRESSION",
                 "lhs": lhs,
                 "operator": convert_descriptor_to_operator(condition),
             }
         elif isinstance(condition, (BetweenExpression, NotBetweenExpression)):
-            base = self.serialize_value(display_context, condition._value)  # type: ignore[attr-defined]
-            lhs = self.serialize_value(display_context, condition._start)  # type: ignore[attr-defined]
-            rhs = self.serialize_value(display_context, condition._end)  # type: ignore[attr-defined]
+            base = self.serialize_value(display_context, condition._value)
+            lhs = self.serialize_value(display_context, condition._start)
+            rhs = self.serialize_value(display_context, condition._end)
 
             return {
                 "type": "TERNARY_EXPRESSION",

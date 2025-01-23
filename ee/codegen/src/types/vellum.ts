@@ -797,3 +797,7 @@ export type OperatorMapping =
   | "not_in"
   | "between"
   | "not_between";
+
+export interface IterableConfig {
+  endWithComma?: boolean;
+}

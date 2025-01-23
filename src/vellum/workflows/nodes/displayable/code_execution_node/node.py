@@ -26,7 +26,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
 from vellum.workflows.outputs.base import BaseOutputs
-from vellum.workflows.types.core import EntityInputsInterface, VellumSecret
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, VellumSecret
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
@@ -81,6 +81,9 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
     packages: Optional[Sequence[CodeExecutionPackage]] = None
 
     request_options: Optional[RequestOptions] = None
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseOutputs):
         # We use our mypy plugin to override the _OutputType with the actual output type

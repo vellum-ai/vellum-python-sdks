@@ -37,12 +37,10 @@ describe("Workflow", () => {
     workflowContext.addEntrypointNode(entrypointNode);
 
     const nodeData = terminalNodeDataFactory();
-    workflowContext.addNodeContext(
-      await createNodeContext({
-        workflowContext: workflowContext,
-        nodeData,
-      })
-    );
+    await createNodeContext({
+      workflowContext: workflowContext,
+      nodeData,
+    });
 
     writer = new Writer();
   });
@@ -122,11 +120,10 @@ describe("Workflow", () => {
       const inputs = codegen.inputs({ workflowContext });
 
       const searchNodeData = searchNodeDataFactory();
-      const searchNodeContext = await createNodeContext({
+      await createNodeContext({
         workflowContext: workflowContext,
         nodeData: searchNodeData,
       });
-      workflowContext.addNodeContext(searchNodeContext);
 
       const edges: WorkflowEdge[] = [
         {
@@ -167,12 +164,10 @@ describe("Workflow", () => {
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
       });
-      workflowContext.addNodeContext(
-        await createNodeContext({
-          workflowContext: workflowContext,
-          nodeData: templatingNodeData1,
-        })
-      );
+      await createNodeContext({
+        workflowContext: workflowContext,
+        nodeData: templatingNodeData1,
+      });
 
       const templatingNodeData2 = templatingNodeFactory({
         id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -180,12 +175,10 @@ describe("Workflow", () => {
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
       });
-      workflowContext.addNodeContext(
-        await createNodeContext({
-          workflowContext: workflowContext,
-          nodeData: templatingNodeData2,
-        })
-      );
+      await createNodeContext({
+        workflowContext: workflowContext,
+        nodeData: templatingNodeData2,
+      });
 
       const edges: WorkflowEdge[] = [
         {
@@ -239,11 +232,10 @@ describe("Workflow", () => {
         );
 
         const searchNodeData = searchNodeDataFactory();
-        const searchNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext: workflowContext,
           nodeData: searchNodeData,
         });
-        workflowContext.addNodeContext(searchNodeContext);
 
         const edges: WorkflowEdge[] = [
           {
@@ -272,11 +264,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -284,11 +275,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const edges: WorkflowEdge[] = [
           {
@@ -325,11 +315,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -337,11 +326,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -349,11 +337,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const edges: WorkflowEdge[] = [
           {
@@ -402,11 +389,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -414,11 +400,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const edges: WorkflowEdge[] = [
           {
@@ -455,11 +440,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -467,18 +451,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const mergeNodeData = mergeNodeDataFactory();
-        const mergeNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: mergeNodeData,
         });
-        workflowContext.addNodeContext(mergeNodeContext);
         const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
         const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
         if (!mergeTargetHandle1 || !mergeTargetHandle2) {
@@ -536,11 +518,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -548,11 +529,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -560,18 +540,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const mergeNodeData = mergeNodeDataFactory();
-        const mergeNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: mergeNodeData,
         });
-        workflowContext.addNodeContext(mergeNodeContext);
         const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
         const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
         if (!mergeTargetHandle1 || !mergeTargetHandle2) {
@@ -650,11 +628,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -662,11 +639,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -674,18 +650,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const mergeNodeData = mergeNodeDataFactory();
-        const mergeNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: mergeNodeData,
         });
-        workflowContext.addNodeContext(mergeNodeContext);
         const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
         const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
         if (!mergeTargetHandle1 || !mergeTargetHandle2) {
@@ -756,11 +730,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -768,11 +741,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -780,18 +752,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const mergeNodeData = mergeNodeDataFactory();
-        const mergeNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: mergeNodeData,
         });
-        workflowContext.addNodeContext(mergeNodeContext);
         const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
         const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
         if (!mergeTargetHandle1 || !mergeTargetHandle2) {
@@ -862,11 +832,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -874,18 +843,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const conditionalNodeData = conditionalNodeFactory();
-        const conditionalNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: conditionalNodeData,
         });
-        workflowContext.addNodeContext(conditionalNodeContext);
         const conditionalIfSourceHandleId =
           conditionalNodeData.data.conditions[0]?.sourceHandleId;
         const conditionalElseSourceHandleId =
@@ -941,11 +908,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -953,11 +919,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -965,11 +930,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const edges: WorkflowEdge[] = [
           {
@@ -1018,11 +982,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1030,11 +993,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -1042,11 +1004,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const edges: WorkflowEdge[] = [
           {
@@ -1095,11 +1056,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1107,11 +1067,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -1119,11 +1078,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const edges: WorkflowEdge[] = [
           {
@@ -1172,11 +1130,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1184,11 +1141,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -1196,11 +1152,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const templatingNodeData4 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf83",
@@ -1208,11 +1163,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9b",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294b",
         });
-        const templatingNodeContext4 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData4,
         });
-        workflowContext.addNodeContext(templatingNodeContext4);
 
         const edges: WorkflowEdge[] = [
           {
@@ -1278,11 +1232,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1290,11 +1243,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
@@ -1302,11 +1254,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const templatingNodeData4 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf83",
@@ -1314,11 +1265,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9b",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294b",
         });
-        const templatingNodeContext4 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData4,
         });
-        workflowContext.addNodeContext(templatingNodeContext4);
 
         const templatingNodeData5 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf84",
@@ -1326,18 +1276,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9c",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294c",
         });
-        const templatingNodeContext5 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData5,
         });
-        workflowContext.addNodeContext(templatingNodeContext5);
 
         const mergeNodeData = mergeNodeDataFactory();
-        const mergeNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: mergeNodeData,
         });
-        workflowContext.addNodeContext(mergeNodeContext);
         const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
         const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
         if (!mergeTargetHandle1 || !mergeTargetHandle2) {
@@ -1426,11 +1374,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1438,18 +1385,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const conditionalNodeData = conditionalNodeFactory();
-        const conditionalNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: conditionalNodeData,
         });
-        workflowContext.addNodeContext(conditionalNodeContext);
         const conditionalIfSourceHandleId =
           conditionalNodeData.data.conditions[0]?.sourceHandleId;
         const conditionalElseSourceHandleId =
@@ -1505,11 +1450,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1517,11 +1461,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf83",
@@ -1529,11 +1472,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9b",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294b",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const templatingNodeData4 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf84",
@@ -1541,18 +1483,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9c",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294c",
         });
-        const templatingNodeContext4 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData4,
         });
-        workflowContext.addNodeContext(templatingNodeContext4);
 
         const conditionalNodeData = conditionalNodeFactory();
-        const conditionalNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: conditionalNodeData,
         });
-        workflowContext.addNodeContext(conditionalNodeContext);
         const conditionalIfSourceHandleId =
           conditionalNodeData.data.conditions[0]?.sourceHandleId;
         const conditionalElseSourceHandleId =
@@ -1617,11 +1557,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1629,11 +1568,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf83",
@@ -1641,11 +1579,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9b",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294b",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const templatingNodeData4 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf84",
@@ -1653,18 +1590,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9c",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294c",
         });
-        const templatingNodeContext4 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData4,
         });
-        workflowContext.addNodeContext(templatingNodeContext4);
 
         const conditionalNodeData = conditionalNodeFactory();
-        const conditionalNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: conditionalNodeData,
         });
-        workflowContext.addNodeContext(conditionalNodeContext);
         const conditionalIfSourceHandleId =
           conditionalNodeData.data.conditions[0]?.sourceHandleId;
         const conditionalElseSourceHandleId =
@@ -1680,11 +1615,10 @@ describe("Workflow", () => {
           ifSourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a6",
           elseSourceHandleId: "14a8b603-6039-4491-92d4-868a4dae4c16",
         });
-        const conditionalNode2Context = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: conditionalNode2Data,
         });
-        workflowContext.addNodeContext(conditionalNode2Context);
         const conditional2IfSourceHandleId =
           conditionalNode2Data.data.conditions[0]?.sourceHandleId;
         const conditional2ElseSourceHandleId =
@@ -1767,11 +1701,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1779,11 +1712,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const templatingNodeData3 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf83",
@@ -1791,11 +1723,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9b",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294b",
         });
-        const templatingNodeContext3 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData3,
         });
-        workflowContext.addNodeContext(templatingNodeContext3);
 
         const templatingNodeData4 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf84",
@@ -1803,11 +1734,10 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9c",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294c",
         });
-        const templatingNodeContext4 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData4,
         });
-        workflowContext.addNodeContext(templatingNodeContext4);
 
         const templatingNodeData5 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf85",
@@ -1815,18 +1745,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9d",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294d",
         });
-        const templatingNodeContext5 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData5,
         });
-        workflowContext.addNodeContext(templatingNodeContext5);
 
         const conditionalNodeData = conditionalNodeFactory();
-        const conditionalNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: conditionalNodeData,
         });
-        workflowContext.addNodeContext(conditionalNodeContext);
         const conditionalIfSourceHandleId =
           conditionalNodeData.data.conditions[0]?.sourceHandleId;
         const conditionalElseSourceHandleId =
@@ -1917,11 +1845,10 @@ describe("Workflow", () => {
         const inputs = codegen.inputs({ workflowContext });
 
         const templatingNodeData1 = templatingNodeFactory();
-        const templatingNodeContext1 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData1,
         });
-        workflowContext.addNodeContext(templatingNodeContext1);
 
         const templatingNodeData2 = templatingNodeFactory({
           id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
@@ -1929,18 +1856,16 @@ describe("Workflow", () => {
           sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
           targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
         });
-        const templatingNodeContext2 = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: templatingNodeData2,
         });
-        workflowContext.addNodeContext(templatingNodeContext2);
 
         const mergeNodeData = mergeNodeDataFactory();
-        const mergeNodeContext = await createNodeContext({
+        await createNodeContext({
           workflowContext,
           nodeData: mergeNodeData,
         });
-        workflowContext.addNodeContext(mergeNodeContext);
         const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
         const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
         if (!mergeTargetHandle1 || !mergeTargetHandle2) {

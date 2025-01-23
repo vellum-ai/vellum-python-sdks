@@ -28,6 +28,8 @@ import {
   NodePort,
   NodeAttribute,
   NodeOutput,
+  AdornmentNode,
+  ConstantValuePointer,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -97,6 +99,7 @@ export function searchNodeDataFactory(args?: {
   metadataFilters?: VellumLogicalConditionGroup;
   metadataFilterInputs?: NodeInput[];
   errorOutputId?: string;
+  limitInput?: ConstantValuePointer;
 }): SearchNode {
   const errorOutputId = args?.errorOutputId;
 
@@ -231,7 +234,7 @@ export function searchNodeDataFactory(args?: {
         key: "limit",
         value: {
           rules: [
-            {
+            args?.limitInput ?? {
               type: "CONSTANT_VALUE",
               data: {
                 type: "NUMBER",
@@ -1355,12 +1358,14 @@ export function genericNodeFactory(
     nodePorts,
     nodeAttributes,
     nodeOutputs,
+    adornments,
   }: {
     name: string;
     nodeTrigger?: NodeTrigger;
     nodePorts?: NodePort[];
     nodeAttributes?: NodeAttribute[];
     nodeOutputs?: NodeOutput[];
+    adornments?: AdornmentNode[];
   } = {
     name: "MyCustomNode",
   }
@@ -1423,6 +1428,7 @@ export function genericNodeFactory(
         },
       },
     ],
+    adornments: adornments,
   };
   return nodeData;
 }

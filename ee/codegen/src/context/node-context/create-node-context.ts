@@ -1,9 +1,3 @@
-import { VellumError } from "vellum-ai";
-import { DocumentIndexRead, MetricDefinitionHistoryItem } from "vellum-ai/api";
-import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
-import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
-import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
-
 import { BaseNodeContext } from "./base";
 import { GuardrailNodeContext } from "./guardrail-node";
 import { InlineSubworkflowNodeContext } from "./inline-subworkflow-node";
@@ -22,58 +16,23 @@ import { NoteNodeContext } from "src/context/node-context/note-node";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
-import {
-  EntityNotFoundError,
-  NodeDefinitionGenerationError,
-} from "src/generators/errors";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import {
   InlinePromptNode,
-  InlinePromptNodeData,
-  LegacyPromptNodeData,
   WorkflowDataNode,
   WorkflowNodeType,
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
-export async function createNodeContext(
+function buildNodeContext(
   args: BaseNodeContext.Args<WorkflowDataNode>
-): Promise<BaseNodeContext<WorkflowDataNode>> {
+): BaseNodeContext<WorkflowDataNode> {
   const nodeData = args.nodeData;
   switch (nodeData.type) {
     case WorkflowNodeType.SEARCH: {
       const searchNodeData = nodeData;
-
-      // Grab the associated document index from api if available to always populate document_index field
-      // with name instead of ID. We can only do this if the document index input is a constant value.
-      let documentIndex: DocumentIndexRead | null = null;
-      const inputValue = searchNodeData.inputs.find(
-        (input) => input.id === searchNodeData.data.documentIndexNodeInputId
-      )?.value;
-
-      const rule = inputValue?.rules?.[0];
-      if (rule?.type === "CONSTANT_VALUE") {
-        if (rule.data.value?.toString()) {
-          try {
-            documentIndex = await new DocumentIndexesClient({
-              apiKey: args.workflowContext.vellumApiKey,
-            }).retrieve(rule.data.value?.toString());
-          } catch (e) {
-            if (e instanceof VellumError && e.statusCode === 404) {
-              args.workflowContext.addError(
-                new EntityNotFoundError(
-                  `Document Index "${rule.data.value?.toString()}" not found.`
-                )
-              );
-            } else {
-              throw e;
-            }
-          }
-        }
-      }
-
       return new TextSearchNodeContext({
         ...args,
-        documentIndex,
         nodeData: searchNodeData,
       });
     }
@@ -89,19 +48,9 @@ export async function createNodeContext(
           });
         }
         case "DEPLOYMENT": {
-          const { releaseTag, workflowDeploymentId } = subworkflowNodeData.data;
-          const workflowDeploymentHistoryItem =
-            await new WorkflowDeploymentsClient({
-              apiKey: args.workflowContext.vellumApiKey,
-            }).workflowDeploymentHistoryItemRetrieve(
-              releaseTag,
-              workflowDeploymentId
-            );
-
           return new SubworkflowDeploymentNodeContext({
             ...args,
             nodeData: subworkflowNodeData,
-            workflowDeploymentHistoryItem,
           });
         }
         default: {
@@ -126,33 +75,9 @@ export async function createNodeContext(
     }
     case WorkflowNodeType.METRIC: {
       const guardrailNodeData = nodeData;
-      let metricDefinitionsHistoryItem:
-        | MetricDefinitionHistoryItem
-        | undefined = undefined;
-
-      try {
-        metricDefinitionsHistoryItem = await new MetricDefinitionsClient({
-          apiKey: args.workflowContext.vellumApiKey,
-        }).metricDefinitionHistoryItemRetrieve(
-          guardrailNodeData.data.releaseTag,
-          guardrailNodeData.data.metricDefinitionId
-        );
-      } catch (e) {
-        if (e instanceof VellumError && e.statusCode === 404) {
-          args.workflowContext.addError(
-            new EntityNotFoundError(
-              `Metric Definition "${guardrailNodeData.data.metricDefinitionId} ${guardrailNodeData.data.releaseTag}" not found.`
-            )
-          );
-        } else {
-          throw e;
-        }
-      }
-
       return new GuardrailNodeContext({
         ...args,
         nodeData: guardrailNodeData,
-        metricDefinitionsHistoryItem,
       });
     }
     case WorkflowNodeType.CODE_EXECUTION: {
@@ -174,32 +99,10 @@ export async function createNodeContext(
           });
         }
         case "LEGACY": {
-          // In the legacy case, we simply convert from LEGACY to INLINE on the fly.
-          const legacyNodeData: LegacyPromptNodeData = promptNodeData.data;
-
-          const promptVersionData =
-            legacyNodeData.sandboxRoutingConfig.promptVersionData;
-          if (!promptVersionData) {
-            throw new NodeDefinitionGenerationError(
-              `Prompt version data not found`
-            );
-          }
-
-          // Dynamically fetch the ML Model's name via API
-          const mlModelName = await args.workflowContext.getMLModelNameById(
-            promptVersionData.mlModelToWorkspaceId
-          );
-
-          const inlinePromptNodeData: InlinePromptNodeData = {
-            ...legacyNodeData,
-            variant: "INLINE",
-            mlModelName,
-            execConfig: promptVersionData.execConfig,
-          };
-
           return new InlinePromptNodeContext({
             ...args,
-            nodeData: { ...promptNodeData, data: inlinePromptNodeData },
+            // This is actually a LegacyPromptNode, but we're converting it to an InlinePromptNode on the fly with `buildProperties`
+            nodeData: promptNodeData as InlinePromptNode,
           });
         }
         case "DEPLOYMENT": {
@@ -275,4 +178,13 @@ export async function createNodeContext(
         `Unsupported node type: ${args.nodeData.type}`
       );
   }
+}
+
+export async function createNodeContext(
+  args: BaseNodeContext.Args<WorkflowDataNode>
+): Promise<BaseNodeContext<WorkflowDataNode>> {
+  const nodeContext = buildNodeContext(args);
+  args.workflowContext.addNodeContext(nodeContext);
+  await nodeContext.buildProperties();
+  return nodeContext;
 }

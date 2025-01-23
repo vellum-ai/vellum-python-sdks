@@ -12,7 +12,6 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
-import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
@@ -43,11 +42,10 @@ describe("InlinePromptNode referenced by Conditional Node", () => {
       errorOutputId: errorOutputId,
     });
 
-    const promptNodeContext = (await createNodeContext({
+    await createNodeContext({
       workflowContext,
       nodeData: promptNode,
-    })) as InlinePromptNodeContext;
-    workflowContext.addNodeContext(promptNodeContext);
+    });
 
     const conditionalNode = conditionalNodeFactory({
       inputReferenceId: errorOutputId,
@@ -58,7 +56,6 @@ describe("InlinePromptNode referenced by Conditional Node", () => {
       workflowContext,
       nodeData: conditionalNode,
     })) as ConditionalNodeContext;
-    workflowContext.addNodeContext(conditionalNodeContext);
 
     node = new ConditionalNode({
       workflowContext,
@@ -131,11 +128,10 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
       errorOutputId: isErrorOutput ? outputId : undefined,
     });
 
-    const promptDeploymentNodeContext = (await createNodeContext({
+    await createNodeContext({
       workflowContext,
       nodeData: promptDeploymentNode,
-    })) as PromptDeploymentNodeContext;
-    workflowContext.addNodeContext(promptDeploymentNodeContext);
+    });
 
     const conditionalNode = conditionalNodeFactory({
       inputReferenceId: outputId,
@@ -146,7 +142,6 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
       workflowContext,
       nodeData: conditionalNode,
     })) as ConditionalNodeContext;
-    workflowContext.addNodeContext(conditionalNodeContext);
 
     node = new ConditionalNode({
       workflowContext,
@@ -167,11 +162,10 @@ describe("InlinePromptNode referenced by Templating Node", () => {
       blockType: "JINJA",
     });
 
-    const promptNodeContext = (await createNodeContext({
+    (await createNodeContext({
       workflowContext,
       nodeData: promptNode,
     })) as InlinePromptNodeContext;
-    workflowContext.addNodeContext(promptNodeContext);
 
     const template: ConstantValuePointer = {
       type: "CONSTANT_VALUE",
@@ -191,7 +185,6 @@ describe("InlinePromptNode referenced by Templating Node", () => {
       workflowContext,
       nodeData: templatingNode,
     })) as TemplatingNodeContext;
-    workflowContext.addNodeContext(templatingNodeContext);
 
     node = new TemplatingNode({
       workflowContext,

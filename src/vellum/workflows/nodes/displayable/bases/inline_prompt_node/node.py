@@ -23,6 +23,7 @@ from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.functions import compile_function_definition
 
@@ -50,6 +51,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = OMIT
+
+    class Trigger(BasePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     def _get_prompt_event_stream(self) -> Iterator[AdHocExecutePromptEvent]:
         input_variables, input_values = self._compile_prompt_inputs()

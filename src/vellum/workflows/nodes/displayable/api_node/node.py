@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.nodes.displayable.bases.api_node import BaseAPINode
-from vellum.workflows.types.core import VellumSecret
+from vellum.workflows.types.core import MergeBehavior, VellumSecret
 
 
 class APINode(BaseAPINode):
@@ -26,6 +26,9 @@ class APINode(BaseAPINode):
     api_key_header_key: Optional[str] = None
     api_key_header_value: Optional[Union[str, VellumSecret]] = None
     bearer_token_value: Optional[Union[str, VellumSecret]] = None
+
+    class Trigger(BaseAPINode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     def run(self) -> BaseAPINode.Outputs:
         headers = self.headers or {}

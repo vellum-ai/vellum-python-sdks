@@ -108,7 +108,7 @@ def is_unresolved(value: Any) -> bool:
     if isinstance(value, Mapping):
         return any(is_unresolved(item) for item in value.values())
 
-    if isinstance(value, Sequence):
+    if isinstance(value, Sequence) and not isinstance(value, str):
         return any(is_unresolved(item) for item in value)
 
     if isinstance(value, Set):

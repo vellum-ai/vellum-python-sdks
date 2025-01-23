@@ -2,6 +2,7 @@ from typing import Iterator, Optional
 
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -17,6 +18,9 @@ class StartNode(BaseNode):
 class NextNode(BaseNode):
     found_value = StartNode.Outputs.found_value
     missing_value = StartNode.Outputs.missing_value
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         final_value: str

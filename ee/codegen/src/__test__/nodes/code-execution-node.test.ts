@@ -26,10 +26,9 @@ describe("CodeExecutionNode", () => {
         workflowContext,
         nodeData,
       })) as CodeExecutionContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new CodeExecutionNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -63,7 +62,6 @@ describe("CodeExecutionNode", () => {
           workflowContext,
           nodeData,
         })) as CodeExecutionContext;
-        workflowContext.addNodeContext(nodeContext);
 
         node = new CodeExecutionNode({
           workflowContext: workflowContext,
@@ -91,7 +89,6 @@ describe("CodeExecutionNode", () => {
         workflowContext,
         nodeData,
       })) as CodeExecutionContext;
-      workflowContext.addNodeContext(nodeContext);
 
       expect(() => {
         new CodeExecutionNode({

@@ -10,7 +10,10 @@ import {
 } from "src/constants";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import { NodeInput } from "src/generators";
-import { NodeAttributeGenerationError } from "src/generators/errors";
+import {
+  NodeAttributeGenerationError,
+  ValueGenerationError,
+} from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
@@ -21,6 +24,7 @@ import {
   VellumLogicalExpression as VellumLogicalExpressionType,
   VellumLogicalExpression,
 } from "src/types/vellum";
+import { isUnaryOperator } from "src/utils/nodes";
 
 export class SearchNode extends BaseSingleFileNode<
   SearchNodeType,
@@ -29,32 +33,63 @@ export class SearchNode extends BaseSingleFileNode<
   getNodeClassBodyStatements(): AstNode[] {
     const bodyStatements: AstNode[] = [];
 
-    bodyStatements.push(
-      python.field({
-        name: "query",
-        initializer: this.getNodeInputByName("query"),
-      })
-    );
+    const query = this.getNodeInputByName("query");
+    if (query) {
+      bodyStatements.push(
+        python.field({
+          name: "query",
+          initializer: query,
+        })
+      );
+    }
 
     const documentName = this.nodeContext.documentIndex?.name;
-
+    const documentIndex = this.getNodeInputByName("document_index_id");
     bodyStatements.push(
       python.field({
         name: "document_index",
         initializer: documentName
           ? python.TypeInstantiation.str(documentName)
-          : this.getNodeInputByName("document_index_id"),
+          : documentIndex ?? python.TypeInstantiation.none(),
       })
     );
 
     const limitInput = this.findNodeInputByName("limit");
     if (limitInput) {
-      bodyStatements.push(
-        python.field({
-          name: "limit",
-          initializer: limitInput,
-        })
-      );
+      const limitValue = limitInput.nodeInputData?.value.rules[0];
+      if (
+        limitValue?.type === "CONSTANT_VALUE" &&
+        limitValue.data.type === "STRING"
+      ) {
+        if (limitValue.data.value != null) {
+          const parsedInt = parseInt(limitValue.data.value);
+          if (isNaN(parsedInt)) {
+            throw new ValueGenerationError(
+              `Failed to parse search node limit value "${limitValue.data.value}" as an integer`
+            );
+          }
+          bodyStatements.push(
+            python.field({
+              name: "limit",
+              initializer: python.TypeInstantiation.int(parsedInt),
+            })
+          );
+        }
+      } else if (
+        limitValue?.type === "CONSTANT_VALUE" &&
+        limitValue.data.type !== "NUMBER"
+      ) {
+        throw new NodeAttributeGenerationError(
+          `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`
+        );
+      } else {
+        bodyStatements.push(
+          python.field({
+            name: "limit",
+            initializer: limitInput,
+          })
+        );
+      }
     }
 
     bodyStatements.push(
@@ -78,13 +113,16 @@ export class SearchNode extends BaseSingleFileNode<
       })
     );
 
-    bodyStatements.push(
-      python.field({
-        name: "chunk_separator",
-        initializer: this.getNodeInputByName("separator"),
-      })
-    );
+    const separator = this.findNodeInputByName("separator");
 
+    if (separator) {
+      bodyStatements.push(
+        python.field({
+          name: "chunk_separator",
+          initializer: separator,
+        })
+      );
+    }
     return bodyStatements;
   }
 
@@ -301,17 +339,20 @@ export class SearchNode extends BaseSingleFileNode<
         )?.nodeInputData?.id;
         if (!lhsQueryInput) {
           throw new NodeAttributeGenerationError(
-            `Could not find node input for id ${logicalExpression.lhsVariableId}`
+            `Could not find search node query input for id ${logicalExpression.lhsVariableId}`
           );
         }
-        if (!rhsQueryInput) {
+        if (!isUnaryOperator(logicalExpression.operator) && !rhsQueryInput) {
           throw new NodeAttributeGenerationError(
-            `Could not find node input for id ${logicalExpression.rhsVariableId}`
+            `Could not find search node query input for id ${logicalExpression.rhsVariableId}`
           );
         }
 
-        result.set(logicalExpression.lhsVariableId, rhsQueryInput);
-        result.set(logicalExpression.rhsVariableId, rhsQueryInput);
+        result.set(logicalExpression.lhsVariableId, lhsQueryInput);
+
+        if (rhsQueryInput) {
+          result.set(logicalExpression.rhsVariableId, rhsQueryInput);
+        }
       } else if (logicalExpression.type === "LOGICAL_CONDITION_GROUP") {
         logicalExpression.conditions.forEach((condition) =>
           traverse(condition)
@@ -463,19 +504,41 @@ export class SearchNodeMetadataFilters extends AstNode {
   private generateLogicalConditionArguments(
     data: VellumLogicalConditionType
   ): python.ClassInstantiation {
+    const args: python.MethodArgument[] = [];
+
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
     if (!lhs) {
       throw new NodeAttributeGenerationError(
-        `Could not find node input for id ${lhsId}`
+        `Could not find search node input for id ${lhsId}`
       );
     }
 
+    args.push(
+      python.methodArgument({
+        name: "lhs_variable",
+        value: lhs,
+      }),
+      python.methodArgument({
+        name: "operator",
+        value: python.TypeInstantiation.str(data.operator),
+      })
+    );
+
     const rhsId = data.rhsVariableId;
     const rhs = this.nodeInputsById.get(rhsId);
-    if (!rhs) {
+    if (!isUnaryOperator(data.operator) && !rhs) {
       throw new NodeAttributeGenerationError(
-        `Could not find node input for id ${rhsId}`
+        `Could not find search node input for id ${rhsId}`
+      );
+    }
+
+    if (rhs) {
+      args.push(
+        python.methodArgument({
+          name: "rhs_variable",
+          value: rhs,
+        })
       );
     }
 
@@ -484,20 +547,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         name: "MetadataLogicalCondition",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
-      arguments_: [
-        python.methodArgument({
-          name: "lhs_variable",
-          value: lhs,
-        }),
-        python.methodArgument({
-          name: "operator",
-          value: python.TypeInstantiation.str(data.operator),
-        }),
-        python.methodArgument({
-          name: "rhs_variable",
-          value: rhs,
-        }),
-      ],
+      arguments_: args,
     });
   }
 

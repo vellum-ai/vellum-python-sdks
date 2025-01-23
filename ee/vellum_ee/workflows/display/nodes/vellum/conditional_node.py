@@ -5,8 +5,12 @@ from typing import Any, ClassVar, Dict, Generic, List, Optional, Tuple, TypeVar,
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.and_ import AndExpression
 from vellum.workflows.expressions.between import BetweenExpression
+from vellum.workflows.expressions.is_nil import IsNilExpression
+from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
 from vellum.workflows.expressions.is_not_null import IsNotNullExpression
+from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
+from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.displayable import ConditionalNode
@@ -89,7 +93,17 @@ but the defined conditions have length {len(condition_ids)}"""
                 }
 
             # Base cases for other descriptors
-            elif isinstance(descriptor, (IsNullExpression, IsNotNullExpression)):
+            elif isinstance(
+                descriptor,
+                (
+                    IsNullExpression,
+                    IsNotNullExpression,
+                    IsNilExpression,
+                    IsNotNilExpression,
+                    IsUndefinedExpression,
+                    IsNotUndefinedExpression,
+                ),
+            ):
                 expression_node_input = create_node_input(
                     node_id, f"{current_id}.field", descriptor._expression, display_context, field_node_input_id
                 )

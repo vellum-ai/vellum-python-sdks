@@ -17,6 +17,7 @@ from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
+from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -46,6 +47,9 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     raw_overrides: Optional[RawPromptExecutionOverridesRequest] = OMIT
     expand_raw: Optional[Sequence[str]] = OMIT
     metadata: Optional[Dict[str, Optional[Any]]] = OMIT
+
+    class Trigger(BasePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     def _get_prompt_event_stream(self) -> Iterator[ExecutePromptEvent]:
         current_parent_context = get_parent_context()

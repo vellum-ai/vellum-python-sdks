@@ -4,6 +4,7 @@ from types import ModuleType
 from typing import Any, Callable, Optional, Type, TypeVar
 
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.types.generics import NodeType
 
@@ -12,7 +13,7 @@ ADORNMENT_MODULE_NAME = "<adornment>"
 
 @cache
 def get_unadorned_node(node: Type[BaseNode]) -> Type[BaseNode]:
-    wrapped_node = getattr(node, "__wrapped_node__", None)
+    wrapped_node = get_wrapped_node(node)
     if wrapped_node is not None:
         return get_unadorned_node(wrapped_node)
 
@@ -28,22 +29,11 @@ def get_unadorned_port(port: Port) -> Port:
     return getattr(unadorned_node.Ports, port.name)
 
 
-@cache
-def get_wrapped_node(node: Type[NodeType]) -> Type[BaseNode]:
-    wrapped_node = getattr(node, "__wrapped_node__", None)
-    if wrapped_node is None:
-        raise AttributeError("Wrapped node not found")
+def get_wrapped_node(node: Type[NodeType]) -> Optional[Type[BaseNode]]:
+    if not issubclass(node, BaseAdornmentNode):
+        return None
 
-    return wrapped_node
-
-
-def has_wrapped_node(node: Type[NodeType]) -> bool:
-    try:
-        get_wrapped_node(node)
-    except AttributeError:
-        return False
-
-    return True
+    return node.__wrapped_node__
 
 
 AdornableNode = TypeVar("AdornableNode", bound=BaseNode)
@@ -56,8 +46,6 @@ def create_adornment(
         # Investigate how to use dependency injection to avoid circular imports
         # https://app.shortcut.com/vellum/story/4116
         from vellum.workflows import BaseWorkflow
-
-        inner_cls._is_wrapped_node = True
 
         class Subworkflow(BaseWorkflow):
             graph = inner_cls

@@ -11,6 +11,9 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
       [this.nodeData.data.jsonOutputId]: "json",
       [this.nodeData.data.statusCodeOutputId]: "status_code",
       [this.nodeData.data.textOutputId]: "text",
+      ...(this.nodeData.data.errorOutputId
+        ? { [this.nodeData.data.errorOutputId]: "error" }
+        : {}),
     };
   }
 

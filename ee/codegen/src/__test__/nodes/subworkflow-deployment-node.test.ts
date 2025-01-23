@@ -38,7 +38,6 @@ describe("SubworkflowDeploymentNode", () => {
         workflowContext,
         nodeData,
       })) as SubworkflowDeploymentNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new SubworkflowDeploymentNode({
         workflowContext,

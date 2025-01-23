@@ -17,6 +17,7 @@ import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
+import { IterableConfig } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
@@ -231,12 +232,15 @@ class ImageVellumValue extends AstNode {
 class ArrayVellumValue extends AstNode {
   private astNode: python.AstNode;
 
-  public constructor(value: unknown) {
+  public constructor(value: unknown, iterableConfig?: IterableConfig) {
     super();
-    this.astNode = this.generateAstNode(value);
+    this.astNode = this.generateAstNode(value, iterableConfig);
   }
 
-  private generateAstNode(value: unknown): AstNode {
+  private generateAstNode(
+    value: unknown,
+    iterableConfig?: IterableConfig
+  ): AstNode {
     if (!Array.isArray(value)) {
       throw new ValueGenerationError(
         "Expected array value for ArrayVellumValue"
@@ -245,7 +249,7 @@ class ArrayVellumValue extends AstNode {
 
     const astNode = python.TypeInstantiation.list(
       value.map((item) => new VellumValue({ vellumValue: item })),
-      { endWithComma: true }
+      iterableConfig ?? { endWithComma: true }
     );
 
     this.inheritReferences(astNode);
@@ -433,13 +437,18 @@ export namespace VellumValue {
   export type Args = {
     vellumValue: VellumVariableValueType;
     isRequestType?: boolean;
+    iterableConfig?: IterableConfig;
   };
 }
 
 export class VellumValue extends AstNode {
   private astNode: AstNode | null;
 
-  public constructor({ vellumValue, isRequestType }: VellumValue.Args) {
+  public constructor({
+    vellumValue,
+    isRequestType,
+    iterableConfig,
+  }: VellumValue.Args) {
     super();
     this.astNode = null;
 
@@ -469,7 +478,7 @@ export class VellumValue extends AstNode {
         this.astNode = new ImageVellumValue(vellumValue.value);
         break;
       case "ARRAY":
-        this.astNode = new ArrayVellumValue(vellumValue.value);
+        this.astNode = new ArrayVellumValue(vellumValue.value, iterableConfig);
         break;
       case "AUDIO":
         this.astNode = new AudioVellumValue(vellumValue.value);

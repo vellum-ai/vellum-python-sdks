@@ -1,4 +1,5 @@
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.types import MergeBehavior
 
 
 class MergeNode(BaseNode):
@@ -7,4 +8,5 @@ class MergeNode(BaseNode):
     with Vellum's Merge Node, and for most cases, you should extend from `BaseNode.Trigger` directly.
     """
 
-    pass
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY

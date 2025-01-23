@@ -28,3 +28,7 @@ export function getNodeLabel(nodeData: WorkflowNode): string {
       return nodeData.data.label;
   }
 }
+
+export function isUnaryOperator(operator: string): boolean {
+  return operator === "null" || operator === "notNull";
+}

@@ -8,7 +8,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
-from vellum.workflows.types.core import EntityInputsInterface
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
@@ -28,6 +28,9 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
     release_tag: str = LATEST_RELEASE_TAG
 
     request_options: Optional[RequestOptions] = None
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseOutputs):
         score: float

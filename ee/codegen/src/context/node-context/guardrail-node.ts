@@ -1,29 +1,19 @@
 import { MetricDefinitionHistoryItem } from "vellum-ai/api";
+import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
+import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
+import { EntityNotFoundError } from "src/generators/errors";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
-
-export declare namespace GuardrailNodeContext {
-  interface Args extends BaseNodeContext.Args<GuardrailNodeType> {
-    metricDefinitionsHistoryItem: MetricDefinitionHistoryItem | undefined;
-  }
-}
 
 export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
   baseNodeClassName = "GuardrailNode";
   baseNodeDisplayClassName = "BaseGuardrailNodeDisplay";
 
-  public readonly metricDefinitionsHistoryItem:
-    | MetricDefinitionHistoryItem
-    | undefined;
-
-  constructor(args: GuardrailNodeContext.Args) {
-    super(args);
-
-    this.metricDefinitionsHistoryItem = args.metricDefinitionsHistoryItem;
-  }
+  public metricDefinitionsHistoryItem: MetricDefinitionHistoryItem | undefined =
+    undefined;
 
   getNodeOutputNamesById(): Record<string, string> {
     if (!this.metricDefinitionsHistoryItem) {
@@ -47,5 +37,31 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
         portId: this.nodeData.data.sourceHandleId,
       }),
     ];
+  }
+
+  async buildProperties(): Promise<void> {
+    let metricDefinitionsHistoryItem: MetricDefinitionHistoryItem | undefined =
+      undefined;
+
+    try {
+      metricDefinitionsHistoryItem = await new MetricDefinitionsClient({
+        apiKey: this.workflowContext.vellumApiKey,
+      }).metricDefinitionHistoryItemRetrieve(
+        this.nodeData.data.releaseTag,
+        this.nodeData.data.metricDefinitionId
+      );
+    } catch (e) {
+      if (e instanceof VellumError && e.statusCode === 404) {
+        this.workflowContext.addError(
+          new EntityNotFoundError(
+            `Metric Definition "${this.nodeData.data.metricDefinitionId} ${this.nodeData.data.releaseTag}" not found.`
+          )
+        );
+      } else {
+        throw e;
+      }
+    }
+
+    this.metricDefinitionsHistoryItem = metricDefinitionsHistoryItem;
   }
 }

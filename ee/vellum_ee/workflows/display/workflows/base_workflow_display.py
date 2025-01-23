@@ -1,15 +1,17 @@
 from abc import abstractmethod
 from copy import copy
 from functools import cached_property
+import importlib
 import logging
 from uuid import UUID
-from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, get_args
+from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, Union, get_args
 
+from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
+from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
@@ -29,7 +31,7 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
+from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext, WorkflowEventDisplayContext
 
 logger = logging.getLogger(__name__)
 
@@ -136,19 +138,18 @@ class BaseWorkflowDisplay(
     ):
         """This method recursively adds nodes wrapped in decorators to the node_output_displays dictionary."""
 
+        inner_node = get_wrapped_node(node)
+        if inner_node:
+            inner_node_display = self._get_node_display(inner_node)
+            self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
+
         for node_output in node.Outputs:
             if node_output in node_output_displays:
                 continue
 
-            if has_wrapped_node(node):
-                inner_node = get_wrapped_node(node)
-                if inner_node._is_wrapped_node:
-                    inner_node_display = self._get_node_display(inner_node)
-                    self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
-
             # TODO: Make sure this output ID matches the workflow output ID of the subworkflow node's workflow
             # https://app.shortcut.com/vellum/story/5660/fix-output-id-in-subworkflow-nodes
-            node_output_displays[node_output] = node, node_display.get_node_output_display(node_output)
+            node_output_displays[node_output] = node_display.get_node_output_display(node_output)
 
     def _enrich_node_port_displays(
         self,
@@ -158,15 +159,14 @@ class BaseWorkflowDisplay(
     ):
         """This method recursively adds nodes wrapped in decorators to the port_displays dictionary."""
 
+        inner_node = get_wrapped_node(node)
+        if inner_node:
+            inner_node_display = self._get_node_display(inner_node)
+            self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
+
         for port in node.Ports:
             if port in port_displays:
                 continue
-
-            if has_wrapped_node(node):
-                inner_node = get_wrapped_node(node)
-                if inner_node._is_wrapped_node:
-                    inner_node_display = self._get_node_display(inner_node)
-                    self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
 
             port_displays[port] = node_display.get_node_port_display(port)
 
@@ -216,13 +216,11 @@ class BaseWorkflowDisplay(
                 global_node_displays[node] = node_display
 
             # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
-            if has_wrapped_node(node):
-                inner_node = get_wrapped_node(node)
+            inner_node = get_wrapped_node(node)
+            if inner_node:
                 inner_node_display = self._get_node_display(inner_node)
-
-                if inner_node._is_wrapped_node:
-                    node_displays[inner_node] = inner_node_display
-                    global_node_displays[inner_node] = inner_node_display
+                node_displays[inner_node] = inner_node_display
+                global_node_displays[inner_node] = inner_node_display
 
             self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
             self._enrich_node_port_displays(node, node_display, port_displays)
@@ -335,3 +333,14 @@ class BaseWorkflowDisplay(
 
         workflow_class = get_args(cls.__orig_bases__[0])[0]  # type: ignore [attr-defined]
         cls._workflow_display_registry[workflow_class] = cls
+
+    @staticmethod
+    def gather_event_display_context(
+        module_path: str, workflow_class: Type[BaseWorkflow]
+    ) -> Union[WorkflowEventDisplayContext, None]:
+        workflow_display_module = f"{module_path}.display.workflow"
+        try:
+            display_class = importlib.import_module(workflow_display_module)
+        except ModuleNotFoundError:
+            return None
+        return display_class.WorkflowDisplay(workflow_class).display_context.build_event_display_context()

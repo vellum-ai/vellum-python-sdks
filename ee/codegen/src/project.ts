@@ -349,11 +349,10 @@ ${errors.slice(0, 3).map((err) => {
 
           nodesToGenerate.push(nodeData);
 
-          const nodeContext = await createNodeContext({
+          await createNodeContext({
             workflowContext: this.workflowContext,
             nodeData,
           });
-          this.workflowContext.addNodeContext(nodeContext);
         }
       )
     );

@@ -7,7 +7,7 @@ from vellum.workflows.edges import Edge
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
-from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node, has_wrapped_node
+from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port
 from vellum.workflows.ports import Port
 from vellum.workflows.references import WorkflowInputReference
 from vellum.workflows.references.output import OutputReference
@@ -95,11 +95,8 @@ class VellumWorkflowDisplay(
         )
 
         # Add all the nodes in the workflow
-        for node, node_display in self.display_context.node_displays.items():
-            if getattr(node, "_is_wrapped_node") is True:
-                # Nodes that are wrapped or decorated by other nodes are not serialized here
-                # They are instead serialized by the wrapper node
-                continue
+        for node in self._workflow.get_nodes():
+            node_display = self.display_context.node_displays[node]
 
             try:
                 serialized_node = node_display.serialize(self.display_context)
@@ -295,13 +292,9 @@ class VellumWorkflowDisplay(
             else uuid4_from_hash(f"{self.workflow_id}|id|{entrypoint_node_id}")
         )
 
-        if has_wrapped_node(entrypoint):
-            wrapped_node = get_wrapped_node(entrypoint)
-            if wrapped_node._is_wrapped_node:
-                entrypoint = wrapped_node
-
-        target_node_id = node_displays[entrypoint].node_id
-        target_handle_id = node_displays[entrypoint].get_target_handle_id()
+        entrypoint_target = get_unadorned_node(entrypoint)
+        target_node_id = node_displays[entrypoint_target].node_id
+        target_handle_id = node_displays[entrypoint_target].get_target_handle_id()
 
         edge_display = self._generate_edge_display_from_source(
             entrypoint_node_id, source_handle_id, target_node_id, target_handle_id, overrides=edge_display_overrides

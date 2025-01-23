@@ -12,9 +12,9 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     node_id = UUID("e5ff9360-a29c-437b-a9c1-05fc52df2834")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
-        UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID("c539a2e2-0873-43b0-ae21-81790bb1c4cb"),
+        UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"),
         UUID("c539a2e2-0873-43b0-ae21-81790bb1c4cb"): UUID("c539a2e2-0873-43b0-ae21-81790bb1c4cb"),
-        UUID("a89483b6-6850-4105-8c4e-ec0fd197cd43"): UUID("847b8ee0-2c37-4e41-9dea-b4ba3579e2c1"),
+        UUID("a89483b6-6850-4105-8c4e-ec0fd197cd43"): UUID("a89483b6-6850-4105-8c4e-ec0fd197cd43"),
         UUID("847b8ee0-2c37-4e41-9dea-b4ba3579e2c1"): UUID("847b8ee0-2c37-4e41-9dea-b4ba3579e2c1"),
     }
     node_input_ids_by_name = {

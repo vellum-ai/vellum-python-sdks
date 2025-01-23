@@ -1,6 +1,7 @@
 from vellum import (
     SearchFiltersRequest,
     SearchRequestOptionsRequest,
+    SearchWeightsRequest,
     StringVellumValueRequest,
     VellumValueLogicalConditionGroupRequest,
     VellumValueLogicalConditionRequest,
@@ -18,6 +19,7 @@ class Inputs(BaseInputs):
 class SimpleSearchNode(SearchNode):
     query = Inputs.query
     document_index = "name"
+    weights = SearchWeightsRequest(semantic_similarity=0.55, keywords=0.45)
     options = SearchRequestOptionsRequest(
         filters=SearchFiltersRequest(
             external_ids=None,

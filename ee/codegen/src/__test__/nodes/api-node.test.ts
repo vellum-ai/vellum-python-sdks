@@ -47,7 +47,6 @@ describe("ApiNode", () => {
         workflowContext,
         nodeData,
       })) as ApiNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new ApiNode({
         workflowContext: workflowContext,
@@ -76,7 +75,6 @@ describe("ApiNode", () => {
         workflowContext,
         nodeData,
       })) as ApiNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new ApiNode({
         workflowContext: workflowContext,

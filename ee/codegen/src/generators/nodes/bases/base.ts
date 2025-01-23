@@ -110,10 +110,12 @@ export abstract class BaseNode<
     return this.nodeInputsByKey.get(name);
   }
 
-  protected getNodeInputByName(name: string): NodeInput {
+  protected getNodeInputByName(name: string): NodeInput | undefined {
     const nodeInput = this.findNodeInputByName(name);
     if (!nodeInput) {
-      throw new NodeAttributeGenerationError(`No input found named "${name}"`);
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(`No input found named "${name}"`)
+      );
     }
 
     return nodeInput;
@@ -218,6 +220,25 @@ export abstract class BaseNode<
     });
   }
 
+  protected getNodeDecorators(): python.Decorator[] | undefined {
+    return this.errorOutputId
+      ? [
+          python.decorator({
+            callable: python.invokeMethod({
+              methodReference: python.reference({
+                name: "TryNode",
+                attribute: ["wrap"],
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .CORE_NODES_MODULE_PATH,
+              }),
+              arguments_: [],
+            }),
+          }),
+        ]
+      : undefined;
+  }
+
   public generateNodeClass(): python.Class {
     const nodeContext = this.nodeContext;
 
@@ -235,22 +256,7 @@ export abstract class BaseNode<
     const nodeClass = python.class_({
       name: nodeContext.nodeClassName,
       extends_: [nodeBaseClass],
-      decorators: this.errorOutputId
-        ? [
-            python.decorator({
-              callable: python.invokeMethod({
-                methodReference: python.reference({
-                  name: "TryNode",
-                  attribute: ["wrap"],
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .CORE_NODES_MODULE_PATH,
-                }),
-                arguments_: [],
-              }),
-            }),
-          ]
-        : undefined,
+      decorators: this.getNodeDecorators(),
     });
 
     this.getNodeClassBodyStatements().forEach((statement) =>

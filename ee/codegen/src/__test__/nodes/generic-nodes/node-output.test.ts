@@ -41,7 +41,6 @@ describe("NodeOutput", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       nodeOutput = new NodeOutputs({
         nodeOutputs: nodeOutputData,
@@ -91,7 +90,6 @@ describe("NodeOutput", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       nodeOutput = new NodeOutputs({
         nodeOutputs: nodeOutputData,
@@ -137,7 +135,6 @@ describe("NodeOutput", () => {
         workflowContext,
         nodeData,
       })) as GenericNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       nodeOutput = new NodeOutputs({
         nodeOutputs: nodeOutputData,

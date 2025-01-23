@@ -111,12 +111,16 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       })
     );
 
-    statements.push(
-      python.field({
-        name: "runtime",
-        initializer: this.getNodeInputByName("runtime"),
-      })
-    );
+    const runtime = this.getNodeInputByName("runtime");
+
+    if (runtime) {
+      statements.push(
+        python.field({
+          name: "runtime",
+          initializer: runtime,
+        })
+      );
+    }
 
     statements.push(
       python.field({

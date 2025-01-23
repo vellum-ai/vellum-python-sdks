@@ -52,7 +52,6 @@ describe("InlinePromptNode", () => {
           workflowContext,
           nodeData,
         })) as InlinePromptNodeContext;
-        workflowContext.addNodeContext(nodeContext);
 
         node = new InlinePromptNode({
           workflowContext,
@@ -82,7 +81,6 @@ describe("InlinePromptNode", () => {
           workflowContext,
           nodeData,
         })) as InlinePromptNodeContext;
-        workflowContext.addNodeContext(nodeContext);
 
         node = new InlinePromptNode({
           workflowContext,
@@ -115,7 +113,6 @@ describe("InlinePromptNode", () => {
           workflowContext,
           nodeData,
         })) as InlinePromptNodeContext;
-        workflowContext.addNodeContext(nodeContext);
 
         node = new InlinePromptNode({
           workflowContext,

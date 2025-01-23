@@ -1,6 +1,11 @@
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
-import { InlinePromptNode as InlinePromptNodeType } from "src/types/vellum";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
+import {
+  InlinePromptNodeData,
+  InlinePromptNode as InlinePromptNodeType,
+  LegacyPromptNodeData,
+} from "src/types/vellum";
 
 export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeType> {
   baseNodeClassName = "InlinePromptNode";
@@ -24,5 +29,35 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
         portId: this.nodeData.data.sourceHandleId,
       }),
     ];
+  }
+
+  async buildProperties(): Promise<void> {
+    // @ts-expect-error In the legacy case, we simply convert from LEGACY to INLINE on the fly after the context is initialized with the legacy node data.
+    if (this.nodeData.data.variant !== "LEGACY") {
+      return;
+    }
+
+    // @ts-expect-error
+    const legacyNodeData: LegacyPromptNodeData = this.nodeData.data;
+
+    const promptVersionData =
+      legacyNodeData.sandboxRoutingConfig.promptVersionData;
+    if (!promptVersionData) {
+      throw new NodeDefinitionGenerationError(`Prompt version data not found`);
+    }
+
+    // Dynamically fetch the ML Model's name via API
+    const mlModelName = await this.workflowContext.getMLModelNameById(
+      promptVersionData.mlModelToWorkspaceId
+    );
+
+    const inlinePromptNodeData: InlinePromptNodeData = {
+      ...legacyNodeData,
+      variant: "INLINE",
+      mlModelName,
+      execConfig: promptVersionData.execConfig,
+    };
+
+    this.nodeData = { ...this.nodeData, data: inlinePromptNodeData };
   }
 }
