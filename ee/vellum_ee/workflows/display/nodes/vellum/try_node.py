@@ -13,6 +13,7 @@ from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeV
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
+from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay as GenericBaseNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
@@ -25,7 +26,13 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
         node = self._node
 
         inner_node = get_wrapped_node(node)
-        if not inner_node:
+        if inner_node:
+
+            class TryBaseNodeDisplay(GenericBaseNodeDisplay[node]):
+                pass
+
+            return TryBaseNodeDisplay().serialize(display_context)
+        else:
             subworkflow = raise_if_descriptor(node.subworkflow)
             if not isinstance(subworkflow.graph, type) or not issubclass(subworkflow.graph, BaseNode):
                 raise NotImplementedError(
