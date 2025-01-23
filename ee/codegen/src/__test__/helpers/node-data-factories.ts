@@ -100,8 +100,10 @@ export function searchNodeDataFactory(args?: {
   metadataFilterInputs?: NodeInput[];
   errorOutputId?: string;
   limitInput?: ConstantValuePointer;
+  includeDocumentIndexInput?: boolean;
 }): SearchNode {
   const errorOutputId = args?.errorOutputId;
+  const includeDocumentIndexInput = args?.includeDocumentIndexInput ?? true;
 
   const metadataFiltersNodeInputId =
     args?.metadataFiltersNodeInputId ?? "7c43b315-d1f2-4727-9540-6cc3fd4641f3";
@@ -194,22 +196,26 @@ export function searchNodeDataFactory(args?: {
           combinator: "OR",
         },
       },
-      {
-        id: "b49bc1ab-2ad5-4cf2-8966-5cc87949900d",
-        key: "document_index_id",
-        value: {
-          combinator: "OR",
-          rules: [
+      ...(includeDocumentIndexInput
+        ? [
             {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "d5beca61-aacb-4b22-a70c-776a1e025aa4",
+              id: "b49bc1ab-2ad5-4cf2-8966-5cc87949900d",
+              key: "document_index_id",
+              value: {
+                combinator: "OR" as const,
+                rules: [
+                  {
+                    type: "CONSTANT_VALUE" as const,
+                    data: {
+                      type: "STRING" as const,
+                      value: "d5beca61-aacb-4b22-a70c-776a1e025aa4",
+                    },
+                  },
+                ],
               },
             },
-          ],
-        },
-      },
+          ]
+        : []),
       {
         id: "1daf3180-4b92-472a-8665-a7703c84a94e",
         key: "weights",
@@ -1314,7 +1320,11 @@ export function codeExecutionNodeFactory({
   return nodeData;
 }
 
-export function errorNodeDataFactory(): ErrorNode {
+export function errorNodeDataFactory({
+  errorSourceInputs,
+}: {
+  errorSourceInputs?: NodeInput[];
+} = {}): ErrorNode {
   const errorSourceInputId = "d2287fee-98fb-421c-9464-e54d8f70f046";
 
   return {
@@ -1327,7 +1337,7 @@ export function errorNodeDataFactory(): ErrorNode {
       errorSourceInputId: errorSourceInputId,
       errorOutputId: "69250713-617d-42a4-9326-456c70d0ef20",
     },
-    inputs: [
+    inputs: errorSourceInputs ?? [
       {
         id: errorSourceInputId,
         key: "error_source_input_id",
@@ -1433,7 +1443,32 @@ export function genericNodeFactory(
   return nodeData;
 }
 
-export function finalOutputNodeFactory(): FinalOutputNode {
+export function finalOutputNodeFactory({
+  includeInput = true,
+}: {
+  includeInput?: boolean;
+} = {}): FinalOutputNode {
+  const inputs: NodeInput[] = [];
+
+  if (includeInput) {
+    inputs.push({
+      id: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
+      key: "node_input",
+      value: {
+        rules: [
+          {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "<my-output>",
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    });
+  }
+
   const nodeData: FinalOutputNode = {
     id: "48e0d88b-a544-4a14-b49f-38aca82e0e13",
     type: "TERMINAL",
@@ -1445,24 +1480,7 @@ export function finalOutputNodeFactory(): FinalOutputNode {
       nodeInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
       outputId: "<output-id>",
     },
-    inputs: [
-      {
-        id: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
-        key: "node_input",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "<my-output>",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-    ],
+    inputs: inputs,
     displayData: {
       width: 462,
       height: 288,

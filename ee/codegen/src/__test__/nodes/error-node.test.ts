@@ -12,14 +12,46 @@ describe("ErrorNode", () => {
   let node: ErrorNode;
   let writer: Writer;
 
-  beforeEach(() => {
-    workflowContext = workflowContextFactory();
+  beforeEach(async () => {
     writer = new Writer();
   });
 
   describe("basic", () => {
     beforeEach(async () => {
+      workflowContext = workflowContextFactory();
+      writer = new Writer();
+
       const nodeData = errorNodeDataFactory();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ErrorNodeContext;
+
+      node = new ErrorNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it(`getNodeDisplayFile`, async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("should codegen successfully without error source inputs", () => {
+    beforeEach(async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+
+      const nodeData = errorNodeDataFactory({
+        errorSourceInputs: [],
+      });
 
       const nodeContext = (await createNodeContext({
         workflowContext,

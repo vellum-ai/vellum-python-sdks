@@ -37,3 +37,33 @@ class ErrorNode(BaseErrorNode):
     error = VellumError(message="Something went wrong!", code="USER_DEFINED_ERROR")
 "
 `;
+
+exports[`ErrorNode > should codegen successfully without error source inputs > getNodeDisplayFile 1`] = `
+"from vellum_ee.workflows.display.nodes import BaseErrorNodeDisplay
+from ...nodes.error_node import ErrorNode
+from uuid import UUID
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+
+class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
+    name = "error-node"
+    node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
+    label = "Error Node"
+    error_output_id = UUID("69250713-617d-42a4-9326-456c70d0ef20")
+    target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
+    error_inputs_by_name = {}
+    node_input_ids_by_name = {}
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`ErrorNode > should codegen successfully without error source inputs > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import ErrorNode as BaseErrorNode
+
+
+class ErrorNode(BaseErrorNode):
+    pass
+"
+`;

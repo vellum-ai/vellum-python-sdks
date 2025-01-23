@@ -374,4 +374,34 @@ describe("TextSearchNode", () => {
       );
     });
   });
+
+  describe("should codegen successfully without document index id input", () => {
+    beforeEach(async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+
+      const nodeData = searchNodeDataFactory({
+        includeDocumentIndexInput: false,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDisplayFile", async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

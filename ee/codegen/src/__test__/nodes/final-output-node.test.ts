@@ -13,13 +13,40 @@ describe("FinalOutputNode", () => {
   let node: FinalOutputNode;
 
   beforeEach(() => {
-    workflowContext = workflowContextFactory();
     writer = new Writer();
   });
 
   describe("basic", () => {
     beforeEach(async () => {
+      workflowContext = workflowContextFactory();
       const nodeData = finalOutputNodeFactory();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as FinalOutputNodeContext;
+
+      node = new FinalOutputNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDisplayFile", async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("should codegen successfully without node input", () => {
+    beforeEach(async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+      const nodeData = finalOutputNodeFactory({ includeInput: false });
 
       const nodeContext = (await createNodeContext({
         workflowContext,
