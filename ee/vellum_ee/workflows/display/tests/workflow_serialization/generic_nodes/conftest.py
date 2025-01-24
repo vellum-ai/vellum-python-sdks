@@ -8,9 +8,9 @@ from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import NodeType
 from vellum_ee.workflows.display.base import WorkflowInputsDisplayType
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
 from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
 from vellum_ee.workflows.display.vellum import NodeDisplayData, WorkflowMetaVellumDisplay
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay

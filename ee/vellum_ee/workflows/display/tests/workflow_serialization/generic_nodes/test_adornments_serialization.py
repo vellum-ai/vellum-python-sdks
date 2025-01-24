@@ -8,8 +8,8 @@ from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
-from vellum_ee.workflows.display.nodes.vellum.base_node import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 
 
@@ -159,7 +159,10 @@ def test_serialize_node__try(serialize_node):
                 {
                     "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
                     "label": "TryNode",
-                    "base": {"name": "TryNode", "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"]},
+                    "base": {
+                        "name": "TryNode",
+                        "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"],
+                    },
                     "attributes": [
                         {
                             "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",

@@ -1,5 +1,4 @@
 from .api_node import BaseAPINodeDisplay
-from .base_node import BaseNodeDisplay
 from .code_execution_node import BaseCodeExecutionNodeDisplay
 from .conditional_node import BaseConditionalNodeDisplay
 from .error_node import BaseErrorNodeDisplay
@@ -28,7 +27,6 @@ __all__ = [
     "BaseInlineSubworkflowNodeDisplay",
     "BaseMapNodeDisplay",
     "BaseMergeNodeDisplay",
-    "BaseNodeDisplay",
     "BaseNoteNodeDisplay",
     "BasePromptDeploymentNodeDisplay",
     "BaseSearchNodeDisplay",

@@ -16,6 +16,8 @@ from typing import (
     get_origin,
 )
 
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.between import BetweenExpression
 from vellum.workflows.expressions.is_nil import IsNilExpression
@@ -26,19 +28,22 @@ from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
+from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator, primitive_to_vellum_value
-from vellum_ee.workflows.display.vellum import CodeResourceDefinition
+from vellum_ee.workflows.display.vellum import CodeResourceDefinition, GenericNodeDisplayData
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -65,7 +70,97 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     _node_display_registry: Dict[Type[NodeType], Type["BaseNodeDisplay"]] = {}
 
     def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
-        raise NotImplementedError(f"Serialization for nodes of type {self._node.__name__} is not supported.")
+        node = self._node
+        node_id = self.node_id
+
+        attributes: JsonArray = []
+        for attribute in node:
+            if inspect.isclass(attribute.instance) and issubclass(attribute.instance, BaseWorkflow):
+                # We don't need to serialize generic node attributes containing a subworkflow
+                continue
+
+            id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
+            attributes.append(
+                {
+                    "id": id,
+                    "name": attribute.name,
+                    "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
+                }
+            )
+
+        adornments = kwargs.get("adornments", None)
+        wrapped_node = get_wrapped_node(node)
+        if wrapped_node is not None:
+            display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
+
+            adornment: JsonObject = {
+                "id": str(node_id),
+                "label": node.__qualname__,
+                "base": self.get_base().dict(),
+                "attributes": attributes,
+            }
+
+            existing_adornments = adornments if adornments is not None else []
+            return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
+
+        ports: JsonArray = []
+        for port in node.Ports:
+            id = str(self.get_node_port_display(port).id)
+
+            if port._condition_type:
+                ports.append(
+                    {
+                        "id": id,
+                        "name": port.name,
+                        "type": port._condition_type.value,
+                        "expression": (
+                            self.serialize_condition(display_context, port._condition) if port._condition else None
+                        ),
+                    }
+                )
+            else:
+                ports.append(
+                    {
+                        "id": id,
+                        "name": port.name,
+                        "type": "DEFAULT",
+                    }
+                )
+
+        outputs: JsonArray = []
+        for output in node.Outputs:
+            type = primitive_type_to_vellum_variable_type(output)
+            value = (
+                self.serialize_value(display_context, output.instance)
+                if output.instance is not None and output.instance != UNDEF
+                else None
+            )
+
+            outputs.append(
+                {
+                    "id": str(uuid4_from_hash(f"{node_id}|{output.name}")),
+                    "name": output.name,
+                    "type": type,
+                    "value": value,
+                }
+            )
+
+        return {
+            "id": str(node_id),
+            "label": node.__qualname__,
+            "type": "GENERIC",
+            "display_data": self._get_generic_node_display_data().dict(),
+            "base": self.get_base().dict(),
+            "definition": self.get_definition().dict(),
+            "trigger": {
+                "id": str(self.get_trigger_id()),
+                "merge_behavior": node.Trigger.merge_behavior.value,
+            },
+            "ports": ports,
+            "adornments": adornments,
+            "attributes": attributes,
+            "outputs": outputs,
+        }
 
     def get_base(self) -> CodeResourceDefinition:
         node = self._node
@@ -89,9 +184,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         )
         return node_definition
 
-    def get_trigger_id(self) -> UUID:
-        return uuid4_from_hash(f"{self.node_id}|trigger")
-
     def get_node_output_display(self, output: OutputReference) -> Tuple[Type[BaseNode], NodeOutputDisplay]:
         explicit_display = self.output_display.get(output)
         if explicit_display:
@@ -109,6 +201,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             port_id = uuid4_from_hash(f"{self.node_id}|ports|{port.name}")
 
         return PortDisplay(id=port_id, node_id=self.node_id)
+
+    def get_trigger_id(self) -> UUID:
+        return uuid4_from_hash(f"{self.node_id}|trigger")
 
     @classmethod
     def get_from_node_display_registry(cls, node_class: Type[NodeType]) -> Type["BaseNodeDisplay"]:
@@ -187,9 +282,18 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
+        if not cls._node_display_registry:
+            cls._node_display_registry[BaseNode] = BaseNodeDisplay
 
         node_class = cls.infer_node_class()
+        if node_class is BaseNode:
+            return
+
         cls._node_display_registry[node_class] = cls
+
+    def _get_generic_node_display_data(self) -> GenericNodeDisplayData:
+        explicit_value = self._get_explicit_node_display_attr("display_data", GenericNodeDisplayData)
+        return explicit_value if explicit_value else GenericNodeDisplayData()
 
     def serialize_condition(self, display_context: "WorkflowDisplayContext", condition: BaseDescriptor) -> JsonObject:
         if isinstance(

@@ -1,13 +1,15 @@
 import types
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 
 from vellum.workflows.types.generics import NodeType
-from vellum_ee.workflows.display.types import NodeDisplayType
+
+if TYPE_CHECKING:
+    from vellum_ee.workflows.display.types import NodeDisplayType
 
 
 def get_node_display_class(
-    base_class: Type[NodeDisplayType], node_class: Type[NodeType], root_node_class: Optional[Type[NodeType]] = None
-) -> Type[NodeDisplayType]:
+    base_class: Type["NodeDisplayType"], node_class: Type[NodeType], root_node_class: Optional[Type[NodeType]] = None
+) -> Type["NodeDisplayType"]:
     try:
         node_display_class = base_class.get_from_node_display_registry(node_class)
     except KeyError:
