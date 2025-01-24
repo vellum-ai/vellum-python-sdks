@@ -124,22 +124,19 @@ def test_map_node_streaming_events():
     assert node_streaming[1].output.name == "count"
     assert node_streaming[2].output.is_streaming
     assert node_streaming[2].output.name == "count"
-    assert {
-        node_streaming[1].output.delta,
-        node_streaming[2].output.delta,
-    } == {
-        (None, 0, "INITIATED"),
-        (None, 1, "INITIATED"),
-    }
-
     assert node_streaming[3].output.is_streaming
     assert node_streaming[3].output.name == "count"
     assert node_streaming[4].output.is_streaming
     assert node_streaming[4].output.name == "count"
+
     assert {
+        node_streaming[1].output.delta,
+        node_streaming[2].output.delta,
         node_streaming[3].output.delta,
         node_streaming[4].output.delta,
     } == {
+        (None, 0, "INITIATED"),
+        (None, 1, "INITIATED"),
         (5, 0, "FULFILLED"),
         (7, 1, "FULFILLED"),
     }
