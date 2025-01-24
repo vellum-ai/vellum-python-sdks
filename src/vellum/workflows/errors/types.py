@@ -61,3 +61,24 @@ def workflow_event_error_to_workflow_error(error: WorkflowEventError) -> Workflo
         message=error.message,
         code=_WORKFLOW_EVENT_ERROR_CODE_TO_WORKFLOW_ERROR_CODE.get(error.code, WorkflowErrorCode.INTERNAL_ERROR),
     )
+
+
+_WORKFLOW_ERROR_CODE_TO_VELLUM_ERROR_CODE: Dict[WorkflowErrorCode, VellumErrorCodeEnum] = {
+    WorkflowErrorCode.INVALID_WORKFLOW: "INVALID_REQUEST",
+    WorkflowErrorCode.INVALID_INPUTS: "INVALID_INPUTS",
+    WorkflowErrorCode.INVALID_OUTPUTS: "INVALID_REQUEST",
+    WorkflowErrorCode.INVALID_STATE: "INVALID_REQUEST",
+    WorkflowErrorCode.INVALID_TEMPLATE: "INVALID_INPUTS",
+    WorkflowErrorCode.INTERNAL_ERROR: "INTERNAL_SERVER_ERROR",
+    WorkflowErrorCode.NODE_EXECUTION: "USER_DEFINED_ERROR",
+    WorkflowErrorCode.PROVIDER_ERROR: "PROVIDER_ERROR",
+    WorkflowErrorCode.USER_DEFINED_ERROR: "USER_DEFINED_ERROR",
+    WorkflowErrorCode.WORKFLOW_CANCELLED: "REQUEST_TIMEOUT",
+}
+
+
+def workflow_error_to_vellum_error(error: WorkflowError) -> VellumError:
+    return VellumError(
+        message=error.message,
+        code=_WORKFLOW_ERROR_CODE_TO_VELLUM_ERROR_CODE.get(error.code, "INTERNAL_SERVER_ERROR"),
+    )

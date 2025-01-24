@@ -25,8 +25,11 @@ from vellum.client.types.search_results_vellum_value import SearchResultsVellumV
 from vellum.client.types.search_results_vellum_value_request import SearchResultsVellumValueRequest
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
+from vellum.client.types.vellum_error import VellumError
 from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_value_request import VellumValueRequest
+from vellum.workflows.errors.types import WorkflowError, workflow_error_to_vellum_error
+from vellum.workflows.state.encoder import DefaultStateEncoder
 
 VELLUM_VALUE_REQUEST_TUPLE = (
     StringVellumValueRequest,
@@ -63,6 +66,10 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
     ):
         search_results = cast(Union[List[SearchResultRequest], List[SearchResult]], value)
         return SearchResultsVellumValue(value=search_results)
+    elif isinstance(value, VellumError):
+        return ErrorVellumValue(value=value)
+    elif isinstance(value, WorkflowError):
+        return ErrorVellumValue(value=workflow_error_to_vellum_error(value))
     elif isinstance(
         value,
         (
@@ -88,7 +95,7 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return value  # type: ignore
 
     try:
-        json_value = json.dumps(value)
+        json_value = json.dumps(value, cls=DefaultStateEncoder)
     except json.JSONDecodeError:
         raise ValueError(f"Unsupported variable type: {value.__class__.__name__}")
 

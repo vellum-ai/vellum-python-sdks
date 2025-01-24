@@ -33,7 +33,7 @@ def test_error_node_display__serialize_with_vellum_error() -> None:
             {
                 "data": {
                     "type": "ERROR",
-                    "error": {
+                    "value": {
                         "message": "A bad thing happened",
                         "code": "USER_DEFINED_ERROR",
                     },

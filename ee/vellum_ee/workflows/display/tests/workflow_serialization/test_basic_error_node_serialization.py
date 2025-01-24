@@ -88,7 +88,21 @@ def test_serialize_workflow():
         {
             "id": "5cf9c5e3-0eae-4daf-8d73-8b9536258eb9",
             "type": "ERROR",
-            "inputs": [],
+            "inputs": [
+                {
+                    "id": "690d825f-6ffd-493e-8141-c86d384e6150",
+                    "key": "error_source_input_id",
+                    "value": {
+                        "rules": [
+                            {
+                                "type": "CONSTANT_VALUE",
+                                "data": {"type": "STRING", "value": "Input threshold was too low"},
+                            }
+                        ],
+                        "combinator": "OR",
+                    },
+                }
+            ],
             "data": {
                 "name": "error-node",
                 "label": "Fail Node",
