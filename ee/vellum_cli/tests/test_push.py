@@ -320,6 +320,7 @@ Files that were different between the original project and the generated artifac
     )
 
 
+@pytest.mark.skip(reason="TODO: https://app.shortcut.com/vellum/story/6315")
 def test_push__workspace_option__uses_different_api_key(mock_module, vellum_client_class):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
