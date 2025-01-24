@@ -318,3 +318,78 @@ Files that were different between the original project and the generated artifac
 \x1b[0m
 """
     )
+
+
+def test_push__workspace_option__uses_different_api_key(mock_module, vellum_client_class):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND a different workspace is set in the pyproject.toml
+    set_pyproject_toml(
+        {
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": workflow_sandbox_id,
+                }
+            ],
+            "workspaces": [
+                {
+                    "name": "my_other_workspace",
+                    "api_key": "MY_OTHER_VELLUM_API_KEY",
+                }
+            ],
+        }
+    )
+
+    # AND the .env file has the other api key stored
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write(
+            """\
+VELLUM_API_KEY=abcdef123456
+MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
+"""
+        )
+
+    # AND a workflow exists in the module successfully
+    base_dir = os.path.join(temp_dir, *module.split("."))
+    os.makedirs(base_dir, exist_ok=True)
+    workflow_py_file_content = """\
+from vellum.workflows import BaseWorkflow
+
+class ExampleWorkflow(BaseWorkflow):
+    pass
+"""
+    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
+        f.write(workflow_py_file_content)
+
+    # AND the push API call returns a new workflow sandbox id
+    new_workflow_sandbox_id = str(uuid4())
+    vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` on strict mode
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module, "--workspace", "my_other_workspace"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API once
+    vellum_client_class.return_value.workflows.push.assert_called_once()
+
+    # AND with the correct api key
+    vellum_client_class.assert_called_once_with(api_key="aaabbbcccddd")
+
+    # AND the vellum lock file should have been updated with the correct workspace
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        assert lock_file_content["workflows"][1] == {
+            "module": module,
+            "workflow_sandbox_id": new_workflow_sandbox_id,
+            "workspace": "my_other_workspace",
+        }
