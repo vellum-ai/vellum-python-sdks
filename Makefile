@@ -17,8 +17,8 @@ install-deps:
 	$(HOME)/.local/bin/poetry env use 3.9 && $(HOME)/.local/bin/poetry lock && $(HOME)/.local/bin/poetry install
 
 setup-pre-commit:
-	pre-commit install \
-	&& pre-commit install -t pre-push
+	$(HOME)/.local/bin/poetry run pre-commit install \
+	&& $(HOME)/.local/bin/poetry run pre-commit install -t pre-push
 
 setup-node:
 	command -v nvm >/dev/null 2>&1 || (curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) \
