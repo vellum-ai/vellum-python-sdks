@@ -37,7 +37,7 @@ def test_serialize_node__basic(serialize_node):
             "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "4fbf0fff-a42e-4410-852a-238b5059198e",
+                    "id": "89dccfa5-cc1a-4612-bd87-86cb444f6dd4",
                     "name": "default",
                     "type": "DEFAULT",
                 }
@@ -80,7 +80,7 @@ def test_serialize_node__await_any(serialize_node):
             "trigger": {"id": "ffa72187-9a18-453f-ae55-b77aad332630", "merge_behavior": "AWAIT_ANY"},
             "ports": [
                 {
-                    "id": "3e219c0a-e5f8-443a-ac78-1a458b189009",
+                    "id": "38b83138-cb07-40cb-82d2-83982ded6883",
                     "name": "default",
                     "type": "DEFAULT",
                 }
@@ -123,7 +123,7 @@ def test_serialize_node__await_all(serialize_node):
             "trigger": {"id": "62074276-c817-476d-b59d-da523ae3f218", "merge_behavior": "AWAIT_ALL"},
             "ports": [
                 {
-                    "id": "9797e93f-9fe6-48b2-a48e-476abbd20e32",
+                    "id": "9edef179-a1c2-4624-b185-593bb84f08a0",
                     "name": "default",
                     "type": "DEFAULT",
                 }

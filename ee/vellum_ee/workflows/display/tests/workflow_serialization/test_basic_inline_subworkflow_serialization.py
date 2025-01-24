@@ -145,7 +145,7 @@ def test_serialize_workflow():
                                 "merge_behavior": "AWAIT_ATTRIBUTES",
                             },
                             "ports": [
-                                {"id": "4a62dea3-6a4a-4390-88d8-4af5d2c81474", "type": "DEFAULT", "name": "default"}
+                                {"id": "1e739e86-a285-4438-9725-a152c15a63e3", "type": "DEFAULT", "name": "default"}
                             ],
                             "adornments": None,
                             "attributes": [
@@ -274,7 +274,7 @@ def test_serialize_workflow():
                             "source_node_id": "afa49a0f-db35-4552-9217-5b8f237e84bc",
                             "source_handle_id": "9914a6a0-9a99-430d-8ddd-f7c13847fe1a",
                             "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                            "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
+                            "target_handle_id": "a95a34f2-e894-4fb6-a2c9-15d12c1e3135",
                             "type": "DEFAULT",
                         },
                         {

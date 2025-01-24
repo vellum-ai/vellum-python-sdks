@@ -44,6 +44,9 @@ def test_serialize_node__retry(serialize_node):
         },
     )
 
+    serialized_node["adornments"][0]["attributes"] = sorted(
+        serialized_node["adornments"][0]["attributes"], key=lambda x: x["name"]
+    )
     assert not DeepDiff(
         {
             "id": "f2a95e79-7d4b-47ad-b986-4f648297ec65",
@@ -64,7 +67,7 @@ def test_serialize_node__retry(serialize_node):
                 ],
             },
             "trigger": {"id": "af9ba01c-4cde-4632-9aa1-7673b42e7bd8", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "55d46900-e558-4264-8802-a5c5fe7226fe", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "c2ecc6c0-f353-4495-9b93-a61a47248556", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
                     "id": "5be7d260-74f7-4734-b31b-a46a94539586",
@@ -80,13 +83,13 @@ def test_serialize_node__retry(serialize_node):
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 3.0}},
                         },
                         {
-                            "id": "c91782e3-140f-4938-9c23-d2a7b85dcdd8",
-                            "name": "retry_on_error_code",
+                            "id": "73a02e62-4535-4e1f-97b5-1264ca8b1d71",
+                            "name": "retry_on_condition",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
                         {
-                            "id": "73a02e62-4535-4e1f-97b5-1264ca8b1d71",
-                            "name": "retry_on_condition",
+                            "id": "c91782e3-140f-4938-9c23-d2a7b85dcdd8",
+                            "name": "retry_on_error_code",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
                     ],
@@ -104,7 +107,6 @@ def test_serialize_node__retry(serialize_node):
             ],
         },
         serialized_node,
-        ignore_order=True,
     )
 
 
@@ -152,7 +154,7 @@ def test_serialize_node__try(serialize_node):
                 ],
             },
             "trigger": {"id": "741f7f75-e921-47a9-8c05-9e66640d0866", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "f76a0b36-018b-4c5c-aa60-102570e2fd8c", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "1b8f8ab5-a656-4015-926c-80655bbd9cb8", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
                     "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
@@ -179,5 +181,4 @@ def test_serialize_node__try(serialize_node):
             ],
         },
         serialized_node,
-        ignore_order=True,
     )

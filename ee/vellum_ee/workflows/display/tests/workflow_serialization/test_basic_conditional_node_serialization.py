@@ -672,7 +672,7 @@ def test_serialize_workflow():
                 "source_node_id": "9b619e4d-b0a7-4121-9060-100d457868cb",
                 "source_handle_id": "3a45b81f-95e4-4cbd-8997-bfdbe30251e8",
                 "target_node_id": "0d959311-c836-4641-a867-58f63df9dfea",
-                "target_handle_id": "7beba198-c452-4749-a38a-ea9420d84e14",
+                "target_handle_id": "139c6965-68f0-4bae-a6d9-3ee68d6347c0",
                 "type": "DEFAULT",
             },
             {
@@ -680,7 +680,7 @@ def test_serialize_workflow():
                 "source_node_id": "9b619e4d-b0a7-4121-9060-100d457868cb",
                 "source_handle_id": "7202f702-1ebc-4067-ab1e-ec67e49158ee",
                 "target_node_id": "68c02b7c-5077-4087-803d-841474a8081f",
-                "target_handle_id": "1dc4eebe-b6db-4229-96e5-115ff8cedb76",
+                "target_handle_id": "6d2c998b-1525-475f-9327-d8495b5e2692",
                 "type": "DEFAULT",
             },
             {
@@ -688,7 +688,7 @@ def test_serialize_workflow():
                 "source_node_id": "9b619e4d-b0a7-4121-9060-100d457868cb",
                 "source_handle_id": "cf45705d-1a47-43a6-9d24-a7fdf78baae0",
                 "target_node_id": "8df781b1-ff28-48a5-98a2-d7d796b932b0",
-                "target_handle_id": "b73c39be-cbfe-4225-86e6-e6e4c161881e",
+                "target_handle_id": "4584996a-4c1e-45d0-8f49-6918d69b755e",
                 "type": "DEFAULT",
             },
             {
@@ -696,7 +696,7 @@ def test_serialize_workflow():
                 "source_node_id": "9b619e4d-b0a7-4121-9060-100d457868cb",
                 "source_handle_id": "f04610dd-61cf-41b0-b337-2235e101cdb0",
                 "target_node_id": "ed7caf01-9ae7-47a3-b15a-16697abaf486",
-                "target_handle_id": "76fe7aec-5cd4-4c1a-b386-cfe09ebe66e4",
+                "target_handle_id": "8da86a9b-0d22-442c-b622-63afe1b569ab",
                 "type": "DEFAULT",
             },
             {
@@ -704,7 +704,7 @@ def test_serialize_workflow():
                 "source_node_id": "9b619e4d-b0a7-4121-9060-100d457868cb",
                 "source_handle_id": "f9dde637-ea90-465f-a871-caf8380ae377",
                 "target_node_id": "148c61bd-e8b0-4d4b-8734-b043a72b90ed",
-                "target_handle_id": "c88839af-3a79-4310-abbd-e1553d981dce",
+                "target_handle_id": "f81bbac8-d7f1-4bfd-95ec-9d0b93e28114",
                 "type": "DEFAULT",
             },
             {
