@@ -88,3 +88,51 @@ def test_vellum_workflow_display__serialize_input_variables_with_capitalized_var
             "extensions": {"color": None},
         }
     ]
+
+
+def test_vellum_workflow_display_serialize_valid_handle_ids_for_base_nodes():
+    # GIVEN a workflow between two base nodes
+    class StartNode(BaseNode):
+        pass
+
+    class EndNode(BaseNode):
+        pass
+
+    class Workflow(BaseWorkflow):
+        graph = StartNode >> EndNode
+
+    # AND a display class for this workflow
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=Workflow,
+    )
+
+    # WHEN we serialize the workflow
+    exec_config = workflow_display.serialize()
+
+    # THEN the serialized workflow handle ids are valid
+    raw_data = exec_config.get("workflow_raw_data")
+    assert isinstance(raw_data, dict)
+    nodes = raw_data.get("nodes")
+    edges = raw_data.get("edges")
+
+    assert isinstance(nodes, list)
+    assert isinstance(edges, list)
+
+    edge_source_handle_ids = {edge.get("source_handle_id") for edge in edges if isinstance(edge, dict)}
+    edge_target_handle_ids = {edge.get("target_handle_id") for edge in edges if isinstance(edge, dict)}
+
+    for node in nodes:
+        assert isinstance(node, dict)
+
+        if node["type"] == "ENTRYPOINT":
+            continue
+
+        ports = node.get("ports")
+        assert isinstance(ports, list)
+        for port in ports:
+            assert isinstance(port, dict)
+            assert port["id"] in edge_source_handle_ids
+
+        assert isinstance(node["trigger"], dict)
+        assert node["trigger"]["id"] in edge_target_handle_ids
