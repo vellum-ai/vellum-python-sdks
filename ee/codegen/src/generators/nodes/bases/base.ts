@@ -14,7 +14,11 @@ import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowProjectGenerator } from "src/project";
-import { NodeDisplayComment, WorkflowDataNode } from "src/types/vellum";
+import {
+  NodeDisplayComment,
+  NodeDisplayData as NodeDisplayDataType,
+  WorkflowDataNode,
+} from "src/types/vellum";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -210,13 +214,37 @@ export abstract class BaseNode<
     });
   }
 
+  private generateNodeDisplayDataWithoutComment() {
+    const nodeDisplayData: NodeDisplayDataType | undefined =
+      this.nodeData.displayData;
+    if (
+      nodeDisplayData &&
+      nodeDisplayData.comment &&
+      nodeDisplayData.comment.expanded
+    ) {
+      const nodeDisplayDataWithoutComment: NodeDisplayDataType = {
+        position: nodeDisplayData.position,
+        width: nodeDisplayData.width,
+        height: nodeDisplayData.height,
+        comment: {
+          expanded: nodeDisplayData.comment.expanded,
+        },
+      };
+      return new NodeDisplayData({
+        workflowContext: this.workflowContext,
+        nodeDisplayData: nodeDisplayDataWithoutComment,
+      });
+    }
+    return new NodeDisplayData({
+      workflowContext: this.workflowContext,
+      nodeDisplayData: this.nodeData.displayData,
+    });
+  }
+
   private getDisplayData(): python.Field {
     return python.field({
       name: "display_data",
-      initializer: new NodeDisplayData({
-        workflowContext: this.workflowContext,
-        nodeDisplayData: this.nodeData.displayData,
-      }),
+      initializer: this.generateNodeDisplayDataWithoutComment(),
     });
   }
 
