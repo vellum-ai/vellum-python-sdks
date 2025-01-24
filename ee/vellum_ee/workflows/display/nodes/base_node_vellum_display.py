@@ -7,7 +7,7 @@ from vellum.workflows.types.generics import NodeType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData
+from vellum_ee.workflows.display.vellum import NodeDisplayComment, NodeDisplayData
 
 
 class BaseNodeVellumDisplay(BaseNodeDisplay[NodeType]):
@@ -26,6 +26,21 @@ class BaseNodeVellumDisplay(BaseNodeDisplay[NodeType]):
 
     def get_display_data(self) -> NodeDisplayData:
         explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
+        docstring = self._node.__doc__
+
+        if explicit_value and explicit_value.comment and docstring:
+            comment = (
+                NodeDisplayComment(value=docstring, expanded=explicit_value.comment.expanded)
+                if explicit_value.comment.expanded
+                else NodeDisplayComment(value=docstring)
+            )
+            return NodeDisplayData(
+                position=explicit_value.position,
+                width=explicit_value.width,
+                height=explicit_value.height,
+                comment=comment,
+            )
+
         return explicit_value if explicit_value else NodeDisplayData()
 
     def get_target_handle_id(self) -> UUID:
