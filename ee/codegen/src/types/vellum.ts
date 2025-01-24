@@ -347,6 +347,7 @@ export interface DeploymentPromptNodeData extends BasePromptNodeData {
   variant: "DEPLOYMENT";
   promptDeploymentId: string;
   releaseTag: string;
+  fallbackModels?: string[];
 }
 
 export interface PromptNodeSourceSandbox {

@@ -610,8 +610,10 @@ export function inlinePromptNodeDataLegacyVariantFactory({
 
 export function promptDeploymentNodeDataFactory({
   errorOutputId = undefined,
+  fallbackModels,
 }: {
   errorOutputId?: string;
+  fallbackModels?: string[];
 } = {}): PromptNode {
   return {
     id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
@@ -626,6 +628,7 @@ export function promptDeploymentNodeDataFactory({
       targetHandleId: "e1f8a351-ab12-4167-93ee-d2dd72c8d15c",
       promptDeploymentId: "afd05488-7a25-4ff2-b87b-878e9552474e",
       releaseTag: "LATEST",
+      fallbackModels,
     },
     inputs: [
       {

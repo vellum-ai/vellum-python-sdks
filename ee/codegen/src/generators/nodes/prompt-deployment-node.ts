@@ -22,6 +22,15 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
 
     const nodeData: DeploymentPromptNodeData = this.nodeData.data;
 
+    if (
+      this.nodeData.data.fallbackModels &&
+      this.nodeData.data.fallbackModels.length > 0
+    ) {
+      throw new NodeDefinitionGenerationError(
+        "Fallback models not currently supported."
+      );
+    }
+
     statements.push(
       python.field({
         name: "deployment",

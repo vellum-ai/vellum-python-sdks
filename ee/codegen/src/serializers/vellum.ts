@@ -798,6 +798,10 @@ export const DeploymentPromptNodeDataSerializer: ObjectSchema<
   arrayOutputId: propertySchema("array_output_id", stringSchema()),
   sourceHandleId: propertySchema("source_handle_id", stringSchema()),
   targetHandleId: propertySchema("target_handle_id", stringSchema()),
+  fallbackModels: propertySchema(
+    "fallback_models",
+    listSchema(stringSchema()).optional()
+  ),
 });
 
 export declare namespace DeploymentPromptNodeDataSerializer {
@@ -810,6 +814,7 @@ export declare namespace DeploymentPromptNodeDataSerializer {
     array_output_id: string;
     source_handle_id: string;
     target_handle_id: string;
+    fallback_models?: string[] | null;
   }
 }
 

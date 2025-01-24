@@ -13,8 +13,8 @@ describe("PromptDeploymentNode", () => {
   let writer: Writer;
 
   beforeEach(() => {
-    workflowContext = workflowContextFactory();
     writer = new Writer();
+    workflowContext = workflowContextFactory();
   });
 
   describe("basic", () => {
@@ -40,6 +40,30 @@ describe("PromptDeploymentNode", () => {
     it(`getNodeDisplayFile`, async () => {
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("fallback models", () => {
+    beforeEach(async () => {
+      const nodeData = promptDeploymentNodeDataFactory({
+        fallbackModels: ["model1"],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as PromptDeploymentNodeContext;
+
+      node = new PromptDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile should fail`, async () => {
+      expect(() => node.getNodeFile().write(writer)).toThrowError(
+        "Fallback models not currently support"
+      );
     });
   });
 });
