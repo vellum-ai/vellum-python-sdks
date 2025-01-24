@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Union
 
 from vellum import AdHocExecutePromptEvent, ExecutePromptEvent, PromptOutput
+from vellum.client.core.api_error import ApiError
 from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode, vellum_error_to_workflow_error
 from vellum.workflows.exceptions import NodeException
@@ -36,7 +37,19 @@ class BasePromptNode(BaseNode, Generic[StateType]):
             )
 
     def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
-        prompt_event_stream = self._get_prompt_event_stream()
+        try:
+            prompt_event_stream = self._get_prompt_event_stream()
+        except ApiError as e:
+            if e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
+                raise NodeException(
+                    message=e.body.get("detail", "Failed to execute prompt"),
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                ) from e
+
+            raise NodeException(
+                message="Failed to execute prompt",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
+            ) from e
 
         outputs: Optional[List[PromptOutput]] = None
         for event in prompt_event_stream:

@@ -132,24 +132,52 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
     )
 
 
-def test_inline_prompt_node__4xx_api_error__invalid_inputs_node_exception(vellum_adhoc_prompt_client):
+@pytest.mark.parametrize(
+    ["exception", "expected_code", "expected_message"],
+    [
+        (
+            ApiError(status_code=404, body={"detail": "Model not found"}),
+            WorkflowErrorCode.INVALID_INPUTS,
+            "Model not found",
+        ),
+        (
+            ApiError(status_code=404, body={"message": "Model not found"}),
+            WorkflowErrorCode.INVALID_INPUTS,
+            "Failed to execute prompt",
+        ),
+        (
+            ApiError(status_code=404, body="Model not found"),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute prompt",
+        ),
+        (
+            ApiError(status_code=None, body={"detail": "Model not found"}),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute prompt",
+        ),
+        (
+            ApiError(status_code=500, body={"detail": "Model not found"}),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute prompt",
+        ),
+    ],
+    ids=["404", "invalid_dict", "invalid_body", "no_status_code", "500"],
+)
+def test_inline_prompt_node__api_error__invalid_inputs_node_exception(
+    vellum_adhoc_prompt_client, exception, expected_code, expected_message
+):
     # GIVEN a prompt node with an invalid model name
     class MyNode(InlinePromptNode):
         ml_model = "my-invalid-model"
         blocks = []
 
     # AND the adhoc prompt client raises a 4xx error
-    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = ApiError(
-        status_code=404,
-        body={
-            "detail": "Model not found",
-        },
-    )
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = exception
 
     # WHEN the node is run
     with pytest.raises(NodeException) as e:
         list(MyNode().run())
 
     # THEN the node raises the correct NodeException
-    assert e.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert e.value.message == "Model not found"
+    assert e.value.code == expected_code
+    assert e.value.message == expected_message
