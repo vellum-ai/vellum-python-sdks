@@ -1,4 +1,5 @@
 import inspect
+from uuid import UUID
 from typing import Any, Generic, Optional, TypeVar, cast
 
 from vellum.workflows.constants import UNDEF
@@ -54,8 +55,8 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
 
         ports: JsonArray = []
-        for idx, port in enumerate(node.Ports):
-            id = str(uuid4_from_hash(f"{node_id}|{idx}"))
+        for port in node.Ports:
+            id = str(self.get_node_port_display(port).id)
 
             if port._condition_type:
                 ports.append(
@@ -103,7 +104,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
             "trigger": {
-                "id": str(uuid4_from_hash(f"{node_id}|trigger")),
+                "id": str(self.get_trigger_id()),
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
             "ports": ports,
@@ -111,6 +112,9 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             "attributes": attributes,
             "outputs": outputs,
         }
+
+    def get_target_handle_id(self) -> UUID:
+        return self.get_trigger_id()
 
     def get_generic_node_display_data(self) -> GenericNodeDisplayData:
         explicit_value = self._get_explicit_node_display_attr("display_data", GenericNodeDisplayData)

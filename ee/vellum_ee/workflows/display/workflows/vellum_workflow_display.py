@@ -352,8 +352,6 @@ class VellumWorkflowDisplay(
 
         target_node_display = node_displays[target_node]
         target_node_id = target_node_display.node_id
-
-        target_handle_id: UUID
         target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(source_node_id)
 
         return self._generate_edge_display_from_source(

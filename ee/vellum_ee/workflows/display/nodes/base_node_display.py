@@ -89,6 +89,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         )
         return node_definition
 
+    def get_trigger_id(self) -> UUID:
+        return uuid4_from_hash(f"{self.node_id}|trigger")
+
     def get_node_output_display(self, output: OutputReference) -> Tuple[Type[BaseNode], NodeOutputDisplay]:
         explicit_display = self.output_display.get(output)
         if explicit_display:

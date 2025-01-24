@@ -96,10 +96,14 @@ def test_vellum_workflow_display_serialize_valid_handle_ids_for_base_nodes():
         pass
 
     class EndNode(BaseNode):
-        pass
+        class Outputs(BaseNode.Outputs):
+            hello = "world"
 
     class Workflow(BaseWorkflow):
         graph = StartNode >> EndNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = EndNode.Outputs.hello
 
     # AND a display class for this workflow
     workflow_display = get_workflow_display(
@@ -125,14 +129,18 @@ def test_vellum_workflow_display_serialize_valid_handle_ids_for_base_nodes():
     for node in nodes:
         assert isinstance(node, dict)
 
-        if node["type"] == "ENTRYPOINT":
+        if node["type"] in {"ENTRYPOINT", "TERMINAL"}:
             continue
 
         ports = node.get("ports")
         assert isinstance(ports, list)
         for port in ports:
             assert isinstance(port, dict)
-            assert port["id"] in edge_source_handle_ids
+            assert (
+                port["id"] in edge_source_handle_ids
+            ), f"Port {port['id']} from node {node['label']} not found in edge source handle ids"
 
         assert isinstance(node["trigger"], dict)
-        assert node["trigger"]["id"] in edge_target_handle_ids
+        assert (
+            node["trigger"]["id"] in edge_target_handle_ids
+        ), f"Trigger {node['trigger']['id']} from node {node['label']} not found in edge target handle ids"
