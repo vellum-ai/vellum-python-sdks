@@ -15,7 +15,7 @@ from vellum.types import WorkflowPushDeploymentConfigRequest
 from vellum.workflows.utils.names import snake_to_title_case
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_cli.config import WorkflowDeploymentConfig, load_vellum_cli_config
+from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
@@ -30,8 +30,9 @@ def push_command(
     release_tags: Optional[List[str]] = None,
     dry_run: Optional[bool] = None,
     strict: Optional[bool] = None,
+    workspace: Optional[str] = None,
 ) -> None:
-    load_dotenv()
+    load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     logger = load_cli_logger()
     config = load_vellum_cli_config()
 
@@ -46,7 +47,27 @@ def push_command(
         raise ValueError(f"No workflow config for '{module}' found in project to push.")
 
     logger.info(f"Loading workflow from {workflow_config.module}")
-    client = create_vellum_client()
+    resolved_workspace = workspace or workflow_config.workspace or DEFAULT_WORKSPACE_CONFIG.name
+    workspace_config = (
+        next((w for w in config.workspaces if w.name == resolved_workspace), DEFAULT_WORKSPACE_CONFIG)
+        if workspace
+        else DEFAULT_WORKSPACE_CONFIG
+    )
+    api_key = os.getenv(workspace_config.api_key)
+    if not api_key:
+        raise ValueError(f"No API key value found in environment for workspace '{workspace_config.name}'.")
+
+    if workspace_config.name != workflow_config.workspace:
+        # We are pushing to a new workspace, so we need a new workflow config
+        workflow_config = WorkflowConfig(
+            module=workflow_config.module,
+            workspace=workspace_config.name,
+        )
+        config.workflows.append(workflow_config)
+
+    client = create_vellum_client(
+        api_key=api_key,
+    )
     sys.path.insert(0, os.getcwd())
 
     # Remove this once we could serialize using the artifact in Vembda

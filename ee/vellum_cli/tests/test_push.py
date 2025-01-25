@@ -3,6 +3,7 @@ import io
 import json
 import os
 import tarfile
+from unittest import mock
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -320,7 +321,6 @@ Files that were different between the original project and the generated artifac
     )
 
 
-@pytest.mark.skip(reason="TODO: https://app.shortcut.com/vellum/story/6315")
 def test_push__workspace_option__uses_different_api_key(mock_module, vellum_client_class):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
@@ -370,7 +370,7 @@ class ExampleWorkflow(BaseWorkflow):
     # AND the push API call returns a new workflow sandbox id
     new_workflow_sandbox_id = str(uuid4())
     vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
-        workflow_sandbox_id=workflow_sandbox_id,
+        workflow_sandbox_id=new_workflow_sandbox_id,
     )
 
     # WHEN calling `vellum push` on strict mode
@@ -378,13 +378,20 @@ class ExampleWorkflow(BaseWorkflow):
     result = runner.invoke(cli_main, ["push", module, "--workspace", "my_other_workspace"])
 
     # THEN it should succeed
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     # AND we should have called the push API once
     vellum_client_class.return_value.workflows.push.assert_called_once()
 
+    # AND the workflow sandbox id arg passed in should be `None`
+    call_args = vellum_client_class.return_value.workflows.push.call_args.kwargs
+    assert call_args["workflow_sandbox_id"] is None
+
     # AND with the correct api key
-    vellum_client_class.assert_called_once_with(api_key="aaabbbcccddd")
+    vellum_client_class.assert_called_once_with(
+        api_key="aaabbbcccddd",
+        environment=mock.ANY,
+    )
 
     # AND the vellum lock file should have been updated with the correct workspace
     with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
@@ -393,4 +400,8 @@ class ExampleWorkflow(BaseWorkflow):
             "module": module,
             "workflow_sandbox_id": new_workflow_sandbox_id,
             "workspace": "my_other_workspace",
+            "container_image_name": None,
+            "container_image_tag": None,
+            "deployments": [],
+            "ignore": None,
         }

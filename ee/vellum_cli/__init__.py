@@ -37,13 +37,15 @@ class PushGroup(ClickAliasedGroup):
 
 @main.group(invoke_without_command=True, cls=PushGroup)
 @click.pass_context
+@click.option("--workspace", type=str, help="The specific Workspace config to use when pushing")
 def push(
     ctx: click.Context,
+    workspace: Optional[str],
 ) -> None:
     """Push Resources to Vellum"""
 
     if ctx.invoked_subcommand is None:
-        push_command()
+        push_command(workspace=workspace)
 
 
 @main.group()
@@ -69,6 +71,7 @@ def workflows():
     is_flag=True,
     help="Raises an error if we detect an unexpected discrepancy in the generated artifact.",
 )
+@click.option("--workspace", type=str, help="The specific Workspace config to use when pushing")
 def workflows_push(
     module: Optional[str],
     deploy: Optional[bool],
@@ -78,6 +81,7 @@ def workflows_push(
     release_tag: Optional[List[str]],
     dry_run: Optional[bool],
     strict: Optional[bool],
+    workspace: Optional[str],
 ) -> None:
     """
     Push Workflows to Vellum. If a module is provided, only the Workflow for that module will be pushed.
@@ -93,6 +97,7 @@ def workflows_push(
         release_tags=release_tag,
         dry_run=dry_run,
         strict=strict,
+        workspace=workspace,
     )
 
 
@@ -113,6 +118,7 @@ def workflows_push(
     is_flag=True,
     help="Raises an error if we detect an unexpected discrepancy in the generated artifact.",
 )
+@click.option("--workspace", type=str, help="The specific Workspace config to use when pushing")
 def push_module(
     ctx: click.Context,
     deploy: Optional[bool],
@@ -122,6 +128,7 @@ def push_module(
     release_tag: Optional[List[str]],
     dry_run: Optional[bool],
     strict: Optional[bool],
+    workspace: Optional[str],
 ) -> None:
     """Push a specific module to Vellum"""
 
@@ -135,6 +142,7 @@ def push_module(
             release_tags=release_tag,
             dry_run=dry_run,
             strict=strict,
+            workspace=workspace,
         )
 
 
