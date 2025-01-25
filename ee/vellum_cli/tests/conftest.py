@@ -46,6 +46,9 @@ def mock_module(request) -> Generator[MockModuleResult, None, None]:
         }
     )
 
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write("VELLUM_API_KEY=abcdef123456")
+
     yield MockModuleResult(
         temp_dir=temp_dir,
         module=module,

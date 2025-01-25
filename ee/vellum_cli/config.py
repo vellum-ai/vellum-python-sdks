@@ -13,6 +13,17 @@ LOCKFILE_PATH = "vellum.lock.json"
 PYPROJECT_TOML_PATH = "pyproject.toml"
 
 
+class WorkspaceConfig(UniversalBaseModel):
+    name: str
+    api_key: str
+
+    def merge(self, other: "WorkspaceConfig") -> "WorkspaceConfig":
+        return WorkspaceConfig(name=self.name or other.name, api_key=self.api_key or other.api_key)
+
+
+DEFAULT_WORKSPACE_CONFIG = WorkspaceConfig(name="default", api_key="VELLUM_API_KEY")
+
+
 class WorkflowDeploymentConfig(UniversalBaseModel):
     id: Optional[UUID] = None
     label: Optional[str] = None
@@ -37,7 +48,7 @@ class WorkflowConfig(UniversalBaseModel):
     deployments: List[WorkflowDeploymentConfig] = field(default_factory=list)
     container_image_name: Optional[str] = None
     container_image_tag: Optional[str] = None
-    workspace: Optional[str] = None
+    workspace: str = DEFAULT_WORKSPACE_CONFIG.name
 
     def merge(self, other: "WorkflowConfig") -> "WorkflowConfig":
         self_deployment_by_id = {
@@ -75,14 +86,6 @@ class WorkflowConfig(UniversalBaseModel):
             container_image_name=self.container_image_name or other.container_image_name,
             workspace=self.workspace or other.workspace,
         )
-
-
-class WorkspaceConfig(UniversalBaseModel):
-    name: str
-    api_key: str
-
-    def merge(self, other: "WorkspaceConfig") -> "WorkspaceConfig":
-        return WorkspaceConfig(name=self.name or other.name, api_key=self.api_key or other.api_key)
 
 
 class VellumCliConfig(UniversalBaseModel):
@@ -158,6 +161,3 @@ def load_vellum_cli_config(root_dir: Optional[str] = None) -> VellumCliConfig:
     toml_config = VellumCliConfig.model_validate(toml_vellum)
 
     return toml_config.merge(lockfile_config)
-
-
-DEFAULT_WORKSPACE_CONFIG = WorkspaceConfig(name="default", api_key="VELLUM_API_KEY")

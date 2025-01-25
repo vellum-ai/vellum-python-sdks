@@ -124,6 +124,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
         lock_data = json.loads(f.read())
         assert lock_data == {
             "version": "1.0",
+            "workspaces": [],
             "workflows": [
                 {
                     "module": "workflow_87654321",
@@ -132,6 +133,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
                     "deployments": [],
                     "container_image_tag": None,
                     "container_image_name": None,
+                    "workspace": "default",
                 }
             ],
         }
@@ -208,8 +210,10 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
                     "deployments": [],
                     "container_image_tag": None,
                     "container_image_name": None,
+                    "workspace": "default",
                 }
             ],
+            "workspaces": [],
         }
 
 
@@ -449,6 +453,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 ],
                 "container_image_name": None,
                 "container_image_tag": None,
+                "workspace": "default",
             },
             {
                 "module": "workflow_87654321",
@@ -457,6 +462,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "deployments": [],
                 "container_image_name": "test",
                 "container_image_tag": "1.0",
+                "workspace": "default",
             },
         ]
 
