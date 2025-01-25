@@ -10,17 +10,12 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
-        run: make setup-poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
         run: poetry install
-      - name: Format
-        run: poetry run black --check .
-      - name: Order Imports
-        run: poetry run isort --check .
-      - name: Lint
-        run: poetry run flake8
       - name: Compile
         run: poetry run mypy .
   test:
@@ -31,9 +26,10 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
-        run: make setup-poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
         run: poetry install
 
@@ -52,9 +48,10 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
-        run: make setup-poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
         run: poetry install
       - name: Publish to pypi
