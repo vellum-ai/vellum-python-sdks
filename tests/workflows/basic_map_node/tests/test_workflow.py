@@ -33,6 +33,10 @@ def test_map_node_streaming_events():
     # WHEN we stream the workflow events
     events = list(workflow.stream(inputs=Inputs(fruits=["apple", "banana"]), event_filter=all_workflow_event_filter))
 
+    apple_len, banana_len = len("apple"), len("banana")
+    apple_index, banana_index = 0, 1
+    apple_final_value, banana_final_value = apple_len + apple_index, banana_len + banana_index
+
     # THEN we see the expected events in the correct relative order
     workflow_initiated_events = [e for e in events if e.name == "workflow.execution.initiated"]
     node_initiated = [e for e in events if e.name == "node.execution.initiated"]
@@ -69,7 +73,7 @@ def test_map_node_streaming_events():
     # Check first iteration
     first_event = next(e for e in node_fulfilled if e.span_id == first_iteration_span_id)
     assert isinstance(first_event, NodeExecutionFulfilledEvent)
-    assert first_event.outputs.count == len("apple")  # 5
+    assert first_event.outputs.count == apple_final_value
     assert first_event.parent is not None
     assert isinstance(first_event.parent, WorkflowParentContext)
     assert first_event.parent.type == "WORKFLOW"
@@ -89,7 +93,7 @@ def test_map_node_streaming_events():
     # Check second iteration
     second_event = next(e for e in node_fulfilled if e.span_id == second_iteration_span_id)
     assert isinstance(second_event, NodeExecutionFulfilledEvent)
-    assert second_event.outputs.count == len("banana") + 1
+    assert second_event.outputs.count == banana_final_value
     assert second_event.parent is not None
     assert isinstance(second_event.parent, WorkflowParentContext)
     assert second_event.parent.type == "WORKFLOW"
@@ -108,7 +112,7 @@ def test_map_node_streaming_events():
 
     # Workflow fulfilled events
     assert len(workflow_fulfilled_events) == 3  # Main + 2 subworkflows
-    assert workflow_fulfilled_events[-1].outputs == {"final_value": [5, 7]}
+    assert workflow_fulfilled_events[-1].outputs == {"final_value": [apple_final_value, banana_final_value]}
     assert workflow_fulfilled_events[-1].parent is None
 
     # Workflow snapshotted events
@@ -137,10 +141,10 @@ def test_map_node_streaming_events():
     } == {
         (None, 0, "INITIATED"),
         (None, 1, "INITIATED"),
-        (5, 0, "FULFILLED"),
-        (7, 1, "FULFILLED"),
+        (apple_final_value, 0, "FULFILLED"),
+        (banana_final_value, 1, "FULFILLED"),
     }
 
     assert node_streaming[5].output.is_fulfilled
     assert node_streaming[5].output.name == "count"
-    assert node_streaming[5].output.value == [5, 7]
+    assert node_streaming[5].output.value == [apple_final_value, banana_final_value]
