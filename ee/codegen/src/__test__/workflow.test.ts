@@ -31,9 +31,7 @@ describe("Workflow", () => {
       mockDocumentIndexFactory() as unknown as DocumentIndexRead
     );
 
-    workflowContext = workflowContextFactory({
-      workflowClassName: "TestWorkflow",
-    });
+    workflowContext = workflowContextFactory();
     workflowContext.addEntrypointNode(entrypointNode);
 
     const nodeData = terminalNodeDataFactory();

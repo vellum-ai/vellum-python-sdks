@@ -2,7 +2,7 @@
 
 exports[`Workflow Sandbox > write > should generate correct and same code for snake and camel casing of input names 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
-from .workflow import Workflow
+from .workflow import TestWorkflow
 from .inputs import Inputs
 
 if __name__ != "__main__":
@@ -10,7 +10,7 @@ if __name__ != "__main__":
 
 
 runner = WorkflowSandboxRunner(
-    workflow=Workflow(),
+    workflow=TestWorkflow(),
     inputs=[
         Inputs(some_foo="some-value"),
         Inputs(some_bar="some-value"),
@@ -23,7 +23,7 @@ runner.run()
 
 exports[`Workflow Sandbox > write > should generate correct code given inputs 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
-from .workflow import Workflow
+from .workflow import TestWorkflow
 from .inputs import Inputs
 
 if __name__ != "__main__":
@@ -31,7 +31,7 @@ if __name__ != "__main__":
 
 
 runner = WorkflowSandboxRunner(
-    workflow=Workflow(),
+    workflow=TestWorkflow(),
     inputs=[
         Inputs(some_foo="some-value"),
         Inputs(some_bar="some-value"),

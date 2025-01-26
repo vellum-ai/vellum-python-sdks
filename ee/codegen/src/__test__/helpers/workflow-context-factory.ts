@@ -16,7 +16,7 @@ export function workflowContextFactory(
     absolutePathToOutputDirectory:
       absolutePathToOutputDirectory || "./src/__tests__/",
     moduleName: moduleName || "code",
-    workflowClassName: workflowClassName || "Workflow",
+    workflowClassName: workflowClassName || "TestWorkflow",
     vellumApiKey: "<TEST_API_KEY>",
     workflowRawEdges: workflowRawEdges || [],
     strict,
