@@ -25,7 +25,6 @@ import {
   WorkflowDisplayData,
   WorkflowEdge,
 } from "src/types/vellum";
-import { getNodeId } from "src/utils/nodes";
 import { isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
@@ -47,7 +46,6 @@ export class Workflow {
   public readonly workflowContext: WorkflowContext;
   private readonly inputs: Inputs;
   private readonly nodes: WorkflowDataNode[];
-  private readonly edgesByPortId: Map<string, WorkflowEdge[]>;
   private readonly displayData: WorkflowDisplayData | undefined;
   private readonly entrypointNodeId: string;
   constructor({ workflowContext, inputs, nodes, displayData }: Workflow.Args) {
@@ -55,45 +53,7 @@ export class Workflow {
     this.inputs = inputs;
     this.nodes = nodes;
     this.displayData = displayData;
-
-    const edges = this.workflowContext.workflowRawEdges;
-    const { edgesByPortId, entrypointNodeId } =
-      this.getEdgesAndEntrypointNodeContexts({ nodes, edges });
-    this.edgesByPortId = edgesByPortId;
-    this.entrypointNodeId = entrypointNodeId;
-  }
-
-  private getEdgesAndEntrypointNodeContexts({
-    nodes,
-    edges,
-  }: {
-    nodes: WorkflowDataNode[];
-    edges: WorkflowEdge[];
-  }) {
-    const entrypointNodeId = this.workflowContext.getEntrypointNode().id;
-    const nodeIds = new Set<string>([
-      ...nodes.map((node) => getNodeId(node)),
-      entrypointNodeId,
-    ]);
-    const edgesByPortId = new Map<string, WorkflowEdge[]>();
-
-    edges.forEach((edge) => {
-      // Handle edge case where there are zombie edges that point to nodes that don't exist
-      if (!nodeIds.has(edge.sourceNodeId) || !nodeIds.has(edge.targetNodeId)) {
-        return;
-      }
-
-      const portId = edge.sourceHandleId;
-
-      const edges = edgesByPortId.get(portId) ?? [];
-      edges.push(edge);
-      edgesByPortId.set(portId, edges);
-    });
-
-    return {
-      edgesByPortId,
-      entrypointNodeId,
-    };
+    this.entrypointNodeId = this.workflowContext.getEntrypointNode().id;
   }
 
   private generateParentWorkflowClass(): python.Reference {
@@ -554,7 +514,7 @@ export class Workflow {
   }
 
   private getEdges(): WorkflowEdge[] {
-    return Array.from(this.edgesByPortId.values()).flat();
+    return this.workflowContext.workflowRawEdges;
   }
 
   private addGraph(workflowClass: python.Class): void {
@@ -565,7 +525,6 @@ export class Workflow {
     const graphField = python.field({
       name: "graph",
       initializer: new GraphAttribute({
-        edgesByPortId: this.edgesByPortId,
         entrypointNodeId: this.entrypointNodeId,
         workflowContext: this.workflowContext,
       }),

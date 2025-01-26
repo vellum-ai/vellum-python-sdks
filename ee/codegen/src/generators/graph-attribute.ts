@@ -38,26 +38,22 @@ type GraphMutableAst =
 export declare namespace GraphAttribute {
   interface Args {
     entrypointNodeId: string;
-    edgesByPortId: Map<string, WorkflowEdge[]>;
     workflowContext: WorkflowContext;
   }
 }
 
 export class GraphAttribute extends AstNode {
   private readonly workflowContext: WorkflowContext;
-  private readonly edgesByPortId: Map<string, WorkflowEdge[]>;
   private readonly entrypointNodeId: string;
   private readonly astNode: python.AstNode;
 
   public constructor({
     entrypointNodeId,
-    edgesByPortId,
     workflowContext,
   }: GraphAttribute.Args) {
     super();
     this.entrypointNodeId = entrypointNodeId;
     this.workflowContext = workflowContext;
-    this.edgesByPortId = edgesByPortId;
 
     this.astNode = this.generateGraphAttribute();
   }
@@ -74,6 +70,7 @@ export class GraphAttribute extends AstNode {
   private generateGraphMutableAst(): GraphMutableAst {
     let graphMutableAst: GraphMutableAst = { type: "empty" };
     const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
+    const edgesByPortId = this.workflowContext.getEdgesByPortId();
     const processedEdges = new Set<WorkflowEdge>();
 
     while (edgesQueue.length > 0) {
@@ -407,7 +404,7 @@ export class GraphAttribute extends AstNode {
 
       graphMutableAst = newMutableAst;
       targetNode.portContextsById.forEach((portContext) => {
-        const edges = this.edgesByPortId.get(portContext.portId);
+        const edges = edgesByPortId.get(portContext.portId);
         edges?.forEach((edge) => {
           if (processedEdges.has(edge) || edgesQueue.includes(edge)) {
             return;

@@ -198,6 +198,17 @@ export class WorkflowContext {
     );
   }
 
+  public getEdgesByPortId(): Map<string, WorkflowEdge[]> {
+    const edgesByPortId = new Map<string, WorkflowEdge[]>();
+    this.workflowRawEdges.forEach((edge) => {
+      const portId = edge.sourceHandleId;
+      const edges = edgesByPortId.get(portId) ?? [];
+      edges.push(edge);
+      edgesByPortId.set(portId, edges);
+    });
+    return edgesByPortId;
+  }
+
   public isInputVariableNameUsed(inputVariableName: string): boolean {
     return this.inputVariableNames.has(inputVariableName);
   }
