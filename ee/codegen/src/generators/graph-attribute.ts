@@ -37,7 +37,6 @@ type GraphMutableAst =
 
 export declare namespace GraphAttribute {
   interface Args {
-    entrypointNodeEdges: WorkflowEdge[];
     entrypointNodeId: string;
     edgesByPortId: Map<string, WorkflowEdge[]>;
     workflowContext: WorkflowContext;
@@ -47,18 +46,15 @@ export declare namespace GraphAttribute {
 export class GraphAttribute extends AstNode {
   private readonly workflowContext: WorkflowContext;
   private readonly edgesByPortId: Map<string, WorkflowEdge[]>;
-  private readonly entrypointNodeEdges: WorkflowEdge[];
   private readonly entrypointNodeId: string;
   private readonly astNode: python.AstNode;
 
   public constructor({
-    entrypointNodeEdges,
     entrypointNodeId,
     edgesByPortId,
     workflowContext,
   }: GraphAttribute.Args) {
     super();
-    this.entrypointNodeEdges = entrypointNodeEdges;
     this.entrypointNodeId = entrypointNodeId;
     this.workflowContext = workflowContext;
     this.edgesByPortId = edgesByPortId;
@@ -77,7 +73,7 @@ export class GraphAttribute extends AstNode {
    */
   private generateGraphMutableAst(): GraphMutableAst {
     let graphMutableAst: GraphMutableAst = { type: "empty" };
-    const edgesQueue = [...this.entrypointNodeEdges];
+    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
     const processedEdges = new Set<WorkflowEdge>();
 
     while (edgesQueue.length > 0) {

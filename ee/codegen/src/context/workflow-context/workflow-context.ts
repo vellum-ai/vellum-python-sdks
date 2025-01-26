@@ -191,6 +191,13 @@ export class WorkflowContext {
     return this.entrypointNode;
   }
 
+  public getEntrypointNodeEdges(): WorkflowEdge[] {
+    const entrypointNodeId = this.getEntrypointNode().id;
+    return this.workflowRawEdges.filter(
+      (edge) => edge.sourceNodeId === entrypointNodeId
+    );
+  }
+
   public isInputVariableNameUsed(inputVariableName: string): boolean {
     return this.inputVariableNames.has(inputVariableName);
   }

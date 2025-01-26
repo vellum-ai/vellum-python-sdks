@@ -48,7 +48,6 @@ export class Workflow {
   private readonly inputs: Inputs;
   private readonly nodes: WorkflowDataNode[];
   private readonly edgesByPortId: Map<string, WorkflowEdge[]>;
-  private readonly entrypointNodeEdges: WorkflowEdge[];
   private readonly displayData: WorkflowDisplayData | undefined;
   private readonly entrypointNodeId: string;
   constructor({ workflowContext, inputs, nodes, displayData }: Workflow.Args) {
@@ -58,10 +57,9 @@ export class Workflow {
     this.displayData = displayData;
 
     const edges = this.workflowContext.workflowRawEdges;
-    const { edgesByPortId, entrypointNodeEdges, entrypointNodeId } =
+    const { edgesByPortId, entrypointNodeId } =
       this.getEdgesAndEntrypointNodeContexts({ nodes, edges });
     this.edgesByPortId = edgesByPortId;
-    this.entrypointNodeEdges = entrypointNodeEdges;
     this.entrypointNodeId = entrypointNodeId;
   }
 
@@ -78,16 +76,11 @@ export class Workflow {
       entrypointNodeId,
     ]);
     const edgesByPortId = new Map<string, WorkflowEdge[]>();
-    const entrypointNodeEdges: WorkflowEdge[] = [];
 
     edges.forEach((edge) => {
       // Handle edge case where there are zombie edges that point to nodes that don't exist
       if (!nodeIds.has(edge.sourceNodeId) || !nodeIds.has(edge.targetNodeId)) {
         return;
-      }
-
-      if (edge.sourceNodeId === entrypointNodeId) {
-        entrypointNodeEdges.push(edge);
       }
 
       const portId = edge.sourceHandleId;
@@ -99,7 +92,6 @@ export class Workflow {
 
     return {
       edgesByPortId,
-      entrypointNodeEdges,
       entrypointNodeId,
     };
   }
@@ -362,7 +354,7 @@ export class Workflow {
       python.field({
         name: "entrypoint_displays",
         initializer: python.TypeInstantiation.dict(
-          this.entrypointNodeEdges.map((edge) => {
+          this.workflowContext.getEntrypointNodeEdges().map((edge) => {
             const defaultEntrypointNodeContext =
               this.workflowContext.getNodeContext(edge.targetNodeId);
 
@@ -574,7 +566,6 @@ export class Workflow {
       name: "graph",
       initializer: new GraphAttribute({
         edgesByPortId: this.edgesByPortId,
-        entrypointNodeEdges: this.entrypointNodeEdges,
         entrypointNodeId: this.entrypointNodeId,
         workflowContext: this.workflowContext,
       }),
