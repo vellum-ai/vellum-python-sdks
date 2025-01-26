@@ -101,6 +101,12 @@ export interface NodeOutputPointer {
   data: NodeOutputData;
 }
 
+export interface WorkflowOutputPointer {
+  type: "NODE_OUTPUT";
+  nodeId: string;
+  nodeOutputId: string;
+}
+
 export interface InputVariableData {
   inputVariableId: string;
 }
@@ -710,11 +716,17 @@ export interface WorkflowDisplayData {
   viewport: WorkflowDisplayDataViewport;
 }
 
+export interface WorkflowOutputValue {
+  outputVariableId: string;
+  value: WorkflowOutputPointer;
+}
+
 export interface WorkflowRawData {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
   displayData?: WorkflowDisplayData;
   definition?: CodeResourceDefinition;
+  outputValues?: WorkflowOutputValue[];
 }
 
 export interface RunnerConfig {
