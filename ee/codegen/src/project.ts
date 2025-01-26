@@ -21,7 +21,6 @@ import {
   NodeDefinitionGenerationError,
   PostProcessingError,
   ProjectSerializationError,
-  WorkflowGenerationError,
 } from "./generators/errors";
 import { BaseNode } from "./generators/nodes/bases";
 import { GuardrailNode } from "./generators/nodes/guardrail-node";
@@ -64,7 +63,6 @@ import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-depl
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
-  EntrypointNode,
   WorkflowDataNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
   WorkflowSandboxInputs,
@@ -148,6 +146,7 @@ ${errors.slice(0, 3).map((err) => {
       }
 
       this.workflowVersionExecConfig = workflowVersionExecConfigResult.value;
+      const rawNodes = this.workflowVersionExecConfig.workflowRawData.nodes;
       const rawEdges = this.workflowVersionExecConfig.workflowRawData.edges;
 
       const workflowClassName =
@@ -160,6 +159,7 @@ ${errors.slice(0, 3).map((err) => {
         moduleName,
         workflowClassName,
         vellumApiKey,
+        workflowRawNodes: rawNodes,
         workflowRawEdges: rawEdges,
         strict: rest.strict,
         codeExecutionNodeCodeRepresentationOverride:
@@ -325,7 +325,6 @@ ${errors.slice(0, 3).map((err) => {
       this.workflowContext.addInputVariableContext(inputVariableContext);
     });
 
-    let entrypointNode: EntrypointNode | undefined;
     const nodesToGenerate: WorkflowDataNode[] = [];
     await Promise.all(
       this.workflowVersionExecConfig.workflowRawData.nodes.map(
@@ -338,12 +337,6 @@ ${errors.slice(0, 3).map((err) => {
               })
             );
           } else if (nodeData.type === "ENTRYPOINT") {
-            if (entrypointNode) {
-              throw new WorkflowGenerationError(
-                "Multiple entrypoint nodes found"
-              );
-            }
-            entrypointNode = nodeData;
             return;
           }
 
@@ -356,10 +349,6 @@ ${errors.slice(0, 3).map((err) => {
         }
       )
     );
-    if (!entrypointNode) {
-      throw new WorkflowGenerationError("Entrypoint node not found");
-    }
-    this.workflowContext.addEntrypointNode(entrypointNode);
 
     const inputs = codegen.inputs({
       workflowContext: this.workflowContext,

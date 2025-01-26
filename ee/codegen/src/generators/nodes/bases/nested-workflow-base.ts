@@ -72,6 +72,7 @@ export abstract class BaseNestedWorkflowNode<
       this.workflowContext.createNestedWorkflowContext({
         parentNode: this,
         workflowClassName: nestedWorkflowClassName,
+        workflowRawNodes: innerWorkflowData.nodes,
         workflowRawEdges: innerWorkflowData.edges,
       });
 

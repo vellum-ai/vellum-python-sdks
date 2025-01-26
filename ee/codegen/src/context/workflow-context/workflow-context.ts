@@ -20,6 +20,7 @@ import {
   EntrypointNode,
   WorkflowDataNode,
   WorkflowEdge,
+  WorkflowNode,
 } from "src/types/vellum";
 
 type InputVariableContextsById = Map<string, InputVariableContext>;
@@ -40,6 +41,7 @@ export declare namespace WorkflowContext {
     workflowsSdkModulePath?: readonly string[];
     portContextByName?: PortContextById;
     vellumApiKey: string;
+    workflowRawNodes: WorkflowNode[];
     workflowRawEdges: WorkflowEdge[];
     strict?: boolean;
     codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
@@ -85,9 +87,6 @@ export class WorkflowContext {
     BaseNodeContext<WorkflowDataNode>
   >;
 
-  // The entrypoint node for this workflow
-  private entrypointNode: EntrypointNode | undefined;
-
   public readonly sdkModulePathNames: SDK_MODULE_PATHS;
 
   public readonly portContextById: PortContextById;
@@ -98,6 +97,7 @@ export class WorkflowContext {
   private readonly errors: BaseCodegenError[] = [];
 
   public readonly workflowRawEdges: WorkflowEdge[];
+  public readonly workflowRawNodes: WorkflowNode[];
 
   public readonly codeExecutionNodeCodeRepresentationOverride:
     | "STANDALONE"
@@ -114,6 +114,7 @@ export class WorkflowContext {
     workflowsSdkModulePath = ["vellum", "workflows"] as const,
     portContextByName,
     vellumApiKey,
+    workflowRawNodes,
     workflowRawEdges,
     strict = false,
     codeExecutionNodeCodeRepresentationOverride,
@@ -142,7 +143,7 @@ export class WorkflowContext {
 
     this.sdkModulePathNames = generateSdkModulePaths(workflowsSdkModulePath);
     this.workflowRawEdges = workflowRawEdges;
-
+    this.workflowRawNodes = workflowRawNodes;
     this.strict = strict;
     this.errors = [];
 
@@ -154,10 +155,12 @@ export class WorkflowContext {
   public createNestedWorkflowContext({
     parentNode,
     workflowClassName,
+    workflowRawNodes,
     workflowRawEdges,
   }: {
     parentNode: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
     workflowClassName: string;
+    workflowRawNodes: WorkflowNode[];
     workflowRawEdges: WorkflowEdge[];
   }) {
     return new WorkflowContext({
@@ -169,26 +172,22 @@ export class WorkflowContext {
       parentNode,
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,
+      workflowRawNodes,
       workflowRawEdges,
       codeExecutionNodeCodeRepresentationOverride:
         this.codeExecutionNodeCodeRepresentationOverride,
     });
   }
 
-  public addEntrypointNode(entrypointNode: EntrypointNode): void {
-    if (this.entrypointNode) {
-      throw new WorkflowGenerationError("Entrypoint node already exists");
-    }
-
-    this.entrypointNode = entrypointNode;
-  }
-
   public getEntrypointNode(): EntrypointNode {
-    if (!this.entrypointNode) {
+    const entrypointNode = this.workflowRawNodes.find(
+      (node): node is EntrypointNode => node.type === "ENTRYPOINT"
+    );
+    if (!entrypointNode) {
       throw new WorkflowGenerationError("Entrypoint node not found");
     }
 
-    return this.entrypointNode;
+    return entrypointNode;
   }
 
   public getEntrypointNodeEdges(): WorkflowEdge[] {

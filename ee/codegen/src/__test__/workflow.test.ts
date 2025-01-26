@@ -15,11 +15,10 @@ import {
 import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { workflowOutputContextFactory } from "src/__test__/helpers/workflow-output-context-factory";
 import * as codegen from "src/codegen";
-import { createNodeContext, WorkflowContext } from "src/context";
+import { createNodeContext } from "src/context";
 import { WorkflowEdge } from "src/types/vellum";
 
 describe("Workflow", () => {
-  let workflowContext: WorkflowContext;
   let writer: Writer;
   const moduleName = "test";
   const entrypointNode = entrypointNodeDataFactory();
@@ -28,15 +27,6 @@ describe("Workflow", () => {
     vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
       mockDocumentIndexFactory() as unknown as DocumentIndexRead
     );
-
-    workflowContext = workflowContextFactory();
-    workflowContext.addEntrypointNode(entrypointNode);
-
-    const nodeData = terminalNodeDataFactory();
-    await createNodeContext({
-      workflowContext: workflowContext,
-      nodeData,
-    });
 
     writer = new Writer();
   });
@@ -47,6 +37,7 @@ describe("Workflow", () => {
 
   describe("write", () => {
     it("should generate correct code when there are input variables", async () => {
+      const workflowContext = workflowContextFactory();
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
         moduleName,
@@ -59,6 +50,7 @@ describe("Workflow", () => {
     });
 
     it("should generate correct code when there are no input variables", async () => {
+      const workflowContext = workflowContextFactory();
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
         moduleName,
@@ -71,6 +63,14 @@ describe("Workflow", () => {
     });
 
     it("should generate correct code with Search Results as an output variable", async () => {
+      const nodeData = terminalNodeDataFactory();
+      const workflowContext = workflowContextFactory({
+        workflowRawNodes: [entrypointNode, nodeData],
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData,
+      });
       workflowContext.addInputVariableContext(
         inputVariableContextFactory({
           inputVariableData: {
@@ -99,6 +99,10 @@ describe("Workflow", () => {
     });
 
     it("should handle edges pointing to non-existent nodes", async () => {
+      const searchNodeData = searchNodeDataFactory();
+      const workflowContext = workflowContextFactory({
+        workflowRawNodes: [entrypointNode, searchNodeData],
+      });
       workflowContext.addInputVariableContext(
         inputVariableContextFactory({
           inputVariableData: {
@@ -112,9 +116,8 @@ describe("Workflow", () => {
 
       const inputs = codegen.inputs({ workflowContext });
 
-      const searchNodeData = searchNodeDataFactory();
       await createNodeContext({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeData: searchNodeData,
       });
 
@@ -156,19 +159,27 @@ describe("Workflow", () => {
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
       });
-      await createNodeContext({
-        workflowContext: workflowContext,
-        nodeData: templatingNodeData1,
-      });
-
       const templatingNodeData2 = templatingNodeFactory({
         id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
         label: "Templating Node",
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
       });
+
+      const workflowContext = workflowContextFactory({
+        workflowRawNodes: [
+          entrypointNode,
+          templatingNodeData1,
+          templatingNodeData2,
+        ],
+      });
       await createNodeContext({
-        workflowContext: workflowContext,
+        workflowContext,
+        nodeData: templatingNodeData1,
+      });
+
+      await createNodeContext({
+        workflowContext,
         nodeData: templatingNodeData2,
       });
 
