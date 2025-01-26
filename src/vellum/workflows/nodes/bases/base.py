@@ -250,11 +250,10 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
             Determines whether a Node's execution should be initiated. Override this method to define custom
             trigger criteria.
             """
+            if state.meta.node_execution_cache.is_node_execution_initiated(cls.node_class, node_span_id):
+                return False
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ATTRIBUTES:
-                if state.meta.node_execution_cache.is_node_execution_initiated(cls.node_class, node_span_id):
-                    return False
-
                 is_ready = True
                 for descriptor in cls.node_class:
                     if not descriptor.instance:
@@ -268,15 +267,9 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 return is_ready
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
-                if state.meta.node_execution_cache.is_node_execution_initiated(cls.node_class, node_span_id):
-                    return False
-
                 return True
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ALL:
-                if state.meta.node_execution_cache.is_node_execution_initiated(cls.node_class, node_span_id):
-                    return False
-
                 """
                 A node utilizing an AWAIT_ALL merge strategy will only be considered ready for the Nth time
                 when all of its dependencies have been executed N times.
