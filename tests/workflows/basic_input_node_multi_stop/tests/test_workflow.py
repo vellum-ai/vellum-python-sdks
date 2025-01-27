@@ -9,7 +9,7 @@ from tests.workflows.basic_input_node_multi_stop.workflow import (
 
 def test_workflow__happy_path_multi_stop():
     """
-    Runs the non-streamed execution of a workflow with an Input Node.
+    Runs the non-streamed execution of a workflow with a two Nodes defining similar ExternalInputs.
     """
 
     # GIVEN a workflow that uses an Input Node
