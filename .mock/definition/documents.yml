@@ -31,6 +31,9 @@ service:
           ordering:
             type: optional<string>
             docs: Which field to use when ordering the results.
+          search:
+            type: optional<string>
+            docs: A search term.
       response:
         docs: ''
         type: root.PaginatedSlimDocumentList
