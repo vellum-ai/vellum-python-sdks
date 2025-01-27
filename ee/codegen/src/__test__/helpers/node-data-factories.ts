@@ -470,12 +470,14 @@ export function inlinePromptNodeDataInlineVariantFactory({
   blockType,
   errorOutputId,
   parameters,
+  defaultBlock,
 }: {
   blockType?: string;
   errorOutputId?: string;
   parameters?: PromptParameters;
+  defaultBlock?: PromptTemplateBlock;
 }): PromptNode {
-  const block = generateBlockGivenType(blockType ?? "JINJA");
+  const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
     id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
     type: WorkflowNodeType.PROMPT,

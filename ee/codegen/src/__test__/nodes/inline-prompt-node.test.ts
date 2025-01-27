@@ -10,6 +10,7 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
+import { PromptTemplateBlock } from "src/types/vellum";
 
 describe("InlinePromptNode", () => {
   let workflowContext: WorkflowContext;
@@ -161,6 +162,38 @@ describe("InlinePromptNode", () => {
       workflowContext,
       nodeContext,
     });
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it("should generate cache config correctly", async () => {
+    const block: PromptTemplateBlock = {
+      id: "1",
+      blockType: "JINJA",
+      state: "ENABLED",
+      properties: {
+        template: "Hello, {{ name }}!",
+      },
+      cacheConfig: {
+        type: "EPHEMERAL",
+      },
+    };
+
+    const nodeData = inlinePromptNodeDataInlineVariantFactory({
+      blockType: "JINJA",
+      defaultBlock: block,
+    });
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as InlinePromptNodeContext;
+
+    const node = new InlinePromptNode({
+      workflowContext,
+      nodeContext,
+    });
+
     node.getNodeFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
