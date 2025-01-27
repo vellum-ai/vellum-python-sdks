@@ -141,27 +141,6 @@ export class GraphAttribute extends AstNode {
         }
       };
 
-      const popSources = (mutableAst: GraphMutableAst): GraphMutableAst => {
-        if (mutableAst.type === "set") {
-          return {
-            type: "set",
-            values: mutableAst.values.map(popSources),
-          };
-        } else if (mutableAst.type === "right_shift") {
-          const newLhs = popSources(mutableAst.lhs);
-          if (newLhs.type === "empty") {
-            return mutableAst.rhs;
-          }
-          return {
-            type: "right_shift",
-            lhs: newLhs,
-            rhs: mutableAst.rhs,
-          };
-        } else {
-          return { type: "empty" };
-        }
-      };
-
       const addEdgeToGraph = (
         mutableAst: GraphMutableAst,
         graphSourceNode: BaseNodeContext<WorkflowDataNode> | null
@@ -331,7 +310,7 @@ export class GraphAttribute extends AstNode {
                         reference: portReference.reference.nodeContext,
                       }
                     : portReference,
-                  rhs: popSources(newSetAst),
+                  rhs: this.popSources(newSetAst),
                 };
               }
             }
@@ -680,6 +659,42 @@ export class GraphAttribute extends AstNode {
     }
     return mutableAst;
   }
+
+  /**
+   * Pops the source node from the AST, returning a new AST without the source node.
+   *
+   * Example:
+   *
+   * ```
+   * A >> B >> C
+   * ```
+   *
+   * Becomes:
+   *
+   * ```
+   * B >> C
+   * ```
+   */
+  private popSources = (mutableAst: GraphMutableAst): GraphMutableAst => {
+    if (mutableAst.type === "set") {
+      return this.flattenSet({
+        type: "set",
+        values: mutableAst.values.map(this.popSources),
+      });
+    } else if (mutableAst.type === "right_shift") {
+      const newLhs = this.popSources(mutableAst.lhs);
+      if (newLhs.type === "empty") {
+        return mutableAst.rhs;
+      }
+      return {
+        type: "right_shift",
+        lhs: newLhs,
+        rhs: mutableAst.rhs,
+      };
+    } else {
+      return { type: "empty" };
+    }
+  };
 
   /**
    * Translates our mutable graph AST into a Fern-native Python AST node.
