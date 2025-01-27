@@ -173,3 +173,12 @@ exports[`Workflow > graph > should be correct for two branches merging from sets
 }
 "
 `;
+
+exports[`Workflow > graph > should define nested sets of nodes without compilation errors 1`] = `
+"TopNode >> {
+    OutputTopNode,
+    OutputMiddleNode,
+    OutputBottomNode,
+}
+"
+`;

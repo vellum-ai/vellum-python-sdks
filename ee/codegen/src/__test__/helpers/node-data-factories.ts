@@ -73,7 +73,7 @@ export function terminalNodeDataFactory(): FinalOutputNode {
   };
 }
 
-export function mergeNodeDataFactory(): MergeNode {
+export function mergeNodeDataFactory(numTargetHandles: number = 2): MergeNode {
   return {
     id: "merge-node-1",
     type: WorkflowNodeType.MERGE,
@@ -81,14 +81,9 @@ export function mergeNodeDataFactory(): MergeNode {
     data: {
       label: "Merge Node",
       mergeStrategy: "AWAIT_ALL",
-      targetHandles: [
-        {
-          id: "target-handle-id-1",
-        },
-        {
-          id: "target-handle-id-2",
-        },
-      ],
+      targetHandles: Array.from({ length: numTargetHandles }, (_, index) => ({
+        id: `target-handle-id-${index + 1}`,
+      })),
       sourceHandleId: "source-handle-id",
     },
   };
@@ -1450,8 +1445,18 @@ export function genericNodeFactory(
 
 export function finalOutputNodeFactory({
   includeInput = true,
+  id,
+  targetHandleId,
+  outputId,
+  name,
+  label,
 }: {
   includeInput?: boolean;
+  id?: string;
+  targetHandleId?: string;
+  outputId?: string;
+  name?: string;
+  label?: string;
 } = {}): FinalOutputNode {
   const inputs: NodeInput[] = [];
 
@@ -1475,15 +1480,15 @@ export function finalOutputNodeFactory({
   }
 
   const nodeData: FinalOutputNode = {
-    id: "48e0d88b-a544-4a14-b49f-38aca82e0e13",
+    id: id ?? "48e0d88b-a544-4a14-b49f-38aca82e0e13",
     type: "TERMINAL",
     data: {
-      label: "Final Output Node",
+      label: label ?? "Final Output Node",
       outputType: "STRING",
-      name: "final-output",
-      targetHandleId: "<target-handle-id>",
+      name: name ?? "final-output",
+      targetHandleId: targetHandleId ?? "<target-handle-id>",
       nodeInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
-      outputId: "<output-id>",
+      outputId: outputId ?? "<output-id>",
     },
     inputs: inputs,
     displayData: {

@@ -4,6 +4,7 @@ import { workflowContextFactory } from "./helpers";
 import {
   conditionalNodeFactory,
   entrypointNodeDataFactory,
+  finalOutputNodeFactory,
   mergeNodeDataFactory,
   templatingNodeFactory,
 } from "./helpers/node-data-factories";
@@ -1467,6 +1468,89 @@ describe("Workflow", () => {
           sourceHandleId: templatingNodeData1.data.sourceHandleId,
           targetNodeId: templatingNodeData2.id,
           targetHandleId: templatingNodeData2.data.targetHandleId,
+        },
+      ];
+      workflowContext.addWorkflowEdges(edges);
+
+      new GraphAttribute({ workflowContext }).write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should define nested sets of nodes without compilation errors", async () => {
+      const topNode = templatingNodeFactory({ label: "Top Node" });
+      await createNodeContext({
+        workflowContext,
+        nodeData: topNode,
+      });
+
+      const outputTopNode = finalOutputNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+        label: "Output Top Node",
+        name: "output-top-node",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294e",
+        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: outputTopNode,
+      });
+
+      const outputMiddleNode = finalOutputNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf87",
+        label: "Output Middle Node",
+        name: "output-middle-node",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294f",
+        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf87",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: outputMiddleNode,
+      });
+
+      const outputBottomNode = finalOutputNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+        label: "Output Bottom Node",
+        name: "output-bottom-node",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2950",
+        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: outputBottomNode,
+      });
+
+      const edges: WorkflowEdge[] = [
+        {
+          id: "edge-1",
+          type: "DEFAULT",
+          sourceNodeId: entrypointNode.id,
+          sourceHandleId: entrypointNode.data.sourceHandleId,
+          targetNodeId: topNode.id,
+          targetHandleId: topNode.data.targetHandleId,
+        },
+        {
+          id: "edge-2",
+          type: "DEFAULT",
+          sourceNodeId: topNode.id,
+          sourceHandleId: topNode.data.sourceHandleId,
+          targetNodeId: outputTopNode.id,
+          targetHandleId: outputTopNode.data.targetHandleId,
+        },
+        {
+          id: "edge-3",
+          type: "DEFAULT",
+          sourceNodeId: topNode.id,
+          sourceHandleId: topNode.data.sourceHandleId,
+          targetNodeId: outputMiddleNode.id,
+          targetHandleId: outputMiddleNode.data.targetHandleId,
+        },
+        {
+          id: "edge-4",
+          type: "DEFAULT",
+          sourceNodeId: topNode.id,
+          sourceHandleId: topNode.data.sourceHandleId,
+          targetNodeId: outputBottomNode.id,
+          targetHandleId: outputBottomNode.data.targetHandleId,
         },
       ];
       workflowContext.addWorkflowEdges(edges);
