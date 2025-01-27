@@ -84,7 +84,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [searchNodeData],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -135,7 +134,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -205,7 +203,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2, templatingNodeData3],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -256,7 +253,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -334,7 +330,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2, mergeNodeData],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -439,12 +434,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          templatingNodeData1,
-          templatingNodeData2,
-          templatingNodeData3,
-          mergeNodeData,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -541,12 +530,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          templatingNodeData1,
-          templatingNodeData2,
-          mergeNodeData,
-          templatingNodeData3,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -643,12 +626,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          templatingNodeData1,
-          templatingNodeData2,
-          mergeNodeData,
-          templatingNodeData3,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -720,7 +697,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [conditionalNodeData, templatingNodeData1, templatingNodeData2],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -790,7 +766,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2, templatingNodeData3],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -860,7 +835,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2, templatingNodeData3],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -930,7 +904,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2, templatingNodeData3],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -1027,12 +1000,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          templatingNodeData1,
-          templatingNodeData2,
-          templatingNodeData3,
-          templatingNodeData4,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -1167,14 +1134,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          templatingNodeData1,
-          templatingNodeData2,
-          templatingNodeData3,
-          templatingNodeData4,
-          templatingNodeData5,
-          mergeNodeData,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -1246,7 +1205,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [conditionalNodeData, templatingNodeData1, templatingNodeData2],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -1348,12 +1306,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          conditionalNodeData,
-          templatingNodeData1,
-          templatingNodeData2,
-          templatingNodeData3,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -1490,14 +1442,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          conditionalNodeData,
-          conditionalNode2Data,
-          templatingNodeData1,
-          templatingNodeData2,
-          templatingNodeData3,
-          templatingNodeData4,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -1634,14 +1578,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [
-          conditionalNodeData,
-          templatingNodeData1,
-          templatingNodeData2,
-          templatingNodeData3,
-          templatingNodeData4,
-          templatingNodeData5,
-        ],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -1719,7 +1655,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2, mergeNodeData],
       });
 
       workflow.getWorkflowFile().write(writer);

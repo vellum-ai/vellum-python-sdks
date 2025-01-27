@@ -20,11 +20,7 @@ import { WorkflowContext } from "src/context";
 import { BaseState } from "src/generators/base-state";
 import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
-import {
-  WorkflowDataNode,
-  WorkflowDisplayData,
-  WorkflowEdge,
-} from "src/types/vellum";
+import { WorkflowDisplayData, WorkflowEdge } from "src/types/vellum";
 import { isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
@@ -35,8 +31,6 @@ export declare namespace Workflow {
     workflowContext: WorkflowContext;
     /* The inputs for the workflow */
     inputs: Inputs;
-    /* The nodes in the workflow */
-    nodes: WorkflowDataNode[];
     /* The display data for the workflow */
     displayData?: WorkflowDisplayData;
   }
@@ -45,12 +39,10 @@ export declare namespace Workflow {
 export class Workflow {
   public readonly workflowContext: WorkflowContext;
   private readonly inputs: Inputs;
-  private readonly nodes: WorkflowDataNode[];
   private readonly displayData: WorkflowDisplayData | undefined;
-  constructor({ workflowContext, inputs, nodes, displayData }: Workflow.Args) {
+  constructor({ workflowContext, inputs, displayData }: Workflow.Args) {
     this.workflowContext = workflowContext;
     this.inputs = inputs;
-    this.nodes = nodes;
     this.displayData = displayData;
   }
 
@@ -516,7 +508,7 @@ export class Workflow {
   }
 
   private addGraph(workflowClass: python.Class): void {
-    if (this.nodes.length === 0) {
+    if (this.getEdges().length === 0) {
       return;
     }
 

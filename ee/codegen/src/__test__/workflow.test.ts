@@ -52,7 +52,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -65,7 +64,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -94,7 +92,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -146,7 +143,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [searchNodeData],
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -201,7 +197,6 @@ describe("Workflow", () => {
         moduleName,
         workflowContext,
         inputs,
-        nodes: [templatingNodeData1, templatingNodeData2],
       });
 
       workflow.getWorkflowFile().write(writer);

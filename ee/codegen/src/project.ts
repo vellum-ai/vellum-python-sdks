@@ -372,7 +372,6 @@ ${errors.slice(0, 3).map((err) => {
       moduleName,
       workflowContext: this.workflowContext,
       inputs,
-      nodes: nodesToGenerate,
       displayData: this.workflowVersionExecConfig.workflowRawData.displayData,
     });
 
