@@ -4,6 +4,7 @@ from deepdiff import DeepDiff
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -19,11 +20,7 @@ class ConstantValueGenericNode(BaseNode):
 
 
 def test_serialize_node__constant_value(serialize_node):
-    input_id = uuid4()
-    serialized_node = serialize_node(
-        node_class=ConstantValueGenericNode,
-        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
-    )
+    serialized_node = serialize_node(ConstantValueGenericNode)
 
     assert not DeepDiff(
         {
@@ -58,6 +55,49 @@ def test_serialize_node__constant_value(serialize_node):
                             "value": "hello",
                         },
                     },
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class ConstantValueReferenceGenericNode(BaseNode):
+    attr: str = ConstantValueReference("hello")
+
+
+def test_serialize_node__constant_value_reference(serialize_node):
+    serialized_node = serialize_node(ConstantValueReferenceGenericNode)
+
+    assert not DeepDiff(
+        {
+            "id": "9271e2b1-f47e-47a4-95ae-51299dedb62f",
+            "label": "ConstantValueReferenceGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "ConstantValueReferenceGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "8cc0b4c4-4ae4-4248-8fd5-bfb2e658eb51", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "fe696d84-47c2-4325-8020-34a1c586a759", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "460aeb68-7369-43d2-9d3d-37caa425611f",
+                    "name": "attr",
+                    "value": {"type": "CONSTANT_VALUE", "value": "hello"},
                 }
             ],
             "outputs": [],

@@ -31,6 +31,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
@@ -337,6 +338,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             }
 
     def serialize_value(self, display_context: "WorkflowDisplayContext", value: BaseDescriptor) -> JsonObject:
+        if isinstance(value, ConstantValueReference):
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": value._value,
+            }
+
         if isinstance(value, WorkflowInputReference):
             workflow_input_display = display_context.global_workflow_input_displays[value]
             return {
