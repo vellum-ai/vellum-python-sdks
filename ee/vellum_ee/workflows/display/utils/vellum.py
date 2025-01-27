@@ -6,6 +6,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.and_ import AndExpression
 from vellum.workflows.expressions.begins_with import BeginsWithExpression
 from vellum.workflows.expressions.between import BetweenExpression
+from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.expressions.contains import ContainsExpression
 from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
 from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
@@ -150,5 +151,7 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperato
         return "and"
     elif isinstance(descriptor, OrExpression):
         return "or"
+    elif isinstance(descriptor, CoalesceExpression):
+        return "coalesce"
     else:
         raise ValueError(f"Unsupported descriptor type: {descriptor}")

@@ -284,3 +284,100 @@ def test_serialize_node__node_execution(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+class CoalesceNodeA(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output: str
+
+
+class CoalesceNodeADisplay(BaseNodeDisplay[CoalesceNodeA]):
+    pass
+
+
+class CoalesceNodeB(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output: str
+
+
+class CoalesceNodeBDisplay(BaseNodeDisplay[CoalesceNodeB]):
+    pass
+
+
+class CoalesceNodeFinal(BaseNode):
+    attr = CoalesceNodeA.Outputs.output.coalesce(CoalesceNodeB.Outputs.output)
+
+
+class CoalesceNodeFinalDisplay(BaseNodeDisplay[CoalesceNodeFinal]):
+    pass
+
+
+def test_serialize_node__coalesce(serialize_node):
+    coalesce_node_a_output_id = uuid4()
+    coalesce_node_b_output_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=CoalesceNodeFinal,
+        global_node_displays={
+            CoalesceNodeA: CoalesceNodeADisplay(),
+            CoalesceNodeB: CoalesceNodeBDisplay(),
+            CoalesceNodeFinal: CoalesceNodeFinalDisplay(),
+        },
+        global_node_output_displays={
+            CoalesceNodeA.Outputs.output: (
+                CoalesceNodeA,
+                NodeOutputDisplay(id=coalesce_node_a_output_id, name="output"),
+            ),
+            CoalesceNodeB.Outputs.output: (
+                CoalesceNodeB,
+                NodeOutputDisplay(id=coalesce_node_b_output_id, name="output"),
+            ),
+        },
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "84d0ce62-afd1-4186-b0e3-5dd8e5ca8b65",
+            "label": "CoalesceNodeFinal",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "CoalesceNodeFinal",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "5165f887-153b-4ecd-9219-1beb3cf4f906", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "08ab456d-f541-4400-8305-e97f30cbe745", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "5a22dd48-9ef3-456b-85b8-7662cf7823eb",
+                    "name": "attr",
+                    "value": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "NODE_OUTPUT",
+                            "node_id": "20c340f2-409c-4d31-b44b-eeffd76938d5",
+                            "node_output_id": str(coalesce_node_a_output_id),
+                        },
+                        "operator": "coalesce",
+                        "rhs": {
+                            "type": "NODE_OUTPUT",
+                            "node_id": "9fac3c54-4e75-46ca-a1f2-a80fc6d8ad3f",
+                            "node_output_id": str(coalesce_node_b_output_id),
+                        },
+                    },
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
