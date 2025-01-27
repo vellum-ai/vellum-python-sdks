@@ -340,10 +340,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     def serialize_value(self, display_context: "WorkflowDisplayContext", value: BaseDescriptor) -> JsonObject:
         if isinstance(value, ConstantValueReference):
-            return {
-                "type": "CONSTANT_VALUE",
-                "value": value._value,
-            }
+            return self.serialize_value(display_context, value._value)
 
         if isinstance(value, LazyReference):
             return self.serialize_value(display_context, value._get())

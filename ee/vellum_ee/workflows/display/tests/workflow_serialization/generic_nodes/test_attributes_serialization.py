@@ -98,7 +98,7 @@ def test_serialize_node__constant_value_reference(serialize_node):
                 {
                     "id": "460aeb68-7369-43d2-9d3d-37caa425611f",
                     "name": "attr",
-                    "value": {"type": "CONSTANT_VALUE", "value": "hello"},
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
                 }
             ],
             "outputs": [],
