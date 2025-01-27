@@ -10,11 +10,12 @@ from vellum.workflows.state.base import BaseState
 class ExpensiveEmitter(BaseWorkflowEmitter):
     delay = 0.02
 
-    def _emit(self, event: WorkflowEvent) -> None:
-        time.sleep(self.delay)
+    def _emit(self) -> None:
+        pass
 
     def emit_event(self, event: WorkflowEvent) -> None:
-        self._emit(event)
+        self._emit()
+        time.sleep(self.delay)
 
     def snapshot_state(self, state: BaseState) -> None:
         time.sleep(self.delay)
