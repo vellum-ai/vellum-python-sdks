@@ -20,7 +20,7 @@ def test_run_workflow__happy_path():
     assert terminal_event.outputs == {"final_value": "https://api.vellum.ai"}
 
 
-def test_run_workflow__missing_environment_variable():
+def test_run_workflow__default_environment_variable():
     # Ensure no relevant environment variables are set
     os.environ.pop("API_URL", None)
 
@@ -30,5 +30,8 @@ def test_run_workflow__missing_environment_variable():
     # WHEN the workflow is run
     terminal_event = workflow.run()
 
-    # THEN the workflow should fail
-    assert terminal_event.name == "workflow.execution.rejected", terminal_event
+    # THEN the workflow should complete successfully
+    assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
+
+    # AND the output should match the default value
+    assert terminal_event.outputs == {"final_value": "https://default.api.vellum.ai"}

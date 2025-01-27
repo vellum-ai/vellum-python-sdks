@@ -4,7 +4,7 @@ from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class ReferenceEnvironmentNode(BaseNode):
-    url = Environment.get("API_URL")
+    url = Environment.get("API_URL", "https://default.api.vellum.ai")
 
     class Outputs(BaseNode.Outputs):
         url: str
