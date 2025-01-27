@@ -1,5 +1,5 @@
 import os
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Union
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class EnvironmentVariableReference(BaseDescriptor[str]):
-    def __init__(self, *, name: str, default: Optional[str] = None) -> None:
+    def __init__(self, *, name: str, default: Union[str, None] = None):
         super().__init__(name=name, types=(str,))
         self.default = default
 
