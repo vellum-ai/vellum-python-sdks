@@ -9,6 +9,8 @@ from typing import (  # type: ignore[attr-defined]
     _UnionGenericAlias,
 )
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
+
 JsonArray = List["Json"]
 JsonObject = Dict[str, "Json"]
 Json = Union[None, bool, int, float, str, JsonArray, JsonObject]
@@ -20,11 +22,8 @@ SpecialGenericAlias = _SpecialGenericAlias
 UnionGenericAlias = _UnionGenericAlias
 
 
-class VellumSecret:
+class VellumSecret(UniversalBaseModel):
     name: str
-
-    def __init__(self, name: str):
-        self.name = name
 
 
 EntityInputsInterface = Dict[str, Any]

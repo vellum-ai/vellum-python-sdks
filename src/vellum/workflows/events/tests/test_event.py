@@ -27,7 +27,9 @@ from vellum.workflows.events.workflow import (
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.core import VellumSecret
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
 
@@ -38,6 +40,7 @@ class MockInputs(BaseInputs):
 
 class MockNode(BaseNode):
     node_foo = MockInputs.foo
+    node_secret = VellumSecretReference("secret")
 
     class Outputs(BaseNode.Outputs):
         example: str
@@ -97,6 +100,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     node_definition=MockNode,
                     inputs={
                         MockNode.node_foo: "bar",
+                        MockNode.node_secret: VellumSecret(name="secret"),
                     },
                 ),
                 parent=NodeParentContext(
@@ -123,6 +127,9 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     },
                     "inputs": {
                         "node_foo": "bar",
+                        "node_secret": {
+                            "name": "secret",
+                        },
                     },
                 },
                 "parent": {
