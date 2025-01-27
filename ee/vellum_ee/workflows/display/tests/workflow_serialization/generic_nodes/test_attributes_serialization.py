@@ -5,6 +5,7 @@ from deepdiff import DeepDiff
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -98,6 +99,49 @@ def test_serialize_node__constant_value_reference(serialize_node):
                     "id": "460aeb68-7369-43d2-9d3d-37caa425611f",
                     "name": "attr",
                     "value": {"type": "CONSTANT_VALUE", "value": "hello"},
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class LazyReferenceGenericNode(BaseNode):
+    attr: str = LazyReference(lambda: "hello")
+
+
+def test_serialize_node__lazy_reference(serialize_node):
+    serialized_node = serialize_node(LazyReferenceGenericNode)
+
+    assert not DeepDiff(
+        {
+            "id": "29563b11-bd4d-47b0-b017-372f78aeaef5",
+            "label": "LazyReferenceGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "LazyReferenceGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "56e9791a-078a-4bb7-90bc-a26c3991c70f", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "acb761a0-fcc2-4d21-bc8c-d0d560912c04", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "4370b381-9165-4fb4-881e-480507abe069",
+                    "name": "attr",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
                 }
             ],
             "outputs": [],

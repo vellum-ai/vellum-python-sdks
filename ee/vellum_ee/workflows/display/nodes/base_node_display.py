@@ -33,6 +33,7 @@ from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -343,6 +344,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 "type": "CONSTANT_VALUE",
                 "value": value._value,
             }
+
+        if isinstance(value, LazyReference):
+            return self.serialize_value(display_context, value._get())
 
         if isinstance(value, WorkflowInputReference):
             workflow_input_display = display_context.global_workflow_input_displays[value]
