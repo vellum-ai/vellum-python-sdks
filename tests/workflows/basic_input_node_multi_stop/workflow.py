@@ -61,6 +61,10 @@ class EndNode(BaseNode):
 
 
 class BasicInputNodeWorkflow(BaseWorkflow[Inputs, State]):
+    """"
+    This Workflow has two nodes that accept `ExternalInputs` of the same shape to ensure that they
+    could each receive external data separately.
+    """"
     graph = StartNode >> MiddleNode >> TransitionNode >> MiddleNode2 >> EndNode
 
     class Outputs(BaseWorkflow.Outputs):
