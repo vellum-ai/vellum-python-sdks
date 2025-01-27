@@ -5,6 +5,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
+import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context";
 import {
   FunctionDefinitionPromptTemplateBlock,
@@ -85,8 +86,7 @@ export abstract class BasePromptBlock<
     return python.instantiateClass({
       classReference: python.reference({
         name: "EphemeralPromptCacheConfig",
-        modulePath:
-          this.workflowContext.sdkModulePathNames.VELLUM_TYPES_MODULE_PATH,
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
       arguments_: [
         new MethodArgument({ name: "type", value: cacheConfigType }),
