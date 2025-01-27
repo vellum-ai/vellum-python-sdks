@@ -1,324 +1,175 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Workflow > graph > should be correct for a basic conditional node case 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.conditional_node import ConditionalNode
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        ConditionalNode.Ports.branch_1 >> TemplatingNode,
-        ConditionalNode.Ports.branch_2 >> TemplatingNode2,
-    }
+"{
+    ConditionalNode.Ports.branch_1 >> TemplatingNode,
+    ConditionalNode.Ports.branch_2 >> TemplatingNode2,
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for a basic merge between a node and an edge 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_3 import TemplatingNode3
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.merge_node import MergeNode
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        TemplatingNode >> TemplatingNode3,
-        TemplatingNode2,
-    } >> MergeNode
+"{
+    TemplatingNode >> TemplatingNode3,
+    TemplatingNode2,
+} >> MergeNode
 "
 `;
 
 exports[`Workflow > graph > should be correct for a basic merge node and an additional edge 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.merge_node import MergeNode
-from .nodes.templating_node_3 import TemplatingNode3
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = (
-        {
-            TemplatingNode,
-            TemplatingNode2,
-        }
-        >> MergeNode
-        >> TemplatingNode3
-    )
+"(
+    {
+        TemplatingNode,
+        TemplatingNode2,
+    }
+    >> MergeNode
+    >> TemplatingNode3
+)
 "
 `;
 
 exports[`Workflow > graph > should be correct for a basic merge node case 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.merge_node import MergeNode
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        TemplatingNode,
-        TemplatingNode2,
-    } >> MergeNode
+"{
+    TemplatingNode,
+    TemplatingNode2,
+} >> MergeNode
 "
 `;
 
 exports[`Workflow > graph > should be correct for a basic merge node case of multiple nodes 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.templating_node_3 import TemplatingNode3
-from .nodes.merge_node import MergeNode
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        TemplatingNode,
-        TemplatingNode2,
-        TemplatingNode3,
-    } >> MergeNode
+"{
+    TemplatingNode,
+    TemplatingNode2,
+    TemplatingNode3,
+} >> MergeNode
 "
 `;
 
 exports[`Workflow > graph > should be correct for a basic multiple nodes case 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        TemplatingNode,
-        TemplatingNode2,
-    }
+"{
+    TemplatingNode,
+    TemplatingNode2,
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for a basic single edge case 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> TemplatingNode2
+"TemplatingNode >> TemplatingNode2
 "
 `;
 
 exports[`Workflow > graph > should be correct for a basic single node case 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .inputs import Inputs
-from vellum.workflows.state import BaseState
-from .nodes.search_node import SearchNode
-from .nodes.final_output import FinalOutput
-
-
-class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = SearchNode
-
-    class Outputs(BaseWorkflow.Outputs):
-        query = FinalOutput.Outputs.value
+"TemplatingNode
 "
 `;
 
 exports[`Workflow > graph > should be correct for a longer branch 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.templating_node_3 import TemplatingNode3
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> TemplatingNode2 >> TemplatingNode3
+"TemplatingNode >> TemplatingNode2 >> TemplatingNode3
 "
 `;
 
 exports[`Workflow > graph > should be correct for a nested conditional node within a set 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.conditional_node import ConditionalNode
-from .nodes.templating_node import TemplatingNode
-from .nodes.conditional_node_2 import ConditionalNode2
-from .nodes.templating_node_3 import TemplatingNode3
-from .nodes.templating_node_4 import TemplatingNode4
-from .nodes.templating_node_2 import TemplatingNode2
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        ConditionalNode.Ports.branch_1 >> TemplatingNode,
-        ConditionalNode.Ports.branch_2
+"{
+    ConditionalNode.Ports.branch_1 >> TemplatingNode,
+    ConditionalNode.Ports.branch_2
+    >> {
+        ConditionalNode2.Ports.branch_2
         >> {
-            ConditionalNode2.Ports.branch_2
-            >> {
-                TemplatingNode3,
-                TemplatingNode4,
-            },
-            TemplatingNode2,
+            TemplatingNode3,
+            TemplatingNode4,
         },
-    }
+        TemplatingNode2,
+    },
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for a node to a set 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.templating_node_3 import TemplatingNode3
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> {
-        TemplatingNode2,
-        TemplatingNode3,
-    }
+"TemplatingNode >> {
+    TemplatingNode2,
+    TemplatingNode3,
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for a node to a set to a node 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.templating_node_3 import TemplatingNode3
-from .nodes.templating_node_4 import TemplatingNode4
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = (
-        TemplatingNode
-        >> {
-            TemplatingNode2,
-            TemplatingNode3,
-        }
-        >> TemplatingNode4
-    )
+"(
+    TemplatingNode
+    >> {
+        TemplatingNode2,
+        TemplatingNode3,
+    }
+    >> TemplatingNode4
+)
 "
 `;
 
 exports[`Workflow > graph > should be correct for a single port pointing to a set 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.conditional_node import ConditionalNode
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = ConditionalNode.Ports.branch_1 >> {
-        TemplatingNode,
-        TemplatingNode2,
-    }
+"ConditionalNode.Ports.branch_1 >> {
+    TemplatingNode,
+    TemplatingNode2,
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for port within set to a set 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.conditional_node import ConditionalNode
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.templating_node_3 import TemplatingNode3
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        ConditionalNode.Ports.branch_1 >> TemplatingNode,
-        ConditionalNode.Ports.branch_2
-        >> {
-            TemplatingNode2,
-            TemplatingNode3,
-        },
-    }
+"{
+    ConditionalNode.Ports.branch_1 >> TemplatingNode,
+    ConditionalNode.Ports.branch_2
+    >> {
+        TemplatingNode2,
+        TemplatingNode3,
+    },
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for set of a branch and a node 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.templating_node_3 import TemplatingNode3
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        TemplatingNode >> TemplatingNode2,
-        TemplatingNode3,
-    }
+"{
+    TemplatingNode >> TemplatingNode2,
+    TemplatingNode3,
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for set of a branch and a node to a node 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_3 import TemplatingNode3
-from .nodes.templating_node_4 import TemplatingNode4
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.merge_node import MergeNode
-from .nodes.templating_node_5 import TemplatingNode5
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = (
-        {
-            TemplatingNode >> TemplatingNode3 >> TemplatingNode4,
-            TemplatingNode2,
-        }
-        >> MergeNode
-        >> TemplatingNode5
-    )
+"(
+    {
+        TemplatingNode >> TemplatingNode3 >> TemplatingNode4,
+        TemplatingNode2,
+    }
+    >> MergeNode
+    >> TemplatingNode5
+)
 "
 `;
 
 exports[`Workflow > graph > should be correct for three nodes 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
-from .nodes.templating_node_3 import TemplatingNode3
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        TemplatingNode,
-        TemplatingNode2,
-        TemplatingNode3,
-    }
+"{
+    TemplatingNode,
+    TemplatingNode2,
+    TemplatingNode3,
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for two branches from the same node 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
-from .nodes.merge_node import MergeNode
-from .nodes.templating_node_2 import TemplatingNode2
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> {
-        MergeNode,
-        TemplatingNode2 >> MergeNode,
-    }
+"TemplatingNode >> {
+    MergeNode,
+    TemplatingNode2 >> MergeNode,
+}
 "
 `;
 
 exports[`Workflow > graph > should be correct for two branches merging from sets 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .nodes.conditional_node import ConditionalNode
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_3 import TemplatingNode3
-from .nodes.templating_node_4 import TemplatingNode4
-from .nodes.templating_node_5 import TemplatingNode5
-from .nodes.templating_node_2 import TemplatingNode2
-
-
-class TestWorkflow(BaseWorkflow):
-    graph = {
-        ConditionalNode.Ports.branch_1
-        >> TemplatingNode
-        >> {
-            TemplatingNode3 >> TemplatingNode4,
-            TemplatingNode5,
-        },
-        ConditionalNode.Ports.branch_2 >> TemplatingNode2 >> TemplatingNode3,
-    }
+"{
+    ConditionalNode.Ports.branch_1
+    >> TemplatingNode
+    >> {
+        TemplatingNode3 >> TemplatingNode4,
+        TemplatingNode5,
+    },
+    ConditionalNode.Ports.branch_2 >> TemplatingNode2 >> TemplatingNode3,
+}
 "
 `;

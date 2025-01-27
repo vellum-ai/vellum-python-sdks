@@ -1,71 +1,35 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { DocumentIndexRead } from "vellum-ai/api";
-import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
-import { vi } from "vitest";
 
 import { workflowContextFactory } from "./helpers";
-import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
 import {
   conditionalNodeFactory,
   entrypointNodeDataFactory,
   mergeNodeDataFactory,
-  searchNodeDataFactory,
   templatingNodeFactory,
-  terminalNodeDataFactory,
 } from "./helpers/node-data-factories";
 
-import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
-import { workflowOutputContextFactory } from "src/__test__/helpers/workflow-output-context-factory";
-import * as codegen from "src/codegen";
 import { createNodeContext, WorkflowContext } from "src/context";
+import { GraphAttribute } from "src/generators/graph-attribute";
 import { WorkflowEdge } from "src/types/vellum";
 
 describe("Workflow", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
-  const moduleName = "test";
   const entrypointNode = entrypointNodeDataFactory();
 
   beforeEach(async () => {
-    vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
-      mockDocumentIndexFactory() as unknown as DocumentIndexRead
-    );
-
     workflowContext = workflowContextFactory();
     workflowContext.addEntrypointNode(entrypointNode);
-
-    const nodeData = terminalNodeDataFactory();
-    await createNodeContext({
-      workflowContext: workflowContext,
-      nodeData,
-    });
 
     writer = new Writer();
   });
 
   describe("graph", () => {
     it("should be correct for a basic single node case", async () => {
-      workflowContext.addInputVariableContext(
-        inputVariableContextFactory({
-          inputVariableData: {
-            id: "input-variable-id",
-            key: "query",
-            type: "STRING",
-          },
-          workflowContext,
-        })
-      );
-
-      const inputs = codegen.inputs({ workflowContext });
-
-      workflowContext.addWorkflowOutputContext(
-        workflowOutputContextFactory({ workflowContext })
-      );
-
-      const searchNodeData = searchNodeDataFactory();
+      const templatingNodeData = templatingNodeFactory();
       await createNodeContext({
-        workflowContext: workflowContext,
-        nodeData: searchNodeData,
+        workflowContext,
+        nodeData: templatingNodeData,
       });
 
       const edges: WorkflowEdge[] = [
@@ -74,25 +38,17 @@ describe("Workflow", () => {
           type: "DEFAULT",
           sourceNodeId: entrypointNode.id,
           sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: searchNodeData.id,
-          targetHandleId: searchNodeData.data.sourceHandleId,
+          targetNodeId: templatingNodeData.id,
+          targetHandleId: templatingNodeData.data.sourceHandleId,
         },
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a basic multiple nodes case", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -130,19 +86,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for three nodes", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -199,19 +147,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a basic single edge case", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -249,19 +189,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a basic merge node case", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -326,19 +258,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a basic merge node case of multiple nodes", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -430,19 +354,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a basic merge node and an additional edge", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -526,19 +442,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a basic merge between a node and an edge", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -622,19 +530,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a basic conditional node case", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -693,19 +593,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a longer branch", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -762,19 +654,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for set of a branch and a node", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -831,19 +715,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a node to a set", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -900,19 +776,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a node to a set to a node", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -996,19 +864,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for set of a branch and a node to a node", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -1130,19 +990,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a single port pointing to a set", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -1201,19 +1053,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for port within set to a set", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -1302,19 +1146,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for a nested conditional node within a set", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -1438,19 +1274,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for two branches merging from sets", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -1574,19 +1402,11 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should be correct for two branches from the same node", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
       const templatingNodeData1 = templatingNodeFactory();
       await createNodeContext({
         workflowContext,
@@ -1651,13 +1471,7 @@ describe("Workflow", () => {
       ];
       workflowContext.addWorkflowEdges(edges);
 
-      const workflow = codegen.workflow({
-        moduleName,
-        workflowContext,
-        inputs,
-      });
-
-      workflow.getWorkflowFile().write(writer);
+      new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
