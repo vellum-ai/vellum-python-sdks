@@ -37,22 +37,16 @@ type GraphMutableAst =
 
 export declare namespace GraphAttribute {
   interface Args {
-    entrypointNodeId: string;
     workflowContext: WorkflowContext;
   }
 }
 
 export class GraphAttribute extends AstNode {
   private readonly workflowContext: WorkflowContext;
-  private readonly entrypointNodeId: string;
   private readonly astNode: python.AstNode;
 
-  public constructor({
-    entrypointNodeId,
-    workflowContext,
-  }: GraphAttribute.Args) {
+  public constructor({ workflowContext }: GraphAttribute.Args) {
     super();
-    this.entrypointNodeId = entrypointNodeId;
     this.workflowContext = workflowContext;
 
     this.astNode = this.generateGraphAttribute();
@@ -80,7 +74,7 @@ export class GraphAttribute extends AstNode {
       }
 
       const sourceNode =
-        edge.sourceNodeId === this.entrypointNodeId
+        edge.sourceNodeId === this.workflowContext.getEntrypointNode().id
           ? null
           : this.workflowContext.getNodeContext(edge.sourceNodeId);
 

@@ -47,13 +47,11 @@ export class Workflow {
   private readonly inputs: Inputs;
   private readonly nodes: WorkflowDataNode[];
   private readonly displayData: WorkflowDisplayData | undefined;
-  private readonly entrypointNodeId: string;
   constructor({ workflowContext, inputs, nodes, displayData }: Workflow.Args) {
     this.workflowContext = workflowContext;
     this.inputs = inputs;
     this.nodes = nodes;
     this.displayData = displayData;
-    this.entrypointNodeId = this.workflowContext.getEntrypointNode().id;
   }
 
   private generateParentWorkflowClass(): python.Reference {
@@ -525,7 +523,6 @@ export class Workflow {
     const graphField = python.field({
       name: "graph",
       initializer: new GraphAttribute({
-        entrypointNodeId: this.entrypointNodeId,
         workflowContext: this.workflowContext,
       }),
     });
