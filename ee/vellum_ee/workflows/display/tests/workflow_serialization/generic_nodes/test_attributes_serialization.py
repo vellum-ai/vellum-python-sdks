@@ -109,7 +109,7 @@ def test_serialize_node__constant_value_reference(serialize_node):
 
 
 class LazyReferenceGenericNode(BaseNode):
-    attr: str = LazyReference(lambda: "hello")
+    attr: str = LazyReference(lambda: ConstantValueReference("hello"))
 
 
 def test_serialize_node__lazy_reference(serialize_node):
