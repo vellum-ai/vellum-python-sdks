@@ -10,15 +10,15 @@ if TYPE_CHECKING:
 class EnvironmentVariableReference(BaseDescriptor[str]):
     def __init__(self, *, name: str, default: Union[str, None] = None):
         super().__init__(name=name, types=(str,))
-        self.default = default
+        self._default = default
 
     def resolve(self, state: "BaseState") -> str:
         env_value = os.environ.get(self.name)
         if env_value is not None:
             return env_value
 
-        if self.default is not None:
-            return self.default
+        if self._default is not None:
+            return self._default
 
         # Fetch Vellum Environment Variable named `self.name` once that project is done
         raise ValueError(f"No environment variable named '{self.name}' found")
