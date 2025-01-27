@@ -1,7 +1,4 @@
-import json
-from typing import Any, Callable, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, Union, get_args, get_origin
-
-from pydantic import BaseModel
+from typing import Any, Callable, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, Union, get_args
 
 from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS
 from vellum.utils.templating.exceptions import JinjaTemplateError
@@ -10,7 +7,8 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.types.core import EntityInputsInterface, Json
+from vellum.workflows.nodes.utils import parse_type_from_str
+from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
 
@@ -79,48 +77,7 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
         else:
             output_type = all_args[1]
 
-        if output_type is str:
-            return rendered_template
-
-        if output_type is float:
-            return float(rendered_template)
-
-        if output_type is int:
-            return int(rendered_template)
-
-        if output_type is bool:
-            return bool(rendered_template)
-
-        if get_origin(output_type) is list:
-            try:
-                data = json.loads(rendered_template)
-            except json.JSONDecodeError:
-                raise ValueError("Invalid JSON Array format for rendered_template")
-
-            if not isinstance(data, list):
-                raise ValueError(f"Expected a list of items for rendered_template, received {data.__class__.__name__}")
-
-            inner_type = get_args(output_type)[0]
-            if issubclass(inner_type, BaseModel):
-                return [inner_type.model_validate(item) for item in data]
-            else:
-                return data
-
-        if output_type is Json:
-            try:
-                return json.loads(rendered_template)
-            except json.JSONDecodeError:
-                raise ValueError("Invalid JSON format for rendered_template")
-
-        if issubclass(output_type, BaseModel):
-            try:
-                data = json.loads(rendered_template)
-            except json.JSONDecodeError:
-                raise ValueError("Invalid JSON format for rendered_template")
-
-            return output_type.model_validate(data)
-
-        raise ValueError(f"Unsupported output type: {output_type}")
+        return parse_type_from_str(rendered_template, output_type)
 
     def run(self) -> Outputs:
         rendered_template = self._render_template()

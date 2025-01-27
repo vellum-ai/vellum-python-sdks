@@ -19,12 +19,13 @@ from vellum import (
     VellumError,
     VellumValue,
 )
+from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
 from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
+from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path, run_code_inline
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, VellumSecret
 from vellum.workflows.types.generics import StateType
@@ -93,23 +94,31 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
 
     def run(self) -> Outputs:
         input_values = self._compile_code_inputs()
-        expected_output_type = primitive_type_to_vellum_variable_type(self.__class__.get_output_type())
-        code_execution = self._context.vellum_client.execute_code(
-            input_values=input_values,
-            code=self._resolve_code(),
-            runtime=self.runtime,
-            output_type=expected_output_type,
-            packages=self.packages or [],
-            request_options=self.request_options,
-        )
+        output_type = self.__class__.get_output_type()
+        code = self._resolve_code()
+        if not self.packages and self.runtime == "PYTHON_3_11_6":
+            logs, result = run_code_inline(code, input_values, output_type)
+            return self.Outputs(result=result, log=logs)
+        else:
+            expected_output_type = primitive_type_to_vellum_variable_type(output_type)
 
-        if code_execution.output.type != expected_output_type:
-            raise NodeException(
-                code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message=f"Expected an output of type '{expected_output_type}', received '{code_execution.output.type}'",
+            code_execution_result = self._context.vellum_client.execute_code(
+                input_values=input_values,
+                code=code,
+                runtime=self.runtime,
+                output_type=expected_output_type,
+                packages=self.packages or [],
+                request_options=self.request_options,
             )
 
-        return self.Outputs(result=code_execution.output.value, log=code_execution.log)
+            if code_execution_result.output.type != expected_output_type:
+                actual_type = code_execution_result.output.type
+                raise NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message=f"Expected an output of type '{expected_output_type}', received '{actual_type}'",
+                )
+
+            return self.Outputs(result=code_execution_result.output.value, log=code_execution_result.log)
 
     def _compile_code_inputs(self) -> List[CodeExecutorInput]:
         # TODO: We may want to consolidate with prompt deployment input compilation
@@ -127,13 +136,10 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                 )
             elif isinstance(input_value, VellumSecret):
                 compiled_inputs.append(
-                    # TODO: Expose a VellumSecret type from the Vellum SDK
-                    # https://app.shortcut.com/vellum/story/4785
-                    {  # type: ignore[arg-type]
-                        "name": input_name,
-                        "type": "SECRET",
-                        "value": input_value.name,
-                    }
+                    CodeExecutorSecretInput(
+                        name=input_name,
+                        value=input_value.name,
+                    )
                 )
             elif isinstance(input_value, list):
                 if all(isinstance(message, ChatMessage) for message in input_value):

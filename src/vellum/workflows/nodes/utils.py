@@ -1,11 +1,15 @@
 from functools import cache
+import json
 import sys
 from types import ModuleType
-from typing import Any, Callable, Optional, Type, TypeVar
+from typing import Any, Callable, Optional, Type, TypeVar, get_args, get_origin
+
+from pydantic import BaseModel
 
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.ports.port import Port
+from vellum.workflows.types.core import Json
 from vellum.workflows.types.generics import NodeType
 
 ADORNMENT_MODULE_NAME = "<adornment>"
@@ -73,3 +77,48 @@ def create_adornment(
         return WrappedNode
 
     return decorator
+
+
+def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
+    if output_type is str:
+        return result_as_str
+
+    if output_type is float:
+        return float(result_as_str)
+
+    if output_type is int:
+        return int(result_as_str)
+
+    if output_type is bool:
+        return bool(result_as_str)
+
+    if get_origin(output_type) is list:
+        try:
+            data = json.loads(result_as_str)
+        except json.JSONDecodeError:
+            raise ValueError("Invalid JSON Array format for result_as_str")
+
+        if not isinstance(data, list):
+            raise ValueError(f"Expected a list of items for result_as_str, received {data.__class__.__name__}")
+
+        inner_type = get_args(output_type)[0]
+        if issubclass(inner_type, BaseModel):
+            return [inner_type.model_validate(item) for item in data]
+        else:
+            return data
+
+    if output_type is Json:
+        try:
+            return json.loads(result_as_str)
+        except json.JSONDecodeError:
+            raise ValueError("Invalid JSON format for result_as_str")
+
+    if issubclass(output_type, BaseModel):
+        try:
+            data = json.loads(result_as_str)
+        except json.JSONDecodeError:
+            raise ValueError("Invalid JSON format for result_as_str")
+
+        return output_type.model_validate(data)
+
+    raise ValueError(f"Unsupported output type: {output_type}")
