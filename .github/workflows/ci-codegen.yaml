@@ -1,6 +1,12 @@
 name: ci-codegen
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - synchronize
 
 jobs:
   compile:
