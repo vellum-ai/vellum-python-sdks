@@ -9,7 +9,7 @@ def test_workflow__happy_path_multi_stop():
     # GIVEN a workflow that uses an Input Node
     workflow = BasicInputNodeWorkflow()
 
-    # WHEN we run the workflow with initial inputs and state
+    # WHEN we run the workflow
     terminal_event = workflow.run()
 
     # THEN we should get workflow in PAUSED state
