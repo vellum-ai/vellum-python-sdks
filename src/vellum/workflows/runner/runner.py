@@ -395,7 +395,6 @@ class WorkflowRunner(Generic[StateType]):
 
                 if state.meta.external_inputs.get(descriptor, UNDEF) is UNDEF:
                     state.meta.external_inputs[descriptor] = UNDEF
-                    self._snapshot_state(state)
                     return
 
             all_deps = self._dependencies[node_class]

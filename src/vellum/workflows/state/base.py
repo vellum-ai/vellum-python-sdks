@@ -201,6 +201,7 @@ class StateMeta(UniversalBaseModel):
 
     def add_snapshot_callback(self, callback: Callable[[], None]) -> None:
         self.node_outputs = _make_snapshottable(self.node_outputs, callback)
+        self.external_inputs = _make_snapshottable(self.external_inputs, callback)
         self.__snapshot_callback__ = callback
 
     def __setattr__(self, name: str, value: Any) -> None:
@@ -231,7 +232,13 @@ class StateMeta(UniversalBaseModel):
             for descriptor, value in self.node_outputs.items()
         }
 
+        new_external_inputs = {
+            descriptor: value if isinstance(value, Queue) else deepcopy(value, memo)
+            for descriptor, value in self.external_inputs.items()
+        }
+
         memo[id(self.node_outputs)] = new_node_outputs
+        memo[id(self.external_inputs)] = new_external_inputs
         memo[id(self.__snapshot_callback__)] = None
 
         return super().__deepcopy__(memo)
