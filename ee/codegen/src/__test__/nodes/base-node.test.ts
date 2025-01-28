@@ -1,8 +1,18 @@
+import { Writer } from "@fern-api/python-ast/core/Writer";
+
 import { workflowContextFactory } from "src/__test__/helpers";
-import { templatingNodeFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  genericNodeFactory,
+  templatingNodeFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext } from "src/context";
+import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
-import { NodeAttributeGenerationError } from "src/generators/errors";
+import {
+  NodeAttributeGenerationError,
+  NodeDefinitionGenerationError,
+} from "src/generators/errors";
+import { GenericNode } from "src/generators/nodes/generic-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
 
 describe("BaseNode", () => {
@@ -127,6 +137,33 @@ describe("BaseNode", () => {
           "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find output value TemplatingNode.Outputs given id '90abcdef-90ab-cdef-90ab-cdef90abcdef'"
         )
       );
+    });
+
+    it(`should generate base nodes as much as possible for non strict workflow contexts`, async () => {
+      vi.spyOn(
+        GenericNode.prototype,
+        "getNodeClassBodyStatements"
+      ).mockRejectedValue(new NodeDefinitionGenerationError("test"));
+
+      const workflowContext = workflowContextFactory({
+        strict: false,
+      });
+      const writer = new Writer();
+
+      const nodeData = genericNodeFactory();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 });
