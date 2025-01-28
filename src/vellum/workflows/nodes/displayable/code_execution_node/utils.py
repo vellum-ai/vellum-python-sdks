@@ -1,10 +1,14 @@
 from contextlib import redirect_stdout
 import io
 import os
+import re
 from typing import Any, List, Tuple, Union
 
+from pydantic import BaseModel, ValidationError
+
 from vellum.client.types.code_executor_input import CodeExecutorInput
-from vellum.workflows.nodes.utils import parse_type_from_str
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 
 
 def read_file_from_path(node_filepath: str, script_filepath: str) -> Union[str, None]:
@@ -70,26 +74,37 @@ def run_code_inline(
     output_type: Any,
 ) -> Tuple[str, Any]:
     log_buffer = io.StringIO()
-    delimiter = "--vellum-output-start--"
-    max_output_length = "16_000_000"
 
-    run_args = [f"{input_value.name}={input_value.name}" for input_value in input_values]
+    exec_globals = {
+        "__arg__inputs": {input_value.name: _clean_for_dict_wrapper(input_value.value) for input_value in input_values},
+        "__arg__out": None,
+    }
+    run_args = [f"{input_value.name}=__arg__inputs['{input_value.name}']" for input_value in input_values]
     execution_code = f"""\
 {code}
 
-import json
-
-out = json.dumps(main({", ".join(run_args)})).strip().splitlines()[-1][:{max_output_length}]
-print("{delimiter}")
-print(out)"""
-    local_namespace = {input_value.name: _clean_for_dict_wrapper(input_value.value) for input_value in input_values}
+__arg__out = main({", ".join(run_args)})
+"""
 
     with redirect_stdout(log_buffer):
-        exec(execution_code, local_namespace)
+        exec(execution_code, exec_globals)
 
     logs = log_buffer.getvalue()
-    output_lines = logs.split(delimiter)
-    execution_logs = output_lines[0]
-    result_as_str = output_lines[1] if len(output_lines) > 1 else ""
-    result = parse_type_from_str(result_as_str, output_type)
-    return execution_logs, result
+    result = exec_globals["__arg__out"]
+
+    if issubclass(output_type, BaseModel) and not isinstance(result, output_type):
+        try:
+            result = output_type.model_validate(result)
+        except ValidationError as e:
+            raise NodeException(
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+                message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
+            ) from e
+
+    if not isinstance(result, output_type):
+        raise NodeException(
+            code=WorkflowErrorCode.INVALID_OUTPUTS,
+            message=f"Expected an output of type '{output_type.__name__}', but received '{result.__class__.__name__}'",
+        )
+
+    return logs, result
