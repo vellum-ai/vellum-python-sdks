@@ -40,12 +40,23 @@ def push_command(
     if not config.workflows:
         raise ValueError("No Workflows found in project to push.")
 
-    if len(config.workflows) > 1 and not module:
+    workflow_configs = (
+        [
+            w
+            for w in config.workflows
+            if (module and w.module == module) or (workflow_sandbox_id and w.workflow_sandbox_id == workflow_sandbox_id)
+        ]
+        if module or workflow_sandbox_id
+        else config.workflows
+    )
+
+    if len(workflow_configs) == 0:
+        raise ValueError(f"No workflow config for '{module}' found in project to push.")
+
+    if len(workflow_configs) > 1:
         raise ValueError("Multiple workflows found in project to push. Pushing only a single workflow is supported.")
 
-    workflow_config = next((w for w in config.workflows if w.module == module), None) if module else config.workflows[0]
-    if workflow_config is None:
-        raise ValueError(f"No workflow config for '{module}' found in project to push.")
+    workflow_config = workflow_configs[0]
 
     logger.info(f"Loading workflow from {workflow_config.module}")
     resolved_workspace = workspace or workflow_config.workspace or DEFAULT_WORKSPACE_CONFIG.name

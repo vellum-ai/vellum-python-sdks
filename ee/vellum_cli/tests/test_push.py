@@ -181,6 +181,57 @@ def test_push__workflow_sandbox_option__existing_id(mock_module, vellum_client, 
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
+def test_push__workflow_sandbox_option__existing_no_module(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    first_module = mock_module.module
+    second_module = f"{first_module}2"
+    first_workflow_sandbox_id = mock_module.workflow_sandbox_id
+    second_workflow_sandbox_id = str(uuid4())
+
+    # AND the pyproject.toml has two workflow sandboxes configured
+    mock_module.set_pyproject_toml(
+        {
+            "workflows": [
+                {"module": first_module, "workflow_sandbox_id": first_workflow_sandbox_id},
+                {"module": second_module, "workflow_sandbox_id": second_workflow_sandbox_id},
+            ]
+        }
+    )
+
+    # AND a workflow exists for both modules
+    _ensure_workflow_py(temp_dir, first_module)
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, second_module)
+
+    # AND the push API call would return successfully for the second module
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=second_workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` with the workflow sandbox option on the second module
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", "--workflow-sandbox-id", second_workflow_sandbox_id])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # Get the last part of the module path and format it
+    expected_label = second_module.split(".")[-1].replace("_", " ").title()
+    expected_artifact_name = f"{second_module.replace('.', '__')}.tar.gz"
+
+    # AND we should have called the push API with the correct args
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
+    assert call_args["label"] == expected_label
+    assert call_args["workflow_sandbox_id"] == second_workflow_sandbox_id
+    assert call_args["artifact"].name == expected_artifact_name
+    assert "deplyment_config" not in call_args
+
+    extracted_files = _extract_tar_gz(call_args["artifact"].read())
+    assert extracted_files["workflow.py"] == workflow_py_file_content
+
+
 def test_push__workflow_sandbox_option__existing_id_different_module(mock_module):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
@@ -213,7 +264,7 @@ def test_push__workflow_sandbox_option__existing_id_different_module(mock_module
     assert result.exception
     assert (
         str(result.exception)
-        == f"Workflow sandbox id '{second_workflow_sandbox_id}' is already associated with '{module}'."
+        == "Multiple workflows found in project to push. Pushing only a single workflow is supported."
     )
 
 
