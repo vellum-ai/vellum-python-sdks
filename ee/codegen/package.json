@@ -28,7 +28,8 @@
     "types": "tsc --noEmit",
     "start": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts",
     "version:codegen": "node scripts/version.js",
-    "upgrade-codegen-service": "node --loader ts-node/esm --experimental-specifier-resolution=node  scripts/upgrade-codegen-service.mts"
+    "upgrade-codegen-service": "node --loader ts-node/esm --experimental-specifier-resolution=node  scripts/upgrade-codegen-service.mts",
+    "upgrade-workflow-server": "node --loader ts-node/esm --experimental-specifier-resolution=node  scripts/upgrade-workflow-server.mts"
   },
   "dependencies": {
     "@fern-api/python-ast": "^0.0.21",
