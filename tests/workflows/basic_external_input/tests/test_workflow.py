@@ -3,7 +3,7 @@ from tests.workflows.basic_external_input.workflow import BasicInputNodeWorkflow
 
 def test_workflow__happy_path_multi_stop():
     """
-    Runs the non-streamed execution of a workflow with a two Nodes defining similar ExternalInputs.
+    Runs the non-streamed execution of a Workflow with a single Nodes defining ExternalInputs.
     """
 
     # GIVEN a workflow that uses an Input Node
