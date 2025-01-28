@@ -564,30 +564,6 @@ ${errors.slice(0, 3).map((err) => {
   private generateNodeFiles(
     nodes: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[]
   ): Promise<unknown>[] {
-    const rootNodesInitFileStatements: AstNode[] = [];
-    const rootDisplayNodesInitFileStatements: AstNode[] = [];
-    if (nodes.length) {
-      const nodeInitFileAllField = python.field({
-        name: "__all__",
-        initializer: python.TypeInstantiation.list([
-          ...nodes.map((node) => {
-            return python.TypeInstantiation.str(node.getNodeClassName());
-          }),
-        ]),
-      });
-      rootNodesInitFileStatements.push(nodeInitFileAllField);
-
-      const nodeDisplayInitFileAllField = python.field({
-        name: "__all__",
-        initializer: python.TypeInstantiation.list([
-          ...nodes.map((node) => {
-            return python.TypeInstantiation.str(node.getNodeDisplayClassName());
-          }),
-        ]),
-      });
-      rootDisplayNodesInitFileStatements.push(nodeDisplayInitFileAllField);
-    }
-
     const rootNodesInitFile = codegen.initFile({
       workflowContext: this.workflowContext,
       modulePath: this.workflowContext.parentNode
@@ -596,7 +572,6 @@ ${errors.slice(0, 3).map((err) => {
             GENERATED_NODES_MODULE_NAME,
           ]
         : [this.workflowContext.moduleName, ...GENERATED_NODES_PATH],
-      statements: rootNodesInitFileStatements,
     });
 
     const rootDisplayNodesInitFile = codegen.initFile({
@@ -610,7 +585,6 @@ ${errors.slice(0, 3).map((err) => {
             this.workflowContext.moduleName,
             ...GENERATED_DISPLAY_NODE_MODULE_PATH,
           ],
-      statements: rootDisplayNodesInitFileStatements,
     });
 
     nodes.forEach((node) => {
