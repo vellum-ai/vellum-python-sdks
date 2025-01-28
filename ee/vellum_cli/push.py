@@ -23,6 +23,7 @@ from vellum_ee.workflows.display.workflows.vellum_workflow_display import Vellum
 
 def push_command(
     module: Optional[str] = None,
+    workflow_sandbox_id: Optional[str] = None,
     deploy: Optional[bool] = None,
     deployment_label: Optional[str] = None,
     deployment_name: Optional[str] = None,
@@ -64,6 +65,15 @@ def push_command(
             workspace=workspace_config.name,
         )
         config.workflows.append(workflow_config)
+
+    if (
+        workflow_sandbox_id
+        and workflow_config.workflow_sandbox_id
+        and workflow_config.workflow_sandbox_id != workflow_sandbox_id
+    ):
+        raise ValueError(
+            f"Workflow sandbox id '{workflow_sandbox_id}' is already associated with '{workflow_config.module}'."
+        )
 
     client = create_vellum_client(
         api_key=api_key,
@@ -138,7 +148,7 @@ def push_command(
             # https://app.shortcut.com/vellum/story/5585
             exec_config=json.dumps(exec_config),
             label=label,
-            workflow_sandbox_id=workflow_config.workflow_sandbox_id,
+            workflow_sandbox_id=workflow_config.workflow_sandbox_id or workflow_sandbox_id,
             artifact=artifact,
             # We should check with fern if we could auto-serialize typed object fields for us
             # https://app.shortcut.com/vellum/story/5568

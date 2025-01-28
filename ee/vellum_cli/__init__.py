@@ -56,6 +56,12 @@ def workflows():
 
 @workflows.command(name="push")
 @click.argument("module", required=False)
+@click.option(
+    "--workflow-sandbox-id",
+    type=str,
+    help="""The specific Workflow Sandbox ID to use when pushing. Must either be already associated \
+with the provided module or be available for use. The Workflow Sandbox must also exist in Vellum.""",
+)
 @click.option("--deploy", is_flag=True, help="Deploy the Workflow after pushing it to Vellum")
 @click.option("--deployment-label", type=str, help="Label to use for the Deployment")
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
@@ -74,6 +80,7 @@ def workflows():
 @click.option("--workspace", type=str, help="The specific Workspace config to use when pushing")
 def workflows_push(
     module: Optional[str],
+    workflow_sandbox_id: Optional[str],
     deploy: Optional[bool],
     deployment_label: Optional[str],
     deployment_name: Optional[str],
@@ -90,6 +97,7 @@ def workflows_push(
 
     push_command(
         module=module,
+        workflow_sandbox_id=workflow_sandbox_id,
         deploy=deploy,
         deployment_label=deployment_label,
         deployment_name=deployment_name,
@@ -103,6 +111,7 @@ def workflows_push(
 
 @push.command(name="*", hidden=True)
 @click.pass_context
+@click.option("--workflow-sandbox-id", type=str, help="The specific Workflow Sandbox ID to use when pushing")
 @click.option("--deploy", is_flag=True, help="Deploy the Resource after pushing it to Vellum")
 @click.option("--deployment-label", type=str, help="Label to use for the Deployment")
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
@@ -121,6 +130,7 @@ def workflows_push(
 @click.option("--workspace", type=str, help="The specific Workspace config to use when pushing")
 def push_module(
     ctx: click.Context,
+    workflow_sandbox_id: Optional[str],
     deploy: Optional[bool],
     deployment_label: Optional[str],
     deployment_name: Optional[str],
@@ -135,6 +145,7 @@ def push_module(
     if ctx.parent:
         push_command(
             module=ctx.parent.invoked_subcommand,
+            workflow_sandbox_id=workflow_sandbox_id,
             deploy=deploy,
             deployment_label=deployment_label,
             deployment_name=deployment_name,

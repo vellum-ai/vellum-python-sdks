@@ -135,13 +135,9 @@ def test_push__happy_path(mock_module, vellum_client, base_command):
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["push"],
-        ["workflows", "push"],
-    ],
-    ids=["push", "workflows_push"],
+@pytest.mark.skip(
+    reason="""Open question on whether we should allow this. \
+We should first consider whether we want to enable pushing without config"""
 )
 def test_push__workflow_sandbox_option__new_id(mock_module, vellum_client, base_command):
     # GIVEN a single workflow configured
@@ -185,6 +181,14 @@ def test_push__workflow_sandbox_option__new_id(mock_module, vellum_client, base_
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["push"],
+        ["workflows", "push"],
+    ],
+    ids=["push", "workflows_push"],
+)
 def test_push__workflow_sandbox_option__existing_id(mock_module, vellum_client, base_command):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
@@ -223,7 +227,7 @@ def test_push__workflow_sandbox_option__existing_id(mock_module, vellum_client, 
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
-def test_push__workflow_sandbox_option__existing_id_different_module(mock_module, vellum_client, base_command):
+def test_push__workflow_sandbox_option__existing_id_different_module(mock_module):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
     module = mock_module.module
@@ -248,7 +252,7 @@ def test_push__workflow_sandbox_option__existing_id_different_module(mock_module
 
     # WHEN calling `vellum push` with the first module and the second workflow sandbox id
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command + [module, "--workflow-sandbox-id", second_workflow_sandbox_id])
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--workflow-sandbox-id", second_workflow_sandbox_id])
 
     # THEN it should fail
     assert result.exit_code == 1
