@@ -29,6 +29,21 @@ def _extract_tar_gz(tar_gz_bytes: bytes) -> dict[str, str]:
     return files
 
 
+def _ensure_workflow_py(temp_dir: str, module: str) -> str:
+    base_dir = os.path.join(temp_dir, *module.split("."))
+    os.makedirs(base_dir, exist_ok=True)
+    workflow_py_file_content = """\
+from vellum.workflows import BaseWorkflow
+
+class ExampleWorkflow(BaseWorkflow):
+    pass
+"""
+    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
+        f.write(workflow_py_file_content)
+
+    return workflow_py_file_content
+
+
 def test_push__no_config(mock_module):
     # GIVEN no config file set
     mock_module.set_pyproject_toml({"workflows": []})
@@ -89,16 +104,7 @@ def test_push__happy_path(mock_module, vellum_client, base_command):
     module = mock_module.module
 
     # AND a workflow exists in the module successfully
-    base_dir = os.path.join(temp_dir, *module.split("."))
-    os.makedirs(base_dir, exist_ok=True)
-    workflow_py_file_content = """\
-from vellum.workflows import BaseWorkflow
-
-class ExampleWorkflow(BaseWorkflow):
-    pass
-"""
-    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
-        f.write(workflow_py_file_content)
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
 
     # AND the push API call returns successfully
     vellum_client.workflows.push.return_value = WorkflowPushResponse(
@@ -137,22 +143,137 @@ class ExampleWorkflow(BaseWorkflow):
     ],
     ids=["push", "workflows_push"],
 )
+def test_push__workflow_sandbox_option__new_id(mock_module, vellum_client, base_command):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND the pyproject.toml is empty
+    set_pyproject_toml({})
+
+    # AND a workflow exists in the module successfully
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call would return successfully
+    new_workflow_sandbox_id = str(uuid4())
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=new_workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` with the workflow sandbox option
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + [module, "--workflow-sandbox-id", new_workflow_sandbox_id])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # Get the last part of the module path and format it
+    expected_label = mock_module.module.split(".")[-1].replace("_", " ").title()
+    expected_artifact_name = f"{mock_module.module.replace('.', '__')}.tar.gz"
+
+    # AND we should have called the push API with the correct args
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
+    assert call_args["label"] == expected_label
+    assert call_args["workflow_sandbox_id"] == new_workflow_sandbox_id
+    assert call_args["artifact"].name == expected_artifact_name
+    assert "deplyment_config" not in call_args
+
+    extracted_files = _extract_tar_gz(call_args["artifact"].read())
+    assert extracted_files["workflow.py"] == workflow_py_file_content
+
+
+def test_push__workflow_sandbox_option__existing_id(mock_module, vellum_client, base_command):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    existing_workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND a workflow exists in the module successfully
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call would return successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=existing_workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` with the workflow sandbox option on an existing config
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + [module, "--workflow-sandbox-id", existing_workflow_sandbox_id])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # Get the last part of the module path and format it
+    expected_label = mock_module.module.split(".")[-1].replace("_", " ").title()
+    expected_artifact_name = f"{mock_module.module.replace('.', '__')}.tar.gz"
+
+    # AND we should have called the push API with the correct args
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
+    assert call_args["label"] == expected_label
+    assert call_args["workflow_sandbox_id"] == existing_workflow_sandbox_id
+    assert call_args["artifact"].name == expected_artifact_name
+    assert "deplyment_config" not in call_args
+
+    extracted_files = _extract_tar_gz(call_args["artifact"].read())
+    assert extracted_files["workflow.py"] == workflow_py_file_content
+
+
+def test_push__workflow_sandbox_option__existing_id_different_module(mock_module, vellum_client, base_command):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    second_module = f"{module}2"
+    first_workflow_sandbox_id = mock_module.workflow_sandbox_id
+    second_workflow_sandbox_id = str(uuid4())
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND the pyproject.toml has two workflow sandboxes configured
+    set_pyproject_toml(
+        {
+            "workflows": [
+                {"module": module, "workflow_sandbox_id": first_workflow_sandbox_id},
+                {"module": second_module, "workflow_sandbox_id": second_workflow_sandbox_id},
+            ]
+        }
+    )
+
+    # AND a workflow exists in both modules successfully
+    _ensure_workflow_py(temp_dir, module)
+    _ensure_workflow_py(temp_dir, second_module)
+
+    # WHEN calling `vellum push` with the first module and the second workflow sandbox id
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + [module, "--workflow-sandbox-id", second_workflow_sandbox_id])
+
+    # THEN it should fail
+    assert result.exit_code == 1
+    assert result.exception
+    assert (
+        str(result.exception)
+        == f"Workflow sandbox id '{second_workflow_sandbox_id}' is already associated with '{module}'."
+    )
+
+
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["push"],
+        ["workflows", "push"],
+    ],
+    ids=["push", "workflows_push"],
+)
 def test_push__deployment(mock_module, vellum_client, base_command):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
     module = mock_module.module
 
     # AND a workflow exists in the module successfully
-    base_dir = os.path.join(temp_dir, *module.split("."))
-    os.makedirs(base_dir, exist_ok=True)
-    workflow_py_file_content = """\
-from vellum.workflows import BaseWorkflow
-
-class ExampleWorkflow(BaseWorkflow):
-    pass
-"""
-    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
-        f.write(workflow_py_file_content)
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
 
     # AND the push API call returns successfully
     vellum_client.workflows.push.return_value = WorkflowPushResponse(
@@ -252,16 +373,7 @@ def test_push__strict_option_returns_diffs(mock_module, vellum_client):
     module = mock_module.module
 
     # AND a workflow exists in the module successfully
-    base_dir = os.path.join(temp_dir, *module.split("."))
-    os.makedirs(base_dir, exist_ok=True)
-    workflow_py_file_content = """\
-from vellum.workflows import BaseWorkflow
-
-class ExampleWorkflow(BaseWorkflow):
-    pass
-"""
-    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
-        f.write(workflow_py_file_content)
+    _ensure_workflow_py(temp_dir, module)
 
     # AND the push API call returns a 4xx response with diffs
     vellum_client.workflows.push.side_effect = ApiError(
@@ -356,16 +468,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         )
 
     # AND a workflow exists in the module successfully
-    base_dir = os.path.join(temp_dir, *module.split("."))
-    os.makedirs(base_dir, exist_ok=True)
-    workflow_py_file_content = """\
-from vellum.workflows import BaseWorkflow
-
-class ExampleWorkflow(BaseWorkflow):
-    pass
-"""
-    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
-        f.write(workflow_py_file_content)
+    _ensure_workflow_py(temp_dir, module)
 
     # AND the push API call returns a new workflow sandbox id
     new_workflow_sandbox_id = str(uuid4())
