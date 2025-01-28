@@ -244,16 +244,21 @@ export class CodeExecutionNode extends BaseSingleFileNode<
   private async persistScriptFile(): Promise<void> {
     const runtimeRuleInput = this.getNodeInputByName("runtime");
     const runtimeRule = runtimeRuleInput?.nodeInputData?.value?.rules[0];
+    let runtime;
     if (
       !runtimeRule ||
       runtimeRule.type !== "CONSTANT_VALUE" ||
       runtimeRule.data.type !== "STRING"
     ) {
-      throw new NodeAttributeGenerationError(
-        "Expected to find runtime input with constant string value"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Expected to find runtime input with constant string value"
+        )
       );
+      runtime = "";
+    } else {
+      runtime = runtimeRule?.data?.value ?? "";
     }
-    const runtime = runtimeRule?.data.value ?? "";
     const filepath =
       this.nodeData.data.filepath ?? runtime?.includes("TYPESCRIPT")
         ? "./script.ts"
