@@ -9,8 +9,8 @@ class InputNode(BaseNode):
 
 class BasicInputNodeWorkflow(BaseWorkflow):
     """
-    This Workflow has two nodes that accept `ExternalInputs` of the same shape to ensure that they
-    could each receive external data separately.
+    This Workflow has a single node that defines an `ExternalInputs` to ensure that it
+    could receive external data as the first node.
     """
 
     graph = InputNode
