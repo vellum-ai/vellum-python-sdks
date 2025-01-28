@@ -1,12 +1,14 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { WorkflowDeploymentHistoryItem } from "vellum-ai/api";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
+import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { subworkflowDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 
 describe("SubworkflowDeploymentNode", () => {
@@ -53,6 +55,32 @@ describe("SubworkflowDeploymentNode", () => {
     it(`getNodeDisplayFile`, async () => {
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("failure", () => {
+    it(`should throw an error we can handle if the workflow deployment history item is not found`, async () => {
+      vi.spyOn(
+        WorkflowDeploymentsClient.prototype,
+        "workflowDeploymentHistoryItemRetrieve"
+      ).mockRejectedValue(
+        new VellumError({
+          body: {
+            detail: "No Workflow Deployment found.",
+          },
+        })
+      );
+
+      const nodeData = subworkflowDeploymentNodeDataFactory();
+
+      await expect(
+        createNodeContext({
+          workflowContext,
+          nodeData,
+        })
+      ).rejects.toThrow(
+        new NodeDefinitionGenerationError("No Workflow Deployment found.")
+      );
     });
   });
 });

@@ -174,7 +174,16 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   public async generateCode(): Promise<void> {
-    const { inputs, workflow, nodes } = await this.generateAssets();
+    const assets = await this.generateAssets().catch((error) => {
+      this.workflowContext.addError(error);
+      return null;
+    });
+
+    if (!assets) {
+      return;
+    }
+
+    const { inputs, workflow, nodes } = assets;
 
     const absolutePathToModuleDirectory = join(
       this.workflowContext.absolutePathToOutputDirectory,
@@ -328,8 +337,8 @@ ${errors.slice(0, 3).map((err) => {
     let entrypointNode: EntrypointNode | undefined;
     const nodesToGenerate: WorkflowDataNode[] = [];
     await Promise.all(
-      this.workflowVersionExecConfig.workflowRawData.nodes.map(
-        async (nodeData) => {
+      this.workflowVersionExecConfig.workflowRawData.nodes
+        .map(async (nodeData) => {
           if (nodeData.type === "TERMINAL") {
             this.workflowContext.addWorkflowOutputContext(
               new WorkflowOutputContext({
@@ -353,8 +362,10 @@ ${errors.slice(0, 3).map((err) => {
             workflowContext: this.workflowContext,
             nodeData,
           });
-        }
-      )
+        })
+        .map((promise) =>
+          promise.catch((error) => this.workflowContext.addError(error))
+        )
     );
     if (!entrypointNode) {
       throw new WorkflowGenerationError("Entrypoint node not found");

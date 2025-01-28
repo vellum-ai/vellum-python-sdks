@@ -1,9 +1,11 @@
 import { WorkflowDeploymentHistoryItem } from "vellum-ai/api";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
+import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 
@@ -42,11 +44,25 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
       return;
     }
 
-    this.workflowDeploymentHistoryItem = await new WorkflowDeploymentsClient({
-      apiKey: this.workflowContext.vellumApiKey,
-    }).workflowDeploymentHistoryItemRetrieve(
-      this.nodeData.data.releaseTag,
-      this.nodeData.data.workflowDeploymentId
-    );
+    try {
+      this.workflowDeploymentHistoryItem = await new WorkflowDeploymentsClient({
+        apiKey: this.workflowContext.vellumApiKey,
+      }).workflowDeploymentHistoryItemRetrieve(
+        this.nodeData.data.releaseTag,
+        this.nodeData.data.workflowDeploymentId
+      );
+    } catch (error) {
+      if (
+        error instanceof VellumError &&
+        typeof error.body === "object" &&
+        error.body !== null &&
+        "detail" in error.body &&
+        typeof error.body.detail === "string"
+      ) {
+        throw new NodeDefinitionGenerationError(error.body.detail);
+      }
+
+      throw error;
+    }
   }
 }
