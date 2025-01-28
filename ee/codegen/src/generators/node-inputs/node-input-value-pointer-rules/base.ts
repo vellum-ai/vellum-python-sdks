@@ -21,7 +21,7 @@ export abstract class BaseNodeInputValuePointerRule<
   public readonly workflowContext: WorkflowContext;
   public readonly nodeInputValuePointerRule: T;
   public readonly iterableConfig?: IterableConfig;
-  private astNode: AstNode;
+  private astNode: AstNode | undefined;
 
   constructor({
     workflowContext,
@@ -34,12 +34,16 @@ export abstract class BaseNodeInputValuePointerRule<
     this.nodeInputValuePointerRule = nodeInputValuePointerRule;
 
     this.astNode = this.getAstNode();
-    this.inheritReferences(this.astNode);
+    if (this.astNode) {
+      this.inheritReferences(this.astNode);
+    }
   }
 
-  abstract getAstNode(): AstNode;
+  abstract getAstNode(): AstNode | undefined;
 
   public write(writer: Writer): void {
-    this.astNode.write(writer);
+    if (this.astNode) {
+      this.astNode.write(writer);
+    }
   }
 }

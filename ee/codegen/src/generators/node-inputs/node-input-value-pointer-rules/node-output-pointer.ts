@@ -6,7 +6,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { NodeOutputPointer } from "src/types/vellum";
 
 export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOutputPointer> {
-  getAstNode(): python.Reference {
+  getAstNode(): python.Reference | undefined {
     const nodeOutputPointerRuleData = this.nodeInputValuePointerRule.data;
 
     const nodeContext = this.workflowContext.getNodeContext(
@@ -17,10 +17,13 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
       nodeOutputPointerRuleData.outputId
     );
 
-    return python.reference({
-      name: nodeContext.nodeClassName,
-      modulePath: nodeContext.nodeModulePath,
-      attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],
-    });
+    if (nodeOutputName) {
+      return python.reference({
+        name: nodeContext.nodeClassName,
+        modulePath: nodeContext.nodeModulePath,
+        attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],
+      });
+    }
+    return undefined;
   }
 }

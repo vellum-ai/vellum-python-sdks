@@ -3,7 +3,10 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
-import { NodeDefinitionGenerationError } from "src/generators/errors";
+import {
+  NodeAttributeGenerationError,
+  NodeDefinitionGenerationError,
+} from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
@@ -88,11 +91,13 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     this.nodeContext.workflowDeploymentHistoryItem.outputVariables.forEach(
       (output) => {
         const outputName = this.nodeContext.getNodeOutputNameById(output.id);
-        outputsClass.add(
-          codegen.vellumVariable({
-            variable: { name: outputName, type: output.type, id: output.id },
-          })
-        );
+        if (outputName) {
+          outputsClass.add(
+            codegen.vellumVariable({
+              variable: { name: outputName, type: output.type, id: output.id },
+            })
+          );
+        }
       }
     );
 
@@ -143,7 +148,11 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
             const outputName = this.nodeContext.getNodeOutputNameById(
               output.id
             );
-
+            if (!outputName) {
+              throw new NodeAttributeGenerationError(
+                `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
+              );
+            }
             return {
               key: python.reference({
                 name: this.nodeContext.nodeClassName,

@@ -657,8 +657,7 @@ export function templatingNodeFactory({
   errorOutputId,
   inputRules,
   outputType = VellumVariableType.String,
-  inputReferenceId,
-  inputReferenceNodeId,
+  inputReferences,
   template,
 }: {
   id?: string;
@@ -668,17 +667,55 @@ export function templatingNodeFactory({
   errorOutputId?: string;
   inputRules?: NodeInputValuePointerRule[];
   outputType?: VellumVariableType;
-  inputReferenceId?: string;
-  inputReferenceNodeId?: string;
-  template?: NodeInputValuePointerRule;
+  inputReferences?: Array<{
+    referenceId: string;
+    referenceNodeId: string;
+  }>;
+  template?: ConstantValuePointer;
 } = {}): TemplatingNode {
-  const defaultTemplate: NodeInputValuePointerRule = {
+  const defaultTemplate: ConstantValuePointer = {
     type: "CONSTANT_VALUE",
     data: {
       type: "STRING",
       value: "Hello, World!",
     },
   };
+
+  const inputs: NodeInput[] = [];
+
+  inputs.push({
+    id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+    key: "text",
+    value: {
+      rules: inputReferences
+        ? inputReferences.map((ref) => ({
+            type: "NODE_OUTPUT" as const,
+            data: {
+              nodeId: ref.referenceNodeId,
+              outputId: ref.referenceId,
+            },
+          }))
+        : inputRules ?? [
+            {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "Hello, world!",
+              },
+            },
+          ],
+      combinator: "OR" as const,
+    },
+  });
+
+  inputs.push({
+    id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+    key: "template",
+    value: {
+      rules: [template ?? defaultTemplate],
+      combinator: "OR",
+    },
+  });
 
   const nodeData: TemplatingNode = {
     id: id ?? "46e221ab-a749-41a2-9242-b1f5bf31f3a5",
@@ -692,43 +729,7 @@ export function templatingNodeFactory({
       templateNodeInputId: "7b8af68b-cf60-4fca-9c57-868042b5b616",
       outputType: outputType,
     },
-    inputs: [
-      {
-        id: "9feb7b5e-5947-496d-b56f-1e2627730796",
-        key: "text",
-        value: {
-          rules:
-            inputReferenceId && inputReferenceNodeId
-              ? [
-                  {
-                    type: "NODE_OUTPUT",
-                    data: {
-                      nodeId: inputReferenceNodeId,
-                      outputId: inputReferenceId,
-                    },
-                  },
-                ]
-              : inputRules ?? [
-                  {
-                    type: "CONSTANT_VALUE",
-                    data: {
-                      type: "STRING",
-                      value: "Hello, world!",
-                    },
-                  },
-                ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
-        key: "template",
-        value: {
-          rules: [template ?? defaultTemplate],
-          combinator: "OR",
-        },
-      },
-    ],
+    inputs,
   };
   return nodeData;
 }

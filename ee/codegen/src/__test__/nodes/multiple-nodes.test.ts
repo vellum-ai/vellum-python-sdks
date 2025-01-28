@@ -1,5 +1,7 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { beforeEach } from "vitest";
+import { WorkflowDeploymentHistoryItem } from "vellum-ai/api";
+import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
+import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
@@ -7,6 +9,7 @@ import {
   conditionalNodeFactory,
   inlinePromptNodeDataInlineVariantFactory,
   promptDeploymentNodeDataFactory,
+  subworkflowDeploymentNodeDataFactory,
   templatingNodeFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
@@ -176,8 +179,87 @@ describe("InlinePromptNode referenced by Templating Node", () => {
     };
 
     const templatingNode = templatingNodeFactory({
-      inputReferenceId: promptNode.data.arrayOutputId,
-      inputReferenceNodeId: promptNode.id,
+      inputReferences: [
+        {
+          referenceId: promptNode.data.arrayOutputId,
+          referenceNodeId: promptNode.id,
+        },
+      ],
+      template: template,
+    });
+
+    const templatingNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: templatingNode,
+    })) as TemplatingNodeContext;
+
+    node = new TemplatingNode({
+      workflowContext,
+      nodeContext: templatingNodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it("getNodeDisplayFile", async () => {
+    node.getNodeDisplayFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
+describe("Non-existent Subworkflow Deployment Node referenced by Templating Node", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: TemplatingNode;
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory({ strict: false });
+    writer = new Writer();
+    vi.spyOn(
+      WorkflowDeploymentsClient.prototype,
+      "workflowDeploymentHistoryItemRetrieve"
+    ).mockResolvedValue({
+      name: "test-deployment",
+      outputVariables: [{ id: "1", key: "output-1", type: "STRING" }],
+    } as unknown as WorkflowDeploymentHistoryItem);
+
+    const subworkflowNodeData = subworkflowDeploymentNodeDataFactory();
+
+    await createNodeContext({
+      workflowContext: workflowContext,
+      nodeData: subworkflowNodeData,
+    });
+
+    const promptNode = inlinePromptNodeDataInlineVariantFactory({
+      blockType: "JINJA",
+    });
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: promptNode,
+    });
+
+    const template: ConstantValuePointer = {
+      type: "CONSTANT_VALUE",
+      data: {
+        type: "STRING",
+        value: "{{ output[0].type }}",
+      },
+    };
+
+    const templatingNode = templatingNodeFactory({
+      inputReferences: [
+        {
+          referenceId: promptNode.data.arrayOutputId,
+          referenceNodeId: promptNode.id,
+        },
+        {
+          referenceId: "some-non-existent-subworkflow-output-id",
+          referenceNodeId: subworkflowNodeData.id,
+        },
+      ],
       template: template,
     });
 

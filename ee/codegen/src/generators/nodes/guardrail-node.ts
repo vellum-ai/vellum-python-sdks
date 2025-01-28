@@ -110,6 +110,11 @@ export class GuardrailNode extends BaseSingleFileNode<
         ).map((output) => {
           const name = this.nodeContext.getNodeOutputNameById(output.id);
 
+          if (!name) {
+            throw new NodeAttributeGenerationError(
+              `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
+            );
+          }
           return {
             key: python.reference({
               name: this.nodeContext.nodeClassName,

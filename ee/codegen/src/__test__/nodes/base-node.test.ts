@@ -74,7 +74,7 @@ describe("BaseNode", () => {
         });
       }).toThrow(
         new NodeAttributeGenerationError(
-          "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find output with id '90abcdef-90ab-cdef-90ab-cdef90abcdef'"
+          "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find output value on TemplatingNode.Outputs given id '90abcdef-90ab-cdef-90ab-cdef90abcdef'"
         )
       );
     });

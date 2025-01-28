@@ -25,7 +25,9 @@ export declare namespace NodeInputValuePointerRule {
 
 export class NodeInputValuePointerRule extends AstNode {
   private workflowContext: WorkflowContext;
-  private astNode: BaseNodeInputValuePointerRule<NodeInputValuePointerRuleType>;
+  public astNode:
+    | BaseNodeInputValuePointerRule<NodeInputValuePointerRuleType>
+    | undefined;
   public readonly ruleType: NodeInputValuePointerRuleType["type"];
   private iterableConfig?: IterableConfig;
 
@@ -36,12 +38,14 @@ export class NodeInputValuePointerRule extends AstNode {
     this.iterableConfig = args.iterableConfig;
 
     this.astNode = this.getAstNode(args.nodeInputValuePointerRuleData);
-    this.inheritReferences(this.astNode);
+    if (this.astNode) {
+      this.inheritReferences(this.astNode);
+    }
   }
 
   private getAstNode(
     nodeInputValuePointerRuleData: NodeInputValuePointerRuleType
-  ): BaseNodeInputValuePointerRule<NodeInputValuePointerRuleType> {
+  ): BaseNodeInputValuePointerRule<NodeInputValuePointerRuleType> | undefined {
     const ruleType = nodeInputValuePointerRuleData.type;
 
     switch (ruleType) {
@@ -51,11 +55,17 @@ export class NodeInputValuePointerRule extends AstNode {
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
           iterableConfig: this.iterableConfig,
         });
-      case "NODE_OUTPUT":
-        return new NodeOutputPointerRule({
+      case "NODE_OUTPUT": {
+        const rule = new NodeOutputPointerRule({
           workflowContext: this.workflowContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });
+        if (rule.getAstNode()) {
+          return rule;
+        } else {
+          return undefined;
+        }
+      }
       case "INPUT_VARIABLE":
         return new InputVariablePointerRule({
           workflowContext: this.workflowContext,
@@ -78,6 +88,8 @@ export class NodeInputValuePointerRule extends AstNode {
   }
 
   public write(writer: Writer): void {
-    this.astNode.write(writer);
+    if (this.astNode) {
+      this.astNode.write(writer);
+    }
   }
 }
