@@ -1,4 +1,3 @@
-from contextlib import redirect_stdout
 import io
 import os
 import re
@@ -78,6 +77,7 @@ def run_code_inline(
     exec_globals = {
         "__arg__inputs": {input_value.name: _clean_for_dict_wrapper(input_value.value) for input_value in input_values},
         "__arg__out": None,
+        "print": lambda *args, **kwargs: log_buffer.write(f"{' '.join(args)}\n"),
     }
     run_args = [f"{input_value.name}=__arg__inputs['{input_value.name}']" for input_value in input_values]
     execution_code = f"""\
@@ -86,8 +86,7 @@ def run_code_inline(
 __arg__out = main({", ".join(run_args)})
 """
 
-    with redirect_stdout(log_buffer):
-        exec(execution_code, exec_globals)
+    exec(execution_code, exec_globals)
 
     logs = log_buffer.getvalue()
     result = exec_globals["__arg__out"]
