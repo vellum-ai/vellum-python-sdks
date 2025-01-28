@@ -97,30 +97,6 @@ class WorkflowRunner(Generic[StateType]):
 
         self.workflow = workflow
         self._is_resuming = False
-
-        # This queue is responsible for sending events from WorkflowRunner to the outside world
-        self._workflow_event_outer_queue: Queue[WorkflowEvent] = Queue()
-
-        # This queue is responsible for sending events from the inner worker threads to WorkflowRunner
-        self._workflow_event_inner_queue: Queue[WorkflowEvent] = Queue()
-
-        self._max_concurrency = max_concurrency
-        self._concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[Edge]]] = Queue()
-
-        # This queue is responsible for sending events from WorkflowRunner to the background thread
-        # for user defined emitters
-        self._background_thread_queue: Queue[BackgroundThreadItem] = Queue()
-
-        self._dependencies: Dict[Type[BaseNode], Set[Type[BaseNode]]] = defaultdict(set)
-
-        self._mocks_by_node_outputs_class = CycleMap(items=node_output_mocks or [], key_by=lambda mock: mock.__class__)
-
-        self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
-        self._cancel_signal = cancel_signal
-        self._parent_context = get_parent_context() or parent_context
-
-        self.workflow.context._register_event_queue(self._workflow_event_inner_queue)
-
         if entrypoint_nodes:
             if len(list(entrypoint_nodes)) > 1:
                 raise ValueError("Cannot resume from multiple nodes")
@@ -138,8 +114,6 @@ class WorkflowRunner(Generic[StateType]):
             for descriptor, value in external_inputs.items():
                 self._initial_state.meta.external_inputs[descriptor] = value
 
-            # Trigger a snapshot of the state
-            self._snapshot_state(self._initial_state)
             self._entrypoints = [
                 ei.inputs_class.__parent_class__
                 for ei in external_inputs
@@ -155,13 +129,33 @@ class WorkflowRunner(Generic[StateType]):
                 self._initial_state = self.workflow.get_default_state(normalized_inputs)
             self._entrypoints = self.workflow.get_entrypoints()
 
-        # Depends on self._initial_state
+        # This queue is responsible for sending events from WorkflowRunner to the outside world
+        self._workflow_event_outer_queue: Queue[WorkflowEvent] = Queue()
+
+        # This queue is responsible for sending events from the inner worker threads to WorkflowRunner
+        self._workflow_event_inner_queue: Queue[WorkflowEvent] = Queue()
+
+        self._max_concurrency = max_concurrency
+        self._concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[Edge]]] = Queue()
+
+        # This queue is responsible for sending events from WorkflowRunner to the background thread
+        # for user defined emitters
+        self._background_thread_queue: Queue[BackgroundThreadItem] = Queue()
+
+        self._dependencies: Dict[Type[BaseNode], Set[Type[BaseNode]]] = defaultdict(set)
         self._state_forks: Set[StateType] = {self._initial_state}
+        self._mocks_by_node_outputs_class = CycleMap(items=node_output_mocks or [], key_by=lambda mock: mock.__class__)
+
+        self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
+        self._cancel_signal = cancel_signal
+        self._parent_context = get_parent_context() or parent_context
+
         setattr(
             self._initial_state,
             "__snapshot_callback__",
             lambda s: self._snapshot_state(s),
         )
+        self.workflow.context._register_event_queue(self._workflow_event_inner_queue)
 
     def _snapshot_state(self, state: StateType) -> StateType:
         self._workflow_event_inner_queue.put(
@@ -401,6 +395,7 @@ class WorkflowRunner(Generic[StateType]):
 
                 if state.meta.external_inputs.get(descriptor, UNDEF) is UNDEF:
                     state.meta.external_inputs[descriptor] = UNDEF
+                    self._snapshot_state(state)
                     return
 
             all_deps = self._dependencies[node_class]
