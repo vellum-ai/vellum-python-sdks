@@ -16,7 +16,7 @@ const main = async () => {
     workflow_id: "version-python-workflow-server.yaml",
     ref: "main",
     inputs: {
-      version
+      version,
     },
   });
 
