@@ -16,7 +16,10 @@ import { NoteNodeContext } from "src/context/node-context/note-node";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
-import { NodeDefinitionGenerationError } from "src/generators/errors";
+import {
+  BaseCodegenError,
+  NodeDefinitionGenerationError,
+} from "src/generators/errors";
 import {
   InlinePromptNode,
   WorkflowDataNode,
@@ -185,6 +188,14 @@ export async function createNodeContext(
 ): Promise<BaseNodeContext<WorkflowDataNode>> {
   const nodeContext = buildNodeContext(args);
   args.workflowContext.addNodeContext(nodeContext);
-  await nodeContext.buildProperties();
+  try {
+    await nodeContext.buildProperties();
+  } catch (error) {
+    if (error instanceof BaseCodegenError) {
+      args.workflowContext.addError(error);
+    } else {
+      throw error;
+    }
+  }
   return nodeContext;
 }

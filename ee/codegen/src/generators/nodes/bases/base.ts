@@ -291,9 +291,20 @@ export abstract class BaseNode<
       decorators: this.getNodeDecorators(),
     });
 
-    this.getNodeClassBodyStatements().forEach((statement) =>
-      nodeClass.add(statement)
-    );
+    try {
+      console.log("BaseNode generateNodeClass");
+      this.getNodeClassBodyStatements().forEach((statement) => {
+        console.log("BaseNode generateNodeClass 2", statement);
+        nodeClass.add(statement);
+      });
+    } catch (error) {
+      console.log("BaseNode generateNodeClass 3", error);
+      if (error instanceof BaseCodegenError) {
+        this.workflowContext.addError(error);
+      } else {
+        throw error;
+      }
+    }
 
     return nodeClass;
   }

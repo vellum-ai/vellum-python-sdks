@@ -51,3 +51,15 @@ class SubworkflowNode(SubworkflowDeploymentNode):
         output_2: float
 "
 `;
+
+exports[`SubworkflowDeploymentNode > failure > should generate subworkflow deployment nodes as much as possible for non strict workflow contexts 1`] = `
+"from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
+
+
+class SubworkflowNode(SubworkflowDeploymentNode):
+    release_tag = "LATEST"
+    subworkflow_inputs = {
+        "input": None,
+    }
+"
+`;

@@ -25,19 +25,21 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     }
 
     if (!this.nodeContext.workflowDeploymentHistoryItem) {
-      throw new NodeDefinitionGenerationError(
-        "Workflow Deployment History Item is not set"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Failed to generate attribute: ${this.nodeData.data.label}.deployment`
+        )
+      );
+    } else {
+      statements.push(
+        python.field({
+          name: "deployment",
+          initializer: python.TypeInstantiation.str(
+            this.nodeContext.workflowDeploymentHistoryItem.name
+          ),
+        })
       );
     }
-
-    statements.push(
-      python.field({
-        name: "deployment",
-        initializer: python.TypeInstantiation.str(
-          this.nodeContext.workflowDeploymentHistoryItem.name
-        ),
-      })
-    );
 
     statements.push(
       python.field({
@@ -63,16 +65,22 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
       })
     );
 
-    statements.push(this.generateOutputsClass());
+    const outputsClass = this.generateOutputsClass();
+    if (outputsClass) {
+      statements.push(outputsClass);
+    }
 
     return statements;
   }
 
-  private generateOutputsClass(): python.Class {
+  private generateOutputsClass(): python.Class | null {
     if (!this.nodeContext.workflowDeploymentHistoryItem) {
-      throw new NodeDefinitionGenerationError(
-        "Workflow Deployment History Item is not set"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Failed to generate attribute: ${this.nodeData.data.label}.deployment`
+        )
       );
+      return null;
     }
 
     const nodeBaseClassRef = this.getNodeBaseClass();

@@ -143,7 +143,9 @@ describe("BaseNode", () => {
       vi.spyOn(
         GenericNode.prototype,
         "getNodeClassBodyStatements"
-      ).mockRejectedValue(new NodeDefinitionGenerationError("test"));
+      ).mockImplementation(() => {
+        throw new NodeDefinitionGenerationError("test");
+      });
 
       const workflowContext = workflowContextFactory({
         strict: false,
