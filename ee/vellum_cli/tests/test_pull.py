@@ -39,6 +39,7 @@ def test_pull(vellum_client, mock_module, base_command):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     module = mock_module.module
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
 
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
@@ -55,6 +56,27 @@ def test_pull(vellum_client, mock_module, base_command):
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
+
+    # AND the vellum.lock.json file is created
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+    with open(vellum_lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data == {
+            "version": "1.0",
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": workflow_sandbox_id,
+                    "container_image_name": None,
+                    "container_image_tag": None,
+                    "ignore": None,
+                    "deployments": [],
+                    "workspace": "default",
+                }
+            ],
+            "workspaces": [],
+        }
 
 
 def test_pull__second_module(vellum_client, mock_module):
@@ -539,3 +561,35 @@ def test_pull__include_sandbox(vellum_client, mock_module):
     with open(lock_json) as f:
         lock_data = json.load(f)
         assert lock_data["workflows"][0]["ignore"] == "sandbox.py"
+
+
+def test_pull__same_pull_twice__one_entry_in_lockfile(vellum_client, mock_module):
+    # GIVEN a module on the user's filesystem
+    module = mock_module.module
+    temp_dir = mock_module.temp_dir
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND the workflow pull API call returns a zip file both times
+    zip_contents = _zip_file_map({"workflow.py": "print('hello')"})
+    responses = iter([zip_contents, zip_contents])
+
+    def workflows_pull_side_effect(*args, **kwargs):
+        return iter([next(responses)])
+
+    vellum_client.workflows.pull.side_effect = workflows_pull_side_effect
+
+    # AND the user runs the pull command once
+    runner = CliRunner()
+    runner.invoke(cli_main, ["pull", module])
+
+    # WHEN the user runs the pull command again but with the workflow sandbox id
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-sandbox-id", workflow_sandbox_id])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0, (result.output, result.exception)
+
+    # AND the lockfile should only have one entry
+    lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    with open(lock_json) as f:
+        lock_data = json.load(f)
+        assert len(lock_data["workflows"]) == 1

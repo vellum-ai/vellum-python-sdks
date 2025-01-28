@@ -98,7 +98,6 @@ def pull_command(
         workflow_sandbox_id=workflow_sandbox_id,
         workflow_deployment=workflow_deployment,
     )
-    save_lock_file = not module
 
     workflow_config = workflow_config_result.workflow_config
     if not workflow_config:
@@ -190,16 +189,12 @@ Its schema should be considered unstable and subject to change at any time."""
     if include_sandbox:
         if not workflow_config.ignore:
             workflow_config.ignore = "sandbox.py"
-            save_lock_file = True
         elif isinstance(workflow_config.ignore, str) and "sandbox.py" != workflow_config.ignore:
             workflow_config.ignore = [workflow_config.ignore, "sandbox.py"]
-            save_lock_file = True
         elif isinstance(workflow_config.ignore, list) and "sandbox.py" not in workflow_config.ignore:
             workflow_config.ignore.append("sandbox.py")
-            save_lock_file = True
 
-    if save_lock_file:
-        config.save()
+    config.save()
 
     if error_content:
         logger.error(error_content)
