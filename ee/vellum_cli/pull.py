@@ -47,6 +47,13 @@ def _resolve_workflow_config(
             pk=workflow_config.workflow_sandbox_id if workflow_config else None,
         )
     elif workflow_sandbox_id:
+        workflow_config = next((w for w in config.workflows if w.workflow_sandbox_id == workflow_sandbox_id), None)
+        if workflow_config:
+            return WorkflowConfigResolutionResult(
+                workflow_config=workflow_config,
+                pk=workflow_sandbox_id,
+            )
+
         workflow_config = WorkflowConfig(
             workflow_sandbox_id=workflow_sandbox_id,
             module=f"workflow_{workflow_sandbox_id.split('-')[0]}",
