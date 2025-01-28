@@ -1,30 +1,9 @@
-import { createAppAuth } from "@octokit/auth-app";
 import path from "path";
 import os from "os";
 import { execSync } from "child_process";
 import packageJson from "../package.json" assert { type: "json" };
 import { readFileSync, writeFileSync } from "node:fs";
-
-const getGithubToken = async () => {
-  const appId = process.env.VELLUM_AUTOMATION_APP_ID;
-  const privateKey = process.env.VELLUM_AUTOMATION_PRIVATE_KEY;
-  const installationId = process.env.VELLUM_AUTOMATION_INSTALLATION_ID;
-
-  if (!appId || !privateKey || !installationId) {
-    throw new Error(
-      "VELLUM_AUTOMATION_APP_ID, VELLUM_AUTOMATION_PRIVATE_KEY, and VELLUM_AUTOMATION_INSTALLATION_ID must be set"
-    );
-  }
-
-  const auth = createAppAuth({
-    appId,
-    privateKey,
-    installationId,
-  });
-
-  const { token } = await auth({ type: "installation" });
-  return token;
-};
+import { getGithubToken } from "./get-github-token.mjs";
 
 const main = async () => {
   const version = packageJson.version;
