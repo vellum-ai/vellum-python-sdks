@@ -101,3 +101,33 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     packages = None
 "
 `;
+
+exports[`CodeExecutionNode > with runtime set > should generate the correct standalone file PYTHON_3_11_6 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > with runtime set > should generate the correct standalone file TYPESCRIPT_5_3_3 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.ts"
+    code_inputs = {}
+    runtime = "TYPESCRIPT_5_3_3"
+    packages = None
+"
+`;

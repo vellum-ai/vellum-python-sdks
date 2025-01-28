@@ -242,7 +242,27 @@ export class CodeExecutionNode extends BaseSingleFileNode<
   }
 
   private async persistScriptFile(): Promise<void> {
-    const filepath = this.nodeData.data.filepath ?? "./script.py";
+    let runtime: string;
+    try {
+      const runtimeRuleInput = this.getNodeInputByName("runtime");
+      const runtimeRule = runtimeRuleInput?.nodeInputData?.value?.rules[0];
+      if (
+        !runtimeRule ||
+        runtimeRule.type !== "CONSTANT_VALUE" ||
+        runtimeRule.data.type !== "STRING"
+      ) {
+        throw new NodeAttributeGenerationError(
+          "Expected to find runtime input with constant string value"
+        );
+      }
+      runtime = runtimeRule?.data.value ?? "";
+    } catch {
+      runtime = "";
+    }
+    const filepath =
+      this.nodeData.data.filepath ?? runtime?.includes("TYPESCRIPT")
+        ? "./script.ts"
+        : "./script.py";
 
     const absolutPathToNodeDirectory = `${
       this.workflowContext.absolutePathToOutputDirectory

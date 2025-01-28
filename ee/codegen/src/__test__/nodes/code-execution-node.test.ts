@@ -1,5 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { beforeEach } from "vitest";
+import { beforeEach, describe } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { codeExecutionNodeFactory } from "src/__test__/helpers/node-data-factories";
@@ -7,6 +7,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
+import { NodeInputValuePointerRule } from "src/types/vellum";
 
 describe("CodeExecutionNode", () => {
   let workflowContext: WorkflowContext;
@@ -100,6 +101,45 @@ describe("CodeExecutionNode", () => {
           "Expected to find code input with constant string value"
         )
       );
+    });
+  });
+  describe("with runtime set", () => {
+    it.each<"PYTHON_3_11_6" | "TYPESCRIPT_5_3_3">([
+      "PYTHON_3_11_6",
+      "TYPESCRIPT_5_3_3",
+    ])("should generate the correct standalone file %s", async (override) => {
+      workflowContext = workflowContextFactory({
+        codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
+      });
+
+      const overrideInputValue: NodeInputValuePointerRule = {
+        type: "CONSTANT_VALUE",
+        data: {
+          type: "STRING",
+          value:
+            override == "TYPESCRIPT_5_3_3"
+              ? "async function main(inputs: {\n\n}): Promise<number> {\n\n  return;\n}"
+              : "def main(inputs):\n  return",
+        },
+      };
+
+      const nodeData = codeExecutionNodeFactory({
+        codeInputValueRule: overrideInputValue,
+        runtime: override,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      node = new CodeExecutionNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 });

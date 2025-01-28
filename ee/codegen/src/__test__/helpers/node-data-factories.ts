@@ -1259,8 +1259,10 @@ export function apiNodeFactory({
 
 export function codeExecutionNodeFactory({
   codeInputValueRule,
+  runtime,
 }: {
   codeInputValueRule?: NodeInputValuePointerRule;
+  runtime?: string;
 } = {}): CodeExecutionNode {
   const nodeData: CodeExecutionNode = {
     id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
@@ -1303,7 +1305,7 @@ export function codeExecutionNodeFactory({
               type: "CONSTANT_VALUE",
               data: {
                 type: "STRING",
-                value: "PYTHON_3_11",
+                value: runtime ? runtime : "PYTHON_3_11",
               },
             },
           ],
