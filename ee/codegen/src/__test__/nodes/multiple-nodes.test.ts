@@ -283,4 +283,12 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
     node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
+
+  it("workflow context should have the error logged", async () => {
+    const errors = workflowContext.getErrors();
+    expect(errors).toHaveLength(1);
+    expect(errors[0]?.message).toContain(
+      "Could not find subworkflow deployment output with id some-non-existent-subworkflow-output-id"
+    );
+  });
 });

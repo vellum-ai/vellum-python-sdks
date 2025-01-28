@@ -377,8 +377,13 @@ export class WorkflowContext {
     if (this.strict) {
       throw error;
     }
+    const errorExists = this.errors.some(
+      (existingError) => existingError.message === error.message
+    );
 
-    this.errors.push(error);
+    if (!errorExists) {
+      this.errors.push(error);
+    }
   }
 
   public getErrors(): BaseCodegenError[] {
