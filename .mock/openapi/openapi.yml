@@ -11654,9 +11654,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/WorkflowPushExecConfig'
           description: The execution configuration of the workflow.
-        label:
-          type: string
-          minLength: 1
         workflow_sandbox_id:
           type: string
           format: uuid
@@ -11675,7 +11672,6 @@ components:
           type: boolean
       required:
       - exec_config
-      - label
     WorkflowPushResponse:
       type: object
       properties:
