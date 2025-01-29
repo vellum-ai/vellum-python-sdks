@@ -7,10 +7,14 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
+
+from ee.vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+from ee.vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 class Inputs(BaseInputs):
@@ -108,6 +112,26 @@ def test_serialize_node__retry(serialize_node):
         },
         serialized_node,
     )
+
+
+def test_serialize_node__retry__no_display():  # GIVEN an adornment node
+    @RetryNode.wrap(max_attempts=5)
+    class StartNode(BaseNode):
+        pass
+
+    # AND a workflow that uses the adornment node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=MyWorkflow,
+    )
+    exec_config = workflow_display.serialize()
+
+    # THEN the workflow display is created successfully
+    assert exec_config is not None
 
 
 @TryNode.wrap()
