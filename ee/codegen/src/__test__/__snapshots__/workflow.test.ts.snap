@@ -46,11 +46,11 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 exports[`Workflow > write > should handle the case of multiple nodes with the same label 1`] = `
 "from vellum.workflows import BaseWorkflow
 from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_1 import TemplatingNode as TemplatingNode1TemplatingNode
+from .nodes.templating_node_1 import TemplatingNode1
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> TemplatingNode1TemplatingNode
+    graph = TemplatingNode >> TemplatingNode1
 "
 `;
 

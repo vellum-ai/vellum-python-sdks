@@ -5,7 +5,7 @@ import {
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { CodeResourceDefinition } from "src/types/vellum";
-import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
+import { toPythonSafeSnakeCase } from "src/utils/casing";
 
 export function getGeneratedInputsModulePath(
   workflowContext: WorkflowContext
@@ -54,10 +54,6 @@ export function getGeneratedNodeModuleInfo({
   let rawModuleName: string;
   let nodeClassName: string;
 
-  // In the case of adorned Nodes, we need to traverse the Adornment Node's definition to get
-  // info about the inner Node that it adorns.
-  // TODO: Handle case where there's multiple adornments on the same Node
-  //  https://app.shortcut.com/vellum/story/5699
   if (modulePathLeaf && modulePathLeaf === "<adornment>") {
     rawModuleName =
       nodeDefinition?.module?.[nodeDefinition.module.length - 3] ??
@@ -65,14 +61,14 @@ export function getGeneratedNodeModuleInfo({
 
     nodeClassName =
       nodeDefinition?.module?.[nodeDefinition.module.length - 2] ??
-      createPythonClassName(nodeLabel);
+      workflowContext.getUniqueClassName(nodeLabel);
   } else {
     rawModuleName = modulePathLeaf ?? toPythonSafeSnakeCase(nodeLabel, "node");
 
-    nodeClassName = nodeDefinition?.name ?? createPythonClassName(nodeLabel);
+    nodeClassName =
+      nodeDefinition?.name ?? workflowContext.getUniqueClassName(nodeLabel);
   }
 
-  // Deduplicate the module name if it's already in use
   let moduleName = rawModuleName;
   let numRenameAttempts = 0;
   while (workflowContext.isNodeModuleNameUsed(moduleName)) {
