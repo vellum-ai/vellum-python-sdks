@@ -12,9 +12,8 @@ from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
-
-from ee.vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from ee.vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 class Inputs(BaseInputs):
