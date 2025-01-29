@@ -31,6 +31,16 @@ class WorkflowConfigResolutionResult(UniversalBaseModel):
     pk: Optional[str] = None
 
 
+class RunnerConfig(UniversalBaseModel):
+    container_image_name: Optional[str] = None
+    container_image_tag: Optional[str] = None
+
+
+class PullContentsMetadata(UniversalBaseModel):
+    label: Optional[str] = None
+    runner_config: Optional[RunnerConfig] = None
+
+
 def _resolve_workflow_config(
     config: VellumCliConfig,
     module: Optional[str] = None,
@@ -65,9 +75,10 @@ def _resolve_workflow_config(
                 pk=workflow_sandbox_id,
             )
 
+        # We use an empty module name to indicate that we want to backfill it once we have the Workflow Sandbox Label
         workflow_config = WorkflowConfig(
             workflow_sandbox_id=workflow_sandbox_id,
-            module=f"workflow_{workflow_sandbox_id.split('-')[0]}",
+            module="",
         )
         config.workflows.append(workflow_config)
         return WorkflowConfigResolutionResult(
@@ -125,7 +136,11 @@ def pull_command(
     if not pk:
         raise ValueError("No workflow sandbox ID found in project to pull from.")
 
-    logger.info(f"Pulling workflow into {workflow_config.module}")
+    if workflow_config.module:
+        logger.info(f"Pulling workflow into {workflow_config.module}...")
+    else:
+        logger.info(f"Pulling workflow from {pk}...")
+
     client = create_vellum_client()
     query_parameters = {}
 
@@ -146,11 +161,30 @@ def pull_command(
     zip_bytes = b"".join(response)
     zip_buffer = io.BytesIO(zip_bytes)
 
-    target_dir = os.path.join(os.getcwd(), *workflow_config.module.split("."))
     error_content = ""
     metadata_json: Optional[dict] = None
 
     with zipfile.ZipFile(zip_buffer) as zip_file:
+        if METADATA_FILE_NAME in zip_file.namelist():
+            with zip_file.open(METADATA_FILE_NAME) as source:
+                metadata_json = json.load(source)
+
+            pull_contents_metadata = PullContentsMetadata.model_validate(metadata_json)
+
+            if pull_contents_metadata.runner_config:
+                workflow_config.container_image_name = pull_contents_metadata.runner_config.container_image_name
+                workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
+                if workflow_config.container_image_name and not workflow_config.container_image_tag:
+                    workflow_config.container_image_tag = "latest"
+
+            if not workflow_config.module and pull_contents_metadata.label:
+                workflow_config.module = snake_case(pull_contents_metadata.label)
+
+        if not workflow_config.module:
+            raise ValueError(f"Failed to resolve a module name for Workflow {pk}")
+
+        target_dir = os.path.join(os.getcwd(), *workflow_config.module.split("."))
+
         # Delete files in target_dir that aren't in the zip file
         if os.path.exists(target_dir):
             ignore_patterns = (
@@ -188,15 +222,6 @@ def pull_command(
                 with open(target_file, "w") as target:
                     logger.info(f"Writing to {target_file}...")
                     target.write(content)
-
-    if metadata_json:
-        runner_config = metadata_json.get("runner_config")
-
-        if runner_config:
-            workflow_config.container_image_name = runner_config.get("container_image_name")
-            workflow_config.container_image_tag = runner_config.get("container_image_tag")
-            if workflow_config.container_image_name and not workflow_config.container_image_tag:
-                workflow_config.container_image_tag = "latest"
 
     if include_json:
         logger.warning(
