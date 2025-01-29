@@ -18,7 +18,6 @@ from .try_node import BaseTryNodeDisplay
 
 # All node display classes must be imported here to be registered in BaseNodeDisplay's node display registry
 __all__ = [
-    "BaseRetryNodeDisplay",
     "BaseAPINodeDisplay",
     "BaseCodeExecutionNodeDisplay",
     "BaseConditionalNodeDisplay",
@@ -31,6 +30,7 @@ __all__ = [
     "BaseMergeNodeDisplay",
     "BaseNoteNodeDisplay",
     "BasePromptDeploymentNodeDisplay",
+    "BaseRetryNodeDisplay",
     "BaseSearchNodeDisplay",
     "BaseSubworkflowDeploymentNodeDisplay",
     "BaseTemplatingNodeDisplay",
