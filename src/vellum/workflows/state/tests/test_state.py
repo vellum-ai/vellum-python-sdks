@@ -64,6 +64,22 @@ def test_state_snapshot__nested_dictionary_edit():
     assert snapshot_count[id(state)] == 1
 
 
+def test_state_snapshot__external_input_edit():
+    # GIVEN an initial state instance
+    state = MockState(foo="bar")
+    assert snapshot_count[id(state)] == 0
+
+    # WHEN we add an external input to state
+    class MockExternalInputs(BaseNode.ExternalInputs):
+        message: str
+
+    # WHEN we edit external inputs dictionary
+    state.meta.external_inputs[MockExternalInputs.message] = "hello"
+
+    # THEN the snapshot is emitted
+    assert snapshot_count[id(state)] == 1
+
+
 def test_state_deepcopy():
     # GIVEN an initial state instance
     state = MockState(foo="bar")
@@ -114,6 +130,32 @@ def test_state_json_serialization__with_node_output_updates():
 
     # THEN the state is serialized correctly
     assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": "hello"}
+
+
+def test_state_deepcopy__with_external_input_updates():
+    # GIVEN an initial state instance
+    state = MockState(foo="bar")
+
+    # AND we add an external input to state
+    class MockExternalInputs(BaseNode.ExternalInputs):
+        message: str
+
+    state.meta.external_inputs[MockExternalInputs.message] = "hello"
+
+    # AND we deepcopy the state
+    deepcopied_state = deepcopy(state)
+
+    # AND we update the original state
+    state.meta.external_inputs[MockExternalInputs.message] = "world"
+
+    # THEN the copied state is not updated
+    assert deepcopied_state.meta.external_inputs[MockExternalInputs.message] == "hello"
+
+    # AND the original state has had the correct number of snapshots
+    assert snapshot_count[id(state)] == 2
+
+    # AND the copied state has had the correct number of snapshots
+    assert snapshot_count[id(deepcopied_state)] == 0
 
 
 def test_state_json_serialization__with_queue():
