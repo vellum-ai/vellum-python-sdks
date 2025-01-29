@@ -51,10 +51,6 @@ service:
             exec_config:
               type: root.WorkflowPushExecConfig
               docs: The execution configuration of the workflow.
-            label:
-              type: string
-              validation:
-                minLength: 1
             workflow_sandbox_id:
               type: optional<string>
               validation:
@@ -72,7 +68,6 @@ service:
       examples:
         - request:
             exec_config: exec_config
-            label: label
           response:
             body:
               workflow_sandbox_id: workflow_sandbox_id

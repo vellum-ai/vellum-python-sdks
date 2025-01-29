@@ -5430,7 +5430,6 @@ client = Vellum(
 )
 client.workflows.push(
     exec_config="exec_config",
-    label="label",
 )
 
 ```
@@ -5448,14 +5447,6 @@ client.workflows.push(
 <dd>
 
 **exec_config:** `WorkflowPushExecConfig` — The execution configuration of the workflow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**label:** `str` 
     
 </dd>
 </dl>
