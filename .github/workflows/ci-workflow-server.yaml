@@ -5,6 +5,7 @@ on:
     branches:
       - main
     tags:
+      - '*'
 jobs:
   publish:
     permissions:
