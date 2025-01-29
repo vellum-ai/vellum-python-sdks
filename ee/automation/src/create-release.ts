@@ -1,29 +1,14 @@
-import fs from "fs";
-import path from "path";
-import { Octokit } from "@octokit/rest";
-import { getGithubToken } from "./auth.js";
-import { fileURLToPath } from "url";
-import dotenv from "dotenv";
+import { Octokit } from '@octokit/rest';
+import { getGithubToken } from './auth.js';
+import dotenv from 'dotenv';
+import { getVersion } from './utils.js';
 
 dotenv.config();
 
 const SDK_REPO = "vellum-python-sdks";
 
 const main = async () => {
-  // Read and parse pyproject.toml
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const pyprojectToml = fs.readFileSync(
-    path.join(__dirname, "..", "..", "..", "pyproject.toml"),
-    "utf8"
-  );
-
-  // Extract version from pyproject.toml using regex
-  const version = pyprojectToml.match(/version = "([^"]+)"/)?.[1];
-  if (!version) {
-    throw new Error("Could not find version in pyproject.toml");
-  }
-  console.log("Found Version:", version);
+  const version = getVersion();
 
   // Create the release
   const auth = await getGithubToken();

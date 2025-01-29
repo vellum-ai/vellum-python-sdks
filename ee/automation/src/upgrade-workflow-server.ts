@@ -1,13 +1,13 @@
-import packageJson from "../package.json" assert { type: "json" };
-import { getGithubToken } from "./get-github-token.mjs";
 import { Octokit } from "@octokit/rest";
+import { getGithubToken } from './auth.js';
+import { getVersion } from './utils.js';
 
 /*
  * This triggers the workflow server version release and lives here for convenience
  * so it can take advantage of the existing github app auth token.
  */
 const main = async () => {
-  const version = packageJson.version;
+  const version = getVersion();
   console.log("Upgrading workflow server to version", version);
   const octokit = new Octokit({ auth: await getGithubToken() });
   await octokit.actions.createWorkflowDispatch({

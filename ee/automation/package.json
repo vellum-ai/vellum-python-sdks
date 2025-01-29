@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "create-release": "ts-node-esm ./src/create-release.ts"
+    "create-release": "ts-node-esm ./src/create-release.ts",
+    "upgrade-workflow-server": "ts-node-esm ./src/upgrade-workflow-server.ts"
   },
   "devDependencies": {
     "@octokit/auth-app": "^7.1.4",
