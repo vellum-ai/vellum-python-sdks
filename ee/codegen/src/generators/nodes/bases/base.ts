@@ -19,6 +19,7 @@ import {
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
 } from "src/types/vellum";
+import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -159,8 +160,10 @@ export abstract class BaseNode<
           nodeInputData,
         });
 
-        nodeInputsByKey.set(nodeInputData.key, nodeInput);
-        nodeInputsById.set(nodeInputData.id, nodeInput);
+        if (!isNilOrEmpty(nodeInput.nodeInputValuePointer.rules)) {
+          nodeInputsByKey.set(nodeInputData.key, nodeInput);
+          nodeInputsById.set(nodeInputData.id, nodeInput);
+        }
       } catch (error) {
         if (error instanceof BaseCodegenError) {
           const nodeAttributeGenerationError = new NodeAttributeGenerationError(

@@ -16,7 +16,7 @@ export declare namespace NodeInput {
 export class NodeInput extends AstNode {
   private workflowContext: WorkflowContext;
   nodeInputData: NodeInputType;
-  private nodeInputValuePointer: NodeInputValuePointer;
+  public nodeInputValuePointer: NodeInputValuePointer;
 
   public constructor(args: NodeInput.Args) {
     super();

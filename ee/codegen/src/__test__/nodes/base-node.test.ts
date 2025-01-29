@@ -11,12 +11,37 @@ describe("BaseNode", () => {
       const workflowContext = workflowContextFactory();
 
       const templatingNodeData = templatingNodeFactory({
-        inputRules: [
+        inputs: [
           {
-            type: "NODE_OUTPUT",
-            data: {
-              nodeId: "12345678-1234-5678-1234-567812345678",
-              outputId: "90abcdef-90ab-cdef-90ab-cdef90abcdef",
+            id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+            key: "text",
+            value: {
+              rules: [
+                {
+                  type: "NODE_OUTPUT",
+                  data: {
+                    nodeId: "12345678-1234-5678-1234-567812345678",
+                    outputId: "90abcdef-90ab-cdef-90ab-cdef90abcdef",
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+          {
+            id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+            key: "template",
+            value: {
+              rules: [
+                {
+                  type: "CONSTANT_VALUE",
+                  data: {
+                    type: "STRING",
+                    value: "Hello, World!",
+                  },
+                },
+              ],
+              combinator: "OR",
             },
           },
         ],
@@ -52,12 +77,37 @@ describe("BaseNode", () => {
         id: "12345678-1234-5678-1234-567812345678",
         sourceHandleId: "12345678-1234-5678-1234-567812345679",
         targetHandleId: "12345678-1234-5678-1234-56781234567a",
-        inputRules: [
+        inputs: [
           {
-            type: "NODE_OUTPUT",
-            data: {
-              nodeId: templatingNodeData.id,
-              outputId: "90abcdef-90ab-cdef-90ab-cdef90abcdef",
+            id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+            key: "text",
+            value: {
+              rules: [
+                {
+                  type: "NODE_OUTPUT",
+                  data: {
+                    nodeId: templatingNodeData.id,
+                    outputId: "90abcdef-90ab-cdef-90ab-cdef90abcdef",
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+          {
+            id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+            key: "template",
+            value: {
+              rules: [
+                {
+                  type: "CONSTANT_VALUE",
+                  data: {
+                    type: "STRING",
+                    value: "Hello, World!",
+                  },
+                },
+              ],
+              combinator: "OR",
             },
           },
         ],
@@ -74,7 +124,7 @@ describe("BaseNode", () => {
         });
       }).toThrow(
         new NodeAttributeGenerationError(
-          "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find output value on TemplatingNode.Outputs given id '90abcdef-90ab-cdef-90ab-cdef90abcdef'"
+          "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find output value TemplatingNode.Outputs given id '90abcdef-90ab-cdef-90ab-cdef90abcdef'"
         )
       );
     });

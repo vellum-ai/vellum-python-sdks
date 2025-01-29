@@ -100,7 +100,7 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
 
     const nodeOutputName = this.nodeOutputNamesById[outputId];
     if (!nodeOutputName) {
-      // Edge case where the node reference is to a non existent subworkflow deployment
+      // This handles an edge case where the node references a non-existent subworkflow deployment
       if (
         this.nodeData.type === "SUBWORKFLOW" &&
         this.nodeData.data.variant === "DEPLOYMENT"
@@ -114,7 +114,7 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       }
 
       throw new NodeOutputNotFoundError(
-        `Failed to find output value on ${this.nodeClassName}.Outputs given id '${outputId}'`
+        `Failed to find output value ${this.nodeClassName}.Outputs given id '${outputId}'`
       );
     }
 

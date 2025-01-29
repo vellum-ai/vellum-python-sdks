@@ -15,7 +15,7 @@ class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNod
     label = "Subworkflow Node"
     node_id = UUID("c8f2964c-09b8-44e0-a06d-606319fe5e2a")
     target_handle_id = UUID("f5e6bd33-527a-4ba6-8906-cd5e96a4321c")
-    node_input_ids_by_name = {"input": UUID("f62b7511-dd69-4dff-a4fc-718a9db3ceba")}
+    node_input_ids_by_name = {}
     output_display = {
         SubworkflowNode.Outputs.output_1: NodeOutputDisplay(
             id=UUID("1"), name="output-1"
@@ -44,9 +44,7 @@ exports[`SubworkflowDeploymentNode > basic > getNodeFile 1`] = `
 class SubworkflowNode(SubworkflowDeploymentNode):
     deployment = "test-deployment"
     release_tag = "LATEST"
-    subworkflow_inputs = {
-        "input": None,
-    }
+    subworkflow_inputs = {}
 
     class Outputs(SubworkflowDeploymentNode.Outputs):
         output_1: str

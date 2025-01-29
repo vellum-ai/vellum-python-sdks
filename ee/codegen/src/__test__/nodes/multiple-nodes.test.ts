@@ -18,7 +18,6 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
-import { ConstantValuePointer } from "src/types/vellum";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
@@ -170,22 +169,44 @@ describe("InlinePromptNode referenced by Templating Node", () => {
       nodeData: promptNode,
     })) as InlinePromptNodeContext;
 
-    const template: ConstantValuePointer = {
-      type: "CONSTANT_VALUE",
-      data: {
-        type: "STRING",
-        value: "{{ output[0].type }}",
-      },
-    };
-
     const templatingNode = templatingNodeFactory({
-      inputReferences: [
+      id: "46e221ab-a749-41a2-9242-b1f5bf31f3a5",
+      sourceHandleId: "6ee2c814-d0a5-4ec9-83b6-45156e2f22c4",
+      targetHandleId: "3960c8e1-9baa-4b9c-991d-e399d16a45aa",
+      inputs: [
         {
-          referenceId: promptNode.data.arrayOutputId,
-          referenceNodeId: promptNode.id,
+          id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+          key: "text",
+          value: {
+            rules: [
+              {
+                type: "NODE_OUTPUT",
+                data: {
+                  nodeId: promptNode.id,
+                  outputId: promptNode.data.outputId,
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+          key: "template",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "{{ output[0].type }}",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
         },
       ],
-      template: template,
     });
 
     const templatingNodeContext = (await createNodeContext({
@@ -241,26 +262,60 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
       nodeData: promptNode,
     });
 
-    const template: ConstantValuePointer = {
-      type: "CONSTANT_VALUE",
-      data: {
-        type: "STRING",
-        value: "{{ output[0].type }}",
-      },
-    };
-
     const templatingNode = templatingNodeFactory({
-      inputReferences: [
+      id: "46e221ab-a749-41a2-9242-b1f5bf31f3a5",
+      sourceHandleId: "6ee2c814-d0a5-4ec9-83b6-45156e2f22c4",
+      targetHandleId: "3960c8e1-9baa-4b9c-991d-e399d16a45aa",
+      inputs: [
         {
-          referenceId: promptNode.data.arrayOutputId,
-          referenceNodeId: promptNode.id,
+          id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+          key: "text",
+          value: {
+            rules: [
+              {
+                type: "NODE_OUTPUT",
+                data: {
+                  nodeId: promptNode.id,
+                  outputId: promptNode.data.outputId,
+                },
+              },
+            ],
+            combinator: "OR",
+          },
         },
         {
-          referenceId: "some-non-existent-subworkflow-output-id",
-          referenceNodeId: subworkflowNodeData.id,
+          id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+          key: "output",
+          value: {
+            rules: [
+              {
+                type: "NODE_OUTPUT",
+                data: {
+                  nodeId: subworkflowNodeData.id,
+                  outputId: "some-non-existent-subworkflow-output-id",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+          key: "template",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "{{ output[0].type }}",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
         },
       ],
-      template: template,
     });
 
     const templatingNodeContext = (await createNodeContext({

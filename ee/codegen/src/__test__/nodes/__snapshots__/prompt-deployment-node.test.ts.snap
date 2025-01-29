@@ -22,7 +22,7 @@ class PromptDeploymentNodeDisplay(
     prompt_input_ids_by_name = {
         "my_var_1": UUID("3911bd2e-eaaf-4805-9ffc-e5d6a71c91a7")
     }
-    node_input_ids_by_name = {"my_var_1": UUID("3911bd2e-eaaf-4805-9ffc-e5d6a71c91a7")}
+    node_input_ids_by_name = {}
     output_display = {
         PromptDeploymentNode.Outputs.text: NodeOutputDisplay(
             id=UUID("fa015382-7e5b-404e-b073-1c5f01832169"), name="text"
@@ -53,8 +53,6 @@ exports[`PromptDeploymentNode > basic > getNodeFile 1`] = `
 class PromptDeploymentNode(BasePromptDeploymentNode):
     deployment = "afd05488-7a25-4ff2-b87b-878e9552474e"
     release_tag = "LATEST"
-    prompt_inputs = {
-        "my_var_1": None,
-    }
+    prompt_inputs = {}
 "
 `;
