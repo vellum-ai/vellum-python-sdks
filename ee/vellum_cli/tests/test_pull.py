@@ -593,3 +593,40 @@ def test_pull__same_pull_twice__one_entry_in_lockfile(vellum_client, mock_module
     with open(lock_json) as f:
         lock_data = json.load(f)
         assert len(lock_data["workflows"]) == 1
+
+
+def test_pull__module_not_in_config(vellum_client, mock_module):
+    # GIVEN a module on the user's filesystem
+    module = mock_module.module
+    temp_dir = mock_module.temp_dir
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND the pyproject.toml does not have the module configured
+    set_pyproject_toml({"workflows": []})
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+
+    # WHEN the user runs the pull command again with the workflow sandbox id and module
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", module, "--workflow-sandbox-id", workflow_sandbox_id])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0, (result.output, result.exception)
+
+    # AND the lockfile should have the new entry
+    lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    with open(lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data["workflows"] == [
+            {
+                "module": module,
+                "workflow_sandbox_id": workflow_sandbox_id,
+                "ignore": None,
+                "deployments": [],
+                "container_image_name": None,
+                "container_image_tag": None,
+                "workspace": "default",
+            }
+        ]
