@@ -42,6 +42,17 @@ def _resolve_workflow_config(
 
     if module:
         workflow_config = next((w for w in config.workflows if w.module == module), None)
+        if not workflow_config and workflow_sandbox_id:
+            workflow_config = WorkflowConfig(
+                workflow_sandbox_id=workflow_sandbox_id,
+                module=module,
+            )
+            config.workflows.append(workflow_config)
+            return WorkflowConfigResolutionResult(
+                workflow_config=workflow_config,
+                pk=workflow_sandbox_id,
+            )
+
         return WorkflowConfigResolutionResult(
             workflow_config=workflow_config,
             pk=workflow_config.workflow_sandbox_id if workflow_config else None,
