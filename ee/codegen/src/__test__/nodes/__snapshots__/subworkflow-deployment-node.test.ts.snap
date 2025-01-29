@@ -58,8 +58,6 @@ exports[`SubworkflowDeploymentNode > failure > should generate subworkflow deplo
 
 class SubworkflowNode(SubworkflowDeploymentNode):
     release_tag = "LATEST"
-    subworkflow_inputs = {
-        "input": None,
-    }
+    subworkflow_inputs = {}
 "
 `;
