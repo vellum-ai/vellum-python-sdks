@@ -162,10 +162,10 @@ def pull_command(
     zip_buffer = io.BytesIO(zip_bytes)
 
     error_content = ""
-    metadata_json: Optional[dict] = None
 
     with zipfile.ZipFile(zip_buffer) as zip_file:
         if METADATA_FILE_NAME in zip_file.namelist():
+            metadata_json: Optional[dict] = None
             with zip_file.open(METADATA_FILE_NAME) as source:
                 metadata_json = json.load(source)
 
@@ -214,7 +214,6 @@ def pull_command(
                     error_content = content
                     continue
                 if file_name == METADATA_FILE_NAME:
-                    metadata_json = json.loads(content)
                     continue
 
                 target_file = os.path.join(target_dir, file_name)
