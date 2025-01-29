@@ -117,7 +117,13 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
     workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})}
+            )
+        ]
+    )
 
     # AND we are currently in a new directory
     current_dir = os.getcwd()
@@ -134,7 +140,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
 
     # AND the pull api is called with the workflow sandbox id
     vellum_client.workflows.pull.assert_called_once()
-    workflow_py = os.path.join(temp_dir, "workflow_87654321", "workflow.py")
+    workflow_py = os.path.join(temp_dir, "super_cool_workflow", "workflow.py")
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
@@ -149,7 +155,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
             "workspaces": [],
             "workflows": [
                 {
-                    "module": "workflow_87654321",
+                    "module": "super_cool_workflow",
                     "workflow_sandbox_id": "87654321-0000-0000-0000-000000000000",
                     "ignore": None,
                     "deployments": [],
@@ -169,7 +175,13 @@ def test_pull__sandbox_id_with_other_workflow_configured(vellum_client, mock_mod
     workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})}
+            )
+        ]
+    )
 
     # WHEN the user runs the pull command with the new workflow sandbox id
     runner = CliRunner()
@@ -184,7 +196,7 @@ def test_pull__sandbox_id_with_other_workflow_configured(vellum_client, mock_mod
     assert call_args[0] == workflow_sandbox_id
 
     # AND the workflow.py file is written to the module directory
-    workflow_py = os.path.join(temp_dir, "workflow_87654321", "workflow.py")
+    workflow_py = os.path.join(temp_dir, "super_cool_workflow", "workflow.py")
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
@@ -442,8 +454,12 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
             _zip_file_map(
                 {
                     "workflow.py": "print('hello')",
-                    "metadata.json": '{"runner_config": { "container_image_name": "test", '
-                    '"container_image_tag": "1.0" } }',
+                    "metadata.json": json.dumps(
+                        {
+                            "runner_config": {"container_image_name": "test", "container_image_tag": "1.0"},
+                            "label": "Super Cool Workflow",
+                        }
+                    ),
                 }
             )
         ]
@@ -478,7 +494,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "workspace": "default",
             },
             {
-                "module": "workflow_87654321",
+                "module": "super_cool_workflow",
                 "workflow_sandbox_id": new_workflow_sandbox_id,
                 "ignore": None,
                 "deployments": [],
