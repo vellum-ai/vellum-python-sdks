@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 from vellum.client.core.api_error import ApiError
 from vellum.resources.workflows.client import OMIT
 from vellum.types import WorkflowPushDeploymentConfigRequest
-from vellum.workflows.utils.names import snake_to_title_case
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
@@ -111,8 +110,6 @@ def push_command(
         "container_image_name": workflow_config.container_image_name,
     }
 
-    label = snake_to_title_case(workflow_config.module.split(".")[-1])
-
     deployment_config: WorkflowPushDeploymentConfigRequest = OMIT
     deployment_config_serialized: str = OMIT
     if deploy:
@@ -158,7 +155,6 @@ def push_command(
             # Remove this once we could serialize using the artifact in Vembda
             # https://app.shortcut.com/vellum/story/5585
             exec_config=json.dumps(exec_config),
-            label=label,
             workflow_sandbox_id=workflow_config.workflow_sandbox_id or workflow_sandbox_id,
             artifact=artifact,
             # We should check with fern if we could auto-serialize typed object fields for us
@@ -230,7 +226,7 @@ def push_command(
         )  # type: ignore[attr-defined]
     else:
         logger.info(
-            f"""Successfully pushed {label} to Vellum!
+            f"""Successfully pushed {workflow_config.module} to Vellum!
 Visit at: https://app.vellum.ai/workflow-sandboxes/{response.workflow_sandbox_id}"""
         )
 
