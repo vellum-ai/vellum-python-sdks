@@ -6,6 +6,8 @@ from pydantic_core import core_schema
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
 
@@ -183,6 +185,15 @@ class _BaseOutputsMeta(type):
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
     def __init__(self, **kwargs: Any) -> None:
+        declared_fields = {name for name in get_class_attr_names(self.__class__)}
+        provided_fields = set(kwargs.keys())
+
+        if not provided_fields.issubset(declared_fields):
+            raise NodeException(
+                message=f"Unexpected outputs: {provided_fields - declared_fields}",
+                code=WorkflowErrorCode.USER_DEFINED_ERROR,
+            )
+
         for name, value in kwargs.items():
             setattr(self, name, value)
 
