@@ -208,8 +208,8 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         return uuid4_from_hash(f"{self.node_id}|trigger")
 
     @classmethod
-    def get_from_node_display_registry(cls, node_class: Type[NodeType]) -> Type["BaseNodeDisplay"]:
-        return cls._node_display_registry[node_class]
+    def get_from_node_display_registry(cls, node_class: Type[NodeType]) -> Optional[Type["BaseNodeDisplay"]]:
+        return cls._node_display_registry.get(node_class)
 
     @classmethod
     def infer_node_class(cls) -> Type[NodeType]:
