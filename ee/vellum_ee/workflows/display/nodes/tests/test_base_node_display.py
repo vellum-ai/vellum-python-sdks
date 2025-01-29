@@ -2,7 +2,11 @@ import pytest
 from uuid import UUID
 
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 @pytest.fixture
@@ -46,3 +50,24 @@ def test_get_id(node_info):
 
     assert node_display().node_id == expected_id
     assert node_display.infer_node_class().__id__ == expected_id
+
+
+def test_base_node_adornments__happy_path():
+    # GIVEN an adornment node
+    @RetryNode.wrap(max_attempts=5)
+    class StartNode(BaseNode):
+        pass
+
+    # AND a workflow that uses the adornment node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=MyWorkflow,
+    )
+    exec_config = workflow_display.serialize()
+
+    # THEN the workflow display is created successfully
+    assert exec_config is not None
