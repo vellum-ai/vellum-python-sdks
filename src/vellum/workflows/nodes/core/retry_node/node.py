@@ -29,7 +29,9 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
         attempt_number: int
 
     def run(self) -> BaseNode.Outputs:
-        last_exception = Exception("max_attempts must be greater than 0")
+        if self.max_attempts <= 0:
+            raise Exception("max_attempts must be greater than 0")
+
         for index in range(self.max_attempts):
             attempt_number = index + 1
             context = WorkflowContext(vellum_client=self._context.vellum_client)
@@ -49,25 +51,22 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
                 return node_outputs
             elif terminal_event.name == "workflow.execution.paused":
-                last_exception = NodeException(
+                raise NodeException(
                     code=WorkflowErrorCode.INVALID_OUTPUTS,
                     message=f"Subworkflow unexpectedly paused on attempt {attempt_number}",
                 )
-                break
             elif self.retry_on_error_code and self.retry_on_error_code != terminal_event.error.code:
-                last_exception = NodeException(
+                raise NodeException(
                     code=WorkflowErrorCode.INVALID_OUTPUTS,
                     message=f"""Unexpected rejection on attempt {attempt_number}: {terminal_event.error.code.value}.
 Message: {terminal_event.error.message}""",
                 )
-                break
             elif self.retry_on_condition and not resolve_value(self.retry_on_condition, self.state):
-                last_exception = NodeException(
+                raise NodeException(
                     code=WorkflowErrorCode.INVALID_OUTPUTS,
                     message=f"""Rejection failed on attempt {attempt_number}: {terminal_event.error.code.value}.
 Message: {terminal_event.error.message}""",
                 )
-                break
             else:
                 last_exception = NodeException(
                     terminal_event.error.message,
