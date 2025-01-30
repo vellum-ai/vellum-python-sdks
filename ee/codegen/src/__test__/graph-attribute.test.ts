@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 
 import { workflowContextFactory } from "./helpers";
 import { edgesFactory } from "./helpers/edge-data-factories";
@@ -1021,73 +1022,79 @@ describe("Workflow", () => {
         nodeData: bottomRightNode,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: topLeftNode.id,
-          targetHandleId: topLeftNode.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: bottomLeftNode.id,
-          targetHandleId: bottomLeftNode.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: topLeftNode.id,
-          sourceHandleId: topLeftNode.data.sourceHandleId,
-          targetNodeId: bottomRightNode.id,
-          targetHandleId: bottomRightNode.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: bottomLeftNode.id,
-          sourceHandleId: bottomLeftNode.data.sourceHandleId,
-          targetNodeId: bottomRightNode.id,
-          targetHandleId: bottomRightNode.data.targetHandleId,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: topLeftNode.id,
-          sourceHandleId: topLeftNode.data.sourceHandleId,
-          targetNodeId: topRightNode.id,
-          targetHandleId: topRightNode.data.targetHandleId,
-        },
-        {
-          id: "edge-6",
-          type: "DEFAULT",
-          sourceNodeId: bottomLeftNode.id,
-          sourceHandleId: bottomLeftNode.data.sourceHandleId,
-          targetNodeId: topRightNode.id,
-          targetHandleId: topRightNode.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, topLeftNode],
+          [entrypointNode, bottomLeftNode],
+          [topLeftNode, topRightNode],
+          [bottomLeftNode, topRightNode],
+          [topLeftNode, bottomRightNode],
+          [bottomLeftNode, bottomRightNode],
+        ])
+      );
 
+      /**
+       * Currently the snapshot generated for this test is suboptimal. Ideally, we would generate:
+       *
+       * {
+       *     TopLeftNode,
+       *     BottomLeftNode,
+       * } >> Graph.from_set(
+       *     {
+       *         TopRightNode,
+       *         BottomRightNode,
+       *     }
+       * )
+       */
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-    it("should walmart", async () => {
-      workflowContext.addWorkflowEdges([
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: setupFallbackValue.id,
-          targetHandleId: setupFallbackValue.data.targetHandleId,
-        },
-      ]);
+    it("should handle loops of conditionals", async () => {
+      const startNode = conditionalNodeFactory({
+        label: "Start Node",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: startNode,
+      });
+
+      const loopCheckNode = conditionalNodeFactory({
+        id: uuidv4(),
+        label: "Loop Check Node",
+        ifSourceHandleId: uuidv4(),
+        elseSourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: loopCheckNode,
+      });
+
+      const finalOutput = finalOutputNodeFactory();
+      await createNodeContext({
+        workflowContext,
+        nodeData: finalOutput,
+      });
+
+      const topNode = templatingNodeFactory({
+        label: "Top Node",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: topNode,
+      });
+
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, startNode],
+          [[startNode, "0"], topNode],
+          [[startNode, "1"], loopCheckNode],
+          [[loopCheckNode, "0"], startNode],
+          [[loopCheckNode, "1"], finalOutput],
+          [[topNode, "0"], loopCheckNode],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
