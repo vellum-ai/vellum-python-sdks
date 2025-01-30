@@ -15,6 +15,15 @@ const getSourceHandleId = (
       return id;
     }
 
+    if (actualNode.type === "CONDITIONAL") {
+      const id = actualNode.data.conditions[Number(portName)]?.sourceHandleId;
+      if (!id) {
+        throw new Error("Conditional node has no source handle id");
+      }
+
+      return id;
+    }
+
     return getSourceHandleId(actualNode);
   }
 
