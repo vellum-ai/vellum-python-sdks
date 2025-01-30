@@ -114,5 +114,37 @@ describe("SubworkflowDeploymentNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it(`should generate subworkflow deployment node display as much as possible for non strict workflow contexts`, async () => {
+      const workflowContext = workflowContextFactory({
+        strict: false,
+      });
+
+      vi.spyOn(
+        WorkflowDeploymentsClient.prototype,
+        "workflowDeploymentHistoryItemRetrieve"
+      ).mockRejectedValue(
+        new VellumError({
+          body: {
+            detail: "No Workflow Deployment found.",
+          },
+        })
+      );
+
+      const nodeData = subworkflowDeploymentNodeDataFactory();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as SubworkflowDeploymentNodeContext;
+
+      node = new SubworkflowDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });
