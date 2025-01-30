@@ -403,21 +403,20 @@ export class WorkflowContext {
   }
 
   public getUniqueClassName(baseName: string): string {
-    const className = createPythonClassName(baseName);
+    let sanitizedName = createPythonClassName(baseName);
+    let numRenameAttempts = 0;
 
-    if (!this.isClassNameUsed(className)) {
-      this.addUsedClassName(className);
-      return className;
+    if (!this.isClassNameUsed(sanitizedName)) {
+      this.addUsedClassName(sanitizedName);
+      return sanitizedName;
     }
 
-    let counter = 1;
-    let newName = `${className}${counter}`;
-    while (this.isClassNameUsed(newName)) {
-      counter++;
-      newName = `${className}${counter}`;
+    while (this.isClassNameUsed(sanitizedName)) {
+      numRenameAttempts += 1;
+      sanitizedName = `${createPythonClassName(baseName)}${numRenameAttempts}`;
     }
 
-    this.addUsedClassName(newName);
-    return newName;
+    this.addUsedClassName(sanitizedName);
+    return sanitizedName;
   }
 }
