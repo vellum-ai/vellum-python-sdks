@@ -1,6 +1,7 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { workflowContextFactory } from "./helpers";
+import { edgesFactory } from "./helpers/edge-data-factories";
 import {
   conditionalNodeFactory,
   entrypointNodeDataFactory,
@@ -33,17 +34,9 @@ describe("Workflow", () => {
         nodeData: templatingNodeData,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData.id,
-          targetHandleId: templatingNodeData.data.sourceHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([[entrypointNode, templatingNodeData]])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
