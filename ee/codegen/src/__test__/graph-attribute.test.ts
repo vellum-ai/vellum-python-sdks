@@ -1,6 +1,8 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 
 import { workflowContextFactory } from "./helpers";
+import { edgesFactory } from "./helpers/edge-data-factories";
 import {
   conditionalNodeFactory,
   entrypointNodeDataFactory,
@@ -11,7 +13,6 @@ import {
 
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GraphAttribute } from "src/generators/graph-attribute";
-import { WorkflowEdge } from "src/types/vellum";
 
 describe("Workflow", () => {
   let workflowContext: WorkflowContext;
@@ -33,17 +34,9 @@ describe("Workflow", () => {
         nodeData: templatingNodeData,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData.id,
-          targetHandleId: templatingNodeData.data.sourceHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([[entrypointNode, templatingNodeData]])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -67,25 +60,12 @@ describe("Workflow", () => {
         nodeData: templatingNodeData2,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -120,33 +100,13 @@ describe("Workflow", () => {
         nodeData: templatingNodeData3,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+          [entrypointNode, templatingNodeData3],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -170,25 +130,12 @@ describe("Workflow", () => {
         nodeData: templatingNodeData2,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [templatingNodeData1, templatingNodeData2],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -217,47 +164,15 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: mergeNodeData,
       });
-      const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
-      const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
-      if (!mergeTargetHandle1 || !mergeTargetHandle2) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle1,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle2,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+          [templatingNodeData1, [mergeNodeData, 0]],
+          [templatingNodeData2, [mergeNodeData, 1]],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -297,63 +212,17 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: mergeNodeData,
       });
-      const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
-      const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
-      if (!mergeTargetHandle1 || !mergeTargetHandle2) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle1,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle2,
-        },
-        {
-          id: "edge-6",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData3.id,
-          sourceHandleId: templatingNodeData3.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle2,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+          [entrypointNode, templatingNodeData3],
+          [templatingNodeData1, [mergeNodeData, 0]],
+          [templatingNodeData2, [mergeNodeData, 1]],
+          [templatingNodeData3, [mergeNodeData, 1]],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -393,55 +262,16 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: mergeNodeData,
       });
-      const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
-      const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
-      if (!mergeTargetHandle1 || !mergeTargetHandle2) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle1,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle2,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: mergeNodeData.id,
-          sourceHandleId: mergeNodeData.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+          [templatingNodeData1, [mergeNodeData, 0]],
+          [templatingNodeData2, [mergeNodeData, 1]],
+          [mergeNodeData, templatingNodeData3],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -481,55 +311,16 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: mergeNodeData,
       });
-      const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
-      const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
-      if (!mergeTargetHandle1 || !mergeTargetHandle2) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle1,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData3.id,
-          sourceHandleId: templatingNodeData3.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle2,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+          [templatingNodeData1, templatingNodeData3],
+          [templatingNodeData2, [mergeNodeData, 0]],
+          [templatingNodeData3, [mergeNodeData, 1]],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -558,41 +349,14 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: conditionalNodeData,
       });
-      const conditionalIfSourceHandleId =
-        conditionalNodeData.data.conditions[0]?.sourceHandleId;
-      const conditionalElseSourceHandleId =
-        conditionalNodeData.data.conditions[1]?.sourceHandleId;
-      if (!conditionalIfSourceHandleId || !conditionalElseSourceHandleId) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: conditionalNodeData.id,
-          targetHandleId: conditionalNodeData.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalIfSourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalElseSourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, conditionalNodeData],
+          [[conditionalNodeData, "0"], templatingNodeData1],
+          [[conditionalNodeData, "1"], templatingNodeData2],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -627,33 +391,13 @@ describe("Workflow", () => {
         nodeData: templatingNodeData3,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [templatingNodeData1, templatingNodeData2],
+          [templatingNodeData2, templatingNodeData3],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -688,33 +432,13 @@ describe("Workflow", () => {
         nodeData: templatingNodeData3,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [templatingNodeData1, templatingNodeData2],
+          [entrypointNode, templatingNodeData3],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -749,33 +473,13 @@ describe("Workflow", () => {
         nodeData: templatingNodeData3,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [templatingNodeData1, templatingNodeData2],
+          [templatingNodeData1, templatingNodeData3],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -821,49 +525,15 @@ describe("Workflow", () => {
         nodeData: templatingNodeData4,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData3.id,
-          sourceHandleId: templatingNodeData3.data.sourceHandleId,
-          targetNodeId: templatingNodeData4.id,
-          targetHandleId: templatingNodeData4.data.targetHandleId,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: templatingNodeData4.id,
-          targetHandleId: templatingNodeData4.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [templatingNodeData1, templatingNodeData2],
+          [templatingNodeData1, templatingNodeData3],
+          [templatingNodeData3, templatingNodeData4],
+          [templatingNodeData2, templatingNodeData4],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -925,71 +595,18 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: mergeNodeData,
       });
-      const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
-      const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
-      if (!mergeTargetHandle1 || !mergeTargetHandle2) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData3.id,
-          sourceHandleId: templatingNodeData3.data.sourceHandleId,
-          targetNodeId: templatingNodeData4.id,
-          targetHandleId: templatingNodeData4.data.targetHandleId,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData4.id,
-          sourceHandleId: templatingNodeData4.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle1,
-        },
-        {
-          id: "edge-6",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle2,
-        },
-        {
-          id: "edge-7",
-          type: "DEFAULT",
-          sourceNodeId: mergeNodeData.id,
-          sourceHandleId: mergeNodeData.data.sourceHandleId,
-          targetNodeId: templatingNodeData5.id,
-          targetHandleId: templatingNodeData5.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+          [templatingNodeData1, templatingNodeData3],
+          [templatingNodeData3, templatingNodeData4],
+          [templatingNodeData4, [mergeNodeData, 0]],
+          [templatingNodeData2, [mergeNodeData, 1]],
+          [mergeNodeData, templatingNodeData5],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -1018,41 +635,14 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: conditionalNodeData,
       });
-      const conditionalIfSourceHandleId =
-        conditionalNodeData.data.conditions[0]?.sourceHandleId;
-      const conditionalElseSourceHandleId =
-        conditionalNodeData.data.conditions[1]?.sourceHandleId;
-      if (!conditionalIfSourceHandleId || !conditionalElseSourceHandleId) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: conditionalNodeData.id,
-          targetHandleId: conditionalNodeData.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalIfSourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalIfSourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, conditionalNodeData],
+          [[conditionalNodeData, "0"], templatingNodeData1],
+          [[conditionalNodeData, "0"], templatingNodeData2],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -1103,49 +693,15 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: conditionalNodeData,
       });
-      const conditionalIfSourceHandleId =
-        conditionalNodeData.data.conditions[0]?.sourceHandleId;
-      const conditionalElseSourceHandleId =
-        conditionalNodeData.data.conditions[1]?.sourceHandleId;
-      if (!conditionalIfSourceHandleId || !conditionalElseSourceHandleId) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: conditionalNodeData.id,
-          targetHandleId: conditionalNodeData.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalIfSourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalElseSourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalElseSourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, conditionalNodeData],
+          [[conditionalNodeData, "0"], templatingNodeData1],
+          [[conditionalNodeData, "1"], templatingNodeData2],
+          [[conditionalNodeData, "1"], templatingNodeData3],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -1196,13 +752,6 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: conditionalNodeData,
       });
-      const conditionalIfSourceHandleId =
-        conditionalNodeData.data.conditions[0]?.sourceHandleId;
-      const conditionalElseSourceHandleId =
-        conditionalNodeData.data.conditions[1]?.sourceHandleId;
-      if (!conditionalIfSourceHandleId || !conditionalElseSourceHandleId) {
-        throw new Error("Handle IDs are required");
-      }
 
       const conditionalNode2Data = conditionalNodeFactory({
         id: "b81a4453-7b80-41ea-bd55-c62df8878fd4",
@@ -1215,65 +764,17 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: conditionalNode2Data,
       });
-      const conditional2IfSourceHandleId =
-        conditionalNode2Data.data.conditions[0]?.sourceHandleId;
-      const conditional2ElseSourceHandleId =
-        conditionalNode2Data.data.conditions[1]?.sourceHandleId;
-      if (!conditional2IfSourceHandleId || !conditional2ElseSourceHandleId) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: conditionalNodeData.id,
-          targetHandleId: conditionalNodeData.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalIfSourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalElseSourceHandleId,
-          targetNodeId: conditionalNode2Data.id,
-          targetHandleId: conditionalNode2Data.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalElseSourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNode2Data.id,
-          sourceHandleId: conditional2ElseSourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-        {
-          id: "edge-6",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNode2Data.id,
-          sourceHandleId: conditional2ElseSourceHandleId,
-          targetNodeId: templatingNodeData4.id,
-          targetHandleId: templatingNodeData4.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, conditionalNodeData],
+          [[conditionalNodeData, "0"], templatingNodeData1],
+          [[conditionalNodeData, "1"], conditionalNode2Data],
+          [[conditionalNodeData, "1"], templatingNodeData2],
+          [[conditionalNode2Data, "1"], templatingNodeData3],
+          [[conditionalNode2Data, "1"], templatingNodeData4],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -1335,73 +836,18 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: conditionalNodeData,
       });
-      const conditionalIfSourceHandleId =
-        conditionalNodeData.data.conditions[0]?.sourceHandleId;
-      const conditionalElseSourceHandleId =
-        conditionalNodeData.data.conditions[1]?.sourceHandleId;
-      if (!conditionalIfSourceHandleId || !conditionalElseSourceHandleId) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: conditionalNodeData.id,
-          targetHandleId: conditionalNodeData.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalIfSourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: conditionalNodeData.id,
-          sourceHandleId: conditionalElseSourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-        {
-          id: "edge-5",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: templatingNodeData3.id,
-          targetHandleId: templatingNodeData3.data.targetHandleId,
-        },
-        {
-          id: "edge-6",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData3.id,
-          sourceHandleId: templatingNodeData3.data.sourceHandleId,
-          targetNodeId: templatingNodeData4.id,
-          targetHandleId: templatingNodeData4.data.targetHandleId,
-        },
-        {
-          id: "edge-7",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData5.id,
-          targetHandleId: templatingNodeData5.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, conditionalNodeData],
+          [[conditionalNodeData, "0"], templatingNodeData1],
+          [[conditionalNodeData, "1"], templatingNodeData2],
+          [templatingNodeData1, templatingNodeData3],
+          [templatingNodeData2, templatingNodeData3],
+          [templatingNodeData3, templatingNodeData4],
+          [templatingNodeData1, templatingNodeData5],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -1430,47 +876,15 @@ describe("Workflow", () => {
         workflowContext,
         nodeData: mergeNodeData,
       });
-      const mergeTargetHandle1 = mergeNodeData.data.targetHandles[0]?.id;
-      const mergeTargetHandle2 = mergeNodeData.data.targetHandles[1]?.id;
-      if (!mergeTargetHandle1 || !mergeTargetHandle2) {
-        throw new Error("Handle IDs are required");
-      }
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle1,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData2.id,
-          sourceHandleId: templatingNodeData2.data.sourceHandleId,
-          targetNodeId: mergeNodeData.id,
-          targetHandleId: mergeTargetHandle2,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: templatingNodeData1.id,
-          sourceHandleId: templatingNodeData1.data.sourceHandleId,
-          targetNodeId: templatingNodeData2.id,
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [templatingNodeData1, [mergeNodeData, 0]],
+          [templatingNodeData2, [mergeNodeData, 1]],
+          [templatingNodeData1, templatingNodeData2],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -1519,41 +933,168 @@ describe("Workflow", () => {
         nodeData: outputBottomNode,
       });
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: topNode.id,
-          targetHandleId: topNode.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: topNode.id,
-          sourceHandleId: topNode.data.sourceHandleId,
-          targetNodeId: outputTopNode.id,
-          targetHandleId: outputTopNode.data.targetHandleId,
-        },
-        {
-          id: "edge-3",
-          type: "DEFAULT",
-          sourceNodeId: topNode.id,
-          sourceHandleId: topNode.data.sourceHandleId,
-          targetNodeId: outputMiddleNode.id,
-          targetHandleId: outputMiddleNode.data.targetHandleId,
-        },
-        {
-          id: "edge-4",
-          type: "DEFAULT",
-          sourceNodeId: topNode.id,
-          sourceHandleId: topNode.data.sourceHandleId,
-          targetNodeId: outputBottomNode.id,
-          targetHandleId: outputBottomNode.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, topNode],
+          [topNode, outputTopNode],
+          [topNode, outputMiddleNode],
+          [topNode, outputBottomNode],
+        ])
+      );
+
+      new GraphAttribute({ workflowContext }).write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should show errors for a node pointing to non-existent node", async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+      workflowContext.addEntrypointNode(entrypointNode);
+      const templatingNodeData1 = templatingNodeFactory();
+      await createNodeContext({
+        workflowContext,
+        nodeData: templatingNodeData1,
+      });
+
+      const templatingNodeData2 = templatingNodeFactory({
+        id: "non-existent-node-id",
+        label: "Templating Node 2",
+        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
+      });
+      // No node context created
+
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+        ])
+      );
+
+      new GraphAttribute({ workflowContext }).write(writer);
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toContain(
+        `Failed to find target node with ID 'non-existent-node-id' referenced from edge edge-2`
+      );
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should support an edge between two sets", async () => {
+      const topLeftNode = templatingNodeFactory({ label: "Top Left Node" });
+      await createNodeContext({
+        workflowContext,
+        nodeData: topLeftNode,
+      });
+
+      const topRightNode = finalOutputNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+        label: "Top Right Node",
+        name: "top-right-node",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294e",
+        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: topRightNode,
+      });
+
+      const bottomLeftNode = templatingNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf87",
+        label: "Bottom Left Node",
+        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
+      });
+
+      await createNodeContext({
+        workflowContext,
+        nodeData: bottomLeftNode,
+      });
+
+      const bottomRightNode = finalOutputNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+        label: "Bottom Right Node",
+        name: "bottom-right-node",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2950",
+        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: bottomRightNode,
+      });
+
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, topLeftNode],
+          [entrypointNode, bottomLeftNode],
+          [topLeftNode, topRightNode],
+          [bottomLeftNode, topRightNode],
+          [topLeftNode, bottomRightNode],
+          [bottomLeftNode, bottomRightNode],
+        ])
+      );
+
+      /**
+       * Currently the snapshot generated for this test is suboptimal. Ideally, we would generate:
+       *
+       * {
+       *     TopLeftNode,
+       *     BottomLeftNode,
+       * } >> Graph.from_set(
+       *     {
+       *         TopRightNode,
+       *         BottomRightNode,
+       *     }
+       * )
+       */
+      new GraphAttribute({ workflowContext }).write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should handle loops of conditionals", async () => {
+      const startNode = conditionalNodeFactory({
+        label: "Start Node",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: startNode,
+      });
+
+      const loopCheckNode = conditionalNodeFactory({
+        id: uuidv4(),
+        label: "Loop Check Node",
+        ifSourceHandleId: uuidv4(),
+        elseSourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: loopCheckNode,
+      });
+
+      const finalOutput = finalOutputNodeFactory();
+      await createNodeContext({
+        workflowContext,
+        nodeData: finalOutput,
+      });
+
+      const topNode = templatingNodeFactory({
+        label: "Top Node",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: topNode,
+      });
+
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, startNode],
+          [[startNode, "0"], topNode],
+          [[startNode, "1"], loopCheckNode],
+          [[loopCheckNode, "0"], startNode],
+          [[loopCheckNode, "1"], finalOutput],
+          [[topNode, "0"], loopCheckNode],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();

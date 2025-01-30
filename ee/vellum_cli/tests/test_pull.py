@@ -117,7 +117,13 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
     workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})}
+            )
+        ]
+    )
 
     # AND we are currently in a new directory
     current_dir = os.getcwd()
@@ -134,7 +140,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
 
     # AND the pull api is called with the workflow sandbox id
     vellum_client.workflows.pull.assert_called_once()
-    workflow_py = os.path.join(temp_dir, "workflow_87654321", "workflow.py")
+    workflow_py = os.path.join(temp_dir, "super_cool_workflow", "workflow.py")
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
@@ -149,7 +155,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
             "workspaces": [],
             "workflows": [
                 {
-                    "module": "workflow_87654321",
+                    "module": "super_cool_workflow",
                     "workflow_sandbox_id": "87654321-0000-0000-0000-000000000000",
                     "ignore": None,
                     "deployments": [],
@@ -169,7 +175,13 @@ def test_pull__sandbox_id_with_other_workflow_configured(vellum_client, mock_mod
     workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})}
+            )
+        ]
+    )
 
     # WHEN the user runs the pull command with the new workflow sandbox id
     runner = CliRunner()
@@ -184,7 +196,7 @@ def test_pull__sandbox_id_with_other_workflow_configured(vellum_client, mock_mod
     assert call_args[0] == workflow_sandbox_id
 
     # AND the workflow.py file is written to the module directory
-    workflow_py = os.path.join(temp_dir, "workflow_87654321", "workflow.py")
+    workflow_py = os.path.join(temp_dir, "super_cool_workflow", "workflow.py")
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
@@ -416,7 +428,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "workflows": [
                     {
                         "module": module,
-                        "workflow_sandbox_id": "0edc07cd-45b9-43e8-99bc-1f181972a857",
+                        "workflow_sandbox_id": workflow_sandbox_id,
                         "ignore": "tests/*",
                         "deployments": [
                             {
@@ -442,8 +454,12 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
             _zip_file_map(
                 {
                     "workflow.py": "print('hello')",
-                    "metadata.json": '{"runner_config": { "container_image_name": "test", '
-                    '"container_image_tag": "1.0" } }',
+                    "metadata.json": json.dumps(
+                        {
+                            "runner_config": {"container_image_name": "test", "container_image_tag": "1.0"},
+                            "label": "Super Cool Workflow",
+                        }
+                    ),
                 }
             )
         ]
@@ -478,7 +494,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "workspace": "default",
             },
             {
-                "module": "workflow_87654321",
+                "module": "super_cool_workflow",
                 "workflow_sandbox_id": new_workflow_sandbox_id,
                 "ignore": None,
                 "deployments": [],
@@ -593,3 +609,81 @@ def test_pull__same_pull_twice__one_entry_in_lockfile(vellum_client, mock_module
     with open(lock_json) as f:
         lock_data = json.load(f)
         assert len(lock_data["workflows"]) == 1
+
+
+def test_pull__module_not_in_config(vellum_client, mock_module):
+    # GIVEN a module on the user's filesystem
+    module = mock_module.module
+    temp_dir = mock_module.temp_dir
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND the pyproject.toml does not have the module configured
+    set_pyproject_toml({"workflows": []})
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+
+    # WHEN the user runs the pull command again with the workflow sandbox id and module
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", module, "--workflow-sandbox-id", workflow_sandbox_id])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0, (result.output, result.exception)
+
+    # AND the lockfile should have the new entry
+    lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    with open(lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data["workflows"] == [
+            {
+                "module": module,
+                "workflow_sandbox_id": workflow_sandbox_id,
+                "ignore": None,
+                "deployments": [],
+                "container_image_name": None,
+                "container_image_tag": None,
+                "workspace": "default",
+            }
+        ]
+
+
+def test_pull__multiple_instances_of_same_module__keep_when_pulling_another_module(vellum_client, mock_module):
+    # GIVEN a module on the user's filesystem
+    module = mock_module.module
+    temp_dir = mock_module.temp_dir
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND the vellum lock file has two instances of some other module
+    lock_data = {
+        "workflows": [
+            {
+                "module": "some_other_module",
+                "workflow_sandbox_id": str(uuid4()),
+                "workspace": "default",
+            },
+            {
+                "module": "some_other_module",
+                "workflow_sandbox_id": str(uuid4()),
+                "workspace": "other",
+            },
+        ]
+    }
+    lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    with open(lock_json, "w") as f:
+        json.dump(lock_data, f)
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+
+    # WHEN the user runs the pull command on the new module
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", module, "--workflow-sandbox-id", workflow_sandbox_id])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0, (result.output, result.exception)
+
+    # AND the lockfile should have all three entries
+    with open(lock_json) as f:
+        lock_data = json.load(f)
+        assert len(lock_data["workflows"]) == 3

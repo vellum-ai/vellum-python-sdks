@@ -5,11 +5,6 @@ import { Type } from "@fern-api/python-ast/Type";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
-import { BasePersistedFile } from "./base-persisted-file";
-import { WorkflowGenerationError } from "./errors";
-import { GraphAttribute } from "./graph-attribute";
-import { WorkflowOutput } from "./workflow-output";
-
 import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_WORKFLOW_MODULE_NAME,
@@ -17,9 +12,16 @@ import {
   PORTS_CLASS_NAME,
 } from "src/constants";
 import { WorkflowContext } from "src/context";
+import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { BaseState } from "src/generators/base-state";
+import {
+  BaseCodegenError,
+  WorkflowGenerationError,
+} from "src/generators/errors";
+import { GraphAttribute } from "src/generators/graph-attribute";
 import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
+import { WorkflowOutput } from "src/generators/workflow-output";
 import { WorkflowDisplayData, WorkflowEdge } from "src/types/vellum";
 import { isDefined } from "src/utils/typing";
 
@@ -512,14 +514,23 @@ export class Workflow {
       return;
     }
 
-    const graphField = python.field({
-      name: "graph",
-      initializer: new GraphAttribute({
-        workflowContext: this.workflowContext,
-      }),
-    });
+    try {
+      const graphField = python.field({
+        name: "graph",
+        initializer: new GraphAttribute({
+          workflowContext: this.workflowContext,
+        }),
+      });
 
-    workflowClass.add(graphField);
+      workflowClass.add(graphField);
+    } catch (error) {
+      if (error instanceof BaseCodegenError) {
+        this.workflowContext.addError(error);
+        return;
+      }
+
+      throw error;
+    }
   }
 
   public getWorkflowFile(): WorkflowFile {

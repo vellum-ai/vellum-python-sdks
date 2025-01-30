@@ -5,7 +5,7 @@ import {
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { CodeResourceDefinition } from "src/types/vellum";
-import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
+import { toPythonSafeSnakeCase } from "src/utils/casing";
 
 export function getGeneratedInputsModulePath(
   workflowContext: WorkflowContext
@@ -65,11 +65,12 @@ export function getGeneratedNodeModuleInfo({
 
     nodeClassName =
       nodeDefinition?.module?.[nodeDefinition.module.length - 2] ??
-      createPythonClassName(nodeLabel);
+      workflowContext.getUniqueClassName(nodeLabel);
   } else {
     rawModuleName = modulePathLeaf ?? toPythonSafeSnakeCase(nodeLabel, "node");
 
-    nodeClassName = nodeDefinition?.name ?? createPythonClassName(nodeLabel);
+    nodeClassName =
+      nodeDefinition?.name ?? workflowContext.getUniqueClassName(nodeLabel);
   }
 
   // Deduplicate the module name if it's already in use

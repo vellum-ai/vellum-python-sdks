@@ -96,7 +96,6 @@ class WorkflowsClient:
         self,
         *,
         exec_config: WorkflowPushExecConfig,
-        label: str,
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
@@ -109,8 +108,6 @@ class WorkflowsClient:
         ----------
         exec_config : WorkflowPushExecConfig
             The execution configuration of the workflow.
-
-        label : str
 
         workflow_sandbox_id : typing.Optional[str]
 
@@ -140,7 +137,6 @@ class WorkflowsClient:
         )
         client.workflows.push(
             exec_config="exec_config",
-            label="label",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -149,7 +145,6 @@ class WorkflowsClient:
             method="POST",
             data={
                 "exec_config": exec_config,
-                "label": label,
                 "workflow_sandbox_id": workflow_sandbox_id,
                 "deployment_config": deployment_config,
                 "dry_run": dry_run,
@@ -253,7 +248,6 @@ class AsyncWorkflowsClient:
         self,
         *,
         exec_config: WorkflowPushExecConfig,
-        label: str,
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
@@ -266,8 +260,6 @@ class AsyncWorkflowsClient:
         ----------
         exec_config : WorkflowPushExecConfig
             The execution configuration of the workflow.
-
-        label : str
 
         workflow_sandbox_id : typing.Optional[str]
 
@@ -302,7 +294,6 @@ class AsyncWorkflowsClient:
         async def main() -> None:
             await client.workflows.push(
                 exec_config="exec_config",
-                label="label",
             )
 
 
@@ -314,7 +305,6 @@ class AsyncWorkflowsClient:
             method="POST",
             data={
                 "exec_config": exec_config,
-                "label": label,
                 "workflow_sandbox_id": workflow_sandbox_id,
                 "deployment_config": deployment_config,
                 "dry_run": dry_run,

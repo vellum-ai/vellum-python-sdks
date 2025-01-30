@@ -3,13 +3,16 @@ import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { WorkflowGenerationError } from "./errors";
-
-import { PORTS_CLASS_NAME } from "src/constants";
-import { WorkflowContext } from "src/context";
-import { BaseNodeContext } from "src/context/node-context/base";
-import { PortContext } from "src/context/port-context";
+import {
+  PORTS_CLASS_NAME,
+  VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
+} from "src/constants";
+import { NodeNotFoundError } from "src/generators/errors";
 import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
+
+import type { WorkflowContext } from "src/context";
+import type { BaseNodeContext } from "src/context/node-context/base";
+import type { PortContext } from "src/context/port-context";
 
 // Fern's Python AST types are not mutable, so we need to define our own types
 // so that we can mutate the graph as we traverse through the edges.
@@ -61,10 +64,11 @@ export class GraphAttribute extends AstNode {
    * The core assumption made is that `graphMutableAst` is always a valid graph, and
    * adding a single edge to it will always produce another valid graph.
    */
-  private generateGraphMutableAst(): GraphMutableAst {
+  public generateGraphMutableAst(): GraphMutableAst {
     let graphMutableAst: GraphMutableAst = { type: "empty" };
     const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
+    const entrypointNodeId = this.workflowContext.getEntrypointNode().id;
     const processedEdges = new Set<WorkflowEdge>();
 
     while (edgesQueue.length > 0) {
@@ -73,12 +77,18 @@ export class GraphAttribute extends AstNode {
         continue;
       }
 
-      const sourceNode =
-        edge.sourceNodeId === this.workflowContext.getEntrypointNode().id
-          ? null
-          : this.workflowContext.getNodeContext(edge.sourceNodeId);
+      let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
+      if (edge.sourceNodeId === entrypointNodeId) {
+        sourceNode = null;
+      } else {
+        sourceNode = this.resolveNodeId(edge.sourceNodeId, edge.id);
+        if (!sourceNode) {
+          processedEdges.add(edge);
+          continue;
+        }
+      }
 
-      const targetNode = this.workflowContext.getNodeContext(edge.targetNodeId);
+      const targetNode = this.resolveNodeId(edge.targetNodeId, edge.id);
       if (!targetNode) {
         processedEdges.add(edge);
         continue;
@@ -352,11 +362,6 @@ export class GraphAttribute extends AstNode {
 
           const newRhs = addEdgeToGraph(mutableAst.rhs, lhsTerminal.reference);
           if (newRhs) {
-            if (lhsTerminals.length > 1 && newRhs.type === "set") {
-              throw new WorkflowGenerationError(
-                "Adding an edge between two sets is not supported"
-              );
-            }
             return {
               type: "right_shift",
               lhs: mutableAst.lhs,
@@ -388,6 +393,25 @@ export class GraphAttribute extends AstNode {
     }
 
     return graphMutableAst;
+  }
+
+  private resolveNodeId(
+    nodeId: string,
+    edgeId: string
+  ): BaseNodeContext<WorkflowDataNode> | null {
+    try {
+      return this.workflowContext.getNodeContext(nodeId);
+    } catch (error) {
+      if (error instanceof NodeNotFoundError) {
+        const enhancedError = new NodeNotFoundError(
+          `Failed to find target node with ID '${nodeId}' referenced from edge ${edgeId}`
+        );
+        this.workflowContext.addError(enhancedError);
+        return null;
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -699,7 +723,10 @@ export class GraphAttribute extends AstNode {
   /**
    * Translates our mutable graph AST into a Fern-native Python AST node.
    */
-  private getGraphAttributeAstNode(mutableAst: GraphMutableAst): AstNode {
+  private getGraphAttributeAstNode(
+    mutableAst: GraphMutableAst,
+    useWrap: boolean = false
+  ): AstNode {
     if (mutableAst.type === "empty") {
       return python.TypeInstantiation.none();
     }
@@ -722,17 +749,30 @@ export class GraphAttribute extends AstNode {
     }
 
     if (mutableAst.type === "set") {
-      return python.TypeInstantiation.set(
+      const setAst = python.TypeInstantiation.set(
         mutableAst.values.map((ast) => this.getGraphAttributeAstNode(ast)),
         {
           endWithComma: true,
         }
       );
+      if (useWrap) {
+        return new python.MethodInvocation({
+          methodReference: python.reference({
+            name: "Graph.from_set",
+            modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
+          }),
+          arguments_: [python.methodArgument({ value: setAst })],
+        });
+      }
+      return setAst;
     }
 
     if (mutableAst.type === "right_shift") {
       const lhs = this.getGraphAttributeAstNode(mutableAst.lhs);
-      const rhs = this.getGraphAttributeAstNode(mutableAst.rhs);
+      const rhs = this.getGraphAttributeAstNode(
+        mutableAst.rhs,
+        mutableAst.lhs.type === "set"
+      );
       if (!lhs || !rhs) {
         return python.TypeInstantiation.none();
       }

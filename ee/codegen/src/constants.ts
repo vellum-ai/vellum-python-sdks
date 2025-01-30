@@ -8,6 +8,11 @@ export const VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH = [
   "bases",
   "types",
 ] as const;
+export const VELLUM_WORKFLOW_GRAPH_MODULE_PATH = [
+  "vellum",
+  "workflows",
+  "graph",
+] as const;
 /* Class names */
 export const OUTPUTS_CLASS_NAME = "Outputs";
 export const PORTS_CLASS_NAME = "Ports";

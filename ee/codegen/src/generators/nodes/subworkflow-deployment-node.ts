@@ -77,7 +77,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     if (!this.nodeContext.workflowDeploymentHistoryItem) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          `Failed to generate attribute: ${this.nodeData.data.label}.deployment`
+          `Failed to generate ${this.nodeData.data.label}.Outputs class`
         )
       );
       return null;
@@ -144,7 +144,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
   protected getOutputDisplay(): python.Field {
     if (!this.nodeContext.workflowDeploymentHistoryItem) {
       throw new NodeDefinitionGenerationError(
-        "Workflow Deployment History Item is not set"
+        `Failed to generate \`output_display\` for ${this.nodeData.data.label}`
       );
     }
 

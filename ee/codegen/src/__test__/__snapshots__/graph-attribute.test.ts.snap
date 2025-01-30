@@ -182,3 +182,37 @@ exports[`Workflow > graph > should define nested sets of nodes without compilati
 }
 "
 `;
+
+exports[`Workflow > graph > should handle loops of conditionals 1`] = `
+"{
+    StartNode.Ports.branch_1 >> TopNode,
+    StartNode.Ports.branch_2,
+} >> Graph.from_set(
+    {
+        LoopCheckNode.Ports.branch_1 >> StartNode,
+        LoopCheckNode.Ports.branch_2 >> FinalOutputNode,
+    }
+)
+"
+`;
+
+exports[`Workflow > graph > should show errors for a node pointing to non-existent node 1`] = `
+"TemplatingNode
+"
+`;
+
+exports[`Workflow > graph > should support an edge between two sets 1`] = `
+"{
+    TopLeftNode
+    >> {
+        TopRightNode,
+        BottomRightNode,
+    },
+    BottomLeftNode
+    >> {
+        TopRightNode,
+        BottomRightNode,
+    },
+}
+"
+`;

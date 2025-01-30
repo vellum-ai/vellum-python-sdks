@@ -10,6 +10,7 @@ from .map_node import BaseMapNodeDisplay
 from .merge_node import BaseMergeNodeDisplay
 from .note_node import BaseNoteNodeDisplay
 from .prompt_deployment_node import BasePromptDeploymentNodeDisplay
+from .retry_node import BaseRetryNodeDisplay
 from .search_node import BaseSearchNodeDisplay
 from .subworkflow_deployment_node import BaseSubworkflowDeploymentNodeDisplay
 from .templating_node import BaseTemplatingNodeDisplay
@@ -29,6 +30,7 @@ __all__ = [
     "BaseMergeNodeDisplay",
     "BaseNoteNodeDisplay",
     "BasePromptDeploymentNodeDisplay",
+    "BaseRetryNodeDisplay",
     "BaseSearchNodeDisplay",
     "BaseSubworkflowDeploymentNodeDisplay",
     "BaseTemplatingNodeDisplay",

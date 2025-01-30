@@ -1361,6 +1361,7 @@ export function genericNodeFactory(
   }
 ): GenericNode {
   const nodeData: GenericNode = {
+    id: "node-1",
     type: WorkflowNodeType.GENERIC,
     base: {
       module: ["vellum", "workflows", "nodes", "bases", "base"],

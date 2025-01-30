@@ -21,6 +21,7 @@ import {
   WorkflowDataNode,
   WorkflowEdge,
 } from "src/types/vellum";
+import { createPythonClassName } from "src/utils/casing";
 
 type InputVariableContextsById = Map<string, InputVariableContext>;
 
@@ -103,6 +104,9 @@ export class WorkflowContext {
     | "STANDALONE"
     | "INLINE"
     | undefined;
+
+  // Track what class names are used within this workflow so that we can ensure name uniqueness
+  private readonly classNames: Set<string> = new Set();
 
   constructor({
     absolutePathToOutputDirectory,
@@ -388,5 +392,31 @@ export class WorkflowContext {
 
   public getErrors(): BaseCodegenError[] {
     return [...this.errors];
+  }
+
+  public isClassNameUsed(className: string): boolean {
+    return this.classNames.has(className);
+  }
+
+  private addUsedClassName(className: string): void {
+    this.classNames.add(className);
+  }
+
+  public getUniqueClassName(baseName: string): string {
+    let sanitizedName = createPythonClassName(baseName);
+    let numRenameAttempts = 0;
+
+    if (!this.isClassNameUsed(sanitizedName)) {
+      this.addUsedClassName(sanitizedName);
+      return sanitizedName;
+    }
+
+    while (this.isClassNameUsed(sanitizedName)) {
+      numRenameAttempts += 1;
+      sanitizedName = `${createPythonClassName(baseName)}${numRenameAttempts}`;
+    }
+
+    this.addUsedClassName(sanitizedName);
+    return sanitizedName;
   }
 }

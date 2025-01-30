@@ -7,7 +7,7 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 export declare namespace Expression {
   interface Args {
     lhs: AstNode;
-    expression: string;
+    operator: string;
     rhs?: AstNode | undefined;
     base?: AstNode | undefined;
   }
@@ -16,14 +16,14 @@ export declare namespace Expression {
 export class Expression extends AstNode {
   private readonly astNode: AstNode;
 
-  constructor({ lhs, expression, rhs, base }: Expression.Args) {
+  constructor({ lhs, operator, rhs, base }: Expression.Args) {
     super();
-    this.astNode = this.generateAstNode({ lhs, expression, rhs, base });
+    this.astNode = this.generateAstNode({ lhs, operator, rhs, base });
   }
 
   private generateAstNode({
     lhs,
-    expression,
+    operator,
     rhs,
     base,
   }: Expression.Args): AstNode {
@@ -37,15 +37,15 @@ export class Expression extends AstNode {
     //  name and modulePath.
 
     const rawExpression = base
-      ? this.generateExpressionWithBase(base, expression, lhs, rhs)
-      : this.generateStandardExpression(lhs, expression, rhs);
+      ? this.generateExpressionWithBase(base, operator, lhs, rhs)
+      : this.generateStandardExpression(lhs, operator, rhs);
 
     return python.codeBlock(rawExpression);
   }
 
   private generateExpressionWithBase(
     base: AstNode,
-    expression: string,
+    operator: string,
     lhs: AstNode,
     rhs: AstNode | undefined
   ): string {
@@ -55,16 +55,16 @@ export class Expression extends AstNode {
       );
     }
     this.inheritReferences(base);
-    return `${base.toString()}.${expression}(${lhs.toString()}, ${rhs.toString()})`;
+    return `${base.toString()}.${operator}(${lhs.toString()}, ${rhs.toString()})`;
   }
 
   private generateStandardExpression(
     lhs: AstNode,
-    expression: string,
+    operator: string,
     rhs: AstNode | undefined
   ): string {
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
-    return `${lhs.toString()}.${expression}${rhsExpression}`;
+    return `${lhs.toString()}.${operator}${rhsExpression}`;
   }
 
   public write(writer: Writer) {

@@ -16,6 +16,8 @@ import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-fa
 import { workflowOutputContextFactory } from "src/__test__/helpers/workflow-output-context-factory";
 import * as codegen from "src/codegen";
 import { createNodeContext, WorkflowContext } from "src/context";
+import { WorkflowGenerationError } from "src/generators/errors";
+import { GraphAttribute } from "src/generators/graph-attribute";
 import { WorkflowEdge } from "src/types/vellum";
 
 describe("Workflow", () => {
@@ -34,7 +36,7 @@ describe("Workflow", () => {
 
     const nodeData = terminalNodeDataFactory();
     await createNodeContext({
-      workflowContext: workflowContext,
+      workflowContext,
       nodeData,
     });
 
@@ -202,5 +204,50 @@ describe("Workflow", () => {
       workflow.getWorkflowFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     }, 1000000);
+
+    it("should handle the workflow generation even if graph attribute fails in non-strict mode", async () => {
+      vi.spyOn(
+        GraphAttribute.prototype,
+        "generateGraphMutableAst"
+      ).mockImplementation(() => {
+        throw new WorkflowGenerationError("test");
+      });
+
+      const workflowContext = workflowContextFactory({ strict: false });
+      workflowContext.addEntrypointNode(entrypointNode);
+
+      const templatingNodeData1 = templatingNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
+        label: "Templating Node",
+        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
+      });
+      await createNodeContext({
+        workflowContext: workflowContext,
+        nodeData: templatingNodeData1,
+      });
+
+      const edges: WorkflowEdge[] = [
+        {
+          id: "edge-1",
+          type: "DEFAULT",
+          sourceNodeId: entrypointNode.id,
+          sourceHandleId: entrypointNode.data.sourceHandleId,
+          targetNodeId: templatingNodeData1.id,
+          targetHandleId: templatingNodeData1.data.targetHandleId,
+        },
+      ];
+      workflowContext.addWorkflowEdges(edges);
+
+      const inputs = codegen.inputs({ workflowContext });
+      const workflow = codegen.workflow({
+        moduleName,
+        workflowContext,
+        inputs,
+      });
+
+      workflow.getWorkflowFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });
