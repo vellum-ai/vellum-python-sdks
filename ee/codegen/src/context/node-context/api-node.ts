@@ -37,7 +37,7 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
     let bearerTokenItem: WorkspaceSecretRead | undefined = undefined;
 
     try {
-      const apiKeyInputId = this.nodeData.data.apiKeyHeaderKeyInputId;
+      const apiKeyInputId = this.nodeData.data.apiKeyHeaderValueInputId;
       const apiKeyInput = this.nodeData.inputs.find(
         (input) => input.id === apiKeyInputId
       );

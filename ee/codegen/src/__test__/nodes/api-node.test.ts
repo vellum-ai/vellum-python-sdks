@@ -67,6 +67,7 @@ describe("ApiNode", () => {
 
     const nodeData = apiNodeFactory();
     const bearer_input = uuid();
+    const api_input = uuid();
     nodeData.inputs.push({
       id: bearer_input,
       key: "bearer_token_value",
@@ -83,7 +84,24 @@ describe("ApiNode", () => {
         combinator: "OR",
       },
     });
+    nodeData.inputs.push({
+      id: api_input,
+      key: "api_key_header_value",
+      value: {
+        rules: [
+          {
+            type: "WORKSPACE_SECRET",
+            data: {
+              type: "STRING",
+              workspaceSecretId: workspaceSecret.id,
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    });
     nodeData.data.bearerTokenValueInputId = bearer_input;
+    nodeData.data.apiKeyHeaderValueInputId = api_input;
     const nodeContext = (await createNodeContext({
       workflowContext,
       nodeData,
@@ -95,9 +113,9 @@ describe("ApiNode", () => {
     });
   };
 
-  describe("basic bearer node", () => {
+  describe("basic auth secret node", () => {
     it.each([{ id: "1234", name: "test-secret" }])(
-      "should be correct for a basic single node case",
+      "secret ids should show names",
       async (workspaceSecret: { id: string; name: string }) => {
         node = await createNode({ workspaceSecret });
         node.getNodeFile().write(writer);
