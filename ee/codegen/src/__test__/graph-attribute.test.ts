@@ -955,35 +955,19 @@ describe("Workflow", () => {
       });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: "non-existent-node-id",
         label: "Templating Node 2",
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
       });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
-      });
+      // No node context created
 
-      const edges: WorkflowEdge[] = [
-        {
-          id: "edge-1",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: templatingNodeData1.id,
-          targetHandleId: templatingNodeData1.data.targetHandleId,
-        },
-        {
-          id: "edge-2",
-          type: "DEFAULT",
-          sourceNodeId: entrypointNode.id,
-          sourceHandleId: entrypointNode.data.sourceHandleId,
-          targetNodeId: "non-existent-node-id",
-          targetHandleId: templatingNodeData2.data.targetHandleId,
-        },
-      ];
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addWorkflowEdges(
+        edgesFactory([
+          [entrypointNode, templatingNodeData1],
+          [entrypointNode, templatingNodeData2],
+        ])
+      );
 
       new GraphAttribute({ workflowContext }).write(writer);
       const errors = workflowContext.getErrors();
