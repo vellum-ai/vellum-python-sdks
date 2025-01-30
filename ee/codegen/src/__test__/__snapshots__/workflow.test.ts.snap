@@ -56,10 +56,9 @@ class TestWorkflow(BaseWorkflow):
 
 exports[`Workflow > write > should handle the workflow generation even if graph attribute fails in non-strict mode 1`] = `
 "from vellum.workflows import BaseWorkflow
-from .nodes.templating_node import TemplatingNode
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode
+    pass
 "
 `;
