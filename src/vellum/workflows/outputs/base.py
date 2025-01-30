@@ -191,7 +191,7 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
         if not provided_fields.issubset(declared_fields):
             raise NodeException(
                 message=f"Unexpected outputs: {provided_fields - declared_fields}",
-                code=WorkflowErrorCode.USER_DEFINED_ERROR,
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
             )
 
         for name, value in kwargs.items():
