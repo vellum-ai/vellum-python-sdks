@@ -13,4 +13,4 @@ def test_workflow__happy_path():
     # THEN the workflow should be rejected
     assert terminal_event.name == "workflow.execution.rejected", terminal_event
     assert terminal_event.error.message == "Unexpected outputs: {'invalid_output'}"
-    assert terminal_event.error.code == WorkflowErrorCode.USER_DEFINED_ERROR
+    assert terminal_event.error.code == WorkflowErrorCode.INVALID_OUTPUTS
