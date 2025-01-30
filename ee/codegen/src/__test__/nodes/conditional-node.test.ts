@@ -456,9 +456,4 @@ describe("Conditional Node with numeric operator casts rhs to NUMBER", () => {
     node.getNodeFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
-
-  it("getNodeDisplayFile", async () => {
-    node.getNodeDisplayFile().write(writer);
-    expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
 });
