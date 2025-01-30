@@ -3,7 +3,10 @@ import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { PORTS_CLASS_NAME } from "src/constants";
+import {
+  PORTS_CLASS_NAME,
+  VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
+} from "src/constants";
 import { NodeNotFoundError } from "src/generators/errors";
 import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
 
@@ -756,7 +759,7 @@ export class GraphAttribute extends AstNode {
         return new python.MethodInvocation({
           methodReference: python.reference({
             name: "Graph.from_set",
-            modulePath: ["vellum", "workflows", "graph"],
+            modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
           }),
           arguments_: [python.methodArgument({ value: setAst })],
         });
