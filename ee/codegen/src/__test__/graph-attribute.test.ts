@@ -977,5 +977,120 @@ describe("Workflow", () => {
       );
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should support an edge between two sets", async () => {
+      const topLeftNode = templatingNodeFactory({ label: "Top Left Node" });
+      await createNodeContext({
+        workflowContext,
+        nodeData: topLeftNode,
+      });
+
+      const topRightNode = finalOutputNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+        label: "Top Right Node",
+        name: "top-right-node",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294e",
+        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: topRightNode,
+      });
+
+      const bottomLeftNode = templatingNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf87",
+        label: "Bottom Left Node",
+        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
+      });
+
+      await createNodeContext({
+        workflowContext,
+        nodeData: bottomLeftNode,
+      });
+
+      const bottomRightNode = finalOutputNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+        label: "Bottom Right Node",
+        name: "bottom-right-node",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2950",
+        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: bottomRightNode,
+      });
+
+      const edges: WorkflowEdge[] = [
+        {
+          id: "edge-1",
+          type: "DEFAULT",
+          sourceNodeId: entrypointNode.id,
+          sourceHandleId: entrypointNode.data.sourceHandleId,
+          targetNodeId: topLeftNode.id,
+          targetHandleId: topLeftNode.data.targetHandleId,
+        },
+        {
+          id: "edge-2",
+          type: "DEFAULT",
+          sourceNodeId: entrypointNode.id,
+          sourceHandleId: entrypointNode.data.sourceHandleId,
+          targetNodeId: bottomLeftNode.id,
+          targetHandleId: bottomLeftNode.data.targetHandleId,
+        },
+        {
+          id: "edge-3",
+          type: "DEFAULT",
+          sourceNodeId: topLeftNode.id,
+          sourceHandleId: topLeftNode.data.sourceHandleId,
+          targetNodeId: bottomRightNode.id,
+          targetHandleId: bottomRightNode.data.targetHandleId,
+        },
+        {
+          id: "edge-4",
+          type: "DEFAULT",
+          sourceNodeId: bottomLeftNode.id,
+          sourceHandleId: bottomLeftNode.data.sourceHandleId,
+          targetNodeId: bottomRightNode.id,
+          targetHandleId: bottomRightNode.data.targetHandleId,
+        },
+        {
+          id: "edge-5",
+          type: "DEFAULT",
+          sourceNodeId: topLeftNode.id,
+          sourceHandleId: topLeftNode.data.sourceHandleId,
+          targetNodeId: topRightNode.id,
+          targetHandleId: topRightNode.data.targetHandleId,
+        },
+        {
+          id: "edge-6",
+          type: "DEFAULT",
+          sourceNodeId: bottomLeftNode.id,
+          sourceHandleId: bottomLeftNode.data.sourceHandleId,
+          targetNodeId: topRightNode.id,
+          targetHandleId: topRightNode.data.targetHandleId,
+        },
+      ];
+      workflowContext.addWorkflowEdges(edges);
+
+      new GraphAttribute({ workflowContext }).write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should walmart", async () => {
+      workflowContext.addWorkflowEdges([
+        {
+          id: "edge-1",
+          type: "DEFAULT",
+          sourceNodeId: entrypointNode.id,
+          sourceHandleId: entrypointNode.data.sourceHandleId,
+          targetNodeId: setupFallbackValue.id,
+          targetHandleId: setupFallbackValue.data.targetHandleId,
+        },
+      ]);
+
+      new GraphAttribute({ workflowContext }).write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });
