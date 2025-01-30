@@ -356,9 +356,17 @@ export abstract class BaseNode<
     });
     nodeClass.add(nodeInputIdsByNameField);
 
-    const outputDisplay = this.getOutputDisplay();
-    if (outputDisplay) {
-      nodeClass.add(outputDisplay);
+    try {
+      const outputDisplay = this.getOutputDisplay();
+      if (outputDisplay) {
+        nodeClass.add(outputDisplay);
+      }
+    } catch (error) {
+      if (error instanceof BaseCodegenError) {
+        this.workflowContext.addError(error);
+      } else {
+        throw error;
+      }
     }
 
     const portDisplay = this.getPortDisplay();

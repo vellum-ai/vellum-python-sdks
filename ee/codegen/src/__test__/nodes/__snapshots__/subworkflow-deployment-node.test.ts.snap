@@ -52,6 +52,32 @@ class SubworkflowNode(SubworkflowDeploymentNode):
 "
 `;
 
+exports[`SubworkflowDeploymentNode > failure > should generate subworkflow deployment node display as much as possible for non strict workflow contexts 1`] = `
+"from vellum_ee.workflows.display.nodes import BaseSubworkflowDeploymentNodeDisplay
+from ...nodes.subworkflow_node import SubworkflowNode
+from uuid import UUID
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+
+class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNode]):
+    label = "Subworkflow Node"
+    node_id = UUID("c8f2964c-09b8-44e0-a06d-606319fe5e2a")
+    target_handle_id = UUID("f5e6bd33-527a-4ba6-8906-cd5e96a4321c")
+    node_input_ids_by_name = {}
+    port_displays = {
+        SubworkflowNode.Ports.default: PortDisplayOverrides(
+            id=UUID("600efd51-8677-4ba3-a582-b298bebb2868")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=2239.986322714681, y=484.74458968144046),
+        width=None,
+        height=None,
+    )
+"
+`;
+
 exports[`SubworkflowDeploymentNode > failure > should generate subworkflow deployment nodes as much as possible for non strict workflow contexts 1`] = `
 "from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
 
