@@ -1,8 +1,13 @@
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
-import { NodeAttributeGenerationError } from "src/generators/errors";
+import {
+  EntityNotFoundError,
+  NodeAttributeGenerationError,
+} from "src/generators/errors";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
+import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
+import { VellumError } from "vellum-ai/errors";
 
 export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType> {
   baseNodeClassName = "CodeExecutionNode";
@@ -71,5 +76,29 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
     }
 
     return filePath;
+  }
+
+  async buildProperties(): Promise<void> {
+    for (const input of this.nodeData.inputs) {
+      try {
+        const inputRule = input?.value.rules.find(
+          (rule) => rule.type == "WORKSPACE_SECRET"
+        );
+        if (inputRule && inputRule.data?.workspaceSecretId) {
+          const tokenItem = await new WorkspaceSecretsClient({
+            apiKey: this.workflowContext.vellumApiKey,
+          }).retrieve(inputRule.data?.workspaceSecretId);
+          inputRule.data.workspaceSecretId = tokenItem.name;
+        }
+      } catch (e) {
+        if (e instanceof VellumError && e.statusCode === 404) {
+          this.workflowContext.addError(
+            new EntityNotFoundError(`Workspace Secret "${input.id}" not found.`)
+          );
+        } else {
+          throw e;
+        }
+      }
+    }
   }
 }
