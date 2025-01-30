@@ -185,7 +185,7 @@ class _BaseOutputsMeta(type):
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
     def __init__(self, **kwargs: Any) -> None:
-        declared_fields = {name for name in get_class_attr_names(self.__class__)}
+        declared_fields = {descriptor.name for descriptor in self.__class__}
         provided_fields = set(kwargs.keys())
 
         if not provided_fields.issubset(declared_fields):
