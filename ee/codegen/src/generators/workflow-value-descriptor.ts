@@ -68,7 +68,7 @@ export class WorkflowValueDescriptor extends AstNode {
         const operator = this.convertOperatorType(workflowValueDescriptor);
         return new Expression({
           lhs,
-          expression: operator,
+          operator: operator,
         });
       }
       case "BINARY_EXPRESSION": {
@@ -77,7 +77,7 @@ export class WorkflowValueDescriptor extends AstNode {
         const operator = this.convertOperatorType(workflowValueDescriptor);
         return new Expression({
           lhs,
-          expression: operator,
+          operator: operator,
           rhs,
         });
       }
@@ -88,7 +88,7 @@ export class WorkflowValueDescriptor extends AstNode {
         const operator = this.convertOperatorType(workflowValueDescriptor);
         return new Expression({
           lhs: lhs,
-          expression: operator,
+          operator: operator,
           rhs: rhs,
           base: base,
         });

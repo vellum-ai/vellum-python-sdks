@@ -8,15 +8,19 @@ import { isNil } from "lodash";
 import {
   NodeAttributeGenerationError,
   NodePortGenerationError,
+  ValueGenerationError,
 } from "./errors";
 
+import * as codegen from "src/codegen";
 import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
 import { NodeInput } from "src/generators/node-inputs";
 import {
   ConditionalNodeConditionData,
   ConditionalRuleData,
+  ConstantValuePointer,
 } from "src/types/vellum";
+import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace ConditionalNodePort {
   export interface Args {
@@ -149,23 +153,65 @@ export class ConditionalNodePort extends AstNode {
       rhsKey = this.valueInputKeysByRuleId.get(ruleId);
     }
     const lhs = this.nodeInputsByKey.get(lhsKey);
-    const rhs = !isNil(rhsKey) ? this.nodeInputsByKey.get(rhsKey) : undefined;
     if (isNil(lhs)) {
       throw new NodePortGenerationError(
         `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey} for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
       );
     }
-    const expression = conditionData.operator
+    const operator = conditionData.operator
       ? this.convertOperatorToMethod(conditionData.operator, lhs)
       : undefined;
-    if (isNil(expression)) {
+    if (isNil(operator)) {
       throw new NodePortGenerationError(
         `Node ${this.nodeLabel} is missing required operator for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
       );
     }
+
+    let rhs;
+    rhs = !isNil(rhsKey) ? this.nodeInputsByKey.get(rhsKey) : undefined;
+    // The following is to account for an edge case where we are getting bad data
+    // from the UI. Numeric operators are being sent with rhs as STRINGS when they should
+    // be NUMBERS
+    if (
+      rhs &&
+      this.isNumericOperator(operator) &&
+      this.isConstantStringPointer(rhs)
+    ) {
+      const nodeValue = rhs.nodeInputData.value
+        .rules[0] as ConstantValuePointer;
+      const castedValue = Number(nodeValue.data.value);
+      if (isNaN(castedValue)) {
+        const error = new ValueGenerationError(
+          `Failed to cast constant value ${nodeValue.data.value} to NUMBER for attribute ${this.nodeLabel}.${rhsKey}`
+        );
+        this.portContext.workflowContext.addError(error);
+      } else {
+        const castedRhs = {
+          id: rhs.nodeInputData.id,
+          key: rhs.nodeInputData.key,
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE" as const,
+                data: {
+                  type: "NUMBER",
+                  value: castedValue,
+                },
+              } as ConstantValuePointer,
+            ],
+            combinator: "OR" as const,
+          },
+        };
+        rhs = codegen.nodeInput({
+          workflowContext: this.portContext.workflowContext,
+          nodeInputData: castedRhs,
+        });
+      }
+    }
+
     return new Expression({
       lhs: lhs,
-      expression: expression,
+      operator: operator,
       rhs: rhs,
     });
   }
@@ -202,6 +248,23 @@ export class ConditionalNodePort extends AstNode {
       );
     }
     return value;
+  }
+
+  private isNumericOperator(operator: string): boolean {
+    return new Set([
+      "less_than",
+      "greater_than",
+      "less_than_or_equal_to",
+      "greater_than_or_equal_to",
+    ]).has(operator);
+  }
+
+  private isConstantStringPointer(input: NodeInput): boolean {
+    return (
+      !isNilOrEmpty(input.nodeInputData.value.rules) &&
+      input.nodeInputData.value.rules[0]?.type === "CONSTANT_VALUE" &&
+      input.nodeInputData.value.rules[0]?.data.type === "STRING"
+    );
   }
 
   public write(writer: Writer): void {
