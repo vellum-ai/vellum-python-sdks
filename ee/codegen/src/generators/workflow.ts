@@ -7,7 +7,6 @@ import { isNil } from "lodash";
 
 import { BasePersistedFile } from "./base-persisted-file";
 import { WorkflowGenerationError } from "./errors";
-import { GraphAttribute } from "./graph-attribute";
 import { WorkflowOutput } from "./workflow-output";
 
 import {
@@ -18,6 +17,7 @@ import {
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseState } from "src/generators/base-state";
+import { GraphAttribute } from "src/generators/graph-attribute";
 import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowDisplayData, WorkflowEdge } from "src/types/vellum";

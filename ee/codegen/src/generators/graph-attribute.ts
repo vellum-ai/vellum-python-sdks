@@ -6,10 +6,11 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { WorkflowGenerationError } from "./errors";
 
 import { PORTS_CLASS_NAME } from "src/constants";
-import { WorkflowContext } from "src/context";
-import { BaseNodeContext } from "src/context/node-context/base";
-import { PortContext } from "src/context/port-context";
-import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
+
+import type { WorkflowContext } from "src/context";
+import type { BaseNodeContext } from "src/context/node-context/base";
+import type { PortContext } from "src/context/port-context";
+import type { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
 
 // Fern's Python AST types are not mutable, so we need to define our own types
 // so that we can mutate the graph as we traverse through the edges.
@@ -61,7 +62,7 @@ export class GraphAttribute extends AstNode {
    * The core assumption made is that `graphMutableAst` is always a valid graph, and
    * adding a single edge to it will always produce another valid graph.
    */
-  private generateGraphMutableAst(): GraphMutableAst {
+  public generateGraphMutableAst(): GraphMutableAst {
     let graphMutableAst: GraphMutableAst = { type: "empty" };
     const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
     const edgesByPortId = this.workflowContext.getEdgesByPortId();

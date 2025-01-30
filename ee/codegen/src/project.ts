@@ -8,6 +8,7 @@ import { Comment } from "@fern-api/python-ast/Comment";
 import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
+import * as codegen from "./codegen";
 import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_DISPLAY_NODE_MODULE_PATH,
@@ -28,8 +29,6 @@ import { GuardrailNode } from "./generators/nodes/guardrail-node";
 import { InlineSubworkflowNode } from "./generators/nodes/inline-subworkflow-node";
 import { SearchNode } from "./generators/nodes/search-node";
 import { TemplatingNode } from "./generators/nodes/templating-node";
-
-import { codegen } from "./index";
 
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { BaseNodeContext } from "src/context/node-context/base";
