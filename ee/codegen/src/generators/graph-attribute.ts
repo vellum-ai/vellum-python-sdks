@@ -3,14 +3,16 @@ import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { WorkflowGenerationError } from "./errors";
-
 import { PORTS_CLASS_NAME } from "src/constants";
+import {
+  NodeNotFoundError,
+  WorkflowGenerationError,
+} from "src/generators/errors";
+import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
 
 import type { WorkflowContext } from "src/context";
 import type { BaseNodeContext } from "src/context/node-context/base";
 import type { PortContext } from "src/context/port-context";
-import type { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
 
 // Fern's Python AST types are not mutable, so we need to define our own types
 // so that we can mutate the graph as we traverse through the edges.
@@ -74,15 +76,39 @@ export class GraphAttribute extends AstNode {
         continue;
       }
 
-      const sourceNode =
-        edge.sourceNodeId === this.workflowContext.getEntrypointNode().id
-          ? null
-          : this.workflowContext.getNodeContext(edge.sourceNodeId);
+      let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
+      try {
+        sourceNode =
+          edge.sourceNodeId === this.workflowContext.getEntrypointNode().id
+            ? null
+            : this.workflowContext.getNodeContext(edge.sourceNodeId);
+      } catch (error) {
+        if (error instanceof NodeNotFoundError) {
+          const enhancedError = new NodeNotFoundError(
+            `Failed to find source node with ID '${edge.sourceNodeId}' referenced from edge ${edge.id}`
+          );
+          this.workflowContext.addError(enhancedError);
+          processedEdges.add(edge);
+          continue;
+        } else {
+          throw error;
+        }
+      }
 
-      const targetNode = this.workflowContext.getNodeContext(edge.targetNodeId);
-      if (!targetNode) {
-        processedEdges.add(edge);
-        continue;
+      let targetNode: BaseNodeContext<WorkflowDataNode> | null;
+      try {
+        targetNode = this.workflowContext.getNodeContext(edge.targetNodeId);
+      } catch (error) {
+        if (error instanceof NodeNotFoundError) {
+          const enhancedError = new NodeNotFoundError(
+            `Failed to find target node with ID '${edge.targetNodeId}' referenced from edge ${edge.id}`
+          );
+          this.workflowContext.addError(enhancedError);
+          processedEdges.add(edge);
+          continue;
+        } else {
+          throw error;
+        }
       }
 
       const isPlural = (mutableAst: GraphMutableAst): boolean => {

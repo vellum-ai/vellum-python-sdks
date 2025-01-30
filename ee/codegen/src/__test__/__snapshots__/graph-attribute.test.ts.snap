@@ -182,3 +182,8 @@ exports[`Workflow > graph > should define nested sets of nodes without compilati
 }
 "
 `;
+
+exports[`Workflow > graph > should show errors for a node pointing to non-existent node 1`] = `
+"TemplatingNode
+"
+`;

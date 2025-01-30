@@ -1558,5 +1558,54 @@ describe("Workflow", () => {
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should show errors for a node pointing to non-existent node", async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+      workflowContext.addEntrypointNode(entrypointNode);
+      const templatingNodeData1 = templatingNodeFactory();
+      await createNodeContext({
+        workflowContext,
+        nodeData: templatingNodeData1,
+      });
+
+      const templatingNodeData2 = templatingNodeFactory({
+        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        label: "Templating Node 2",
+        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
+        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: templatingNodeData2,
+      });
+
+      const edges: WorkflowEdge[] = [
+        {
+          id: "edge-1",
+          type: "DEFAULT",
+          sourceNodeId: entrypointNode.id,
+          sourceHandleId: entrypointNode.data.sourceHandleId,
+          targetNodeId: templatingNodeData1.id,
+          targetHandleId: templatingNodeData1.data.targetHandleId,
+        },
+        {
+          id: "edge-2",
+          type: "DEFAULT",
+          sourceNodeId: entrypointNode.id,
+          sourceHandleId: entrypointNode.data.sourceHandleId,
+          targetNodeId: "non-existent-node-id",
+          targetHandleId: templatingNodeData2.data.targetHandleId,
+        },
+      ];
+      workflowContext.addWorkflowEdges(edges);
+
+      new GraphAttribute({ workflowContext }).write(writer);
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toContain(
+        `Failed to find target node with ID 'non-existent-node-id' referenced from edge edge-2`
+      );
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });
