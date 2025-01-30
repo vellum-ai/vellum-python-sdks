@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import field
 import json
 import os
@@ -88,6 +89,50 @@ class WorkflowConfig(UniversalBaseModel):
         )
 
 
+def merge_workflows_by_sandbox_id(
+    workflows: List[WorkflowConfig], other_workflows: List[WorkflowConfig]
+) -> List[WorkflowConfig]:
+    merged_workflows: List[WorkflowConfig] = []
+    for self_workflow in workflows:
+        if self_workflow.workflow_sandbox_id is None:
+            # If the user defines a workflow in the pyproject.toml without a sandbox_id,
+            # we merge the workflow with one of the ones in the lockfile.
+            other_workflow = next(
+                (
+                    other_workflow
+                    for other_workflow in other_workflows
+                    if self_workflow.workspace == other_workflow.workspace
+                ),
+                None,
+            )
+            if other_workflow is not None:
+                merged_workflows.append(self_workflow.merge(other_workflow))
+            else:
+                merged_workflows.append(self_workflow)
+        else:
+            # If the user defines a workflow in the pyproject.toml with a sandbox_id,
+            # we merge the workflow with one of the ones in the lockfile with the same sandbox_id.
+            other_workflow = next(
+                (
+                    other_workflow
+                    for other_workflow in other_workflows
+                    if self_workflow.workflow_sandbox_id == other_workflow.workflow_sandbox_id
+                ),
+                None,
+            )
+            if other_workflow is not None:
+                merged_workflows.append(self_workflow.merge(other_workflow))
+            else:
+                merged_workflows.append(self_workflow)
+
+    workflow_sandbox_ids_so_far = {workflow.workflow_sandbox_id for workflow in merged_workflows}
+    for other_workflow in other_workflows:
+        if other_workflow.workflow_sandbox_id not in workflow_sandbox_ids_so_far:
+            merged_workflows.append(other_workflow)
+
+    return merged_workflows
+
+
 class VellumCliConfig(UniversalBaseModel):
     version: Literal["1.0"] = "1.0"
     workflows: List[WorkflowConfig] = field(default_factory=list)
@@ -97,24 +142,31 @@ class VellumCliConfig(UniversalBaseModel):
         lockfile_path = os.path.join(os.getcwd(), LOCKFILE_PATH)
         with open(lockfile_path, "w") as f:
             json.dump(self.model_dump(), f, indent=2, cls=DefaultStateEncoder)
+            # Makes sure the file ends with a newline, consistent with most autoformatters
+            f.write("\n")
 
     def merge(self, other: "VellumCliConfig") -> "VellumCliConfig":
         if other.version != self.version:
             raise ValueError("Lockfile version mismatch")
 
-        self_workflow_by_module = {workflow.module: workflow for workflow in self.workflows}
-        other_workflow_by_module = {workflow.module: workflow for workflow in other.workflows}
-        all_modules = sorted(set(self_workflow_by_module.keys()).union(set(other_workflow_by_module.keys())))
+        self_workflows_by_module = self.get_workflows_by_module_mapping()
+        other_workflows_by_module = other.get_workflows_by_module_mapping()
+        all_modules = sorted(set(self_workflows_by_module.keys()).union(set(other_workflows_by_module.keys())))
         merged_workflows = []
         for module in all_modules:
-            self_workflow = self_workflow_by_module.get(module)
-            other_workflow = other_workflow_by_module.get(module)
-            if self_workflow and other_workflow:
-                merged_workflows.append(self_workflow.merge(other_workflow))
-            elif self_workflow:
-                merged_workflows.append(self_workflow)
-            elif other_workflow:
-                merged_workflows.append(other_workflow)
+            self_workflows = self_workflows_by_module.get(module)
+            other_workflows = other_workflows_by_module.get(module)
+            if self_workflows and other_workflows:
+                merged_workflows.extend(
+                    merge_workflows_by_sandbox_id(
+                        self_workflows,
+                        other_workflows,
+                    )
+                )
+            elif self_workflows:
+                merged_workflows.extend(self_workflows)
+            elif other_workflows:
+                merged_workflows.extend(other_workflows)
 
         self_workspace_by_name = {workspace.name: workspace for workspace in self.workspaces}
         other_workspace_by_name = {workspace.name: workspace for workspace in other.workspaces}
@@ -131,6 +183,12 @@ class VellumCliConfig(UniversalBaseModel):
                 merged_workspaces.append(other_workspace)
 
         return VellumCliConfig(workflows=merged_workflows, workspaces=merged_workspaces, version=self.version)
+
+    def get_workflows_by_module_mapping(self) -> Dict[str, List[WorkflowConfig]]:
+        workflows_by_module = defaultdict(list)
+        for workflow in self.workflows:
+            workflows_by_module[workflow.module].append(workflow)
+        return workflows_by_module
 
 
 def load_vellum_cli_config(root_dir: Optional[str] = None) -> VellumCliConfig:

@@ -428,7 +428,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "workflows": [
                     {
                         "module": module,
-                        "workflow_sandbox_id": "0edc07cd-45b9-43e8-99bc-1f181972a857",
+                        "workflow_sandbox_id": workflow_sandbox_id,
                         "ignore": "tests/*",
                         "deployments": [
                             {
