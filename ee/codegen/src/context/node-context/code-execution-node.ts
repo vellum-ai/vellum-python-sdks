@@ -1,3 +1,6 @@
+import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
+import { VellumError } from "vellum-ai/errors";
+
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
@@ -6,8 +9,6 @@ import {
   NodeAttributeGenerationError,
 } from "src/generators/errors";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
-import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
-import { VellumError } from "vellum-ai/errors";
 
 export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType> {
   baseNodeClassName = "CodeExecutionNode";

@@ -1,4 +1,7 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuid } from "uuid";
+import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
+import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { beforeEach, describe } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -8,9 +11,6 @@ import { CodeExecutionContext } from "src/context/node-context/code-execution-no
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
 import { NodeInputValuePointerRule } from "src/types/vellum";
-import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
-import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
-import { v4 as uuid } from "uuid";
 
 describe("CodeExecutionNode", () => {
   let workflowContext: WorkflowContext;
