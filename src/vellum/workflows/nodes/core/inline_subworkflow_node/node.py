@@ -55,16 +55,6 @@ class _InlineSubworkflowNodeMeta(BaseNodeMeta):
                 return getattr(cls.__wrapped_node__, name)
             raise
 
-    @property
-    def _localns(cls) -> Dict[str, Any]:
-        if not hasattr(cls, "Outputs"):
-            return super()._localns
-
-        return {
-            **super()._localns,
-            "Outputs": getattr(cls, "Outputs"),
-        }
-
 
 class InlineSubworkflowNode(
     BaseNode[StateType], Generic[StateType, WorkflowInputsType, InnerStateType], metaclass=_InlineSubworkflowNodeMeta
