@@ -22,7 +22,12 @@ import { GraphAttribute } from "src/generators/graph-attribute";
 import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
-import { WorkflowDisplayData, WorkflowEdge } from "src/types/vellum";
+import {
+  NodeDisplayData as NodeDisplayDataType,
+  WorkflowDataNode,
+  WorkflowDisplayData,
+  WorkflowEdge,
+} from "src/types/vellum";
 import { isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
