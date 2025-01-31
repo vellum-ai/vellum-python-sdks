@@ -246,29 +246,12 @@ export class WorkflowContext {
     return this.globalInputVariableContextsById.get(inputVariableId);
   }
 
-  public getInputVariableContextById(
-    inputVariableId: string
-  ): InputVariableContext {
-    const inputVariableContext =
-      this.findInputVariableContextById(inputVariableId);
-
-    if (!inputVariableContext) {
-      throw new WorkflowInputGenerationError(
-        `Input variable context not found for ID: ${inputVariableId}`
-      );
-    }
-
-    return inputVariableContext;
-  }
-
   public findInputVariableContextByRawName(
     rawName: string
   ): InputVariableContext | undefined {
-    const inputVariableContext = Array.from(
-      this.inputVariableContextsById.values()
-    ).find((inputContext) => inputContext.getRawName() === rawName);
-
-    return inputVariableContext;
+    return Array.from(this.inputVariableContextsById.values()).find(
+      (inputContext) => inputContext.getRawName() === rawName
+    );
   }
 
   public getInputVariableContextByRawName(
