@@ -33,7 +33,7 @@ describe("NodeOutput", () => {
         },
       ];
       const nodeData = genericNodeFactory({
-        name: "AnnotatedOutputGenericNode",
+        label: "AnnotatedOutputGenericNode",
         nodeOutputs: nodeOutputData,
       });
 
@@ -69,7 +69,7 @@ describe("NodeOutput", () => {
         },
       ];
       const nodeData = genericNodeFactory({
-        name: "WorkflowInputGenericNode",
+        label: "WorkflowInputGenericNode",
         nodeOutputs: nodeOutputData,
       });
 
@@ -123,7 +123,7 @@ describe("NodeOutput", () => {
       ];
 
       const nodeData = genericNodeFactory({
-        name: "GenericNodeReferencingOutput",
+        label: "GenericNodeReferencingOutput",
         nodeOutputs: nodeOutputData,
       });
 

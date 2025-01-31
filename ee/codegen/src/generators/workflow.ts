@@ -107,6 +107,29 @@ export class Workflow {
     return outputsClass;
   }
 
+  private getTargetHandleId(nodeData: WorkflowDataNode): string {
+    let targetHandleId: string;
+    if (nodeData.type === "GENERIC") {
+      // TODO: Fill this out
+      targetHandleId = "";
+    } else if ("targetHandleId" in nodeData.data) {
+      targetHandleId = nodeData.data.targetHandleId;
+    } else {
+      throw new WorkflowGenerationError(
+        `${nodeData.data.label} with id ${nodeData.id} is missing required targetHandleId`
+      );
+    }
+    return targetHandleId;
+  }
+
+  private getLabel(nodeData: WorkflowDataNode): string {
+    if (nodeData.type === "GENERIC") {
+      return nodeData.label;
+    } else {
+      return nodeData.data.label;
+    }
+  }
+
   public generateWorkflowClass(): python.Class {
     const workflowClassName = this.workflowContext.workflowClassName;
 
@@ -458,6 +481,7 @@ export class Workflow {
               let label: string;
               let displayData: NodeDisplayDataType | undefined;
 
+              // Final output node
               if ("type" in finalOutput) {
                 nodeId = finalOutput.id;
                 targetHandleId = finalOutput.data.targetHandleId;
@@ -467,6 +491,7 @@ export class Workflow {
                 label = finalOutput.data.label;
                 displayData = finalOutput.displayData;
               } else {
+                // Workflow output value
                 const referencedNode = this.workflowContext.getNodeContext(
                   finalOutput.value.nodeId
                 );
@@ -475,9 +500,19 @@ export class Workflow {
                     `Could not find node ${finalOutput.value.nodeId}`
                   );
                 }
-                const nodeData = referencedNode.nodeData;
+                const referencedOutput =
+                  this.workflowContext.getOutputVariableContextById(
+                    finalOutput.outputVariableId
+                  );
                 nodeId = referencedNode.getNodeId();
-                targetHandleId = nodeData.data;
+                targetHandleId = this.getTargetHandleId(
+                  referencedNode.nodeData
+                );
+                outputId = finalOutput.value.nodeOutputId;
+                nodeInputId = "";
+                name = referencedOutput.name;
+                label = this.getLabel(referencedNode.nodeData);
+                displayData = referencedNode.nodeData.displayData;
               }
 
               const edge = this.getEdges().find((edge) => {
@@ -489,7 +524,7 @@ export class Workflow {
 
               if (!edge) {
                 throw new WorkflowGenerationError(
-                  `Could not find edge for terminal node ${nodeId}`
+                  `Could not find edge for final output node ${nodeId}`
                 );
               }
 

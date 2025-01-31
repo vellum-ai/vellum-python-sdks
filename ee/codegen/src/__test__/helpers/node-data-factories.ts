@@ -1411,8 +1411,8 @@ export function nodePortsFactory(ports?: Partial<NodePort>[]): NodePort[] {
 
 export function genericNodeFactory(
   {
-    id,
-    name,
+      id,
+      label,
     nodeTrigger,
     nodePorts,
     nodeAttributes,
@@ -1420,25 +1420,26 @@ export function genericNodeFactory(
     adornments,
   }: {
     id?: string;
-    name: string;
+    label: string;
     nodeTrigger?: NodeTrigger;
     nodePorts?: NodePort[];
     nodeAttributes?: NodeAttribute[];
     nodeOutputs?: NodeOutput[];
     adornments?: AdornmentNode[];
   } = {
-    name: "MyCustomNode",
+    label: "MyCustomNode",
   }
 ): GenericNode {
   const nodeData: GenericNode = {
     id: id ?? uuidv4(),
+    label: label,
     type: WorkflowNodeType.GENERIC,
     base: {
       module: ["vellum", "workflows", "nodes", "bases", "base"],
       name: "BaseNode",
     },
     definition: {
-      name,
+      name: label,
       module: ["my_nodes", "my_custom_node"],
     },
     trigger: nodeTrigger ?? {

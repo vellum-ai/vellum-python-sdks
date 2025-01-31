@@ -668,6 +668,7 @@ export interface NodeOutput {
 
 export interface GenericNode extends BaseWorkflowNode {
   id: string;
+  label: string;
   type: "GENERIC";
   displayData?: GenericNodeDisplayData;
   base: CodeResourceDefinition;

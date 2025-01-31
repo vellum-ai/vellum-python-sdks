@@ -347,8 +347,6 @@ ${errors.slice(0, 3).map((err) => {
       this.workflowContext.addOutputVariableContext(outputVariableContext);
     });
 
-    this.initializeWorkflowOutputContexts();
-
     let entrypointNode: EntrypointNode | undefined;
     const nodesToGenerate: WorkflowDataNode[] = [];
     await Promise.all(
@@ -379,6 +377,9 @@ ${errors.slice(0, 3).map((err) => {
           promise.catch((error) => this.workflowContext.addError(error))
         )
     );
+
+    this.initializeWorkflowOutputContexts();
+
     if (!entrypointNode) {
       throw new WorkflowGenerationError("Entrypoint node not found");
     }
@@ -720,15 +721,10 @@ ${errors.slice(0, 3).map((err) => {
 
   private initializeWorkflowOutputContexts(): void {
     const { workflowRawData } = this.workflowVersionExecConfig;
-
     if (!isNilOrEmpty(workflowRawData.outputValues)) {
       // If we have explicit output values, use those
       workflowRawData.outputValues?.forEach((outputValue) => {
-        const node = workflowRawData.nodes.find(
-          (node) => node.id === outputValue.value.nodeId
-        ) as WorkflowDataNode;
-
-        if (node) {
+        if (outputValue) {
           this.workflowContext.addWorkflowOutputContext(
             new WorkflowOutputContext({
               workflowContext: this.workflowContext,

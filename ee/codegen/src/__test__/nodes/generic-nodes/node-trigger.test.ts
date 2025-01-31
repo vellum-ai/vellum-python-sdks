@@ -25,7 +25,7 @@ describe("NodeTrigger", () => {
         mergeBehavior: "AWAIT_ALL",
       };
       const nodeData = genericNodeFactory({
-        name: "MyGenericNode",
+        label: "MyGenericNode",
         nodeTrigger: nodeTriggerData,
       });
 

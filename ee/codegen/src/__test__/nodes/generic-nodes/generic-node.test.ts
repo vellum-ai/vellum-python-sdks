@@ -83,7 +83,7 @@ describe("GenericNode", () => {
       ];
 
       const nodeData = genericNodeFactory({
-        name: "MyCustomNode",
+        label: "MyCustomNode",
         nodeAttributes: nodeAttributes,
       });
 
@@ -173,7 +173,7 @@ describe("GenericNode", () => {
       ];
 
       const nodeData = genericNodeFactory({
-        name: "MyCustomNode",
+        label: "MyCustomNode",
         adornments: adornments,
       });
 
