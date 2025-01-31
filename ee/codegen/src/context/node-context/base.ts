@@ -3,7 +3,7 @@ import { PortContext } from "src/context/port-context";
 import { NodeOutputNotFoundError } from "src/generators/errors";
 import { WorkflowDataNode } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
-import { getNodeId, getNodeLabel } from "src/utils/nodes";
+import { getNodeLabel } from "src/utils/nodes";
 import {
   getGeneratedNodeDisplayModulePath,
   getGeneratedNodeModuleInfo,
@@ -83,10 +83,6 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
 
   protected abstract getNodeOutputNamesById(): Record<string, string>;
   protected abstract createPortContexts(): PortContext[];
-
-  public getNodeId(): string {
-    return getNodeId(this.nodeData);
-  }
 
   public getNodeLabel(): string {
     return getNodeLabel(this.nodeData);

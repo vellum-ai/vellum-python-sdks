@@ -69,7 +69,6 @@ import {
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
-import { getNodeId } from "src/utils/nodes";
 import { assertUnreachable } from "src/utils/typing";
 
 export interface WorkflowProjectGeneratorOptions {
@@ -375,7 +374,7 @@ ${errors.slice(0, 3).map((err) => {
       workflowContext: this.workflowContext,
     });
 
-    const nodeIds = nodesToGenerate.map((nodeData) => getNodeId(nodeData));
+    const nodeIds = nodesToGenerate.map((nodeData) => nodeData.id);
     const nodes = await this.generateNodes(nodeIds);
 
     const workflow = codegen.workflow({

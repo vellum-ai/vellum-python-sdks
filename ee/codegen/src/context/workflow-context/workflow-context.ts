@@ -293,7 +293,7 @@ export class WorkflowContext {
   }
 
   public addNodeContext(nodeContext: BaseNodeContext<WorkflowDataNode>): void {
-    const nodeId = nodeContext.getNodeId();
+    const nodeId = nodeContext.nodeData.id;
 
     if (this.globalNodeContextsByNodeId.get(nodeId)) {
       throw new NodeDefinitionGenerationError(
