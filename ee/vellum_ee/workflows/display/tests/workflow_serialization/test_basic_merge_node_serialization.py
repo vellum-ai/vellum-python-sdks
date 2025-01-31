@@ -101,7 +101,7 @@ def test_serialize_workflow__await_all():
             "target_handle_id": "ff55701c-16d3-4348-a633-6a298e71377d",
             "output_id": "959ba00d-d30b-402e-8676-76efc4c3d2ae",
             "output_type": "STRING",
-            "node_input_id": "7f950be4-2fab-44e0-87a3-b1631aadd0e3",
+            "node_input_id": "fed9d343-6504-460c-968b-d3f9658193d0",
         },
         "base": {
             "module": [
@@ -117,7 +117,7 @@ def test_serialize_workflow__await_all():
         "definition": None,
         "inputs": [
             {
-                "id": "7f950be4-2fab-44e0-87a3-b1631aadd0e3",
+                "id": "fed9d343-6504-460c-968b-d3f9658193d0",
                 "key": "node_input",
                 "value": {
                     "rules": [

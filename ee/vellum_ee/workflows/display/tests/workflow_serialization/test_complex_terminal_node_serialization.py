@@ -132,11 +132,11 @@ def test_serialize_workflow__missing_final_output_node():
                     "target_handle_id": "5e337b19-cef6-45af-802b-46da4ad7e794",
                     "output_id": "5e6d3ea6-ef91-4937-8fff-f33e07446e6a",
                     "output_type": "STRING",
-                    "node_input_id": "47ba0ee9-4725-4065-a178-c929ac556be9",
+                    "node_input_id": "590161f1-20ed-4339-9ce3-61aade3a142a",
                 },
                 "inputs": [
                     {
-                        "id": "47ba0ee9-4725-4065-a178-c929ac556be9",
+                        "id": "590161f1-20ed-4339-9ce3-61aade3a142a",
                         "key": "node_input",
                         "value": {
                             "rules": [

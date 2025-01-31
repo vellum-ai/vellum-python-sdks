@@ -210,11 +210,11 @@ def test_serialize_workflow(vellum_client):
                     "target_handle_id": "06853542-e1a1-4a00-bd1e-4ac40f347b32",
                     "output_id": "9a37bf7d-484e-4725-903e-f3254df38a0a",
                     "output_type": "JSON",
-                    "node_input_id": "b544fc9a-2747-47e9-b28b-3e88d87b0f95",
+                    "node_input_id": "b49f0f85-37fc-4686-81a7-287c06634661",
                 },
                 "inputs": [
                     {
-                        "id": "b544fc9a-2747-47e9-b28b-3e88d87b0f95",
+                        "id": "b49f0f85-37fc-4686-81a7-287c06634661",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -233,14 +233,7 @@ def test_serialize_workflow(vellum_client):
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
                 "base": {
                     "name": "FinalOutputNode",
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "final_output_node",
-                        "node",
-                    ],
+                    "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
                 },
                 "definition": None,
             },
@@ -253,11 +246,11 @@ def test_serialize_workflow(vellum_client):
                     "target_handle_id": "80d0894f-642e-4d2e-b43a-f236e7bedb3c",
                     "output_id": "5090e96d-5787-4a08-bf58-129101cf2548",
                     "output_type": "JSON",
-                    "node_input_id": "6828b56e-80b7-4699-b9dd-fd1f0820732e",
+                    "node_input_id": "5e892e5b-0004-4a04-bd2e-1ea9e0e5d3f9",
                 },
                 "inputs": [
                     {
-                        "id": "6828b56e-80b7-4699-b9dd-fd1f0820732e",
+                        "id": "5e892e5b-0004-4a04-bd2e-1ea9e0e5d3f9",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -276,14 +269,7 @@ def test_serialize_workflow(vellum_client):
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
                 "base": {
                     "name": "FinalOutputNode",
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "final_output_node",
-                        "node",
-                    ],
+                    "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
                 },
                 "definition": None,
             },
@@ -296,11 +282,11 @@ def test_serialize_workflow(vellum_client):
                     "target_handle_id": "0c98c306-b519-40d7-8b05-321b1dfd7f11",
                     "output_id": "44ea8d75-e2a8-4627-85b1-8504b65d25c9",
                     "output_type": "NUMBER",
-                    "node_input_id": "500ff745-344f-4094-9425-48c4b40b7a5d",
+                    "node_input_id": "14345321-7e6b-4e2a-918a-7a5b0064f047",
                 },
                 "inputs": [
                     {
-                        "id": "500ff745-344f-4094-9425-48c4b40b7a5d",
+                        "id": "14345321-7e6b-4e2a-918a-7a5b0064f047",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -319,14 +305,7 @@ def test_serialize_workflow(vellum_client):
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
                 "base": {
                     "name": "FinalOutputNode",
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "final_output_node",
-                        "node",
-                    ],
+                    "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
                 },
                 "definition": None,
             },

@@ -135,7 +135,6 @@ class VellumWorkflowDisplay(
                     # This is currently the wrapper node's output, but we want the wrapped node
                     workflow_output.instance,
                     self.display_context,
-                    workflow_output_display.node_input_id,
                 )
 
                 source_node_display: Optional[BaseNodeDisplay]
@@ -323,7 +322,6 @@ class VellumWorkflowDisplay(
                 name=overrides.name,
                 label=overrides.label,
                 node_id=overrides.node_id,
-                node_input_id=overrides.node_input_id,
                 target_handle_id=overrides.target_handle_id,
                 edge_id=overrides.edge_id,
                 display_data=overrides.display_data,
@@ -332,13 +330,11 @@ class VellumWorkflowDisplay(
         output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
         edge_id = uuid4_from_hash(f"{self.workflow_id}|edge_id|{output.name}")
         node_id = uuid4_from_hash(f"{self.workflow_id}|node_id|{output.name}")
-        node_input_id = uuid4_from_hash(f"{self.workflow_id}|node_input_id|{output.name}")
         target_handle_id = uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{output.name}")
 
         return WorkflowOutputVellumDisplay(
             id=output_id,
             node_id=node_id,
-            node_input_id=node_input_id,
             name=output.name,
             label="Final Output",
             target_handle_id=target_handle_id,

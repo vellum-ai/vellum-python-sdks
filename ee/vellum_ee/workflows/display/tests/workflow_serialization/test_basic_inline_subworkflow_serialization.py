@@ -145,7 +145,7 @@ def test_serialize_workflow():
                                 "merge_behavior": "AWAIT_ATTRIBUTES",
                             },
                             "ports": [
-                                {"id": "1e739e86-a285-4438-9725-a152c15a63e3", "type": "DEFAULT", "name": "default"}
+                                {"id": "1e739e86-a285-4438-9725-a152c15a63e3", "name": "default", "type": "DEFAULT"}
                             ],
                             "adornments": None,
                             "attributes": [
@@ -190,11 +190,11 @@ def test_serialize_workflow():
                                 "target_handle_id": "804bb543-9cf4-457f-acf1-fb4b8b7d9259",
                                 "output_id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622",
                                 "output_type": "NUMBER",
-                                "node_input_id": "a9dc6e1e-ecbd-4308-93f4-7429483dd07c",
+                                "node_input_id": "712eaeec-9e1e-41bd-9217-9caec8b6ade7",
                             },
                             "inputs": [
                                 {
-                                    "id": "a9dc6e1e-ecbd-4308-93f4-7429483dd07c",
+                                    "id": "712eaeec-9e1e-41bd-9217-9caec8b6ade7",
                                     "key": "node_input",
                                     "value": {
                                         "rules": [
@@ -213,14 +213,7 @@ def test_serialize_workflow():
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
                             "base": {
                                 "name": "FinalOutputNode",
-                                "module": [
-                                    "vellum",
-                                    "workflows",
-                                    "nodes",
-                                    "displayable",
-                                    "final_output_node",
-                                    "node",
-                                ],
+                                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
                             },
                             "definition": None,
                         },
@@ -233,11 +226,11 @@ def test_serialize_workflow():
                                 "target_handle_id": "6d4c4a14-c388-4c7a-b223-eb39baf5c080",
                                 "output_id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82",
                                 "output_type": "STRING",
-                                "node_input_id": "39c0f9c2-1805-4617-9771-4eb23c76d88e",
+                                "node_input_id": "8fd4279a-4f13-4257-9577-1b55e964cdf1",
                             },
                             "inputs": [
                                 {
-                                    "id": "39c0f9c2-1805-4617-9771-4eb23c76d88e",
+                                    "id": "8fd4279a-4f13-4257-9577-1b55e964cdf1",
                                     "key": "node_input",
                                     "value": {
                                         "rules": [
@@ -256,14 +249,7 @@ def test_serialize_workflow():
                             "display_data": {"position": {"x": 0.0, "y": 0.0}},
                             "base": {
                                 "name": "FinalOutputNode",
-                                "module": [
-                                    "vellum",
-                                    "workflows",
-                                    "nodes",
-                                    "displayable",
-                                    "final_output_node",
-                                    "node",
-                                ],
+                                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
                             },
                             "definition": None,
                         },
@@ -297,12 +283,7 @@ def test_serialize_workflow():
                     "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
                     "definition": {
                         "name": "NestedWorkflow",
-                        "module": [
-                            "tests",
-                            "workflows",
-                            "basic_inline_subworkflow",
-                            "workflow",
-                        ],
+                        "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
                     },
                 },
                 "input_variables": [{"id": "704c4640-bfda-44f0-8da3-e9cfc4f21cf2", "key": "metro", "type": "STRING"}],
@@ -336,29 +317,17 @@ def test_serialize_workflow():
         {
             "id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
             "type": "TERMINAL",
-            "base": {
-                "module": [
-                    "vellum",
-                    "workflows",
-                    "nodes",
-                    "displayable",
-                    "final_output_node",
-                    "node",
-                ],
-                "name": "FinalOutputNode",
-            },
-            "definition": None,
             "data": {
                 "label": "Final Output",
                 "name": "reasoning",
                 "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
                 "output_id": "7444a019-081a-4e10-a528-3249299159f7",
                 "output_type": "STRING",
-                "node_input_id": "736473c8-b0b4-4cdd-b743-6453dd5306fc",
+                "node_input_id": "c1833b54-95b6-4365-8e57-51b09c8e2606",
             },
             "inputs": [
                 {
-                    "id": "736473c8-b0b4-4cdd-b743-6453dd5306fc",
+                    "id": "c1833b54-95b6-4365-8e57-51b09c8e2606",
                     "key": "node_input",
                     "value": {
                         "rules": [
@@ -366,7 +335,7 @@ def test_serialize_workflow():
                                 "type": "NODE_OUTPUT",
                                 "data": {
                                     "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
-                                    "output_id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82",
+                                    "output_id": "0a7192da-5576-4933-bba4-de8adf5d7996",
                                 },
                             }
                         ],
@@ -375,6 +344,11 @@ def test_serialize_workflow():
                 }
             ],
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "FinalOutputNode",
+                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
+            },
+            "definition": None,
         },
         reasoning_terminal_node,
         ignore_order=True,
@@ -387,29 +361,17 @@ def test_serialize_workflow():
         {
             "id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
             "type": "TERMINAL",
-            "base": {
-                "module": [
-                    "vellum",
-                    "workflows",
-                    "nodes",
-                    "displayable",
-                    "final_output_node",
-                    "node",
-                ],
-                "name": "FinalOutputNode",
-            },
-            "definition": None,
             "data": {
                 "label": "Final Output",
                 "name": "temperature",
                 "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
                 "output_id": "99afb757-2782-465d-ab55-80ccf50552b9",
                 "output_type": "NUMBER",
-                "node_input_id": "df0d7e0c-2b37-4059-91c1-0419f950b7fe",
+                "node_input_id": "7761c5e1-cc2e-43ab-bfd2-f66c3d47b3b9",
             },
             "inputs": [
                 {
-                    "id": "df0d7e0c-2b37-4059-91c1-0419f950b7fe",
+                    "id": "7761c5e1-cc2e-43ab-bfd2-f66c3d47b3b9",
                     "key": "node_input",
                     "value": {
                         "rules": [
@@ -417,7 +379,7 @@ def test_serialize_workflow():
                                 "type": "NODE_OUTPUT",
                                 "data": {
                                     "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
-                                    "output_id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622",
+                                    "output_id": "86dd0202-c141-48a3-8382-2da60372e77c",
                                 },
                             }
                         ],
@@ -426,6 +388,11 @@ def test_serialize_workflow():
                 }
             ],
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {
+                "name": "FinalOutputNode",
+                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
+            },
+            "definition": None,
         },
         temperature_terminal_node,
         ignore_order=True,

@@ -181,11 +181,11 @@ def test_serialize_workflow(vellum_client):
                     "target_handle_id": "23117248-df28-4519-bebc-abcb24f966b3",
                     "output_id": "3f487916-126f-4d6c-95b4-fa72d875b793",
                     "output_type": "NUMBER",
-                    "node_input_id": "29e10bd7-eb39-4e0f-a406-c3a55b834d6f",
+                    "node_input_id": "6f4955d8-8a3f-4db7-8293-7affc5877dcd",
                 },
                 "inputs": [
                     {
-                        "id": "29e10bd7-eb39-4e0f-a406-c3a55b834d6f",
+                        "id": "6f4955d8-8a3f-4db7-8293-7affc5877dcd",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -224,11 +224,11 @@ def test_serialize_workflow(vellum_client):
                     "target_handle_id": "c3aeba92-4faf-4814-9842-eec7436ee555",
                     "output_id": "45d53a1e-26e8-4c43-a010-80d141acc249",
                     "output_type": "STRING",
-                    "node_input_id": "daaf0664-0aca-4619-af30-07caa1486b90",
+                    "node_input_id": "74337307-3fcb-42c5-9aed-98bd4a79caef",
                 },
                 "inputs": [
                     {
-                        "id": "daaf0664-0aca-4619-af30-07caa1486b90",
+                        "id": "74337307-3fcb-42c5-9aed-98bd4a79caef",
                         "key": "node_input",
                         "value": {
                             "rules": [

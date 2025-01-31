@@ -130,11 +130,11 @@ def test_serialize_workflow():
                 "target_handle_id": "16ba108e-61a8-4338-8a5b-4f1278d7fd7b",
                 "output_id": "62ec9b08-6437-4f8d-bc20-983d317bc348",
                 "output_type": "JSON",
-                "node_input_id": "310072db-6d07-4d29-8e5c-9c6909300925",
+                "node_input_id": "da51bb91-227c-481c-84d7-69c64322b485",
             },
             "inputs": [
                 {
-                    "id": "310072db-6d07-4d29-8e5c-9c6909300925",
+                    "id": "da51bb91-227c-481c-84d7-69c64322b485",
                     "key": "node_input",
                     "value": {
                         "rules": [

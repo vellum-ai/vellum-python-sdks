@@ -178,7 +178,7 @@ def test_serialize_workflow(vellum_client):
         "definition": None,
         "inputs": [
             {
-                "id": "5f0fdd0f-63fe-4437-bc1b-cd6a84bb84c5",
+                "id": "78aeb65b-3491-4d2a-8c47-401d4cb3d560",
                 "key": "node_input",
                 "value": {
                     "combinator": "OR",
@@ -197,7 +197,7 @@ def test_serialize_workflow(vellum_client):
         "data": {
             "label": "Final Output",
             "name": "text",
-            "node_input_id": "5f0fdd0f-63fe-4437-bc1b-cd6a84bb84c5",
+            "node_input_id": "78aeb65b-3491-4d2a-8c47-401d4cb3d560",
             "output_id": "a609ab19-db1b-4cd0-bdb0-aee5ed31dc28",
             "output_type": "STRING",
             "target_handle_id": "dced939a-9122-4290-8482-7daa9525dad6",

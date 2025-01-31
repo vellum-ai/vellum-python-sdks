@@ -138,11 +138,11 @@ def test_serialize_workflow():
                 "target_handle_id": "b070e9bc-e9b7-46d3-8f5b-0b646bd25cf0",
                 "output_id": "04c5c6be-f5e1-41b8-b668-39e179790d9e",
                 "output_type": "NUMBER",
-                "node_input_id": "39ff42c9-eae8-432e-ad41-e208fba77027",
+                "node_input_id": "c191a5c1-8912-49ad-bf4b-c6d4d58ed482",
             },
             "inputs": [
                 {
-                    "id": "39ff42c9-eae8-432e-ad41-e208fba77027",
+                    "id": "c191a5c1-8912-49ad-bf4b-c6d4d58ed482",
                     "key": "node_input",
                     "value": {
                         "rules": [

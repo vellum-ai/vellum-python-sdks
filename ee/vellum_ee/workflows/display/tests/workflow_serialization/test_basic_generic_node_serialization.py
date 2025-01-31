@@ -83,11 +83,11 @@ def test_serialize_workflow(vellum_client):
                 "target_handle_id": "8bd9f4f3-9f66-4d95-8e84-529b0002c531",
                 "output_id": "2b6389d0-266a-4be4-843e-4e543dd3d727",
                 "output_type": "STRING",
-                "node_input_id": "7a9f2d3a-0b23-4bd4-b567-e9493135b727",
+                "node_input_id": "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90",
             },
             "inputs": [
                 {
-                    "id": "7a9f2d3a-0b23-4bd4-b567-e9493135b727",
+                    "id": "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90",
                     "key": "node_input",
                     "value": {
                         "rules": [

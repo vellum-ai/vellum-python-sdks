@@ -58,7 +58,6 @@ class MapNodeWorkflowDisplay(VellumWorkflowDisplay[MapNodeWorkflow]):
         MapNodeWorkflow.Outputs.final_output: WorkflowOutputVellumDisplayOverrides(
             id=UUID("bffc4749-00b8-44db-90ee-db655cbc7e62"),
             node_id=UUID("d9d29911-dd45-45d5-9ac8-1a06bb596c2f"),
-            node_input_id=UUID("18dddbce-025b-461c-aa7a-ab2561739521"),
             name="final-output",
             label="Final Output",
             target_handle_id=UUID("8ff89a09-6ff0-4b02-bba7-eb8456a9c865"),

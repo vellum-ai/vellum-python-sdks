@@ -27,7 +27,7 @@ def create_node_input(
     input_name: str,
     value: Any,
     display_context: WorkflowDisplayContext,
-    input_id: Union[Optional[UUID], Optional[str]],
+    input_id: Union[Optional[UUID], Optional[str]] = None,
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = ConstantValuePointer,
 ) -> NodeInput:
     input_id = str(input_id) if input_id else str(uuid4_from_hash(f"{node_id}|{input_name}"))

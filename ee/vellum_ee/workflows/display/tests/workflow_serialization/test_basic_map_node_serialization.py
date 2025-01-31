@@ -173,11 +173,11 @@ def test_serialize_workflow():
                                 "target_handle_id": "9d74571f-b7f5-4c1d-8b7c-b9c648738a4d",
                                 "output_id": "2a957315-fae0-4366-8a35-f0b315c5eade",
                                 "output_type": "NUMBER",
-                                "node_input_id": "ae65cf7e-3db6-410f-a556-75ee11ce7e84",
+                                "node_input_id": "05f2e4cc-0e36-4c6b-a535-be38281e5280",
                             },
                             "inputs": [
                                 {
-                                    "id": "ae65cf7e-3db6-410f-a556-75ee11ce7e84",
+                                    "id": "05f2e4cc-0e36-4c6b-a535-be38281e5280",
                                     "key": "node_input",
                                     "value": {
                                         "rules": [
@@ -293,11 +293,11 @@ def test_serialize_workflow():
                 "target_handle_id": "720dd872-2f3d-47b9-8245-89387f04f300",
                 "output_id": "145b0b68-224b-4f83-90e6-eea3457e6c3e",
                 "output_type": "JSON",
-                "node_input_id": "d1b01eac-23a9-43ce-beb3-e13f83bd7d18",
+                "node_input_id": "57fe72e9-cc9f-48f2-b5ea-25ac52637a33",
             },
             "inputs": [
                 {
-                    "id": "d1b01eac-23a9-43ce-beb3-e13f83bd7d18",
+                    "id": "57fe72e9-cc9f-48f2-b5ea-25ac52637a33",
                     "key": "node_input",
                     "value": {
                         "rules": [

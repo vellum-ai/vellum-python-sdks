@@ -249,11 +249,11 @@ def test_serialize_workflow():
             "target_handle_id": "cd8c736f-1b77-493d-b857-d8feb5c03b15",
             "output_id": "27424f7d-9767-4059-bdcf-c2be8b798fd7",
             "output_type": "STRING",
-            "node_input_id": "008eaf1d-98c0-4098-8839-5b94121394d7",
+            "node_input_id": "39c7f674-a794-4525-8a04-f22a40ed0914",
         },
         "inputs": [
             {
-                "id": "008eaf1d-98c0-4098-8839-5b94121394d7",
+                "id": "39c7f674-a794-4525-8a04-f22a40ed0914",
                 "key": "node_input",
                 "value": {
                     "rules": [

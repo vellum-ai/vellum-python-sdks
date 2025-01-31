@@ -42,7 +42,6 @@ class SubworkflowNodeWorkflowDisplay(VellumWorkflowDisplay[SubworkflowNodeWorkfl
         SubworkflowNodeWorkflow.Outputs.final_output: WorkflowOutputVellumDisplayOverrides(
             id=UUID("6ab3665f-881d-488b-9124-a6da40136c68"),
             node_id=UUID("f3fe1e6e-5a4a-42d8-9cfe-9ecbcb935f72"),
-            node_input_id=UUID("8e8c6182-4898-47de-be8f-769edad990ed"),
             name="final-output",
             label="Final Output",
             target_handle_id=UUID("20aa0107-742b-4662-941f-4f146b3c5565"),

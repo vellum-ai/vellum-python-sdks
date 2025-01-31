@@ -457,12 +457,6 @@ export class Workflow {
                       value: python.TypeInstantiation.uuid(terminalNodeData.id),
                     }),
                     python.methodArgument({
-                      name: "node_input_id",
-                      value: python.TypeInstantiation.uuid(
-                        terminalNodeData.data.nodeInputId
-                      ),
-                    }),
-                    python.methodArgument({
                       name: "name",
                       value: python.TypeInstantiation.str(
                         // Intentionally use the raw name from the terminal node
