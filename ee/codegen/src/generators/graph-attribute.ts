@@ -3,6 +3,8 @@ import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { StaticMethodInvocation } from "./static-method-invocation";
+
 import {
   PORTS_CLASS_NAME,
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
@@ -756,11 +758,12 @@ export class GraphAttribute extends AstNode {
         }
       );
       if (useWrap) {
-        return new python.MethodInvocation({
-          methodReference: python.reference({
-            name: "Graph.from_set",
+        return new StaticMethodInvocation({
+          reference: python.reference({
+            name: "Graph",
             modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
           }),
+          methodName: "from_set",
           arguments_: [python.methodArgument({ value: setAst })],
         });
       }
