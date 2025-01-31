@@ -192,7 +192,7 @@ class _BaseNodeTriggerMeta(type):
 
 class _BaseNodeExecutionMeta(type):
     def __getattribute__(cls, name: str) -> Any:
-        if name.startswith("count") and issubclass(cls, BaseNode.Execution):
+        if name == "count" and issubclass(cls, BaseNode.Execution):
             return ExecutionCountReference(cls.node_class)
 
         return super().__getattribute__(name)
