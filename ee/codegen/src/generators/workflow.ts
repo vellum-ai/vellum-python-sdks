@@ -478,17 +478,17 @@ export class Workflow {
             (workflowOutputContext) => {
               const finalOutput =
                 workflowOutputContext.getFinalOutputNodeData();
-              let nodeId: string;
+              let outputNodeId: string;
               let targetHandleId: string;
               let outputId: string;
-              let nodeInputId: string;
+              let nodeInputId: string | undefined;
               let name: string;
               let label: string;
               let displayData: NodeDisplayDataType | undefined;
 
               // Final output node
               if ("type" in finalOutput) {
-                nodeId = finalOutput.id;
+                outputNodeId = finalOutput.id;
                 targetHandleId = finalOutput.data.targetHandleId;
                 outputId = finalOutput.data.outputId;
                 nodeInputId = finalOutput.data.nodeInputId;
@@ -509,12 +509,11 @@ export class Workflow {
                   this.workflowContext.getOutputVariableContextById(
                     finalOutput.outputVariableId
                   );
-                nodeId = referencedNode.getNodeId();
+                outputNodeId = referencedNode.getNodeId();
                 targetHandleId = this.getTargetHandleId(
                   referencedNode.nodeData
                 );
                 outputId = finalOutput.value.nodeOutputId;
-                nodeInputId = "";
                 name = referencedOutput.name;
                 label = this.getLabel(referencedNode.nodeData);
                 displayData = referencedNode.nodeData.displayData;
@@ -522,14 +521,14 @@ export class Workflow {
 
               const edge = this.getEdges().find((edge) => {
                 return (
-                  edge.targetNodeId === nodeId &&
+                  edge.targetNodeId === outputNodeId &&
                   edge.targetHandleId === targetHandleId
                 );
               });
 
               if (!edge) {
                 throw new WorkflowGenerationError(
-                  `Could not find edge for final output node ${nodeId}`
+                  `Could not find edge for final output node ${outputNodeId}`
                 );
               }
 
@@ -553,7 +552,7 @@ export class Workflow {
                     }),
                     python.methodArgument({
                       name: "node_id",
-                      value: python.TypeInstantiation.uuid(nodeId),
+                      value: python.TypeInstantiation.uuid(outputNodeId),
                     }),
                     python.methodArgument({
                       name: "name",

@@ -1,0 +1,189 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
+        "type": "TEMPLATING",
+        "data": {
+          "label": "Templating Node",
+          "output_id": "c66c362b-bb83-4333-a691-b72dc9a8734d",
+          "error_output_id": null,
+          "source_handle_id": "74e0d264-fed6-453f-8769-23f26b976fc2",
+          "target_handle_id": "62e924f8-3f80-475f-b6f0-bda3420a50bc",
+          "template_node_input_id": "e7904d49-cb35-4bc8-8dd6-3c8e243353d2",
+          "output_type": "STRING"
+        },
+        "inputs": [
+          {
+            "id": "5e8396fe-1803-405f-ab1b-95132b592552",
+            "key": "example_var_1",
+            "value": {
+              "rules": [
+                {
+                  "type": "INPUT_VARIABLE",
+                  "data": {
+                    "input_variable_id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "e7904d49-cb35-4bc8-8dd6-3c8e243353d2",
+            "key": "template",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "{{ example_var_1 }}"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 1934.0008032128517,
+            "y": 219.2219534344094
+          },
+          "comment": null,
+          "width": 466.0,
+          "height": 224.0
+        },
+        "base": null,
+        "definition": null,
+        "trigger": {
+          "id": "62e924f8-3f80-475f-b6f0-bda3420a50bc",
+          "merge_behavior": "AWAIT_ANY"
+        }
+      },
+      {
+        "id": "39a5155a-d137-4a56-be36-d525802df463",
+        "type": "ENTRYPOINT",
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "beddfefc-dc34-483d-b313-f6a2a2e0737e"
+        },
+        "inputs": [],
+        "display_data": {
+          "position": {
+            "x": 1545.0,
+            "y": 330.0
+          },
+          "comment": null,
+          "width": 124.0,
+          "height": 48.0
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "eb72f89e-f831-4fc1-a54f-dec7f429fff9",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "final-output",
+          "target_handle_id": "52b9ff71-e090-4c68-a713-fd72d194b992",
+          "output_id": "4dc6e13e-92ba-436e-aa35-87e258f2f585",
+          "output_type": "STRING",
+          "node_input_id": "0d184119-05b8-4551-a01c-418d3b983880"
+        },
+        "inputs": [
+          {
+            "id": "0d184119-05b8-4551-a01c-418d3b983880",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
+                    "output_id": "c66c362b-bb83-4333-a691-b72dc9a8734d"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 2750.0,
+            "y": 211.25540166204985
+          },
+          "comment": null,
+          "width": 471.0,
+          "height": 234.0
+        },
+        "base": null,
+        "definition": null,
+        "trigger": {
+          "id": "52b9ff71-e090-4c68-a713-fd72d194b992",
+          "merge_behavior": "AWAIT_ANY"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "type": "DEFAULT",
+        "id": "e659e56b-89a7-49d0-b792-b27006242fe1",
+        "source_node_id": "39a5155a-d137-4a56-be36-d525802df463",
+        "source_handle_id": "beddfefc-dc34-483d-b313-f6a2a2e0737e",
+        "target_node_id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
+        "target_handle_id": "62e924f8-3f80-475f-b6f0-bda3420a50bc"
+      },
+      {
+        "type": "DEFAULT",
+        "id": "dd79b52e-5a4d-4e62-9f83-9dd2468ca891",
+        "source_node_id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
+        "source_handle_id": "74e0d264-fed6-453f-8769-23f26b976fc2",
+        "target_node_id": "eb72f89e-f831-4fc1-a54f-dec7f429fff9",
+        "target_handle_id": "52b9ff71-e090-4c68-a713-fd72d194b992"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": -803.590909090909,
+        "y": 155.55369283943529,
+        "zoom": 0.5494263018534863
+      }
+    },
+    "definition": null,
+    "output_values": [
+      {
+        "output_variable_id": "4dc6e13e-92ba-436e-aa35-87e258f2f585",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "eb72f89e-f831-4fc1-a54f-dec7f429fff9",
+          "node_output_id": "4dc6e13e-92ba-436e-aa35-87e258f2f585"
+        }
+      }
+    ]
+  },
+  "input_variables": [
+    {
+      "id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5",
+      "key": "text",
+      "type": "STRING",
+      "required": true,
+      "default": null,
+      "extensions": null
+    }
+  ],
+  "output_variables": [
+    {
+      "id": "4dc6e13e-92ba-436e-aa35-87e258f2f585",
+      "key": "final-output",
+      "type": "STRING",
+      "required": null,
+      "default": null,
+      "extensions": null
+    }
+  ],
+  "runner_config": null
+}
