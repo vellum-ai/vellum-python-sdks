@@ -1,10 +1,10 @@
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.retry_node import RetryNode
+from vellum.workflows.state import BaseState
 
 
-@RetryNode.wrap(max_attempts=3, interval=0.1)
-class RetryableNode(BaseNode):
+class StartNode(BaseNode):
     attempt_number = RetryNode.SubworkflowInputs.attempt_number
 
     class Outputs(BaseNode.Outputs):
@@ -15,6 +15,22 @@ class RetryableNode(BaseNode):
             raise Exception("This is a retryable node")
 
         return self.Outputs(execution_count=self.attempt_number)
+
+
+class Subworkflow(BaseWorkflow[RetryNode.SubworkflowInputs, BaseState]):
+    graph = StartNode
+
+    class Outputs(StartNode.Outputs):
+        pass
+
+
+class RetryableNode(RetryNode):
+    max_attempts = 3
+    delay = 0.1  # 0.1 second between retries
+    subworkflow = Subworkflow
+
+    class Outputs(Subworkflow.Outputs):
+        pass
 
 
 class SimpleRetryExample(BaseWorkflow):

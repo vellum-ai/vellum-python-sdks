@@ -18,13 +18,13 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     Used to retry a Subworkflow a specified number of times.
 
     max_attempts: int - The maximum number of attempts to retry the Subworkflow
-    interval: float = 0 - The number of seconds to wait between retries
+    delay: float = 0 - The number of seconds to wait between retries
     retry_on_error_code: Optional[VellumErrorCode] = None - The error code to retry on
     subworkflow: Type["BaseWorkflow[SubworkflowInputs, BaseState]"] - The Subworkflow to execute
     """
 
     max_attempts: int
-    interval: float = 0
+    delay: Optional[float] = None
     retry_on_error_code: Optional[WorkflowErrorCode] = None
     retry_on_condition: Optional[BaseDescriptor] = None
 
@@ -75,7 +75,8 @@ Message: {terminal_event.error.message}""",
                     terminal_event.error.message,
                     code=terminal_event.error.code,
                 )
-                time.sleep(self.interval)
+                if self.delay:
+                    time.sleep(self.delay)
 
         raise last_exception
 
@@ -83,7 +84,7 @@ Message: {terminal_event.error.message}""",
     def wrap(
         cls,
         max_attempts: int,
-        interval: float = 0,
+        delay: Optional[float] = None,
         retry_on_error_code: Optional[WorkflowErrorCode] = None,
         retry_on_condition: Optional[BaseDescriptor] = None,
     ) -> Callable[..., Type["RetryNode"]]:
@@ -91,7 +92,7 @@ Message: {terminal_event.error.message}""",
             cls,
             attributes={
                 "max_attempts": max_attempts,
-                "interval": interval,
+                "delay": delay,
                 "retry_on_error_code": retry_on_error_code,
                 "retry_on_condition": retry_on_condition,
             },
