@@ -219,7 +219,7 @@ ${errors.slice(0, 3).map((err) => {
 
     await new Promise((resolve, reject) => {
       exec(
-        `${isortCmd} --sp ${setupCfgPath} ${this.workflowContext.absolutePathToOutputDirectory}`,
+        `${isortCmd} --sp ${setupCfgPath} --skip script.py ${this.workflowContext.absolutePathToOutputDirectory}`,
         (error: Error | null) => {
           if (error) {
             reject(error);
