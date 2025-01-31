@@ -448,19 +448,48 @@ export class Workflow {
         initializer: python.TypeInstantiation.dict(
           this.workflowContext.workflowOutputContexts.map(
             (workflowOutputContext) => {
-              const terminalNodeData =
+              const finalOutput =
                 workflowOutputContext.getFinalOutputNodeData();
+              let nodeId: string;
+              let targetHandleId: string;
+              let outputId: string;
+              let nodeInputId: string;
+              let name: string;
+              let label: string;
+              let displayData: NodeDisplayDataType | undefined;
+
+              if ("type" in finalOutput) {
+                nodeId = finalOutput.id;
+                targetHandleId = finalOutput.data.targetHandleId;
+                outputId = finalOutput.data.outputId;
+                nodeInputId = finalOutput.data.nodeInputId;
+                name = finalOutput.data.name;
+                label = finalOutput.data.label;
+                displayData = finalOutput.displayData;
+              } else {
+                const referencedNode = this.workflowContext.getNodeContext(
+                  finalOutput.value.nodeId
+                );
+                if (!referencedNode) {
+                  throw new WorkflowGenerationError(
+                    `Could not find node ${finalOutput.value.nodeId}`
+                  );
+                }
+                const nodeData = referencedNode.nodeData;
+                nodeId = referencedNode.getNodeId();
+                targetHandleId = nodeData.data;
+              }
 
               const edge = this.getEdges().find((edge) => {
                 return (
-                  edge.targetNodeId === terminalNodeData.id &&
-                  edge.targetHandleId === terminalNodeData.data.targetHandleId
+                  edge.targetNodeId === nodeId &&
+                  edge.targetHandleId === targetHandleId
                 );
               });
 
               if (!edge) {
                 throw new WorkflowGenerationError(
-                  `Could not find edge for terminal node ${terminalNodeData.id}`
+                  `Could not find edge for terminal node ${nodeId}`
                 );
               }
 
@@ -480,32 +509,28 @@ export class Workflow {
                   arguments_: [
                     python.methodArgument({
                       name: "id",
-                      value: python.TypeInstantiation.uuid(
-                        terminalNodeData.data.outputId
-                      ),
+                      value: python.TypeInstantiation.uuid(outputId),
                     }),
                     python.methodArgument({
                       name: "node_id",
-                      value: python.TypeInstantiation.uuid(terminalNodeData.id),
+                      value: python.TypeInstantiation.uuid(nodeId),
                     }),
                     python.methodArgument({
                       name: "name",
                       value: python.TypeInstantiation.str(
                         // Intentionally use the raw name from the terminal node
                         // Rather than the sanitized name from the output context
-                        terminalNodeData.data.name
+                        name
                       ),
                     }),
                     python.methodArgument({
                       name: "label",
-                      value: python.TypeInstantiation.str(
-                        terminalNodeData.data.label
-                      ),
+                      value: python.TypeInstantiation.str(label),
                     }),
                     python.methodArgument({
                       name: "display_data",
                       value: new NodeDisplayData({
-                        nodeDisplayData: terminalNodeData.displayData,
+                        nodeDisplayData: displayData,
                         workflowContext: this.workflowContext,
                       }),
                     }),

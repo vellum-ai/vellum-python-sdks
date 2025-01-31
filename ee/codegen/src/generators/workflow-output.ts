@@ -29,7 +29,7 @@ export class WorkflowOutput extends AstNode {
   }
 
   private generateWorkflowOutput(): Field {
-    const terminalNodeId = this.workflowOutputContext.getFinalOutputNodeId();
+    const terminalNodeId = this.workflowOutputContext.getOutputNodeId();
     const terminalNodeContext =
       this.workflowContext.getNodeContext(terminalNodeId);
 

@@ -47,6 +47,7 @@ import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-dep
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
+import { OutputVariableContext } from "src/context/output-variable-context";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { ApiNode } from "src/generators/nodes/api-node";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
@@ -64,12 +65,13 @@ import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   EntrypointNode,
+  FinalOutputNode as FinalOutputNodeType,
   WorkflowDataNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
-import { assertUnreachable } from "src/utils/typing";
+import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
 
 export interface WorkflowProjectGeneratorOptions {
   /**
@@ -338,19 +340,25 @@ ${errors.slice(0, 3).map((err) => {
       this.workflowContext.addInputVariableContext(inputVariableContext);
     });
 
+    this.workflowVersionExecConfig.outputVariables.forEach((outputVariable) => {
+      const outputVariableContext = new OutputVariableContext({
+        outputVariableData: outputVariable,
+      });
+      this.workflowContext.addOutputVariableContext(outputVariableContext);
+    });
+
+    this.initializeWorkflowOutputContexts();
+
     let entrypointNode: EntrypointNode | undefined;
     const nodesToGenerate: WorkflowDataNode[] = [];
     await Promise.all(
       this.workflowVersionExecConfig.workflowRawData.nodes
         .map(async (nodeData) => {
           if (nodeData.type === "TERMINAL") {
-            this.workflowContext.addWorkflowOutputContext(
-              new WorkflowOutputContext({
-                workflowContext: this.workflowContext,
-                terminalNodeData: nodeData,
-              })
-            );
-          } else if (nodeData.type === "ENTRYPOINT") {
+            return;
+          }
+
+          if (nodeData.type === "ENTRYPOINT") {
             if (entrypointNode) {
               throw new WorkflowGenerationError(
                 "Multiple entrypoint nodes found"
@@ -708,5 +716,39 @@ ${errors.slice(0, 3).map((err) => {
     }
 
     throw new PostProcessingError("No isort Config file found");
+  }
+
+  private initializeWorkflowOutputContexts(): void {
+    const { workflowRawData } = this.workflowVersionExecConfig;
+
+    if (!isNilOrEmpty(workflowRawData.outputValues)) {
+      // If we have explicit output values, use those
+      workflowRawData.outputValues?.forEach((outputValue) => {
+        const node = workflowRawData.nodes.find(
+          (node) => node.id === outputValue.value.nodeId
+        ) as WorkflowDataNode;
+
+        if (node) {
+          this.workflowContext.addWorkflowOutputContext(
+            new WorkflowOutputContext({
+              workflowContext: this.workflowContext,
+              workflowOutputValue: outputValue,
+            })
+          );
+        }
+      });
+    } else {
+      // Otherwise fall back to creating from all terminal nodes
+      workflowRawData.nodes
+        .filter((node) => node.type === "TERMINAL")
+        .forEach((terminalNode) => {
+          this.workflowContext.addWorkflowOutputContext(
+            new WorkflowOutputContext({
+              workflowContext: this.workflowContext,
+              terminalNodeData: terminalNode as FinalOutputNodeType,
+            })
+          );
+        });
+    }
   }
 }

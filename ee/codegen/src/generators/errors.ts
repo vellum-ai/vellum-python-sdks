@@ -2,6 +2,7 @@ export type CodegenErrorCode =
   | "PROJECT_SERIALIZATION_ERROR"
   | "WORKFLOW_GENERATION_ERROR"
   | "WORKFLOW_INPUT_GENERATION_ERROR"
+  | "WORKFLOW_OUTPUT_GENERATION_ERROR"
   | "NODE_DEFINITION_GENERATION_ERROR"
   | "NODE_ATTRIBUTE_GENERATION_ERROR"
   | "NODE_PORT_GENERATION_ERROR"
@@ -39,6 +40,14 @@ export class WorkflowGenerationError extends BaseCodegenError {
  */
 export class WorkflowInputGenerationError extends BaseCodegenError {
   code = "WORKFLOW_INPUT_GENERATION_ERROR" as const;
+}
+
+/**
+ * An error that raises when the Workflow Outputs fail to
+ * generate.
+ */
+export class WorkflowOutputGenerationError extends BaseCodegenError {
+  code = "WORKFLOW_OUTPUT_GENERATION_ERROR" as const;
 }
 
 /**

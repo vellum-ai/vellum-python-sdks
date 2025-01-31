@@ -3,6 +3,7 @@ import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
 import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";
 import { InputVariableContext } from "src/context/input-variable-context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { OutputVariableContext } from "src/context/output-variable-context";
 import { PortContext } from "src/context/port-context";
 import { generateSdkModulePaths } from "src/context/workflow-context/sdk-module-paths";
 import { SDK_MODULE_PATHS } from "src/context/workflow-context/types";
@@ -14,6 +15,7 @@ import {
   NodePortGenerationError,
   WorkflowGenerationError,
   WorkflowInputGenerationError,
+  WorkflowOutputGenerationError,
 } from "src/generators/errors";
 import { BaseNode } from "src/generators/nodes/bases";
 import {
@@ -24,6 +26,8 @@ import {
 import { createPythonClassName } from "src/utils/casing";
 
 type InputVariableContextsById = Map<string, InputVariableContext>;
+
+type OutputVariableContextsById = Map<string, OutputVariableContext>;
 
 type NodeContextsByNodeId = Map<string, BaseNodeContext<WorkflowDataNode>>;
 
@@ -37,6 +41,7 @@ export declare namespace WorkflowContext {
     workflowClassName: string;
     globalInputVariableContextsById?: InputVariableContextsById;
     globalNodeContextsByNodeId?: NodeContextsByNodeId;
+    globalOutputVariableContextsById?: OutputVariableContextsById;
     parentNode?: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
     workflowsSdkModulePath?: readonly string[];
     portContextByName?: PortContextById;
@@ -58,6 +63,12 @@ export class WorkflowContext {
   // Tracks local and global contexts in the case of nested workflows.
   public readonly inputVariableContextsById: InputVariableContextsById;
   public readonly globalInputVariableContextsById: InputVariableContextsById;
+
+  // Maps workflow output variable IDs to the output variable
+  // Tracks local and global contexts in the case of nested workflows.
+  public readonly outputVariableContextsById: OutputVariableContextsById;
+  public readonly globalOutputVariableContextsById: OutputVariableContextsById;
+
   public readonly strict: boolean;
 
   // Track what input variables names are used within this workflow so that we can ensure name uniqueness when adding
@@ -114,6 +125,7 @@ export class WorkflowContext {
     workflowClassName,
     globalInputVariableContextsById,
     globalNodeContextsByNodeId,
+    globalOutputVariableContextsById,
     parentNode,
     workflowsSdkModulePath = ["vellum", "workflows"] as const,
     portContextByName,
@@ -152,6 +164,10 @@ export class WorkflowContext {
 
     this.codeExecutionNodeCodeRepresentationOverride =
       codeExecutionNodeCodeRepresentationOverride;
+
+    this.outputVariableContextsById = new Map();
+    this.globalOutputVariableContextsById =
+      globalOutputVariableContextsById ?? new Map();
   }
 
   /* Create a new workflow context for a nested workflow from its parent */
@@ -244,6 +260,64 @@ export class WorkflowContext {
     inputVariableId: string
   ): InputVariableContext | undefined {
     return this.globalInputVariableContextsById.get(inputVariableId);
+  }
+
+  public findOutputVariableContextById(
+    outputVariableId: string
+  ): OutputVariableContext | undefined {
+    return this.globalOutputVariableContextsById.get(outputVariableId);
+  }
+
+  public getInputVariableContextById(
+    inputVariableId: string
+  ): InputVariableContext {
+    const inputVariableContext =
+      this.findInputVariableContextById(inputVariableId);
+
+    if (!inputVariableContext) {
+      throw new WorkflowInputGenerationError(
+        `Input variable context not found for ID: ${inputVariableId}`
+      );
+    }
+
+    return inputVariableContext;
+  }
+
+  public addOutputVariableContext(
+    outputVariableContext: OutputVariableContext
+  ): void {
+    const outputVariableId = outputVariableContext.getOutputVariableId();
+
+    if (this.globalOutputVariableContextsById.get(outputVariableId)) {
+      throw new WorkflowOutputGenerationError(
+        `Output variable context already exists for output variable ID: ${outputVariableId}`
+      );
+    }
+
+    this.outputVariableContextsById.set(
+      outputVariableId,
+      outputVariableContext
+    );
+    this.globalOutputVariableContextsById.set(
+      outputVariableId,
+      outputVariableContext
+    );
+    this.addUsedOutputVariableName(outputVariableContext.name);
+  }
+
+  public getOutputVariableContextById(
+    outputVariableId: string
+  ): OutputVariableContext {
+    const outputVariableContext =
+      this.findOutputVariableContextById(outputVariableId);
+
+    if (!outputVariableContext) {
+      throw new WorkflowInputGenerationError(
+        `Output variable context not found for ID: ${outputVariableId}`
+      );
+    }
+
+    return outputVariableContext;
   }
 
   public findInputVariableContextByRawName(
