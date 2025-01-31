@@ -182,7 +182,7 @@ class VellumWorkflowDisplay(
 
                     synthetic_output_edges.append(
                         {
-                            "id": str(workflow_output_display.edge_id),
+                            "id": str(uuid4_from_hash(f"{self.workflow_id}|edge_id|{workflow_output_display.name}")),
                             "source_node_id": str(source_node_display.node_id),
                             "source_handle_id": str(source_handle_id),
                             "target_node_id": str(workflow_output_display.node_id),
@@ -325,12 +325,10 @@ class VellumWorkflowDisplay(
                 node_id=overrides.node_id,
                 node_input_id=overrides.node_input_id,
                 target_handle_id=overrides.target_handle_id,
-                edge_id=overrides.edge_id,
                 display_data=overrides.display_data,
             )
 
         output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
-        edge_id = uuid4_from_hash(f"{self.workflow_id}|edge_id|{output.name}")
         node_id = uuid4_from_hash(f"{self.workflow_id}|node_id|{output.name}")
         node_input_id = uuid4_from_hash(f"{self.workflow_id}|node_input_id|{output.name}")
         target_handle_id = uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{output.name}")
@@ -342,7 +340,6 @@ class VellumWorkflowDisplay(
             name=output.name,
             label="Final Output",
             target_handle_id=target_handle_id,
-            edge_id=edge_id,
             display_data=NodeDisplayData(),
         )
 

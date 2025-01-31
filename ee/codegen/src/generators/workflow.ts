@@ -489,10 +489,6 @@ export class Workflow {
                         workflowContext: this.workflowContext,
                       }),
                     }),
-                    python.methodArgument({
-                      name: "edge_id",
-                      value: python.TypeInstantiation.uuid(edge.id),
-                    }),
                   ],
                 }),
               };

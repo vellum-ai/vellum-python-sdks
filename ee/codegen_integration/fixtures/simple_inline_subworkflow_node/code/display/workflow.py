@@ -53,6 +53,5 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
             label="Final Output",
             target_handle_id=UUID("abf4fec7-4053-417c-bf17-21819155d4d1"),
             display_data=NodeDisplayData(position=NodeDisplayPosition(x=2750, y=210), width=480, height=233),
-            edge_id=UUID("d6c3d222-a05c-43b2-8d21-462f94fd3b1e"),
         )
     }

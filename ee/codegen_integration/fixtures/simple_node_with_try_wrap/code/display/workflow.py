@@ -55,6 +55,5 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
             display_data=NodeDisplayData(
                 position=NodeDisplayPosition(x=2761.0242006615217, y=208.9757993384785), width=474, height=234
             ),
-            edge_id=UUID("95b7bf4b-6447-438a-88a5-1f47ec9b3d3c"),
         )
     }
