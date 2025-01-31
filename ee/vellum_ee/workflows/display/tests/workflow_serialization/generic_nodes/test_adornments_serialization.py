@@ -20,7 +20,7 @@ class Inputs(BaseInputs):
     input: str
 
 
-@RetryNode.wrap(max_attempts=3, interval=1)
+@RetryNode.wrap(max_attempts=3)
 class InnerRetryGenericNode(BaseNode):
     input = Inputs.input
 
@@ -81,11 +81,6 @@ def test_serialize_node__retry(serialize_node):
                     },
                     "attributes": [
                         {
-                            "id": "6810e294-15c0-48a0-b77c-fa7318fd1c33",
-                            "name": "interval",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1.0}},
-                        },
-                        {
                             "id": "f388e93b-8c68-4f54-8577-bbd0c9091557",
                             "name": "max_attempts",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 3.0}},
@@ -119,7 +114,7 @@ def test_serialize_node__retry(serialize_node):
 
 
 def test_serialize_node__retry__no_display():  # GIVEN an adornment node
-    @RetryNode.wrap(max_attempts=5, interval=1)
+    @RetryNode.wrap(max_attempts=5)
     class StartNode(BaseNode):
         pass
 
