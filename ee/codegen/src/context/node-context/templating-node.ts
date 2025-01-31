@@ -11,7 +11,7 @@ export class TemplatingNodeContext extends BaseNodeContext<TemplatingNode> {
     return {
       [this.nodeData.data.outputId]: "result",
       ...(this.nodeData.data.errorOutputId
-        ? { [this.nodeData.data.errorOutputId]: "errorOutputId" }
+        ? { [this.nodeData.data.errorOutputId]: "error" }
         : {}),
     };
   }

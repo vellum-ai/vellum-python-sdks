@@ -43,6 +43,28 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 "
 `;
 
+exports[`Workflow > write > should handle loops of conditionals and import Graph.from_set properly 1`] = `
+"from vellum.workflows import BaseWorkflow
+from .nodes.start_node import StartNode
+from .nodes.top_node import TopNode
+from vellum.workflows.graph import Graph
+from .nodes.loop_check_node import LoopCheckNode
+from .nodes.final_output_node import FinalOutputNode
+
+
+class TestWorkflow(BaseWorkflow):
+    graph = {
+        StartNode.Ports.branch_1 >> TopNode,
+        StartNode.Ports.branch_2,
+    } >> Graph.from_set(
+        {
+            LoopCheckNode.Ports.branch_1 >> StartNode,
+            LoopCheckNode.Ports.branch_2 >> FinalOutputNode,
+        }
+    )
+"
+`;
+
 exports[`Workflow > write > should handle the case of multiple nodes with the same label 1`] = `
 "from vellum.workflows import BaseWorkflow
 from .nodes.templating_node import TemplatingNode

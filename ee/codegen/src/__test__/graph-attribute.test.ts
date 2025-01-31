@@ -1,5 +1,4 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { v4 as uuidv4 } from "uuid";
 
 import { workflowContextFactory } from "./helpers";
 import { edgesFactory } from "./helpers/edge-data-factories";
@@ -1046,56 +1045,6 @@ describe("Workflow", () => {
        *     }
        * )
        */
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("should handle loops of conditionals", async () => {
-      const startNode = conditionalNodeFactory({
-        label: "Start Node",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: startNode,
-      });
-
-      const loopCheckNode = conditionalNodeFactory({
-        id: uuidv4(),
-        label: "Loop Check Node",
-        ifSourceHandleId: uuidv4(),
-        elseSourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: loopCheckNode,
-      });
-
-      const finalOutput = finalOutputNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: finalOutput,
-      });
-
-      const topNode = templatingNodeFactory({
-        label: "Top Node",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: topNode,
-      });
-
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, startNode],
-          [[startNode, "0"], topNode],
-          [[startNode, "1"], loopCheckNode],
-          [[loopCheckNode, "0"], startNode],
-          [[loopCheckNode, "1"], finalOutput],
-          [[topNode, "0"], loopCheckNode],
-        ])
-      );
-
       new GraphAttribute({ workflowContext }).write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

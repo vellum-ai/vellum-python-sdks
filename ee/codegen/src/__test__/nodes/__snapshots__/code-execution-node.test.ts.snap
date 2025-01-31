@@ -57,6 +57,24 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`CodeExecutionNode > basic secret node > secret ids should show names 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+from vellum.workflows.references import VellumSecretReference
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {
+        "secret_arg": VellumSecretReference("test-secret"),
+    }
+    runtime = "PYTHON_3_11"
+    packages = None
+"
+`;
+
 exports[`CodeExecutionNode > code representation override > should generate the correct node class when the override is INLINE 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,

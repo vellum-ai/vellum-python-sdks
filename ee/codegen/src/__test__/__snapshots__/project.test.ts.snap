@@ -1,5 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`WorkflowProjectGenerator > code execution node at project level > should not autoformat the script file 1`] = `
+"import foo, bar
+baz = foo + bar
+"
+`;
+
 exports[`WorkflowProjectGenerator > inlude sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
 "from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
 from vellum.workflows.sandbox import WorkflowSandboxRunner

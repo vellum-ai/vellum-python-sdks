@@ -618,4 +618,107 @@ Encountered 1 error(s) while generating code:
       expect(nodeFiles).toContain("templating_node_1.py");
     });
   });
+
+  describe("code execution node at project level", () => {
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: "code-node",
+            type: "CODE_EXECUTION",
+            data: {
+              label: "Code Execution Node",
+              code_input_id: "code",
+              runtime_input_id: "python",
+              output_id: "output",
+              output_type: "STRING",
+              source_handle_id: "code_source",
+              target_handle_id: "code_target",
+            },
+            inputs: [
+              {
+                id: "code",
+                key: "code",
+                value: {
+                  combinator: "OR",
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: `\
+import foo, bar
+baz = foo + bar
+`,
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                id: "python",
+                key: "runtime",
+                value: {
+                  combinator: "OR",
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "PYTHON_3_11_6",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: "code-node",
+            target_handle_id: "code_target",
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+        ],
+      },
+      input_variables: [],
+      output_variables: [],
+      runner_config: {},
+    };
+    it("should not autoformat the script file", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        strict: true,
+      });
+
+      await project.generateCode();
+
+      const scriptPath = join(
+        tempDir,
+        project.getModuleName(),
+        "nodes",
+        "code_execution_node",
+        "script.py"
+      );
+      expect(fs.existsSync(scriptPath)).toBe(true);
+      expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
+    });
+  });
 });
