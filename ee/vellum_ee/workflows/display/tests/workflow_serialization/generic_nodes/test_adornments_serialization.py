@@ -81,6 +81,11 @@ def test_serialize_node__retry(serialize_node):
                     },
                     "attributes": [
                         {
+                            "id": "8a07dc58-3fed-41d4-8ca6-31ee0bb86c61",
+                            "name": "delay",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                        {
                             "id": "f388e93b-8c68-4f54-8577-bbd0c9091557",
                             "name": "max_attempts",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 3.0}},
