@@ -29,7 +29,7 @@ class _InlineSubworkflowNodeMeta(BaseNodeMeta):
             return node_class
 
         if not issubclass(node_class, InlineSubworkflowNode):
-            raise ValueError("BaseAdornableNodeMeta can only be used on subclasses of InlineSubworkflowNode")
+            raise ValueError("_InlineSubworkflowNodeMeta can only be used on subclasses of InlineSubworkflowNode")
 
         subworkflow_outputs = getattr(subworkflow_attribute, "Outputs")
         if not issubclass(subworkflow_outputs, BaseOutputs):
@@ -57,12 +57,12 @@ class _InlineSubworkflowNodeMeta(BaseNodeMeta):
 
     @property
     def _localns(cls) -> Dict[str, Any]:
-        if not hasattr(cls, "SubworkflowInputs"):
+        if not hasattr(cls, "Outputs"):
             return super()._localns
 
         return {
             **super()._localns,
-            "SubworkflowInputs": getattr(cls, "SubworkflowInputs"),
+            "Outputs": getattr(cls, "Outputs"),
         }
 
 
@@ -137,6 +137,6 @@ class InlineSubworkflowNode(
 
     @classmethod
     def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
-        # Subclasses of BaseAdornableNode can override this method to provider their own
+        # Subclasses of InlineSubworkflowNode can override this method to provider their own
         # approach to annotating the outputs class based on the `subworkflow.Outputs`
         setattr(outputs_class, reference.name, reference)
