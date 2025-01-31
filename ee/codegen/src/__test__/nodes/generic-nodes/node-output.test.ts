@@ -63,10 +63,8 @@ describe("NodeOutput", () => {
           name: "output",
           type: "STRING",
           value: {
-            type: "INPUT_VARIABLE",
-            data: {
-              inputVariableId: "some-id",
-            },
+            type: "WORKFLOW_INPUT",
+            inputVariableId: "some-id",
           },
         },
       ];
@@ -118,10 +116,8 @@ describe("NodeOutput", () => {
           type: "STRING",
           value: {
             type: "NODE_OUTPUT",
-            data: {
-              nodeId: "some-node-id",
-              outputId: "some-output-id",
-            },
+            nodeId: "some-node-id",
+            nodeOutputId: "some-output-id",
           },
         },
       ];

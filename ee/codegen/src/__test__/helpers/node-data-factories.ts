@@ -1386,10 +1386,8 @@ export function nodePortFactory(port: Partial<NodePort> = {}): NodePort {
         type: "UNARY_EXPRESSION",
         operator: "null",
         lhs: {
-          type: "INPUT_VARIABLE",
-          data: {
-            inputVariableId: "input-1",
-          },
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
         },
       },
     };
@@ -1454,7 +1452,7 @@ export function genericNodeFactory(
         name: "default-attribute",
         value: {
           type: "CONSTANT_VALUE",
-          data: {
+          value: {
             type: "STRING",
             value: "default-value",
           },
@@ -1464,10 +1462,8 @@ export function genericNodeFactory(
         id: "attr-2",
         name: "default-attribute-2",
         value: {
-          type: "INPUT_VARIABLE",
-          data: {
-            inputVariableId: "input-1",
-          },
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
         },
       },
     ],
@@ -1478,7 +1474,7 @@ export function genericNodeFactory(
         type: "STRING",
         value: {
           type: "CONSTANT_VALUE",
-          data: {
+          value: {
             type: "STRING",
             value: "default-value",
           },

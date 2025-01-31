@@ -43,10 +43,8 @@ describe("WorkflowValueDescriptor", () => {
         type: "UNARY_EXPRESSION",
         operator: "null",
         lhs: {
-          type: "INPUT_VARIABLE",
-          data: {
-            inputVariableId: "input-1",
-          },
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
         },
       };
 
@@ -65,14 +63,12 @@ describe("WorkflowValueDescriptor", () => {
         operator: "=",
         lhs: {
           type: "NODE_OUTPUT",
-          data: {
-            nodeId: "node-1",
-            outputId: "output-1",
-          },
+          nodeId: "node-1",
+          nodeOutputId: "output-1",
         },
         rhs: {
           type: "CONSTANT_VALUE",
-          data: {
+          value: {
             type: "STRING",
             value: "expected-value",
           },
@@ -97,14 +93,12 @@ describe("WorkflowValueDescriptor", () => {
           operator: "=",
           lhs: {
             type: "NODE_OUTPUT",
-            data: {
-              nodeId: "node-1",
-              outputId: "output-1",
-            },
+            nodeId: "node-1",
+            nodeOutputId: "output-1",
           },
           rhs: {
             type: "CONSTANT_VALUE",
-            data: {
+            value: {
               type: "STRING",
               value: "expected-value",
             },
@@ -112,7 +106,7 @@ describe("WorkflowValueDescriptor", () => {
         },
         rhs: {
           type: "CONSTANT_VALUE",
-          data: {
+          value: {
             type: "STRING",
             value: "another-expected-value",
           },
@@ -133,21 +127,19 @@ describe("WorkflowValueDescriptor", () => {
         type: "TERNARY_EXPRESSION",
         operator: "between",
         base: {
-          type: "INPUT_VARIABLE",
-          data: {
-            inputVariableId: "input-1",
-          },
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
         },
         lhs: {
           type: "CONSTANT_VALUE",
-          data: {
+          value: {
             type: "NUMBER",
             value: 1,
           },
         },
         rhs: {
           type: "CONSTANT_VALUE",
-          data: {
+          value: {
             type: "NUMBER",
             value: 10,
           },

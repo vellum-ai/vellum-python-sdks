@@ -757,15 +757,50 @@ export interface TernaryWorkflowExpression {
   rhs: WorkflowValueDescriptor;
 }
 
+export interface NodeOutputWorkflowReference {
+  type: "NODE_OUTPUT";
+  nodeId: string;
+  nodeOutputId: string;
+}
+
+export interface WorkflowInputWorkflowReference {
+  type: "WORKFLOW_INPUT";
+  inputVariableId: string;
+}
+
+export interface WorkflowStateVariableWorkflowReference {
+  type: "WORKFLOW_STATE";
+  stateVariableId: string;
+}
+
+export interface ConstantValueWorkflowReference {
+  type: "CONSTANT_VALUE";
+  value: VellumValue;
+}
+
+export interface VellumSecretWorkflowReference {
+  type: "VELLUM_SECRET";
+  vellumSecretName: string;
+}
+
+export interface ExecutionCounterWorkflowReference {
+  type: "EXECUTION_COUNTER";
+  nodeId: string;
+}
+
+export type WorkflowValueDescriptorReference =
+  | NodeOutputWorkflowReference
+  | WorkflowInputWorkflowReference
+  | WorkflowStateVariableWorkflowReference
+  | ConstantValueWorkflowReference
+  | VellumSecretWorkflowReference
+  | ExecutionCounterWorkflowReference;
+
 export type WorkflowValueDescriptor =
   | UnaryWorkflowExpression
   | BinaryWorkflowExpression
   | TernaryWorkflowExpression
-  | NodeOutputPointer
-  | InputVariablePointer
-  | ConstantValuePointer
-  | WorkspaceSecretPointer
-  | ExecutionCounterPointer;
+  | WorkflowValueDescriptorReference;
 
 export interface NodeAttribute {
   id: string;

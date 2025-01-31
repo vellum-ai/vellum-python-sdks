@@ -90,14 +90,12 @@ describe("NodePorts", () => {
               operator: "=",
               lhs: {
                 type: "NODE_OUTPUT",
-                data: {
-                  nodeId: "node-1",
-                  outputId: "output-1",
-                },
+                nodeId: "node-1",
+                nodeOutputId: "output-1",
               },
               rhs: {
                 type: "CONSTANT_VALUE",
-                data: {
+                value: {
                   type: "STRING",
                   value: "expected-value",
                 },
@@ -105,7 +103,7 @@ describe("NodePorts", () => {
             },
             rhs: {
               type: "CONSTANT_VALUE",
-              data: {
+              value: {
                 type: "STRING",
                 value: "another-expected-value",
               },

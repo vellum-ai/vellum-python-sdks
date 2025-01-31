@@ -76,10 +76,8 @@ describe("GenericNode", () => {
           name: "default-attribute",
           value: {
             type: "NODE_OUTPUT",
-            data: {
-              nodeId: referencedNode.id,
-              outputId: referencedNode.data.outputId,
-            },
+            nodeId: referencedNode.id,
+            nodeOutputId: referencedNode.data.outputId,
           },
         },
       ];
@@ -127,7 +125,7 @@ describe("GenericNode", () => {
               name: "max_attempts",
               value: {
                 type: "CONSTANT_VALUE",
-                data: {
+                value: {
                   type: "NUMBER",
                   value: 3,
                 },
@@ -155,7 +153,7 @@ describe("GenericNode", () => {
               name: "items",
               value: {
                 type: "CONSTANT_VALUE",
-                data: {
+                value: {
                   type: "ARRAY",
                   value: [
                     {
