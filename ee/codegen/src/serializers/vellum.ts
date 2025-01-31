@@ -1867,7 +1867,6 @@ export const GenericNodeSerializer: ObjectSchema<
   id: stringSchema(),
   data: objectSchema({
     label: stringSchema(),
-    base: CodeResourceDefinitionSerializer,
     trigger: NodeTriggerSerializer,
     ports: listSchema(NodePortSerializer),
     adornments: listSchema(AdornmentNodeSerializer).optional(),
@@ -1878,6 +1877,7 @@ export const GenericNodeSerializer: ObjectSchema<
     "display_data",
     GenericNodeDisplayDataSerializer.optional()
   ),
+  base: CodeResourceDefinitionSerializer,
   definition: CodeResourceDefinitionSerializer.optional(),
 });
 
@@ -1886,7 +1886,6 @@ export declare namespace GenericNodeSerializer {
     id: string;
     data: {
       label: string;
-      base: CodeResourceDefinitionSerializer.Raw;
       trigger: NodeTriggerSerializer.Raw;
       ports: NodePortSerializer.Raw[];
       adornments?: AdornmentNodeSerializer.Raw[] | null;
@@ -1899,6 +1898,7 @@ export declare namespace GenericNodeSerializer {
         y: number;
       } | null;
     } | null;
+    base: CodeResourceDefinitionSerializer.Raw;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
   }
 }

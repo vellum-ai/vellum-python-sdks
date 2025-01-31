@@ -1365,10 +1365,6 @@ export function genericNodeFactory(
     type: WorkflowNodeType.GENERIC,
     data: {
       label: label,
-      base: {
-        module: ["vellum", "workflows", "nodes", "bases", "base"],
-        name: "BaseNode",
-      },
       trigger: nodeTrigger ?? {
         id: "trigger-1",
         mergeBehavior: "AWAIT_ALL",
@@ -1418,6 +1414,10 @@ export function genericNodeFactory(
         },
       ],
       adornments: adornments,
+    },
+    base: {
+      module: ["vellum", "workflows", "nodes", "bases", "base"],
+      name: "BaseNode",
     },
     definition: {
       name: label,

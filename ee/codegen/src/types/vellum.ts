@@ -662,7 +662,6 @@ export interface NodeOutput {
 
 export interface GenericNodeData {
   label: string;
-  base: CodeResourceDefinition;
   trigger: NodeTrigger;
   ports: NodePort[];
   adornments?: AdornmentNode[];
@@ -675,6 +674,7 @@ export interface GenericNode extends BaseWorkflowNode {
   type: "GENERIC";
   data: GenericNodeData;
   displayData?: GenericNodeDisplayData;
+  base: CodeResourceDefinition;
   definition?: CodeResourceDefinition;
 }
 
