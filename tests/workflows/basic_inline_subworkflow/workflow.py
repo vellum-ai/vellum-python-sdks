@@ -41,10 +41,6 @@ class ExampleInlineSubworkflowNode(InlineSubworkflowNode):
     }
     subworkflow = NestedWorkflow
 
-    class Outputs(InlineSubworkflowNode.Outputs):
-        temperature = NestedWorkflow.Outputs.temperature
-        reasoning = NestedWorkflow.Outputs.reasoning
-
 
 class BasicInlineSubworkflowWorkflow(BaseWorkflow[Inputs, BaseState]):
     graph = ExampleInlineSubworkflowNode

@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, ClassVar, Generic, Iterator, Optional, Set, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.bases.base import BaseNode, BaseNodeMeta
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.references import OutputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
@@ -19,7 +20,55 @@ if TYPE_CHECKING:
 InnerStateType = TypeVar("InnerStateType", bound=BaseState)
 
 
-class InlineSubworkflowNode(BaseNode[StateType], Generic[StateType, WorkflowInputsType, InnerStateType]):
+class _InlineSubworkflowNodeMeta(BaseNodeMeta):
+    def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
+        node_class = super().__new__(cls, name, bases, dct)
+
+        subworkflow_attribute = dct.get("subworkflow")
+        if not subworkflow_attribute:
+            return node_class
+
+        if not issubclass(node_class, InlineSubworkflowNode):
+            raise ValueError("BaseAdornableNodeMeta can only be used on subclasses of InlineSubworkflowNode")
+
+        subworkflow_outputs = getattr(subworkflow_attribute, "Outputs")
+        if not issubclass(subworkflow_outputs, BaseOutputs):
+            raise ValueError("subworkflow.Outputs must be a subclass of BaseOutputs")
+
+        outputs_class = dct.get("Outputs")
+        if not outputs_class:
+            raise ValueError("Outputs class not found in base classes")
+
+        if not issubclass(outputs_class, BaseNode.Outputs):
+            raise ValueError("Outputs class must be a subclass of BaseNode.Outputs")
+
+        for descriptor in subworkflow_outputs:
+            node_class.__annotate_outputs_class__(outputs_class, descriptor)
+
+        return node_class
+
+    def __getattribute__(cls, name: str) -> Any:
+        try:
+            return super().__getattribute__(name)
+        except AttributeError:
+            if name != "__wrapped_node__" and issubclass(cls, InlineSubworkflowNode):
+                return getattr(cls.__wrapped_node__, name)
+            raise
+
+    @property
+    def _localns(cls) -> Dict[str, Any]:
+        if not hasattr(cls, "SubworkflowInputs"):
+            return super()._localns
+
+        return {
+            **super()._localns,
+            "SubworkflowInputs": getattr(cls, "SubworkflowInputs"),
+        }
+
+
+class InlineSubworkflowNode(
+    BaseNode[StateType], Generic[StateType, WorkflowInputsType, InnerStateType], metaclass=_InlineSubworkflowNodeMeta
+):
     """
     Used to execute a Subworkflow defined inline.
 
@@ -85,3 +134,9 @@ class InlineSubworkflowNode(BaseNode[StateType], Generic[StateType, WorkflowInpu
             return self.subworkflow_inputs
         else:
             raise ValueError(f"Invalid subworkflow inputs type: {type(self.subworkflow_inputs)}")
+
+    @classmethod
+    def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
+        # Subclasses of BaseAdornableNode can override this method to provider their own
+        # approach to annotating the outputs class based on the `subworkflow.Outputs`
+        setattr(outputs_class, reference.name, reference)
