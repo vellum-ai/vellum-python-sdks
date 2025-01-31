@@ -1,0 +1,183 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "29f798ff-a8d4-4969-9366-59572d6e664a",
+        "type": "ENTRYPOINT",
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "6a8f99cf-8946-4b2c-bbbc-3b74cd975235"
+        },
+        "inputs": [],
+        "display_data": {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "comment": null,
+          "width": null,
+          "height": null
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "e59f038e-1be0-45cc-a576-8d4e17a59ee1",
+        "label": "DBQueryNode",
+        "type": "GENERIC",
+        "base": {
+          "name": "BaseNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "bases",
+            "base"
+          ]
+        },
+        "definition": {
+          "name": "DBQueryNode",
+          "module": [
+            "examples",
+            "custom_docker_image",
+            "nodes",
+            "db_query_node"
+          ]
+        },
+        "display_data": {
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "trigger": {
+          "id": "c4912b7a-9577-4d98-b9c5-82e70a498230",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": [
+          {
+            "id": "dc3be705-f1b5-4ec4-9ced-2f786f749040",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ],
+        "adornments": null,
+        "attributes": [],
+        "outputs": [
+          {
+            "id": "6e9febd1-988c-492f-b8fc-da8d34047ab5",
+            "name": "rows",
+            "type": "JSON",
+            "value": null
+          }
+        ]
+      },
+      {
+        "id": "82b006d5-cfe1-4307-b5aa-b247ee645e02",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "final_value",
+          "target_handle_id": "b1b9bb96-2da5-4e4c-81fc-34350f0c6dcc",
+          "output_id": "db9f29e7-92ef-4e9c-b959-1e5db0de8e6e",
+          "output_type": "JSON",
+          "node_input_id": "75164375-6f2d-4f0b-9edc-011dd0828d6b"
+        },
+        "inputs": [
+          {
+            "id": "75164375-6f2d-4f0b-9edc-011dd0828d6b",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "examples.custom_docker_image.nodes.db_query_node.DBQueryNode",
+                    "output_id": "6e9febd1-988c-492f-b8fc-da8d34047ab5"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "comment": null,
+          "width": null,
+          "height": null
+        },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": null,
+        "trigger": {
+          "id": "b1b9bb96-2da5-4e4c-81fc-34350f0c6dcc",
+          "merge_behavior": "AWAIT_ANY"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "type": "DEFAULT",
+        "id": "b22539d8-ab89-402b-9387-61cd0f4b670a",
+        "source_node_id": "29f798ff-a8d4-4969-9366-59572d6e664a",
+        "source_handle_id": "6a8f99cf-8946-4b2c-bbbc-3b74cd975235",
+        "target_node_id": "examples.custom_docker_image.nodes.db_query_node.DBQueryNode",
+        "target_handle_id": "c4912b7a-9577-4d98-b9c5-82e70a498230"
+      },
+      {
+        "type": "DEFAULT",
+        "id": "a708f8f3-6713-494e-8ca5-541705ac726e",
+        "source_node_id": "examples.custom_docker_image.nodes.db_query_node.DBQueryNode",
+        "source_handle_id": "dc3be705-f1b5-4ec4-9ced-2f786f749040",
+        "target_node_id": "82b006d5-cfe1-4307-b5aa-b247ee645e02",
+        "target_handle_id": "b1b9bb96-2da5-4e4c-81fc-34350f0c6dcc"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1
+      }
+    },
+    "definition": {
+      "name": "CustomDockerImageWorkflow",
+      "module": [
+        "examples",
+        "custom_docker_image",
+        "workflow"
+      ]
+    },
+    "output_values": null
+  },
+  "input_variables": [],
+  "output_variables": [
+    {
+      "id": "db9f29e7-92ef-4e9c-b959-1e5db0de8e6e",
+      "key": "final_value",
+      "type": "JSON",
+      "required": null,
+      "default": null,
+      "extensions": null
+    }
+  ],
+  "runner_config": {
+    "container_image_name": "custom-workflow-image-example",
+    "container_image_tag": "1.0.0",
+    "codegen_version": null,
+    "sdk_version": "0.13.18"
+  }
+}

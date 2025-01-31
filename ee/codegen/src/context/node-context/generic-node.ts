@@ -11,6 +11,12 @@ export class GenericNodeContext extends BaseNodeContext<GenericNodeType> {
   }
 
   protected createPortContexts(): PortContext[] {
-    return [];
+    return this.nodeData.ports.map((port) => ({
+      workflowContext: this.workflowContext,
+      nodeContext: this,
+      portId: port.id,
+      portName: port.name,
+      isDefault: false,
+    }));
   }
 }
