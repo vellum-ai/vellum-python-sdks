@@ -1865,23 +1865,34 @@ export const GenericNodeSerializer: ObjectSchema<
   Omit<GenericNode, "type">
 > = objectSchema({
   id: stringSchema(),
+  data: objectSchema({
+    label: stringSchema(),
+    base: CodeResourceDefinitionSerializer,
+    trigger: NodeTriggerSerializer,
+    ports: listSchema(NodePortSerializer),
+    adornments: listSchema(AdornmentNodeSerializer).optional(),
+    attributes: listSchema(NodeAttributeSerializer),
+    outputs: listSchema(NodeOutputSerializer),
+  }),
   displayData: propertySchema(
     "display_data",
     GenericNodeDisplayDataSerializer.optional()
   ),
-  base: CodeResourceDefinitionSerializer,
   definition: CodeResourceDefinitionSerializer.optional(),
-  trigger: NodeTriggerSerializer,
-  ports: listSchema(NodePortSerializer),
-  adornments: listSchema(AdornmentNodeSerializer).optional(),
-  attributes: listSchema(NodeAttributeSerializer),
-  outputs: listSchema(NodeOutputSerializer),
 });
 
 export declare namespace GenericNodeSerializer {
-  interface Raw extends BaseWorkflowNodeSerializer.Raw {
+  interface Raw {
     id: string;
-    base: CodeResourceDefinitionSerializer.Raw;
+    data: {
+      label: string;
+      base: CodeResourceDefinitionSerializer.Raw;
+      trigger: NodeTriggerSerializer.Raw;
+      ports: NodePortSerializer.Raw[];
+      adornments?: AdornmentNodeSerializer.Raw[] | null;
+      attributes: NodeAttributeSerializer.Raw[];
+      outputs: NodeOutputSerializer.Raw[];
+    };
     display_data?: {
       position?: {
         x: number;
@@ -1889,11 +1900,6 @@ export declare namespace GenericNodeSerializer {
       } | null;
     } | null;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
-    trigger: NodeTriggerSerializer.Raw;
-    ports: NodePortSerializer.Raw[];
-    adornments?: AdornmentNodeSerializer.Raw[] | null;
-    attributes: NodeAttributeSerializer.Raw[];
-    outputs: NodeOutputSerializer.Raw[];
   }
 }
 

@@ -16,10 +16,10 @@ export class GenericNode extends BaseSingleFileNode<
   GenericNodeContext
 > {
   getNodeDecorators(): python.Decorator[] | undefined {
-    if (!this.nodeData.adornments) {
+    if (!this.nodeData.data.adornments) {
       return [];
     }
-    return this.nodeData.adornments.map((adornment) =>
+    return this.nodeData.data.adornments.map((adornment) =>
       python.decorator({
         callable: python.invokeMethod({
           methodReference: python.reference({
@@ -44,7 +44,7 @@ export class GenericNode extends BaseSingleFileNode<
 
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
-    this.nodeData.attributes.forEach((attribute) => {
+    this.nodeData.data.attributes.forEach((attribute) => {
       statements.push(
         python.field({
           name: toPythonSafeSnakeCase(attribute.name),
@@ -58,16 +58,16 @@ export class GenericNode extends BaseSingleFileNode<
 
     statements.push(
       new NodeTrigger({
-        nodeTrigger: this.nodeData.trigger,
+        nodeTrigger: this.nodeData.data.trigger,
         nodeContext: this.nodeContext,
       }),
       new NodePorts({
-        nodePorts: this.nodeData.ports,
+        nodePorts: this.nodeData.data.ports,
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
       }),
       new NodeOutputs({
-        nodeOutputs: this.nodeData.outputs,
+        nodeOutputs: this.nodeData.data.outputs,
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
       })

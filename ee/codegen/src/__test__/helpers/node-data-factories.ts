@@ -1343,83 +1343,86 @@ export function errorNodeDataFactory({
 
 export function genericNodeFactory(
   {
-    name,
+    label,
     nodeTrigger,
     nodePorts,
     nodeAttributes,
     nodeOutputs,
     adornments,
   }: {
-    name: string;
+    label: string;
     nodeTrigger?: NodeTrigger;
     nodePorts?: NodePort[];
     nodeAttributes?: NodeAttribute[];
     nodeOutputs?: NodeOutput[];
     adornments?: AdornmentNode[];
   } = {
-    name: "MyCustomNode",
+    label: "MyCustomNode",
   }
 ): GenericNode {
   const nodeData: GenericNode = {
     id: "node-1",
     type: WorkflowNodeType.GENERIC,
-    base: {
-      module: ["vellum", "workflows", "nodes", "bases", "base"],
-      name: "BaseNode",
+    data: {
+      label: label,
+      base: {
+        module: ["vellum", "workflows", "nodes", "bases", "base"],
+        name: "BaseNode",
+      },
+      trigger: nodeTrigger ?? {
+        id: "trigger-1",
+        mergeBehavior: "AWAIT_ALL",
+      },
+      ports: nodePorts ?? [
+        {
+          type: "DEFAULT",
+          id: "port-1",
+          name: "default-port",
+        },
+      ],
+      attributes: nodeAttributes ?? [
+        {
+          id: "attr-1",
+          name: "default-attribute",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "default-value",
+            },
+          },
+        },
+        {
+          id: "attr-2",
+          name: "default-attribute-2",
+          value: {
+            type: "INPUT_VARIABLE",
+            data: {
+              inputVariableId: "input-1",
+            },
+          },
+        },
+      ],
+      outputs: nodeOutputs ?? [
+        {
+          id: "output-1",
+          name: "output",
+          type: "STRING",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "default-value",
+            },
+          },
+        },
+      ],
+      adornments: adornments,
     },
     definition: {
-      name,
+      name: label,
       module: ["my_nodes", "my_custom_node"],
     },
-    trigger: nodeTrigger ?? {
-      id: "trigger-1",
-      mergeBehavior: "AWAIT_ALL",
-    },
-    ports: nodePorts ?? [
-      {
-        type: "DEFAULT",
-        id: "port-1",
-        name: "default-port",
-      },
-    ],
-    attributes: nodeAttributes ?? [
-      {
-        id: "attr-1",
-        name: "default-attribute",
-        value: {
-          type: "CONSTANT_VALUE",
-          data: {
-            type: "STRING",
-            value: "default-value",
-          },
-        },
-      },
-      {
-        id: "attr-2",
-        name: "default-attribute-2",
-        value: {
-          type: "INPUT_VARIABLE",
-          data: {
-            inputVariableId: "input-1",
-          },
-        },
-      },
-    ],
-    outputs: nodeOutputs ?? [
-      {
-        id: "output-1",
-        name: "output",
-        type: "STRING",
-        value: {
-          type: "CONSTANT_VALUE",
-          data: {
-            type: "STRING",
-            value: "default-value",
-          },
-        },
-      },
-    ],
-    adornments: adornments,
   };
   return nodeData;
 }

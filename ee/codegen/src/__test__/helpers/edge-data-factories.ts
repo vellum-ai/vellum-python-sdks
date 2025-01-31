@@ -7,7 +7,9 @@ const getSourceHandleId = (
     const [actualNode, portName] = node;
 
     if (actualNode.type === "GENERIC") {
-      const id = actualNode.ports.find((port) => port.name === portName)?.id;
+      const id = actualNode.data.ports.find(
+        (port) => port.name === portName
+      )?.id;
       if (!id) {
         throw new Error(`Port not found: ${portName}`);
       }
@@ -28,7 +30,7 @@ const getSourceHandleId = (
   }
 
   if (node.type === "GENERIC") {
-    const port = node.ports[0];
+    const port = node.data.ports[0];
     if (!port) {
       throw new Error("Generic node has no ports");
     }
@@ -69,7 +71,7 @@ const getTargetHandleId = (
   }
 
   if (node.type === "GENERIC") {
-    return node.trigger.id;
+    return node.data.trigger.id;
   }
 
   if (node.type === "MERGE") {

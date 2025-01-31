@@ -63,7 +63,7 @@ describe("NodePorts", () => {
       ];
 
       const nodeData = genericNodeFactory({
-        name: "MyGenericNode",
+        label: "MyGenericNode",
         nodePorts: nodePortsData,
       });
 
@@ -145,7 +145,7 @@ describe("NodePorts", () => {
       ];
 
       const nodeData = genericNodeFactory({
-        name: "MyGenericNode",
+        label: "MyGenericNode",
         nodePorts: nodePortsData,
       });
 

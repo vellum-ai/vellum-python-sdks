@@ -660,17 +660,22 @@ export interface NodeOutput {
   value?: WorkflowValueDescriptor;
 }
 
-export interface GenericNode extends BaseWorkflowNode {
-  id: string;
-  type: "GENERIC";
-  displayData?: GenericNodeDisplayData;
+export interface GenericNodeData {
+  label: string;
   base: CodeResourceDefinition;
-  definition?: CodeResourceDefinition;
   trigger: NodeTrigger;
   ports: NodePort[];
   adornments?: AdornmentNode[];
   attributes: NodeAttribute[];
   outputs: NodeOutput[];
+}
+
+export interface GenericNode extends BaseWorkflowNode {
+  id: string;
+  type: "GENERIC";
+  data: GenericNodeData;
+  displayData?: GenericNodeDisplayData;
+  definition?: CodeResourceDefinition;
 }
 
 export type WorkflowDataNode =
