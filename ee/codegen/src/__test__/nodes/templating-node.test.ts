@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import { VellumVariableType } from "vellum-ai/api/types";
 import { beforeEach } from "vitest";
 
@@ -8,6 +9,7 @@ import { templatingNodeFactory } from "src/__test__/helpers/node-data-factories"
 import { createNodeContext, WorkflowContext } from "src/context";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
 
 describe("TemplatingNode", () => {
   let workflowContext: WorkflowContext;
@@ -85,14 +87,17 @@ describe("TemplatingNode", () => {
   });
 
   describe("reject on error enabled", () => {
+    let templatingNodeData: TemplatingNodeType;
+    const errorOutputId = "e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f";
+
     beforeEach(async () => {
-      const nodeData = templatingNodeFactory({
-        errorOutputId: "e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f",
+      templatingNodeData = templatingNodeFactory({
+        errorOutputId,
       });
 
       const nodeContext = (await createNodeContext({
         workflowContext,
-        nodeData,
+        nodeData: templatingNodeData,
       })) as TemplatingNodeContext;
 
       node = new TemplatingNode({
@@ -108,6 +113,61 @@ describe("TemplatingNode", () => {
 
     it("getNodeDisplayFile", async () => {
       node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should generate the node file for a dependency correctly", async () => {
+      const nextTemplatingNode = templatingNodeFactory({
+        id: uuidv4(),
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
+        inputs: [
+          {
+            id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+            key: "text",
+            value: {
+              rules: [
+                {
+                  type: "NODE_OUTPUT",
+                  data: {
+                    nodeId: templatingNodeData.id,
+                    outputId: errorOutputId,
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+          {
+            id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+            key: "template",
+            value: {
+              rules: [
+                {
+                  type: "CONSTANT_VALUE",
+                  data: {
+                    type: "STRING",
+                    value: "Hello, World!",
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+        ],
+      });
+
+      const nextTemplatingNodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData: nextTemplatingNode,
+      })) as TemplatingNodeContext;
+
+      const nextTemplatingNodeAst = new TemplatingNode({
+        workflowContext,
+        nodeContext: nextTemplatingNodeContext,
+      });
+
+      nextTemplatingNodeAst.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });

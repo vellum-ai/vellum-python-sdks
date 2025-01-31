@@ -138,3 +138,17 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
     inputs = {}
 "
 `;
+
+exports[`TemplatingNode > reject on error enabled > should generate the node file for a dependency correctly 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+from .templating_node import TemplatingNode as TemplatingNodeTemplatingNode
+
+
+class TemplatingNode1(TemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {
+        "text": TemplatingNodeTemplatingNode.Outputs.error,
+    }
+"
+`;
