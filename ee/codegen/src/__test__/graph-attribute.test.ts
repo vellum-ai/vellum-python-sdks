@@ -554,58 +554,37 @@ describe("Workflow", () => {
 
     it("should define nested sets of nodes without compilation errors", async () => {
       const topNode = templatingNodeFactory({ label: "Top Node" });
-      await createNodeContext({
-        workflowContext,
-        nodeData: topNode,
-      });
 
       const outputTopNode = finalOutputNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+        id: uuidv4(),
         label: "Output Top Node",
         name: "output-top-node",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294e",
-        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: outputTopNode,
+        targetHandleId: uuidv4(),
+        outputId: uuidv4(),
       });
 
       const outputMiddleNode = finalOutputNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf87",
+        id: uuidv4(),
         label: "Output Middle Node",
         name: "output-middle-node",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294f",
-        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf87",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: outputMiddleNode,
+        targetHandleId: uuidv4(),
+        outputId: uuidv4(),
       });
 
       const outputBottomNode = finalOutputNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+        id: uuidv4(),
         label: "Output Bottom Node",
         name: "output-bottom-node",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2950",
-        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: outputBottomNode,
+        targetHandleId: uuidv4(),
+        outputId: uuidv4(),
       });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, topNode],
-          [topNode, outputTopNode],
-          [topNode, outputMiddleNode],
-          [topNode, outputBottomNode],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, topNode],
+        [topNode, outputTopNode],
+        [topNode, outputMiddleNode],
+        [topNode, outputBottomNode],
+      ]);
     });
 
     it("should show errors for a node pointing to non-existent node", async () => {
