@@ -672,7 +672,7 @@ describe("Workflow", () => {
       ]);
     });
 
-    it.skip("should handle a simple edge of generic nodes", async () => {
+    it("should handle a simple edge of generic nodes", async () => {
       const startNode = genericNodeFactory({
         name: "StartNode",
       });
