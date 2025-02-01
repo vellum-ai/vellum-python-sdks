@@ -5,6 +5,8 @@ from vellum import AsyncVellum
 import typing
 from .utilities import validate_response
 from vellum import NamedTestCaseStringVariableValueRequest
+from vellum import NamedTestCaseArrayVariableValueRequest
+from vellum import StringVellumValueRequest
 
 
 async def test_list_test_suite_test_cases(client: Vellum, async_client: AsyncVellum) -> None:
@@ -63,15 +65,35 @@ async def test_upsert_test_suite_test_case(client: Vellum, async_client: AsyncVe
     }
     response = client.test_suites.upsert_test_suite_test_case(
         id_="id",
-        input_values=[NamedTestCaseStringVariableValueRequest(name="name")],
-        evaluation_values=[NamedTestCaseStringVariableValueRequest(name="name")],
+        label="Test Case 1",
+        input_values=[NamedTestCaseStringVariableValueRequest(value="What are your favorite colors?", name="var_1")],
+        evaluation_values=[
+            NamedTestCaseArrayVariableValueRequest(
+                value=[
+                    StringVellumValueRequest(value="Red"),
+                    StringVellumValueRequest(value="Green"),
+                    StringVellumValueRequest(value="Blue"),
+                ],
+                name="var_2",
+            )
+        ],
     )
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.test_suites.upsert_test_suite_test_case(
         id_="id",
-        input_values=[NamedTestCaseStringVariableValueRequest(name="name")],
-        evaluation_values=[NamedTestCaseStringVariableValueRequest(name="name")],
+        label="Test Case 1",
+        input_values=[NamedTestCaseStringVariableValueRequest(value="What are your favorite colors?", name="var_1")],
+        evaluation_values=[
+            NamedTestCaseArrayVariableValueRequest(
+                value=[
+                    StringVellumValueRequest(value="Red"),
+                    StringVellumValueRequest(value="Green"),
+                    StringVellumValueRequest(value="Blue"),
+                ],
+                name="var_2",
+            )
+        ],
     )
     validate_response(async_response, expected_response, expected_types)
 
