@@ -85,8 +85,6 @@ def create_node_input_value_pointer_rule(
         workflow_input_display = display_context.global_workflow_input_displays[value]
         return InputVariablePointer(data=InputVariableData(input_variable_id=str(workflow_input_display.id)))
     if isinstance(value, VellumSecretReference):
-        # TODO: Pass through the name instead of retrieving the ID
-        # https://app.shortcut.com/vellum/story/5072
         vellum_client = create_vellum_client()
         workspace_secret = vellum_client.workspace_secrets.retrieve(
             id=value.name,
