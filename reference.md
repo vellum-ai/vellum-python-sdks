@@ -4527,16 +4527,30 @@ or overwritten with default values.
 <dd>
 
 ```python
-from vellum import NamedTestCaseStringVariableValueRequest, Vellum
+from vellum import (
+    NamedTestCaseArrayVariableValueRequest,
+    NamedTestCaseStringVariableValueRequest,
+    StringVellumValueRequest,
+    Vellum,
+)
 
 client = Vellum(
     api_key="YOUR_API_KEY",
 )
 client.test_suites.upsert_test_suite_test_case(
     id_="id",
+    label="Test Case 2",
     input_values=[
-        NamedTestCaseStringVariableValueRequest(
-            name="name",
+        NamedTestCaseArrayVariableValueRequest(
+            value=[
+                StringVellumValueRequest(
+                    value="Hello",
+                ),
+                StringVellumValueRequest(
+                    value="World",
+                ),
+            ],
+            name="var_1",
         )
     ],
     evaluation_values=[

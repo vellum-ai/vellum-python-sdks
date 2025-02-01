@@ -1881,6 +1881,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpsertTestSuiteTestCaseRequest'
+            examples:
+              Example1:
+                value:
+                  label: Test Case 1
+                  input_values:
+                  - type: STRING
+                    name: var_1
+                    value: Hello, world!
+                  evaluation_values: []
+                summary: Insert New Test Case With String Input
+                description: This example shows how to create a new test case with
+                  a string input.
+              Example2:
+                value:
+                  label: Test Case 2
+                  input_values:
+                  - type: ARRAY
+                    name: var_1
+                    value:
+                    - type: STRING
+                      value: Hello
+                    - type: STRING
+                      value: World
+                  evaluation_values: []
+                summary: Insert New Test Case With Array Input
+                description: This example shows how to create a new test case with
+                  an array input.
         required: true
       security:
       - apiKeyAuth: []

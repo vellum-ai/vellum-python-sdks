@@ -85,12 +85,46 @@ service:
       url: Default
       availability: pre-release
       examples:
-        - path-parameters:
+        - name: Insert New Test Case With String Input
+          path-parameters:
             id: id
           request:
+            label: Test Case 1
             input_values:
               - type: STRING
+                value: Hello, world!
+                name: var_1
+            evaluation_values:
+              - type: STRING
                 name: name
+          response:
+            body:
+              id: id
+              external_id: external_id
+              label: label
+              input_values:
+                - variable_id: variable_id
+                  name: name
+                  type: STRING
+                  value: value
+              evaluation_values:
+                - variable_id: variable_id
+                  name: name
+                  type: STRING
+                  value: value
+        - name: Insert New Test Case With Array Input
+          path-parameters:
+            id: id
+          request:
+            label: Test Case 2
+            input_values:
+              - type: ARRAY
+                value:
+                  - type: STRING
+                    value: Hello
+                  - type: STRING
+                    value: World
+                name: var_1
             evaluation_values:
               - type: STRING
                 name: name
