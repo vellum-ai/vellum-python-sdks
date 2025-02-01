@@ -1342,7 +1342,7 @@ export function errorNodeDataFactory({
   };
 }
 
-export function nodePortFactory(port: Partial<NodePort>): NodePort {
+export function nodePortFactory(port: Partial<NodePort> = {}): NodePort {
   const portType = port.type ?? "DEFAULT";
   const portId = port.id ?? uuidv4();
   const portName = port.name ?? `${portType.toLowerCase()}_port`;
@@ -1406,13 +1406,7 @@ export function genericNodeFactory(
       id: "trigger-1",
       mergeBehavior: "AWAIT_ALL",
     },
-    ports: nodePorts ?? [
-      {
-        type: "DEFAULT",
-        id: "port-1",
-        name: "default-port",
-      },
-    ],
+    ports: nodePorts ?? [nodePortFactory()],
     attributes: nodeAttributes ?? [
       {
         id: "attr-1",
