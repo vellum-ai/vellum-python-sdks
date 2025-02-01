@@ -1,7 +1,11 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 
 import { workflowContextFactory } from "./helpers";
-import { edgesFactory } from "./helpers/edge-data-factories";
+import {
+  EdgeFactoryNodePair,
+  edgesFactory,
+} from "./helpers/edge-data-factories";
 import {
   conditionalNodeFactory,
   entrypointNodeDataFactory,
@@ -10,319 +14,220 @@ import {
   templatingNodeFactory,
 } from "./helpers/node-data-factories";
 
-import { createNodeContext, WorkflowContext } from "src/context";
+import { WorkflowContext, createNodeContext } from "src/context";
 import { GraphAttribute } from "src/generators/graph-attribute";
+import { WorkflowDataNode } from "src/types/vellum";
 
 describe("Workflow", () => {
-  let workflowContext: WorkflowContext;
-  let writer: Writer;
   const entrypointNode = entrypointNodeDataFactory();
-
-  beforeEach(async () => {
-    workflowContext = workflowContextFactory();
+  const runGraphTest = async (edges: EdgeFactoryNodePair[]) => {
+    const workflowContext = workflowContextFactory();
+    const writer = new Writer();
     workflowContext.addEntrypointNode(entrypointNode);
 
+    const nodes = Array.from(
+      new Set(
+        edges
+          .flatMap(([source, target]) => [
+            Array.isArray(source) ? source[0] : source,
+            Array.isArray(target) ? target[0] : target,
+          ])
+          .filter(
+            (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
+          )
+      )
+    );
+
+    await Promise.all(
+      nodes.map((node) => {
+        createNodeContext({
+          workflowContext,
+          nodeData: node,
+        });
+      })
+    );
+
+    workflowContext.addWorkflowEdges(edgesFactory(edges));
+
+    new GraphAttribute({ workflowContext }).write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  };
+
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+
+  beforeEach(() => {
+    workflowContext = workflowContextFactory();
+    workflowContext.addEntrypointNode(entrypointNode);
     writer = new Writer();
   });
 
   describe("graph", () => {
     it("should be correct for a basic single node case", async () => {
       const templatingNodeData = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData,
-      });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([[entrypointNode, templatingNodeData]])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([[entrypointNode, templatingNodeData]]);
     });
 
     it("should be correct for a basic multiple nodes case", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [entrypointNode, templatingNodeData2],
+      ]);
     });
 
     it("should be correct for three nodes", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData3 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
+        id: uuidv4(),
         label: "Templating Node 3",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData3,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-          [entrypointNode, templatingNodeData3],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [entrypointNode, templatingNodeData2],
+        [entrypointNode, templatingNodeData3],
+      ]);
     });
 
     it("should be correct for a basic single edge case", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [templatingNodeData1, templatingNodeData2],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [templatingNodeData1, templatingNodeData2],
+      ]);
     });
 
     it("should be correct for a basic merge node case", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const mergeNodeData = mergeNodeDataFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: mergeNodeData,
-      });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-          [templatingNodeData1, [mergeNodeData, 0]],
-          [templatingNodeData2, [mergeNodeData, 1]],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [entrypointNode, templatingNodeData2],
+        [templatingNodeData1, [mergeNodeData, 0]],
+        [templatingNodeData2, [mergeNodeData, 1]],
+      ]);
     });
 
     it("should be correct for a basic merge node case of multiple nodes", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData3 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
+        id: uuidv4(),
         label: "Templating Node 3",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData3,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
-      const mergeNodeData = mergeNodeDataFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: mergeNodeData,
-      });
+      const mergeNodeData = mergeNodeDataFactory(3);
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-          [entrypointNode, templatingNodeData3],
-          [templatingNodeData1, [mergeNodeData, 0]],
-          [templatingNodeData2, [mergeNodeData, 1]],
-          [templatingNodeData3, [mergeNodeData, 1]],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [entrypointNode, templatingNodeData2],
+        [entrypointNode, templatingNodeData3],
+        [templatingNodeData1, [mergeNodeData, 0]],
+        [templatingNodeData2, [mergeNodeData, 1]],
+        [templatingNodeData3, [mergeNodeData, 2]],
+      ]);
     });
 
     it("should be correct for a basic merge node and an additional edge", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData3 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
+        id: uuidv4(),
         label: "Templating Node 3",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData3,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const mergeNodeData = mergeNodeDataFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: mergeNodeData,
-      });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-          [templatingNodeData1, [mergeNodeData, 0]],
-          [templatingNodeData2, [mergeNodeData, 1]],
-          [mergeNodeData, templatingNodeData3],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [entrypointNode, templatingNodeData2],
+        [templatingNodeData1, [mergeNodeData, 0]],
+        [templatingNodeData2, [mergeNodeData, 1]],
+        [mergeNodeData, templatingNodeData3],
+      ]);
     });
 
     it("should be correct for a basic merge between a node and an edge", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData3 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
+        id: uuidv4(),
         label: "Templating Node 3",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData3,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const mergeNodeData = mergeNodeDataFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: mergeNodeData,
-      });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-          [templatingNodeData1, templatingNodeData3],
-          [templatingNodeData2, [mergeNodeData, 0]],
-          [templatingNodeData3, [mergeNodeData, 1]],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [entrypointNode, templatingNodeData2],
+        [templatingNodeData1, templatingNodeData3],
+        [templatingNodeData2, [mergeNodeData, 0]],
+        [templatingNodeData3, [mergeNodeData, 1]],
+      ]);
     });
 
     it("should be correct for a basic conditional node case", async () => {

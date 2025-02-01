@@ -83,12 +83,12 @@ const getTargetHandleId = (
   return node.data.targetHandleId;
 };
 
-export function edgesFactory(
-  nodePairs: [
-    WorkflowNode | [WorkflowNode, string],
-    WorkflowNode | [WorkflowNode, number]
-  ][]
-): WorkflowEdge[] {
+export type EdgeFactoryNodePair = [
+  WorkflowNode | [WorkflowNode, string],
+  WorkflowNode | [WorkflowNode, number]
+];
+
+export function edgesFactory(nodePairs: EdgeFactoryNodePair[]): WorkflowEdge[] {
   return nodePairs.map(([sourceNode, targetNode], index) => ({
     id: `edge-${index + 1}`,
     type: "DEFAULT",
