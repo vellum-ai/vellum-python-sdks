@@ -400,38 +400,21 @@ describe("Workflow", () => {
 
     it("should be correct for a single port pointing to a set", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const conditionalNodeData = conditionalNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: conditionalNodeData,
-      });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, conditionalNodeData],
-          [[conditionalNodeData, "0"], templatingNodeData1],
-          [[conditionalNodeData, "0"], templatingNodeData2],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, conditionalNodeData],
+        [[conditionalNodeData, "0"], templatingNodeData1],
+        [[conditionalNodeData, "0"], templatingNodeData2],
+      ]);
     });
 
     it("should be correct for port within set to a set", async () => {
