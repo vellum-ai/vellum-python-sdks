@@ -85,12 +85,15 @@ service:
       url: Default
       availability: pre-release
       examples:
-        - path-parameters:
+        - name: Insert New Test Case With String Input
+          path-parameters:
             id: id
           request:
+            label: Test Case 1
             input_values:
               - type: STRING
-                name: name
+                value: Hello, world!
+                name: var_1
             evaluation_values:
               - type: STRING
                 name: name

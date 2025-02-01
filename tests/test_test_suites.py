@@ -63,14 +63,16 @@ async def test_upsert_test_suite_test_case(client: Vellum, async_client: AsyncVe
     }
     response = client.test_suites.upsert_test_suite_test_case(
         id_="id",
-        input_values=[NamedTestCaseStringVariableValueRequest(name="name")],
+        label="Test Case 1",
+        input_values=[NamedTestCaseStringVariableValueRequest(value="Hello, world!", name="var_1")],
         evaluation_values=[NamedTestCaseStringVariableValueRequest(name="name")],
     )
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.test_suites.upsert_test_suite_test_case(
         id_="id",
-        input_values=[NamedTestCaseStringVariableValueRequest(name="name")],
+        label="Test Case 1",
+        input_values=[NamedTestCaseStringVariableValueRequest(value="Hello, world!", name="var_1")],
         evaluation_values=[NamedTestCaseStringVariableValueRequest(name="name")],
     )
     validate_response(async_response, expected_response, expected_types)
