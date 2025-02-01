@@ -3,7 +3,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  genericNodeFactory,
+  nodePortFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
@@ -40,26 +43,12 @@ describe("NodePorts", () => {
   describe("basic", () => {
     beforeEach(async () => {
       const nodePortsData: NodePort[] = [
-        {
+        nodePortFactory({
           type: "IF",
-          id: "port-2",
-          name: "if_port",
-          expression: {
-            type: "UNARY_EXPRESSION",
-            operator: "null",
-            lhs: {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "input-1",
-              },
-            },
-          },
-        },
-        {
+        }),
+        nodePortFactory({
           type: "ELSE",
-          id: "port-3",
-          name: "else_port",
-        },
+        }),
       ];
 
       const nodeData = genericNodeFactory({
@@ -88,25 +77,11 @@ describe("NodePorts", () => {
   describe("basic with nested expression in port", () => {
     beforeEach(async () => {
       const nodePortsData: NodePort[] = [
-        {
+        nodePortFactory({
           type: "IF",
-          id: "port-2",
-          name: "if_port",
-          expression: {
-            type: "UNARY_EXPRESSION",
-            operator: "null",
-            lhs: {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "input-1",
-              },
-            },
-          },
-        },
-        {
+        }),
+        nodePortFactory({
           type: "ELIF",
-          id: "port-2",
-          name: "elif_port",
           expression: {
             type: "BINARY_EXPRESSION",
             operator: "=",
@@ -136,12 +111,10 @@ describe("NodePorts", () => {
               },
             },
           },
-        },
-        {
+        }),
+        nodePortFactory({
           type: "ELSE",
-          id: "port-3",
-          name: "else_port",
-        },
+        }),
       ];
 
       const nodeData = genericNodeFactory({

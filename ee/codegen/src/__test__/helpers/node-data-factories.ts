@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { VellumVariableType, PromptParameters } from "vellum-ai/api";
 
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
@@ -1338,6 +1339,36 @@ export function errorNodeDataFactory({
         },
       },
     ],
+  };
+}
+
+export function nodePortFactory(port: Partial<NodePort>): NodePort {
+  const portType = port.type ?? "DEFAULT";
+  const portId = port.id ?? uuidv4();
+  const portName = port.name ?? `${portType.toLowerCase()}_port`;
+
+  if (port.type === "IF" || port.type === "ELIF") {
+    return {
+      type: portType,
+      id: portId,
+      name: portName,
+      expression: port.expression ?? {
+        type: "UNARY_EXPRESSION",
+        operator: "null",
+        lhs: {
+          type: "INPUT_VARIABLE",
+          data: {
+            inputVariableId: "input-1",
+          },
+        },
+      },
+    };
+  }
+
+  return {
+    type: portType,
+    id: portId,
+    name: portName,
   };
 }
 
