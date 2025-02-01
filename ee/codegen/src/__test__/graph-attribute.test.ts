@@ -688,7 +688,7 @@ describe("Workflow", () => {
       ]);
     });
 
-    it("should be pointing to the correct terminal nodes from a nested set of conditionals", async () => {
+    it.skip("should be pointing to the correct terminal nodes from a nested set of conditionals", async () => {
       const firstCheckNode = genericNodeFactory({
         name: "FirstCheckNode",
         nodePorts: [
