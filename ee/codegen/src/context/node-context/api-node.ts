@@ -1,11 +1,10 @@
-import { WorkspaceSecretRead } from "vellum-ai/api";
 import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
 import { EntityNotFoundError } from "src/generators/errors";
-import { ApiNode as ApiNodeType } from "src/types/vellum";
+import { ApiNode as ApiNodeType, NodeInput } from "src/types/vellum";
 
 export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
   baseNodeClassName = "APINode";
@@ -32,62 +31,48 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
     ];
   }
 
+  private async processSecretInput(input: NodeInput): Promise<void> {
+    const inputRule = input?.value.rules.find(
+      (rule) => rule.type == "WORKSPACE_SECRET"
+    );
+    if (!inputRule || !inputRule.data?.workspaceSecretId) {
+      return;
+    }
+    try {
+      const tokenItem = await new WorkspaceSecretsClient({
+        apiKey: this.workflowContext.vellumApiKey,
+      }).retrieve(inputRule.data.workspaceSecretId);
+      inputRule.data.workspaceSecretId = tokenItem.name;
+    } catch (e) {
+      if (e instanceof VellumError && e.statusCode === 404) {
+        this.workflowContext.addError(
+          new EntityNotFoundError(`Workspace Secret "${input.key}" not found.`)
+        );
+      } else {
+        throw e;
+      }
+    }
+  }
+
   async buildProperties(): Promise<void> {
-    let apiTokenItem: WorkspaceSecretRead | undefined = undefined;
-    let bearerTokenItem: WorkspaceSecretRead | undefined = undefined;
+    const apiKeyInputId = this.nodeData.data.apiKeyHeaderValueInputId;
+    const apiKeyInput = this.nodeData.inputs.find(
+      (input) => input.id === apiKeyInputId
+    );
 
-    try {
-      const apiKeyInputId = this.nodeData.data.apiKeyHeaderValueInputId;
-      const apiKeyInput = this.nodeData.inputs.find(
-        (input) => input.id === apiKeyInputId
-      );
-
-      const apiKeyInputRule = apiKeyInput?.value.rules.find(
-        (rule) => rule.type == "WORKSPACE_SECRET"
-      );
-      if (apiKeyInputRule && apiKeyInputRule.data?.workspaceSecretId) {
-        apiTokenItem = await new WorkspaceSecretsClient({
-          apiKey: this.workflowContext.vellumApiKey,
-        }).retrieve(apiKeyInputRule.data?.workspaceSecretId);
-        apiKeyInputRule.data.workspaceSecretId = apiTokenItem.name;
-      }
-    } catch (e) {
-      if (e instanceof VellumError && e.statusCode === 404) {
-        this.workflowContext.addError(
-          new EntityNotFoundError(
-            `Workspace Secret "${this.nodeData.data.apiKeyHeaderValueInputId}" not found.`
-          )
-        );
-      } else {
-        throw e;
-      }
+    const bearerKeyInputId = this.nodeData.data.bearerTokenValueInputId;
+    const bearerKeyInput = this.nodeData.inputs.find(
+      (input) => input.id === bearerKeyInputId
+    );
+    const secrets = [];
+    if (apiKeyInput) {
+      secrets.push(apiKeyInput);
     }
-
-    try {
-      const bearerKeyInputId = this.nodeData.data.bearerTokenValueInputId;
-      const bearerKeyInput = this.nodeData.inputs.find(
-        (input) => input.id === bearerKeyInputId
-      );
-
-      const bearerKeyInputRule = bearerKeyInput?.value.rules.find(
-        (rule) => rule.type == "WORKSPACE_SECRET"
-      );
-      if (bearerKeyInputRule && bearerKeyInputRule.data?.workspaceSecretId) {
-        bearerTokenItem = await new WorkspaceSecretsClient({
-          apiKey: this.workflowContext.vellumApiKey,
-        }).retrieve(bearerKeyInputRule.data?.workspaceSecretId);
-        bearerKeyInputRule.data.workspaceSecretId = bearerTokenItem.name;
-      }
-    } catch (e) {
-      if (e instanceof VellumError && e.statusCode === 404) {
-        this.workflowContext.addError(
-          new EntityNotFoundError(
-            `Workspace Secret "${this.nodeData.data.bearerTokenValueInputId}" not found.`
-          )
-        );
-      } else {
-        throw e;
-      }
+    if (bearerKeyInput) {
+      secrets.push(bearerKeyInput);
     }
+    await Promise.all(
+      secrets.map(async (input) => this.processSecretInput(input))
+    );
   }
 }
