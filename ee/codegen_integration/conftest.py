@@ -2,9 +2,10 @@ import pytest
 from datetime import datetime
 import glob
 import os
+from uuid import uuid4
 from typing import List, Optional, Set, Tuple
 
-from vellum import WorkspaceSecretRead
+from vellum import DeploymentRead, WorkspaceSecretRead
 
 current_file_path = os.path.abspath(__file__)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -59,3 +60,18 @@ def workspace_secret_client(vellum_client):
         secret_type="USER_DEFINED",
     )
     vellum_client.workspace_secrets.retrieve.return_value = workspace_secret
+
+
+@pytest.fixture
+def deployment_client(vellum_client):
+    deployment = DeploymentRead(
+        id="e68d6033-f3e6-4681-a7b9-6bfd2828a237",
+        created=datetime.now(),
+        label="Example Deployment",
+        name="example deployment",
+        last_deployed_on=datetime.now(),
+        input_variables=[],
+        active_model_version_ids=[],
+        last_deployed_history_item_id=str(uuid4()),
+    )
+    vellum_client.workflow_deployments.retrieve.return_value = deployment

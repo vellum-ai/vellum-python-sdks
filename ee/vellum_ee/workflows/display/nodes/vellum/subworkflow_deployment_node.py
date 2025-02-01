@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import SubworkflowDeploymentNode
 from vellum.workflows.types.core import JsonObject
@@ -15,7 +15,6 @@ _SubworkflowDeploymentNodeType = TypeVar("_SubworkflowDeploymentNodeType", bound
 class BaseSubworkflowDeploymentNodeDisplay(
     BaseNodeVellumDisplay[_SubworkflowDeploymentNodeType], Generic[_SubworkflowDeploymentNodeType]
 ):
-    subworkflow_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
@@ -30,7 +29,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 input_name=variable_name,
                 value=variable_value,
                 display_context=display_context,
-                input_id=self.subworkflow_input_ids_by_name.get(variable_name),
+                input_id=self.node_input_ids_by_name.get(variable_name),
             )
             for variable_name, variable_value in subworkflow_inputs.items()
         ]

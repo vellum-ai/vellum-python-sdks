@@ -1,0 +1,198 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "39a5155a-d137-4a56-be36-d525802df463",
+        "type": "ENTRYPOINT",
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "beddfefc-dc34-483d-b313-f6a2a2e0737e"
+        },
+        "inputs": [],
+        "display_data": {
+          "position": {
+            "x": 1545,
+            "y": 330
+          },
+          "width": 124,
+          "height": 48
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "07d76e33-f3df-4235-8493-07e341208bf5",
+        "type": "SUBWORKFLOW",
+        "data": {
+          "label": "Subworkflow Deployment",
+          "source_handle_id": "fc38b3bd-5c08-4729-9e37-211c415637ad",
+          "target_handle_id": "30771282-5c0a-4a98-a3a8-4c7eeda30d23",
+          "error_output_id": null,
+          "variant": "DEPLOYMENT",
+          "workflow_deployment_id": "e68d6033-f3e6-4681-a7b9-6bfd2828a237",
+          "release_tag": "LATEST"
+        },
+        "inputs": [
+          {
+            "id": "97b63d71-5413-417f-9cf5-49e1b4fd56e4",
+            "key": "test",
+            "value": {
+              "rules": [
+                {
+                  "type": "INPUT_VARIABLE",
+                  "data": {
+                    "input_variable_id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 1873.116343490305,
+            "y": 239.74958448753466
+          },
+          "width": null,
+          "height": null
+        },
+        "base": {
+          "name": "SubworkflowDeploymentNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "subworkflow_deployment_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_subworkflow_deployment_node",
+            "code",
+            "nodes",
+            "subworkflow_deployment"
+          ],
+          "name": "SubworkflowDeployment"
+        }
+      },
+      {
+        "id": "eb72f89e-f831-4fc1-a54f-dec7f429fff9",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "final-output",
+          "target_handle_id": "52b9ff71-e090-4c68-a713-fd72d194b992",
+          "output_id": "4dc6e13e-92ba-436e-aa35-87e258f2f585",
+          "output_type": "STRING",
+          "node_input_id": "0d184119-05b8-4551-a01c-418d3b983880"
+        },
+        "inputs": [
+          {
+            "id": "0d184119-05b8-4551-a01c-418d3b983880",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "INPUT_VARIABLE",
+                  "data": {
+                    "input_variable_id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 2750,
+            "y": 211.25540166204985
+          },
+          "width": 471,
+          "height": 234
+        },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_subworkflow_deployment_node",
+            "code",
+            "nodes",
+            "final_output"
+          ],
+          "name": "FinalOutput"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "type": "DEFAULT",
+        "id": "fbf75594-70e8-4e03-ae3d-a64f573df51f",
+        "source_node_id": "39a5155a-d137-4a56-be36-d525802df463",
+        "source_handle_id": "beddfefc-dc34-483d-b313-f6a2a2e0737e",
+        "target_node_id": "07d76e33-f3df-4235-8493-07e341208bf5",
+        "target_handle_id": "30771282-5c0a-4a98-a3a8-4c7eeda30d23"
+      },
+      {
+        "type": "DEFAULT",
+        "id": "85970a9b-4ce7-46a5-b539-66aaeef080df",
+        "source_node_id": "07d76e33-f3df-4235-8493-07e341208bf5",
+        "source_handle_id": "fc38b3bd-5c08-4729-9e37-211c415637ad",
+        "target_node_id": "eb72f89e-f831-4fc1-a54f-dec7f429fff9",
+        "target_handle_id": "52b9ff71-e090-4c68-a713-fd72d194b992"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": -1404.2954545454543,
+        "y": 51.525595763459876,
+        "zoom": 0.7965578111209178
+      }
+    },
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "simple_subworkflow_deployment_node",
+        "code",
+        "workflow"
+      ]
+    }
+  },
+  "input_variables": [
+    {
+      "id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5",
+      "key": "test",
+      "type": "STRING",
+      "required": true,
+      "default": null,
+      "extensions": {
+        "color": null
+      }
+    }
+  ],
+  "output_variables": [
+    {
+      "id": "4dc6e13e-92ba-436e-aa35-87e258f2f585",
+      "key": "final-output",
+      "type": "STRING"
+    }
+  ]
+}
