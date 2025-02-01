@@ -176,19 +176,15 @@ exports[`Workflow > graph > should be correct for two branches merging from sets
 
 exports[`Workflow > graph > should be pointing to the correct terminal nodes from a nested set of conditionals 1`] = `
 "{
-    FirstCheckNode.Ports.if_port
+    FirstCheckNode.Ports.if_port 
+    >> FirstInnerCheckNode 
+    >> SecondInnerCheckNode
+    >> FinalCheckNode,
+    FirstCheckNode.Ports.else_port
     >> {
-        FirstInnerCheckNode.Ports.if_port >> {
-            SecondInnerCheckNode.Ports.if_port >> FinalCheckNode,
-            SecondInnerCheckNode.Ports.else_port >> OuterOutputNode,
-        },
-        FirstInnerCheckNode.Ports.else_port
-        >> {
-            FinalCheckNode.Ports.if_port >> InnerTerminalNode,
-            FinalCheckNode.Ports.else_port >> OuterOutputNode,
-        },
+        FinalCheckNode.Ports.if_port >> InnerTerminalNode,
+        FinalCheckNode.Ports.else_port >> OuterOutputNode,
     },
-    FirstCheckNode.Ports.else_port >> FinalCheckNode,
 }
 "
 `;

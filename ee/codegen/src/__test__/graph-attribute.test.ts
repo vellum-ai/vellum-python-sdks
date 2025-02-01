@@ -703,14 +703,6 @@ describe("Workflow", () => {
 
       const firstInnerCheckNode = genericNodeFactory({
         name: "FirstInnerCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
       });
 
       const finalCheckNode = genericNodeFactory({
@@ -731,14 +723,6 @@ describe("Workflow", () => {
 
       const secondInnerCheckNode = genericNodeFactory({
         name: "SecondInnerCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
       });
 
       const outerOutputNode = genericNodeFactory({
@@ -749,36 +733,24 @@ describe("Workflow", () => {
         [entrypointNode, firstCheckNode],
         [[firstCheckNode, "if_port"], firstInnerCheckNode],
         [[firstCheckNode, "else_port"], finalCheckNode],
+        [firstInnerCheckNode, secondInnerCheckNode],
         [[finalCheckNode, "if_port"], innerTerminalNode],
         [[finalCheckNode, "else_port"], outerOutputNode],
-        [[secondInnerCheckNode, "if_port"], finalCheckNode],
-        [[secondInnerCheckNode, "else_port"], outerOutputNode],
-        [[firstInnerCheckNode, "if_port"], secondInnerCheckNode],
-        [[firstInnerCheckNode, "else_port"], finalCheckNode],
+        [secondInnerCheckNode, finalCheckNode],
       ]);
       /**
        * Currently generating the following:
 {
-    FirstCheckNode.Ports.if_port
+    FirstCheckNode.Ports.if_port >> FirstInnerCheckNode >> SecondInnerCheckNode,
+    FirstCheckNode.Ports.else_port
     >> {
-        FirstInnerCheckNode.Ports.if_port >> SecondInnerCheckNode.Ports.if_port,
-        FirstInnerCheckNode.Ports.else_port
-        >> {
-            FinalCheckNode.Ports.if_port >> InnerTerminalNode,
-            FinalCheckNode.Ports.else_port >> OuterOutputNode,
-        },
+        FinalCheckNode.Ports.if_port >> InnerTerminalNode,
+        FinalCheckNode.Ports.else_port >> OuterOutputNode,
     },
-    FirstCheckNode.Ports.else_port,
-} >> Graph.from_set(
-    {
-        FinalCheckNode,
-        OuterOutputNode,
-    }
-)
-       * There are several issues with this graph:
-       * - SecondInnerCheckNode.Ports.else_port >> OuterOutputNode is missing
+} >> FinalCheckNode
+       * There are two symptoms of the same issues with this graph:
+       * - Hallucinated a InnerTerminalNode >> FinalCheckNode edge
        * - Hallucinated a OuterOutputNode >> FinalCheckNode edge
-       * - Hallucinated a OuterOutputNode >> OuterOutputNode edge
        */
     });
   });
