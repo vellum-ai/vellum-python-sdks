@@ -688,7 +688,7 @@ describe("Workflow", () => {
       ]);
     });
 
-    it.skip("should be pointing to the correct terminal nodes from a nested set of conditionals", async () => {
+    it("should be pointing to the correct terminal nodes from a nested set of conditionals", async () => {
       const firstCheckNode = genericNodeFactory({
         name: "FirstCheckNode",
         nodePorts: [
@@ -738,20 +738,6 @@ describe("Workflow", () => {
         [[finalCheckNode, "else_port"], outerOutputNode],
         [secondInnerCheckNode, finalCheckNode],
       ]);
-      /**
-       * Currently generating the following:
-{
-    FirstCheckNode.Ports.if_port >> FirstInnerCheckNode >> SecondInnerCheckNode,
-    FirstCheckNode.Ports.else_port
-    >> {
-        FinalCheckNode.Ports.if_port >> InnerTerminalNode,
-        FinalCheckNode.Ports.else_port >> OuterOutputNode,
-    },
-} >> FinalCheckNode
-       * There are two symptoms of the same issues with this graph:
-       * - Hallucinated a InnerTerminalNode >> FinalCheckNode edge
-       * - Hallucinated a OuterOutputNode >> FinalCheckNode edge
-       */
     });
   });
 });

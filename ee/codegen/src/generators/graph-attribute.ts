@@ -568,10 +568,13 @@ export class GraphAttribute extends AstNode {
       return 0;
     } else if (
       mutableAst.type === "node_reference" ||
-      mutableAst.type === "port_reference" ||
-      mutableAst.type === "set"
+      mutableAst.type === "port_reference"
     ) {
       return 1;
+    } else if (mutableAst.type === "set") {
+      return Math.max(
+        ...mutableAst.values.map((value) => this.getBranchSize(value))
+      );
     } else if (mutableAst.type === "right_shift") {
       return (
         this.getBranchSize(mutableAst.lhs) + this.getBranchSize(mutableAst.rhs)
@@ -632,6 +635,9 @@ export class GraphAttribute extends AstNode {
     ) {
       return { lhs: mutableAst, rhs: { type: "empty" } };
     } else if (mutableAst.type === "set") {
+      if (this.startsWithTargetNode(targetNode, mutableAst)) {
+        return { lhs: { type: "empty" }, rhs: mutableAst };
+      }
       return { lhs: mutableAst, rhs: { type: "empty" } };
     } else if (mutableAst.type === "right_shift") {
       if (this.isNodeInBranch(targetNode, mutableAst.lhs)) {
@@ -720,6 +726,24 @@ export class GraphAttribute extends AstNode {
     } else {
       return { type: "empty" };
     }
+  };
+
+  private startsWithTargetNode = (
+    targetNode: BaseNodeContext<WorkflowDataNode>,
+    mutableAst: GraphMutableAst
+  ): boolean => {
+    if (mutableAst.type === "node_reference") {
+      return mutableAst.reference === targetNode;
+    } else if (mutableAst.type === "port_reference") {
+      return mutableAst.reference.nodeContext === targetNode;
+    } else if (mutableAst.type === "set") {
+      return mutableAst.values.every((value) =>
+        this.startsWithTargetNode(targetNode, value)
+      );
+    } else if (mutableAst.type === "right_shift") {
+      return this.startsWithTargetNode(targetNode, mutableAst.lhs);
+    }
+    return false;
   };
 
   /**
