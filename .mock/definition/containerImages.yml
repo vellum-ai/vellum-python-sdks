@@ -43,7 +43,8 @@ service:
                   repository: repository
                   sha: sha
                   tags:
-                    - tags
+                    - name: name
+                      modified: '2024-01-15T09:30:00Z'
       audiences:
         - internal
     retrieve:
@@ -75,7 +76,8 @@ service:
               repository: repository
               sha: sha
               tags:
-                - tags
+                - name: name
+                  modified: '2024-01-15T09:30:00Z'
       audiences:
         - internal
     docker-service-token:
@@ -138,7 +140,8 @@ service:
               repository: repository
               sha: sha
               tags:
-                - tags
+                - name: name
+                  modified: '2024-01-15T09:30:00Z'
       audiences:
         - internal
   source:

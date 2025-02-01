@@ -1339,6 +1339,15 @@ types:
       source_handle_id: optional<string>
     source:
       openapi: openapi/openapi.yml
+  ContainerImageContainerImageTag:
+    properties:
+      name:
+        type: string
+        validation:
+          maxLength: 128
+      modified: datetime
+    source:
+      openapi: openapi/openapi.yml
   ContainerImageRead:
     properties:
       id:
@@ -1360,7 +1369,7 @@ types:
         type: string
         validation:
           maxLength: 256
-      tags: list<string>
+      tags: list<ContainerImageContainerImageTag>
     source:
       openapi: openapi/openapi.yml
   CreateEnum: literal<"CREATE">
