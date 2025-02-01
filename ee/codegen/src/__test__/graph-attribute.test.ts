@@ -12,6 +12,7 @@ import {
   finalOutputNodeFactory,
   genericNodeFactory,
   mergeNodeDataFactory,
+  nodePortFactory,
   templatingNodeFactory,
 } from "./helpers/node-data-factories";
 
@@ -685,6 +686,100 @@ describe("Workflow", () => {
         [entrypointNode, startNode],
         [startNode, endNode],
       ]);
+    });
+
+    it("should be pointing to the correct terminal nodes from a nested set of conditionals", async () => {
+      const firstCheckNode = genericNodeFactory({
+        name: "FirstCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const firstInnerCheckNode = genericNodeFactory({
+        name: "FirstInnerCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const finalCheckNode = genericNodeFactory({
+        name: "FinalCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const innerTerminalNode = genericNodeFactory({
+        name: "InnerTerminalNode",
+      });
+
+      const secondInnerCheckNode = genericNodeFactory({
+        name: "SecondInnerCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const outerOutputNode = genericNodeFactory({
+        name: "OuterOutputNode",
+      });
+
+      await runGraphTest([
+        [entrypointNode, firstCheckNode],
+        [[firstCheckNode, "if_port"], firstInnerCheckNode],
+        [[firstCheckNode, "else_port"], finalCheckNode],
+        [[finalCheckNode, "if_port"], innerTerminalNode],
+        [[finalCheckNode, "else_port"], outerOutputNode],
+        [[secondInnerCheckNode, "if_port"], finalCheckNode],
+        [[secondInnerCheckNode, "else_port"], outerOutputNode],
+        [[firstInnerCheckNode, "if_port"], secondInnerCheckNode],
+        [[firstInnerCheckNode, "else_port"], finalCheckNode],
+      ]);
+      /**
+       * Currently generating the following:
+{
+    FirstCheckNode.Ports.if_port
+    >> {
+        FirstInnerCheckNode.Ports.if_port >> SecondInnerCheckNode.Ports.if_port,
+        FirstInnerCheckNode.Ports.else_port
+        >> {
+            FinalCheckNode.Ports.if_port >> InnerTerminalNode,
+            FinalCheckNode.Ports.else_port >> OuterOutputNode,
+        },
+    },
+    FirstCheckNode.Ports.else_port,
+} >> Graph.from_set(
+    {
+        FinalCheckNode,
+        OuterOutputNode,
+    }
+)
+       * There are several issues with this graph:
+       * - SecondInnerCheckNode.Ports.else_port >> OuterOutputNode is missing
+       * - Hallucinated a OuterOutputNode >> FinalCheckNode edge
+       * - Hallucinated a OuterOutputNode >> OuterOutputNode edge
+       */
     });
   });
 });
