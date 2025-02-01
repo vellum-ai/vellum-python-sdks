@@ -1881,6 +1881,27 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpsertTestSuiteTestCaseRequest'
+            examples:
+              Example1:
+                value:
+                  label: Test Case 1
+                  input_values:
+                  - type: STRING
+                    name: var_1
+                    value: What are your favorite colors?
+                  evaluation_values:
+                  - type: ARRAY
+                    name: var_2
+                    value:
+                    - type: STRING
+                      value: Red
+                    - type: STRING
+                      value: Green
+                    - type: STRING
+                      value: Blue
+                summary: Insert New Test Case with Input and Evaluation Values
+                description: This example shows how to create a new test case with
+                  input and evaluation values.
         required: true
       security:
       - apiKeyAuth: []
@@ -3374,6 +3395,18 @@ components:
         source_handle_id:
           type: string
           nullable: true
+    ContainerImageContainerImageTag:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        modified:
+          type: string
+          format: date-time
+      required:
+      - modified
+      - name
     ContainerImageRead:
       type: object
       properties:
@@ -3401,8 +3434,7 @@ components:
         tags:
           type: array
           items:
-            type: string
-          readOnly: true
+            $ref: '#/components/schemas/ContainerImageContainerImageTag'
       required:
       - created
       - id

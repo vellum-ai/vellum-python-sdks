@@ -85,15 +85,25 @@ service:
       url: Default
       availability: pre-release
       examples:
-        - path-parameters:
+        - name: Insert New Test Case with Input and Evaluation Values
+          path-parameters:
             id: id
           request:
+            label: Test Case 1
             input_values:
               - type: STRING
-                name: name
+                value: What are your favorite colors?
+                name: var_1
             evaluation_values:
-              - type: STRING
-                name: name
+              - type: ARRAY
+                value:
+                  - type: STRING
+                    value: Red
+                  - type: STRING
+                    value: Green
+                  - type: STRING
+                    value: Blue
+                name: var_2
           response:
             body:
               id: id
