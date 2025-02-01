@@ -11,7 +11,7 @@ from vellum.workflows.references import OutputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
-from vellum.workflows.types.generics import StateType, WorkflowInputsType
+from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
@@ -57,16 +57,16 @@ class _InlineSubworkflowNodeMeta(BaseNodeMeta):
 
 
 class InlineSubworkflowNode(
-    BaseNode[StateType], Generic[StateType, WorkflowInputsType, InnerStateType], metaclass=_InlineSubworkflowNodeMeta
+    BaseNode[StateType], Generic[StateType, InputsType, InnerStateType], metaclass=_InlineSubworkflowNodeMeta
 ):
     """
     Used to execute a Subworkflow defined inline.
 
-    subworkflow: Type["BaseWorkflow[WorkflowInputsType, InnerStateType]"] - The Subworkflow to execute
+    subworkflow: Type["BaseWorkflow[InputsType, InnerStateType]"] - The Subworkflow to execute
     subworkflow_inputs: ClassVar[EntityInputsInterface] = {}
     """
 
-    subworkflow: Type["BaseWorkflow[WorkflowInputsType, InnerStateType]"]
+    subworkflow: Type["BaseWorkflow[InputsType, InnerStateType]"]
     subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[UNDEF]]] = UNDEF
 
     def run(self) -> Iterator[BaseOutput]:
@@ -109,7 +109,7 @@ class InlineSubworkflowNode(
                     value=output_value,
                 )
 
-    def _compile_subworkflow_inputs(self) -> WorkflowInputsType:
+    def _compile_subworkflow_inputs(self) -> InputsType:
         inputs_class = self.subworkflow.get_inputs_class()
         if self.subworkflow_inputs is UNDEF:
             inputs_dict = {}

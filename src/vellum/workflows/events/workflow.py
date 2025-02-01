@@ -6,7 +6,7 @@ from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references import ExternalInputReference
-from vellum.workflows.types.generics import OutputsType, StateType, WorkflowInputsType
+from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 from .node import (
     NodeExecutionFulfilledEvent,
@@ -38,20 +38,20 @@ class _BaseWorkflowEvent(BaseEvent):
         return self.body.workflow_definition
 
 
-class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[WorkflowInputsType]):
-    inputs: WorkflowInputsType
+class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsType]):
+    inputs: InputsType
 
     @field_serializer("inputs")
-    def serialize_inputs(self, inputs: WorkflowInputsType, _info: Any) -> Dict[str, Any]:
+    def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(inputs)
 
 
-class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[WorkflowInputsType]):
+class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType]):
     name: Literal["workflow.execution.initiated"] = "workflow.execution.initiated"
-    body: WorkflowExecutionInitiatedBody[WorkflowInputsType]
+    body: WorkflowExecutionInitiatedBody[InputsType]
 
     @property
-    def inputs(self) -> WorkflowInputsType:
+    def inputs(self) -> InputsType:
         return self.body.inputs
 
 

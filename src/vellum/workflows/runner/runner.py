@@ -65,7 +65,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.cycle_map import CycleMap
-from vellum.workflows.types.generics import OutputsType, StateType, WorkflowInputsType
+from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 if TYPE_CHECKING:
     from vellum.workflows import BaseWorkflow
@@ -82,8 +82,8 @@ class WorkflowRunner(Generic[StateType]):
 
     def __init__(
         self,
-        workflow: "BaseWorkflow[WorkflowInputsType, StateType]",
-        inputs: Optional[WorkflowInputsType] = None,
+        workflow: "BaseWorkflow[InputsType, StateType]",
+        inputs: Optional[InputsType] = None,
         state: Optional[StateType] = None,
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,

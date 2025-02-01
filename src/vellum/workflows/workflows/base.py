@@ -68,7 +68,7 @@ from vellum.workflows.runner.runner import ExternalInputsArg, RunFromNodeArg
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.store import Store
-from vellum.workflows.types.generics import StateType, WorkflowInputsType
+from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
@@ -88,7 +88,7 @@ class _BaseWorkflowMeta(type):
 GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
 
 
-class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkflowMeta):
+class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
     graph: ClassVar[GraphAttribute]
     emitters: List[BaseWorkflowEmitter]
@@ -99,7 +99,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
     WorkflowEvent = Union[  # type: ignore
         GenericWorkflowEvent,
-        WorkflowExecutionInitiatedEvent[WorkflowInputsType],  # type: ignore[valid-type]
+        WorkflowExecutionInitiatedEvent[InputsType],  # type: ignore[valid-type]
         WorkflowExecutionFulfilledEvent[Outputs],
         WorkflowExecutionSnapshottedEvent[StateType],  # type: ignore[valid-type]
     ]
@@ -181,7 +181,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
     def run(
         self,
-        inputs: Optional[WorkflowInputsType] = None,
+        inputs: Optional[InputsType] = None,
         *,
         state: Optional[StateType] = None,
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
@@ -198,7 +198,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
         Parameters
         ----------
-        inputs: Optional[WorkflowInputsType] = None
+        inputs: Optional[InputsType] = None
             The Inputs instance used to initiate the Workflow Execution.
 
         state: Optional[StateType] = None
@@ -288,7 +288,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
 
     def stream(
         self,
-        inputs: Optional[WorkflowInputsType] = None,
+        inputs: Optional[InputsType] = None,
         *,
         event_filter: Optional[Callable[[Type["BaseWorkflow"], WorkflowEvent], bool]] = None,
         state: Optional[StateType] = None,
@@ -307,7 +307,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
             A filter that can be used to filter events based on the Workflow Class and the event itself. If the method
             returns `False`, the event will not be yielded.
 
-        inputs: Optional[WorkflowInputsType] = None
+        inputs: Optional[InputsType] = None
             The Inputs instance used to initiate the Workflow Execution.
 
         state: Optional[StateType] = None
@@ -359,7 +359,7 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
     @lru_cache
     def _get_parameterized_classes(
         cls,
-    ) -> Tuple[Type[WorkflowInputsType], Type[StateType]]:
+    ) -> Tuple[Type[InputsType], Type[StateType]]:
         original_base = get_original_base(cls)
 
         inputs_type, state_type = get_args(original_base)
@@ -378,17 +378,17 @@ class BaseWorkflow(Generic[WorkflowInputsType, StateType], metaclass=_BaseWorkfl
         return (inputs_type, state_type)
 
     @classmethod
-    def get_inputs_class(cls) -> Type[WorkflowInputsType]:
+    def get_inputs_class(cls) -> Type[InputsType]:
         return cls._get_parameterized_classes()[0]
 
     @classmethod
     def get_state_class(cls) -> Type[StateType]:
         return cls._get_parameterized_classes()[1]
 
-    def get_default_inputs(self) -> WorkflowInputsType:
+    def get_default_inputs(self) -> InputsType:
         return self.get_inputs_class()()
 
-    def get_default_state(self, workflow_inputs: Optional[WorkflowInputsType] = None) -> StateType:
+    def get_default_state(self, workflow_inputs: Optional[InputsType] = None) -> StateType:
         return self.get_state_class()(
             meta=StateMeta(
                 parent=self._parent_state,

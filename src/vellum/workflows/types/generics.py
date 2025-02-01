@@ -10,5 +10,5 @@ if TYPE_CHECKING:
 NodeType = TypeVar("NodeType", bound="BaseNode")
 StateType = TypeVar("StateType", bound="BaseState")
 WorkflowType = TypeVar("WorkflowType", bound="BaseWorkflow")
-WorkflowInputsType = TypeVar("WorkflowInputsType", bound="BaseInputs")
+InputsType = TypeVar("InputsType", bound="BaseInputs")
 OutputsType = TypeVar("OutputsType", bound="BaseOutputs")
