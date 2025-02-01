@@ -356,75 +356,46 @@ describe("Workflow", () => {
 
     it("should be correct for set of a branch and a node to a node", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData3 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
+        id: uuidv4(),
         label: "Templating Node 3",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData3,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData4 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf83",
+        id: uuidv4(),
         label: "Templating Node 4",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9b",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294b",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData4,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData5 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf84",
+        id: uuidv4(),
         label: "Templating Node 5",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9c",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294c",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData5,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const mergeNodeData = mergeNodeDataFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: mergeNodeData,
-      });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-          [templatingNodeData1, templatingNodeData3],
-          [templatingNodeData3, templatingNodeData4],
-          [templatingNodeData4, [mergeNodeData, 0]],
-          [templatingNodeData2, [mergeNodeData, 1]],
-          [mergeNodeData, templatingNodeData5],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [entrypointNode, templatingNodeData2],
+        [templatingNodeData1, templatingNodeData3],
+        [templatingNodeData3, templatingNodeData4],
+        [templatingNodeData4, [mergeNodeData, 0]],
+        [templatingNodeData2, [mergeNodeData, 1]],
+        [mergeNodeData, templatingNodeData5],
+      ]);
     });
 
     it("should be correct for a single port pointing to a set", async () => {
