@@ -588,6 +588,8 @@ describe("Workflow", () => {
     });
 
     it("should show errors for a node pointing to non-existent node", async () => {
+      // We skip using runGraphTest here because we want to test an error case
+
       workflowContext = workflowContextFactory({ strict: false });
       workflowContext.addEntrypointNode(entrypointNode);
       const templatingNodeData1 = templatingNodeFactory();
@@ -622,57 +624,29 @@ describe("Workflow", () => {
 
     it("should support an edge between two sets", async () => {
       const topLeftNode = templatingNodeFactory({ label: "Top Left Node" });
-      await createNodeContext({
-        workflowContext,
-        nodeData: topLeftNode,
-      });
 
       const topRightNode = finalOutputNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
+        id: uuidv4(),
         label: "Top Right Node",
         name: "top-right-node",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294e",
-        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf86",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: topRightNode,
+        targetHandleId: uuidv4(),
+        outputId: uuidv4(),
       });
 
       const bottomLeftNode = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf87",
+        id: uuidv4(),
         label: "Bottom Left Node",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-
-      await createNodeContext({
-        workflowContext,
-        nodeData: bottomLeftNode,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const bottomRightNode = finalOutputNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+        id: uuidv4(),
         label: "Bottom Right Node",
         name: "bottom-right-node",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2950",
-        outputId: "7e09927b-6d6f-4829-92c9-54e66bdcaf88",
+        targetHandleId: uuidv4(),
+        outputId: uuidv4(),
       });
-      await createNodeContext({
-        workflowContext,
-        nodeData: bottomRightNode,
-      });
-
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, topLeftNode],
-          [entrypointNode, bottomLeftNode],
-          [topLeftNode, topRightNode],
-          [bottomLeftNode, topRightNode],
-          [topLeftNode, bottomRightNode],
-          [bottomLeftNode, bottomRightNode],
-        ])
-      );
 
       /**
        * Currently the snapshot generated for this test is suboptimal. Ideally, we would generate:
@@ -687,8 +661,14 @@ describe("Workflow", () => {
        *     }
        * )
        */
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, topLeftNode],
+        [entrypointNode, bottomLeftNode],
+        [topLeftNode, topRightNode],
+        [bottomLeftNode, topRightNode],
+        [topLeftNode, bottomRightNode],
+        [bottomLeftNode, bottomRightNode],
+      ]);
     });
   });
 });
