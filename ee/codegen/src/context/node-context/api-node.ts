@@ -65,8 +65,12 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
       (input) => input.id === bearerKeyInputId
     );
     const secrets = [];
-    secrets.push(apiKeyInput);
-    secrets.push(bearerKeyInput);
+    if (apiKeyInput) {
+      secrets.push(apiKeyInput);
+    }
+    if (bearerKeyInput) {
+      secrets.push(bearerKeyInput);
+    }
     await Promise.all(
       secrets.map(async (input) => this.processSecretInput(input))
     );
