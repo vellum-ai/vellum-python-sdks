@@ -1374,6 +1374,7 @@ export function nodePortFactory(port: Partial<NodePort> = {}): NodePort {
 
 export function genericNodeFactory(
   {
+    id,
     name,
     nodeTrigger,
     nodePorts,
@@ -1381,6 +1382,7 @@ export function genericNodeFactory(
     nodeOutputs,
     adornments,
   }: {
+    id?: string;
     name: string;
     nodeTrigger?: NodeTrigger;
     nodePorts?: NodePort[];
@@ -1392,7 +1394,7 @@ export function genericNodeFactory(
   }
 ): GenericNode {
   const nodeData: GenericNode = {
-    id: "node-1",
+    id: id ?? uuidv4(),
     type: WorkflowNodeType.GENERIC,
     base: {
       module: ["vellum", "workflows", "nodes", "bases", "base"],
