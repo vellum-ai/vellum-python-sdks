@@ -299,43 +299,26 @@ describe("Workflow", () => {
 
     it("should be correct for a node to a set", async () => {
       const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
+        id: uuidv4(),
         label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData2,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
       const templatingNodeData3 = templatingNodeFactory({
-        id: "7e09927b-6d6f-4829-92c9-54e66bdcaf82",
+        id: uuidv4(),
         label: "Templating Node 3",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb9a",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a294a",
-      });
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData3,
+        sourceHandleId: uuidv4(),
+        targetHandleId: uuidv4(),
       });
 
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [templatingNodeData1, templatingNodeData2],
-          [templatingNodeData1, templatingNodeData3],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      await runGraphTest([
+        [entrypointNode, templatingNodeData1],
+        [templatingNodeData1, templatingNodeData2],
+        [templatingNodeData1, templatingNodeData3],
+      ]);
     });
 
     it("should be correct for a node to a set to a node", async () => {
