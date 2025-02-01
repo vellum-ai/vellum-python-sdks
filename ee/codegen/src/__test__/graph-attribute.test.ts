@@ -10,6 +10,7 @@ import {
   conditionalNodeFactory,
   entrypointNodeDataFactory,
   finalOutputNodeFactory,
+  genericNodeFactory,
   mergeNodeDataFactory,
   templatingNodeFactory,
 } from "./helpers/node-data-factories";
@@ -668,6 +669,21 @@ describe("Workflow", () => {
         [bottomLeftNode, topRightNode],
         [topLeftNode, bottomRightNode],
         [bottomLeftNode, bottomRightNode],
+      ]);
+    });
+
+    it.skip("should handle a simple edge of generic nodes", async () => {
+      const startNode = genericNodeFactory({
+        name: "StartNode",
+      });
+
+      const endNode = genericNodeFactory({
+        name: "EndNode",
+      });
+
+      await runGraphTest([
+        [entrypointNode, startNode],
+        [startNode, endNode],
       ]);
     });
   });
