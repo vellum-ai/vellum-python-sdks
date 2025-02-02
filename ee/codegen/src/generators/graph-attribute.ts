@@ -96,29 +96,6 @@ export class GraphAttribute extends AstNode {
         continue;
       }
 
-      const getAstTerminals = (
-        mutableAst: GraphMutableAst
-      ): GraphNodeReference[] => {
-        if (mutableAst.type === "empty") {
-          return [];
-        } else if (mutableAst.type === "node_reference") {
-          return [mutableAst];
-        } else if (mutableAst.type === "set") {
-          return mutableAst.values.flatMap(getAstTerminals);
-        } else if (mutableAst.type === "right_shift") {
-          return getAstTerminals(mutableAst.rhs);
-        } else if (mutableAst.type == "port_reference") {
-          return [
-            {
-              type: "node_reference",
-              reference: mutableAst.reference.nodeContext,
-            },
-          ];
-        } else {
-          return [];
-        }
-      };
-
       const addEdgeToGraph = (
         mutableAst: GraphMutableAst,
         graphSourceNode: BaseNodeContext<WorkflowDataNode> | null
@@ -309,7 +286,7 @@ export class GraphAttribute extends AstNode {
             return;
           }
 
-          const lhsTerminals = getAstTerminals(mutableAst.lhs);
+          const lhsTerminals = this.getAstTerminals(mutableAst.lhs);
           const lhsTerminal = lhsTerminals[0];
           if (!lhsTerminal) {
             return;
@@ -441,7 +418,7 @@ export class GraphAttribute extends AstNode {
       }
       return [];
     } else if (mutableAst.type === "set") {
-      return mutableAst.values.flatMap(this.getAstSources);
+      return mutableAst.values.flatMap((val) => this.getAstSources(val));
     } else if (mutableAst.type === "right_shift") {
       return this.getAstSources(mutableAst.lhs);
     } else if (mutableAst.type == "port_reference") {
@@ -450,6 +427,32 @@ export class GraphAttribute extends AstNode {
       return [];
     }
   };
+
+  /**
+   * Gets the terminals of the AST. The AST terminals are the set of Node References that
+   * serve as the exit points of the Graph. In the case of a set, it's the set of
+   * terminals of each of the set's members.
+   */
+  private getAstTerminals(mutableAst: GraphMutableAst): GraphNodeReference[] {
+    if (mutableAst.type === "empty") {
+      return [];
+    } else if (mutableAst.type === "node_reference") {
+      return [mutableAst];
+    } else if (mutableAst.type === "set") {
+      return mutableAst.values.flatMap((val) => this.getAstTerminals(val));
+    } else if (mutableAst.type === "right_shift") {
+      return this.getAstTerminals(mutableAst.rhs);
+    } else if (mutableAst.type == "port_reference") {
+      return [
+        {
+          type: "node_reference",
+          reference: mutableAst.reference.nodeContext,
+        },
+      ];
+    } else {
+      return [];
+    }
+  }
 
   /**
    * Optimizes the set by seeing if there's a common node across all branches
