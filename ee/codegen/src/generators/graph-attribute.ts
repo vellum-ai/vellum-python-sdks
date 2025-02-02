@@ -96,33 +96,6 @@ export class GraphAttribute extends AstNode {
         continue;
       }
 
-      const getAstSources = (
-        mutableAst: GraphMutableAst
-      ): GraphPortReference[] => {
-        if (mutableAst.type === "empty") {
-          return [];
-        } else if (mutableAst.type === "node_reference") {
-          const defaultPort = mutableAst.reference.defaultPortContext;
-          if (defaultPort) {
-            return [
-              {
-                type: "port_reference",
-                reference: defaultPort,
-              },
-            ];
-          }
-          return [];
-        } else if (mutableAst.type === "set") {
-          return mutableAst.values.flatMap(getAstSources);
-        } else if (mutableAst.type === "right_shift") {
-          return getAstSources(mutableAst.lhs);
-        } else if (mutableAst.type == "port_reference") {
-          return [mutableAst];
-        } else {
-          return [];
-        }
-      };
-
       const getAstTerminals = (
         mutableAst: GraphMutableAst
       ): GraphNodeReference[] => {
@@ -284,7 +257,7 @@ export class GraphAttribute extends AstNode {
             };
             if (this.isPlural(newSetAst)) {
               const newAstSources = newSetAst.values.flatMap((value) =>
-                getAstSources(value)
+                this.getAstSources(value)
               );
 
               const uniqueAstSourceIds = new Set(
@@ -445,6 +418,38 @@ export class GraphAttribute extends AstNode {
       (mutableAst.type === "set" && mutableAst.values.every(this.isPlural))
     );
   }
+
+  /**
+   * Gets the sources of the AST. The AST source are the set of Port References that
+   * serve as the entrypoints to the Graph. In the case of a set, it's the set of sources
+   * of each of the set's members.
+   */
+  private getAstSources = (
+    mutableAst: GraphMutableAst
+  ): GraphPortReference[] => {
+    if (mutableAst.type === "empty") {
+      return [];
+    } else if (mutableAst.type === "node_reference") {
+      const defaultPort = mutableAst.reference.defaultPortContext;
+      if (defaultPort) {
+        return [
+          {
+            type: "port_reference",
+            reference: defaultPort,
+          },
+        ];
+      }
+      return [];
+    } else if (mutableAst.type === "set") {
+      return mutableAst.values.flatMap(this.getAstSources);
+    } else if (mutableAst.type === "right_shift") {
+      return this.getAstSources(mutableAst.lhs);
+    } else if (mutableAst.type == "port_reference") {
+      return [mutableAst];
+    } else {
+      return [];
+    }
+  };
 
   /**
    * Optimizes the set by seeing if there's a common node across all branches
