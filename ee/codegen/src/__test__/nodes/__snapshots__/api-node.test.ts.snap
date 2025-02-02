@@ -116,6 +116,26 @@ class APINode(BaseAPINode):
 "
 `;
 
+exports[`ApiNode > basic auth secret node > should generate Workspace secrets for header values 1`] = `
+"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.references import VellumSecretReference
+
+
+class APINode(BaseAPINode):
+    url = "fasdfadsf"
+    method = APIRequestMethod.POST
+    json = {}
+    headers = {
+        "X-Secret-Key": VellumSecretReference("test-secret"),
+    }
+    api_key_header_key = None
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
+"
+`;
+
 exports[`ApiNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay, BaseTryNodeDisplay
 from ...nodes.api_node import APINode

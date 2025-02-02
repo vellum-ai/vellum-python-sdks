@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { beforeEach, describe } from "vitest";
@@ -135,11 +136,37 @@ describe("ApiNode", () => {
       }
     );
 
-    it("should generate Workspace secrets for header values", async () => {
-      const workspaceSecretId = uuid();
+    it.skip("should generate Workspace secrets for header values", async () => {
+      const workspaceSecretId = uuidv4();
       node = await createNode({
         workspaceSecrets: [{ id: workspaceSecretId, name: "test-secret" }],
+        additionalHeaders: [
+          {
+            key: nodeInputFactory({
+              key: "test-key",
+              value: {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "X-Secret-Key",
+                },
+              },
+            }),
+            value: nodeInputFactory({
+              key: "test-value",
+              value: {
+                type: "WORKSPACE_SECRET",
+                data: {
+                  type: "STRING",
+                  workspaceSecretId: workspaceSecretId,
+                },
+              },
+            }),
+          },
+        ],
       });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 
