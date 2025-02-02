@@ -293,89 +293,13 @@ export class GraphAttribute extends AstNode {
         targetNode
       );
     } else if (mutableAst.type === "right_shift") {
-      const newLhs = this.addEdgeToGraph({
+      return this.addEdgeToRightShift({
         edge,
-        mutableAst: mutableAst.lhs,
+        mutableAst,
+        sourceNode,
+        targetNode,
         graphSourceNode,
       });
-
-      if (newLhs) {
-        const newSetAst: GraphSet = {
-          type: "set",
-          values: [mutableAst, newLhs],
-        };
-        if (this.isPlural(newSetAst)) {
-          const newAstSources = newSetAst.values.flatMap((value) =>
-            this.getAstSources(value)
-          );
-
-          const uniqueAstSourceIds = new Set(
-            newAstSources.map((source) => source.reference.portId)
-          );
-          if (uniqueAstSourceIds.size === 1 && newAstSources[0]) {
-            // If all the sources are the same, we can simplify the graph into a
-            // right shift between the source node and the set.
-            const portReference = newAstSources[0];
-            return {
-              type: "right_shift",
-              lhs: portReference.reference.isDefault
-                ? {
-                    type: "node_reference",
-                    reference: portReference.reference.nodeContext,
-                  }
-                : portReference,
-              rhs: this.popSources(newSetAst),
-            };
-          }
-        }
-        return newSetAst;
-      }
-
-      if (
-        mutableAst.lhs.type == "port_reference" &&
-        sourceNode &&
-        mutableAst.lhs.reference.nodeContext == sourceNode
-      ) {
-        const sourcePortContext = sourceNode.portContextsById.get(
-          edge.sourceHandleId
-        );
-        if (sourcePortContext) {
-          return {
-            type: "set",
-            values: [
-              mutableAst,
-              {
-                type: "right_shift",
-                lhs: {
-                  type: "port_reference",
-                  reference: sourcePortContext,
-                },
-                rhs: { type: "node_reference", reference: targetNode },
-              },
-            ],
-          };
-        }
-        return;
-      }
-
-      const lhsTerminals = this.getAstTerminals(mutableAst.lhs);
-      const lhsTerminal = lhsTerminals[0];
-      if (!lhsTerminal) {
-        return;
-      }
-
-      const newRhs = this.addEdgeToGraph({
-        edge,
-        mutableAst: mutableAst.rhs,
-        graphSourceNode: lhsTerminal.reference,
-      });
-      if (newRhs) {
-        return {
-          type: "right_shift",
-          lhs: mutableAst.lhs,
-          rhs: newRhs,
-        };
-      }
     }
 
     return;
@@ -418,6 +342,112 @@ export class GraphAttribute extends AstNode {
         values: [mutableAst, { type: "node_reference", reference: targetNode }],
       };
     }
+    return;
+  }
+
+  /**
+   * Adds an edge to a Graph that is just a Right Shift between two graphs. We prioritize
+   * adding the edge to the left hand side of the right shift before then checking the right hand side.
+   * When checking the right hand side, we calculate a new graphSourceNode which is the terminals of the
+   * left hand side.
+   */
+  private addEdgeToRightShift({
+    edge,
+    sourceNode,
+    targetNode,
+    mutableAst,
+    graphSourceNode,
+  }: {
+    edge: WorkflowEdge;
+    mutableAst: GraphRightShift;
+    sourceNode: BaseNodeContext<WorkflowDataNode> | null;
+    targetNode: BaseNodeContext<WorkflowDataNode>;
+    graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
+  }): GraphMutableAst | undefined {
+    const newLhs = this.addEdgeToGraph({
+      edge,
+      mutableAst: mutableAst.lhs,
+      graphSourceNode,
+    });
+
+    if (newLhs) {
+      const newSetAst: GraphSet = {
+        type: "set",
+        values: [mutableAst, newLhs],
+      };
+      if (this.isPlural(newSetAst)) {
+        const newAstSources = newSetAst.values.flatMap((value) =>
+          this.getAstSources(value)
+        );
+
+        const uniqueAstSourceIds = new Set(
+          newAstSources.map((source) => source.reference.portId)
+        );
+        if (uniqueAstSourceIds.size === 1 && newAstSources[0]) {
+          // If all the sources are the same, we can simplify the graph into a
+          // right shift between the source node and the set.
+          const portReference = newAstSources[0];
+          return {
+            type: "right_shift",
+            lhs: portReference.reference.isDefault
+              ? {
+                  type: "node_reference",
+                  reference: portReference.reference.nodeContext,
+                }
+              : portReference,
+            rhs: this.popSources(newSetAst),
+          };
+        }
+      }
+      return newSetAst;
+    }
+
+    if (
+      mutableAst.lhs.type == "port_reference" &&
+      sourceNode &&
+      mutableAst.lhs.reference.nodeContext == sourceNode
+    ) {
+      const sourcePortContext = sourceNode.portContextsById.get(
+        edge.sourceHandleId
+      );
+      if (sourcePortContext) {
+        return {
+          type: "set",
+          values: [
+            mutableAst,
+            {
+              type: "right_shift",
+              lhs: {
+                type: "port_reference",
+                reference: sourcePortContext,
+              },
+              rhs: { type: "node_reference", reference: targetNode },
+            },
+          ],
+        };
+      }
+      return;
+    }
+
+    const lhsTerminals = this.getAstTerminals(mutableAst.lhs);
+    const lhsTerminal = lhsTerminals[0];
+    if (!lhsTerminal) {
+      return;
+    }
+
+    const newRhs = this.addEdgeToGraph({
+      edge,
+      mutableAst: mutableAst.rhs,
+      graphSourceNode: lhsTerminal.reference,
+    });
+    if (newRhs) {
+      return {
+        type: "right_shift",
+        lhs: mutableAst.lhs,
+        rhs: newRhs,
+      };
+    }
+
     return;
   }
 
