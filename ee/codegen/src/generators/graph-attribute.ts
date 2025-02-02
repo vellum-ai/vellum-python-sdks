@@ -195,26 +195,13 @@ export class GraphAttribute extends AstNode {
             };
           }
         } else if (mutableAst.type === "port_reference") {
-          if (sourceNode) {
-            const sourceNodePortContext = sourceNode.portContextsById.get(
-              edge.sourceHandleId
-            );
-            if (sourceNodePortContext === mutableAst.reference) {
-              return {
-                type: "right_shift",
-                lhs: mutableAst,
-                rhs: { type: "node_reference", reference: targetNode },
-              };
-            }
-          } else if (sourceNode == graphSourceNode) {
-            return {
-              type: "set",
-              values: [
-                mutableAst,
-                { type: "node_reference", reference: targetNode },
-              ],
-            };
-          }
+          return this.addEdgeToPortReference({
+            edge,
+            mutableAst,
+            sourceNode,
+            targetNode,
+            graphSourceNode,
+          });
         } else if (mutableAst.type === "set") {
           const newSet = mutableAst.values.map((subAst) => {
             const canBeAdded = this.isNodeInBranch(sourceNode, subAst);
@@ -414,6 +401,46 @@ export class GraphAttribute extends AstNode {
         throw error;
       }
     }
+  }
+
+  /**
+   * Adds an edge to a Graph that is just a Port Reference. Three main cases:
+   * 1. The edge's source node is the same port as the existing AST.
+   *    Transforms `A.Ports.a` to `A.Ports.a >> B`
+   * 2. The edge's source node is the graph's source node feeding into the AST.
+   *    Transforms `A.Ports.a` to `{ A.Ports.a, B }`
+   */
+  private addEdgeToPortReference({
+    edge,
+    mutableAst,
+    sourceNode,
+    targetNode,
+    graphSourceNode,
+  }: {
+    edge: WorkflowEdge;
+    mutableAst: GraphPortReference;
+    sourceNode: BaseNodeContext<WorkflowDataNode> | null;
+    targetNode: BaseNodeContext<WorkflowDataNode>;
+    graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
+  }): GraphMutableAst | undefined {
+    if (sourceNode) {
+      const sourceNodePortContext = sourceNode.portContextsById.get(
+        edge.sourceHandleId
+      );
+      if (sourceNodePortContext === mutableAst.reference) {
+        return {
+          type: "right_shift",
+          lhs: mutableAst,
+          rhs: { type: "node_reference", reference: targetNode },
+        };
+      }
+    } else if (sourceNode == graphSourceNode) {
+      return {
+        type: "set",
+        values: [mutableAst, { type: "node_reference", reference: targetNode }],
+      };
+    }
+    return;
   }
 
   /**
