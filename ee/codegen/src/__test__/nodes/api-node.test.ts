@@ -6,7 +6,10 @@ import { beforeEach, describe } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import { apiNodeFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  apiNodeFactory,
+  ApiNodeFactoryProps,
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { ApiNode } from "src/generators/nodes/api-node";
@@ -55,59 +58,39 @@ describe("ApiNode", () => {
 
   const createNode = async ({
     workspaceSecrets,
+    ...apiNodeProps
   }: {
     workspaceSecrets: { id: string; name: string }[];
-  }) => {
+  } & ApiNodeFactoryProps) => {
     const workspaceSecretIdByName = Object.fromEntries(
       workspaceSecrets.map(({ id, name }) => [name, id])
     );
+    const workspaceSecretNameById = Object.fromEntries(
+      workspaceSecrets.map(({ id, name }) => [id, name])
+    );
     vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
-      async (id) => {
-        const name = workspaceSecretIdByName[id];
-        if (!name) {
-          throw new Error(`Workspace secret with id ${id} not found`);
+      async (idOrName) => {
+        const id = workspaceSecretIdByName[idOrName];
+        if (id) {
+          return mockWorkspaceSecretDefinition({
+            id,
+            name: idOrName,
+          });
         }
-        return mockWorkspaceSecretDefinition({
-          id,
-          name,
-        });
+
+        const name = workspaceSecretNameById[idOrName];
+        if (name) {
+          return mockWorkspaceSecretDefinition({
+            id: idOrName,
+            name,
+          });
+        }
+
+        throw new Error(`Workspace secret ${idOrName} not found`);
       }
     );
 
-    const nodeData = apiNodeFactory({
-      bearerToken: {
-        id: uuid(),
-        key: "bearer_token_value",
-        value: {
-          rules: [
-            {
-              type: "WORKSPACE_SECRET",
-              data: {
-                type: "STRING",
-                workspaceSecretId: workspaceSecret.id,
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      apiKeyHeaderValue: {
-        id: uuid(),
-        key: "api_key_header_value",
-        value: {
-          rules: [
-            {
-              type: "WORKSPACE_SECRET",
-              data: {
-                type: "STRING",
-                workspaceSecretId: workspaceSecret.id,
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-    });
+    const nodeData = apiNodeFactory(apiNodeProps);
 
     const nodeContext = (await createNodeContext({
       workflowContext,
@@ -124,7 +107,41 @@ describe("ApiNode", () => {
     it.each([{ id: "1234", name: "test-secret" }])(
       "secret ids should show names",
       async (workspaceSecret: { id: string; name: string }) => {
-        node = await createNode({ workspaceSecret });
+        node = await createNode({
+          workspaceSecrets: [workspaceSecret],
+          bearerToken: {
+            id: uuid(),
+            key: "bearer_token_value",
+            value: {
+              rules: [
+                {
+                  type: "WORKSPACE_SECRET",
+                  data: {
+                    type: "STRING",
+                    workspaceSecretId: workspaceSecret.id,
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+          apiKeyHeaderValue: {
+            id: uuid(),
+            key: "api_key_header_value",
+            value: {
+              rules: [
+                {
+                  type: "WORKSPACE_SECRET",
+                  data: {
+                    type: "STRING",
+                    workspaceSecretId: workspaceSecret.id,
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+        });
         node.getNodeFile().write(writer);
         expect(await writer.toStringFormatted()).toMatchSnapshot();
       }

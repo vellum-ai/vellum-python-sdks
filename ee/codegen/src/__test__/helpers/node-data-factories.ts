@@ -978,15 +978,17 @@ export function conditionalNodeFactory({
   return nodeData;
 }
 
+export type ApiNodeFactoryProps = {
+  errorOutputId?: string;
+  bearerToken?: NodeInput;
+  apiKeyHeaderValue?: NodeInput;
+};
+
 export function apiNodeFactory({
   errorOutputId,
   bearerToken,
   apiKeyHeaderValue,
-}: {
-  errorOutputId?: string;
-  bearerToken?: NodeInput;
-  apiKeyHeaderValue?: NodeInput;
-} = {}): ApiNode {
+}: ApiNodeFactoryProps = {}): ApiNode {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
     key: "bearer_token_value",
