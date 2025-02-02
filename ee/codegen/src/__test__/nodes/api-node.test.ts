@@ -1,5 +1,4 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { v4 as uuid } from "uuid";
 import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { beforeEach, describe } from "vitest";
@@ -9,6 +8,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   apiNodeFactory,
   ApiNodeFactoryProps,
+  nodeInputFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
@@ -109,38 +109,26 @@ describe("ApiNode", () => {
       async (workspaceSecret: { id: string; name: string }) => {
         node = await createNode({
           workspaceSecrets: [workspaceSecret],
-          bearerToken: {
-            id: uuid(),
+          bearerToken: nodeInputFactory({
             key: "bearer_token_value",
             value: {
-              rules: [
-                {
-                  type: "WORKSPACE_SECRET",
-                  data: {
-                    type: "STRING",
-                    workspaceSecretId: workspaceSecret.id,
-                  },
-                },
-              ],
-              combinator: "OR",
+              type: "WORKSPACE_SECRET",
+              data: {
+                type: "STRING",
+                workspaceSecretId: workspaceSecret.id,
+              },
             },
-          },
-          apiKeyHeaderValue: {
-            id: uuid(),
+          }),
+          apiKeyHeaderValue: nodeInputFactory({
             key: "api_key_header_value",
             value: {
-              rules: [
-                {
-                  type: "WORKSPACE_SECRET",
-                  data: {
-                    type: "STRING",
-                    workspaceSecretId: workspaceSecret.id,
-                  },
-                },
-              ],
-              combinator: "OR",
+              type: "WORKSPACE_SECRET",
+              data: {
+                type: "STRING",
+                workspaceSecretId: workspaceSecret.id,
+              },
             },
-          },
+          }),
         });
         node.getNodeFile().write(writer);
         expect(await writer.toStringFormatted()).toMatchSnapshot();

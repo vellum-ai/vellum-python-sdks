@@ -42,6 +42,19 @@ export function entrypointNodeDataFactory(): EntrypointNode {
   };
 }
 
+export const nodeInputFactory = (
+  props: Omit<Partial<NodeInput>, "value"> & {
+    value: NodeInputValuePointerRule | NodeInputValuePointerRule[];
+  }
+): NodeInput => ({
+  id: props.id ?? uuidv4(),
+  key: props.key ?? "input",
+  value: {
+    combinator: "OR",
+    rules: Array.isArray(props.value) ? props.value : [props.value],
+  },
+});
+
 export function terminalNodeDataFactory(): FinalOutputNode {
   return {
     id: "terminal-node-1",
