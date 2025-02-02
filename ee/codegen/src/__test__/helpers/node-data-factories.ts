@@ -980,9 +980,47 @@ export function conditionalNodeFactory({
 
 export function apiNodeFactory({
   errorOutputId,
+  bearerToken,
+  apiKeyHeaderValue,
 }: {
   errorOutputId?: string;
+  bearerToken?: NodeInput;
+  apiKeyHeaderValue?: NodeInput;
 } = {}): ApiNode {
+  const bearerTokenInput = bearerToken ?? {
+    id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
+    key: "bearer_token_value",
+    value: {
+      rules: [
+        {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "<my-bearer-token>",
+          },
+        },
+      ],
+      combinator: "OR",
+    },
+  };
+
+  const apiKeyHeaderValueInput = apiKeyHeaderValue ?? {
+    id: "bfc2e790-66fd-42fd-acf7-3b2c785c1a0a",
+    key: "api_key_header_value",
+    value: {
+      rules: [
+        {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "<my-api-value>",
+          },
+        },
+      ],
+      combinator: "OR",
+    },
+  };
+
   const nodeData: ApiNode = {
     id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
     type: "API",
@@ -992,9 +1030,9 @@ export function apiNodeFactory({
       urlInputId: "480a4c12-22d6-4223-a38a-85db5eda118c",
       bodyInputId: "74865eb7-cdaf-4d40-a499-0a6505e72680",
       authorizationTypeInputId: "de330dac-05b1-4e78-bee7-7452203af3d5",
-      bearerTokenValueInputId: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
+      bearerTokenValueInputId: bearerTokenInput.id,
       apiKeyHeaderKeyInputId: "96c8343d-cc94-4df0-9001-eb2905a00be7",
-      apiKeyHeaderValueInputId: "bfc2e790-66fd-42fd-acf7-3b2c785c1a0a",
+      apiKeyHeaderValueInputId: apiKeyHeaderValueInput.id,
       additionalHeaders: [
         {
           headerKeyInputId: "8ad006f3-d19e-4af1-931f-3e955152cd91",
@@ -1081,22 +1119,7 @@ export function apiNodeFactory({
           combinator: "OR",
         },
       },
-      {
-        id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
-        key: "bearer_token_value",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "<my-bearer-token>",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
+      bearerTokenInput,
       {
         id: "96c8343d-cc94-4df0-9001-eb2905a00be7",
         key: "api_key_header_key",
@@ -1112,22 +1135,7 @@ export function apiNodeFactory({
           combinator: "OR",
         },
       },
-      {
-        id: "bfc2e790-66fd-42fd-acf7-3b2c785c1a0a",
-        key: "api_key_header_value",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "<my-api-value>",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
+      apiKeyHeaderValueInput,
       {
         id: "8ad006f3-d19e-4af1-931f-3e955152cd91",
         key: "additional_header_key_1",

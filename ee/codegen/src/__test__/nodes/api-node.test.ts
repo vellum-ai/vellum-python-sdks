@@ -65,43 +65,41 @@ describe("ApiNode", () => {
       ) as unknown as WorkspaceSecretRead
     );
 
-    const nodeData = apiNodeFactory();
-    const bearer_input = uuid();
-    const api_input = uuid();
-    nodeData.inputs.push({
-      id: bearer_input,
-      key: "bearer_token_value",
-      value: {
-        rules: [
-          {
-            type: "WORKSPACE_SECRET",
-            data: {
-              type: "STRING",
-              workspaceSecretId: workspaceSecret.id,
+    const nodeData = apiNodeFactory({
+      bearerToken: {
+        id: uuid(),
+        key: "bearer_token_value",
+        value: {
+          rules: [
+            {
+              type: "WORKSPACE_SECRET",
+              data: {
+                type: "STRING",
+                workspaceSecretId: workspaceSecret.id,
+              },
             },
-          },
-        ],
-        combinator: "OR",
+          ],
+          combinator: "OR",
+        },
+      },
+      apiKeyHeaderValue: {
+        id: uuid(),
+        key: "api_key_header_value",
+        value: {
+          rules: [
+            {
+              type: "WORKSPACE_SECRET",
+              data: {
+                type: "STRING",
+                workspaceSecretId: workspaceSecret.id,
+              },
+            },
+          ],
+          combinator: "OR",
+        },
       },
     });
-    nodeData.inputs.push({
-      id: api_input,
-      key: "api_key_header_value",
-      value: {
-        rules: [
-          {
-            type: "WORKSPACE_SECRET",
-            data: {
-              type: "STRING",
-              workspaceSecretId: workspaceSecret.id,
-            },
-          },
-        ],
-        combinator: "OR",
-      },
-    });
-    nodeData.data.bearerTokenValueInputId = bearer_input;
-    nodeData.data.apiKeyHeaderValueInputId = api_input;
+
     const nodeContext = (await createNodeContext({
       workflowContext,
       nodeData,
