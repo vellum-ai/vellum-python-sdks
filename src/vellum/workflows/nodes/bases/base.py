@@ -1,3 +1,4 @@
+from dataclasses import field
 from functools import cached_property, reduce
 import inspect
 from types import MappingProxyType
@@ -230,7 +231,7 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
     #   "Outputs" class inherits from "BaseOutputs" and do so automatically.
     #   https://app.shortcut.com/vellum/story/4008/auto-inherit-basenodeoutputs-in-outputs-classes
     class Outputs(BaseOutputs):
-        _node_class: Optional[Type["BaseNode"]] = None
+        _node_class: Type["BaseNode"] = field(init=False)
 
     class Ports(NodePorts):
         default = Port(default=True)

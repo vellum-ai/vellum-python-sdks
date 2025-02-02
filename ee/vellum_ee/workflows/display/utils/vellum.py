@@ -79,10 +79,7 @@ def create_node_input_value_pointer_rule(
     if isinstance(value, OutputReference):
         if value not in display_context.global_node_output_displays:
             if issubclass(value.outputs_class, BaseNode.Outputs):
-                if value.outputs_class._node_class:
-                    raise ValueError(
-                        f"Reference to node '{value.outputs_class._node_class.__name__}' not found in graph."
-                    )
+                raise ValueError(f"Reference to node '{value.outputs_class._node_class.__name__}' not found in graph.")
 
         upstream_node, output_display = display_context.global_node_output_displays[value]
         upstream_node_display = display_context.global_node_displays[upstream_node]
