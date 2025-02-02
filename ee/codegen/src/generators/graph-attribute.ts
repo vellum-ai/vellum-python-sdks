@@ -70,7 +70,6 @@ export class GraphAttribute extends AstNode {
     let graphMutableAst: GraphMutableAst = { type: "empty" };
     const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
-    const entrypointNodeId = this.workflowContext.getEntrypointNode().id;
     const processedEdges = new Set<WorkflowEdge>();
 
     while (edgesQueue.length > 0) {
@@ -79,233 +78,11 @@ export class GraphAttribute extends AstNode {
         continue;
       }
 
-      let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
-      if (edge.sourceNodeId === entrypointNodeId) {
-        sourceNode = null;
-      } else {
-        sourceNode = this.resolveNodeId(edge.sourceNodeId, edge.id);
-        if (!sourceNode) {
-          processedEdges.add(edge);
-          continue;
-        }
-      }
-
-      const targetNode = this.resolveNodeId(edge.targetNodeId, edge.id);
-      if (!targetNode) {
-        processedEdges.add(edge);
-        continue;
-      }
-
-      const addEdgeToGraph = (
-        mutableAst: GraphMutableAst,
-        graphSourceNode: BaseNodeContext<WorkflowDataNode> | null
-      ): GraphMutableAst | undefined => {
-        if (mutableAst.type === "empty") {
-          return {
-            type: "node_reference",
-            reference: targetNode,
-          };
-        } else if (mutableAst.type === "node_reference") {
-          if (sourceNode && mutableAst.reference === sourceNode) {
-            const sourceNodePortContext = sourceNode.portContextsById.get(
-              edge.sourceHandleId
-            );
-            if (sourceNodePortContext) {
-              if (sourceNodePortContext.isDefault) {
-                return {
-                  type: "right_shift",
-                  lhs: mutableAst,
-                  rhs: { type: "node_reference", reference: targetNode },
-                };
-              } else {
-                return {
-                  type: "right_shift",
-                  lhs: {
-                    type: "port_reference",
-                    reference: sourceNodePortContext,
-                  },
-                  rhs: { type: "node_reference", reference: targetNode },
-                };
-              }
-            }
-          } else if (sourceNode == graphSourceNode) {
-            return {
-              type: "set",
-              values: [
-                mutableAst,
-                { type: "node_reference", reference: targetNode },
-              ],
-            };
-          }
-        } else if (mutableAst.type === "port_reference") {
-          return this.addEdgeToPortReference({
-            edge,
-            mutableAst,
-            sourceNode,
-            targetNode,
-            graphSourceNode,
-          });
-        } else if (mutableAst.type === "set") {
-          const newSet = mutableAst.values.map((subAst) => {
-            const canBeAdded = this.isNodeInBranch(sourceNode, subAst);
-            if (!canBeAdded) {
-              return { edgeAddedPriority: 0, original: subAst, value: subAst };
-            }
-
-            const newSubAst = addEdgeToGraph(subAst, graphSourceNode);
-            if (!newSubAst) {
-              return { edgeAddedPriority: 0, original: subAst, value: subAst };
-            }
-
-            if (subAst.type !== "set" && newSubAst.type === "set") {
-              return {
-                edgeAddedPriority: 1,
-                original: subAst,
-                value: newSubAst,
-              };
-            }
-
-            if (
-              subAst.type === "set" &&
-              newSubAst.type === "set" &&
-              newSubAst.values.length > subAst.values.length
-            ) {
-              return {
-                edgeAddedPriority: 1,
-                original: subAst,
-                value: newSubAst,
-              };
-            }
-
-            return { edgeAddedPriority: 2, original: subAst, value: newSubAst };
-          });
-          if (
-            newSet.every(({ edgeAddedPriority }) => edgeAddedPriority === 0)
-          ) {
-            if (sourceNode == graphSourceNode) {
-              return {
-                type: "set",
-                values: [
-                  ...mutableAst.values,
-                  { type: "node_reference", reference: targetNode },
-                ],
-              };
-            } else {
-              return;
-            }
-          }
-
-          // We only want to add the edge to _one_ of the set members.
-          // So we need to pick the one with the highest priority,
-          // tie breaking by earliest index.
-          const { index: maxPriorityIndex } = newSet.reduce(
-            (prev, curr, index) => {
-              if (curr.edgeAddedPriority > prev.priority) {
-                return { index, priority: curr.edgeAddedPriority };
-              }
-              return prev;
-            },
-            {
-              index: -1,
-              priority: -1,
-            }
-          );
-
-          const newSetAst: GraphSet = {
-            type: "set",
-            values: newSet.map(({ value, original }, index) =>
-              index == maxPriorityIndex ? value : original
-            ),
-          };
-
-          const flattenedNewSetAst = this.flattenSet(newSetAst);
-
-          return this.optimizeSetThroughCommonTarget(
-            flattenedNewSetAst,
-            targetNode
-          );
-        } else if (mutableAst.type === "right_shift") {
-          const newLhs = addEdgeToGraph(mutableAst.lhs, graphSourceNode);
-
-          if (newLhs) {
-            const newSetAst: GraphSet = {
-              type: "set",
-              values: [mutableAst, newLhs],
-            };
-            if (this.isPlural(newSetAst)) {
-              const newAstSources = newSetAst.values.flatMap((value) =>
-                this.getAstSources(value)
-              );
-
-              const uniqueAstSourceIds = new Set(
-                newAstSources.map((source) => source.reference.portId)
-              );
-              if (uniqueAstSourceIds.size === 1 && newAstSources[0]) {
-                // If all the sources are the same, we can simplify the graph into a
-                // right shift between the source node and the set.
-                const portReference = newAstSources[0];
-                return {
-                  type: "right_shift",
-                  lhs: portReference.reference.isDefault
-                    ? {
-                        type: "node_reference",
-                        reference: portReference.reference.nodeContext,
-                      }
-                    : portReference,
-                  rhs: this.popSources(newSetAst),
-                };
-              }
-            }
-            return newSetAst;
-          }
-
-          if (
-            mutableAst.lhs.type == "port_reference" &&
-            sourceNode &&
-            mutableAst.lhs.reference.nodeContext == sourceNode
-          ) {
-            const sourcePortContext = sourceNode.portContextsById.get(
-              edge.sourceHandleId
-            );
-            if (sourcePortContext) {
-              return {
-                type: "set",
-                values: [
-                  mutableAst,
-                  {
-                    type: "right_shift",
-                    lhs: {
-                      type: "port_reference",
-                      reference: sourcePortContext,
-                    },
-                    rhs: { type: "node_reference", reference: targetNode },
-                  },
-                ],
-              };
-            }
-            return;
-          }
-
-          const lhsTerminals = this.getAstTerminals(mutableAst.lhs);
-          const lhsTerminal = lhsTerminals[0];
-          if (!lhsTerminal) {
-            return;
-          }
-
-          const newRhs = addEdgeToGraph(mutableAst.rhs, lhsTerminal.reference);
-          if (newRhs) {
-            return {
-              type: "right_shift",
-              lhs: mutableAst.lhs,
-              rhs: newRhs,
-            };
-          }
-        }
-
-        return;
-      };
-
-      const newMutableAst = addEdgeToGraph(graphMutableAst, null);
+      const newMutableAst = this.addEdgeToGraph({
+        edge,
+        mutableAst: graphMutableAst,
+        graphSourceNode: null,
+      });
       processedEdges.add(edge);
 
       if (!newMutableAst) {
@@ -313,6 +90,11 @@ export class GraphAttribute extends AstNode {
       }
 
       graphMutableAst = newMutableAst;
+      const targetNode = this.resolveNodeId(edge.targetNodeId, edge.id);
+      if (!targetNode) {
+        continue;
+      }
+
       targetNode.portContextsById.forEach((portContext) => {
         const edges = edgesByPortId.get(portContext.portId);
         edges?.forEach((edge) => {
@@ -344,6 +126,259 @@ export class GraphAttribute extends AstNode {
         throw error;
       }
     }
+  }
+
+  /**
+   * Adds an edge to the graph.
+   *
+   * This function is the core of the algorithm. It's a recursive function that
+   * traverses the graph and adds the edge to the appropriate place. The following
+   * invariants must be maintained:
+   * 1. The input `mutableAst` is always a valid graph.
+   * 2. The output `mutableAst` must always be a valid graph.
+   * 3. The edge must be added at most once.
+   * 4. The method returns undefined if the edge cannot be added. This is useful for
+   *    recursive calls to `addEdgeToGraph` to explore multiple paths.
+   */
+  private addEdgeToGraph({
+    edge,
+    mutableAst,
+    graphSourceNode,
+  }: {
+    edge: WorkflowEdge;
+    mutableAst: GraphMutableAst;
+    graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
+  }): GraphMutableAst | undefined {
+    const entrypointNodeId = this.workflowContext.getEntrypointNode().id;
+
+    let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
+    if (edge.sourceNodeId === entrypointNodeId) {
+      sourceNode = null;
+    } else {
+      sourceNode = this.resolveNodeId(edge.sourceNodeId, edge.id);
+      if (!sourceNode) {
+        return;
+      }
+    }
+
+    const targetNode = this.resolveNodeId(edge.targetNodeId, edge.id);
+    if (!targetNode) {
+      return;
+    }
+
+    if (mutableAst.type === "empty") {
+      return {
+        type: "node_reference",
+        reference: targetNode,
+      };
+    } else if (mutableAst.type === "node_reference") {
+      if (sourceNode && mutableAst.reference === sourceNode) {
+        const sourceNodePortContext = sourceNode.portContextsById.get(
+          edge.sourceHandleId
+        );
+        if (sourceNodePortContext) {
+          if (sourceNodePortContext.isDefault) {
+            return {
+              type: "right_shift",
+              lhs: mutableAst,
+              rhs: { type: "node_reference", reference: targetNode },
+            };
+          } else {
+            return {
+              type: "right_shift",
+              lhs: {
+                type: "port_reference",
+                reference: sourceNodePortContext,
+              },
+              rhs: { type: "node_reference", reference: targetNode },
+            };
+          }
+        }
+      } else if (sourceNode == graphSourceNode) {
+        return {
+          type: "set",
+          values: [
+            mutableAst,
+            { type: "node_reference", reference: targetNode },
+          ],
+        };
+      }
+    } else if (mutableAst.type === "port_reference") {
+      return this.addEdgeToPortReference({
+        edge,
+        mutableAst,
+        sourceNode,
+        targetNode,
+        graphSourceNode,
+      });
+    } else if (mutableAst.type === "set") {
+      const newSet = mutableAst.values.map((subAst) => {
+        const canBeAdded = this.isNodeInBranch(sourceNode, subAst);
+        if (!canBeAdded) {
+          return { edgeAddedPriority: 0, original: subAst, value: subAst };
+        }
+
+        const newSubAst = this.addEdgeToGraph({
+          edge,
+          mutableAst: subAst,
+          graphSourceNode,
+        });
+        if (!newSubAst) {
+          return { edgeAddedPriority: 0, original: subAst, value: subAst };
+        }
+
+        if (subAst.type !== "set" && newSubAst.type === "set") {
+          return {
+            edgeAddedPriority: 1,
+            original: subAst,
+            value: newSubAst,
+          };
+        }
+
+        if (
+          subAst.type === "set" &&
+          newSubAst.type === "set" &&
+          newSubAst.values.length > subAst.values.length
+        ) {
+          return {
+            edgeAddedPriority: 1,
+            original: subAst,
+            value: newSubAst,
+          };
+        }
+
+        return { edgeAddedPriority: 2, original: subAst, value: newSubAst };
+      });
+      if (newSet.every(({ edgeAddedPriority }) => edgeAddedPriority === 0)) {
+        if (sourceNode == graphSourceNode) {
+          return {
+            type: "set",
+            values: [
+              ...mutableAst.values,
+              { type: "node_reference", reference: targetNode },
+            ],
+          };
+        } else {
+          return;
+        }
+      }
+
+      // We only want to add the edge to _one_ of the set members.
+      // So we need to pick the one with the highest priority,
+      // tie breaking by earliest index.
+      const { index: maxPriorityIndex } = newSet.reduce(
+        (prev, curr, index) => {
+          if (curr.edgeAddedPriority > prev.priority) {
+            return { index, priority: curr.edgeAddedPriority };
+          }
+          return prev;
+        },
+        {
+          index: -1,
+          priority: -1,
+        }
+      );
+
+      const newSetAst: GraphSet = {
+        type: "set",
+        values: newSet.map(({ value, original }, index) =>
+          index == maxPriorityIndex ? value : original
+        ),
+      };
+
+      const flattenedNewSetAst = this.flattenSet(newSetAst);
+
+      return this.optimizeSetThroughCommonTarget(
+        flattenedNewSetAst,
+        targetNode
+      );
+    } else if (mutableAst.type === "right_shift") {
+      const newLhs = this.addEdgeToGraph({
+        edge,
+        mutableAst: mutableAst.lhs,
+        graphSourceNode,
+      });
+
+      if (newLhs) {
+        const newSetAst: GraphSet = {
+          type: "set",
+          values: [mutableAst, newLhs],
+        };
+        if (this.isPlural(newSetAst)) {
+          const newAstSources = newSetAst.values.flatMap((value) =>
+            this.getAstSources(value)
+          );
+
+          const uniqueAstSourceIds = new Set(
+            newAstSources.map((source) => source.reference.portId)
+          );
+          if (uniqueAstSourceIds.size === 1 && newAstSources[0]) {
+            // If all the sources are the same, we can simplify the graph into a
+            // right shift between the source node and the set.
+            const portReference = newAstSources[0];
+            return {
+              type: "right_shift",
+              lhs: portReference.reference.isDefault
+                ? {
+                    type: "node_reference",
+                    reference: portReference.reference.nodeContext,
+                  }
+                : portReference,
+              rhs: this.popSources(newSetAst),
+            };
+          }
+        }
+        return newSetAst;
+      }
+
+      if (
+        mutableAst.lhs.type == "port_reference" &&
+        sourceNode &&
+        mutableAst.lhs.reference.nodeContext == sourceNode
+      ) {
+        const sourcePortContext = sourceNode.portContextsById.get(
+          edge.sourceHandleId
+        );
+        if (sourcePortContext) {
+          return {
+            type: "set",
+            values: [
+              mutableAst,
+              {
+                type: "right_shift",
+                lhs: {
+                  type: "port_reference",
+                  reference: sourcePortContext,
+                },
+                rhs: { type: "node_reference", reference: targetNode },
+              },
+            ],
+          };
+        }
+        return;
+      }
+
+      const lhsTerminals = this.getAstTerminals(mutableAst.lhs);
+      const lhsTerminal = lhsTerminals[0];
+      if (!lhsTerminal) {
+        return;
+      }
+
+      const newRhs = this.addEdgeToGraph({
+        edge,
+        mutableAst: mutableAst.rhs,
+        graphSourceNode: lhsTerminal.reference,
+      });
+      if (newRhs) {
+        return {
+          type: "right_shift",
+          lhs: mutableAst.lhs,
+          rhs: newRhs,
+        };
+      }
+    }
+
+    return;
   }
 
   /**
