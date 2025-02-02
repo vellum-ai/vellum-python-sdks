@@ -45,24 +45,33 @@ describe("ApiNode", () => {
   const mockWorkspaceSecretDefinition = (workspaceSecret: {
     id: string;
     name: string;
-  }) => ({
+  }): WorkspaceSecretRead => ({
     id: workspaceSecret.id,
     name: workspaceSecret.name,
     modified: new Date(),
     label: "mocked-workspace-secret-label",
-    description: "mocked-workspace-secret-description",
     secretType: SecretTypeEnum.UserDefined,
   });
 
   const createNode = async ({
-    workspaceSecret,
+    workspaceSecrets,
   }: {
-    workspaceSecret: { id: string; name: string };
+    workspaceSecrets: { id: string; name: string }[];
   }) => {
-    vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockResolvedValue(
-      mockWorkspaceSecretDefinition(
-        workspaceSecret
-      ) as unknown as WorkspaceSecretRead
+    const workspaceSecretIdByName = Object.fromEntries(
+      workspaceSecrets.map(({ id, name }) => [name, id])
+    );
+    vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
+      async (id) => {
+        const name = workspaceSecretIdByName[id];
+        if (!name) {
+          throw new Error(`Workspace secret with id ${id} not found`);
+        }
+        return mockWorkspaceSecretDefinition({
+          id,
+          name,
+        });
+      }
     );
 
     const nodeData = apiNodeFactory({
