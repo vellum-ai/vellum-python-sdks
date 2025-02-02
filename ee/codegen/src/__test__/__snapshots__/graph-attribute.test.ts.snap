@@ -1,5 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Workflow > graph > Should handle an else case within a conditioned set 1`] = `
+"{
+    FirstCheckNode.Ports.if_port >> {
+        SecondInnerCheckNode.Ports.if_port >> FirstOutputNode,
+        SecondInnerCheckNode.Ports.else_port >> SecondOutputNode,
+    },
+    FirstCheckNode.Ports.else_port >> FirstOutputNode,
+}
+"
+`;
+
 exports[`Workflow > graph > should be able to create a proper else edge when there are three ports pointing to a set 1`] = `
 "{
     FirstCheckNode.Ports.if_port

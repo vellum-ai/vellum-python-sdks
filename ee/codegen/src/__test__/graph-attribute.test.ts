@@ -787,23 +787,32 @@ describe("Workflow", () => {
         */
     });
 
-    it("Should handle an else case within a conditioned set", async () => {
+    it.skip("Should handle an else case within a conditioned set", async () => {
       const firstCheckNode = genericNodeFactory({
         name: "FirstCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
+        nodePorts: nodePortsFactory(),
       });
 
-      const firstInnerCheckNode = genericNodeFactory({
-        name: "FirstInnerCheckNode",
+      const firstOutputNode = genericNodeFactory({
+        name: "FirstOutputNode",
       });
-      // {FirstInnerCheckNode.Ports.if_port >> SecondInnerCheckNode.Ports.if_port, FirstInnerCheckNode.Ports.else_port}
+
+      const secondCheckNode = genericNodeFactory({
+        name: "SecondInnerCheckNode",
+        nodePorts: nodePortsFactory(),
+      });
+
+      const secondOutputNode = genericNodeFactory({
+        name: "SecondOutputNode",
+      });
+
+      await runGraphTest([
+        [entrypointNode, firstCheckNode],
+        [[firstCheckNode, "if_port"], secondCheckNode],
+        [[firstCheckNode, "else_port"], firstOutputNode],
+        [[secondCheckNode, "if_port"], firstOutputNode],
+        [[secondCheckNode, "else_port"], secondOutputNode],
+      ]);
     });
   });
 });
