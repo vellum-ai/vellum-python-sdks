@@ -12,7 +12,7 @@ import {
   finalOutputNodeFactory,
   genericNodeFactory,
   mergeNodeDataFactory,
-  nodePortFactory,
+  nodePortsFactory,
   templatingNodeFactory,
 } from "./helpers/node-data-factories";
 
@@ -691,14 +691,7 @@ describe("Workflow", () => {
     it("should be pointing to the correct terminal nodes from a nested set of conditionals", async () => {
       const firstCheckNode = genericNodeFactory({
         name: "FirstCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
+        nodePorts: nodePortsFactory(),
       });
 
       const firstInnerCheckNode = genericNodeFactory({
@@ -707,14 +700,7 @@ describe("Workflow", () => {
 
       const finalCheckNode = genericNodeFactory({
         name: "FinalCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
+        nodePorts: nodePortsFactory(),
       });
 
       const innerTerminalNode = genericNodeFactory({
@@ -743,38 +729,17 @@ describe("Workflow", () => {
     it.skip("should be able to create a proper else edge when there are three ports pointing to a set", async () => {
       const firstCheckNode = genericNodeFactory({
         name: "FirstCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
+        nodePorts: nodePortsFactory(),
       });
 
       const firstInnerCheckNode = genericNodeFactory({
         name: "FirstInnerCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
+        nodePorts: nodePortsFactory(),
       });
 
       const finalCheckNode = genericNodeFactory({
         name: "FinalCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
+        nodePorts: nodePortsFactory(),
       });
 
       const innerTerminalNode = genericNodeFactory({
@@ -783,14 +748,7 @@ describe("Workflow", () => {
 
       const secondInnerCheckNode = genericNodeFactory({
         name: "SecondInnerCheckNode",
-        nodePorts: [
-          nodePortFactory({
-            type: "IF",
-          }),
-          nodePortFactory({
-            type: "ELSE",
-          }),
-        ],
+        nodePorts: nodePortsFactory(),
       });
 
       const outerOutputNode = genericNodeFactory({

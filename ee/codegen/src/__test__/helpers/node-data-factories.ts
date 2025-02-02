@@ -1402,6 +1402,15 @@ export function nodePortFactory(port: Partial<NodePort> = {}): NodePort {
   };
 }
 
+export function nodePortsFactory(ports?: Partial<NodePort>[]): NodePort[] {
+  return (
+    ports?.map((port) => nodePortFactory(port)) ?? [
+      nodePortFactory({ type: "IF" }),
+      nodePortFactory({ type: "ELSE" }),
+    ]
+  );
+}
+
 export function genericNodeFactory(
   {
     id,
