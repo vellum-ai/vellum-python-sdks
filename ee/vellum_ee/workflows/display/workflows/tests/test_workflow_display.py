@@ -36,7 +36,6 @@ def test_serialize_workflow__node_referenced_in_workflow_outputs_not_in_graph():
     assert str(exc_info.value) == "Failed to serialize output 'final': Reference to node 'OutNode' not found in graph."
 
 
-@pytest.mark.skip(reason="This test is not yet implemented")
 def test_serialize_workflow__workflow_outputs_reference_non_node_outputs():
     # GIVEN one Workflow
     class FirstWorkflow(BaseWorkflow):
@@ -61,5 +60,6 @@ def test_serialize_workflow__workflow_outputs_reference_non_node_outputs():
     # AND the error message should be user friendly
     assert (
         str(exc_info.value)
-        == "Failed to serialize output 'final': Reference to outputs 'FirstWorkflow.Outputs' is invalid."
+        == """Failed to serialize output 'final': Reference to outputs \
+'test_serialize_workflow__workflow_outputs_reference_non_node_outputs.<locals>.FirstWorkflow.Outputs' is invalid."""
     )

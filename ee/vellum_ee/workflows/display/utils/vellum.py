@@ -81,6 +81,8 @@ def create_node_input_value_pointer_rule(
             if issubclass(value.outputs_class, BaseNode.Outputs):
                 raise ValueError(f"Reference to node '{value.outputs_class._node_class.__name__}' not found in graph.")
 
+            raise ValueError(f"Reference to outputs '{value.outputs_class.__qualname__}' is invalid.")
+
         upstream_node, output_display = display_context.global_node_output_displays[value]
         upstream_node_display = display_context.global_node_displays[upstream_node]
         return NodeOutputPointer(
