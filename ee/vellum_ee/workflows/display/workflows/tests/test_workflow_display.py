@@ -6,7 +6,6 @@ from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
-@pytest.mark.skip(reason="This test is not yet implemented")
 def test_serialize_workflow__node_referenced_in_workflow_outputs_not_in_graph():
     # GIVEN a couple of nodes
     class InNode(BaseNode):

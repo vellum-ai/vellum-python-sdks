@@ -28,6 +28,7 @@ from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualTo
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
@@ -76,6 +77,13 @@ def create_node_input_value_pointer_rule(
     value: Any, display_context: "WorkflowDisplayContext"
 ) -> NodeInputValuePointerRule:
     if isinstance(value, OutputReference):
+        if value not in display_context.global_node_output_displays:
+            if issubclass(value.outputs_class, BaseNode.Outputs):
+                if value.outputs_class._node_class:
+                    raise ValueError(
+                        f"Reference to node '{value.outputs_class._node_class.__name__}' not found in graph."
+                    )
+
         upstream_node, output_display = display_context.global_node_output_displays[value]
         upstream_node_display = display_context.global_node_displays[upstream_node]
         return NodeOutputPointer(

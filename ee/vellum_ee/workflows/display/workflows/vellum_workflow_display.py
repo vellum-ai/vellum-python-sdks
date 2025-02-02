@@ -129,13 +129,16 @@ class VellumWorkflowDisplay(
 
             if workflow_output.instance not in final_output_node_outputs:
                 # Create a synthetic terminal node only if there is no terminal node for this output
-                node_input = create_node_input(
-                    final_output_node_id,
-                    "node_input",
-                    # This is currently the wrapper node's output, but we want the wrapped node
-                    workflow_output.instance,
-                    self.display_context,
-                )
+                try:
+                    node_input = create_node_input(
+                        final_output_node_id,
+                        "node_input",
+                        # This is currently the wrapper node's output, but we want the wrapped node
+                        workflow_output.instance,
+                        self.display_context,
+                    )
+                except ValueError as e:
+                    raise ValueError(f"Failed to serialize output '{workflow_output.name}': {str(e)}") from e
 
                 source_node_display: Optional[BaseNodeDisplay]
                 first_rule = node_input.value.rules[0]
