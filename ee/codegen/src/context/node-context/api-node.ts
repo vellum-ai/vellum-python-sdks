@@ -4,7 +4,11 @@ import { VellumError } from "vellum-ai/errors";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
 import { EntityNotFoundError } from "src/generators/errors";
-import { ApiNode as ApiNodeType, NodeInput } from "src/types/vellum";
+import {
+  ApiNode as ApiNodeType,
+  NodeInput,
+  WorkspaceSecretPointer,
+} from "src/types/vellum";
 
 export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
   baseNodeClassName = "APINode";
@@ -33,7 +37,7 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
 
   private async processSecretInput(input: NodeInput): Promise<void> {
     const inputRule = input?.value.rules.find(
-      (rule) => rule.type == "WORKSPACE_SECRET"
+      (rule): rule is WorkspaceSecretPointer => rule.type == "WORKSPACE_SECRET"
     );
     if (!inputRule || !inputRule.data?.workspaceSecretId) {
       return;
