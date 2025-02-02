@@ -136,7 +136,7 @@ describe("ApiNode", () => {
       }
     );
 
-    it.skip("should generate Workspace secrets for header values", async () => {
+    it("should generate Workspace secrets for header values", async () => {
       const workspaceSecretId = uuidv4();
       node = await createNode({
         workspaceSecrets: [{ id: workspaceSecretId, name: "test-secret" }],
