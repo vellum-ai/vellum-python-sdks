@@ -184,10 +184,10 @@
             "value": {
               "rules": [
                 {
-                  "type": "WORKSPACE_SECRET",
+                  "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "workspace_secret_id": "cecd16a2-4de5-444d-acff-37a5c400600c"
+                    "value": "test-value"
                   }
                 }
               ],
@@ -216,10 +216,10 @@
             "value": {
               "rules": [
                 {
-                  "type": "WORKSPACE_SECRET",
+                  "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "workspace_secret_id": "cecd16a2-4de5-444d-acff-37a5c400600c"
+                    "value": "nom-value"
                   }
                 }
               ],
