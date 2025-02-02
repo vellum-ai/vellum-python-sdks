@@ -1,5 +1,3 @@
-import pytest
-
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -464,7 +462,6 @@ def test_graph__node_to_port():
     assert len(list(graph.edges)) == 2
 
 
-@pytest.mark.skip(reason="Not implemented")
 def test_graph__set_to_graph():
     # GIVEN three nodes
     class SourceNode(BaseNode):
@@ -477,7 +474,7 @@ def test_graph__set_to_graph():
         pass
 
     # WHEN we create a graph from a set to a graph
-    graph: Graph = {SourceNode, MiddleNode} >> Graph.from_node(TargetNode)  # type: ignore
+    graph: Graph = {SourceNode, MiddleNode} >> Graph.from_node(TargetNode)
 
     # THEN the graph has the source node and middle node as the entrypoints
     assert set(graph.entrypoints) == {SourceNode, MiddleNode}

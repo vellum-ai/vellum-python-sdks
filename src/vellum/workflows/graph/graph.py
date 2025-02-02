@@ -118,6 +118,12 @@ class Graph:
         self._terminals = {other}
         return self
 
+    def __rrshift__(cls, other_cls: GraphTarget) -> "Graph":
+        if not isinstance(other_cls, set):
+            other_cls = {other_cls}
+
+        return Graph.from_set(other_cls) >> cls
+
     @property
     def entrypoints(self) -> Iterator[Type["BaseNode"]]:
         return iter(e.node_class for e in self._entrypoints)
