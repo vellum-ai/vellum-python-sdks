@@ -982,12 +982,17 @@ export type ApiNodeFactoryProps = {
   errorOutputId?: string;
   bearerToken?: NodeInput;
   apiKeyHeaderValue?: NodeInput;
+  additionalHeaders?: {
+    key: NodeInput;
+    value: NodeInput;
+  }[];
 };
 
 export function apiNodeFactory({
   errorOutputId,
   bearerToken,
   apiKeyHeaderValue,
+  additionalHeaders,
 }: ApiNodeFactoryProps = {}): ApiNode {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
@@ -1023,6 +1028,110 @@ export function apiNodeFactory({
     },
   };
 
+  const additionalHeaderInputs =
+    additionalHeaders ??
+    ([
+      {
+        key: {
+          id: "8ad006f3-d19e-4af1-931f-3e955152cd91",
+          key: "additional_header_key_1",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "foo",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        value: {
+          id: "36865dca-40b4-432c-bab4-1e11bb9f4083",
+          key: "additional_header_value_1",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "5f64210f-ec43-48ce-ae40-40a9ba4c4c11",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      },
+      {
+        key: {
+          id: "3075be8c-248b-421d-9266-7779297be883",
+          key: "additional_header_key_2",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "bar",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        value: {
+          id: "00baaee1-b785-403d-b391-f68b3aea334f",
+          key: "additional_header_value_2",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "b81c5c88-9528-47d0-8106-14a75520ed47",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      },
+      {
+        key: {
+          id: "13c2dd5e-cdd0-431b-aa91-46ad8da1cb51",
+          key: "additional_header_key_3",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "baz",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        value: {
+          id: "408c2b3d-7c30-4e01-a2e3-276753beadbc",
+          key: "additional_header_value_3",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "b81c5c88-9528-47d0-8106-14a75520ed47",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      },
+    ] as { key: NodeInput; value: NodeInput }[]);
+
   const nodeData: ApiNode = {
     id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
     type: "API",
@@ -1035,20 +1144,10 @@ export function apiNodeFactory({
       bearerTokenValueInputId: bearerTokenInput.id,
       apiKeyHeaderKeyInputId: "96c8343d-cc94-4df0-9001-eb2905a00be7",
       apiKeyHeaderValueInputId: apiKeyHeaderValueInput.id,
-      additionalHeaders: [
-        {
-          headerKeyInputId: "8ad006f3-d19e-4af1-931f-3e955152cd91",
-          headerValueInputId: "36865dca-40b4-432c-bab4-1e11bb9f4083",
-        },
-        {
-          headerKeyInputId: "3075be8c-248b-421d-9266-7779297be883",
-          headerValueInputId: "00baaee1-b785-403d-b391-f68b3aea334f",
-        },
-        {
-          headerKeyInputId: "13c2dd5e-cdd0-431b-aa91-46ad8da1cb51",
-          headerValueInputId: "408c2b3d-7c30-4e01-a2e3-276753beadbc",
-        },
-      ],
+      additionalHeaders: additionalHeaderInputs.map(({ key, value }) => ({
+        headerKeyInputId: key.id,
+        headerValueInputId: value.id,
+      })),
       textOutputId: "81b270c0-4deb-4db3-aae5-138f79531b2b",
       jsonOutputId: "af576eaa-d39d-4c19-8992-1f01a65a709a",
       statusCodeOutputId: "69250713-617d-42a4-9326-456c70d0ef20",
@@ -1138,99 +1237,7 @@ export function apiNodeFactory({
         },
       },
       apiKeyHeaderValueInput,
-      {
-        id: "8ad006f3-d19e-4af1-931f-3e955152cd91",
-        key: "additional_header_key_1",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "foo",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "36865dca-40b4-432c-bab4-1e11bb9f4083",
-        key: "additional_header_value_1",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "5f64210f-ec43-48ce-ae40-40a9ba4c4c11",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "3075be8c-248b-421d-9266-7779297be883",
-        key: "additional_header_key_2",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "bar",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "00baaee1-b785-403d-b391-f68b3aea334f",
-        key: "additional_header_value_2",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "b81c5c88-9528-47d0-8106-14a75520ed47",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "13c2dd5e-cdd0-431b-aa91-46ad8da1cb51",
-        key: "additional_header_key_3",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "baz",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "408c2b3d-7c30-4e01-a2e3-276753beadbc",
-        key: "additional_header_value_3",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "b81c5c88-9528-47d0-8106-14a75520ed47",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
+      ...additionalHeaderInputs.flatMap(({ key, value }) => [key, value]),
     ],
     displayData: {
       width: 462,
