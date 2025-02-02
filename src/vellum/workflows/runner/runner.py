@@ -519,19 +519,6 @@ class WorkflowRunner(Generic[StateType]):
         )
 
     def _stream(self) -> None:
-        # TODO: We should likely handle this during initialization
-        # https://app.shortcut.com/vellum/story/4327
-        if not self._entrypoints:
-            self._workflow_event_outer_queue.put(
-                self._reject_workflow_event(
-                    WorkflowError(
-                        message="No entrypoints defined",
-                        code=WorkflowErrorCode.INVALID_WORKFLOW,
-                    )
-                )
-            )
-            return
-
         for edge in self.workflow.get_edges():
             self._dependencies[edge.to_node].add(edge.from_port.node_class)
 
