@@ -1,5 +1,6 @@
 from typing import Callable, Generic, Iterator, Optional, Set, Type
 
+from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
@@ -26,13 +27,15 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
         error: Optional[WorkflowError] = None
 
     def run(self) -> Iterator[BaseOutput]:
-        subworkflow = self.subworkflow(
-            parent_state=self.state,
-            context=WorkflowContext(vellum_client=self._context.vellum_client),
-        )
-        subworkflow_stream = subworkflow.stream(
-            event_filter=all_workflow_event_filter,
-        )
+        parent_context = get_parent_context() or self._context.parent_context
+        with execution_context(parent_context=parent_context):
+            subworkflow = self.subworkflow(
+                parent_state=self.state,
+                context=WorkflowContext(vellum_client=self._context.vellum_client),
+            )
+            subworkflow_stream = subworkflow.stream(
+                event_filter=all_workflow_event_filter,
+            )
 
         outputs: Optional[BaseOutputs] = None
         exception: Optional[NodeException] = None

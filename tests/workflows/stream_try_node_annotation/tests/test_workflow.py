@@ -1,4 +1,4 @@
-from vellum.workflows.events.types import VellumCodeResourceDefinition
+from vellum.workflows.events.types import CodeResourceDefinition, VellumCodeResourceDefinition
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
@@ -32,10 +32,9 @@ def test_workflow_stream__happy_path():
     assert workflow_initiated_events[0].parent is None
     assert workflow_initiated_events[1].workflow_definition == InnerWorkflow
 
-    # TODO: Try Node Parent Context - https://app.shortcut.com/vellum/story/5601
-    # assert workflow_initiated_events[1].parent is not None
-    # assert workflow_initiated_events[1].parent.type == "WORKFLOW_NODE"
-    # assert workflow_initiated_events[1].parent.node_definition == InnerNode
+    assert workflow_initiated_events[1].parent is not None
+    assert workflow_initiated_events[1].parent.type == "WORKFLOW_NODE"
+    assert workflow_initiated_events[1].parent.node_definition == CodeResourceDefinition.encode(InnerNode)
     assert len(workflow_initiated_events) == 2
 
     # node initiated events
