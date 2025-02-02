@@ -739,5 +739,95 @@ describe("Workflow", () => {
         [secondInnerCheckNode, finalCheckNode],
       ]);
     });
+
+    it.skip("should be able to create a proper else edge when there are three ports pointing to a set", async () => {
+      const firstCheckNode = genericNodeFactory({
+        name: "FirstCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const firstInnerCheckNode = genericNodeFactory({
+        name: "FirstInnerCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const finalCheckNode = genericNodeFactory({
+        name: "FinalCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const innerTerminalNode = genericNodeFactory({
+        name: "InnerTerminalNode",
+      });
+
+      const secondInnerCheckNode = genericNodeFactory({
+        name: "SecondInnerCheckNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+          }),
+          nodePortFactory({
+            type: "ELSE",
+          }),
+        ],
+      });
+
+      const outerOutputNode = genericNodeFactory({
+        name: "OuterOutputNode",
+      });
+
+      await runGraphTest([
+        [entrypointNode, firstCheckNode],
+        [[firstCheckNode, "if_port"], firstInnerCheckNode],
+        [[firstCheckNode, "else_port"], finalCheckNode],
+        [[firstInnerCheckNode, "if_port"], secondInnerCheckNode],
+        [[firstInnerCheckNode, "else_port"], finalCheckNode],
+        [[finalCheckNode, "if_port"], innerTerminalNode],
+        [[finalCheckNode, "else_port"], outerOutputNode],
+        [[secondInnerCheckNode, "if_port"], finalCheckNode],
+        [[secondInnerCheckNode, "else_port"], outerOutputNode],
+      ]);
+    });
+
+    /**
+     * Currently creating the following incorrect graph:
+{
+    FirstCheckNode.Ports.if_port
+    >> {
+        FirstInnerCheckNode.Ports.if_port >> SecondInnerCheckNode.Ports.if_port,
+        FirstInnerCheckNode.Ports.else_port,
+    },
+    FirstCheckNode.Ports.else_port,
+} >> Graph.from_set(
+    {
+        FinalCheckNode.Ports.if_port >> InnerTerminalNode,
+        FinalCheckNode.Ports.else_port >> OuterOutputNode,
+        OuterOutputNode,
+    }
+)
+     * This graph incorrectly adds `OuterOutputNode` to the right hand side set, instead of
+     * creating the proper `else` edge for `SecondInnerCheckNode`.
+     */
   });
 });
