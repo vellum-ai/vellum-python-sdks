@@ -134,6 +134,13 @@ describe("ApiNode", () => {
         expect(await writer.toStringFormatted()).toMatchSnapshot();
       }
     );
+
+    it("should generate Workspace secrets for header values", async () => {
+      const workspaceSecretId = uuid();
+      node = await createNode({
+        workspaceSecrets: [{ id: workspaceSecretId, name: "test-secret" }],
+      });
+    });
   });
 
   describe("basic", () => {
