@@ -296,8 +296,8 @@ export class GraphAttribute extends AstNode {
       return this.addEdgeToRightShift({
         edge,
         mutableAst,
-        sourceNode,
-        targetNode,
+        // sourceNode,
+        // targetNode,
         graphSourceNode,
       });
     }
@@ -309,7 +309,9 @@ export class GraphAttribute extends AstNode {
    * Adds an edge to a Graph that is just a Port Reference. Three main cases:
    * 1. The edge's source node is the same port as the existing AST.
    *    Transforms `A.Ports.a` to `A.Ports.a >> B`
-   * 2. The edge's source node is the graph's source node feeding into the AST.
+   * 2. The edge's source node is the same node as the existing AST, but a different port.
+   *    Transforms `A.Ports.a` to `{ A.Ports.a, A.Ports.b >> B }`
+   * 3. The edge's source node is the graph's source node feeding into the AST.
    *    Transforms `A.Ports.a` to `{ A.Ports.a, B }`
    */
   private addEdgeToPortReference({
@@ -336,6 +338,24 @@ export class GraphAttribute extends AstNode {
           rhs: { type: "node_reference", reference: targetNode },
         };
       }
+      if (
+        sourceNodePortContext?.nodeContext === mutableAst.reference.nodeContext
+      ) {
+        return {
+          type: "set",
+          values: [
+            mutableAst,
+            {
+              type: "right_shift",
+              lhs: {
+                type: "port_reference",
+                reference: sourceNodePortContext,
+              },
+              rhs: { type: "node_reference", reference: targetNode },
+            },
+          ],
+        };
+      }
     } else if (sourceNode == graphSourceNode) {
       return {
         type: "set",
@@ -353,15 +373,13 @@ export class GraphAttribute extends AstNode {
    */
   private addEdgeToRightShift({
     edge,
-    sourceNode,
-    targetNode,
+    // sourceNode,
+    // targetNode,
     mutableAst,
     graphSourceNode,
   }: {
     edge: WorkflowEdge;
     mutableAst: GraphRightShift;
-    sourceNode: BaseNodeContext<WorkflowDataNode> | null;
-    targetNode: BaseNodeContext<WorkflowDataNode>;
     graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
   }): GraphMutableAst | undefined {
     const newLhs = this.addEdgeToGraph({
@@ -399,34 +417,7 @@ export class GraphAttribute extends AstNode {
           };
         }
       }
-      return newSetAst;
-    }
-
-    if (
-      mutableAst.lhs.type == "port_reference" &&
-      sourceNode &&
-      mutableAst.lhs.reference.nodeContext == sourceNode
-    ) {
-      const sourcePortContext = sourceNode.portContextsById.get(
-        edge.sourceHandleId
-      );
-      if (sourcePortContext) {
-        return {
-          type: "set",
-          values: [
-            mutableAst,
-            {
-              type: "right_shift",
-              lhs: {
-                type: "port_reference",
-                reference: sourcePortContext,
-              },
-              rhs: { type: "node_reference", reference: targetNode },
-            },
-          ],
-        };
-      }
-      return;
+      return this.flattenSet(newSetAst);
     }
 
     const lhsTerminals = this.getAstTerminals(mutableAst.lhs);
@@ -457,7 +448,8 @@ export class GraphAttribute extends AstNode {
   private isPlural(mutableAst: GraphMutableAst): boolean {
     return (
       mutableAst.type === "right_shift" ||
-      (mutableAst.type === "set" && mutableAst.values.every(this.isPlural))
+      (mutableAst.type === "set" &&
+        mutableAst.values.every((v) => this.isPlural(v)))
     );
   }
 
@@ -569,16 +561,58 @@ export class GraphAttribute extends AstNode {
     return newSetAst;
   }
 
+  /**
+   * Flattens a set of GraphMutableAsts into a single set of GraphMutableAsts. Any entries
+   * that are subsets of previous members are removed.
+   */
   private flattenSet(setAst: GraphSet): GraphSet {
+    const newEntries: GraphMutableAst[] = [];
+    for (const entry of setAst.values) {
+      const potentialEntries =
+        entry.type === "set" ? this.flattenSet(entry).values : [entry];
+      for (const potentialEntry of potentialEntries) {
+        if (
+          newEntries.some((e) =>
+            this.isGraphSubsetOfTargetGraph(potentialEntry, e)
+          )
+        ) {
+          continue;
+        }
+        newEntries.push(potentialEntry);
+      }
+    }
     return {
       type: "set",
-      values: setAst.values.flatMap((value) => {
-        if (value.type === "set") {
-          return this.flattenSet(value).values;
-        }
-        return [value];
-      }),
+      values: newEntries,
     };
+  }
+
+  /**
+   * Checks if the source graph is a subset of the target graph.
+   */
+  private isGraphSubsetOfTargetGraph(
+    sourceGraph: GraphMutableAst,
+    targetGraph: GraphMutableAst
+  ): boolean {
+    if (sourceGraph.type === "empty") {
+      return true;
+    }
+
+    if (sourceGraph.type === "node_reference") {
+      return this.getAstSources(targetGraph).some(
+        (s) => s.reference.nodeContext === sourceGraph.reference
+      );
+    }
+
+    if (sourceGraph.type === "port_reference") {
+      return this.getAstSources(targetGraph).some(
+        (s) => s.reference === sourceGraph.reference
+      );
+    }
+
+    // TODO: We likely need to handle all the cases here, but deferring until
+    // the test cases to force the issue arise.
+    return false;
   }
 
   /**
