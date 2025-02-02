@@ -787,7 +787,7 @@ describe("Workflow", () => {
         */
     });
 
-    it.skip("Should handle an else case within a conditioned set", async () => {
+    it("Should handle an else case within a conditioned set", async () => {
       const firstCheckNode = genericNodeFactory({
         name: "FirstCheckNode",
         nodePorts: nodePortsFactory(),

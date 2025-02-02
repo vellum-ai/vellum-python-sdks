@@ -296,8 +296,6 @@ export class GraphAttribute extends AstNode {
       return this.addEdgeToRightShift({
         edge,
         mutableAst,
-        // sourceNode,
-        // targetNode,
         graphSourceNode,
       });
     }
@@ -373,8 +371,6 @@ export class GraphAttribute extends AstNode {
    */
   private addEdgeToRightShift({
     edge,
-    // sourceNode,
-    // targetNode,
     mutableAst,
     graphSourceNode,
   }: {
@@ -389,11 +385,32 @@ export class GraphAttribute extends AstNode {
     });
 
     if (newLhs) {
-      const newSetAst: GraphSet = {
-        type: "set",
-        values: [mutableAst, newLhs],
-      };
-      if (this.isPlural(newSetAst)) {
+      const oldTerminals = this.getAstTerminals(mutableAst.lhs);
+
+      const newSetAst = oldTerminals.reduce(
+        (accAst, terminal): GraphMutableAst => {
+          if (!accAst) {
+            return accAst;
+          }
+
+          return this.replaceTerminalWithRightShift({
+            terminal,
+            rightShift: {
+              type: "right_shift",
+              lhs: terminal,
+              rhs: mutableAst.rhs,
+            },
+            mutableAst: accAst,
+          });
+        },
+        newLhs
+      );
+
+      if (!newSetAst) {
+        return;
+      }
+
+      if (newSetAst.type == "set" && this.isPlural(newSetAst)) {
         const newAstSources = newSetAst.values.flatMap((value) =>
           this.getAstSources(value)
         );
@@ -417,7 +434,10 @@ export class GraphAttribute extends AstNode {
           };
         }
       }
-      return this.flattenSet(newSetAst);
+      if (newSetAst.type === "set") {
+        return this.flattenSet(newSetAst);
+      }
+      return newSetAst;
     }
 
     const lhsTerminals = this.getAstTerminals(mutableAst.lhs);
@@ -863,6 +883,18 @@ export class GraphAttribute extends AstNode {
     } else {
       return { type: "empty" };
     }
+  };
+
+  private replaceTerminalWithRightShift = ({
+    terminal,
+    rightShift,
+    mutableAst,
+  }: {
+    terminal: GraphNodeReference;
+    rightShift: GraphRightShift;
+    mutableAst: GraphMutableAst;
+  }): GraphMutableAst => {
+    return mutableAst;
   };
 
   private startsWithTargetNode = (
