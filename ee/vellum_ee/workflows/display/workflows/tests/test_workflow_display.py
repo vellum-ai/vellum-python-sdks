@@ -34,3 +34,32 @@ def test_serialize_workflow__node_referenced_in_workflow_outputs_not_in_graph():
 
     # AND the error message should be user friendly
     assert str(exc_info.value) == "Failed to serialize output 'final': Reference to node 'OutNode' not found in graph."
+
+
+@pytest.mark.skip(reason="This test is not yet implemented")
+def test_serialize_workflow__workflow_outputs_reference_non_node_outputs():
+    # GIVEN one Workflow
+    class FirstWorkflow(BaseWorkflow):
+        class Outputs(BaseWorkflow.Outputs):
+            foo = "bar"
+
+    # AND A workflow that references the Outputs of that Workflow
+    class Workflow(BaseWorkflow):
+        class Outputs(BaseWorkflow.Outputs):
+            final = FirstWorkflow.Outputs.foo
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=Workflow,
+    )
+
+    # THEN it should raise an error
+    with pytest.raises(ValueError) as exc_info:
+        workflow_display.serialize()
+
+    # AND the error message should be user friendly
+    assert (
+        str(exc_info.value)
+        == "Failed to serialize output 'final': Reference to outputs 'FirstWorkflow.Outputs' is invalid."
+    )
