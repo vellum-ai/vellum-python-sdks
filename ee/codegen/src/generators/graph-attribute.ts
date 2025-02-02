@@ -296,8 +296,6 @@ export class GraphAttribute extends AstNode {
       return this.addEdgeToRightShift({
         edge,
         mutableAst,
-        // sourceNode,
-        // targetNode,
         graphSourceNode,
       });
     }
@@ -373,8 +371,6 @@ export class GraphAttribute extends AstNode {
    */
   private addEdgeToRightShift({
     edge,
-    // sourceNode,
-    // targetNode,
     mutableAst,
     graphSourceNode,
   }: {

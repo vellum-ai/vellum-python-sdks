@@ -2,11 +2,16 @@
 
 exports[`Workflow > graph > Should handle an else case within a conditioned set 1`] = `
 "{
-    FirstCheckNode.Ports.if_port >> {
-        SecondInnerCheckNode.Ports.if_port >> FirstOutputNode,
+    {
+        FirstCheckNode.Ports.if_port >> SecondInnerCheckNode.Ports.if_port,
+        FirstCheckNode.Ports.else_port,
+    }
+    >> FirstOutputNode,
+    FirstCheckNode.Ports.if_port
+    >> {
+        SecondInnerCheckNode.Ports.if_port,
         SecondInnerCheckNode.Ports.else_port >> SecondOutputNode,
     },
-    FirstCheckNode.Ports.else_port >> FirstOutputNode,
 }
 "
 `;
