@@ -96,13 +96,6 @@ export class GraphAttribute extends AstNode {
         continue;
       }
 
-      const isPlural = (mutableAst: GraphMutableAst): boolean => {
-        return (
-          mutableAst.type === "right_shift" ||
-          (mutableAst.type === "set" && mutableAst.values.every(isPlural))
-        );
-      };
-
       const getAstSources = (
         mutableAst: GraphMutableAst
       ): GraphPortReference[] => {
@@ -289,7 +282,7 @@ export class GraphAttribute extends AstNode {
               type: "set",
               values: [mutableAst, newLhs],
             };
-            if (isPlural(newSetAst)) {
+            if (this.isPlural(newSetAst)) {
               const newAstSources = newSetAst.values.flatMap((value) =>
                 getAstSources(value)
               );
@@ -441,6 +434,16 @@ export class GraphAttribute extends AstNode {
       };
     }
     return;
+  }
+
+  /**
+   * Checks if the AST contains an edge. We consider a `set` to be plural if all of its members are plural.
+   */
+  private isPlural(mutableAst: GraphMutableAst): boolean {
+    return (
+      mutableAst.type === "right_shift" ||
+      (mutableAst.type === "set" && mutableAst.values.every(this.isPlural))
+    );
   }
 
   /**
