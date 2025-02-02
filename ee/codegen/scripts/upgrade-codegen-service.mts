@@ -50,8 +50,11 @@ const main = async () => {
     })
     .join("\n");
 
-  const codeGeneratorFunction = `/**
+  const codeGeneratorFunction = `// @ts-nocheck
+/**
  * This file was generated automatically by the codegen CD pipeline in vellum-python-sdks do not modify it.
+ *
+ * We don't have type declarations for older vellum-codegen versions, so we need to ts-ignore the whole file.
  **/
 export const getCodegenModule = async (version: string | null | undefined) => {
 ${packageVersionsLookups}
