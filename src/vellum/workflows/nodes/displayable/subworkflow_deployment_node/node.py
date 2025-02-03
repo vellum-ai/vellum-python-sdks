@@ -1,3 +1,4 @@
+import json
 from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union, cast
 
@@ -17,6 +18,7 @@ from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
+from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
@@ -91,9 +93,19 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                     )
                 )
             else:
-                raise NodeException(
-                    message=f"Unrecognized input type for input '{input_name}'",
-                    code=WorkflowErrorCode.INVALID_INPUTS,
+                try:
+                    input_value = default_serializer(input_value)
+                except json.JSONDecodeError as e:
+                    raise NodeException(
+                        message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                    )
+
+                compiled_inputs.append(
+                    WorkflowRequestJsonInputRequest(
+                        name=input_name,
+                        value=input_value,
+                    )
                 )
 
         return compiled_inputs
