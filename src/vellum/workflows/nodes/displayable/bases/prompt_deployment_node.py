@@ -1,3 +1,4 @@
+import json
 from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Sequence, Union, cast
 
@@ -16,6 +17,7 @@ from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
 from vellum.workflows.types import MergeBehavior
@@ -99,19 +101,20 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                         value=cast(List[ChatMessage], input_value),
                     )
                 )
-            elif isinstance(input_value, dict):
-                # Note: We may want to fail early here if we know that input_value is not
-                #   JSON serializable.
+            else:
+                try:
+                    input_value = default_serializer(input_value)
+                except json.JSONDecodeError as e:
+                    raise NodeException(
+                        message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                    )
+
                 compiled_inputs.append(
                     JsonInputRequest(
                         name=input_name,
-                        value=cast(Dict[str, Any], input_value),
+                        value=input_value,
                     )
-                )
-            else:
-                raise NodeException(
-                    message=f"Unrecognized input type for input '{input_name}': {input_value.__class__}",
-                    code=WorkflowErrorCode.INVALID_INPUTS,
                 )
 
         return compiled_inputs
