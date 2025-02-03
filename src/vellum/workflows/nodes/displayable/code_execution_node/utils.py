@@ -91,19 +91,21 @@ __arg__out = main({", ".join(run_args)})
     logs = log_buffer.getvalue()
     result = exec_globals["__arg__out"]
 
-    if issubclass(output_type, BaseModel) and not isinstance(result, output_type):
-        try:
-            result = output_type.model_validate(result)
-        except ValidationError as e:
+    if output_type != Any:
+        if issubclass(output_type, BaseModel) and not isinstance(result, output_type):
+            try:
+                result = output_type.model_validate(result)
+            except ValidationError as e:
+                raise NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
+                ) from e
+
+        if not isinstance(result, output_type):
             raise NodeException(
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
-            ) from e
-
-    if not isinstance(result, output_type):
-        raise NodeException(
-            code=WorkflowErrorCode.INVALID_OUTPUTS,
-            message=f"Expected an output of type '{output_type.__name__}', but received '{result.__class__.__name__}'",
-        )
+                message=f"Expected an output of type '{output_type.__name__}',"
+                f" but received '{result.__class__.__name__}'",
+            )
 
     return logs, result
