@@ -352,6 +352,31 @@ ${errors.slice(0, 3).map((err) => {
     await Promise.all(
       this.workflowVersionExecConfig.workflowRawData.nodes
         .map(async (nodeData) => {
+          if (nodeData.type === "ENTRYPOINT") {
+            if (entrypointNode) {
+              throw new WorkflowGenerationError(
+                "Multiple entrypoint nodes found"
+              );
+            }
+            entrypointNode = nodeData;
+            return;
+          }
+
+          nodesToGenerate.push(nodeData);
+
+          await createNodeContext({
+            workflowContext: this.workflowContext,
+            nodeData,
+          });
+        })
+        .map((promise) =>
+          promise.catch((error) => this.workflowContext.addError(error))
+        )
+    );
+
+    await Promise.all(
+      this.workflowVersionExecConfig.workflowRawData.nodes.map(
+        async (nodeData) => {
           if (nodeData.type === "TERMINAL") {
             // If we have explicit output values, use those
             if (
@@ -381,26 +406,8 @@ ${errors.slice(0, 3).map((err) => {
               );
             }
           }
-          if (nodeData.type === "ENTRYPOINT") {
-            if (entrypointNode) {
-              throw new WorkflowGenerationError(
-                "Multiple entrypoint nodes found"
-              );
-            }
-            entrypointNode = nodeData;
-            return;
-          }
-
-          nodesToGenerate.push(nodeData);
-
-          await createNodeContext({
-            workflowContext: this.workflowContext,
-            nodeData,
-          });
-        })
-        .map((promise) =>
-          promise.catch((error) => this.workflowContext.addError(error))
-        )
+        }
+      )
     );
 
     if (!entrypointNode) {
