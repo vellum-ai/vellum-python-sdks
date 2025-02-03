@@ -12,6 +12,7 @@ from vellum import (
     StringInputRequest,
 )
 from vellum.client import RequestOptions
+from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
@@ -89,7 +90,9 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                         value=input_value,
                     )
                 )
-            elif isinstance(input_value, list) and all(isinstance(message, ChatMessage) for message in input_value):
+            elif isinstance(input_value, list) and all(
+                isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
+            ):
                 compiled_inputs.append(
                     ChatHistoryInputRequest(
                         name=input_name,

@@ -15,6 +15,7 @@ def test_run_workflow__happy_path(vellum_client):
 
     # GIVEN a Prompt Deployment Node
     class ExamplePromptDeploymentNode(PromptDeploymentNode):
+        deployment = "example_prompt_deployment"
         prompt_inputs = {
             "chat_history": [ChatMessageRequest(role="USER", text="Hello, how are you?")],
         }
@@ -40,7 +41,7 @@ def test_run_workflow__happy_path(vellum_client):
     events = list(node.run())
 
     # THEN the node should have completed successfully
-    assert events[-1].value == [StringVellumValue(value="Great!")]
+    assert events[-1].value == "Great!"
 
     # AND we should have invoked the Prompt Deployment with the expected inputs
     call_kwargs = vellum_client.execute_prompt_stream.call_args.kwargs
