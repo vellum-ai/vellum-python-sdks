@@ -29,9 +29,15 @@ from vellum_ee.workflows.display.base import (
     WorkflowOutputDisplayOverridesType,
     WorkflowOutputDisplayType,
 )
+from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext, WorkflowEventDisplayContext
+from vellum_ee.workflows.display.types import (
+    NodeDisplay,
+    NodeDisplayType,
+    WorkflowDisplayContext,
+    WorkflowEventDisplayContext,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -343,4 +349,42 @@ class BaseWorkflowDisplay(
             display_class = importlib.import_module(workflow_display_module)
         except ModuleNotFoundError:
             return None
-        return display_class.WorkflowDisplay(workflow_class).display_context.build_event_display_context()
+
+        display_context = display_class.WorkflowDisplay(workflow_class).display_context
+        if not isinstance(display_context, WorkflowDisplayContext):
+            return None
+
+        workflow_outputs = {
+            output.name: display_context.workflow_output_displays[output].id
+            for output in display_context.workflow_output_displays
+        }
+        workflow_inputs = {
+            input.name: display_context.workflow_input_displays[input].id
+            for input in display_context.workflow_input_displays
+        }
+        node_displays = {
+            str(node.__id__): display_context.node_displays[node] for node in display_context.node_displays
+        }
+        temp_node_displays = {}
+        for node in node_displays:
+            current_node = node_displays[node]
+            input_display = {}
+            if isinstance(current_node, BaseNodeVellumDisplay):
+                input_display = current_node.node_input_ids_by_name
+            node_display_meta = {
+                output.name: current_node.output_display[output].id for output in current_node.output_display
+            }
+            port_display_meta = {port.name: current_node.port_displays[port].id for port in current_node.port_displays}
+
+            temp_node_displays[node] = NodeDisplay(
+                input_display=input_display,
+                output_display=node_display_meta,
+                port_display=port_display_meta,
+            )
+
+        display_meta = WorkflowEventDisplayContext(
+            workflow_outputs=workflow_outputs,
+            workflow_inputs=workflow_inputs,
+            node_displays=temp_node_displays,
+        )
+        return display_meta
