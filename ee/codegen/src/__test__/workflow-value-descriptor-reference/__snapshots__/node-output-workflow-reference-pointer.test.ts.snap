@@ -1,6 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`NodeOutputWorkflowReference > should generate correct AST for node output reference 1`] = `
-"TestNode.Outputs.my_output
-"
-`;

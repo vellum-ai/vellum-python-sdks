@@ -1,6 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`ConstantValueReference > should generate correct AST for string constant value reference 1`] = `
-""test-value"
-"
-`;
