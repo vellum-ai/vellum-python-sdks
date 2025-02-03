@@ -125,7 +125,7 @@ describe("WorkflowProjectGenerator", () => {
     );
   });
   describe("failure cases", () => {
-    const displayData = {
+    let displayData = {
       workflow_raw_data: {
         nodes: [
           {
@@ -257,6 +257,116 @@ Encountered 1 error(s) while generating code:
           "Failed to generate attribute 'BadNode.inputs.other': Failed to find node with id 'node_that_doesnt_exist'"
         )
       );
+    });
+
+    it("should generate code even if a node fails to find invalid ports and target nodes", async () => {
+      displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "some-node-id",
+              type: "TEMPLATING",
+              data: {
+                label: "Bad Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "foo",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry-source",
+              target_node_id: "some-node-id",
+              target_handle_id: "template_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+            {
+              source_node_id: "bad-source-node-id",
+              source_handle_id: "bad-source-handle-id",
+              target_node_id: "bad-target",
+              target_handle_id: "template_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      expect(
+        fs.existsSync(join(tempDir, project.getModuleName(), "workflow.py"))
+      ).toBe(true);
+      expect(
+        fs.existsSync(join(tempDir, project.getModuleName(), "nodes"))
+      ).toBe(true);
+
+      const badNodePath = join(
+        tempDir,
+        project.getModuleName(),
+        "nodes",
+        "bad_node.py"
+      );
+      expect(fs.existsSync(badNodePath)).toBe(true);
+      expect(fs.readFileSync(badNodePath, "utf-8")).toBe(`\
+from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class BadNode(TemplatingNode[BaseState, str]):
+    template = """foo"""
+    inputs = {}
+`);
+
+      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
+      expect(fs.existsSync(errorLogPath)).toBe(true);
+      expect(fs.readFileSync(errorLogPath, "utf-8")).toBe(`\
+Encountered 2 error(s) while generating code:
+
+- Port context not found for port id: bad-source-handle-id
+- Failed to find node with id 'bad-target'
+`);
     });
   });
   describe("inlude sandbox", () => {

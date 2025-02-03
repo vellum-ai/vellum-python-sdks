@@ -362,42 +362,74 @@ export class Workflow {
             return acc;
           }
 
+          let hasError = false;
+
+          // This is an edge case where we have a phantom port edge from a non-existent source handle
           const sourcePortId = edge.sourceHandleId;
-          const sourcePortContext =
-            this.workflowContext.getPortContextById(sourcePortId);
+          let sourcePortContext;
+          try {
+            sourcePortContext =
+              this.workflowContext.getPortContextById(sourcePortId);
+          } catch (e) {
+            if (e instanceof BaseCodegenError) {
+              this.workflowContext.addError(e);
+            } else {
+              throw e;
+            }
+            hasError = true;
+          }
 
+          // This is an edge case where we have a phantom edge that connects a source node to a non-existent target node
           const targetNodeId = edge.targetNodeId;
-          const targetNode = this.workflowContext.getNodeContext(targetNodeId);
+          let targetNode;
+          try {
+            targetNode = this.workflowContext.getNodeContext(targetNodeId);
+          } catch (e) {
+            if (e instanceof BaseCodegenError) {
+              this.workflowContext.addError(e);
+            } else {
+              throw e;
+            }
+            hasError = true;
+          }
 
-          const edgeDisplayEntry = {
-            key: python.TypeInstantiation.tuple([
-              python.reference({
-                name: sourcePortContext.nodeContext.nodeClassName,
-                modulePath: sourcePortContext.nodeContext.nodeModulePath,
-                attribute: [PORTS_CLASS_NAME, sourcePortContext.portName],
-              }),
-              python.reference({
-                name: targetNode.nodeClassName,
-                modulePath: targetNode.nodeModulePath,
-              }),
-            ]),
-            value: python.instantiateClass({
-              classReference: python.reference({
-                name: "EdgeVellumDisplayOverrides",
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .VELLUM_TYPES_MODULE_PATH,
-              }),
-              arguments_: [
-                python.methodArgument({
-                  name: "id",
-                  value: python.TypeInstantiation.uuid(edge.id),
+          if (hasError) {
+            return acc;
+          }
+
+          if (sourcePortContext && targetNode) {
+            const edgeDisplayEntry = {
+              key: python.TypeInstantiation.tuple([
+                python.reference({
+                  name: sourcePortContext.nodeContext.nodeClassName,
+                  modulePath: sourcePortContext.nodeContext.nodeModulePath,
+                  attribute: [PORTS_CLASS_NAME, sourcePortContext.portName],
                 }),
-              ],
-            }),
-          };
+                python.reference({
+                  name: targetNode.nodeClassName,
+                  modulePath: targetNode.nodeModulePath,
+                }),
+              ]),
+              value: python.instantiateClass({
+                classReference: python.reference({
+                  name: "EdgeVellumDisplayOverrides",
+                  modulePath:
+                    this.workflowContext.sdkModulePathNames
+                      .VELLUM_TYPES_MODULE_PATH,
+                }),
+                arguments_: [
+                  python.methodArgument({
+                    name: "id",
+                    value: python.TypeInstantiation.uuid(edge.id),
+                  }),
+                ],
+              }),
+            };
 
-          return [...acc, edgeDisplayEntry];
+            return [...acc, edgeDisplayEntry];
+          }
+
+          return acc;
         },
         []
       );
