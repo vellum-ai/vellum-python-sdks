@@ -1,6 +1,6 @@
 import json
 from uuid import uuid4
-from typing import Callable, ClassVar, Generic, Iterator, List, Optional, Tuple, Union, cast
+from typing import Callable, ClassVar, Generic, Iterator, List, Optional, Tuple, Union
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -16,6 +16,7 @@ from vellum import (
     VellumVariable,
 )
 from vellum.client import RequestOptions
+from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.constants import OMIT
 from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
@@ -108,7 +109,14 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                         value=input_value,
                     )
                 )
-            elif isinstance(input_value, list) and all(isinstance(message, ChatMessage) for message in input_value):
+            elif isinstance(input_value, list) and all(
+                isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
+            ):
+                chat_history = [
+                    message if isinstance(message, ChatMessage) else ChatMessage.model_validate(message.model_dump())
+                    for message in input_value
+                    if isinstance(message, (ChatMessage, ChatMessageRequest))
+                ]
                 input_variables.append(
                     VellumVariable(
                         # TODO: Determine whether or not we actually need an id here and if we do,
@@ -122,7 +130,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 input_values.append(
                     PromptRequestChatHistoryInput(
                         key=input_name,
-                        value=cast(List[ChatMessage], input_value),
+                        value=chat_history,
                     )
                 )
             else:

@@ -5,6 +5,8 @@ from typing import Any, Iterator, List
 
 from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.types.chat_message import ChatMessage
+from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
@@ -12,6 +14,7 @@ from vellum.client.types.function_call_vellum_value import FunctionCallVellumVal
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.prompt_output import PromptOutput
+from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -181,3 +184,49 @@ def test_inline_prompt_node__api_error__invalid_inputs_node_exception(
     # THEN the node raises the correct NodeException
     assert e.value.code == expected_code
     assert e.value.message == expected_message
+
+
+def test_inline_prompt_node__chat_history_inputs(vellum_adhoc_prompt_client):
+    # GIVEN a prompt node with a chat history input
+    class MyNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+        prompt_inputs = {
+            "chat_history": [ChatMessageRequest(role="USER", text="Hello, how are you?")],
+        }
+
+    # AND a known response from invoking an inline prompt
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value="Great!"),
+    ]
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the node is run
+    events = list(MyNode().run())
+
+    # THEN the prompt is executed with the correct inputs
+    assert events[-1].value == "Great!"
+
+    # AND the prompt is executed with the correct inputs
+    mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
+    assert mock_api.call_count == 1
+    assert mock_api.call_args.kwargs["input_values"] == [
+        PromptRequestChatHistoryInput(
+            key="chat_history",
+            type="CHAT_HISTORY",
+            value=[ChatMessage(role="USER", text="Hello, how are you?")],
+        ),
+    ]
+    assert mock_api.call_args.kwargs["input_variables"][0].type == "CHAT_HISTORY"
