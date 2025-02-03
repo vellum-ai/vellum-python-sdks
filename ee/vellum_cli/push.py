@@ -49,6 +49,9 @@ def push_command(
         else config.workflows
     )
 
+    if len(workflow_configs) > 1 and workspace:
+        workflow_configs = [w for w in workflow_configs if w.workspace == workspace]
+
     if len(workflow_configs) == 0:
         raise ValueError(f"No workflow config for '{module}' found in project to push.")
 
@@ -230,15 +233,11 @@ def push_command(
 Visit at: https://app.vellum.ai/workflow-sandboxes/{response.workflow_sandbox_id}"""
         )
 
-    requires_save = False
     if not workflow_config.workflow_sandbox_id:
         workflow_config.workflow_sandbox_id = response.workflow_sandbox_id
-        requires_save = True
 
     if not workflow_config.deployments and response.workflow_deployment_id:
         workflow_config.deployments.append(WorkflowDeploymentConfig(id=UUID(response.workflow_deployment_id)))
-        requires_save = True
 
-    if requires_save:
-        config.save()
-        logger.info("Updated vellum.lock file.")
+    config.save()
+    logger.info("Updated vellum.lock.json file.")

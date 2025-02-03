@@ -489,7 +489,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
 
     # AND the workflow sandbox id arg passed in should be `None`
     call_args = vellum_client_class.return_value.workflows.push.call_args.kwargs
-    assert call_args["workflow_sandbox_id"] is None
+    assert call_args["workflow_sandbox_id"] is None, result.output
 
     # AND with the correct api key
     vellum_client_class.assert_called_once_with(
@@ -511,7 +511,6 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         }
 
 
-@pytest.mark.skip(reason="https://app.shortcut.com/vellum/story/6424")
 def test_push__workspace_option__both_options_already_configured(mock_module, vellum_client_class):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
@@ -572,7 +571,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
 
     # AND the workflow sandbox id arg passed in should be `None`
     call_args = vellum_client_class.return_value.workflows.push.call_args.kwargs
-    assert call_args["workflow_sandbox_id"] is None
+    assert call_args["workflow_sandbox_id"] == second_workflow_sandbox_id
 
     # AND with the correct api key
     vellum_client_class.assert_called_once_with(
