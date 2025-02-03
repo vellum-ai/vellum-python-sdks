@@ -204,6 +204,7 @@ export class ConditionalNodePort extends AstNode {
         };
         rhs = codegen.nodeInput({
           workflowContext: this.portContext.workflowContext,
+          nodeContext: this.portContext.nodeContext,
           nodeInputData: castedRhs,
         });
       }
