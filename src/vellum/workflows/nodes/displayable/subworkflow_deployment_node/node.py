@@ -11,6 +11,7 @@ from vellum import (
     WorkflowRequestNumberInputRequest,
     WorkflowRequestStringInputRequest,
 )
+from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.core import RequestOptions
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.context import get_parent_context
@@ -66,7 +67,9 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                         value=input_value,
                     )
                 )
-            elif isinstance(input_value, list) and all(isinstance(message, ChatMessage) for message in input_value):
+            elif isinstance(input_value, list) and all(
+                isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
+            ):
                 compiled_inputs.append(
                     WorkflowRequestChatHistoryInputRequest(
                         name=input_name,
