@@ -2,7 +2,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
-import { ConstantValueReferencePointer } from "src/generators/workflow-value-descriptor-reference/constant-value-reference-pointer";
+import { ConstantValueReference } from "src/generators/workflow-value-descriptor-reference/constant-value-reference";
 import { WorkflowValueDescriptorReference } from "src/types/vellum";
 
 describe("ConstantValueReferencePointer", () => {
@@ -21,7 +21,7 @@ describe("ConstantValueReferencePointer", () => {
       },
     };
 
-    const pointer = new ConstantValueReferencePointer({
+    const pointer = new ConstantValueReference({
       workflowContext,
       nodeInputWorkflowReferencePointer: constantValueReference,
     });

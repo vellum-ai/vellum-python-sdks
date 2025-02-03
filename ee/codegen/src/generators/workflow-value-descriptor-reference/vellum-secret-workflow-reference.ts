@@ -2,10 +2,10 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
-import { BaseNodeInputWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReferencePointer";
+import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { VellumSecretWorkflowReference as VellumSecretWorkflowReferenceType } from "src/types/vellum";
 
-export class VellumSecretWorkflowReferencePointer extends BaseNodeInputWorkflowReferencePointer<VellumSecretWorkflowReferenceType> {
+export class VellumSecretWorkflowReference extends BaseNodeInputWorkflowReference<VellumSecretWorkflowReferenceType> {
   getAstNode(): AstNode | undefined {
     const vellumSecretName =
       this.nodeInputWorkflowReferencePointer.vellumSecretName;

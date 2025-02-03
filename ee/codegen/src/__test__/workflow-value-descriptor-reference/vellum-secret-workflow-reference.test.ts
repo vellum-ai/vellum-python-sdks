@@ -2,7 +2,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
-import { VellumSecretWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/vellum-secret-workflow-reference-pointer";
+import { VellumSecretWorkflowReference } from "src/generators/workflow-value-descriptor-reference/vellum-secret-workflow-reference";
 import { WorkflowValueDescriptorReference } from "src/types/vellum";
 
 describe("VellumSecretWorkflowReferencePointer", () => {
@@ -18,7 +18,7 @@ describe("VellumSecretWorkflowReferencePointer", () => {
       vellumSecretName: "test-secret",
     };
 
-    const pointer = new VellumSecretWorkflowReferencePointer({
+    const pointer = new VellumSecretWorkflowReference({
       workflowContext,
       nodeInputWorkflowReferencePointer: secretReference,
     });

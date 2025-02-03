@@ -1,0 +1,6 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ExecutionCounterWorkflowReferencePointer > should generate correct AST for execution counter reference 1`] = `
+"SearchNode.Execution.count
+"
+`;

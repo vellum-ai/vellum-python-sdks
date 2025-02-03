@@ -3,7 +3,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
-import { NodeOutputWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/node-output-workflow-reference-pointer";
+import { NodeOutputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/node-output-workflow-reference";
 import {
   WorkflowDataNode,
   WorkflowValueDescriptorReference,
@@ -28,7 +28,7 @@ describe("NodeOutputWorkflowReferencePointer", () => {
       nodeOutputId: "test-output",
     };
 
-    const pointer = new NodeOutputWorkflowReferencePointer({
+    const pointer = new NodeOutputWorkflowReference({
       workflowContext,
       nodeInputWorkflowReferencePointer: nodeOutputReference,
     });

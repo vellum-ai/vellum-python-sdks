@@ -2,13 +2,13 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
-import { BaseNodeInputWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReferencePointer";
+import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import {
   ConstantValueWorkflowReference as ConstantValueWorkflowReferenceType,
   IterableConfig,
 } from "src/types/vellum";
 
-export declare namespace ConstantValueReferencePointer {
+export declare namespace ConstantValueReference {
   interface Args {
     workflowContext: WorkflowContext;
     nodeInputWorkflowReferencePointer: ConstantValueWorkflowReferenceType;
@@ -16,8 +16,8 @@ export declare namespace ConstantValueReferencePointer {
   }
 }
 
-export class ConstantValueReferencePointer extends BaseNodeInputWorkflowReferencePointer<ConstantValueWorkflowReferenceType> {
-  constructor(args: ConstantValueReferencePointer.Args) {
+export class ConstantValueReference extends BaseNodeInputWorkflowReference<ConstantValueWorkflowReferenceType> {
+  constructor(args: ConstantValueReference.Args) {
     super(args);
   }
 

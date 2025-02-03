@@ -9,7 +9,7 @@ import {
   NodePortGenerationError,
 } from "src/generators/errors";
 import { Expression } from "src/generators/expression";
-import { WorkflowValueDescriptorReferencePointer } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference-pointer";
+import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
   IterableConfig,
   OperatorMapping,
@@ -55,7 +55,7 @@ export class WorkflowValueDescriptor extends AstNode {
   ): AstNode {
     // Base case
     if (this.isReference(workflowValueDescriptor)) {
-      return new WorkflowValueDescriptorReferencePointer({
+      return new WorkflowValueDescriptorReference({
         workflowContext: this.workflowContext,
         workflowValueReferencePointer: workflowValueDescriptor,
         iterableConfig: this.iterableConfig,

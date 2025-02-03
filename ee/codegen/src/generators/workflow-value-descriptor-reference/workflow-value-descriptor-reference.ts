@@ -3,19 +3,19 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { ValueGenerationError } from "src/generators/errors";
-import { BaseNodeInputWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReferencePointer";
-import { ConstantValueReferencePointer } from "src/generators/workflow-value-descriptor-reference/constant-value-reference-pointer";
-import { ExecutionCounterWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/execution-counter-workflow-reference-pointer";
-import { NodeOutputWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/node-output-workflow-reference-pointer";
-import { VellumSecretWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/vellum-secret-workflow-reference-pointer";
-import { WorkflowInputReferencePointer } from "src/generators/workflow-value-descriptor-reference/workflow-input-reference-pointer";
+import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
+import { ConstantValueReference } from "src/generators/workflow-value-descriptor-reference/constant-value-reference";
+import { ExecutionCounterWorkflowReference } from "src/generators/workflow-value-descriptor-reference/execution-counter-workflow-reference";
+import { NodeOutputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/node-output-workflow-reference";
+import { VellumSecretWorkflowReference } from "src/generators/workflow-value-descriptor-reference/vellum-secret-workflow-reference";
+import { WorkflowInputReference } from "src/generators/workflow-value-descriptor-reference/workflow-input-reference";
 import {
   IterableConfig,
   WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
-export declare namespace WorkflowValueDescriptorReferencePointer {
+export declare namespace WorkflowValueDescriptorReference {
   export interface Args {
     workflowContext: WorkflowContext;
     workflowValueReferencePointer: WorkflowValueDescriptorReferenceType;
@@ -23,15 +23,15 @@ export declare namespace WorkflowValueDescriptorReferencePointer {
   }
 }
 
-export class WorkflowValueDescriptorReferencePointer extends AstNode {
+export class WorkflowValueDescriptorReference extends AstNode {
   private workflowContext: WorkflowContext;
   public readonly workflowValueReferencePointer: WorkflowValueDescriptorReferenceType["type"];
   private iterableConfig?: IterableConfig;
   public astNode:
-    | BaseNodeInputWorkflowReferencePointer<WorkflowValueDescriptorReferenceType>
+    | BaseNodeInputWorkflowReference<WorkflowValueDescriptorReferenceType>
     | undefined;
 
-  constructor(args: WorkflowValueDescriptorReferencePointer.Args) {
+  constructor(args: WorkflowValueDescriptorReference.Args) {
     super();
 
     this.workflowContext = args.workflowContext;
@@ -49,13 +49,13 @@ export class WorkflowValueDescriptorReferencePointer extends AstNode {
   private getAstNode(
     workflowValueReferencePointer: WorkflowValueDescriptorReferenceType
   ):
-    | BaseNodeInputWorkflowReferencePointer<WorkflowValueDescriptorReferenceType>
+    | BaseNodeInputWorkflowReference<WorkflowValueDescriptorReferenceType>
     | undefined {
     const referenceType = workflowValueReferencePointer.type;
 
     switch (referenceType) {
       case "NODE_OUTPUT": {
-        const reference = new NodeOutputWorkflowReferencePointer({
+        const reference = new NodeOutputWorkflowReference({
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
@@ -66,7 +66,7 @@ export class WorkflowValueDescriptorReferencePointer extends AstNode {
         }
       }
       case "WORKFLOW_INPUT":
-        return new WorkflowInputReferencePointer({
+        return new WorkflowInputReference({
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
@@ -78,18 +78,18 @@ export class WorkflowValueDescriptorReferencePointer extends AstNode {
         );
         return undefined;
       case "CONSTANT_VALUE":
-        return new ConstantValueReferencePointer({
+        return new ConstantValueReference({
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
           iterableConfig: this.iterableConfig,
         });
       case "VELLUM_SECRET":
-        return new VellumSecretWorkflowReferencePointer({
+        return new VellumSecretWorkflowReference({
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
       case "EXECUTION_COUNTER":
-        return new ExecutionCounterWorkflowReferencePointer({
+        return new ExecutionCounterWorkflowReference({
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });

@@ -10,7 +10,7 @@ import {
 import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { WorkflowContext } from "src/context";
-import { ExecutionCounterWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/execution-counter-workflow-reference-pointer";
+import { ExecutionCounterWorkflowReference } from "src/generators/workflow-value-descriptor-reference/execution-counter-workflow-reference";
 import {
   WorkflowDataNode,
   WorkflowValueDescriptorReference,
@@ -35,7 +35,7 @@ describe("ExecutionCounterWorkflowReferencePointer", () => {
       nodeId: node.id,
     };
 
-    const pointer = new ExecutionCounterWorkflowReferencePointer({
+    const pointer = new ExecutionCounterWorkflowReference({
       workflowContext,
       nodeInputWorkflowReferencePointer: counterReference,
     });

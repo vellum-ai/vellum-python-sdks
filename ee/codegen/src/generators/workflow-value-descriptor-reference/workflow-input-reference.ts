@@ -2,10 +2,10 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { NodeInputNotFoundError } from "src/generators/errors";
-import { BaseNodeInputWorkflowReferencePointer } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReferencePointer";
+import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { WorkflowInputWorkflowReference as WorkflowInputWorkflowReferenceType } from "src/types/vellum";
 
-export class WorkflowInputReferencePointer extends BaseNodeInputWorkflowReferencePointer<WorkflowInputWorkflowReferenceType> {
+export class WorkflowInputReference extends BaseNodeInputWorkflowReference<WorkflowInputWorkflowReferenceType> {
   getAstNode(): AstNode | undefined {
     const workflowInputReference = this.nodeInputWorkflowReferencePointer;
 

@@ -7,7 +7,7 @@ import {
   WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
 } from "src/types/vellum";
 
-export declare namespace BaseNodeInputWorkflowReferencePointer {
+export declare namespace BaseNodeInputWorkflowReference {
   export interface Args<T extends WorkflowValueDescriptorReferenceType> {
     workflowContext: WorkflowContext;
     nodeInputWorkflowReferencePointer: T;
@@ -15,7 +15,7 @@ export declare namespace BaseNodeInputWorkflowReferencePointer {
   }
 }
 
-export abstract class BaseNodeInputWorkflowReferencePointer<
+export abstract class BaseNodeInputWorkflowReference<
   T extends WorkflowValueDescriptorReferenceType
 > extends AstNode {
   public readonly workflowContext: WorkflowContext;
@@ -27,7 +27,7 @@ export abstract class BaseNodeInputWorkflowReferencePointer<
     workflowContext,
     nodeInputWorkflowReferencePointer,
     iterableConfig,
-  }: BaseNodeInputWorkflowReferencePointer.Args<T>) {
+  }: BaseNodeInputWorkflowReference.Args<T>) {
     super();
 
     this.workflowContext = workflowContext;
