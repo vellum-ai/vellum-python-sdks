@@ -167,7 +167,7 @@ ${errors.slice(0, 3).map((err) => {
           rest.options?.codeExecutionNodeCodeRepresentationOverride,
       });
       this.sandboxInputs = rest.sandboxInputs;
-      this.options = rest.options
+      this.options = rest.options;
     }
   }
 
