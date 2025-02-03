@@ -28,6 +28,10 @@ import {
   WorkflowDisplayData,
   WorkflowEdge,
 } from "src/types/vellum";
+import {
+  getNodeIdFromNodeOutputWorkflowReference,
+  getNodeOutputIdFromNodeOutputWorkflowReference,
+} from "src/utils/nodes";
 import { isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
@@ -115,8 +119,7 @@ export class Workflow {
   private getTargetHandleId(nodeData: WorkflowDataNode): string {
     let targetHandleId: string;
     if (nodeData.type === "GENERIC") {
-      // TODO: Fill this out
-      targetHandleId = "";
+      targetHandleId = nodeData.trigger.id;
     } else if ("targetHandleId" in nodeData.data) {
       targetHandleId = nodeData.data.targetHandleId;
     } else {
@@ -481,7 +484,6 @@ export class Workflow {
               let outputNodeId: string;
               let targetHandleId: string;
               let outputId: string;
-              let nodeInputId: string | undefined;
               let name: string;
               let label: string;
               let displayData: NodeDisplayDataType | undefined;
@@ -491,29 +493,30 @@ export class Workflow {
                 outputNodeId = finalOutput.id;
                 targetHandleId = finalOutput.data.targetHandleId;
                 outputId = finalOutput.data.outputId;
-                nodeInputId = finalOutput.data.nodeInputId;
                 name = finalOutput.data.name;
                 label = finalOutput.data.label;
                 displayData = finalOutput.displayData;
               } else {
+                const nodeId =
+                  getNodeIdFromNodeOutputWorkflowReference(finalOutput);
                 // Workflow output value
-                const referencedNode = this.workflowContext.getNodeContext(
-                  finalOutput.value.nodeId
-                );
+                const referencedNode =
+                  this.workflowContext.getNodeContext(nodeId);
                 if (!referencedNode) {
                   throw new WorkflowGenerationError(
-                    `Could not find node ${finalOutput.value.nodeId}`
+                    `Could not find node ${finalOutput.value}`
                   );
                 }
                 const referencedOutput =
                   this.workflowContext.getOutputVariableContextById(
                     finalOutput.outputVariableId
                   );
-                outputNodeId = referencedNode.getNodeId();
+                outputNodeId = referencedNode.nodeData.id;
                 targetHandleId = this.getTargetHandleId(
                   referencedNode.nodeData
                 );
-                outputId = finalOutput.value.nodeOutputId;
+                outputId =
+                  getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
                 name = referencedOutput.name;
                 label = this.getLabel(referencedNode.nodeData);
                 displayData = referencedNode.nodeData.displayData;

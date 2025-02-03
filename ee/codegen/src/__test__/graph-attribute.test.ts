@@ -675,11 +675,11 @@ describe("Workflow", () => {
 
     it("should handle a simple edge of generic nodes", async () => {
       const startNode = genericNodeFactory({
-        name: "StartNode",
+        label: "StartNode",
       });
 
       const endNode = genericNodeFactory({
-        name: "EndNode",
+        label: "EndNode",
       });
 
       await runGraphTest([
@@ -690,29 +690,29 @@ describe("Workflow", () => {
 
     it("should be pointing to the correct terminal nodes from a nested set of conditionals", async () => {
       const firstCheckNode = genericNodeFactory({
-        name: "FirstCheckNode",
+        label: "FirstCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const firstInnerCheckNode = genericNodeFactory({
-        name: "FirstInnerCheckNode",
+        label: "FirstInnerCheckNode",
       });
 
       const finalCheckNode = genericNodeFactory({
-        name: "FinalCheckNode",
+        label: "FinalCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const innerTerminalNode = genericNodeFactory({
-        name: "InnerTerminalNode",
+        label: "InnerTerminalNode",
       });
 
       const secondInnerCheckNode = genericNodeFactory({
-        name: "SecondInnerCheckNode",
+        label: "SecondInnerCheckNode",
       });
 
       const outerOutputNode = genericNodeFactory({
-        name: "OuterOutputNode",
+        label: "OuterOutputNode",
       });
 
       await runGraphTest([
@@ -728,31 +728,31 @@ describe("Workflow", () => {
 
     it.skip("should be able to create a proper else edge when there are three ports pointing to a set", async () => {
       const firstCheckNode = genericNodeFactory({
-        name: "FirstCheckNode",
+        label: "FirstCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const firstInnerCheckNode = genericNodeFactory({
-        name: "FirstInnerCheckNode",
+        label: "FirstInnerCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const finalCheckNode = genericNodeFactory({
-        name: "FinalCheckNode",
+        label: "FinalCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const innerTerminalNode = genericNodeFactory({
-        name: "InnerTerminalNode",
+        label: "InnerTerminalNode",
       });
 
       const secondInnerCheckNode = genericNodeFactory({
-        name: "SecondInnerCheckNode",
+        label: "SecondInnerCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const outerOutputNode = genericNodeFactory({
-        name: "OuterOutputNode",
+        label: "OuterOutputNode",
       });
 
       await runGraphTest([
@@ -789,21 +789,21 @@ describe("Workflow", () => {
 
     it("Should handle an else case within a conditioned set", async () => {
       const firstCheckNode = genericNodeFactory({
-        name: "FirstCheckNode",
+        label: "FirstCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const firstOutputNode = genericNodeFactory({
-        name: "FirstOutputNode",
+        label: "FirstOutputNode",
       });
 
       const secondCheckNode = genericNodeFactory({
-        name: "SecondInnerCheckNode",
+        label: "SecondInnerCheckNode",
         nodePorts: nodePortsFactory(),
       });
 
       const secondOutputNode = genericNodeFactory({
-        name: "SecondOutputNode",
+        label: "SecondOutputNode",
       });
 
       /**

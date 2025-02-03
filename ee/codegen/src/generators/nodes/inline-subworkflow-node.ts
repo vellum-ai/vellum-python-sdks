@@ -10,6 +10,7 @@ import {
   SubworkflowNode as SubworkflowNodeType,
   WorkflowRawData,
 } from "src/types/vellum";
+import { getNodeOutputIdFromNodeOutputWorkflowReference } from "src/utils/nodes";
 
 export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
   SubworkflowNodeType,
@@ -131,7 +132,8 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
           if ("type" in finalOutput) {
             outputId = finalOutput.data.outputId;
           } else {
-            outputId = finalOutput.value.nodeOutputId;
+            outputId =
+              getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
           }
 
           return {

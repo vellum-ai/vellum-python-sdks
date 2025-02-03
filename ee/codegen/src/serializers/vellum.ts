@@ -115,7 +115,7 @@ import {
   VellumSecretWorkflowReference,
   ExecutionCounterWorkflowReference,
   WorkflowStateVariableWorkflowReference,
-    WorkflowOutputValue
+  WorkflowOutputValue,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -2052,18 +2052,18 @@ export declare namespace WorkflowEdgeSerializer {
 }
 
 export declare namespace WorkflowOutputValueSerializer {
-    interface Raw {
-        output_variable_id: string;
-        value: WorkflowOutputPointerSerializer.Raw;
-    }
+  interface Raw {
+    output_variable_id: string;
+    value: WorkflowValueDescriptorSerializer.Raw;
+  }
 }
 
 export const WorkflowOutputValueSerializer: ObjectSchema<
-    WorkflowOutputValueSerializer.Raw,
-    WorkflowOutputValue
+  WorkflowOutputValueSerializer.Raw,
+  WorkflowOutputValue
 > = objectSchema({
-    outputVariableId: propertySchema("output_variable_id", stringSchema()),
-    value: WorkflowOutputPointerSerializer,
+  outputVariableId: propertySchema("output_variable_id", stringSchema()),
+  value: WorkflowValueDescriptorSerializer,
 });
 
 export const WorkflowRawDataSerializer: ObjectSchema<

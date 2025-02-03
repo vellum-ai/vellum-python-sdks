@@ -1411,8 +1411,8 @@ export function nodePortsFactory(ports?: Partial<NodePort>[]): NodePort[] {
 
 export function genericNodeFactory(
   {
-      id,
-      label,
+    id,
+    label,
     nodeTrigger,
     nodePorts,
     nodeAttributes,

@@ -7,6 +7,7 @@ import {
   WorkflowOutputValue as WorkflowOutputValueType,
 } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { getNodeIdFromNodeOutputWorkflowReference } from "src/utils/nodes";
 
 export declare namespace WorkflowOutputContext {
   export type Args = {
@@ -36,7 +37,9 @@ export class WorkflowOutputContext {
   public getOutputNodeId(): string {
     let outputNodeId: string | undefined;
     if (this.workflowOutputValue) {
-      outputNodeId = this.workflowOutputValue.value.nodeId;
+      outputNodeId = getNodeIdFromNodeOutputWorkflowReference(
+        this.workflowOutputValue
+      );
     }
     if (this.terminalNodeData) {
       outputNodeId = this.terminalNodeData.id;

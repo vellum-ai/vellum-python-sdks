@@ -36,6 +36,8 @@ _fixture_paths = _get_fixtures(
     exclude_fixtures={
         "faa_q_and_a_bot",
         "simple_search_node",
+        # TODO: Remove once serialization support is in
+        "simple_workflow_node_with_output_values",
     }
 )
 _fixture_ids = [os.path.basename(path) for path in _fixture_paths]

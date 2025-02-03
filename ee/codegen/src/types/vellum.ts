@@ -719,7 +719,7 @@ export interface WorkflowDisplayData {
 
 export interface WorkflowOutputValue {
   outputVariableId: string;
-  value: WorkflowOutputPointer;
+  value: WorkflowValueDescriptor;
 }
 
 export interface WorkflowRawData {
