@@ -4,20 +4,7 @@ import logging
 from queue import Empty, Queue
 from threading import Event as ThreadingEvent, Thread
 from uuid import UUID
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Generic,
-    Iterable,
-    Iterator,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.context import execution_context, get_parent_context
