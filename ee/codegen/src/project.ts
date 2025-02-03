@@ -78,6 +78,7 @@ export interface WorkflowProjectGeneratorOptions {
    *  be inlined as a node attribute.
    */
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
+  disableFormatting?: boolean;
 }
 
 export declare namespace WorkflowProjectGenerator {
@@ -107,6 +108,8 @@ export class WorkflowProjectGenerator {
   public readonly workflowVersionExecConfig: WorkflowVersionExecConfig;
   public readonly workflowContext: WorkflowContext;
   private readonly sandboxInputs?: WorkflowSandboxInputs[];
+  private readonly options?: WorkflowProjectGeneratorOptions;
+
   constructor({ moduleName, ...rest }: WorkflowProjectGenerator.Args) {
     if ("workflowContext" in rest) {
       this.workflowContext = rest.workflowContext;
@@ -164,6 +167,7 @@ ${errors.slice(0, 3).map((err) => {
           rest.options?.codeExecutionNodeCodeRepresentationOverride,
       });
       this.sandboxInputs = rest.sandboxInputs;
+      this.options = rest.options
     }
   }
 
@@ -213,21 +217,23 @@ ${errors.slice(0, 3).map((err) => {
     // collects errors raised by the rest of the codegen process
     await this.generateErrorLogFile().persist();
 
-    const setupCfgPath = this.resolvePythonConfigFilePath();
-    const isortCmd = process.env.ISORT_CMD ?? "isort";
+    if (!this.options?.disableFormatting) {
+      const setupCfgPath = this.resolvePythonConfigFilePath();
+      const isortCmd = process.env.ISORT_CMD ?? "isort";
 
-    await new Promise((resolve, reject) => {
-      exec(
-        `${isortCmd} --sp ${setupCfgPath} --skip script.py ${this.workflowContext.absolutePathToOutputDirectory}`,
-        (error: Error | null) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(undefined);
+      await new Promise((resolve, reject) => {
+        exec(
+          `${isortCmd} --sp ${setupCfgPath} --skip script.py ${this.workflowContext.absolutePathToOutputDirectory}`,
+          (error: Error | null) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(undefined);
+            }
           }
-        }
-      );
-    });
+        );
+      });
+    }
   }
 
   private generateRootInitFile(): InitFile {
