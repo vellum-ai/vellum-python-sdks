@@ -34,771 +34,33 @@ errors:
           detail: detail
       - value:
           key: value
-service:
-  auth: false
-  base-path: ''
-  endpoints:
-    execute-code:
-      path: /v1/execute-code
-      method: POST
-      auth: true
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: CodeExecutor
-        body:
-          properties:
-            code:
-              type: string
-              validation:
-                minLength: 1
-            runtime: CodeExecutionRuntime
-            input_values: list<CodeExecutorInput>
-            packages: list<CodeExecutionPackage>
-            output_type: VellumVariableType
-        content-type: application/json
-      response:
-        docs: ''
-        type: CodeExecutorResponse
-      url: Predict
-      availability: pre-release
-      errors:
-        - BadRequestError
-      examples:
-        - request:
-            code: code
-            runtime: PYTHON_3_11_6
-            input_values:
-              - name: name
-                type: STRING
-                value: value
-            packages:
-              - version: version
-                name: name
-            output_type: STRING
-          response:
-            body:
-              log: log
-              output:
-                type: STRING
-                value: value
-      audiences:
-        - internal
-    execute-prompt:
-      path: /v1/execute-prompt
-      method: POST
-      auth: true
-      docs: Executes a deployed Prompt and returns the result.
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: ExecutePromptRequest
-        body:
-          properties:
-            inputs:
-              docs: >-
-                A list consisting of the Prompt Deployment's input variables and
-                their values.
-              type: list<PromptDeploymentInputRequest>
-            prompt_deployment_id:
-              type: optional<string>
-              docs: >-
-                The ID of the Prompt Deployment. Must provide either this or
-                prompt_deployment_name.
-              validation:
-                format: uuid
-            prompt_deployment_name:
-              type: optional<string>
-              docs: >-
-                The unique name of the Prompt Deployment. Must provide either
-                this or prompt_deployment_id.
-              validation:
-                minLength: 1
-            release_tag:
-              type: optional<string>
-              docs: >-
-                Optionally specify a release tag if you want to pin to a
-                specific release of the Prompt Deployment
-              validation:
-                minLength: 1
-            external_id:
-              type: optional<string>
-              docs: >-
-                Optionally include a unique identifier for tracking purposes.
-                Must be unique within a given Prompt Deployment.
-              validation:
-                minLength: 1
-            expand_meta:
-              type: optional<PromptDeploymentExpandMetaRequest>
-              docs: >-
-                An optionally specified configuration used to opt in to
-                including additional metadata about this prompt execution in the
-                API response. Corresponding values will be returned under the
-                `meta` key of the API response.
-            raw_overrides:
-              type: optional<RawPromptExecutionOverridesRequest>
-              docs: >-
-                Overrides for the raw API request sent to the model host.
-                Combined with `expand_raw`, it can be used to access new
-                features from models.
-            expand_raw:
-              type: optional<list<string>>
-              docs: >-
-                A list of keys whose values you'd like to directly return from
-                the JSON response of the model provider. Useful if you need
-                lower-level info returned by model providers that Vellum would
-                otherwise omit. Corresponding key/value pairs will be returned
-                under the `raw` key of the API response.
-            metadata:
-              type: optional<map<string, unknown>>
-              docs: >-
-                Arbitrary JSON metadata associated with this request. Can be
-                used to capture additional monitoring data such as user id,
-                session id, etc. for future analysis.
-        content-type: application/json
-      response:
-        docs: ''
-        type: ExecutePromptResponse
-      url: Predict
-      availability: generally-available
-      errors:
-        - BadRequestError
-        - ForbiddenError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            inputs:
-              - name: name
-                type: STRING
-                value: value
-          response:
-            body:
-              meta:
-                model_name: model_name
-                latency: 1
-                deployment_release_tag: deployment_release_tag
-                prompt_version_id: prompt_version_id
-                finish_reason: LENGTH
-                usage:
-                  output_token_count: 1
-                  input_token_count: 1
-                  input_char_count: 1
-                  output_char_count: 1
-                  compute_nanos: 1
-                  cache_creation_input_tokens: 1
-                  cache_read_input_tokens: 1
-                cost:
-                  value: 1.1
-                  unit: USD
-              raw:
-                key: value
-              execution_id: execution_id
-              state: FULFILLED
-              outputs:
-                - type: STRING
-                  value: value
-      audiences:
-        - customers
-    execute-prompt-stream:
-      path: /v1/execute-prompt-stream
-      method: POST
-      auth: true
-      docs: Executes a deployed Prompt and streams back the results.
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: ExecutePromptStreamRequest
-        body:
-          properties:
-            inputs:
-              docs: >-
-                A list consisting of the Prompt Deployment's input variables and
-                their values.
-              type: list<PromptDeploymentInputRequest>
-            prompt_deployment_id:
-              type: optional<string>
-              docs: >-
-                The ID of the Prompt Deployment. Must provide either this or
-                prompt_deployment_name.
-              validation:
-                format: uuid
-            prompt_deployment_name:
-              type: optional<string>
-              docs: >-
-                The unique name of the Prompt Deployment. Must provide either
-                this or prompt_deployment_id.
-              validation:
-                minLength: 1
-            release_tag:
-              type: optional<string>
-              docs: >-
-                Optionally specify a release tag if you want to pin to a
-                specific release of the Prompt Deployment
-              validation:
-                minLength: 1
-            external_id:
-              type: optional<string>
-              docs: >-
-                Optionally include a unique identifier for tracking purposes.
-                Must be unique within a given Prompt Deployment.
-              validation:
-                minLength: 1
-            expand_meta:
-              type: optional<PromptDeploymentExpandMetaRequest>
-              docs: >-
-                An optionally specified configuration used to opt in to
-                including additional metadata about this prompt execution in the
-                API response. Corresponding values will be returned under the
-                `meta` key of the API response.
-            raw_overrides:
-              type: optional<RawPromptExecutionOverridesRequest>
-              docs: >-
-                Overrides for the raw API request sent to the model host.
-                Combined with `expand_raw`, it can be used to access new
-                features from models.
-            expand_raw:
-              type: optional<list<string>>
-              docs: >-
-                A list of keys whose values you'd like to directly return from
-                the JSON response of the model provider. Useful if you need
-                lower-level info returned by model providers that Vellum would
-                otherwise omit. Corresponding key/value pairs will be returned
-                under the `raw` key of the API response.
-            metadata:
-              type: optional<map<string, unknown>>
-              docs: >-
-                Arbitrary JSON metadata associated with this request. Can be
-                used to capture additional monitoring data such as user id,
-                session id, etc. for future analysis.
-        content-type: application/json
-      response-stream:
-        docs: ''
-        type: ExecutePromptEvent
-        format: json
-      url: Predict
-      availability: generally-available
-      errors:
-        - BadRequestError
-        - ForbiddenError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            inputs:
-              - name: name
-                type: STRING
-                value: value
-          response:
-            stream:
-              - state: INITIATED
-                meta:
-                  model_name: model_name
-                  latency: 1
-                  deployment_release_tag: deployment_release_tag
-                  prompt_version_id: prompt_version_id
-                execution_id: execution_id
-      audiences:
-        - customers
-    execute-workflow:
-      path: /v1/execute-workflow
-      method: POST
-      auth: true
-      docs: Executes a deployed Workflow and returns its outputs.
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: ExecuteWorkflowRequest
-        body:
-          properties:
-            inputs:
-              docs: >-
-                The list of inputs defined in the Workflow's Deployment with
-                their corresponding values.
-              type: list<WorkflowRequestInputRequest>
-            expand_meta:
-              type: optional<WorkflowExpandMetaRequest>
-              docs: >-
-                An optionally specified configuration used to opt in to
-                including additional metadata about this workflow execution in
-                the API response. Corresponding values will be returned under
-                the `execution_meta` key within NODE events in the response
-                stream.
-            workflow_deployment_id:
-              type: optional<string>
-              docs: >-
-                The ID of the Workflow Deployment. Must provide either this or
-                workflow_deployment_name.
-              validation:
-                format: uuid
-            workflow_deployment_name:
-              type: optional<string>
-              docs: >-
-                The name of the Workflow Deployment. Must provide either this or
-                workflow_deployment_id.
-              validation:
-                minLength: 1
-            release_tag:
-              type: optional<string>
-              docs: >-
-                Optionally specify a release tag if you want to pin to a
-                specific release of the Workflow Deployment
-              validation:
-                minLength: 1
-            external_id:
-              type: optional<string>
-              docs: >-
-                Optionally include a unique identifier for tracking purposes.
-                Must be unique for a given workflow deployment.
-              validation:
-                minLength: 1
-            metadata:
-              type: optional<map<string, unknown>>
-              docs: >-
-                Arbitrary JSON metadata associated with this request. Can be
-                used to capture additional monitoring data such as user id,
-                session id, etc. for future analysis.
-        content-type: application/json
-      response:
-        docs: ''
-        type: ExecuteWorkflowResponse
-      url: Predict
-      availability: generally-available
-      errors:
-        - BadRequestError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            inputs:
-              - name: name
-                type: STRING
-                value: value
-          response:
-            body:
-              execution_id: execution_id
-              run_id: run_id
-              external_id: external_id
-              data:
-                id: id
-                state: FULFILLED
-                ts: '2024-01-15T09:30:00Z'
-                outputs:
-                  - id: id
-                    name: name
-                    type: STRING
-      audiences:
-        - customers
-    execute-workflow-stream:
-      path: /v1/execute-workflow-stream
-      method: POST
-      auth: true
-      docs: Executes a deployed Workflow and streams back its results.
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: ExecuteWorkflowStreamRequest
-        body:
-          properties:
-            inputs:
-              docs: >-
-                The list of inputs defined in the Workflow's Deployment with
-                their corresponding values.
-              type: list<WorkflowRequestInputRequest>
-            expand_meta:
-              type: optional<WorkflowExpandMetaRequest>
-              docs: >-
-                An optionally specified configuration used to opt in to
-                including additional metadata about this workflow execution in
-                the API response. Corresponding values will be returned under
-                the `execution_meta` key within NODE events in the response
-                stream.
-            workflow_deployment_id:
-              type: optional<string>
-              docs: >-
-                The ID of the Workflow Deployment. Must provide either this or
-                workflow_deployment_name.
-              validation:
-                format: uuid
-            workflow_deployment_name:
-              type: optional<string>
-              docs: >-
-                The name of the Workflow Deployment. Must provide either this or
-                workflow_deployment_id.
-              validation:
-                minLength: 1
-            release_tag:
-              type: optional<string>
-              docs: >-
-                Optionally specify a release tag if you want to pin to a
-                specific release of the Workflow Deployment
-              validation:
-                minLength: 1
-            external_id:
-              type: optional<string>
-              docs: >-
-                Optionally include a unique identifier for tracking purposes.
-                Must be unique for a given workflow deployment.
-              validation:
-                minLength: 1
-            event_types:
-              type: optional<list<WorkflowExecutionEventType>>
-              docs: >-
-                Optionally specify which events you want to receive. Defaults to
-                only WORKFLOW events. Note that the schema of non-WORKFLOW
-                events is unstable and should be used with caution.
-            metadata:
-              type: optional<map<string, unknown>>
-              docs: >-
-                Arbitrary JSON metadata associated with this request. Can be
-                used to capture additional monitoring data such as user id,
-                session id, etc. for future analysis.
-        content-type: application/json
-      response-stream:
-        docs: ''
-        type: WorkflowStreamEvent
-        format: json
-      url: Predict
-      availability: generally-available
-      errors:
-        - BadRequestError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            inputs:
-              - name: name
-                type: STRING
-                value: value
-          response:
-            stream:
-              - execution_id: execution_id
-                run_id: run_id
-                external_id: external_id
-                type: WORKFLOW
-                data:
-                  id: id
-                  state: INITIATED
-                  ts: '2024-01-15T09:30:00Z'
-                  output:
-                    id: id
-                    name: name
-                    state: INITIATED
-                    node_id: node_id
-                    delta: delta
-                    type: STRING
-                    value: value
-                  error:
-                    message: message
-                    code: WORKFLOW_INITIALIZATION
-                  outputs:
-                    - id: id
-                      name: name
-                      type: STRING
-                  inputs:
-                    - id: id
-                      name: name
-                      type: STRING
-      audiences:
-        - customers
-    generate:
-      path: /v1/generate
-      method: POST
-      auth: true
-      docs: |-
-        Generate a completion using a previously defined deployment.
-
-        Important: This endpoint is DEPRECATED and has been superseded by
-        [execute-prompt](/api-reference/api-reference/execute-prompt).
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: GenerateBodyRequest
-        body:
-          properties:
-            deployment_id:
-              type: optional<string>
-              docs: >-
-                The ID of the deployment. Must provide either this or
-                deployment_name.
-              validation:
-                format: uuid
-            deployment_name:
-              type: optional<string>
-              docs: >-
-                The name of the deployment. Must provide either this or
-                deployment_id.
-              validation:
-                minLength: 1
-            requests:
-              docs: >-
-                The generation request to make. Bulk requests are no longer
-                supported, this field must be an array of length 1.
-              type: list<GenerateRequest>
-            options:
-              type: optional<GenerateOptionsRequest>
-              docs: >-
-                Additional configuration that can be used to control what's
-                included in the response.
-        content-type: application/json
-      response:
-        docs: ''
-        type: GenerateResponse
-      url: Predict
-      availability: deprecated
-      errors:
-        - BadRequestError
-        - ForbiddenError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            requests:
-              - input_values:
-                  key: value
-          response:
-            body:
-              results:
-                - data:
-                    completions:
-                      - id: id
-                        text: text
-                        prompt_version_id: prompt_version_id
-                        deployment_release_tag: deployment_release_tag
-                        model_name: model_name
-                  error:
-                    message: message
-      audiences:
-        - deprecated
-    generate-stream:
-      path: /v1/generate-stream
-      method: POST
-      auth: true
-      docs: >-
-        Generate a stream of completions using a previously defined deployment.
-
-
-        Important: This endpoint is DEPRECATED and has been superseded by
-
-        [execute-prompt-stream](/api-reference/api-reference/execute-prompt-stream).
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: GenerateStreamBodyRequest
-        body:
-          properties:
-            deployment_id:
-              type: optional<string>
-              docs: >-
-                The ID of the deployment. Must provide either this or
-                deployment_name.
-              validation:
-                format: uuid
-            deployment_name:
-              type: optional<string>
-              docs: >-
-                The name of the deployment. Must provide either this or
-                deployment_id.
-              validation:
-                minLength: 1
-            requests:
-              docs: >-
-                The generation request to make. Bulk requests are no longer
-                supported, this field must be an array of length 1.
-              type: list<GenerateRequest>
-            options:
-              type: optional<GenerateOptionsRequest>
-              docs: >-
-                Additional configuration that can be used to control what's
-                included in the response.
-        content-type: application/json
-      response-stream:
-        docs: ''
-        type: GenerateStreamResponse
-        format: json
-      url: Predict
-      availability: deprecated
-      errors:
-        - BadRequestError
-        - ForbiddenError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            requests:
-              - input_values:
-                  key: value
-          response:
-            stream:
-              - delta:
-                  request_index: 1
-                  data:
-                    completion_index: 1
-                    completion:
-                      id: id
-                      text: text
-                      prompt_version_id: prompt_version_id
-                      deployment_release_tag: deployment_release_tag
-                      model_name: model_name
-                  error:
-                    message: message
-      audiences:
-        - deprecated
-    search:
-      path: /v1/search
-      method: POST
-      auth: true
-      docs: Perform a search against a document index.
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: SearchRequestBodyRequest
-        body:
-          properties:
-            index_id:
-              type: optional<string>
-              docs: >-
-                The ID of the index to search against. Must provide either this,
-                index_name or document_index.
-              validation:
-                format: uuid
-            index_name:
-              type: optional<string>
-              docs: >-
-                The name of the index to search against. Must provide either
-                this, index_id or document_index.
-              validation:
-                minLength: 1
-            query:
-              type: string
-              docs: The query to search for.
-              validation:
-                minLength: 1
-            options:
-              type: optional<SearchRequestOptionsRequest>
-              docs: Configuration options for the search.
-            document_index:
-              type: optional<string>
-              docs: >-
-                Either the index name or index ID to search against. Must
-                provide either this, index_id or index_name.
-              validation:
-                minLength: 1
-        content-type: application/json
-      response:
-        docs: ''
-        type: SearchResponse
-      url: Predict
-      availability: generally-available
-      errors:
-        - BadRequestError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            query: query
-          response:
-            body:
-              results:
-                - text: text
-                  score: 1.1
-                  keywords:
-                    - keywords
-                  document:
-                    label: label
-      audiences:
-        - customers
-    submit-completion-actuals:
-      path: /v1/submit-completion-actuals
-      method: POST
-      auth: true
-      docs: >-
-        Used to submit feedback regarding the quality of previously generated
-        completions.
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: SubmitCompletionActualsRequest
-        body:
-          properties:
-            deployment_id:
-              type: optional<string>
-              docs: >-
-                The ID of the deployment. Must provide either this or
-                deployment_name.
-              validation:
-                format: uuid
-            deployment_name:
-              type: optional<string>
-              docs: >-
-                The name of the deployment. Must provide either this or
-                deployment_id.
-              validation:
-                minLength: 1
-            actuals:
-              docs: >-
-                Feedback regarding the quality of previously generated
-                completions
-              type: list<SubmitCompletionActualRequest>
-        content-type: application/json
-      url: Predict
-      availability: generally-available
-      errors:
-        - BadRequestError
-        - NotFoundError
-        - InternalServerError
-      examples:
-        - request:
-            actuals:
-              - {}
-      audiences:
-        - customers
-    submit-workflow-execution-actuals:
-      path: /v1/submit-workflow-execution-actuals
-      method: POST
-      auth: true
-      docs: |2-
-            Used to submit feedback regarding the quality of previous workflow execution and its outputs.
-
-            **Note:** Uses a base url of `https://predict.vellum.ai`.    
-      source:
-        openapi: openapi/openapi.yml
-      request:
-        name: SubmitWorkflowExecutionActualsRequest
-        body:
-          properties:
-            actuals:
-              docs: >-
-                Feedback regarding the quality of an output on a previously
-                executed workflow.
-              type: list<SubmitWorkflowExecutionActualRequest>
-            execution_id:
-              type: optional<string>
-              docs: >-
-                The Vellum-generated ID of a previously executed workflow. Must
-                provide either this or external_id.
-              validation:
-                format: uuid
-            external_id:
-              type: optional<string>
-              docs: >-
-                The external ID that was originally provided by when executing
-                the workflow, if applicable, that you'd now like to submit
-                actuals for. Must provide either this or execution_id.
-              validation:
-                minLength: 1
-        content-type: application/json
-      url: Predict
-      availability: generally-available
-      examples:
-        - request:
-            actuals:
-              - output_type: STRING
-      audiences:
-        - customers
-  source:
-    openapi: openapi/openapi.yml
 types:
+  ExecuteApiRequestBody:
+    discriminated: false
+    union:
+      - type: string
+        validation:
+          minLength: 1
+      - map<string, unknown>
+    source:
+      openapi: openapi/openapi.yml
+    inline: true
+  ExecuteApiRequestHeadersValue:
+    discriminated: false
+    union:
+      - string
+      - VellumSecret
+    source:
+      openapi: openapi/openapi.yml
+    inline: true
+  ExecuteApiRequestBearerToken:
+    discriminated: false
+    union:
+      - string
+      - VellumSecret
+    source:
+      openapi: openapi/openapi.yml
+    inline: true
   AdHocExecutePromptEvent:
     discriminated: false
     union:
@@ -1781,6 +1043,14 @@ types:
     properties:
       type: literal<"ERROR">
       value: optional<VellumErrorRequest>
+    source:
+      openapi: openapi/openapi.yml
+  ExecuteApiResponse:
+    properties:
+      status_code: integer
+      text: string
+      json: map<string, unknown>
+      headers: map<string, string>
     source:
       openapi: openapi/openapi.yml
   ExecutePromptApiErrorResponse:
@@ -2884,6 +2154,21 @@ types:
     union:
       - MetadataFilterConfigRequest
       - VellumValueLogicalExpressionRequest
+    source:
+      openapi: openapi/openapi.yml
+  MethodEnum:
+    enum:
+      - POST
+      - GET
+      - PATCH
+      - PUT
+      - DELETE
+    docs: |-
+      * `POST` - POST
+      * `GET` - GET
+      * `PATCH` - PATCH
+      * `PUT` - PUT
+      * `DELETE` - DELETE
     source:
       openapi: openapi/openapi.yml
   MetricDefinitionExecution:
@@ -5902,6 +5187,14 @@ types:
       metadata: optional<map<string, unknown>>
     source:
       openapi: openapi/openapi.yml
+  VellumSecret:
+    properties:
+      name:
+        type: string
+        validation:
+          minLength: 1
+    source:
+      openapi: openapi/openapi.yml
   VellumValue:
     discriminated: false
     union:
@@ -6817,3 +6110,804 @@ types:
   TextEmbeddingAda002Enum: literal<"text-embedding-ada-002">
   TextMultilingualEmbedding002Enum: literal<"text-multilingual-embedding-002">
   TokenOverlappingWindowChunkerEnum: literal<"token-overlapping-window-chunker">
+service:
+  auth: false
+  base-path: ''
+  endpoints:
+    execute-api:
+      path: /v1/execute-api
+      method: POST
+      auth: true
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: ExecuteApiRequest
+        body:
+          properties:
+            url:
+              type: string
+              validation:
+                minLength: 1
+            method: optional<MethodEnum>
+            body: optional<ExecuteApiRequestBody>
+            headers: optional<map<string, ExecuteApiRequestHeadersValue>>
+            bearer_token: optional<ExecuteApiRequestBearerToken>
+        content-type: application/json
+      response:
+        docs: ''
+        type: ExecuteApiResponse
+      url: Default
+      availability: pre-release
+      examples:
+        - request:
+            url: url
+          response:
+            body:
+              status_code: 1
+              text: text
+              json:
+                key: value
+              headers:
+                key: value
+      audiences:
+        - internal
+    execute-code:
+      path: /v1/execute-code
+      method: POST
+      auth: true
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: CodeExecutor
+        body:
+          properties:
+            code:
+              type: string
+              validation:
+                minLength: 1
+            runtime: CodeExecutionRuntime
+            input_values: list<CodeExecutorInput>
+            packages: list<CodeExecutionPackage>
+            output_type: VellumVariableType
+        content-type: application/json
+      response:
+        docs: ''
+        type: CodeExecutorResponse
+      url: Predict
+      availability: pre-release
+      errors:
+        - BadRequestError
+      examples:
+        - request:
+            code: code
+            runtime: PYTHON_3_11_6
+            input_values:
+              - name: name
+                type: STRING
+                value: value
+            packages:
+              - version: version
+                name: name
+            output_type: STRING
+          response:
+            body:
+              log: log
+              output:
+                type: STRING
+                value: value
+      audiences:
+        - internal
+    execute-prompt:
+      path: /v1/execute-prompt
+      method: POST
+      auth: true
+      docs: Executes a deployed Prompt and returns the result.
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: ExecutePromptRequest
+        body:
+          properties:
+            inputs:
+              docs: >-
+                A list consisting of the Prompt Deployment's input variables and
+                their values.
+              type: list<PromptDeploymentInputRequest>
+            prompt_deployment_id:
+              type: optional<string>
+              docs: >-
+                The ID of the Prompt Deployment. Must provide either this or
+                prompt_deployment_name.
+              validation:
+                format: uuid
+            prompt_deployment_name:
+              type: optional<string>
+              docs: >-
+                The unique name of the Prompt Deployment. Must provide either
+                this or prompt_deployment_id.
+              validation:
+                minLength: 1
+            release_tag:
+              type: optional<string>
+              docs: >-
+                Optionally specify a release tag if you want to pin to a
+                specific release of the Prompt Deployment
+              validation:
+                minLength: 1
+            external_id:
+              type: optional<string>
+              docs: >-
+                Optionally include a unique identifier for tracking purposes.
+                Must be unique within a given Prompt Deployment.
+              validation:
+                minLength: 1
+            expand_meta:
+              type: optional<PromptDeploymentExpandMetaRequest>
+              docs: >-
+                An optionally specified configuration used to opt in to
+                including additional metadata about this prompt execution in the
+                API response. Corresponding values will be returned under the
+                `meta` key of the API response.
+            raw_overrides:
+              type: optional<RawPromptExecutionOverridesRequest>
+              docs: >-
+                Overrides for the raw API request sent to the model host.
+                Combined with `expand_raw`, it can be used to access new
+                features from models.
+            expand_raw:
+              type: optional<list<string>>
+              docs: >-
+                A list of keys whose values you'd like to directly return from
+                the JSON response of the model provider. Useful if you need
+                lower-level info returned by model providers that Vellum would
+                otherwise omit. Corresponding key/value pairs will be returned
+                under the `raw` key of the API response.
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Arbitrary JSON metadata associated with this request. Can be
+                used to capture additional monitoring data such as user id,
+                session id, etc. for future analysis.
+        content-type: application/json
+      response:
+        docs: ''
+        type: ExecutePromptResponse
+      url: Predict
+      availability: generally-available
+      errors:
+        - BadRequestError
+        - ForbiddenError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            inputs:
+              - name: name
+                type: STRING
+                value: value
+          response:
+            body:
+              meta:
+                model_name: model_name
+                latency: 1
+                deployment_release_tag: deployment_release_tag
+                prompt_version_id: prompt_version_id
+                finish_reason: LENGTH
+                usage:
+                  output_token_count: 1
+                  input_token_count: 1
+                  input_char_count: 1
+                  output_char_count: 1
+                  compute_nanos: 1
+                  cache_creation_input_tokens: 1
+                  cache_read_input_tokens: 1
+                cost:
+                  value: 1.1
+                  unit: USD
+              raw:
+                key: value
+              execution_id: execution_id
+              state: FULFILLED
+              outputs:
+                - type: STRING
+                  value: value
+      audiences:
+        - customers
+    execute-prompt-stream:
+      path: /v1/execute-prompt-stream
+      method: POST
+      auth: true
+      docs: Executes a deployed Prompt and streams back the results.
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: ExecutePromptStreamRequest
+        body:
+          properties:
+            inputs:
+              docs: >-
+                A list consisting of the Prompt Deployment's input variables and
+                their values.
+              type: list<PromptDeploymentInputRequest>
+            prompt_deployment_id:
+              type: optional<string>
+              docs: >-
+                The ID of the Prompt Deployment. Must provide either this or
+                prompt_deployment_name.
+              validation:
+                format: uuid
+            prompt_deployment_name:
+              type: optional<string>
+              docs: >-
+                The unique name of the Prompt Deployment. Must provide either
+                this or prompt_deployment_id.
+              validation:
+                minLength: 1
+            release_tag:
+              type: optional<string>
+              docs: >-
+                Optionally specify a release tag if you want to pin to a
+                specific release of the Prompt Deployment
+              validation:
+                minLength: 1
+            external_id:
+              type: optional<string>
+              docs: >-
+                Optionally include a unique identifier for tracking purposes.
+                Must be unique within a given Prompt Deployment.
+              validation:
+                minLength: 1
+            expand_meta:
+              type: optional<PromptDeploymentExpandMetaRequest>
+              docs: >-
+                An optionally specified configuration used to opt in to
+                including additional metadata about this prompt execution in the
+                API response. Corresponding values will be returned under the
+                `meta` key of the API response.
+            raw_overrides:
+              type: optional<RawPromptExecutionOverridesRequest>
+              docs: >-
+                Overrides for the raw API request sent to the model host.
+                Combined with `expand_raw`, it can be used to access new
+                features from models.
+            expand_raw:
+              type: optional<list<string>>
+              docs: >-
+                A list of keys whose values you'd like to directly return from
+                the JSON response of the model provider. Useful if you need
+                lower-level info returned by model providers that Vellum would
+                otherwise omit. Corresponding key/value pairs will be returned
+                under the `raw` key of the API response.
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Arbitrary JSON metadata associated with this request. Can be
+                used to capture additional monitoring data such as user id,
+                session id, etc. for future analysis.
+        content-type: application/json
+      response-stream:
+        docs: ''
+        type: ExecutePromptEvent
+        format: json
+      url: Predict
+      availability: generally-available
+      errors:
+        - BadRequestError
+        - ForbiddenError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            inputs:
+              - name: name
+                type: STRING
+                value: value
+          response:
+            stream:
+              - state: INITIATED
+                meta:
+                  model_name: model_name
+                  latency: 1
+                  deployment_release_tag: deployment_release_tag
+                  prompt_version_id: prompt_version_id
+                execution_id: execution_id
+      audiences:
+        - customers
+    execute-workflow:
+      path: /v1/execute-workflow
+      method: POST
+      auth: true
+      docs: Executes a deployed Workflow and returns its outputs.
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: ExecuteWorkflowRequest
+        body:
+          properties:
+            inputs:
+              docs: >-
+                The list of inputs defined in the Workflow's Deployment with
+                their corresponding values.
+              type: list<WorkflowRequestInputRequest>
+            expand_meta:
+              type: optional<WorkflowExpandMetaRequest>
+              docs: >-
+                An optionally specified configuration used to opt in to
+                including additional metadata about this workflow execution in
+                the API response. Corresponding values will be returned under
+                the `execution_meta` key within NODE events in the response
+                stream.
+            workflow_deployment_id:
+              type: optional<string>
+              docs: >-
+                The ID of the Workflow Deployment. Must provide either this or
+                workflow_deployment_name.
+              validation:
+                format: uuid
+            workflow_deployment_name:
+              type: optional<string>
+              docs: >-
+                The name of the Workflow Deployment. Must provide either this or
+                workflow_deployment_id.
+              validation:
+                minLength: 1
+            release_tag:
+              type: optional<string>
+              docs: >-
+                Optionally specify a release tag if you want to pin to a
+                specific release of the Workflow Deployment
+              validation:
+                minLength: 1
+            external_id:
+              type: optional<string>
+              docs: >-
+                Optionally include a unique identifier for tracking purposes.
+                Must be unique for a given workflow deployment.
+              validation:
+                minLength: 1
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Arbitrary JSON metadata associated with this request. Can be
+                used to capture additional monitoring data such as user id,
+                session id, etc. for future analysis.
+        content-type: application/json
+      response:
+        docs: ''
+        type: ExecuteWorkflowResponse
+      url: Predict
+      availability: generally-available
+      errors:
+        - BadRequestError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            inputs:
+              - name: name
+                type: STRING
+                value: value
+          response:
+            body:
+              execution_id: execution_id
+              run_id: run_id
+              external_id: external_id
+              data:
+                id: id
+                state: FULFILLED
+                ts: '2024-01-15T09:30:00Z'
+                outputs:
+                  - id: id
+                    name: name
+                    type: STRING
+      audiences:
+        - customers
+    execute-workflow-stream:
+      path: /v1/execute-workflow-stream
+      method: POST
+      auth: true
+      docs: Executes a deployed Workflow and streams back its results.
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: ExecuteWorkflowStreamRequest
+        body:
+          properties:
+            inputs:
+              docs: >-
+                The list of inputs defined in the Workflow's Deployment with
+                their corresponding values.
+              type: list<WorkflowRequestInputRequest>
+            expand_meta:
+              type: optional<WorkflowExpandMetaRequest>
+              docs: >-
+                An optionally specified configuration used to opt in to
+                including additional metadata about this workflow execution in
+                the API response. Corresponding values will be returned under
+                the `execution_meta` key within NODE events in the response
+                stream.
+            workflow_deployment_id:
+              type: optional<string>
+              docs: >-
+                The ID of the Workflow Deployment. Must provide either this or
+                workflow_deployment_name.
+              validation:
+                format: uuid
+            workflow_deployment_name:
+              type: optional<string>
+              docs: >-
+                The name of the Workflow Deployment. Must provide either this or
+                workflow_deployment_id.
+              validation:
+                minLength: 1
+            release_tag:
+              type: optional<string>
+              docs: >-
+                Optionally specify a release tag if you want to pin to a
+                specific release of the Workflow Deployment
+              validation:
+                minLength: 1
+            external_id:
+              type: optional<string>
+              docs: >-
+                Optionally include a unique identifier for tracking purposes.
+                Must be unique for a given workflow deployment.
+              validation:
+                minLength: 1
+            event_types:
+              type: optional<list<WorkflowExecutionEventType>>
+              docs: >-
+                Optionally specify which events you want to receive. Defaults to
+                only WORKFLOW events. Note that the schema of non-WORKFLOW
+                events is unstable and should be used with caution.
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Arbitrary JSON metadata associated with this request. Can be
+                used to capture additional monitoring data such as user id,
+                session id, etc. for future analysis.
+        content-type: application/json
+      response-stream:
+        docs: ''
+        type: WorkflowStreamEvent
+        format: json
+      url: Predict
+      availability: generally-available
+      errors:
+        - BadRequestError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            inputs:
+              - name: name
+                type: STRING
+                value: value
+          response:
+            stream:
+              - execution_id: execution_id
+                run_id: run_id
+                external_id: external_id
+                type: WORKFLOW
+                data:
+                  id: id
+                  state: INITIATED
+                  ts: '2024-01-15T09:30:00Z'
+                  output:
+                    id: id
+                    name: name
+                    state: INITIATED
+                    node_id: node_id
+                    delta: delta
+                    type: STRING
+                    value: value
+                  error:
+                    message: message
+                    code: WORKFLOW_INITIALIZATION
+                  outputs:
+                    - id: id
+                      name: name
+                      type: STRING
+                  inputs:
+                    - id: id
+                      name: name
+                      type: STRING
+      audiences:
+        - customers
+    generate:
+      path: /v1/generate
+      method: POST
+      auth: true
+      docs: |-
+        Generate a completion using a previously defined deployment.
+
+        Important: This endpoint is DEPRECATED and has been superseded by
+        [execute-prompt](/api-reference/api-reference/execute-prompt).
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: GenerateBodyRequest
+        body:
+          properties:
+            deployment_id:
+              type: optional<string>
+              docs: >-
+                The ID of the deployment. Must provide either this or
+                deployment_name.
+              validation:
+                format: uuid
+            deployment_name:
+              type: optional<string>
+              docs: >-
+                The name of the deployment. Must provide either this or
+                deployment_id.
+              validation:
+                minLength: 1
+            requests:
+              docs: >-
+                The generation request to make. Bulk requests are no longer
+                supported, this field must be an array of length 1.
+              type: list<GenerateRequest>
+            options:
+              type: optional<GenerateOptionsRequest>
+              docs: >-
+                Additional configuration that can be used to control what's
+                included in the response.
+        content-type: application/json
+      response:
+        docs: ''
+        type: GenerateResponse
+      url: Predict
+      availability: deprecated
+      errors:
+        - BadRequestError
+        - ForbiddenError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            requests:
+              - input_values:
+                  key: value
+          response:
+            body:
+              results:
+                - data:
+                    completions:
+                      - id: id
+                        text: text
+                        prompt_version_id: prompt_version_id
+                        deployment_release_tag: deployment_release_tag
+                        model_name: model_name
+                  error:
+                    message: message
+      audiences:
+        - deprecated
+    generate-stream:
+      path: /v1/generate-stream
+      method: POST
+      auth: true
+      docs: >-
+        Generate a stream of completions using a previously defined deployment.
+
+
+        Important: This endpoint is DEPRECATED and has been superseded by
+
+        [execute-prompt-stream](/api-reference/api-reference/execute-prompt-stream).
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: GenerateStreamBodyRequest
+        body:
+          properties:
+            deployment_id:
+              type: optional<string>
+              docs: >-
+                The ID of the deployment. Must provide either this or
+                deployment_name.
+              validation:
+                format: uuid
+            deployment_name:
+              type: optional<string>
+              docs: >-
+                The name of the deployment. Must provide either this or
+                deployment_id.
+              validation:
+                minLength: 1
+            requests:
+              docs: >-
+                The generation request to make. Bulk requests are no longer
+                supported, this field must be an array of length 1.
+              type: list<GenerateRequest>
+            options:
+              type: optional<GenerateOptionsRequest>
+              docs: >-
+                Additional configuration that can be used to control what's
+                included in the response.
+        content-type: application/json
+      response-stream:
+        docs: ''
+        type: GenerateStreamResponse
+        format: json
+      url: Predict
+      availability: deprecated
+      errors:
+        - BadRequestError
+        - ForbiddenError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            requests:
+              - input_values:
+                  key: value
+          response:
+            stream:
+              - delta:
+                  request_index: 1
+                  data:
+                    completion_index: 1
+                    completion:
+                      id: id
+                      text: text
+                      prompt_version_id: prompt_version_id
+                      deployment_release_tag: deployment_release_tag
+                      model_name: model_name
+                  error:
+                    message: message
+      audiences:
+        - deprecated
+    search:
+      path: /v1/search
+      method: POST
+      auth: true
+      docs: Perform a search against a document index.
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: SearchRequestBodyRequest
+        body:
+          properties:
+            index_id:
+              type: optional<string>
+              docs: >-
+                The ID of the index to search against. Must provide either this,
+                index_name or document_index.
+              validation:
+                format: uuid
+            index_name:
+              type: optional<string>
+              docs: >-
+                The name of the index to search against. Must provide either
+                this, index_id or document_index.
+              validation:
+                minLength: 1
+            query:
+              type: string
+              docs: The query to search for.
+              validation:
+                minLength: 1
+            options:
+              type: optional<SearchRequestOptionsRequest>
+              docs: Configuration options for the search.
+            document_index:
+              type: optional<string>
+              docs: >-
+                Either the index name or index ID to search against. Must
+                provide either this, index_id or index_name.
+              validation:
+                minLength: 1
+        content-type: application/json
+      response:
+        docs: ''
+        type: SearchResponse
+      url: Predict
+      availability: generally-available
+      errors:
+        - BadRequestError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            query: query
+          response:
+            body:
+              results:
+                - text: text
+                  score: 1.1
+                  keywords:
+                    - keywords
+                  document:
+                    label: label
+      audiences:
+        - customers
+    submit-completion-actuals:
+      path: /v1/submit-completion-actuals
+      method: POST
+      auth: true
+      docs: >-
+        Used to submit feedback regarding the quality of previously generated
+        completions.
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: SubmitCompletionActualsRequest
+        body:
+          properties:
+            deployment_id:
+              type: optional<string>
+              docs: >-
+                The ID of the deployment. Must provide either this or
+                deployment_name.
+              validation:
+                format: uuid
+            deployment_name:
+              type: optional<string>
+              docs: >-
+                The name of the deployment. Must provide either this or
+                deployment_id.
+              validation:
+                minLength: 1
+            actuals:
+              docs: >-
+                Feedback regarding the quality of previously generated
+                completions
+              type: list<SubmitCompletionActualRequest>
+        content-type: application/json
+      url: Predict
+      availability: generally-available
+      errors:
+        - BadRequestError
+        - NotFoundError
+        - InternalServerError
+      examples:
+        - request:
+            actuals:
+              - {}
+      audiences:
+        - customers
+    submit-workflow-execution-actuals:
+      path: /v1/submit-workflow-execution-actuals
+      method: POST
+      auth: true
+      docs: |2-
+            Used to submit feedback regarding the quality of previous workflow execution and its outputs.
+
+            **Note:** Uses a base url of `https://predict.vellum.ai`.    
+      source:
+        openapi: openapi/openapi.yml
+      request:
+        name: SubmitWorkflowExecutionActualsRequest
+        body:
+          properties:
+            actuals:
+              docs: >-
+                Feedback regarding the quality of an output on a previously
+                executed workflow.
+              type: list<SubmitWorkflowExecutionActualRequest>
+            execution_id:
+              type: optional<string>
+              docs: >-
+                The Vellum-generated ID of a previously executed workflow. Must
+                provide either this or external_id.
+              validation:
+                format: uuid
+            external_id:
+              type: optional<string>
+              docs: >-
+                The external ID that was originally provided by when executing
+                the workflow, if applicable, that you'd now like to submit
+                actuals for. Must provide either this or execution_id.
+              validation:
+                minLength: 1
+        content-type: application/json
+      url: Predict
+      availability: generally-available
+      examples:
+        - request:
+            actuals:
+              - output_type: STRING
+      audiences:
+        - customers
+  source:
+    openapi: openapi/openapi.yml

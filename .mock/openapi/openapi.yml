@@ -919,6 +919,29 @@ paths:
       servers:
       - url: https://documents.vellum.ai
         x-name: Documents
+  /v1/execute-api:
+    post:
+      operationId: execute_api
+      tags:
+      - execute-api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteApiRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteApiResponse'
+          description: ''
+      x-fern-availability: beta
+      x-fern-audiences:
+      - internal
   /v1/execute-code:
     post:
       operationId: execute_code
@@ -4170,6 +4193,51 @@ components:
       required:
       - type
       - value
+    ExecuteApiRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/MethodEnum'
+        body:
+          oneOf:
+          - type: string
+            minLength: 1
+          - type: object
+            additionalProperties: {}
+        headers:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - $ref: '#/components/schemas/VellumSecret'
+        bearer_token:
+          oneOf:
+          - type: string
+          - $ref: '#/components/schemas/VellumSecret'
+      required:
+      - url
+    ExecuteApiResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+        text:
+          type: string
+        json:
+          type: object
+          additionalProperties: {}
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - headers
+      - json
+      - status_code
+      - text
     ExecuteMetricDefinition:
       type: object
       properties:
@@ -6136,6 +6204,20 @@ components:
       oneOf:
       - $ref: '#/components/schemas/MetadataFilterConfigRequest'
       - $ref: '#/components/schemas/VellumValueLogicalExpressionRequest'
+    MethodEnum:
+      enum:
+      - POST
+      - GET
+      - PATCH
+      - PUT
+      - DELETE
+      type: string
+      description: |-
+        * `POST` - POST
+        * `GET` - GET
+        * `PATCH` - PATCH
+        * `PUT` - PUT
+        * `DELETE` - DELETE
     MetricDefinitionExecution:
       type: object
       properties:
@@ -10893,6 +10975,14 @@ components:
           nullable: true
       required:
       - src
+    VellumSecret:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+      required:
+      - name
     VellumValue:
       oneOf:
       - $ref: '#/components/schemas/StringVellumValue'
