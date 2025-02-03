@@ -9,7 +9,7 @@ import {
   NodePortGenerationError,
 } from "src/generators/errors";
 import { Expression } from "src/generators/expression";
-import { NodeInputValuePointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/node-input-value-pointer-rule";
+import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
   IterableConfig,
   OperatorMapping,
@@ -55,9 +55,9 @@ export class WorkflowValueDescriptor extends AstNode {
   ): AstNode {
     // Base case
     if (this.isReference(workflowValueDescriptor)) {
-      return new NodeInputValuePointerRule({
+      return new WorkflowValueDescriptorReference({
         workflowContext: this.workflowContext,
-        nodeInputValuePointerRuleData: workflowValueDescriptor,
+        workflowValueReferencePointer: workflowValueDescriptor,
         iterableConfig: this.iterableConfig,
       });
     }
@@ -148,9 +148,10 @@ export class WorkflowValueDescriptor extends AstNode {
   private isReference(workflowValueDescriptor: WorkflowValueDescriptorType) {
     return (
       workflowValueDescriptor.type === "NODE_OUTPUT" ||
-      workflowValueDescriptor.type === "INPUT_VARIABLE" ||
+      workflowValueDescriptor.type === "WORKFLOW_INPUT" ||
+      workflowValueDescriptor.type === "WORKFLOW_STATE" ||
       workflowValueDescriptor.type === "CONSTANT_VALUE" ||
-      workflowValueDescriptor.type === "WORKSPACE_SECRET" ||
+      workflowValueDescriptor.type === "VELLUM_SECRET" ||
       workflowValueDescriptor.type === "EXECUTION_COUNTER"
     );
   }

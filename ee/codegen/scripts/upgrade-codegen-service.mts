@@ -31,6 +31,7 @@ const main = async () => {
       stdio: "inherit",
     }
   );
+  execSync(`npm run postinstall`, { stdio: "inherit" });
 
   // Generate our codegen module lookup function. If we generate all if cases instead of
   // passing in a variable version to the async imports this will cause static type checking

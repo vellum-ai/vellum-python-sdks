@@ -152,6 +152,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         )
         events = subworkflow.stream(
             inputs=self.SubworkflowInputs(index=index, item=item, all_items=self.items),
+            node_output_mocks=self._context._get_all_node_output_mocks(),
             event_filter=all_workflow_event_filter,
         )
 

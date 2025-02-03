@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST for CONSTANT_VALUE reference 1`] = `
+""Hello, World!"
+"
+`;
+
+exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST for EXECUTION_COUNTER reference 1`] = `
+"SearchNode.Execution.count
+"
+`;
+
+exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST for NODE_OUTPUT reference 1`] = `
+"TestNode.Outputs.my_output
+"
+`;
+
+exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST for VELLUM_SECRET reference 1`] = `
+"VellumSecretReference("API_KEY")
+"
+`;

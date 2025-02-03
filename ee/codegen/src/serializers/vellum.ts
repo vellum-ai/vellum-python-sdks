@@ -109,6 +109,12 @@ import {
   NodeAttribute,
   AdornmentNode,
   NodeOutput,
+  ConstantValueWorkflowReference,
+  WorkflowInputWorkflowReference,
+  NodeOutputWorkflowReference,
+  VellumSecretWorkflowReference,
+  ExecutionCounterWorkflowReference,
+  WorkflowStateVariableWorkflowReference,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -1664,6 +1670,86 @@ export declare namespace TernaryWorkflowExpressionSerializer {
   }
 }
 
+export const NodeOutputWorkflowReferenceSerializer: ObjectSchema<
+  NodeOutputWorkflowReferenceSerializer.Raw,
+  Omit<NodeOutputWorkflowReference, "type">
+> = objectSchema({
+  nodeId: propertySchema("node_id", stringSchema()),
+  nodeOutputId: propertySchema("node_output_id", stringSchema()),
+});
+
+export declare namespace NodeOutputWorkflowReferenceSerializer {
+  interface Raw {
+    node_id: string;
+    node_output_id: string;
+  }
+}
+
+export const WorkflowInputWorkflowReferenceSerializer: ObjectSchema<
+  WorkflowInputWorkflowReferenceSerializer.Raw,
+  Omit<WorkflowInputWorkflowReference, "type">
+> = objectSchema({
+  inputVariableId: propertySchema("input_variable_id", stringSchema()),
+});
+
+export declare namespace WorkflowInputWorkflowReferenceSerializer {
+  interface Raw {
+    input_variable_id: string;
+  }
+}
+
+export const WorkflowStateVariableWorkflowReferenceSerializer: ObjectSchema<
+  WorkflowStateVariableWorkflowReferenceSerializer.Raw,
+  Omit<WorkflowStateVariableWorkflowReference, "type">
+> = objectSchema({
+  stateVariableId: propertySchema("state_variable_id", stringSchema()),
+});
+
+export declare namespace WorkflowStateVariableWorkflowReferenceSerializer {
+  interface Raw {
+    state_variable_id: string;
+  }
+}
+
+export const ConstantValueWorkflowReferenceSerializer: ObjectSchema<
+  ConstantValueWorkflowReferenceSerializer.Raw,
+  Omit<ConstantValueWorkflowReference, "type">
+> = objectSchema({
+  value: VellumValueSerializer,
+});
+
+export declare namespace ConstantValueWorkflowReferenceSerializer {
+  interface Raw {
+    value: VellumValueSerializer.Raw;
+  }
+}
+
+export const VellumSecretWorkflowReferenceSerializer: ObjectSchema<
+  VellumSecretWorkflowReferenceSerializer.Raw,
+  Omit<VellumSecretWorkflowReference, "type">
+> = objectSchema({
+  vellumSecretName: propertySchema("vellum_secret_name", stringSchema()),
+});
+
+export declare namespace VellumSecretWorkflowReferenceSerializer {
+  interface Raw {
+    vellum_secret_name: string;
+  }
+}
+
+export const ExecutionCounterWorkflowReferenceSerializer: ObjectSchema<
+  ExecutionCounterWorkflowReferenceSerializer.Raw,
+  Omit<ExecutionCounterWorkflowReference, "type">
+> = objectSchema({
+  nodeId: propertySchema("node_id", stringSchema()),
+});
+
+export declare namespace ExecutionCounterWorkflowReferenceSerializer {
+  interface Raw {
+    node_id: string;
+  }
+}
+
 export const WorkflowValueDescriptorSerializer: Schema<
   WorkflowValueDescriptorSerializer.Raw,
   WorkflowValueDescriptor
@@ -1671,11 +1757,12 @@ export const WorkflowValueDescriptorSerializer: Schema<
   UNARY_EXPRESSION: UnaryWorkflowExpressionSerializer,
   BINARY_EXPRESSION: BinaryWorkflowExpressionSerializer,
   TERNARY_EXPRESSION: TernaryWorkflowExpressionSerializer,
-  NODE_OUTPUT: NodeOutputPointerSerializer,
-  INPUT_VARIABLE: InputVariablePointerSerializer,
-  CONSTANT_VALUE: ConstantValuePointerSerializer,
-  WORKSPACE_SECRET: WorkspaceSecretPointerSerializer,
-  EXECUTION_COUNTER: ExecutionCounterPointerSerializer,
+  NODE_OUTPUT: NodeOutputWorkflowReferenceSerializer,
+  WORKFLOW_INPUT: WorkflowInputWorkflowReferenceSerializer,
+  WORKFLOW_STATE: WorkflowStateVariableWorkflowReferenceSerializer,
+  CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
+  VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
+  EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
 });
 
 export declare namespace WorkflowValueDescriptorSerializer {
@@ -1683,11 +1770,12 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | UnaryWorkflowExpressionSerializer.Raw
     | BinaryWorkflowExpressionSerializer.Raw
     | TernaryWorkflowExpressionSerializer.Raw
-    | NodeOutputPointerSerializer.Raw
-    | InputVariablePointerSerializer.Raw
-    | ConstantValuePointerSerializer.Raw
-    | WorkspaceSecretPointerSerializer.Raw
-    | ExecutionCounterPointerSerializer.Raw;
+    | NodeOutputWorkflowReferenceSerializer.Raw
+    | WorkflowInputWorkflowReferenceSerializer.Raw
+    | WorkflowStateVariableWorkflowReferenceSerializer.Raw
+    | ConstantValueWorkflowReferenceSerializer.Raw
+    | VellumSecretWorkflowReferenceSerializer.Raw
+    | ExecutionCounterWorkflowReferenceSerializer.Raw;
 }
 
 export const DefaultConditionNodePortSerializer: ObjectSchema<

@@ -44,6 +44,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
             )
             terminal_event = subworkflow.run(
                 inputs=self.SubworkflowInputs(attempt_number=attempt_number),
+                node_output_mocks=self._context._get_all_node_output_mocks(),
             )
             if terminal_event.name == "workflow.execution.fulfilled":
                 node_outputs = self.Outputs()

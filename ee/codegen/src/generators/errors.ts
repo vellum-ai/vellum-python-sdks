@@ -7,6 +7,7 @@ export type CodegenErrorCode =
   | "NODE_PORT_GENERATION_ERROR"
   | "NODE_NOT_FOUND_ERROR"
   | "NODE_OUTPUT_NOT_FOUND_ERROR"
+  | "NODE_INPUT_NOT_FOUND_ERROR"
   | "UNSUPPORTED_SANDBOX_INPUT_ERROR"
   | "ENTITY_NOT_FOUND_ERROR"
   | "POST_PROCESSING_ERROR"
@@ -87,6 +88,13 @@ export class UnsupportedSandboxInputError extends BaseCodegenError {
  */
 export class NodeOutputNotFoundError extends BaseCodegenError {
   code = "NODE_OUTPUT_NOT_FOUND_ERROR" as const;
+}
+
+/**
+ * An error that raises when a node input is not found.
+ */
+export class NodeInputNotFoundError extends BaseCodegenError {
+  code = "NODE_INPUT_NOT_FOUND_ERROR" as const;
 }
 
 /**
