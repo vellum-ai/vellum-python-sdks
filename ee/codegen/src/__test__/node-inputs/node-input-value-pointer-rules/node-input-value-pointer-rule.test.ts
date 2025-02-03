@@ -1,6 +1,9 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { workflowContextFactory } from "src/__test__/helpers";
+import {
+  nodeContextFactory,
+  workflowContextFactory,
+} from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -13,10 +16,12 @@ import {
 describe("NodeInputValuePointerRule", () => {
   let writer: Writer;
   let workflowContext: WorkflowContext;
+  let nodeContext: BaseNodeContext<WorkflowDataNode>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     writer = new Writer();
     workflowContext = workflowContextFactory();
+    nodeContext = await nodeContextFactory({ workflowContext });
   });
 
   it("should generate correct AST for CONSTANT_VALUE pointer", async () => {
@@ -29,7 +34,7 @@ describe("NodeInputValuePointerRule", () => {
     };
 
     const rule = new NodeInputValuePointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRuleData: constantValuePointer,
     });
 
@@ -38,7 +43,7 @@ describe("NodeInputValuePointerRule", () => {
   });
 
   it("should generate correct AST for NODE_OUTPUT pointer", async () => {
-    vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
+    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
       nodeClassName: "TestNode",
       path: ["nodes", "test-node-path"],
       getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
@@ -53,7 +58,7 @@ describe("NodeInputValuePointerRule", () => {
     };
 
     const rule = new NodeInputValuePointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRuleData: nodeOutputPointer,
     });
 
@@ -81,7 +86,7 @@ describe("NodeInputValuePointerRule", () => {
     };
 
     const rule = new NodeInputValuePointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRuleData: inputVariablePointer,
     });
 

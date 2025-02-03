@@ -1,13 +1,17 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { workflowContextFactory } from "src/__test__/helpers";
+import { nodeContextFactory } from "src/__test__/helpers";
+import { BaseNodeContext } from "src/context/node-context/base";
 import { WorkspaceSecretPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/workspace-secret-pointer";
+import { WorkflowDataNode } from "src/types/vellum";
 
 describe("WorkspaceSecretPointer", () => {
   let writer: Writer;
+  let nodeContext: BaseNodeContext<WorkflowDataNode>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     writer = new Writer();
+    nodeContext = await nodeContextFactory();
   });
 
   afterEach(() => {
@@ -15,10 +19,8 @@ describe("WorkspaceSecretPointer", () => {
   });
 
   it("should generate correct Python code", async () => {
-    const workflowContext = workflowContextFactory();
-
     const workspaceSecretPointer = new WorkspaceSecretPointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRule: {
         type: "WORKSPACE_SECRET",
         data: {
@@ -33,10 +35,8 @@ describe("WorkspaceSecretPointer", () => {
   });
 
   it("should handle the the case where the workspace secret isn't yet specified", async () => {
-    const workflowContext = workflowContextFactory();
-
     const workspaceSecretPointer = new WorkspaceSecretPointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRule: {
         type: "WORKSPACE_SECRET",
         data: {

@@ -1,13 +1,17 @@
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import * as codegen from "src/codegen";
-import { WorkflowContext } from "src/context";
+import { BaseNodeContext } from "src/context/node-context/base";
 import { VellumValue } from "src/generators";
-import { ConstantValuePointer, IterableConfig } from "src/types/vellum";
+import {
+  ConstantValuePointer,
+  IterableConfig,
+  WorkflowDataNode,
+} from "src/types/vellum";
 
 export declare namespace ConstantValuePointerRule {
   interface Args {
-    workflowContext: WorkflowContext;
+    nodeContext: BaseNodeContext<WorkflowDataNode>;
     nodeInputValuePointerRule: ConstantValuePointer;
     iterableConfig?: IterableConfig;
   }

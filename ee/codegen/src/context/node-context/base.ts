@@ -17,7 +17,7 @@ export declare namespace BaseNodeContext {
 }
 
 export abstract class BaseNodeContext<T extends WorkflowDataNode> {
-  protected workflowContext: WorkflowContext;
+  public readonly workflowContext: WorkflowContext;
   public readonly nodeModulePath: string[];
   public readonly nodeModuleName: string;
   public readonly nodeFileName: string;

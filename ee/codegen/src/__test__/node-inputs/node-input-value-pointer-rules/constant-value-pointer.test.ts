@@ -1,15 +1,15 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { workflowContextFactory } from "src/__test__/helpers";
-import { WorkflowContext } from "src/context";
+import { nodeContextFactory } from "src/__test__/helpers";
+import { BaseNodeContext } from "src/context/node-context/base";
 import { ConstantValuePointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/constant-value-pointer";
-import { ConstantValuePointer } from "src/types/vellum";
+import { ConstantValuePointer, WorkflowDataNode } from "src/types/vellum";
 
 describe("ConstantValuePointer", () => {
-  let workflowContext: WorkflowContext;
+  let nodeContext: BaseNodeContext<WorkflowDataNode>;
 
-  beforeEach(() => {
-    workflowContext = workflowContextFactory();
+  beforeEach(async () => {
+    nodeContext = await nodeContextFactory();
   });
 
   it("should generate correct AST for STRING constant value", async () => {
@@ -22,7 +22,7 @@ describe("ConstantValuePointer", () => {
     };
 
     const rule = new ConstantValuePointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRule: constantValuePointer,
     });
 

@@ -1,7 +1,10 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { describe, it, expect, beforeEach } from "vitest";
 
-import { workflowContextFactory } from "src/__test__/helpers";
+import {
+  nodeContextFactory,
+  workflowContextFactory,
+} from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeInputValuePointer } from "src/generators/node-inputs/node-input-value-pointer";
@@ -11,12 +14,14 @@ import {
 } from "src/types/vellum";
 
 describe("NodeInputValuePointer", () => {
-  let workflowContext: WorkflowContext;
   let writer: Writer;
+  let workflowContext: WorkflowContext;
+  let nodeContext: BaseNodeContext<WorkflowDataNode>;
 
-  beforeEach(() => {
-    workflowContext = workflowContextFactory();
+  beforeEach(async () => {
     writer = new Writer();
+    workflowContext = workflowContextFactory();
+    nodeContext = await nodeContextFactory({ workflowContext });
   });
 
   it("should handle a single constant value rule", async () => {
@@ -34,7 +39,7 @@ describe("NodeInputValuePointer", () => {
     };
 
     const nodeInputValuePointer = new NodeInputValuePointer({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerData,
     });
 
@@ -44,7 +49,7 @@ describe("NodeInputValuePointer", () => {
   });
 
   it("should handle three node output pointer rules", async () => {
-    vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
+    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
       nodeClassName: "TestNode",
       path: ["nodes", "test-node-path"],
       getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
@@ -78,7 +83,7 @@ describe("NodeInputValuePointer", () => {
     };
 
     const nodeInputValuePointer = new NodeInputValuePointer({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerData,
     });
 
@@ -88,7 +93,7 @@ describe("NodeInputValuePointer", () => {
   });
 
   it("should handle two node output pointers and one constant value", async () => {
-    vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
+    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
       nodeClassName: "TestNode",
       path: ["nodes", "test-node-path"],
       getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
@@ -122,7 +127,7 @@ describe("NodeInputValuePointer", () => {
     };
 
     const nodeInputValuePointer = new NodeInputValuePointer({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerData,
     });
 
@@ -132,7 +137,7 @@ describe("NodeInputValuePointer", () => {
   });
 
   it("should handle two node output pointers with a constant value in between", async () => {
-    vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
+    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
       nodeClassName: "TestNode",
       path: ["nodes", "test-node-path"],
       getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
@@ -166,7 +171,7 @@ describe("NodeInputValuePointer", () => {
     };
 
     const nodeInputValuePointer = new NodeInputValuePointer({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerData,
     });
 

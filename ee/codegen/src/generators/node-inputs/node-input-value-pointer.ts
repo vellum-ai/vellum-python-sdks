@@ -4,25 +4,28 @@ import { isNil } from "lodash";
 
 import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node-input-value-pointer-rule";
 
-import { WorkflowContext } from "src/context";
-import { NodeInputValuePointer as NodeInputValuePointerType } from "src/types/vellum";
+import { BaseNodeContext } from "src/context/node-context/base";
+import {
+  NodeInputValuePointer as NodeInputValuePointerType,
+  WorkflowDataNode,
+} from "src/types/vellum";
 
 export declare namespace NodeInputValuePointer {
   export interface Args {
-    workflowContext: WorkflowContext;
+    nodeContext: BaseNodeContext<WorkflowDataNode>;
     nodeInputValuePointerData: NodeInputValuePointerType;
   }
 }
 
 export class NodeInputValuePointer extends AstNode {
-  private workflowContext: WorkflowContext;
+  private nodeContext: BaseNodeContext<WorkflowDataNode>;
   private nodeInputValuePointerData: NodeInputValuePointerType;
   public rules: NodeInputValuePointerRule[];
 
   public constructor(args: NodeInputValuePointer.Args) {
     super();
 
-    this.workflowContext = args.workflowContext;
+    this.nodeContext = args.nodeContext;
     this.nodeInputValuePointerData = args.nodeInputValuePointerData;
 
     this.rules = this.generateRules();
@@ -32,7 +35,7 @@ export class NodeInputValuePointer extends AstNode {
     return this.nodeInputValuePointerData.rules
       .map((ruleData) => {
         const rule = new NodeInputValuePointerRule({
-          workflowContext: this.workflowContext,
+          nodeContext: this.nodeContext,
           nodeInputValuePointerRuleData: ruleData,
         });
         if (rule.astNode) {

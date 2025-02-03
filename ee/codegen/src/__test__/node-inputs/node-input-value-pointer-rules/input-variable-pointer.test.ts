@@ -1,6 +1,9 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { workflowContextFactory } from "src/__test__/helpers";
+import {
+  nodeContextFactory,
+  workflowContextFactory,
+} from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { InputVariablePointerRule } from "src/generators/node-inputs";
 
@@ -28,8 +31,10 @@ describe("InputVariablePointer", () => {
       })
     );
 
+    const nodeContext = await nodeContextFactory({ workflowContext });
+
     const inputVariablePointer = new InputVariablePointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRule: {
         type: "INPUT_VARIABLE",
         data: {
@@ -45,9 +50,10 @@ describe("InputVariablePointer", () => {
 
   it("should handle when it's referencing an input variable that no longer exists", async () => {
     const workflowContext = workflowContextFactory();
+    const nodeContext = await nodeContextFactory({ workflowContext });
 
     const inputVariablePointer = new InputVariablePointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRule: {
         type: "INPUT_VARIABLE",
         data: {

@@ -6,25 +6,26 @@ import { ConstantValuePointerRule } from "./constant-value-pointer";
 import { InputVariablePointerRule } from "./input-variable-pointer";
 import { NodeOutputPointerRule } from "./node-output-pointer";
 
-import { WorkflowContext } from "src/context";
+import { BaseNodeContext } from "src/context/node-context/base";
 import { ExecutionCounterPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/execution-counter-pointer";
 import { WorkspaceSecretPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/workspace-secret-pointer";
 import {
   IterableConfig,
   NodeInputValuePointerRule as NodeInputValuePointerRuleType,
+  WorkflowDataNode,
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
 export declare namespace NodeInputValuePointerRule {
   export interface Args {
-    workflowContext: WorkflowContext;
+    nodeContext: BaseNodeContext<WorkflowDataNode>;
     nodeInputValuePointerRuleData: NodeInputValuePointerRuleType;
     iterableConfig?: IterableConfig;
   }
 }
 
 export class NodeInputValuePointerRule extends AstNode {
-  private workflowContext: WorkflowContext;
+  private nodeContext: BaseNodeContext<WorkflowDataNode>;
   public astNode:
     | BaseNodeInputValuePointerRule<NodeInputValuePointerRuleType>
     | undefined;
@@ -33,7 +34,7 @@ export class NodeInputValuePointerRule extends AstNode {
 
   public constructor(args: NodeInputValuePointerRule.Args) {
     super();
-    this.workflowContext = args.workflowContext;
+    this.nodeContext = args.nodeContext;
     this.ruleType = args.nodeInputValuePointerRuleData.type;
     this.iterableConfig = args.iterableConfig;
 
@@ -51,13 +52,13 @@ export class NodeInputValuePointerRule extends AstNode {
     switch (ruleType) {
       case "CONSTANT_VALUE":
         return new ConstantValuePointerRule({
-          workflowContext: this.workflowContext,
+          nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
           iterableConfig: this.iterableConfig,
         });
       case "NODE_OUTPUT": {
         const rule = new NodeOutputPointerRule({
-          workflowContext: this.workflowContext,
+          nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });
         if (rule.getAstNode()) {
@@ -68,17 +69,17 @@ export class NodeInputValuePointerRule extends AstNode {
       }
       case "INPUT_VARIABLE":
         return new InputVariablePointerRule({
-          workflowContext: this.workflowContext,
+          nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });
       case "WORKSPACE_SECRET":
         return new WorkspaceSecretPointerRule({
-          workflowContext: this.workflowContext,
+          nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });
       case "EXECUTION_COUNTER":
         return new ExecutionCounterPointerRule({
-          workflowContext: this.workflowContext,
+          nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });
       default: {

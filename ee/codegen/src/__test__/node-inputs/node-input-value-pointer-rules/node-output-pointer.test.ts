@@ -1,6 +1,9 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { workflowContextFactory } from "src/__test__/helpers";
+import {
+  nodeContextFactory,
+  workflowContextFactory,
+} from "src/__test__/helpers";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeOutputPointerRule } from "src/generators/node-inputs";
 import { WorkflowDataNode } from "src/types/vellum";
@@ -24,8 +27,10 @@ describe("NodeOutputPointer", () => {
       getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
     } as unknown as BaseNodeContext<WorkflowDataNode>);
 
+    const nodeContext = await nodeContextFactory({ workflowContext });
+
     const nodeOutputPointer = new NodeOutputPointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRule: {
         type: "NODE_OUTPUT",
         data: {

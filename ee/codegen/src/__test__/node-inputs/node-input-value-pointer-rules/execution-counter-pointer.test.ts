@@ -29,10 +29,13 @@ describe("ExecutionCounterPointer", () => {
     const workflowContext = workflowContextFactory();
 
     const node = searchNodeDataFactory();
-    await nodeContextFactory({ workflowContext, nodeData: node });
+    const nodeContext = await nodeContextFactory({
+      workflowContext,
+      nodeData: node,
+    });
 
     const executionCounterPointer = new ExecutionCounterPointerRule({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputValuePointerRule: {
         type: "EXECUTION_COUNTER",
         data: {

@@ -3,21 +3,18 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { NodeInputValuePointer } from "./node-input-value-pointer";
 
-import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeInput as NodeInputType, WorkflowDataNode } from "src/types/vellum";
 
 export declare namespace NodeInput {
   export interface Args {
     nodeContext: BaseNodeContext<WorkflowDataNode>;
-    workflowContext: WorkflowContext;
     nodeInputData: NodeInputType;
   }
 }
 
 export class NodeInput extends AstNode {
   private nodeContext: BaseNodeContext<WorkflowDataNode>;
-  private workflowContext: WorkflowContext;
   public nodeInputData: NodeInputType;
   public nodeInputValuePointer: NodeInputValuePointer;
 
@@ -25,7 +22,6 @@ export class NodeInput extends AstNode {
     super();
 
     this.nodeContext = args.nodeContext;
-    this.workflowContext = args.workflowContext;
     this.nodeInputData = args.nodeInputData;
 
     this.nodeInputValuePointer = this.generateNodeInputValuePointer();
@@ -33,7 +29,7 @@ export class NodeInput extends AstNode {
 
   private generateNodeInputValuePointer(): NodeInputValuePointer {
     const nodeInputValuePointer = new NodeInputValuePointer({
-      workflowContext: this.workflowContext,
+      nodeContext: this.nodeContext,
       nodeInputValuePointerData: this.nodeInputData.value,
     });
     this.inheritReferences(nodeInputValuePointer);
