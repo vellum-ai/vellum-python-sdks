@@ -213,7 +213,6 @@ export class ConditionalNodePort extends AstNode {
       lhs: lhs,
       operator: operator,
       rhs: rhs,
-      workflowContext: this.portContext.workflowContext,
     });
   }
 

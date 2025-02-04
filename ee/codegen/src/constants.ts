@@ -13,6 +13,12 @@ export const VELLUM_WORKFLOW_GRAPH_MODULE_PATH = [
   "workflows",
   "graph",
 ] as const;
+export const VELLUM_WORKFLOW_CONSTANTS_PATH = [
+  "vellum",
+  "workflows",
+  "references",
+  "constant",
+] as const;
 /* Class names */
 export const OUTPUTS_CLASS_NAME = "Outputs";
 export const PORTS_CLASS_NAME = "Ports";
