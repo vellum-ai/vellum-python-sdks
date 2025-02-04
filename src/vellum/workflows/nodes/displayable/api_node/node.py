@@ -33,6 +33,7 @@ class APINode(BaseAPINode):
     def run(self) -> BaseAPINode.Outputs:
         headers = self.headers or {}
         header_overrides = {}
+        bearer_token = None
 
         if (
             self.authorization_type == AuthorizationType.API_KEY
@@ -40,9 +41,15 @@ class APINode(BaseAPINode):
             and self.api_key_header_value
         ):
             header_overrides[self.api_key_header_key] = self.api_key_header_value
-        elif self.authorization_type == AuthorizationType.BEARER_TOKEN:
+        elif self.authorization_type == AuthorizationType.BEARER_TOKEN and isinstance(self.bearer_token_value, str):
             header_overrides["Authorization"] = f"Bearer {self.bearer_token_value}"
-
+        else:
+            bearer_token = self.bearer_token_value
         return self._run(
-            method=self.method, url=self.url, data=self.data, json=self.json, headers={**headers, **header_overrides}
+            method=self.method,
+            url=self.url,
+            data=self.data or self.json,
+            json=self.json,
+            headers={**headers, **header_overrides},
+            bearer_token=bearer_token,
         )
