@@ -56,34 +56,9 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             if isinstance(headers[header], VellumSecret):
                 vellum_instance = True
         if vellum_instance or bearer_token:
-            client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
-            vellum_response = self._context.vellum_client.execute_api(
-                url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
-            )
-            json = vellum_response.json_
-            headers = vellum_response.headers
-            status_code = vellum_response.status_code
-            text = vellum_response.text
+            headers, json, status_code, text = self._vellum_execute_api(bearer_token, data, headers, json, method, url)
         else:
-            try:
-                prepped = Request(method=method.value, url=url, data=data, json=json, headers=headers).prepare()
-            except Exception as e:
-                raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
-
-            try:
-                with Session() as session:
-                    response = session.send(prepped)
-            except RequestException as e:
-                raise NodeException(f"HTTP request failed: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
-
-            try:
-                json = response.json()
-            except JSONDecodeError:
-                json = None
-
-            headers = {header: value for header, value in response.headers.items()}
-            status_code = response.status_code
-            text = response.text
+            headers, json, status_code, text = self._local_execute_api(data, headers, json, method, url)
 
         return self.Outputs(
             json=json,
@@ -91,3 +66,33 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             status_code=status_code,
             text=text,
         )
+
+    def _local_execute_api(self, data, headers, json, method, url):
+        try:
+            prepped = Request(method=method.value, url=url, data=data, json=json, headers=headers).prepare()
+        except Exception as e:
+            raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
+        try:
+            with Session() as session:
+                response = session.send(prepped)
+        except RequestException as e:
+            raise NodeException(f"HTTP request failed: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
+        try:
+            json = response.json()
+        except JSONDecodeError:
+            json = None
+        headers = {header: value for header, value in response.headers.items()}
+        status_code = response.status_code
+        text = response.text
+        return headers, json, status_code, text
+
+    def _vellum_execute_api(self, bearer_token, data, headers, json, method, url):
+        client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
+        vellum_response = self._context.vellum_client.execute_api(
+            url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
+        )
+        json = vellum_response.json_
+        headers = vellum_response.headers
+        status_code = vellum_response.status_code
+        text = vellum_response.text
+        return headers, json, status_code, text
