@@ -116,20 +116,6 @@ export class Workflow {
     return outputsClass;
   }
 
-  private getTargetHandleId(nodeData: WorkflowDataNode): string {
-    let targetHandleId: string;
-    if (nodeData.type === "GENERIC") {
-      targetHandleId = nodeData.trigger.id;
-    } else if ("targetHandleId" in nodeData.data) {
-      targetHandleId = nodeData.data.targetHandleId;
-    } else {
-      throw new WorkflowGenerationError(
-        `${nodeData.data.label} with id ${nodeData.id} is missing required targetHandleId`
-      );
-    }
-    return targetHandleId;
-  }
-
   private getLabel(nodeData: WorkflowDataNode): string {
     if (nodeData.type === "GENERIC") {
       return nodeData.label;
@@ -482,7 +468,6 @@ export class Workflow {
               const finalOutput =
                 workflowOutputContext.getFinalOutputNodeData();
               let outputNodeId: string;
-              let targetHandleId: string;
               let outputId: string;
               let name: string;
               let label: string;
@@ -491,7 +476,6 @@ export class Workflow {
               // Final output node
               if ("type" in finalOutput) {
                 outputNodeId = finalOutput.id;
-                targetHandleId = finalOutput.data.targetHandleId;
                 outputId = finalOutput.data.outputId;
                 name = finalOutput.data.name;
                 label = finalOutput.data.label;
@@ -512,9 +496,6 @@ export class Workflow {
                     finalOutput.outputVariableId
                   );
                 outputNodeId = referencedNode.nodeData.id;
-                targetHandleId = this.getTargetHandleId(
-                  referencedNode.nodeData
-                );
                 outputId =
                   getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
                 name = referencedOutput.name;
