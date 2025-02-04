@@ -801,6 +801,11 @@ export interface ExecutionCounterWorkflowReference {
   nodeId: string;
 }
 
+export type WorkflowExpression =
+  | UnaryWorkflowExpression
+  | BinaryWorkflowExpression
+  | TernaryWorkflowExpression;
+
 export type WorkflowValueDescriptorReference =
   | NodeOutputWorkflowReference
   | WorkflowInputWorkflowReference
@@ -810,9 +815,7 @@ export type WorkflowValueDescriptorReference =
   | ExecutionCounterWorkflowReference;
 
 export type WorkflowValueDescriptor =
-  | UnaryWorkflowExpression
-  | BinaryWorkflowExpression
-  | TernaryWorkflowExpression
+  | WorkflowExpression
   | WorkflowValueDescriptorReference;
 
 export interface NodeAttribute {

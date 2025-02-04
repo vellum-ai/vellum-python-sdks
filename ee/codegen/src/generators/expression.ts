@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 
 export declare namespace Expression {
   interface Args {
@@ -54,6 +55,14 @@ export class Expression extends AstNode {
         "rhs must be defined if base is defined"
       );
     }
+    if (this.isConstantValueReference(base)) {
+      return this.generateExpressionBeginningWithConstantReference(
+        lhs,
+        operator,
+        rhs,
+        base
+      );
+    }
     this.inheritReferences(base);
     return `${base.toString()}.${operator}(${lhs.toString()}, ${rhs.toString()})`;
   }
@@ -63,8 +72,61 @@ export class Expression extends AstNode {
     operator: string,
     rhs: AstNode | undefined
   ): string {
+    if (this.isConstantValueReference(lhs)) {
+      return this.generateExpressionBeginningWithConstantReference(
+        lhs,
+        operator,
+        rhs
+      );
+    }
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
     return `${lhs.toString()}.${operator}${rhsExpression}`;
+  }
+
+  // We are assuming that the expression contains "good data". If the expression contains data
+  // where the generated expression is not correct, update the logic here with guardrails similar to the UI
+  private generateExpressionBeginningWithConstantReference(
+    lhs: AstNode,
+    operator: string,
+    rhs: AstNode | undefined,
+    base?: AstNode | undefined
+  ): string {
+    if (operator === "between" || operator === "notBetween") {
+      return operator === "between"
+        ? `${lhs.toString()} <= ${base?.toString()} <= ${rhs?.toString()}`
+        : `${base?.toString()} < ${lhs.toString()} or ${base?.toString()} > ${rhs?.toString()}`;
+    } else if (operator === "in" || operator === "notIn") {
+      return operator === "in"
+        ? `${lhs.toString()} in ${rhs?.toString()}`
+        : `${lhs.toString()} not in ${rhs?.toString()}`;
+    } else if (operator === "contains" || operator === "doesNotContain") {
+      return operator === "contains"
+        ? `${rhs?.toString()} in ${lhs.toString()}`
+        : `${rhs?.toString()} not in ${lhs.toString()}`;
+    } else if (operator === "startswith" || operator === "endswith") {
+      return `${lhs.toString()}.${operator}(${rhs ? rhs.toString() : ""})`;
+    } else if (operator === "null" || operator === "notNull") {
+      return operator === "null"
+        ? `${lhs.toString()} is None`
+        : `${lhs.toString()} is not None`;
+    } else if (
+      operator === "doesNotBeginWith" ||
+      operator === "doesNotEndWith"
+    ) {
+      return operator === "doesNotBeginWith"
+        ? `!${lhs.toString()}.startswith(${rhs ? rhs.toString() : ""})`
+        : `!${lhs.toString()}.endswith(${rhs ? rhs.toString() : ""})`;
+    } else {
+      const rhsExpression = rhs ? ` ${operator} ${rhs.toString()}` : "";
+      return `${lhs.toString()}${rhsExpression}`;
+    }
+  }
+
+  private isConstantValueReference(lhs: AstNode): boolean {
+    return (
+      lhs instanceof WorkflowValueDescriptorReference &&
+      lhs.workflowValueReferencePointer === "CONSTANT_VALUE"
+    );
   }
 
   public write(writer: Writer) {

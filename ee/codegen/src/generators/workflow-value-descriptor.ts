@@ -65,7 +65,12 @@ export class WorkflowValueDescriptor extends AstNode {
     switch (workflowValueDescriptor.type) {
       case "UNARY_EXPRESSION": {
         const lhs = this.buildExpression(workflowValueDescriptor.lhs);
-        const operator = this.convertOperatorType(workflowValueDescriptor);
+        const operator =
+          workflowValueDescriptor.lhs.type === "CONSTANT_VALUE"
+            ? this.getOperatorTypeForReference(workflowValueDescriptor.operator)
+            : this.getOperatorTypeForExpression(
+                workflowValueDescriptor.operator
+              );
         return new Expression({
           lhs,
           operator: operator,
@@ -74,7 +79,12 @@ export class WorkflowValueDescriptor extends AstNode {
       case "BINARY_EXPRESSION": {
         const lhs = this.buildExpression(workflowValueDescriptor.lhs);
         const rhs = this.buildExpression(workflowValueDescriptor.rhs);
-        const operator = this.convertOperatorType(workflowValueDescriptor);
+        const operator =
+          workflowValueDescriptor.lhs.type === "CONSTANT_VALUE"
+            ? this.getOperatorTypeForReference(workflowValueDescriptor.operator)
+            : this.getOperatorTypeForExpression(
+                workflowValueDescriptor.operator
+              );
         return new Expression({
           lhs,
           operator: operator,
@@ -85,7 +95,12 @@ export class WorkflowValueDescriptor extends AstNode {
         const base = this.buildExpression(workflowValueDescriptor.base);
         const lhs = this.buildExpression(workflowValueDescriptor.lhs);
         const rhs = this.buildExpression(workflowValueDescriptor.rhs);
-        const operator = this.convertOperatorType(workflowValueDescriptor);
+        const operator =
+          workflowValueDescriptor.base.type === "CONSTANT_VALUE"
+            ? this.getOperatorTypeForReference(workflowValueDescriptor.operator)
+            : this.getOperatorTypeForExpression(
+                workflowValueDescriptor.operator
+              );
         return new Expression({
           lhs: lhs,
           operator: operator,
@@ -98,48 +113,70 @@ export class WorkflowValueDescriptor extends AstNode {
     }
   }
 
-  private convertOperatorType(
-    workflowValueDescriptor: WorkflowValueDescriptorType
-  ): OperatorMapping {
-    if (this.isExpression(workflowValueDescriptor)) {
-      const operator = workflowValueDescriptor.operator;
-      const operatorMappings: Record<string, OperatorMapping> = {
-        "=": "equals",
-        "!=": "does_not_equal",
-        "<": "less_than",
-        ">": "greater_than",
-        "<=": "less_than_or_equal_to",
-        ">=": "greater_than_or_equal_to",
-        contains: "contains",
-        beginsWith: "begins_with",
-        endsWith: "ends_with",
-        doesNotContain: "does_not_contain",
-        doesNotBeginWith: "does_not_begin_with",
-        doesNotEndWith: "does_not_end_with",
-        null: "is_null",
-        notNull: "is_not_null",
-        in: "in",
-        notIn: "not_in",
-        between: "between",
-        notBetween: "not_between",
-      };
-      const value = operatorMappings[operator];
-      if (!value) {
-        throw new NodePortGenerationError(
-          `This operator: ${operator} is not supported`
-        );
-      }
-      return value;
-    } else {
-      throw new NodeAttributeGenerationError(
-        `Operators should exist on expression and not be null`
+  private getOperatorTypeForExpression(operator: string): OperatorMapping {
+    const operatorMappings: Record<string, OperatorMapping> = {
+      "=": "equals",
+      "!=": "does_not_equal",
+      "<": "less_than",
+      ">": "greater_than",
+      "<=": "less_than_or_equal_to",
+      ">=": "greater_than_or_equal_to",
+      contains: "contains",
+      beginsWith: "begins_with",
+      endsWith: "ends_with",
+      doesNotContain: "does_not_contain",
+      doesNotBeginWith: "does_not_begin_with",
+      doesNotEndWith: "does_not_end_with",
+      null: "is_null",
+      notNull: "is_not_null",
+      in: "in",
+      notIn: "not_in",
+      between: "between",
+      notBetween: "not_between",
+    };
+    const value = operatorMappings[operator];
+    if (!value) {
+      throw new NodePortGenerationError(
+        `This operator: ${operator} is not supported`
       );
     }
+    return value;
+  }
+
+  private getOperatorTypeForReference(operator: string): string {
+    const operatorMappings: { [key: string]: string } = {
+      "=": "==",
+      "!=": "!=",
+      "<": "<",
+      ">": ">",
+      "<=": "<=",
+      ">=": ">=",
+      contains: "in",
+      beginsWith: "startswith",
+      endsWith: "endswith",
+      doesNotContain: "doesNotContain",
+      doesNotBeginWith: "doesNotBeginWith",
+      doesNotEndWith: "doesNotEndWith",
+      null: "null",
+      notNull: "notNull",
+      in: "in",
+      notIn: "notIn",
+      between: "between",
+      notBetween: "notBetween",
+    };
+
+    const pythonOperator = operatorMappings[operator];
+    if (!pythonOperator) {
+      throw new NodeAttributeGenerationError(
+        `Operator ${operator} is not supported for constant values`
+      );
+    }
+    return pythonOperator;
   }
 
   private isExpression(workflowValueDescriptor: WorkflowValueDescriptorType) {
     return (
-      workflowValueDescriptor.type === "UNARY_EXPRESSION" ||
+      workflowValueDescriptor.type === "CONSTANT_VALUE" ||
       workflowValueDescriptor.type === "BINARY_EXPRESSION" ||
       workflowValueDescriptor.type === "TERNARY_EXPRESSION"
     );
