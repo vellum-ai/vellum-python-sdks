@@ -1,3 +1,4 @@
+import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
@@ -5,6 +6,7 @@ import { isNil } from "lodash";
 import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node-input-value-pointer-rule";
 
 import { BaseNodeContext } from "src/context/node-context/base";
+import { AccessAttribute } from "src/generators/access-attribute";
 import {
   NodeInputValuePointer as NodeInputValuePointerType,
   WorkflowDataNode,
@@ -20,7 +22,9 @@ export declare namespace NodeInputValuePointer {
 export class NodeInputValuePointer extends AstNode {
   private nodeContext: BaseNodeContext<WorkflowDataNode>;
   private nodeInputValuePointerData: NodeInputValuePointerType;
+
   public rules: NodeInputValuePointerRule[];
+  private astNode: AstNode;
 
   public constructor(args: NodeInputValuePointer.Args) {
     super();
@@ -29,6 +33,11 @@ export class NodeInputValuePointer extends AstNode {
     this.nodeInputValuePointerData = args.nodeInputValuePointerData;
 
     this.rules = this.generateRules();
+
+    const astNode = this.generateAstNode();
+    this.inheritReferences(astNode);
+
+    this.astNode = astNode;
   }
 
   private generateRules(): NodeInputValuePointerRule[] {
@@ -47,29 +56,74 @@ export class NodeInputValuePointer extends AstNode {
       .filter((rule) => !isNil(rule));
   }
 
-  write(writer: Writer): void {
-    const firstRule = this.rules[0];
+  private generateAstNode(): AstNode {
+    const rules = this.rules;
+
+    const firstRule = rules[0];
     if (!firstRule) {
-      writer.write("None");
-      return;
+      return python.TypeInstantiation.none();
     }
 
-    firstRule.write(writer);
+    let expression: AstNode = firstRule;
 
-    for (let i = 1; i < this.rules.length; i++) {
-      const rule = this.rules[i];
+    for (let i = 1; i < rules.length; i++) {
+      const rule = rules[i];
       if (!rule) {
         continue;
       }
 
-      const previousRule = this.rules[i - 1];
+      const previousRule = rules[i - 1];
       if (previousRule && previousRule.ruleType === "CONSTANT_VALUE") {
         break;
       }
 
-      writer.write(".coalesce(");
-      rule.write(writer);
-      writer.write(")");
+      const coalesceMethod = python.invokeMethod({
+        methodReference: python.reference({ name: "coalesce" }),
+        arguments_: [python.methodArgument({ value: rule })],
+      });
+
+      expression = new AccessAttribute({
+        lhs: expression,
+        rhs: coalesceMethod,
+      });
     }
+
+    const hasReferenceToSelf = this.hasReferenceToSelf(rules);
+    if (hasReferenceToSelf) {
+      const lazyReference = python.instantiateClass({
+        classReference: python.reference({
+          name: "LazyReference",
+          modulePath: [
+            ...this.nodeContext.workflowContext.sdkModulePathNames
+              .WORKFLOWS_MODULE_PATH,
+            "references",
+          ],
+        }),
+        arguments_: [
+          python.methodArgument({
+            value: python.lambda({
+              body: expression,
+            }),
+          }),
+        ],
+      });
+      return lazyReference;
+    } else {
+      return expression;
+    }
+  }
+
+  private hasReferenceToSelf(rules: NodeInputValuePointerRule[]): boolean {
+    const referencedNodeContexts = new Set(
+      rules
+        .map((rule) => rule.getReferencedNodeContext())
+        .filter((nodeContext) => !isNil(nodeContext))
+    );
+
+    return referencedNodeContexts.has(this.nodeContext);
+  }
+
+  write(writer: Writer): void {
+    this.astNode.write(writer);
   }
 }

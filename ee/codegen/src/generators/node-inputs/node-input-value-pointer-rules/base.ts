@@ -43,6 +43,12 @@ export abstract class BaseNodeInputValuePointerRule<
     }
   }
 
+  public getReferencedNodeContext():
+    | BaseNodeContext<WorkflowDataNode>
+    | undefined {
+    return undefined;
+  }
+
   abstract getAstNode(): AstNode | undefined;
 
   public write(writer: Writer): void {

@@ -88,6 +88,12 @@ export class NodeInputValuePointerRule extends AstNode {
     }
   }
 
+  public getReferencedNodeContext():
+    | BaseNodeContext<WorkflowDataNode>
+    | undefined {
+    return this.astNode?.getReferencedNodeContext();
+  }
+
   public write(writer: Writer): void {
     if (this.astNode) {
       this.astNode.write(writer);
