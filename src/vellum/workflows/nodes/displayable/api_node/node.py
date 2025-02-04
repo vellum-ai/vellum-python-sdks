@@ -43,7 +43,9 @@ class APINode(BaseAPINode):
             header_overrides[self.api_key_header_key] = self.api_key_header_value
         elif self.authorization_type == AuthorizationType.BEARER_TOKEN and isinstance(self.bearer_token_value, str):
             header_overrides["Authorization"] = f"Bearer {self.bearer_token_value}"
-        else:
+        elif self.authorization_type == AuthorizationType.BEARER_TOKEN and isinstance(
+            self.bearer_token_value, VellumSecret
+        ):
             bearer_token = self.bearer_token_value
         return self._run(
             method=self.method,

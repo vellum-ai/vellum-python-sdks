@@ -1,7 +1,8 @@
-from vellum import ExecuteApiResponse, VellumSecret
+from vellum import ExecuteApiResponse
 from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.nodes import APINode
 from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import VellumSecret
 
 
 def test_run_workflow__secrets(vellum_client):

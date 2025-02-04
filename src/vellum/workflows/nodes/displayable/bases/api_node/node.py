@@ -3,6 +3,7 @@ from typing import Any, Dict, Generic, Optional, Union
 from requests import Request, RequestException, Session
 from requests.exceptions import JSONDecodeError
 
+from vellum.client.types.vellum_secret import VellumSecret as ClientVellumSecret
 from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -45,7 +46,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         self,
         method: APIRequestMethod,
         url: str,
-        data: Optional[str] = None,
+        data: Optional[Union[str, Any]] = None,
         json: Any = None,
         headers: Any = None,
         bearer_token: Optional[VellumSecret] = None,
@@ -55,10 +56,14 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             if isinstance(headers[header], VellumSecret):
                 vellum_instance = True
         if vellum_instance or bearer_token:
-            response = self._context.vellum_client.execute_api(
-                url=url, method=method.value, body=data, headers=headers, bearer_token=bearer_token
+            client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
+            vellum_response = self._context.vellum_client.execute_api(
+                url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
             )
-            json = response.json_
+            json = vellum_response.json_
+            headers = vellum_response.headers
+            status_code = vellum_response.status_code
+            text = vellum_response.text
         else:
             try:
                 prepped = Request(method=method.value, url=url, data=data, json=json, headers=headers).prepare()
@@ -76,9 +81,13 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             except JSONDecodeError:
                 json = None
 
+            headers = {header: value for header, value in response.headers.items()}
+            status_code = response.status_code
+            text = response.text
+
         return self.Outputs(
             json=json,
-            headers={header: value for header, value in response.headers.items()},
-            status_code=response.status_code,
-            text=response.text,
+            headers=headers,
+            status_code=status_code,
+            text=text,
         )
