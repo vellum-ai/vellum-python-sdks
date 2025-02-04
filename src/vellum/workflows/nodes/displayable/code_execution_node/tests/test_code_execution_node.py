@@ -419,7 +419,7 @@ name
 def test_run_workflow__run_inline__valid_dict_to_pydantic_any_type():
     """Confirm that CodeExecutionNodes can convert a dict to a Pydantic model during inline execution."""
 
-    # GIVEN a node that subclasses CodeExecutionNode that returns a dict matching a Pydantic model
+    # GIVEN a node that subclasses CodeExecutionNode that returns a dict matching Any
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Any]):
         code = """\
 def main(word: str) -> dict:
