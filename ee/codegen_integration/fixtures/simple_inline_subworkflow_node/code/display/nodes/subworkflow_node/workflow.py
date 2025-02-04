@@ -44,7 +44,6 @@ class SubworkflowNodeWorkflowDisplay(VellumWorkflowDisplay[SubworkflowNodeWorkfl
             node_id=UUID("f3fe1e6e-5a4a-42d8-9cfe-9ecbcb935f72"),
             name="final-output",
             label="Final Output",
-            target_handle_id=UUID("20aa0107-742b-4662-941f-4f146b3c5565"),
             display_data=NodeDisplayData(
                 position=NodeDisplayPosition(x=2750, y=208.7778595317725), width=456, height=233
             ),

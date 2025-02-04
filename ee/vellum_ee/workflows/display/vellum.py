@@ -113,8 +113,8 @@ class WorkflowOutputVellumDisplayOverrides(WorkflowOutputDisplay, WorkflowOutput
     name: str
     label: str
     node_id: UUID
-    target_handle_id: UUID
     display_data: NodeDisplayData
+    target_handle_id: Optional[UUID] = None
 
 
 @dataclass

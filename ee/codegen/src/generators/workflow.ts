@@ -503,12 +503,6 @@ export class Workflow {
                       ),
                     }),
                     python.methodArgument({
-                      name: "target_handle_id",
-                      value: python.TypeInstantiation.uuid(
-                        terminalNodeData.data.targetHandleId
-                      ),
-                    }),
-                    python.methodArgument({
                       name: "display_data",
                       value: new NodeDisplayData({
                         nodeDisplayData: terminalNodeData.displayData,
