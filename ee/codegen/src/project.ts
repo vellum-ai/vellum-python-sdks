@@ -374,41 +374,36 @@ ${errors.slice(0, 3).map((err) => {
         )
     );
 
-    await Promise.all(
-      this.workflowVersionExecConfig.workflowRawData.nodes.map(
-        async (nodeData) => {
-          if (nodeData.type === "TERMINAL") {
-            // If we have explicit output values, use those
-            if (
-              !isNilOrEmpty(
-                this.workflowVersionExecConfig.workflowRawData.outputValues
-              )
-            ) {
-              this.workflowVersionExecConfig.workflowRawData.outputValues?.forEach(
-                (outputValue) => {
-                  if (outputValue) {
-                    this.workflowContext.addWorkflowOutputContext(
-                      new WorkflowOutputContext({
-                        workflowContext: this.workflowContext,
-                        workflowOutputValue: outputValue,
-                      })
-                    );
-                  }
-                }
-              );
-            } else {
-              // Otherwise fall back to creating from all terminal nodes
-              this.workflowContext.addWorkflowOutputContext(
-                new WorkflowOutputContext({
-                  workflowContext: this.workflowContext,
-                  terminalNodeData: nodeData as FinalOutputNodeType,
-                })
-              );
-            }
+    if (
+      !isNilOrEmpty(this.workflowVersionExecConfig.workflowRawData.outputValues)
+    ) {
+      this.workflowVersionExecConfig.workflowRawData.outputValues?.forEach(
+        (outputValue) => {
+          if (outputValue) {
+            this.workflowContext.addWorkflowOutputContext(
+              new WorkflowOutputContext({
+                workflowContext: this.workflowContext,
+                workflowOutputValue: outputValue,
+              })
+            );
           }
         }
-      )
-    );
+      );
+    } else {
+      // Otherwise fall back to creating from all terminal nodes
+      this.workflowVersionExecConfig.workflowRawData.nodes.forEach(
+        (nodeData) => {
+          if (nodeData.type === "TERMINAL") {
+            this.workflowContext.addWorkflowOutputContext(
+              new WorkflowOutputContext({
+                workflowContext: this.workflowContext,
+                terminalNodeData: nodeData as FinalOutputNodeType,
+              })
+            );
+          }
+        }
+      );
+    }
 
     if (!entrypointNode) {
       throw new WorkflowGenerationError("Entrypoint node not found");

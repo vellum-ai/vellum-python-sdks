@@ -522,19 +522,6 @@ export class Workflow {
                 displayData = referencedNode.nodeData.displayData;
               }
 
-              const edge = this.getEdges().find((edge) => {
-                return (
-                  edge.targetNodeId === outputNodeId &&
-                  edge.targetHandleId === targetHandleId
-                );
-              });
-
-              if (!edge) {
-                throw new WorkflowGenerationError(
-                  `Could not find edge for final output node ${outputNodeId}`
-                );
-              }
-
               return {
                 key: python.reference({
                   name: this.workflowContext.workflowClassName,
