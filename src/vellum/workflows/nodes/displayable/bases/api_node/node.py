@@ -56,16 +56,9 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             if isinstance(headers[header], VellumSecret):
                 vellum_instance = True
         if vellum_instance or bearer_token:
-            headers, json, status_code, text = self._vellum_execute_api(bearer_token, data, headers, json, method, url)
+            return self._vellum_execute_api(bearer_token, data, headers, json, method, url)
         else:
-            headers, json, status_code, text = self._local_execute_api(data, headers, json, method, url)
-
-        return self.Outputs(
-            json=json,
-            headers=headers,
-            status_code=status_code,
-            text=text,
-        )
+            return self._local_execute_api(data, headers, json, method, url)
 
     def _local_execute_api(self, data, headers, json, method, url):
         try:
@@ -81,18 +74,21 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             json = response.json()
         except JSONDecodeError:
             json = None
-        headers = {header: value for header, value in response.headers.items()}
-        status_code = response.status_code
-        text = response.text
-        return headers, json, status_code, text
+        return self.Outputs(
+            json=json,
+            headers={header: value for header, value in response.headers.items()},
+            status_code=response.status_code,
+            text=response.text,
+        )
 
     def _vellum_execute_api(self, bearer_token, data, headers, json, method, url):
         client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
         vellum_response = self._context.vellum_client.execute_api(
             url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
         )
-        json = vellum_response.json_
-        headers = vellum_response.headers
-        status_code = vellum_response.status_code
-        text = vellum_response.text
-        return headers, json, status_code, text
+        return self.Outputs(
+            json=vellum_response.json_,
+            headers=vellum_response.headers,
+            status_code=vellum_response.status_code,
+            text=vellum_response.text,
+        )
