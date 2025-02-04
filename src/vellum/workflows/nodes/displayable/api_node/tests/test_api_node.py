@@ -26,8 +26,9 @@ def test_run_workflow__secrets(vellum_client):
         bearer_token_value = VellumSecret(name="secret")
 
     node = SimpleBaseAPINode(state=BaseState())
-    node.run()
+    terminal = node.run()
 
     assert vellum_client.execute_api.call_count == 1
     bearer_token = vellum_client.execute_api.call_args.kwargs["bearer_token"]
     assert bearer_token == ClientVellumSecret(name="secret")
+    assert terminal.headers == {"X-Response-Header": "bar"}
