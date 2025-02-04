@@ -1,7 +1,9 @@
+import pytest
 from datetime import datetime
 from uuid import uuid4
 from typing import Any, Iterator, List
 
+from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.workflow_execution_workflow_result_event import WorkflowExecutionWorkflowResultEvent
 from vellum.client.types.workflow_output_string import WorkflowOutputString
@@ -12,14 +14,15 @@ from vellum.client.types.workflow_stream_event import WorkflowStreamEvent
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 
 
-def test_run_workflow__chat_history_input(vellum_client):
+@pytest.mark.parametrize("ChatMessageClass", [ChatMessageRequest, ChatMessage])
+def test_run_workflow__chat_history_input(vellum_client, ChatMessageClass):
     """Confirm that we can successfully invoke a Subworkflow Deployment Node that uses Chat History Inputs"""
 
     # GIVEN a Subworkflow Deployment Node
     class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
         deployment = "example_subworkflow_deployment"
         subworkflow_inputs = {
-            "chat_history": [ChatMessageRequest(role="USER", text="Hello, how are you?")],
+            "chat_history": [ChatMessageClass(role="USER", text="Hello, how are you?")],
         }
 
     # AND we know what the Subworkflow Deployment will respond with

@@ -1,7 +1,9 @@
+import pytest
 from uuid import uuid4
 from typing import Any, Iterator, List
 
 from vellum.client.types.chat_history_input_request import ChatHistoryInputRequest
+from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
@@ -11,14 +13,15 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.nodes.displayable.prompt_deployment_node.node import PromptDeploymentNode
 
 
-def test_run_node__chat_history_input(vellum_client):
+@pytest.mark.parametrize("ChatMessageClass", [ChatMessageRequest, ChatMessage])
+def test_run_node__chat_history_input(vellum_client, ChatMessageClass):
     """Confirm that we can successfully invoke a Prompt Deployment Node that uses Chat History Inputs"""
 
     # GIVEN a Prompt Deployment Node
     class ExamplePromptDeploymentNode(PromptDeploymentNode):
         deployment = "example_prompt_deployment"
         prompt_inputs = {
-            "chat_history": [ChatMessageRequest(role="USER", text="Hello, how are you?")],
+            "chat_history": [ChatMessageClass(role="USER", text="Hello, how are you?")],
         }
 
     # AND we know what the Prompt Deployment will respond with

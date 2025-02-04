@@ -1,6 +1,6 @@
 import json
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Sequence, Union, cast
+from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Sequence, Union
 
 from vellum import (
     ChatHistoryInputRequest,
@@ -95,10 +95,19 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
             elif isinstance(input_value, list) and all(
                 isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
             ):
+                chat_history = [
+                    (
+                        message
+                        if isinstance(message, ChatMessageRequest)
+                        else ChatMessageRequest.model_validate(message.model_dump())
+                    )
+                    for message in input_value
+                    if isinstance(message, (ChatMessage, ChatMessageRequest))
+                ]
                 compiled_inputs.append(
                     ChatHistoryInputRequest(
                         name=input_name,
-                        value=cast(List[ChatMessage], input_value),
+                        value=chat_history,
                     )
                 )
             else:

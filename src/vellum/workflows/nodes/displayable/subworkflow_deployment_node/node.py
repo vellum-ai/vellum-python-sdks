@@ -72,10 +72,19 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             elif isinstance(input_value, list) and all(
                 isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
             ):
+                chat_history = [
+                    (
+                        message
+                        if isinstance(message, ChatMessageRequest)
+                        else ChatMessageRequest.model_validate(message.model_dump())
+                    )
+                    for message in input_value
+                    if isinstance(message, (ChatMessage, ChatMessageRequest))
+                ]
                 compiled_inputs.append(
                     WorkflowRequestChatHistoryInputRequest(
                         name=input_name,
-                        value=cast(List[ChatMessage], input_value),
+                        value=chat_history,
                     )
                 )
             elif isinstance(input_value, dict):
