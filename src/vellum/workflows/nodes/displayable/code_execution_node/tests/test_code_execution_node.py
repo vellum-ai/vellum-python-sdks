@@ -1,5 +1,6 @@
 import pytest
 import os
+from typing import Any
 
 from vellum import CodeExecutorResponse, NumberVellumValue, StringInput
 from vellum.client.types.code_execution_package import CodeExecutionPackage
@@ -413,3 +414,35 @@ name
   Field required [type=missing, input_value={'n': 'hello', 'a': {}}, input_type=dict]\
 """
     )
+
+
+def test_run_workflow__run_inline__valid_dict_to_pydantic_any_type():
+    """Confirm that CodeExecutionNodes can convert a dict to a Pydantic model during inline execution."""
+
+    # GIVEN a node that subclasses CodeExecutionNode that returns a dict matching a Pydantic model
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Any]):
+        code = """\
+def main(word: str) -> dict:
+    return {
+        "name": "word",
+        "arguments": {},
+    }
+    """
+        runtime = "PYTHON_3_11_6"
+
+        code_inputs = {
+            "word": "hello",
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should have produced the outputs we expect
+    assert outputs == {
+        "result": {
+            "name": "word",
+            "arguments": {},
+        },
+        "log": "",
+    }
