@@ -1,4 +1,92 @@
 # Reference
+<details><summary><code>client.<a href="src/vellum/client.py">execute_api</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.execute_api(
+    url="url",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**url:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**method:** `typing.Optional[MethodEnum]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**body:** `typing.Optional[ExecuteApiRequestBody]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**headers:** `typing.Optional[typing.Dict[str, ExecuteApiRequestHeadersValue]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**bearer_token:** `typing.Optional[ExecuteApiRequestBearerToken]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.<a href="src/vellum/client.py">execute_code</a>(...)</code></summary>
 <dl>
 <dd>
