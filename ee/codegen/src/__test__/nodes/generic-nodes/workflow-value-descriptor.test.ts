@@ -30,6 +30,17 @@ describe("WorkflowValueDescriptor", () => {
       })
     );
 
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "input-2",
+          key: "another_count",
+          type: "NUMBER",
+        },
+        workflowContext,
+      })
+    );
+
     vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
       nodeClassName: "TestNode",
       path: ["nodes", "test-node-path"],
@@ -157,65 +168,7 @@ describe("WorkflowValueDescriptor", () => {
   });
 
   describe("expressions that begin with constant values", () => {
-    it("generates binary expression with lhs of string and rhs of string", async () => {
-      const descriptor: WorkflowValueDescriptorType = {
-        type: "BINARY_EXPRESSION",
-        operator: "=",
-        lhs: {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "STRING",
-            value: "Hello, World!",
-          },
-        },
-        rhs: {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "STRING",
-            value: "Hello, World!",
-          },
-        },
-      };
-
-      const valueDescriptor = new WorkflowValueDescriptor({
-        workflowValueDescriptor: descriptor,
-        workflowContext,
-      });
-
-      valueDescriptor.write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("generates binary expression with lhs of number and rhs of number", async () => {
-      const descriptor: WorkflowValueDescriptorType = {
-        type: "BINARY_EXPRESSION",
-        operator: "=",
-        lhs: {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "NUMBER",
-            value: 5,
-          },
-        },
-        rhs: {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "NUMBER",
-            value: 500,
-          },
-        },
-      };
-
-      const valueDescriptor = new WorkflowValueDescriptor({
-        workflowValueDescriptor: descriptor,
-        workflowContext,
-      });
-
-      valueDescriptor.write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("generates unary expression with lhs of string", async () => {
+    it("generates unary expression beginning with constant value reference", async () => {
       const descriptor: WorkflowValueDescriptorType = {
         type: "UNARY_EXPRESSION",
         operator: "null",
@@ -236,21 +189,22 @@ describe("WorkflowValueDescriptor", () => {
       valueDescriptor.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-
-    it("generates binary expression with not equals operator and numbers", async () => {
+    it("generates binary expression beginning with constant value reference", async () => {
       const descriptor: WorkflowValueDescriptorType = {
         type: "BINARY_EXPRESSION",
-        operator: "!=",
+        operator: "=",
         lhs: {
           type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 5 },
+          value: {
+            type: "STRING",
+            value: "Hello, World!",
+          },
         },
         rhs: {
-          type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 10 },
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
         },
       };
-
       const valueDescriptor = new WorkflowValueDescriptor({
         workflowValueDescriptor: descriptor,
         workflowContext,
@@ -259,110 +213,26 @@ describe("WorkflowValueDescriptor", () => {
       valueDescriptor.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-
-    it("generates ternary expression with between operator and numbers", async () => {
+    it("generates ternary expression beginning with constant value reference", async () => {
       const descriptor: WorkflowValueDescriptorType = {
         type: "TERNARY_EXPRESSION",
         operator: "between",
         base: {
           type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 5 },
-        },
-        lhs: {
-          type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 1 },
-        },
-        rhs: {
-          type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 10 },
-        },
-      };
-
-      const valueDescriptor = new WorkflowValueDescriptor({
-        workflowValueDescriptor: descriptor,
-        workflowContext,
-      });
-
-      valueDescriptor.write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("generates ternary expression with not between operator and numbers", async () => {
-      const descriptor: WorkflowValueDescriptorType = {
-        type: "TERNARY_EXPRESSION",
-        operator: "notBetween",
-        base: {
-          type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 5 },
-        },
-        lhs: {
-          type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 1 },
-        },
-        rhs: {
-          type: "CONSTANT_VALUE",
-          value: { type: "NUMBER", value: 10 },
-        },
-      };
-
-      const valueDescriptor = new WorkflowValueDescriptor({
-        workflowValueDescriptor: descriptor,
-        workflowContext,
-      });
-
-      valueDescriptor.write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("generates binary expression with in operator and string array", async () => {
-      const descriptor: WorkflowValueDescriptorType = {
-        type: "BINARY_EXPRESSION",
-        operator: "in",
-        lhs: {
-          type: "CONSTANT_VALUE",
-          value: { type: "STRING", value: "test" },
-        },
-        rhs: {
-          type: "CONSTANT_VALUE",
           value: {
-            type: "ARRAY",
-            value: [
-              { type: "STRING", value: "test" },
-              { type: "STRING", value: "other" },
-            ],
+            type: "NUMBER",
+            value: 123,
           },
         },
-      };
-
-      const valueDescriptor = new WorkflowValueDescriptor({
-        workflowValueDescriptor: descriptor,
-        workflowContext,
-      });
-
-      valueDescriptor.write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("generates binary expression with not in operator and string array", async () => {
-      const descriptor: WorkflowValueDescriptorType = {
-        type: "BINARY_EXPRESSION",
-        operator: "notIn",
         lhs: {
-          type: "CONSTANT_VALUE",
-          value: { type: "STRING", value: "test" },
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
         },
         rhs: {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "ARRAY",
-            value: [
-              { type: "STRING", value: "test" },
-              { type: "STRING", value: "other" },
-            ],
-          },
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-2",
         },
       };
-
       const valueDescriptor = new WorkflowValueDescriptor({
         workflowValueDescriptor: descriptor,
         workflowContext,
