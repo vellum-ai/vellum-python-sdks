@@ -18,7 +18,7 @@ import { ValueGenerationError } from "./errors";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
 import { IterableConfig } from "src/types/vellum";
-import { assertUnreachable } from "src/utils/typing";
+import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
   private astNode: AstNode;
@@ -74,7 +74,7 @@ class JsonVellumValue extends AstNode {
 }
 
 class ChatHistoryVellumValue extends AstNode {
-  private astNode: AstNode;
+  private astNode: AstNode | undefined;
 
   public constructor({
     value,
@@ -90,7 +90,10 @@ class ChatHistoryVellumValue extends AstNode {
   private generateAstNode(
     value: ChatMessageRequest[],
     isRequestType: boolean
-  ): AstNode {
+  ): AstNode | undefined {
+    if (isNilOrEmpty(value)) {
+      return undefined;
+    }
     const chatMessages = value.map((chatMessage) => {
       const arguments_ = [
         python.methodArgument({
@@ -148,7 +151,9 @@ class ChatHistoryVellumValue extends AstNode {
   }
 
   public write(writer: Writer): void {
-    this.astNode.write(writer);
+    if (this.astNode) {
+      this.astNode.write(writer);
+    }
   }
 }
 

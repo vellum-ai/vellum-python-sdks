@@ -71,6 +71,17 @@ describe("VellumValue", () => {
       expect(await writer.toString()).toMatchSnapshot();
       expect(chatHistoryValue.getReferences()).toHaveLength(2);
     });
+
+    it("should write nothing when CHAT_HISTORY value is null", async () => {
+      const chatHistoryValue = codegen.vellumValue({
+        vellumValue: {
+          type: "CHAT_HISTORY",
+        },
+      });
+      chatHistoryValue.write(writer);
+      expect(await writer.toString()).toMatchSnapshot();
+      expect(chatHistoryValue.getReferences()).toHaveLength(0);
+    });
   });
 
   describe("JSON", () => {
