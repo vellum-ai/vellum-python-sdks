@@ -4,7 +4,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import type { python } from "@fern-api/python-ast";
 
 export class StaticMethodInvocation extends AstNode {
-  private reference: python.Reference;
+  private reference: python.AstNode;
   private methodName: string;
   private arguments: python.MethodArgument[];
   constructor({
@@ -12,7 +12,7 @@ export class StaticMethodInvocation extends AstNode {
     arguments_,
     methodName,
   }: {
-    reference: python.Reference;
+    reference: python.AstNode;
     arguments_: python.MethodArgument[];
     methodName: string;
   }) {
@@ -20,6 +20,7 @@ export class StaticMethodInvocation extends AstNode {
     this.reference = reference;
     this.methodName = methodName;
     this.arguments = arguments_;
+
     this.inheritReferences(reference);
     this.arguments.forEach((arg) => {
       this.inheritReferences(arg);
