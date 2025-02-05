@@ -343,6 +343,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             return self.serialize_value(display_context, value._value)
 
         if isinstance(value, LazyReference):
+            if isinstance(value._get, str):
+                raise NotImplementedError("LazyReference with a string is not implemented")
+
             return self.serialize_value(display_context, value._get())
 
         if isinstance(value, WorkflowInputReference):
