@@ -1,6 +1,6 @@
 import ast
 import inspect
-from typing import TYPE_CHECKING, Callable, Generic, TypeVar, get_args
+from typing import TYPE_CHECKING, Callable, Generic, TypeVar, Union, get_args
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 
@@ -13,7 +13,7 @@ _T = TypeVar("_T")
 class LazyReference(BaseDescriptor[_T], Generic[_T]):
     def __init__(
         self,
-        get: Callable[[], BaseDescriptor[_T]],
+        get: Union[Callable[[], BaseDescriptor[_T]], str],
     ) -> None:
         self._get = get
         # TODO: figure out this some times returns empty
@@ -25,6 +25,9 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
     def resolve(self, state: "BaseState") -> _T:
         from vellum.workflows.descriptors.utils import resolve_value
 
+        if isinstance(self._get, str):
+            raise NotImplementedError("LazyReference with a string is not implemented")
+
         return resolve_value(self._get(), state)
 
     def _get_name(self) -> str:
@@ -33,6 +36,9 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         setting that as the descriptor's name. Names are only used for debugging, so
         we could flesh out edge cases over time.
         """
+        if isinstance(self._get, str):
+            return self._get
+
         source = inspect.getsource(self._get).strip()
         try:
             parsed = ast.parse(source)
