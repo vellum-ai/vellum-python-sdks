@@ -1,7 +1,7 @@
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports.port import Port
 
-from tests.workflows.await_all_executions.workflow import SecondNode
+from tests.workflows.circular_lazy_reference.nodes.second import SecondNode
 
 
 class LoopNode(BaseNode):

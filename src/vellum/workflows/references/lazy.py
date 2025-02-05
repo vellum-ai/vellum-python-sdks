@@ -2,6 +2,7 @@ import ast
 import inspect
 from typing import TYPE_CHECKING, Callable, Generic, TypeVar, Union, get_args
 
+from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
 
 if TYPE_CHECKING:
@@ -26,7 +27,17 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         from vellum.workflows.descriptors.utils import resolve_value
 
         if isinstance(self._get, str):
-            raise NotImplementedError("LazyReference with a string is not implemented")
+            # The full solution will involve creating a nodes registry on `WorkflowContext`. I want to update
+            # how WorkflowContext works so that we could just access it directly instead of it needing to be
+            # passed in, similar to get_workflow_context(). Because we don't want this to slow down p1 issues
+            # that we are debugging with existing workflows, using the following workaround for now.
+            for output_reference, value in state.meta.node_outputs.items():
+                if str(output_reference) == self._get:
+                    return value
+
+            # Fix typing surrounding the return value of node outputs/output descriptors
+            # https://app.shortcut.com/vellum/story/4783
+            return UNDEF  # type: ignore[return-value]
 
         return resolve_value(self._get(), state)
 

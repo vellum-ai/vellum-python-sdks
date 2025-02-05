@@ -15,4 +15,4 @@ class CircularLazyReferenceWorkflow(BaseWorkflow):
     graph = FirstNode >> SecondNode >> LoopNode.Ports.loop >> FirstNode
 
     class Outputs(BaseWorkflow.Outputs):
-        final_value = LoopNode.Execution.count
+        final_value = SecondNode.Outputs.value

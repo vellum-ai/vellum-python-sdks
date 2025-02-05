@@ -3,7 +3,7 @@ from vellum.workflows.references.lazy import LazyReference
 
 
 class FirstNode(BaseNode):
-    second = LazyReference[str]("SecondNode.Outputs.value")
+    second = LazyReference[str]("SecondNode.Outputs.value").coalesce("Start")
 
     class Outputs(BaseNode.Outputs):
         value: str
