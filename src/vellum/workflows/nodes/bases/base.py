@@ -255,17 +255,15 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 return False
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ATTRIBUTES:
-                is_ready = True
                 for descriptor in cls.node_class:
                     if not descriptor.instance:
                         continue
 
                     resolved_value = resolve_value(descriptor.instance, state, path=descriptor.name)
                     if is_unresolved(resolved_value):
-                        is_ready = False
-                        break
+                        return False
 
-                return is_ready
+                return True
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
                 return True
