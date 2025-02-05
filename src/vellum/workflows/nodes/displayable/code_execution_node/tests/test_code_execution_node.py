@@ -345,7 +345,7 @@ def test_run_node__int_input(vellum_client):
     assert vellum_client.execute_code.call_args_list[0].kwargs["input_values"] == [
         NumberInput(
             name="counter",
-            value=1,
+            value=1.0,
         )
     ]
 

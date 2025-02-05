@@ -170,11 +170,11 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                         value=cast(Dict[str, Any], input_value),
                     )
                 )
-            elif isinstance(input_value, float):
+            elif isinstance(input_value, (float, int)):
                 compiled_inputs.append(
                     NumberInput(
                         name=input_name,
-                        value=input_value,
+                        value=float(input_value),
                     )
                 )
             elif isinstance(input_value, FunctionCall):
