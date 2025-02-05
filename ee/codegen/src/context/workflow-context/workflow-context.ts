@@ -186,6 +186,7 @@ export class WorkflowContext {
       workflowClassName: workflowClassName,
       globalInputVariableContextsById: this.globalInputVariableContextsById,
       globalNodeContextsByNodeId: this.globalNodeContextsByNodeId,
+      globalOutputVariableContextsById: this.globalOutputVariableContextsById,
       parentNode,
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,

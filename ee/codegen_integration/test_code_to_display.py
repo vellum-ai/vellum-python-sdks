@@ -29,7 +29,11 @@ def test_code_to_display_data(code_to_display_fixture_paths, workspace_secret_cl
         significant_digits=6,
         # This is for the input_variables order being out of order sometimes.
         ignore_order=True,
-        exclude_regex_paths=[r"root\['workflow_raw_data'\]\['edges'\]\[\d+\]\['target_handle_id'\]"],
+        exclude_regex_paths=[
+            r"root\['workflow_raw_data'\]\['edges'\]\[\d+\]\['target_handle_id'\]",
+            # This is for output values since this currently isn't serialized yet
+            r"root\['workflow_raw_data'\]\['nodes'\]\[\d+\]\['data'\]\['workflow_raw_data'\]\['output_values'\]",
+        ],
     )
 
 

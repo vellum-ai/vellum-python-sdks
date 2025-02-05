@@ -328,7 +328,17 @@
                 "subworkflow_node",
                 "workflow"
               ]
-            }
+            },
+            "output_values": [
+                                        {
+                                            "output_variable_id": "6ab3665f-881d-488b-9124-a6da40136c68",
+                                            "value": {
+                                                "type": "NODE_OUTPUT",
+                                                "node_id": "f3fe1e6e-5a4a-42d8-9cfe-9ecbcb935f72",
+                                                "node_output_id": "6ab3665f-881d-488b-9124-a6da40136c68"
+                                            }
+                                        }
+                                    ]
           },
           "input_variables": [],
           "output_variables": [
