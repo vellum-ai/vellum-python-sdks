@@ -7,9 +7,12 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 class Inputs(BaseInputs):
@@ -149,6 +152,41 @@ def test_serialize_node__lazy_reference(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+def test_serialize_node__lazy_reference_with_string():
+    # GIVEN two nodes with one lazily referencing the other
+    class LazyReferenceGenericNode(BaseNode):
+        attr = LazyReference[str]("OtherNode.Outputs.result")
+
+    class OtherNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    # AND a workflow with both nodes
+    class Workflow(BaseWorkflow):
+        graph = LazyReferenceGenericNode >> OtherNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the attribute reference
+    lazy_reference_node = next(
+        node for node in serialized_workflow["nodes"] if node["id"] == str(LazyReferenceGenericNode.__id__)
+    )
+
+    assert lazy_reference_node["attributes"][0]["value"]["type"] == [
+        {
+            "id": "4370b381-9165-4fb4-881e-480507abe069",
+            "name": "attr",
+            "value": {
+                "type": "NODE_OUTPUT",
+                "node_id": str(OtherNode.__id__),
+                "node_output_id": "4370b381-9165-4fb4-881e-480507abe069",
+            },
+        }
+    ]
 
 
 class WorkflowInputGenericNode(BaseNode):
