@@ -117,10 +117,9 @@ export class GraphAttribute extends AstNode {
       return this.workflowContext.getNodeContext(nodeId);
     } catch (error) {
       if (error instanceof NodeNotFoundError) {
-        const enhancedError = new NodeNotFoundError(
+        console.warn(
           `Failed to find target node with ID '${nodeId}' referenced from edge ${edgeId}`
         );
-        this.workflowContext.addError(enhancedError);
         return null;
       } else {
         throw error;

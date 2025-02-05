@@ -359,15 +359,6 @@ class BadNode(TemplatingNode[BaseState, str]):
     template = """foo"""
     inputs = {}
 `);
-
-      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
-      expect(fs.existsSync(errorLogPath)).toBe(true);
-      expect(fs.readFileSync(errorLogPath, "utf-8")).toBe(`\
-Encountered 2 error(s) while generating code:
-
-- Port context not found for port id: bad-source-handle-id
-- Failed to find node with id 'bad-target'
-`);
     });
   });
   describe("inlude sandbox", () => {

@@ -235,11 +235,6 @@ exports[`Workflow > graph > should handle a simple edge of generic nodes 1`] = `
 "
 `;
 
-exports[`Workflow > graph > should show errors for a node pointing to non-existent node 1`] = `
-"TemplatingNode
-"
-`;
-
 exports[`Workflow > graph > should support an edge between two sets 1`] = `
 "{
     TopLeftNode

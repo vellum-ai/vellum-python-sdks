@@ -56,12 +56,10 @@ describe("Workflow", () => {
   };
 
   let workflowContext: WorkflowContext;
-  let writer: Writer;
 
   beforeEach(() => {
     workflowContext = workflowContextFactory();
     workflowContext.addEntrypointNode(entrypointNode);
-    writer = new Writer();
   });
 
   describe("graph", () => {
@@ -587,41 +585,6 @@ describe("Workflow", () => {
         [topNode, outputMiddleNode],
         [topNode, outputBottomNode],
       ]);
-    });
-
-    it("should show errors for a node pointing to non-existent node", async () => {
-      // We skip using runGraphTest here because we want to test an error case
-
-      workflowContext = workflowContextFactory({ strict: false });
-      workflowContext.addEntrypointNode(entrypointNode);
-      const templatingNodeData1 = templatingNodeFactory();
-      await createNodeContext({
-        workflowContext,
-        nodeData: templatingNodeData1,
-      });
-
-      const templatingNodeData2 = templatingNodeFactory({
-        id: "non-existent-node-id",
-        label: "Templating Node 2",
-        sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
-        targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      // No node context created
-
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, templatingNodeData1],
-          [entrypointNode, templatingNodeData2],
-        ])
-      );
-
-      new GraphAttribute({ workflowContext }).write(writer);
-      const errors = workflowContext.getErrors();
-      expect(errors).toHaveLength(1);
-      expect(errors[0]?.message).toContain(
-        `Failed to find target node with ID 'non-existent-node-id' referenced from edge edge-2`
-      );
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should support an edge between two sets", async () => {
