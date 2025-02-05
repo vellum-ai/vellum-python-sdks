@@ -32,11 +32,15 @@ setup-fern:
 # Testing
 ################################
 
+file ?= .
 test:
-	fern test --command "poetry run pytest -rEf -s -vv $(file)"
-
-test-raw:
 	poetry run pytest -rEf -s -vv $(file)
+
+# This used to be different from `make test`, but were aligned after we removed the auto-generated fern tests from `make test`
+# Kept for now until users are migrated to the new `make test` command
+file ?= .
+test-raw:
+	poetry run pytest -rEf -s -vv $(file) && echo '"make test-raw" is DEPRECATED. Use "make test" instead'
 
 
 ################################
