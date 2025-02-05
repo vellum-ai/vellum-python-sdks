@@ -3,6 +3,7 @@ import * as fs from "node:fs";
 import { join } from "path";
 
 import { difference } from "lodash";
+import { v4 as uuidv4 } from "uuid";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { expect, vi } from "vitest";
@@ -17,7 +18,6 @@ import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-fa
 import { SpyMocks } from "src/__test__/utils/SpyMocks";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowProjectGenerator } from "src/project";
-
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
 
@@ -827,6 +827,132 @@ baz = foo + bar
         "nodes",
         "code_execution_node",
         "script.py"
+      );
+      expect(fs.existsSync(scriptPath)).toBe(true);
+      expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
+    });
+  });
+
+  describe("Nodes with forward references", () => {
+    const firstNodeId = uuidv4();
+    const secondNodeId = uuidv4();
+    const secondNodeOutputId = uuidv4();
+    const firstNodeDefaultPortId = uuidv4();
+    const firstNodeTriggerId = uuidv4();
+    const secondNodeTriggerId = uuidv4();
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: firstNodeId,
+            type: "GENERIC",
+            label: "First Node",
+            attributes: [
+              {
+                id: uuidv4(),
+                name: "forward",
+                value: {
+                  type: "NODE_OUTPUT",
+                  node_id: secondNodeId,
+                  node_output_id: secondNodeOutputId,
+                },
+              },
+            ],
+            trigger: {
+              id: firstNodeTriggerId,
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            ports: [
+              {
+                id: firstNodeDefaultPortId,
+                name: "default",
+                type: "DEFAULT",
+              },
+            ],
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+            outputs: [],
+          },
+          {
+            id: secondNodeId,
+            type: "GENERIC",
+            label: "Second Node",
+            attributes: [],
+            outputs: [
+              {
+                id: secondNodeOutputId,
+                name: "output",
+                type: "STRING",
+              },
+            ],
+            ports: [],
+            trigger: {
+              id: secondNodeTriggerId,
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: firstNodeId,
+            target_handle_id: firstNodeTriggerId,
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+          {
+            source_node_id: firstNodeId,
+            source_handle_id: firstNodeDefaultPortId,
+            target_node_id: secondNodeId,
+            target_handle_id: secondNodeTriggerId,
+            type: "DEFAULT",
+            id: "edge_2",
+          },
+        ],
+      },
+      input_variables: [],
+      output_variables: [],
+      runner_config: {},
+    };
+    it.skip("should generate a proper Lazy Reference for the first node", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        strict: false,
+      });
+
+      await project.generateCode();
+
+      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
+      const errorLog = fs.existsSync(errorLogPath)
+        ? fs.readFileSync(errorLogPath, "utf-8")
+        : "";
+      expect(errorLog).toBe("");
+
+      const scriptPath = join(
+        tempDir,
+        project.getModuleName(),
+        "nodes",
+        "first_node.py"
       );
       expect(fs.existsSync(scriptPath)).toBe(true);
       expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
