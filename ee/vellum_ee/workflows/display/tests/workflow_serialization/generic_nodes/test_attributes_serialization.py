@@ -173,17 +173,19 @@ def test_serialize_node__lazy_reference_with_string():
 
     # THEN the node should properly serialize the attribute reference
     lazy_reference_node = next(
-        node for node in serialized_workflow["nodes"] if node["id"] == str(LazyReferenceGenericNode.__id__)
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(LazyReferenceGenericNode.__id__)
     )
 
-    assert lazy_reference_node["attributes"][0]["value"]["type"] == [
+    assert lazy_reference_node["attributes"] == [
         {
-            "id": "4370b381-9165-4fb4-881e-480507abe069",
+            "id": "98833d71-42a8-47e9-81c4-6a35646e3d3c",
             "name": "attr",
             "value": {
                 "type": "NODE_OUTPUT",
                 "node_id": str(OtherNode.__id__),
-                "node_output_id": "4370b381-9165-4fb4-881e-480507abe069",
+                "node_output_id": "7a3406a1-6f11-4568-8aa0-e5dba6534dc2",
             },
         }
     ]
