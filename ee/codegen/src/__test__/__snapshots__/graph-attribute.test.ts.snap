@@ -33,6 +33,18 @@ exports[`Workflow > graph > Should handle an else case within a conditioned set 
 "
 `;
 
+exports[`Workflow > graph > Should handle two branches from a node to a node 1`] = `
+"(
+    FirstNode 
+    >> {
+        SecondNode >> ThirdNode >> FourthNode,
+        FourthNode,
+    }
+    >> FifthNode
+)
+"
+`;
+
 exports[`Workflow > graph > should be able to create a proper else edge when there are three ports pointing to a set 1`] = `
 "{
     FirstCheckNode.Ports.if_port

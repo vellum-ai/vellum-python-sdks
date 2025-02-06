@@ -826,5 +826,37 @@ describe("Workflow", () => {
         [thirdOutputNode, fourthOutputNode],
       ]);
     });
+
+    it("Should handle two branches from a node to a node", async () => {
+      const firstNode = genericNodeFactory({
+        label: "FirstNode",
+      });
+
+      const secondNode = genericNodeFactory({
+        label: "SecondNode",
+      });
+
+      const thirdNode = genericNodeFactory({
+        label: "ThirdNode",
+      });
+
+      const fourthNode = genericNodeFactory({
+        label: "FourthNode",
+      });
+
+      const fifthNode = genericNodeFactory({
+        label: "FifthNode",
+        nodePorts: nodePortsFactory(),
+      });
+
+      await runGraphTest([
+        [entrypointNode, firstNode],
+        [firstNode, secondNode],
+        [firstNode, fourthNode],
+        [secondNode, thirdNode],
+        [thirdNode, fourthNode],
+        [fourthNode, fifthNode],
+      ]);
+    });
   });
 });
