@@ -6,7 +6,6 @@ import { isNil } from "lodash";
 import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node-input-value-pointer-rule";
 
 import { BaseNodeContext } from "src/context/node-context/base";
-import { StaticMethodInvocation } from "src/generators/static-method-invocation";
 import {
   NodeInputValuePointer as NodeInputValuePointerType,
   WorkflowDataNode,
@@ -77,10 +76,14 @@ export class NodeInputValuePointer extends AstNode {
         break;
       }
 
-      expression = new StaticMethodInvocation({
-        reference: expression,
-        methodName: "coalesce",
-        arguments_: [python.methodArgument({ value: rule })],
+      expression = python.accessAttribute({
+        lhs: expression,
+        rhs: python.invokeMethod({
+          methodReference: python.reference({
+            name: "coalesce",
+          }),
+          arguments_: [python.methodArgument({ value: rule })],
+        }),
       });
     }
 
