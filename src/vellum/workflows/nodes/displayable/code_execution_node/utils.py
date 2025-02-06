@@ -93,10 +93,11 @@ __arg__out = main({", ".join(run_args)})
     result = exec_globals["__arg__out"]
 
     if output_type != Any:
-        if issubclass(output_type, BaseModel) and not isinstance(result, output_type):
+        if output_type == NumberVellumValue:
+            number_result = {"value": float(result), "type": "NUMBER"}
+            result = NumberVellumValue.model_validate(number_result)
+        elif issubclass(output_type, BaseModel) and not isinstance(result, output_type):
             try:
-                if output_type == NumberVellumValue:
-                    result = {"value": float(result), "type": "NUMBER"}
                 result = output_type.model_validate(result)
             except ValidationError as e:
                 raise NodeException(
