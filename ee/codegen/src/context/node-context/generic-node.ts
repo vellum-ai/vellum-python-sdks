@@ -7,7 +7,9 @@ export class GenericNodeContext extends BaseNodeContext<GenericNodeType> {
   baseNodeDisplayClassName = "BaseNodeDisplay";
 
   getNodeOutputNamesById(): Record<string, string> {
-    return {};
+    return Object.fromEntries(
+      this.nodeData.outputs.map((output) => [output.id, output.name])
+    );
   }
 
   createPortContexts(): PortContext[] {

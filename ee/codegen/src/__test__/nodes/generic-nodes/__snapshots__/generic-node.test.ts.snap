@@ -66,6 +66,22 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with generic node output as attribute > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import BaseNode
+from .my_custom_node import ReferencedNode
+
+
+class MyCustomNode(BaseNode):
+    default_attribute = ReferencedNode.Outputs.output
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from ...nodes.my_custom_node import MyCustomNode

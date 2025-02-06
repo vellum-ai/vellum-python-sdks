@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -105,6 +106,58 @@ describe("GenericNode", () => {
 
     it("getNodeDisplayFile", async () => {
       node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with generic node output as attribute", () => {
+    beforeEach(async () => {
+      const nodeOutputId = uuidv4();
+      const referencedNode = genericNodeFactory({
+        label: "ReferencedNode",
+        nodeOutputs: [
+          {
+            id: nodeOutputId,
+            name: "output",
+            type: "STRING",
+          },
+        ],
+      });
+      await createNodeContext({
+        workflowContext,
+        nodeData: referencedNode,
+      });
+
+      const nodeAttributes: NodeAttribute[] = [
+        {
+          id: "attr-1",
+          name: "default-attribute",
+          value: {
+            type: "NODE_OUTPUT",
+            nodeId: referencedNode.id,
+            nodeOutputId: nodeOutputId,
+          },
+        },
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "MyCustomNode",
+        nodeAttributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
