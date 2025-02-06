@@ -71,13 +71,13 @@ export class WorkflowOutputContext {
     const defaultName = "output_";
 
     let rawOutputVariableName: string;
-    if (this.workflowOutputValue) {
+    if (this.terminalNodeData) {
+      rawOutputVariableName = this.terminalNodeData.data.name;
+    } else if (this.workflowOutputValue) {
       const outputVariable = this.workflowContext.getOutputVariableContextById(
         this.workflowOutputValue.outputVariableId
       );
       rawOutputVariableName = outputVariable.name;
-    } else if (this.terminalNodeData) {
-      rawOutputVariableName = this.terminalNodeData.data.name;
     } else {
       throw new WorkflowOutputGenerationError(
         "Expected either workflow output value or terminal node data to be defined"
