@@ -35,10 +35,14 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
         node_blocks = raise_if_descriptor(node.blocks)
         function_definitions = raise_if_descriptor(node.functions)
 
-        blocks = [
+        blocks: list = [
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
-        functions = [self._generate_function_tools(function) for function in function_definitions]
+        functions = (
+            [self._generate_function_tools(function) for function in function_definitions]
+            if function_definitions
+            else []
+        )
         blocks.extend(functions)
 
         return {
