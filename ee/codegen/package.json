@@ -31,7 +31,7 @@
     "upgrade-codegen-service": "node --loader ts-node/esm --experimental-specifier-resolution=node  scripts/upgrade-codegen-service.mts"
   },
   "dependencies": {
-    "@fern-api/python-ast": "^0.0.22",
+    "@fern-api/python-ast": "^0.0.24",
     "@fern-fern/generator-cli-sdk": "file:./stubs/generator-cli-sdk",
     "@fern-fern/generator-exec-sdk": "file:./stubs/generator-exec-sdk",
     "lodash": "^4.17.21",
