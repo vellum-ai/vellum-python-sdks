@@ -35,7 +35,7 @@ exports[`Workflow > graph > Should handle an else case within a conditioned set 
 
 exports[`Workflow > graph > Should handle two branches from a node to a node 1`] = `
 "(
-    FirstNode 
+    FirstNode
     >> {
         SecondNode >> ThirdNode >> FourthNode,
         FourthNode,

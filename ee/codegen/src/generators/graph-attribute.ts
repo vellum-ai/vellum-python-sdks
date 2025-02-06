@@ -522,13 +522,13 @@ export class GraphAttribute extends AstNode {
    * ```
    */
   private optimizeSetThroughCommonTarget(
-    newSetAst: GraphSet,
+    mutableSetAst: GraphSet,
     targetNode: BaseNodeContext<WorkflowDataNode>
   ): GraphMutableAst | undefined {
     if (
       this.canBranchBeSplitByTargetNode({
         targetNode,
-        mutableAst: newSetAst,
+        mutableAst: mutableSetAst,
         isRoot: true,
       })
     ) {
@@ -537,13 +537,35 @@ export class GraphAttribute extends AstNode {
         values: [],
       };
       let longestRhs: GraphMutableAst = { type: "empty" };
-      for (const branch of newSetAst.values) {
+      for (const branch of mutableSetAst.values) {
         const { lhs, rhs } = this.splitBranchByTargetNode(targetNode, branch);
         if (this.getBranchSize(rhs) > this.getBranchSize(longestRhs)) {
           longestRhs = rhs;
         }
         newLhs.values.push(lhs);
       }
+
+      // In a situation where the graph was:
+      // {
+      //   A >> B >> C,
+      //   C >> D,
+      // }
+      //
+      // The longest rhs would be C >> D, but it would create an empty set member.
+      // In this case, we want just `D` to be the longest rhs.
+      if (newLhs.values.some((v) => v.type === "empty")) {
+        const sources = this.getAstSources(longestRhs);
+        const readjustedSource = sources[0];
+        if (readjustedSource) {
+          const newLongestRhs = this.popSources(longestRhs);
+          return {
+            type: "right_shift",
+            lhs: this.appendNodeToAst(readjustedSource, newLhs),
+            rhs: newLongestRhs,
+          };
+        }
+      }
+
       return {
         type: "right_shift",
         lhs: newLhs,
@@ -551,7 +573,7 @@ export class GraphAttribute extends AstNode {
       };
     }
 
-    return newSetAst;
+    return mutableSetAst;
   }
 
   /**
@@ -857,6 +879,40 @@ export class GraphAttribute extends AstNode {
       return { type: "empty" };
     }
   };
+
+  /**
+   * Appends a node to the AST.
+   */
+  private appendNodeToAst(
+    node: GraphPortReference,
+    ast: GraphMutableAst
+  ): GraphMutableAst {
+    if (ast.type === "empty") {
+      return node.reference.isDefault
+        ? { type: "node_reference", reference: node.reference.nodeContext }
+        : node;
+    }
+    if (ast.type === "node_reference" || ast.type === "port_reference") {
+      return {
+        type: "right_shift",
+        lhs: ast,
+        rhs: node.reference.isDefault
+          ? { type: "node_reference", reference: node.reference.nodeContext }
+          : node,
+      };
+    }
+    if (ast.type === "set") {
+      return {
+        type: "set",
+        values: ast.values.map((value) => this.appendNodeToAst(node, value)),
+      };
+    }
+    return {
+      type: "right_shift",
+      lhs: ast.lhs,
+      rhs: this.appendNodeToAst(node, ast.rhs),
+    };
+  }
 
   private startsWithTargetNode = (
     targetNode: BaseNodeContext<WorkflowDataNode>,
