@@ -441,6 +441,10 @@ ${errors.slice(0, 3).map((err) => {
     return { inputs, workflow, nodes };
   }
 
+  /**
+   * This method is used to order the nodes based on a declared import order, determined by a
+   * breadth first search over edges in the graph.
+   */
   private getOrderedNodes(): WorkflowDataNode[] {
     const rawData = this.workflowVersionExecConfig.workflowRawData;
     const nodesById = Object.fromEntries(
