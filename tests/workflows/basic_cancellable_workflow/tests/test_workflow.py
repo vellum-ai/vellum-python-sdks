@@ -1,3 +1,4 @@
+import pytest
 from threading import Event as ThreadingEvent, Thread
 import time
 
@@ -62,3 +63,23 @@ def test_workflow__cancel_stream():
     assert events[-1].name == "workflow.execution.rejected"
     assert events[-1].error.message == "Workflow run cancelled"
     assert events[-1].error.code == WorkflowErrorCode.WORKFLOW_CANCELLED
+
+
+@pytest.mark.skip(reason="This is a bug in the workflow server")
+def test_workflow__cancel_signal_not_set__run():
+    """
+    Test that we can cancel a run of a long running workflow with cancel signal passed in but not set.
+    """
+
+    # GIVEN a workflow that is long running
+    workflow = BasicCancellableWorkflow()
+
+    # AND we have a cancel signal
+    cancel_signal = ThreadingEvent()
+
+    # WHEN we run the workflow
+    terminal_event = workflow.run(cancel_signal=cancel_signal)
+
+    # THEN we should get the expected rejection
+    assert terminal_event.name == "workflow.execution.fulfilled"
+    assert terminal_event.outputs.final_value == "hello world"
