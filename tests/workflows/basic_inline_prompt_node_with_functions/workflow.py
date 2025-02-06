@@ -1,7 +1,7 @@
 from vellum import ChatMessagePromptBlock, FunctionDefinition, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node import BaseInlinePromptNode
+from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.state import BaseState
 
 
@@ -9,7 +9,7 @@ class WorkflowInputs(BaseInputs):
     noun: str
 
 
-class ExampleBaseInlinePromptNodeWithFunctions(BaseInlinePromptNode):
+class ExampleBaseInlinePromptNodeWithFunctions(InlinePromptNode):
     ml_model = "gpt-4o"
     blocks = [
         ChatMessagePromptBlock(

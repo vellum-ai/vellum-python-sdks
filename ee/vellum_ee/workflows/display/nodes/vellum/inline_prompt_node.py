@@ -1,9 +1,10 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Callable, ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
-from vellum import PromptBlock, RichTextChildBlock, VellumVariable
+from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -32,6 +33,13 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
         _, output_display = display_context.global_node_output_displays[node.Outputs.text]
         _, array_display = display_context.global_node_output_displays[node.Outputs.results]
         node_blocks = raise_if_descriptor(node.blocks)
+        function_definitions = raise_if_descriptor(node.functions)
+
+        blocks = [
+            self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
+        ]
+        functions = [self._generate_function_tools(function) for function in function_definitions]
+        blocks.extend(functions)
 
         return {
             "id": str(node_id),
@@ -50,10 +58,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
                     "input_variables": [prompt_input.dict() for prompt_input in prompt_inputs],
                     "prompt_template_block_data": {
                         "version": 1,
-                        "blocks": [
-                            self._generate_prompt_block(block, input_variable_id_by_name, [i])
-                            for i, block in enumerate(node_blocks)
-                        ],
+                        "blocks": blocks,
                     },
                 },
                 "ml_model_name": raise_if_descriptor(node.ml_model),
@@ -90,6 +95,21 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
             prompt_inputs.append(VellumVariable(id=str(node_input.id), key=variable_name, type=vellum_variable_type))
 
         return node_inputs, prompt_inputs
+
+    def _generate_function_tools(self, function: Union[FunctionDefinition, Callable]) -> JsonObject:
+        normalized_functions = (
+            function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
+        )
+        return {
+            "block_type": "FUNCTION_DEFINITION",
+            "properties": {
+                "function_name": normalized_functions.name,
+                "function_description": normalized_functions.description,
+                "function_parameters": normalized_functions.parameters,
+                "function_forced": normalized_functions.forced,
+                "function_strict": normalized_functions.strict,
+            },
+        }
 
     def _generate_prompt_block(
         self,
