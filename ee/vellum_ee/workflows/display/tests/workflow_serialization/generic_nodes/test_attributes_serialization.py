@@ -1,12 +1,16 @@
+import pytest
 from uuid import uuid4
+from typing import List
 
 from deepdiff import DeepDiff
 
+from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -235,6 +239,33 @@ def test_serialize_node__workflow_input(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+def test_serialize_node__workflow_input_as_nested_chat_history():
+    # GIVEN workflow inputs as chat history
+    class Inputs(BaseInputs):
+        chat_history: List[ChatMessage]
+
+    # AND a node referencing the workflow input
+    class GenericNode(BaseNode):
+        attr = {
+            "hello": Inputs.chat_history,
+        }
+
+    # AND a workflow with the node
+    class Workflow(BaseWorkflow[Inputs, BaseState]):
+        graph = GenericNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=Workflow,
+    )
+    with pytest.raises(Exception) as exc_info:
+        workflow_display.serialize()
+
+    # THEN we should raise a user facing error
+    assert str(exc_info) == "Failed to serialize attribute 'attr': Nested references are not supported."
 
 
 def test_serialize_node__node_output(serialize_node):
