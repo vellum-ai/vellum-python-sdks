@@ -67,6 +67,8 @@ import {
   EntrypointNode,
   FinalOutputNode as FinalOutputNodeType,
   WorkflowDataNode,
+  WorkflowEdge,
+  WorkflowNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
@@ -82,6 +84,26 @@ export interface WorkflowProjectGeneratorOptions {
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
   disableFormatting?: boolean;
 }
+
+const getPortIds = (node: WorkflowNode): string[] => {
+  if (node.type === "GENERIC") {
+    return node.ports.map((port) => port.id);
+  }
+
+  if (node.type === "CONDITIONAL") {
+    return node.data.conditions.map((condition) => condition.sourceHandleId);
+  }
+
+  if (
+    node.type === "TERMINAL" ||
+    node.type === "NOTE" ||
+    node.type == "ERROR"
+  ) {
+    return [];
+  }
+
+  return [node.data.sourceHandleId];
+};
 
 export declare namespace WorkflowProjectGenerator {
   interface BaseArgs {
@@ -349,8 +371,9 @@ ${errors.slice(0, 3).map((err) => {
 
     let entrypointNode: EntrypointNode | undefined;
     const nodesToGenerate: WorkflowDataNode[] = [];
+    console.log("WHAT THE ORDERED NODES", this.getOrderedNodes());
     await Promise.all(
-      this.workflowVersionExecConfig.workflowRawData.nodes
+      this.getOrderedNodes()
         .map(async (nodeData) => {
           if (nodeData.type === "ENTRYPOINT") {
             if (entrypointNode) {
@@ -425,6 +448,62 @@ ${errors.slice(0, 3).map((err) => {
     });
 
     return { inputs, workflow, nodes };
+  }
+
+  private getOrderedNodes(): WorkflowNode[] {
+    const rawData = this.workflowVersionExecConfig.workflowRawData;
+    const nodesById = Object.fromEntries(
+      rawData.nodes.map((node) => [node.id, node])
+    );
+    debugger;
+
+    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
+    const edgesByPortId = this.workflowContext.getEdgesByPortId();
+    const processedEdges = new Set<WorkflowEdge>();
+    const processedNodeIds = new Set<string>();
+
+    const orderedNodes: WorkflowNode[] = [];
+
+    while (edgesQueue.length > 0) {
+      const edge = edgesQueue.shift();
+      if (!edge) {
+        continue;
+      }
+
+      const sourceNode = nodesById[edge.sourceNodeId];
+      if (!sourceNode) {
+        continue;
+      }
+
+      const targetNode = nodesById[edge.targetNodeId];
+      if (!targetNode) {
+        continue;
+      }
+
+      if (!processedNodeIds.has(sourceNode.id)) {
+        orderedNodes.push(sourceNode);
+        processedNodeIds.add(sourceNode.id);
+      }
+
+      if (!processedNodeIds.has(targetNode.id)) {
+        orderedNodes.push(targetNode);
+        processedNodeIds.add(targetNode.id);
+      }
+      processedEdges.add(edge);
+
+      const portIds = getPortIds(targetNode);
+      portIds.forEach((portId) => {
+        const edges = edgesByPortId.get(portId);
+        edges?.forEach((edge) => {
+          if (processedEdges.has(edge)) {
+            return;
+          }
+          edgesQueue.push(edge);
+        });
+      });
+    }
+
+    return orderedNodes;
   }
 
   private async generateNodes(

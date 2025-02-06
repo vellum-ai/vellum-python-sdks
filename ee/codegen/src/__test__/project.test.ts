@@ -922,7 +922,7 @@ baz = foo + bar
       output_variables: [],
       runner_config: {},
     };
-    it.skip("should generate a proper Lazy Reference for the first node", async () => {
+    it("should generate a proper Lazy Reference for the first node", async () => {
       const project = new WorkflowProjectGenerator({
         absolutePathToOutputDirectory: tempDir,
         workflowVersionExecConfigData: displayData,
@@ -945,6 +945,7 @@ baz = foo + bar
         "nodes",
         "first_node.py"
       );
+      console.log("WHAT THW scriptPath", fs.readdirSync(join(tempDir)));
       expect(fs.existsSync(scriptPath)).toBe(true);
       expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
     });
