@@ -58,7 +58,8 @@ export class NodeOutputs extends AstNode {
             name: output.name,
             initializer: new WorkflowValueDescriptor({
               workflowValueDescriptor: output.value,
-              workflowContext: workflowContext,
+              workflowContext,
+              nodeContext,
             }),
           })
         : python.field({

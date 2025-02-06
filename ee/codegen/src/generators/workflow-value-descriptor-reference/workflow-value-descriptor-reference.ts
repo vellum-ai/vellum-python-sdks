@@ -2,6 +2,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
+import { BaseNodeContext } from "src/context/node-context/base";
 import { ValueGenerationError } from "src/generators/errors";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { ConstantValueReference } from "src/generators/workflow-value-descriptor-reference/constant-value-reference";
@@ -11,12 +12,14 @@ import { VellumSecretWorkflowReference } from "src/generators/workflow-value-des
 import { WorkflowInputReference } from "src/generators/workflow-value-descriptor-reference/workflow-input-reference";
 import {
   IterableConfig,
+  WorkflowDataNode,
   WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
 export declare namespace WorkflowValueDescriptorReference {
   export interface Args {
+    nodeContext?: BaseNodeContext<WorkflowDataNode>;
     workflowContext: WorkflowContext;
     workflowValueReferencePointer: WorkflowValueDescriptorReferenceType;
     iterableConfig?: IterableConfig;
@@ -25,6 +28,7 @@ export declare namespace WorkflowValueDescriptorReference {
 
 export class WorkflowValueDescriptorReference extends AstNode {
   private workflowContext: WorkflowContext;
+  private nodeContext?: BaseNodeContext<WorkflowDataNode>;
   public readonly workflowValueReferencePointer: WorkflowValueDescriptorReferenceType["type"];
   private iterableConfig?: IterableConfig;
   public astNode:
@@ -35,6 +39,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
     super();
 
     this.workflowContext = args.workflowContext;
+    this.nodeContext = args.nodeContext;
     this.workflowValueReferencePointer =
       args.workflowValueReferencePointer.type;
     this.iterableConfig = args.iterableConfig;

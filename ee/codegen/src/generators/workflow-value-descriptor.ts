@@ -4,6 +4,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
 import { WorkflowContext } from "src/context";
+import { BaseNodeContext } from "src/context/node-context/base";
 import {
   NodeAttributeGenerationError,
   NodePortGenerationError,
@@ -13,12 +14,14 @@ import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-
 import {
   IterableConfig,
   OperatorMapping,
+  WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
 export namespace WorkflowValueDescriptor {
   export interface Args {
+    nodeContext?: BaseNodeContext<WorkflowDataNode>;
     workflowValueDescriptor: WorkflowValueDescriptorType;
     workflowContext: WorkflowContext;
     iterableConfig?: IterableConfig;
@@ -26,6 +29,7 @@ export namespace WorkflowValueDescriptor {
 }
 
 export class WorkflowValueDescriptor extends AstNode {
+  private nodeContext?: BaseNodeContext<WorkflowDataNode>;
   private workflowContext: WorkflowContext;
   private iterableConfig?: IterableConfig;
   private astNode: AstNode;
@@ -57,6 +61,7 @@ export class WorkflowValueDescriptor extends AstNode {
     if (this.isReference(workflowValueDescriptor)) {
       return new WorkflowValueDescriptorReference({
         workflowContext: this.workflowContext,
+        nodeContext: this.nodeContext,
         workflowValueReferencePointer: workflowValueDescriptor,
         iterableConfig: this.iterableConfig,
       });

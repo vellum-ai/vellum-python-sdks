@@ -32,6 +32,7 @@ export class GenericNode extends BaseSingleFileNode<
               name: attr.name,
               value: new WorkflowValueDescriptor({
                 workflowValueDescriptor: attr.value,
+                nodeContext: this.nodeContext,
                 workflowContext: this.workflowContext,
                 iterableConfig: { endWithComma: false },
               }),
@@ -51,6 +52,7 @@ export class GenericNode extends BaseSingleFileNode<
           initializer: new WorkflowValueDescriptor({
             workflowValueDescriptor: attribute.value,
             workflowContext: this.workflowContext,
+            nodeContext: this.nodeContext,
           }),
         })
       );

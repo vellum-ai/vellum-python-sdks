@@ -139,6 +139,7 @@ export class NodePorts extends AstNode {
     return new WorkflowValueDescriptor({
       workflowValueDescriptor: expression,
       workflowContext: this.workflowContext,
+      nodeContext: this.nodeContext,
     });
   }
 }
