@@ -498,7 +498,7 @@ def main(word: str) -> dict:
 def test_run_node__run_inline__number_output_type():
     """Confirm that CodeExecutionNodes raise an error if the output type is incorrect during inline execution."""
 
-    # GIVEN a node that subclasses CodeExecutionNode that returns a string but is defined to return an int
+    # GIVEN a node that subclasses CodeExecutionNode that returns an int but is defined to return an NumberVellumValue
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, NumberVellumValue]):
         code = """\
 def main(arg: int) -> int:
@@ -512,5 +512,5 @@ def main(arg: int) -> int:
     node = ExampleCodeExecutionNode()
     result = node.run()
 
-    # THEN the node should have produced the exception we expected
+    # THEN the node should have produced NumberVellumValue
     assert result.result == NumberVellumValue(value=1.0)
