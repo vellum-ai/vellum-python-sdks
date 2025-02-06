@@ -929,7 +929,7 @@ export class GraphAttribute extends AstNode {
     }
 
     if (mutableAst.type === "right_shift") {
-      const lhs = this.getGraphAttributeAstNode(mutableAst.lhs);
+      const lhs = this.getGraphAttributeAstNode(mutableAst.lhs, useWrap);
       const rhs = this.getGraphAttributeAstNode(
         mutableAst.rhs,
         mutableAst.lhs.type === "set"

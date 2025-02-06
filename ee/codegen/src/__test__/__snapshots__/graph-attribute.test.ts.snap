@@ -6,10 +6,12 @@ exports[`Workflow > graph > Should handle an a conditional pointing both ports t
         FirstCheckNode.Ports.if_port,
         FirstCheckNode.Ports.else_port >> FirstOutputNode,
     }
-    >> Graph.from_set({
-        SecondCheckNode.Ports.if_port >> SecondOutputNode,
-        SecondCheckNode.Ports.else_port >> ThirdOutputNode,
-    })
+    >> Graph.from_set(
+        {
+            SecondCheckNode.Ports.if_port >> SecondOutputNode,
+            SecondCheckNode.Ports.else_port >> ThirdOutputNode,
+        }
+    )
     >> FourthOutputNode
 )
 "
