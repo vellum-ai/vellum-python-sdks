@@ -39,7 +39,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
         functions = (
-            [self._generate_function_tools(function) for function in function_definitions]
+            [self._generate_function_tools(function, i) for i, function in enumerate(function_definitions)]
             if function_definitions
             else []
         )
@@ -100,11 +100,12 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
 
         return node_inputs, prompt_inputs
 
-    def _generate_function_tools(self, function: Union[FunctionDefinition, Callable]) -> JsonObject:
+    def _generate_function_tools(self, function: Union[FunctionDefinition, Callable], index: int) -> JsonObject:
         normalized_functions = (
             function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
         )
         return {
+            "id": str(uuid4_from_hash(f"{self.node_id}-FUNCTION_DEFINITION-{index}")),
             "block_type": "FUNCTION_DEFINITION",
             "properties": {
                 "function_name": normalized_functions.name,
