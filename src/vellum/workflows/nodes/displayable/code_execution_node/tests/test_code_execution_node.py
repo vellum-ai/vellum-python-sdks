@@ -513,4 +513,7 @@ def main(arg: int) -> int:
     result = node.run()
 
     # THEN the node should have produced the exception we expected
-    assert result.result and result.result.value == 1
+    assert result == {
+        "result": 1.0,
+        "log": "",
+    }
