@@ -945,7 +945,10 @@ baz = foo + bar
         "nodes",
         "first_node.py"
       );
-      console.log("WHAT THW scriptPath", fs.readdirSync(join(tempDir)));
+      console.log(
+        "WHAT THW scriptPath",
+        fs.readdirSync(join(tempDir, project.getModuleName(), "nodes"))
+      );
       expect(fs.existsSync(scriptPath)).toBe(true);
       expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
     });

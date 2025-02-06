@@ -15,10 +15,30 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
     );
   }
 
-  getAstNode(): python.Reference | undefined {
+  getAstNode(): python.AstNode | undefined {
     const nodeOutputPointerRuleData = this.nodeInputValuePointerRule.data;
 
     const nodeContext = this.getReferencedNodeContext();
+
+    if (this.nodeContext && this.nodeContext.isImportedBefore(nodeContext)) {
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "LazyReference",
+          modulePath: [
+            ...this.nodeContext.workflowContext.sdkModulePathNames
+              .WORKFLOWS_MODULE_PATH,
+            "references",
+          ],
+        }),
+        arguments_: [
+          python.methodArgument({
+            value: python.TypeInstantiation.str(
+              `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputPointerRuleData.outputId}`
+            ),
+          }),
+        ],
+      });
+    }
 
     const nodeOutputName = nodeContext.getNodeOutputNameById(
       nodeOutputPointerRuleData.outputId

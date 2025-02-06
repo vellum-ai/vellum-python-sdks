@@ -18,6 +18,25 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
     );
 
     if (nodeOutputName) {
+      if (this.nodeContext && this.nodeContext.isImportedBefore(nodeContext)) {
+        return python.instantiateClass({
+          classReference: python.reference({
+            name: "LazyReference",
+            modulePath: [
+              ...this.nodeContext.workflowContext.sdkModulePathNames
+                .WORKFLOWS_MODULE_PATH,
+              "references",
+            ],
+          }),
+          arguments_: [
+            python.methodArgument({
+              value: python.TypeInstantiation.str(
+                `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
+              ),
+            }),
+          ],
+        });
+      }
       return python.reference({
         name: nodeContext.nodeClassName,
         modulePath: nodeContext.nodeModulePath,

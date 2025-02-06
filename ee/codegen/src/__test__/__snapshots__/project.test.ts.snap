@@ -1,5 +1,21 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`WorkflowProjectGenerator > Nodes with forward references > should generate a proper Lazy Reference for the first node 1`] = `
+"from vellum.workflows.nodes.displayable import BaseNode
+from vellum.workflows.references import LazyReference
+
+
+class FirstNode(BaseNode):
+    forward = LazyReference("SecondNode.Outputs.output")
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ATTRIBUTES"
+
+    class Outputs(BaseNode.Outputs):
+        pass
+"
+`;
+
 exports[`WorkflowProjectGenerator > code execution node at project level > should not autoformat the script file 1`] = `
 "import foo, bar
 baz = foo + bar

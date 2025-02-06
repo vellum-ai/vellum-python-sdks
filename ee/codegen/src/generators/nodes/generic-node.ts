@@ -50,6 +50,7 @@ export class GenericNode extends BaseSingleFileNode<
         python.field({
           name: toPythonSafeSnakeCase(attribute.name),
           initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
             workflowValueDescriptor: attribute.value,
             workflowContext: this.workflowContext,
             nodeContext: this.nodeContext,

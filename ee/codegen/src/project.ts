@@ -369,32 +369,33 @@ ${errors.slice(0, 3).map((err) => {
       this.workflowContext.addOutputVariableContext(outputVariableContext);
     });
 
-    let entrypointNode: EntrypointNode | undefined;
-    const nodesToGenerate: WorkflowDataNode[] = [];
-    console.log("WHAT THE ORDERED NODES", this.getOrderedNodes());
-    await Promise.all(
-      this.getOrderedNodes()
-        .map(async (nodeData) => {
-          if (nodeData.type === "ENTRYPOINT") {
-            if (entrypointNode) {
-              throw new WorkflowGenerationError(
-                "Multiple entrypoint nodes found"
-              );
-            }
-            entrypointNode = nodeData;
-            return;
-          }
+    const entrypointNodes =
+      this.workflowVersionExecConfig.workflowRawData.nodes.filter(
+        (n): n is EntrypointNode => n.type === "ENTRYPOINT"
+      );
+    if (entrypointNodes.length > 1) {
+      throw new WorkflowGenerationError("Multiple entrypoint nodes found");
+    }
 
-          nodesToGenerate.push(nodeData);
+    const entrypointNode = entrypointNodes[0];
+    if (!entrypointNode) {
+      throw new WorkflowGenerationError("Entrypoint node not found");
+    }
+    this.workflowContext.addEntrypointNode(entrypointNode);
 
-          await createNodeContext({
-            workflowContext: this.workflowContext,
-            nodeData,
-          });
-        })
-        .map((promise) =>
-          promise.catch((error) => this.workflowContext.addError(error))
-        )
+    const nodesToGenerate = await Promise.all(
+      this.getOrderedNodes().map(async (nodeData, importOrder) => {
+        await createNodeContext({
+          workflowContext: this.workflowContext,
+          nodeData,
+          importOrder: this.workflowContext.parentNode
+            ? this.workflowContext.parentNode.nodeContext.importOrder.concat([
+                importOrder,
+              ])
+            : [importOrder],
+        }).catch((error) => this.workflowContext.addError(error));
+        return nodeData;
+      })
     );
 
     if (
@@ -428,11 +429,6 @@ ${errors.slice(0, 3).map((err) => {
       );
     }
 
-    if (!entrypointNode) {
-      throw new WorkflowGenerationError("Entrypoint node not found");
-    }
-    this.workflowContext.addEntrypointNode(entrypointNode);
-
     const inputs = codegen.inputs({
       workflowContext: this.workflowContext,
     });
@@ -450,19 +446,18 @@ ${errors.slice(0, 3).map((err) => {
     return { inputs, workflow, nodes };
   }
 
-  private getOrderedNodes(): WorkflowNode[] {
+  private getOrderedNodes(): WorkflowDataNode[] {
     const rawData = this.workflowVersionExecConfig.workflowRawData;
     const nodesById = Object.fromEntries(
       rawData.nodes.map((node) => [node.id, node])
     );
-    debugger;
 
     const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
     const processedEdges = new Set<WorkflowEdge>();
     const processedNodeIds = new Set<string>();
 
-    const orderedNodes: WorkflowNode[] = [];
+    const orderedNodes: WorkflowDataNode[] = [];
 
     while (edgesQueue.length > 0) {
       const edge = edgesQueue.shift();
@@ -480,12 +475,18 @@ ${errors.slice(0, 3).map((err) => {
         continue;
       }
 
-      if (!processedNodeIds.has(sourceNode.id)) {
+      if (
+        !processedNodeIds.has(sourceNode.id) &&
+        sourceNode.type !== "ENTRYPOINT"
+      ) {
         orderedNodes.push(sourceNode);
         processedNodeIds.add(sourceNode.id);
       }
 
-      if (!processedNodeIds.has(targetNode.id)) {
+      if (
+        !processedNodeIds.has(targetNode.id) &&
+        targetNode.type !== "ENTRYPOINT"
+      ) {
         orderedNodes.push(targetNode);
         processedNodeIds.add(targetNode.id);
       }

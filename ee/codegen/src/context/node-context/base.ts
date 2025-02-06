@@ -13,11 +13,13 @@ export declare namespace BaseNodeContext {
   interface Args<T extends WorkflowDataNode> {
     workflowContext: WorkflowContext;
     nodeData: T;
+    importOrder: readonly number[];
   }
 }
 
 export abstract class BaseNodeContext<T extends WorkflowDataNode> {
   public readonly workflowContext: WorkflowContext;
+  public readonly importOrder: readonly number[];
   public readonly nodeModulePath: string[];
   public readonly nodeModuleName: string;
   public readonly nodeFileName: string;
@@ -42,6 +44,7 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
   constructor(args: BaseNodeContext.Args<T>) {
     this.workflowContext = args.workflowContext;
     this.nodeData = args.nodeData;
+    this.importOrder = args.importOrder;
 
     this.baseNodeClassModulePath =
       this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;
@@ -123,5 +126,38 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
    */
   public buildProperties(): Promise<void> {
     return Promise.resolve();
+  }
+
+  public isImportedBefore(
+    nodeContext: BaseNodeContext<WorkflowDataNode>
+  ): boolean {
+    for (
+      let i = 0;
+      i < Math.max(this.importOrder.length, nodeContext.importOrder.length);
+      i++
+    ) {
+      const thisImportOrder = this.importOrder[i];
+      const otherImportOrder = nodeContext.importOrder[i];
+      if (thisImportOrder === undefined && otherImportOrder === undefined) {
+        return false;
+      }
+
+      if (thisImportOrder === undefined) {
+        return true;
+      }
+
+      if (otherImportOrder === undefined) {
+        return false;
+      }
+
+      if (thisImportOrder < otherImportOrder) {
+        return true;
+      }
+
+      if (thisImportOrder > otherImportOrder) {
+        return false;
+      }
+    }
+    return false;
   }
 }

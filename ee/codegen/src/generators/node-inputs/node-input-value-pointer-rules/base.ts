@@ -20,7 +20,7 @@ export declare namespace BaseNodeInputValuePointerRule {
 export abstract class BaseNodeInputValuePointerRule<
   T extends NodeInputValuePointerRuleType
 > extends AstNode {
-  private readonly nodeContext: BaseNodeContext<WorkflowDataNode>;
+  protected readonly nodeContext: BaseNodeContext<WorkflowDataNode>;
   public readonly workflowContext: WorkflowContext;
   public readonly nodeInputValuePointerRule: T;
   public readonly iterableConfig?: IterableConfig;

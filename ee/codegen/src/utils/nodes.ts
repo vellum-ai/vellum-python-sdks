@@ -4,7 +4,7 @@ import { WorkflowNode, WorkflowOutputValue } from "src/types/vellum";
 export function getNodeLabel(nodeData: WorkflowNode): string {
   switch (nodeData.type) {
     case "GENERIC":
-      return nodeData.definition?.name ?? "Generic Node";
+      return nodeData.definition?.name ?? nodeData.label ?? "Generic Node";
     default:
       return nodeData.data.label;
   }
