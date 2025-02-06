@@ -513,7 +513,4 @@ def main(arg: int) -> int:
     result = node.run()
 
     # THEN the node should have produced the exception we expected
-    assert result == {
-        "result": 1.0,
-        "log": "",
-    }
+    assert result.result == NumberVellumValue(value=1.0)
