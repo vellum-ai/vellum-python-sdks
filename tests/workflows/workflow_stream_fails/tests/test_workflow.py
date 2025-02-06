@@ -1,4 +1,5 @@
 import pytest
+import time
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -23,6 +24,27 @@ def test_run_workflow__stream_fails(mock_stream):
 
     # WHEN we run the workflow
     terminal_event = workflow.run()
+
+    # THEN the workflow should have completed with a failure
+    assert terminal_event.name == "workflow.execution.rejected", terminal_event
+
+    # AND the correct error is raised
+    assert terminal_event.error.code == WorkflowErrorCode.INTERNAL_ERROR
+    assert terminal_event.error.message == "An unexpected error occurred while streaming Workflow events"
+
+
+def test_run_workflow__stream_crash():
+    # GIVEN a workflow that will always fail within its `_stream` method
+    workflow = AlwaysFailsWorkflow()
+
+    # AND the failure happens after the _stream thread has started
+    def mock_stream_side_effect(self):
+        time.sleep(0.2)  # Wait for the _stream thread to start
+        raise Exception("Stream failed")
+
+    # WHEN we run the workflow
+    with patch.object(WorkflowRunner, "_stream", new=mock_stream_side_effect):
+        terminal_event = workflow.run()
 
     # THEN the workflow should have completed with a failure
     assert terminal_event.name == "workflow.execution.rejected", terminal_event
