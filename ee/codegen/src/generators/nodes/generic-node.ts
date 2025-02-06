@@ -53,7 +53,6 @@ export class GenericNode extends BaseSingleFileNode<
             nodeContext: this.nodeContext,
             workflowValueDescriptor: attribute.value,
             workflowContext: this.workflowContext,
-            nodeContext: this.nodeContext,
           }),
         })
       );

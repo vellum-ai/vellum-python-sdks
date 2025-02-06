@@ -8,17 +8,16 @@ import {
   nodePortFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
-import { BaseNodeContext } from "src/context/node-context/base";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { NodePorts } from "src/generators/node-port";
-import { NodePort, WorkflowDataNode } from "src/types/vellum";
+import { NodePort } from "src/types/vellum";
 
 describe("NodePorts", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
   let nodePorts: NodePorts;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     workflowContext = workflowContextFactory();
     writer = new Writer();
 
@@ -33,11 +32,14 @@ describe("NodePorts", () => {
       })
     );
 
-    vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
-      nodeClassName: "TestNode",
-      path: ["nodes", "test-node-path"],
-      getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
-    } as unknown as BaseNodeContext<WorkflowDataNode>);
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node-1",
+        label: "TestNode",
+        nodeOutputs: [{ id: "output-1", name: "my-output", type: "STRING" }],
+      }),
+    });
   });
 
   describe("basic", () => {

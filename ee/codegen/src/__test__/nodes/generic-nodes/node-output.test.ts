@@ -5,13 +5,9 @@ import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
-import { BaseNodeContext } from "src/context/node-context/base";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { NodeOutputs } from "src/generators/node-outputs";
-import {
-  NodeOutput as NodeOutputType,
-  WorkflowDataNode,
-} from "src/types/vellum";
+import { NodeOutput as NodeOutputType } from "src/types/vellum";
 
 describe("NodeOutput", () => {
   let workflowContext: WorkflowContext;
@@ -104,11 +100,16 @@ describe("NodeOutput", () => {
 
   describe("node output reference", () => {
     beforeEach(async () => {
-      vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
-        nodeClassName: "TestNode",
-        path: ["nodes", "test-node-path"],
-        getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
-      } as unknown as BaseNodeContext<WorkflowDataNode>);
+      await createNodeContext({
+        workflowContext,
+        nodeData: genericNodeFactory({
+          id: "some-node-id",
+          label: "TestNode",
+          nodeOutputs: [
+            { id: "some-output-id", name: "my-output", type: "STRING" },
+          ],
+        }),
+      });
       const nodeOutputData: NodeOutputType[] = [
         {
           id: "db010db3-7076-4df9-ae1b-069caa16fa20",

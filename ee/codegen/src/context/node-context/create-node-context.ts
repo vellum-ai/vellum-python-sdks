@@ -184,9 +184,18 @@ function buildNodeContext(
 }
 
 export async function createNodeContext(
-  args: BaseNodeContext.Args<WorkflowDataNode>
+  args: Omit<BaseNodeContext.Args<WorkflowDataNode>, "importOrder">
 ): Promise<BaseNodeContext<WorkflowDataNode>> {
-  const nodeContext = buildNodeContext(args);
+  const existingImportOrder = args.workflowContext.parentNode
+    ? args.workflowContext.parentNode.nodeContext.importOrder
+    : [];
+  const nodeContext = buildNodeContext({
+    ...args,
+    importOrder: [
+      ...existingImportOrder,
+      args.workflowContext.nodeContextsByNodeId.size,
+    ],
+  });
   args.workflowContext.addNodeContext(nodeContext);
   try {
     await nodeContext.buildProperties();

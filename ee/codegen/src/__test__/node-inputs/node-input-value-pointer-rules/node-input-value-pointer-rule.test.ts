@@ -5,7 +5,8 @@ import {
   workflowContextFactory,
 } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import { WorkflowContext } from "src/context";
+import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
+import { WorkflowContext, createNodeContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeInputValuePointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/node-input-value-pointer-rule";
 import {
@@ -43,11 +44,23 @@ describe("NodeInputValuePointerRule", () => {
   });
 
   it("should generate correct AST for NODE_OUTPUT pointer", async () => {
-    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
-      nodeClassName: "TestNode",
-      path: ["nodes", "test-node-path"],
-      getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
-    } as unknown as BaseNodeContext<WorkflowDataNode>);
+    workflowContext = workflowContextFactory();
+    const nodeData = genericNodeFactory({
+      id: "test-node-id",
+      label: "TestNode",
+      nodeOutputs: [
+        {
+          id: "test-output-id",
+          name: "my-output",
+          type: "STRING",
+        },
+      ],
+    });
+    await createNodeContext({
+      workflowContext,
+      nodeData,
+    });
+    nodeContext = await nodeContextFactory({ workflowContext });
 
     const nodeOutputPointer: NodeInputValuePointerRuleType = {
       type: "NODE_OUTPUT",

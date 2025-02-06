@@ -4,9 +4,8 @@ import {
   nodeContextFactory,
   workflowContextFactory,
 } from "src/__test__/helpers";
-import { BaseNodeContext } from "src/context/node-context/base";
+import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { NodeOutputPointerRule } from "src/generators/node-inputs";
-import { WorkflowDataNode } from "src/types/vellum";
 
 describe("NodeOutputPointer", () => {
   let writer: Writer;
@@ -21,12 +20,14 @@ describe("NodeOutputPointer", () => {
 
   it("should generate correct Python code", async () => {
     const workflowContext = workflowContextFactory();
-    vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
-      nodeClassName: "TestNode",
-      path: ["nodes", "test-node-path"],
-      getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
-    } as unknown as BaseNodeContext<WorkflowDataNode>);
-
+    const nodeData = genericNodeFactory({
+      id: "test-node-id",
+      label: "TestNode",
+      nodeOutputs: [
+        { id: "test-output-id", name: "my-output", type: "STRING" },
+      ],
+    });
+    await nodeContextFactory({ workflowContext, nodeData });
     const nodeContext = await nodeContextFactory({ workflowContext });
 
     const nodeOutputPointer = new NodeOutputPointerRule({

@@ -5,7 +5,8 @@ import {
   nodeContextFactory,
   workflowContextFactory,
 } from "src/__test__/helpers";
-import { WorkflowContext } from "src/context";
+import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
+import { WorkflowContext, createNodeContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeInputValuePointer } from "src/generators/node-inputs/node-input-value-pointer";
 import {
@@ -49,11 +50,55 @@ describe("NodeInputValuePointer", () => {
   });
 
   it("should handle three node output pointer rules", async () => {
-    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
-      nodeClassName: "TestNode",
-      path: ["nodes", "test-node-path"],
-      getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
-    } as unknown as BaseNodeContext<WorkflowDataNode>);
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node1",
+        label: "TestNode",
+        nodeOutputs: [
+          {
+            id: "output1",
+            name: "my_output",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node2",
+        label: "TestNode",
+        nodeOutputs: [
+          {
+            id: "output2",
+            name: "my_output",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node3",
+        label: "TestNode",
+        nodeOutputs: [
+          {
+            id: "output3",
+            name: "my_output",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+
+    const nodeContext = await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory(),
+    });
 
     const nodeInputValuePointerData: NodeInputValuePointerType = {
       combinator: "OR",
@@ -93,11 +138,40 @@ describe("NodeInputValuePointer", () => {
   });
 
   it("should handle two node output pointers and one constant value", async () => {
-    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
-      nodeClassName: "TestNode",
-      path: ["nodes", "test-node-path"],
-      getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
-    } as unknown as BaseNodeContext<WorkflowDataNode>);
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node1",
+        label: "TestNode",
+        nodeOutputs: [
+          {
+            id: "output1",
+            name: "my_output",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node2",
+        label: "TestNode",
+        nodeOutputs: [
+          {
+            id: "output2",
+            name: "my_output",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+
+    const nodeContext = await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory(),
+    });
 
     const nodeInputValuePointerData: NodeInputValuePointerType = {
       combinator: "OR",
@@ -137,11 +211,53 @@ describe("NodeInputValuePointer", () => {
   });
 
   it("should handle two node output pointers with a constant value in between", async () => {
-    vi.spyOn(nodeContext.workflowContext, "getNodeContext").mockReturnValue({
-      nodeClassName: "TestNode",
-      path: ["nodes", "test-node-path"],
-      getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),
-    } as unknown as BaseNodeContext<WorkflowDataNode>);
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node1",
+        label: "TestNode",
+        nodeOutputs: [
+          {
+            id: "output1",
+            name: "my_output",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node2",
+        label: "TestNode2",
+        nodeOutputs: [
+          {
+            id: "output2",
+            name: "output2",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+    await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory({
+        id: "node3",
+        label: "TestNode3",
+        nodeOutputs: [
+          {
+            id: "output3",
+            name: "output3",
+            type: "STRING",
+          },
+        ],
+      }),
+    });
+    const nodeContext = await createNodeContext({
+      workflowContext,
+      nodeData: genericNodeFactory(),
+    });
 
     const nodeInputValuePointerData: NodeInputValuePointerType = {
       combinator: "OR",

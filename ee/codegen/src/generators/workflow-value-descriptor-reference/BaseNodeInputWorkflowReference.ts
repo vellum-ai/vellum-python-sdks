@@ -11,7 +11,7 @@ import {
 
 export declare namespace BaseNodeInputWorkflowReference {
   export interface Args<T extends WorkflowValueDescriptorReferenceType> {
-    nodeContext: BaseNodeContext<WorkflowDataNode>;
+    nodeContext?: BaseNodeContext<WorkflowDataNode>;
     workflowContext: WorkflowContext;
     nodeInputWorkflowReferencePointer: T;
     iterableConfig?: IterableConfig;

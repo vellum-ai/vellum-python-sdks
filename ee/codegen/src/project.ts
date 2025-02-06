@@ -384,15 +384,10 @@ ${errors.slice(0, 3).map((err) => {
     this.workflowContext.addEntrypointNode(entrypointNode);
 
     const nodesToGenerate = await Promise.all(
-      this.getOrderedNodes().map(async (nodeData, importOrder) => {
+      this.getOrderedNodes().map(async (nodeData) => {
         await createNodeContext({
           workflowContext: this.workflowContext,
           nodeData,
-          importOrder: this.workflowContext.parentNode
-            ? this.workflowContext.parentNode.nodeContext.importOrder.concat([
-                importOrder,
-              ])
-            : [importOrder],
         }).catch((error) => this.workflowContext.addError(error));
         return nodeData;
       })

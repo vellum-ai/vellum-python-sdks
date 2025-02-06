@@ -63,7 +63,6 @@ export class WorkflowValueDescriptor extends AstNode {
       return new WorkflowValueDescriptorReference({
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
-        nodeContext: this.nodeContext,
         workflowValueReferencePointer: workflowValueDescriptor,
         iterableConfig: this.iterableConfig,
       });
