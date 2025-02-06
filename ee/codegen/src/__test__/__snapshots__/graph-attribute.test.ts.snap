@@ -1,5 +1,20 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Workflow > graph > Should handle an a conditional pointing both ports to the same conditional node 1`] = `
+"(
+    {
+        FirstCheckNode.Ports.if_port,
+        FirstCheckNode.Ports.else_port >> FirstOutputNode,
+    }
+    >> Graph.from_set({
+        SecondCheckNode.Ports.if_port >> SecondOutputNode,
+        SecondCheckNode.Ports.else_port >> ThirdOutputNode,
+    })
+    >> FourthOutputNode
+)
+"
+`;
+
 exports[`Workflow > graph > Should handle an else case within a conditioned set 1`] = `
 "{
     {

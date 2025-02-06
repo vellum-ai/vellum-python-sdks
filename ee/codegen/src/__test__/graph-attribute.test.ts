@@ -787,5 +787,44 @@ describe("Workflow", () => {
         [[secondCheckNode, "else_port"], secondOutputNode],
       ]);
     });
+
+    it("Should handle an a conditional pointing both ports to the same conditional node", async () => {
+      const firstCheckNode = genericNodeFactory({
+        label: "FirstCheckNode",
+        nodePorts: nodePortsFactory(),
+      });
+
+      const firstOutputNode = genericNodeFactory({
+        label: "FirstOutputNode",
+      });
+
+      const secondCheckNode = genericNodeFactory({
+        label: "SecondCheckNode",
+        nodePorts: nodePortsFactory(),
+      });
+
+      const secondOutputNode = genericNodeFactory({
+        label: "SecondOutputNode",
+      });
+
+      const thirdOutputNode = genericNodeFactory({
+        label: "ThirdOutputNode",
+      });
+
+      const fourthOutputNode = genericNodeFactory({
+        label: "FourthOutputNode",
+      });
+
+      await runGraphTest([
+        [entrypointNode, firstCheckNode],
+        [[firstCheckNode, "if_port"], secondCheckNode],
+        [[firstCheckNode, "else_port"], firstOutputNode],
+        [firstOutputNode, secondCheckNode],
+        [[secondCheckNode, "if_port"], secondOutputNode],
+        [[secondCheckNode, "else_port"], thirdOutputNode],
+        [secondOutputNode, fourthOutputNode],
+        [thirdOutputNode, fourthOutputNode],
+      ]);
+    });
   });
 });
