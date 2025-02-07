@@ -47,7 +47,24 @@ describe("CodeExecutionNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+  describe("basic representation", () => {
+    it("should accept int and float", async () => {
+      const nodeData = codeExecutionNodeFactory({
+        codeOutputValueType: "NUMBER",
+      });
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+      node = new CodeExecutionNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
 
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
   describe("code representation override", () => {
     it.each<"INLINE" | "STANDALONE" | undefined>([
       undefined,

@@ -1,36 +1,36 @@
 import { v4 as uuidv4 } from "uuid";
-import { VellumVariableType, PromptParameters } from "vellum-ai/api";
+import { PromptParameters, VellumVariableType } from "vellum-ai/api";
 
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
-  EntrypointNode,
-  CodeExecutionNode,
-  GuardrailNode,
-  SearchNode,
-  FinalOutputNode,
-  WorkflowNodeType,
-  PromptNode,
-  TemplatingNode,
-  ConditionalNode,
-  ApiNode,
-  MergeNode,
-  GenericNode,
-  SubworkflowNode,
-  NoteNode,
-  ErrorNode,
-  NodeInputValuePointerRule,
-  PromptTemplateBlock,
-  VellumLogicalConditionGroup,
-  ConditionalNodeConditionData,
-  NodeOutputData,
-  NodeInput,
-  MapNode,
-  NodeTrigger,
-  NodePort,
-  NodeAttribute,
-  NodeOutput,
   AdornmentNode,
+  ApiNode,
+  CodeExecutionNode,
+  ConditionalNode,
+  ConditionalNodeConditionData,
   ConstantValuePointer,
+  EntrypointNode,
+  ErrorNode,
+  FinalOutputNode,
+  GenericNode,
+  GuardrailNode,
+  MapNode,
+  MergeNode,
+  NodeAttribute,
+  NodeInput,
+  NodeInputValuePointerRule,
+  NodeOutput,
+  NodeOutputData,
+  NodePort,
+  NodeTrigger,
+  NoteNode,
+  PromptNode,
+  PromptTemplateBlock,
+  SearchNode,
+  SubworkflowNode,
+  TemplatingNode,
+  VellumLogicalConditionGroup,
+  WorkflowNodeType,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -1266,9 +1266,11 @@ export function apiNodeFactory({
 
 export function codeExecutionNodeFactory({
   codeInputValueRule,
+  codeOutputValueType,
   runtime,
 }: {
   codeInputValueRule?: NodeInputValuePointerRule;
+  codeOutputValueType?: VellumVariableType;
   runtime?: string;
 } = {}): CodeExecutionNode {
   const nodeData: CodeExecutionNode = {
@@ -1278,7 +1280,7 @@ export function codeExecutionNodeFactory({
       label: "Code Execution Node",
       codeInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
       outputId: "81b270c0-4deb-4db3-aae5-138f79531b2b",
-      outputType: "STRING",
+      outputType: codeOutputValueType ?? "STRING",
       runtimeInputId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
       targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",

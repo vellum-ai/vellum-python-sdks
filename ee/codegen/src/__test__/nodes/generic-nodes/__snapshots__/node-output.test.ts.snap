@@ -2,7 +2,7 @@
 
 exports[`NodeOutput > basic > generates output class with number type 1`] = `
 "class Outputs(BaseNode.Outputs):
-    output: float
+    output: Union[float, int]
 "
 `;
 

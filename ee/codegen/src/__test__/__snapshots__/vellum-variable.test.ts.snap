@@ -36,7 +36,7 @@ exports[`VellumVariableField > NullVellumVariable snapshot 1`] = `
 `;
 
 exports[`VellumVariableField > NumberVellumVariable snapshot 1`] = `
-"test: float
+"test: Union[float, int]
 "
 `;
 

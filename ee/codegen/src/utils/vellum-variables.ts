@@ -11,7 +11,7 @@ export function getVellumVariablePrimitiveType(
     case "STRING":
       return python.Type.str();
     case "NUMBER":
-      return python.Type.float();
+      return python.Type.union([python.Type.float(), python.Type.int()]);
     case "JSON":
       return python.Type.any();
     case "CHAT_HISTORY":

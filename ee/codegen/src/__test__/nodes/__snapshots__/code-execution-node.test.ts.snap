@@ -57,6 +57,22 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`CodeExecutionNode > basic representation > should accept int and float 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+from typing import Union
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, Union[float, int]]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11"
+    packages = None
+"
+`;
+
 exports[`CodeExecutionNode > basic secret node > secret ids should show names 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,

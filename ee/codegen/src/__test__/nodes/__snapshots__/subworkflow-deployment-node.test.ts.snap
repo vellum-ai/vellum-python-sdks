@@ -39,6 +39,7 @@ class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNod
 
 exports[`SubworkflowDeploymentNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
+from typing import Union
 
 
 class SubworkflowNode(SubworkflowDeploymentNode):
@@ -48,7 +49,7 @@ class SubworkflowNode(SubworkflowDeploymentNode):
 
     class Outputs(SubworkflowDeploymentNode.Outputs):
         output_1: str
-        output_2: float
+        output_2: Union[float, int]
 "
 `;
 

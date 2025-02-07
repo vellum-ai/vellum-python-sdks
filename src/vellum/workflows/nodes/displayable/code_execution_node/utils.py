@@ -5,7 +5,6 @@ from typing import Any, List, Tuple, Union
 
 from pydantic import BaseModel, ValidationError
 
-from vellum import NumberVellumValue
 from vellum.client.types.code_executor_input import CodeExecutorInput
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -93,10 +92,7 @@ __arg__out = main({", ".join(run_args)})
     result = exec_globals["__arg__out"]
 
     if output_type != Any:
-        if output_type == NumberVellumValue and type(result) in [float, int]:
-            number_result = {"value": result, "type": "NUMBER"}
-            result = output_type.model_validate(number_result)
-        elif issubclass(output_type, BaseModel) and not isinstance(result, output_type):
+        if issubclass(output_type, BaseModel) and not isinstance(result, output_type):
             try:
                 result = output_type.model_validate(result)
             except ValidationError as e:
