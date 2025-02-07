@@ -69,7 +69,7 @@ def test_run_workflow__fallthrough():
     assert terminal_event.outputs.fallthrough == "lol"
 
 
-def test_run_workflow__fallthrough_none():
+def test_run_workflow__try_none():
     workflow = Workflow()
     terminal_event = workflow.run(inputs=TryInputs(name="mar"))
     assert terminal_event.name == "workflow.execution.fulfilled"
