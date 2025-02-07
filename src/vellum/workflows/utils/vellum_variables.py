@@ -45,6 +45,9 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
             ]
             if types == actual_types_with_explicit_ref:
                 return "JSON"
+            # Number now supports float and int
+            elif types == [float, int]:
+                return "NUMBER"
             raise ValueError(f"Expected Descriptor to only have one type, got {types}")
 
         type_ = type_.types[0]
