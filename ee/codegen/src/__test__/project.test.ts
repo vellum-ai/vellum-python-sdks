@@ -949,4 +949,141 @@ baz = foo + bar
       expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
     });
   });
+
+  // TODO: Remove this once we move away completely from terminal nodes
+  describe("nodes with output values", () => {
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: "templating-node",
+            type: "TEMPLATING",
+            data: {
+              label: "Templating Node",
+              template_node_input_id: "template",
+              output_id: "output",
+              output_type: "STRING",
+              source_handle_id: "template_source",
+              target_handle_id: "template_target",
+            },
+            inputs: [
+              {
+                id: "template",
+                key: "template",
+                value: {
+                  combinator: "OR",
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "hello",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+          {
+            id: "terminal-node",
+            type: "TERMINAL",
+            data: {
+              label: "Final Output",
+              name: "final-output",
+              target_handle_id: "terminal_target",
+              output_id: "terminal_output_id",
+              output_type: "STRING",
+              node_input_id: "terminal_input",
+            },
+            inputs: [
+              {
+                id: "terminal_input",
+                key: "node_input",
+                value: {
+                  rules: [
+                    {
+                      type: "NODE_OUTPUT",
+                      data: {
+                        node_id: "templating-node",
+                        output_id: "output",
+                      },
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              },
+            ],
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: "templating-node",
+            target_handle_id: "template_target",
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+          {
+            source_node_id: "templating-node",
+            source_handle_id: "template_source",
+            target_node_id: "terminal-node",
+            target_handle_id: "terminal_target",
+            type: "DEFAULT",
+            id: "edge_2",
+          },
+        ],
+      },
+      input_variables: [],
+      output_variables: [
+        {
+          id: "not-used-output-variable-id",
+          key: "not-used-output-variable-key",
+          type: "STRING",
+        },
+      ],
+      output_values: [
+        {
+          output_variable_id: "not-used-output-variable-id",
+          value: {
+            type: "NODE_OUTPUT",
+            node_id: "not-used-node-id",
+            node_output_id: "not-used-node-output-id",
+          },
+        },
+      ],
+      runner_config: {},
+    };
+    it("should prioritize terminal node data over output values", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        strict: true,
+      });
+
+      await project.generateCode();
+
+      const nodesPath = join(tempDir, project.getModuleName(), "nodes");
+      const nodeFiles = fs.readdirSync(nodesPath);
+      expect(nodeFiles).toContain("templating_node.py");
+      expect(nodeFiles).toContain("final_output.py");
+
+      const finalOutputPath = join(nodesPath, "final_output.py");
+      expect(fs.existsSync(finalOutputPath)).toBe(true);
+      expect(fs.readFileSync(finalOutputPath, "utf-8")).toMatchSnapshot();
+    });
+  });
 });
