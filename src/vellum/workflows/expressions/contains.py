@@ -24,11 +24,11 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         # Support any type that implements the in operator
         # https://app.shortcut.com/vellum/story/4658
         lhs = resolve_value(self._lhs, state)
-        if not isinstance(lhs, (list, tuple, set, dict, str, UNDEF)):
-            raise ValueError(f"Expected a LHS that supported contains, got: {lhs.__class__.__name__}")
         # assumes that lack of is also false
         if lhs is UNDEF:
             return False
+        if not isinstance(lhs, (list, tuple, set, dict, str)):
+            raise ValueError(f"Expected a LHS that supported contains, got: {lhs.__class__.__name__}")
 
         rhs = resolve_value(self._rhs, state)
         return rhs in lhs
