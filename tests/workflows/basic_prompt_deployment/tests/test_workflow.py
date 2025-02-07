@@ -13,7 +13,9 @@ from vellum import (
     StringInputRequest,
     StringVellumValue,
 )
+from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import VellumCodeResourceDefinition, WorkflowParentContext
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
@@ -185,3 +187,41 @@ def test_stream_workflow__happy_path(vellum_client):
             workflow_definition=workflow.__class__, span_id=uuid4()
         ).workflow_definition.model_dump()
     )
+
+
+def test_stream_workflow__deployment_not_found(vellum_client):
+    """Confirm that we emit the correct events when a deployment is not found"""
+
+    # GIVEN a workflow that's set up to hit a Prompt Deployment
+    workflow = BasicPromptDeploymentWorkflow()
+
+    # AND the Prompt Deployment is not found
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        if kwargs.get("_mock_condition_to_induce_an_error"):
+            yield InitiatedExecutePromptEvent(execution_id=str(uuid4()))
+        else:
+            raise ApiError(status_code=404, body={"detail": "Deployment not found"})
+
+    vellum_client.execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN we run the workflow
+    result = list(
+        workflow.stream(
+            event_filter=root_workflow_event_filter,
+            inputs=Inputs(
+                city="San Francisco",
+                date="2024-01-01",
+            ),
+        )
+    )
+
+    events = next(
+        event
+        for event in result
+        if event.name == "workflow.execution.rejected" or event.name == "workflow.execution.fulfilled"
+    )
+
+    # THEN the last event should be a rejected event
+    assert events.name == "workflow.execution.rejected"
+    assert events.error.code == WorkflowErrorCode.INVALID_INPUTS
+    assert events.error.message == "Deployment not found"
