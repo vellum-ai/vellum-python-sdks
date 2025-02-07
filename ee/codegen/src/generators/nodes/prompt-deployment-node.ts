@@ -3,10 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
-import {
-  NodeAttributeGenerationError,
-  NodeDefinitionGenerationError,
-} from "src/generators/errors";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { DeploymentPromptNodeData, PromptNode } from "src/types/vellum";
 
@@ -34,17 +31,21 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
       );
     }
 
-    if (!this.nodeContext.deploymentHistoryItem) {
-      this.workflowContext.addError(
-        new NodeAttributeGenerationError(`
-          Failed to generate attribute: ${this.nodeData.data.label}.deployment`)
+    if (this.nodeContext.deploymentHistoryItem) {
+      statements.push(
+        python.field({
+          name: "deployment",
+          initializer: python.TypeInstantiation.str(
+            this.nodeContext.deploymentHistoryItem.name
+          ),
+        })
       );
     } else {
       statements.push(
         python.field({
           name: "deployment",
           initializer: python.TypeInstantiation.str(
-            this.nodeContext.deploymentHistoryItem.name
+            this.nodeData.data.promptDeploymentId
           ),
         })
       );

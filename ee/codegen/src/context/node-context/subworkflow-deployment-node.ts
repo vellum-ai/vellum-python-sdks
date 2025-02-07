@@ -1,6 +1,5 @@
 import { WorkflowDeploymentHistoryItem } from "vellum-ai/api";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
-import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "./base";
 
@@ -8,6 +7,7 @@ import { PortContext } from "src/context/port-context";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { isVellumErrorWithDetail } from "src/utils/nodes";
 
 export class SubworkflowDeploymentNodeContext extends BaseNodeContext<SubworkflowNodeType> {
   baseNodeClassName = "SubworkflowDeploymentNode";
@@ -52,13 +52,7 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
         this.nodeData.data.workflowDeploymentId
       );
     } catch (error) {
-      if (
-        error instanceof VellumError &&
-        typeof error.body === "object" &&
-        error.body !== null &&
-        "detail" in error.body &&
-        typeof error.body.detail === "string"
-      ) {
+      if (isVellumErrorWithDetail(error)) {
         throw new NodeDefinitionGenerationError(error.body.detail);
       }
 

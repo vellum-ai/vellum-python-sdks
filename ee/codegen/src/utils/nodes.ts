@@ -1,3 +1,5 @@
+import { VellumError } from "vellum-ai/errors";
+
 import { WorkflowGenerationError } from "src/generators/errors";
 import { WorkflowNode, WorkflowOutputValue } from "src/types/vellum";
 
@@ -42,4 +44,16 @@ export function getNodeOutputIdFromNodeOutputWorkflowReference(
       `Expected WorkflowOutputValue to be of type NODE_OUTPUT but got ${workflowOutput.value.type} instead`
     );
   }
+}
+
+export function isVellumErrorWithDetail(
+  error: unknown
+): error is VellumError & { body: { detail: string } } {
+  return (
+    error instanceof VellumError &&
+    typeof error.body === "object" &&
+    error.body !== null &&
+    "detail" in error.body &&
+    typeof error.body.detail === "string"
+  );
 }

@@ -56,3 +56,16 @@ class PromptDeploymentNode(BasePromptDeploymentNode):
     prompt_inputs = {}
 "
 `;
+
+exports[`PromptDeploymentNode > no prompt deployment found > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    PromptDeploymentNode as BasePromptDeploymentNode,
+)
+
+
+class PromptDeploymentNode(BasePromptDeploymentNode):
+    deployment = "afd05488-7a25-4ff2-b87b-878e9552474e"
+    release_tag = "LATEST"
+    prompt_inputs = {}
+"
+`;

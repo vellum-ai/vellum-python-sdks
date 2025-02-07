@@ -1,11 +1,10 @@
 import { DeploymentHistoryItem } from "vellum-ai/api";
 import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
-import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
-import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { PromptNode } from "src/types/vellum";
+import { isVellumErrorWithDetail } from "src/utils/nodes";
 
 export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
   baseNodeClassName = "PromptDeploymentNode";
@@ -46,14 +45,10 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
         this.nodeData.data.promptDeploymentId
       );
     } catch (error) {
-      if (
-        error instanceof VellumError &&
-        typeof error.body === "object" &&
-        error.body !== null &&
-        "detail" in error.body &&
-        typeof error.body.detail === "string"
-      ) {
-        throw new NodeDefinitionGenerationError(error.body.detail);
+      if (isVellumErrorWithDetail(error)) {
+        console.warn(
+          `Could not find prompt deployment with id: ${this.nodeData.data.promptDeploymentId}, falling back to id`
+        );
       } else {
         throw error;
       }
