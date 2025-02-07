@@ -30,7 +30,7 @@ class FinalNode(BaseNode):
         value = MiddleNode2.Outputs.text_str
 
 
-class ConditionalNode(ConditionalNode):
+class TestConditionalNode(ConditionalNode):
     class Ports(ConditionalNode.Ports):
         branch_1 = Port.on_if(Node.Outputs.error.contains("Provider Error"))
         branch_2 = Port.on_else()
@@ -39,7 +39,10 @@ class ConditionalNode(ConditionalNode):
 class Workflow(BaseWorkflow[Inputs, BaseState]):
     graph = {
         Node
-        >> {ConditionalNode.Ports.branch_1 >> MiddleNode, ConditionalNode.Ports.branch_2 >> MiddleNode2 >> FinalNode}
+        >> {
+            TestConditionalNode.Ports.branch_1 >> MiddleNode,
+            TestConditionalNode.Ports.branch_2 >> MiddleNode2 >> FinalNode,
+        }
     }
 
     class Outputs(BaseWorkflow.Outputs):
