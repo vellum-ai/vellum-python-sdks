@@ -51,7 +51,7 @@ exports[`PromptDeploymentNode > basic > getNodeFile 1`] = `
 
 
 class PromptDeploymentNode(BasePromptDeploymentNode):
-    deployment = "Prompt Deployment Node"
+    deployment = "some-unique-deployment-name"
     release_tag = "LATEST"
     prompt_inputs = {}
 "

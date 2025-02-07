@@ -1,5 +1,9 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { WorkflowDeploymentHistoryItem } from "vellum-ai/api";
+import {
+  DeploymentHistoryItem,
+  WorkflowDeploymentHistoryItem,
+} from "vellum-ai/api";
+import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 import { beforeEach, vi } from "vitest";
 
@@ -97,6 +101,14 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
   ];
 
   beforeEach(async () => {
+    vi.spyOn(
+      DeploymentsClient.prototype,
+      "deploymentHistoryItemRetrieve"
+    ).mockResolvedValue({
+      id: "some-id",
+      deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
+      name: "some-unique-deployment-name",
+    } as unknown as DeploymentHistoryItem);
     workflowContext = workflowContextFactory();
     writer = new Writer();
 

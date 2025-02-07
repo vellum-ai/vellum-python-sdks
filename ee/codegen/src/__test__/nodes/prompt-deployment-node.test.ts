@@ -1,5 +1,7 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { beforeEach } from "vitest";
+import { DeploymentHistoryItem } from "vellum-ai/api";
+import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
+import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { promptDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-factories";
@@ -15,6 +17,14 @@ describe("PromptDeploymentNode", () => {
   beforeEach(() => {
     writer = new Writer();
     workflowContext = workflowContextFactory();
+    vi.spyOn(
+      DeploymentsClient.prototype,
+      "deploymentHistoryItemRetrieve"
+    ).mockResolvedValue({
+      id: "some-id",
+      deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
+      name: "some-unique-deployment-name",
+    } as unknown as DeploymentHistoryItem);
   });
 
   describe("basic", () => {
