@@ -1,5 +1,6 @@
 from typing import Generic, TypeVar, Union
 
+from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
@@ -23,8 +24,11 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         # Support any type that implements the in operator
         # https://app.shortcut.com/vellum/story/4658
         lhs = resolve_value(self._lhs, state)
-        if not isinstance(lhs, (list, tuple, set, dict, str)):
+        if not isinstance(lhs, (list, tuple, set, dict, str, UNDEF)):
             raise ValueError(f"Expected a LHS that supported contains, got: {lhs.__class__.__name__}")
+        # assumes that lack of is also false
+        if lhs is UNDEF:
+            return False
 
         rhs = resolve_value(self._rhs, state)
         return rhs in lhs
