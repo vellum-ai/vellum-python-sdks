@@ -3,6 +3,7 @@ from typing import Any, Dict, Generic, Optional, Union
 from requests import Request, RequestException, Session
 from requests.exceptions import JSONDecodeError
 
+from vellum.client import ApiError
 from vellum.client.types.vellum_secret import VellumSecret as ClientVellumSecret
 from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -83,9 +84,13 @@ class BaseAPINode(BaseNode, Generic[StateType]):
 
     def _vellum_execute_api(self, bearer_token, data, headers, method, url):
         client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
-        vellum_response = self._context.vellum_client.execute_api(
-            url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
-        )
+        try:
+            vellum_response = self._context.vellum_client.execute_api(
+                url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
+            )
+        except ApiError as e:
+            NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
+
         return self.Outputs(
             json=vellum_response.json_,
             headers={header: value for header, value in vellum_response.headers.items()},
