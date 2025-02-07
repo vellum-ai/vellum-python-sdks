@@ -1,6 +1,7 @@
 from vellum.workflows.constants import UNDEF
 
 from tests.workflows.basic_conditional_node.workflow import CategoryWorkflow, Inputs
+from tests.workflows.basic_conditional_node.workflow_with_try_node import Workflow
 
 
 def test_run_workflow__question():
@@ -66,3 +67,10 @@ def test_run_workflow__fallthrough():
     assert terminal_event.outputs.compliment is UNDEF
     assert terminal_event.outputs.statement is UNDEF
     assert terminal_event.outputs.fallthrough == "lol"
+
+
+def test_run_workflow__fallthrough_none():
+    workflow = Workflow()
+    terminal_event = workflow.run(inputs=Inputs(name="mar"))
+    assert terminal_event.outputs.pass_final_output == "pass"
+    assert terminal_event.outputs.fail_final_output is UNDEF
