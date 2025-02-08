@@ -1,4 +1,4 @@
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 
 from tests.workflows.basic_merge_node.await_all_workflow import AwaitAllFailingWorkflow, AwaitAllPassingWorkflow
 from tests.workflows.basic_merge_node.await_any_workflow import AwaitAnyPassingWorkflow
@@ -29,7 +29,7 @@ def test_run_workflow__await_all__failing():
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
 
     # AND there should not be a final output
-    assert terminal_event.outputs.value is UNDEF
+    assert terminal_event.outputs.value is undefined
 
 
 def test_run_workflow__await_any__passing():

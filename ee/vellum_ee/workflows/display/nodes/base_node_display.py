@@ -17,7 +17,7 @@ from typing import (
 )
 
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.between import BetweenExpression
 from vellum.workflows.expressions.is_nil import IsNilExpression
@@ -134,7 +134,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             type = primitive_type_to_vellum_variable_type(output)
             value = (
                 self.serialize_value(display_context, output.instance)
-                if output.instance is not None and output.instance != UNDEF
+                if output.instance is not None and output.instance != undefined
                 else None
             )
 

@@ -1,4 +1,4 @@
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 from tests.workflows.basic_conditional_branch.workflow import (
@@ -23,7 +23,7 @@ def test_run_workflow__branch_a():
     # THEN the Workflow should succeed with the expected outputs
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
     assert terminal_event.outputs.branch_a == "Branch A"
-    assert terminal_event.outputs.branch_b is UNDEF
+    assert terminal_event.outputs.branch_b is undefined
 
 
 def test_run_workflow__branch_b():
@@ -40,7 +40,7 @@ def test_run_workflow__branch_b():
     # THEN the Workflow should succeed with the expected outputs
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
     assert terminal_event.outputs.branch_b == "Branch B"
-    assert terminal_event.outputs.branch_a is UNDEF
+    assert terminal_event.outputs.branch_a is undefined
 
 
 def test_stream_workflow__verify_invoked_ports():

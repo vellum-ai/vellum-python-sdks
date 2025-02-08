@@ -5,7 +5,7 @@ from types import MappingProxyType
 from uuid import UUID
 from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -165,7 +165,7 @@ class BaseNodeMeta(type):
                 if attr_name in yielded_attr_names:
                     continue
 
-                attr_value = getattr(resolved_cls, attr_name, UNDEF)
+                attr_value = getattr(resolved_cls, attr_name, undefined)
                 if not isinstance(attr_value, NodeReference):
                     continue
 

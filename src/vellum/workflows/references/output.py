@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Generator, Generic, Optional, Tuple, Type
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 
 if TYPE_CHECKING:
@@ -32,13 +32,13 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
         return self._outputs_class
 
     def resolve(self, state: "BaseState") -> _OutputType:
-        node_output = state.meta.node_outputs.get(self, UNDEF)
+        node_output = state.meta.node_outputs.get(self, undefined)
         if isinstance(node_output, Queue):
             # Fix typing surrounding the return value of node outputs
             # https://app.shortcut.com/vellum/story/4783
             return self._as_generator(node_output)  # type: ignore[return-value]
 
-        if node_output is not UNDEF:
+        if node_output is not undefined:
             return cast(_OutputType, node_output)
 
         if state.meta.parent:
@@ -46,13 +46,13 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
 
         # Fix typing surrounding the return value of node outputs
         # https://app.shortcut.com/vellum/story/4783
-        return cast(Type[UNDEF], node_output)  # type: ignore[return-value]
+        return cast(Type[undefined], node_output)  # type: ignore[return-value]
 
-    def _as_generator(self, node_output: Queue) -> Generator[_OutputType, None, Type[UNDEF]]:
+    def _as_generator(self, node_output: Queue) -> Generator[_OutputType, None, Type[undefined]]:
         while True:
             item = node_output.get()
-            if item is UNDEF:
-                return UNDEF
+            if item is undefined:
+                return undefined
             yield cast(_OutputType, item)
 
     def __eq__(self, other: object) -> bool:

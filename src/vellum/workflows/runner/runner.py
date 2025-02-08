@@ -6,7 +6,7 @@ from threading import Event as ThreadingEvent, Thread
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges.edge import Edge
@@ -267,7 +267,7 @@ class WorkflowRunner(Generic[StateType]):
                             )
                         elif output.is_fulfilled:
                             if output.name in streaming_output_queues:
-                                streaming_output_queues[output.name].put(UNDEF)
+                                streaming_output_queues[output.name].put(undefined)
 
                             setattr(outputs, output.name, output.value)
                             self._workflow_event_inner_queue.put(
@@ -286,7 +286,7 @@ class WorkflowRunner(Generic[StateType]):
             node.state.meta.node_execution_cache.fulfill_node_execution(node.__class__, span_id)
 
             for descriptor, output_value in outputs:
-                if output_value is UNDEF:
+                if output_value is undefined:
                     if descriptor in node.state.meta.node_outputs:
                         del node.state.meta.node_outputs[descriptor]
                     continue
@@ -386,8 +386,8 @@ class WorkflowRunner(Generic[StateType]):
                 if not isinstance(descriptor, ExternalInputReference):
                     continue
 
-                if state.meta.external_inputs.get(descriptor, UNDEF) is UNDEF:
-                    state.meta.external_inputs[descriptor] = UNDEF
+                if state.meta.external_inputs.get(descriptor, undefined) is undefined:
+                    state.meta.external_inputs[descriptor] = undefined
                     return
 
             all_deps = self._dependencies[node_class]
@@ -577,7 +577,7 @@ class WorkflowRunner(Generic[StateType]):
         unresolved_external_inputs = {
             descriptor
             for descriptor, node_input_value in final_state.meta.external_inputs.items()
-            if node_input_value is UNDEF
+            if node_input_value is undefined
         }
         if unresolved_external_inputs:
             self._workflow_event_outer_queue.put(

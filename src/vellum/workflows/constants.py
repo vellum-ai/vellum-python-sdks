@@ -4,11 +4,11 @@ from typing import Any, cast
 
 class _UndefMeta(type):
     def __repr__(cls) -> str:
-        return "UNDEF"
+        return "undefined"
 
     def __getattribute__(cls, name: str) -> Any:
         if name == "__class__":
-            # ensures that UNDEF.__class__ == UNDEF
+            # ensures that undefined.__class__ == undefined
             return cls
 
         return super().__getattribute__(name)
@@ -17,7 +17,12 @@ class _UndefMeta(type):
         return False
 
 
-class UNDEF(metaclass=_UndefMeta):
+class undefined(metaclass=_UndefMeta):
+    """
+    A singleton class that represents an `undefined` value, mirroring the behavior of the `undefined`
+    value in TypeScript.
+    """
+
     pass
 
 

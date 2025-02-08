@@ -1,6 +1,6 @@
 from typing import Generic, TypeVar, Union
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
@@ -19,4 +19,4 @@ class IsNilExpression(BaseDescriptor[bool], Generic[_T]):
 
     def resolve(self, state: "BaseState") -> bool:
         expression = resolve_value(self._expression, state)
-        return expression is None or expression is UNDEF
+        return expression is None or expression is undefined

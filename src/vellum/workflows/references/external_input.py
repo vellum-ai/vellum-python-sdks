@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Type, TypeVar, 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -34,7 +34,7 @@ class ExternalInputReference(BaseDescriptor[_InputType], Generic[_InputType]):
 
     def resolve(self, state: "BaseState") -> _InputType:
         external_input = state.meta.external_inputs.get(self)
-        if external_input is not UNDEF:
+        if external_input is not undefined:
             return cast(_InputType, external_input)
 
         if state.meta.parent:

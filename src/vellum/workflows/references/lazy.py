@@ -2,7 +2,7 @@ import ast
 import inspect
 from typing import TYPE_CHECKING, Callable, Generic, TypeVar, Union, get_args
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 
 if TYPE_CHECKING:
@@ -37,7 +37,7 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
 
             # Fix typing surrounding the return value of node outputs/output descriptors
             # https://app.shortcut.com/vellum/story/4783
-            return UNDEF  # type: ignore[return-value]
+            return undefined  # type: ignore[return-value]
 
         return resolve_value(self._get(), state)
 

@@ -1,6 +1,6 @@
 from typing import TypeVar, Union
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
@@ -27,7 +27,7 @@ class CoalesceExpression(BaseDescriptor[Union[LHS, RHS]]):
 
     def resolve(self, state: "BaseState") -> Union[LHS, RHS]:
         lhs = resolve_value(self._lhs, state)
-        if lhs is not UNDEF and lhs is not None:
+        if lhs is not undefined and lhs is not None:
             return lhs
 
         return resolve_value(self._rhs, state)

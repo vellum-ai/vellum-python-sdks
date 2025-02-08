@@ -4,7 +4,7 @@ from typing_extensions import dataclass_transform
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -19,17 +19,17 @@ _Accumulated = TypeVar("_Accumulated")
 
 
 class BaseOutput(Generic[_Delta, _Accumulated]):
-    _value: Union[_Accumulated, Type[UNDEF]]
-    _delta: Union[_Delta, Type[UNDEF]]
+    _value: Union[_Accumulated, Type[undefined]]
+    _delta: Union[_Delta, Type[undefined]]
     _name: str
 
     def __init__(
         self,
         name: str,
-        value: Union[_Accumulated, Type[UNDEF]] = UNDEF,
-        delta: Union[_Delta, Type[UNDEF]] = UNDEF,
+        value: Union[_Accumulated, Type[undefined]] = undefined,
+        delta: Union[_Delta, Type[undefined]] = undefined,
     ) -> None:
-        if value is not UNDEF and delta is not UNDEF:
+        if value is not undefined and delta is not undefined:
             raise ValueError("Cannot set both value and delta")
 
         self._name = name
@@ -37,24 +37,24 @@ class BaseOutput(Generic[_Delta, _Accumulated]):
         self._delta = delta
 
     @property
-    def delta(self) -> Union[_Delta, Type[UNDEF]]:
+    def delta(self) -> Union[_Delta, Type[undefined]]:
         return self._delta
 
     @property
-    def value(self) -> Union[_Accumulated, Type[UNDEF]]:
+    def value(self) -> Union[_Accumulated, Type[undefined]]:
         return self._value
 
     @property
     def is_initiated(self) -> bool:
-        return self._delta is UNDEF and self._value is UNDEF
+        return self._delta is undefined and self._value is undefined
 
     @property
     def is_streaming(self) -> bool:
-        return self._delta is not UNDEF and self._value is UNDEF
+        return self._delta is not undefined and self._value is undefined
 
     @property
     def is_fulfilled(self) -> bool:
-        return self._delta is UNDEF and self._value is not UNDEF
+        return self._delta is undefined and self._value is not undefined
 
     @property
     def name(self) -> str:
@@ -71,18 +71,18 @@ class BaseOutput(Generic[_Delta, _Accumulated]):
             "name": self.name,
         }
 
-        if self.value is not UNDEF:
+        if self.value is not undefined:
             data["value"] = self.value
 
-        if self.delta is not UNDEF:
+        if self.delta is not undefined:
             data["delta"] = self.delta
 
         return data
 
     def __repr__(self) -> str:
-        if self.value is not UNDEF:
+        if self.value is not undefined:
             return f"{self.__class__.__name__}({self.name}={self.value})"
-        elif self.delta is not UNDEF:
+        elif self.delta is not undefined:
             return f"{self.__class__.__name__}({self.name}={self.delta})"
         else:
             return f"{self.__class__.__name__}(name='{self.name}')"
@@ -144,7 +144,7 @@ class _BaseOutputsMeta(type):
             # We first try to resolve the instance that this class attribute name is mapped to. If it's not found,
             # we iterate through its inheritance hierarchy to find the first base class that has this attribute
             # and use its mapping.
-            instance = vars(cls).get(name, UNDEF)
+            instance = vars(cls).get(name, undefined)
             if not instance:
                 for base in cls.__mro__[1:]:
                     if hasattr(base, name):
@@ -204,7 +204,9 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
         if not isinstance(other, dict):
             return super().__eq__(other)
 
-        outputs = {name: value for name, value in vars(self).items() if not name.startswith("_") and value is not UNDEF}
+        outputs = {
+            name: value for name, value in vars(self).items() if not name.startswith("_") and value is not undefined
+        }
         return outputs == other
 
     def __repr__(self) -> str:
@@ -213,9 +215,9 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
 
     def __iter__(self) -> Iterator[Tuple[OutputReference, Any]]:
         for output_descriptor in self.__class__:
-            output_value = getattr(self, output_descriptor.name, UNDEF)
+            output_value = getattr(self, output_descriptor.name, undefined)
             if isinstance(output_value, BaseDescriptor):
-                output_value = UNDEF
+                output_value = undefined
 
             yield (output_descriptor, output_value)
 

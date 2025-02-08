@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union
 
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -67,7 +67,7 @@ class InlineSubworkflowNode(
     """
 
     subworkflow: Type["BaseWorkflow[InputsType, InnerStateType]"]
-    subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[UNDEF]]] = UNDEF
+    subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[undefined]]] = undefined
 
     def run(self) -> Iterator[BaseOutput]:
         with execution_context(parent_context=get_parent_context() or self._context.parent_context):
@@ -112,7 +112,7 @@ class InlineSubworkflowNode(
 
     def _compile_subworkflow_inputs(self) -> InputsType:
         inputs_class = self.subworkflow.get_inputs_class()
-        if self.subworkflow_inputs is UNDEF:
+        if self.subworkflow_inputs is undefined:
             inputs_dict = {}
             for descriptor in inputs_class:
                 if hasattr(self, descriptor.name):

@@ -12,7 +12,7 @@ from pydantic import GetCoreSchemaHandler, field_serializer
 from pydantic_core import core_schema
 
 from vellum.core.pydantic_utilities import UniversalBaseModel
-from vellum.workflows.constants import UNDEF
+from vellum.workflows.constants import undefined
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
@@ -347,7 +347,7 @@ class BaseState(metaclass=_BaseStateMeta):
             if key.startswith("_"):
                 continue
 
-            if getattr(latest_state, key, UNDEF) == UNDEF:
+            if getattr(latest_state, key, undefined) == undefined:
                 setattr(latest_state, key, value)
 
         return cast(StateType, latest_state)
