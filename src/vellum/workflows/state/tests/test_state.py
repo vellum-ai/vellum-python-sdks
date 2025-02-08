@@ -23,6 +23,9 @@ class MockState(BaseState):
 
 
 class MockNode(BaseNode):
+    class ExternalInputs(BaseNode.ExternalInputs):
+        message: str
+
     class Outputs(BaseOutputs):
         baz: str
 
@@ -70,11 +73,7 @@ def test_state_snapshot__external_input_edit():
     assert snapshot_count[id(state)] == 0
 
     # WHEN we add an external input to state
-    class MockExternalInputs(BaseNode.ExternalInputs):
-        message: str
-
-    # WHEN we edit external inputs dictionary
-    state.meta.external_inputs[MockExternalInputs.message] = "hello"
+    state.meta.external_inputs[MockNode.ExternalInputs.message] = "hello"
 
     # THEN the snapshot is emitted
     assert snapshot_count[id(state)] == 1
@@ -137,19 +136,16 @@ def test_state_deepcopy__with_external_input_updates():
     state = MockState(foo="bar")
 
     # AND we add an external input to state
-    class MockExternalInputs(BaseNode.ExternalInputs):
-        message: str
-
-    state.meta.external_inputs[MockExternalInputs.message] = "hello"
+    state.meta.external_inputs[MockNode.ExternalInputs.message] = "hello"
 
     # AND we deepcopy the state
     deepcopied_state = deepcopy(state)
 
     # AND we update the original state
-    state.meta.external_inputs[MockExternalInputs.message] = "world"
+    state.meta.external_inputs[MockNode.ExternalInputs.message] = "world"
 
     # THEN the copied state is not updated
-    assert deepcopied_state.meta.external_inputs[MockExternalInputs.message] == "hello"
+    assert deepcopied_state.meta.external_inputs[MockNode.ExternalInputs.message] == "hello"
 
     # AND the original state has had the correct number of snapshots
     assert snapshot_count[id(state)] == 2
