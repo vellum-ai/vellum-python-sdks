@@ -1,4 +1,3 @@
-import pytest
 from threading import Event as ThreadingEvent, Thread
 import time
 
@@ -65,7 +64,6 @@ def test_workflow__cancel_stream():
     assert events[-1].error.code == WorkflowErrorCode.WORKFLOW_CANCELLED
 
 
-@pytest.mark.skip(reason="This is a bug in the workflow server")
 def test_workflow__cancel_signal_not_set__run():
     """
     Test that we can cancel a run of a long running workflow with cancel signal passed in but not set.

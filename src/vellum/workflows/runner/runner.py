@@ -616,19 +616,21 @@ class WorkflowRunner(Generic[StateType]):
                 for emitter in self.workflow.emitters:
                     emitter.emit_event(item)
 
-    def _run_cancel_thread(self) -> None:
+    def _run_cancel_thread(self, kill_switch: ThreadingEvent) -> None:
         if not self._cancel_signal:
             return
 
-        self._cancel_signal.wait()
-        self._workflow_event_outer_queue.put(
-            self._reject_workflow_event(
-                WorkflowError(
-                    code=WorkflowErrorCode.WORKFLOW_CANCELLED,
-                    message="Workflow run cancelled",
+        while not kill_switch.wait(timeout=0.1):
+            if self._cancel_signal.is_set():
+                self._workflow_event_outer_queue.put(
+                    self._reject_workflow_event(
+                        WorkflowError(
+                            code=WorkflowErrorCode.WORKFLOW_CANCELLED,
+                            message="Workflow run cancelled",
+                        )
+                    )
                 )
-            )
-        )
+                return
 
     def _is_terminal_event(self, event: WorkflowEvent) -> bool:
         if (
@@ -646,10 +648,12 @@ class WorkflowRunner(Generic[StateType]):
         )
         background_thread.start()
 
+        cancel_thread_kill_switch = ThreadingEvent()
         if self._cancel_signal:
             cancel_thread = Thread(
                 target=self._run_cancel_thread,
                 name=f"{self.workflow.__class__.__name__}.cancel_thread",
+                kwargs={"kill_switch": cancel_thread_kill_switch},
             )
             cancel_thread.start()
 
@@ -694,3 +698,4 @@ class WorkflowRunner(Generic[StateType]):
             )
 
         self._background_thread_queue.put(None)
+        cancel_thread_kill_switch.set()
