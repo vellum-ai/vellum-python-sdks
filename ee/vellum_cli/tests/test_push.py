@@ -589,3 +589,47 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         assert lock_file_content["workflows"][1]["module"] == module
         assert lock_file_content["workflows"][1]["workflow_sandbox_id"] == second_workflow_sandbox_id
         assert lock_file_content["workflows"][1]["workspace"] == "my_other_workspace"
+
+
+def test_push__create_new_config_for_existing_module(mock_module, vellum_client):
+    # GIVEN an empty config (no workflows configured)
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    # GIVEN multiple workflows configured
+    mock_module.set_pyproject_toml({"workflows": [{"module": "examples.mock"}, {"module": "examples.mock2"}]})
+
+    # AND a workflow exists in the module successfully
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully
+    new_workflow_sandbox_id = str(uuid4())
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=new_workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` with a module that exists but isn't in config
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the push API with the correct args
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
+    assert call_args["workflow_sandbox_id"] is None  # Should be None since it's a new config
+    assert call_args["artifact"].name == f"{module.replace('.', '__')}.tar.gz"
+
+    # AND the files in the artifact should be correct
+    extracted_files = _extract_tar_gz(call_args["artifact"].read())
+    assert extracted_files["workflow.py"] == workflow_py_file_content
+
+    # AND check that lockfile was updated with new config
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        new_configs = [w for w in lock_file_content["workflows"] if w["module"] == module]
+        assert len(new_configs) == 1  # Should only create one config
+        new_config = new_configs[0]
+        assert new_config["workflow_sandbox_id"] == new_workflow_sandbox_id
+        assert new_config["workspace"] == "default"

@@ -53,7 +53,16 @@ def push_command(
         workflow_configs = [w for w in workflow_configs if w.workspace == workspace]
 
     if len(workflow_configs) == 0:
-        raise ValueError(f"No workflow config for '{module}' found in project to push.")
+        if module and module_exists(module):
+            new_config = WorkflowConfig(
+                module=module,
+                workflow_sandbox_id=workflow_sandbox_id,
+                workspace=workspace or DEFAULT_WORKSPACE_CONFIG.name,
+            )
+            config.workflows.append(new_config)
+            workflow_configs = [new_config]
+        else:
+            raise ValueError(f"No workflow config for '{module}' found in project to push.")
 
     if len(workflow_configs) > 1:
         raise ValueError("Multiple workflows found in project to push. Pushing only a single workflow is supported.")
@@ -241,3 +250,8 @@ Visit at: https://app.vellum.ai/workflow-sandboxes/{response.workflow_sandbox_id
 
     config.save()
     logger.info("Updated vellum.lock.json file.")
+
+
+def module_exists(module_name: str) -> bool:
+    module_path = os.path.join(os.getcwd(), *module_name.split("."))
+    return os.path.exists(module_path) and os.path.isdir(module_path)
