@@ -24,14 +24,12 @@ classifiers = [
     "Typing :: Typed",
     "License :: OSI Approved :: MIT License"
 ]
+urls = { Repository = "https://github.com/vellum-ai/vellum-python-sdks" }
 packages = [
     { include = "vellum", from = "src" },
     { include = "vellum_cli", from = "ee" },
     { include = "vellum_ee", from = "ee" },
 ]
-
-[project.urls]
-Repository = 'https://github.com/vellum-ai/vellum-python-sdks'
 
 [tool.poetry.dependencies]
 python = "^3.9"
