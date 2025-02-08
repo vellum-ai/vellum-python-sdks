@@ -6,6 +6,7 @@ from pydantic import BaseModel, GetCoreSchemaHandler
 from pydantic_core import core_schema
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
 
@@ -32,13 +33,13 @@ class AccessorExpression(BaseDescriptor[Any]):
 
         if dataclasses.is_dataclass(base):
             if isinstance(self._field, int):
-                raise ValueError("Cannot access field by index on a dataclass")
+                raise InvalidExpressionException("Cannot access field by index on a dataclass")
 
             return getattr(base, self._field)
 
         if isinstance(base, BaseModel):
             if isinstance(self._field, int):
-                raise ValueError("Cannot access field by index on a BaseModel")
+                raise InvalidExpressionException("Cannot access field by index on a BaseModel")
 
             return getattr(base, self._field)
 
@@ -49,7 +50,7 @@ class AccessorExpression(BaseDescriptor[Any]):
             index = int(self._field)
             return base[index]
 
-        raise ValueError(f"Cannot get field {self._field} from {base}")
+        raise InvalidExpressionException(f"Cannot get field {self._field} from {base}")
 
     @classmethod
     def __get_pydantic_core_schema__(

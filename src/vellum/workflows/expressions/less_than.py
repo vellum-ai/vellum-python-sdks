@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Union
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
 
@@ -24,10 +25,10 @@ class LessThanExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         # https://app.shortcut.com/vellum/story/4658
         lhs = resolve_value(self._lhs, state)
         if not isinstance(lhs, (int, float)):
-            raise ValueError(f"Expected a numeric lhs value, got: {lhs.__class__.__name__}")
+            raise InvalidExpressionException(f"Expected a numeric lhs value, got: {lhs.__class__.__name__}")
 
         rhs = resolve_value(self._rhs, state)
         if not isinstance(rhs, (int, float)):
-            raise ValueError(f"Expected a numeric rhs value, got: {rhs.__class__.__name__}")
+            raise InvalidExpressionException(f"Expected a numeric rhs value, got: {rhs.__class__.__name__}")
 
         return lhs < rhs

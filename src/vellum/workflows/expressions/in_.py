@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Union
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
 
@@ -26,6 +27,6 @@ class InExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
 
         rhs = resolve_value(self._rhs, state)
         if not isinstance(rhs, (list, tuple, set, dict, str)):
-            raise ValueError(f"Expected a RHS that supported in, got: {rhs.__class__.__name__}")
+            raise InvalidExpressionException(f"Expected a RHS that supported in, got: {rhs.__class__.__name__}")
 
         return lhs in rhs

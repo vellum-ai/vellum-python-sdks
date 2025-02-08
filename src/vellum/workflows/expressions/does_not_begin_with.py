@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Union
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
 
@@ -23,9 +24,9 @@ class DoesNotBeginWithExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         lhs = resolve_value(self._lhs, state)
         rhs = resolve_value(self._rhs, state)
         if not isinstance(lhs, str):
-            raise ValueError(f"Expected LHS to be a string, got {type(lhs)}")
+            raise InvalidExpressionException(f"Expected LHS to be a string, got {type(lhs)}")
 
         if not isinstance(rhs, str):
-            raise ValueError(f"Expected RHS to be a string, got {type(rhs)}")
+            raise InvalidExpressionException(f"Expected RHS to be a string, got {type(rhs)}")
 
         return not lhs.startswith(rhs)

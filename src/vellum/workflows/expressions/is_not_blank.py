@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Union
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
 
@@ -19,6 +20,6 @@ class IsNotBlankExpression(BaseDescriptor[bool], Generic[_T]):
     def resolve(self, state: "BaseState") -> bool:
         expression = resolve_value(self._expression, state)
         if not isinstance(expression, str):
-            raise ValueError(f"Expected a string expression, got: {expression.__class__.__name__}")
+            raise InvalidExpressionException(f"Expected a string expression, got: {expression.__class__.__name__}")
 
         return len(expression) != 0
