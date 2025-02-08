@@ -2,6 +2,7 @@ from typing import Generic, TypeVar, Union
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
 
@@ -28,7 +29,9 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         if lhs is UNDEF:
             return False
         if not isinstance(lhs, (list, tuple, set, dict, str)):
-            raise ValueError(f"Expected a LHS that supported contains, got: {lhs.__class__.__name__}")
+            raise InvalidExpressionException(
+                f"Expected a LHS that supported `contains`, got `{lhs.__class__.__name__}`"
+            )
 
         rhs = resolve_value(self._rhs, state)
         return rhs in lhs

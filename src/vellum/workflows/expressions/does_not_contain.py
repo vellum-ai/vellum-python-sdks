@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Union
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
 
@@ -24,7 +25,9 @@ class DoesNotContainExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         # https://app.shortcut.com/vellum/story/4658
         lhs = resolve_value(self._lhs, state)
         if not isinstance(lhs, (list, tuple, set, dict, str)):
-            raise ValueError(f"Expected a LHS that supported contains, got: {lhs.__class__.__name__}")
+            raise InvalidExpressionException(
+                f"Expected a LHS that supported `contains`, got `{lhs.__class__.__name__}`"
+            )
 
         rhs = resolve_value(self._rhs, state)
         return rhs not in lhs

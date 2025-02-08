@@ -4,7 +4,10 @@ from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.edges.edge import Edge
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph import Graph, GraphTarget
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import ConditionType
@@ -82,11 +85,17 @@ class Port:
         return Port(condition_type=ConditionType.ELSE, fork_state=fork_state)
 
     def resolve_condition(self, state: BaseState) -> bool:
-        if self._condition is None:
-            return False
+        try:
+            if self._condition is None:
+                return False
 
-        value = self._condition.resolve(state)
-        return bool(value)
+            value = self._condition.resolve(state)
+            return bool(value)
+        except InvalidExpressionException as e:
+            raise NodeException(
+                message=f"Failed to resolve condition for port `{self.name}`: {e}",
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            ) from e
 
     def serialize(self) -> dict:
         return {

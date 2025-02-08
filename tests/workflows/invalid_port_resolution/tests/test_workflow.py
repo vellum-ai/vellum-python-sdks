@@ -17,4 +17,7 @@ def test_workflow__expected_path():
     # THEN the workflow raises the correct error
     assert final_event.name == "workflow.execution.rejected"
     assert final_event.error.code == WorkflowErrorCode.INVALID_INPUTS
-    assert final_event.error.message == "Invalid port `foo`: Bad"
+    assert (
+        final_event.error.message
+        == "Failed to resolve condition for port `foo`: Expected a LHS that supported `contains`, got `int`"
+    )
