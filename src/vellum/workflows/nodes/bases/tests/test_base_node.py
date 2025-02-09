@@ -5,6 +5,7 @@ from vellum.client.types.string_vellum_value_request import StringVellumValueReq
 from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
 
 
@@ -148,3 +149,21 @@ def test_base_node__node_resolution__descriptor_in_fern_pydantic():
     node = SomeNode(state=State(foo="bar"))
 
     assert node.model.value == "bar"
+
+
+def test_base_node__inherit_base_outputs():
+    class MyNode(BaseNode):
+        class Outputs:
+            foo: str
+
+    # TEST that the Outputs class is a subclass of BaseOutputs
+    assert issubclass(MyNode.Outputs, BaseOutputs)
+
+    # TEST that the Outputs class has the correct attributes
+    assert hasattr(MyNode.Outputs, "foo")
+
+    # WHEN the node outputs is initialized
+    outputs = MyNode.Outputs(foo="bar")  # type: ignore
+
+    # THEN the outputs should be correct
+    assert outputs.foo == "bar"
