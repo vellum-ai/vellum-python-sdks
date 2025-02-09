@@ -46,9 +46,17 @@ class BaseNodeMeta(type):
         if "Outputs" in dct:
             outputs_class = dct["Outputs"]
             if not any(issubclass(base, BaseOutputs) for base in outputs_class.__bases__):
+                parent_outputs_class = next(
+                    (base.Outputs for base in bases if hasattr(base, "Outputs")),
+                    BaseOutputs,  # Default to BaseOutputs only if no parent has Outputs
+                )
+
+                # Filter out object from bases while preserving other inheritance
+                filtered_bases = tuple(base for base in outputs_class.__bases__ if base is not object)
+
                 dct["Outputs"] = type(
                     f"{name}.Outputs",
-                    (BaseOutputs,) + outputs_class.__bases__,  # Add BaseOutputs as first base
+                    (parent_outputs_class,) + filtered_bases,
                     {**outputs_class.__dict__, "__module__": dct["__module__"]},
                 )
         else:

@@ -156,14 +156,78 @@ def test_base_node__inherit_base_outputs():
         class Outputs:
             foo: str
 
+        def run(self):
+            return self.Outputs(foo="bar")  # type: ignore
+
     # TEST that the Outputs class is a subclass of BaseOutputs
     assert issubclass(MyNode.Outputs, BaseOutputs)
+
+    # TEST that the Outputs class does not inherit from object
+    assert object not in MyNode.Outputs.__bases__
 
     # TEST that the Outputs class has the correct attributes
     assert hasattr(MyNode.Outputs, "foo")
 
-    # WHEN the node outputs is initialized
-    outputs = MyNode.Outputs(foo="bar")  # type: ignore
+    # WHEN the node is run
+    node = MyNode()
+    outputs = node.run()
 
     # THEN the outputs should be correct
     assert outputs.foo == "bar"
+
+
+def test_child_node__inherits_base_outputs_when_no_parent_outputs():
+    class ParentNode(BaseNode):  # No Outputs class here
+        pass
+
+    class ChildNode(ParentNode):
+        class Outputs:
+            foo: str
+
+        def run(self):
+            return self.Outputs(foo="bar")  # type: ignore
+
+    # TEST that ChildNode.Outputs is a subclass of BaseOutputs (since ParentNode has no Outputs)
+    assert issubclass(ChildNode.Outputs, BaseOutputs)
+
+    # TEST that ChildNode.Outputs has the correct attributes
+    assert hasattr(ChildNode.Outputs, "foo")
+
+    # WHEN the node is run
+    node = ChildNode()
+    outputs = node.run()
+
+    # THEN the outputs should be correct
+    assert outputs.foo == "bar"
+
+
+def test_outputs_preserves_non_object_bases():
+    class ParentNode(BaseNode):
+        class Outputs:
+            foo: str
+
+    class Foo:
+        bar: str
+
+    class ChildNode(ParentNode):
+        class Outputs(ParentNode.Outputs, Foo):
+            pass
+
+        def run(self):
+            return self.Outputs(foo="bar", bar="baz")  # type: ignore
+
+    # TEST that Outputs **inherits from ExtraMixin**
+    assert Foo in ChildNode.Outputs.__bases__, "Foo should be preserved in bases"
+    assert object not in ChildNode.Outputs.__bases__, "object should not be in bases"
+
+    # TEST that Outputs has the correct attributes
+    assert hasattr(ChildNode.Outputs, "foo")
+    assert hasattr(ChildNode.Outputs, "bar")
+
+    # WHEN Outputs is instantiated
+    node = ChildNode()
+    outputs = node.run()
+
+    # THEN the output values should be correct
+    assert outputs.foo == "bar"
+    assert outputs.bar == "baz"
