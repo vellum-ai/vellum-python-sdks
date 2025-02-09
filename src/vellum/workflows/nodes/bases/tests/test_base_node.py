@@ -216,8 +216,9 @@ def test_outputs_preserves_non_object_bases():
         def run(self):
             return self.Outputs(foo="bar", bar="baz")  # type: ignore
 
-    # TEST that Outputs **inherits from ExtraMixin**
+    # TEST that Outputs is a subclass of Foo and ParentNode.Outputs
     assert Foo in ChildNode.Outputs.__bases__, "Foo should be preserved in bases"
+    assert ParentNode.Outputs in ChildNode.Outputs.__bases__, "ParentNode.Outputs should be preserved in bases"
     assert object not in ChildNode.Outputs.__bases__, "object should not be in bases"
 
     # TEST that Outputs has the correct attributes
