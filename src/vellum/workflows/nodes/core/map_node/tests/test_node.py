@@ -63,3 +63,25 @@ def test_map_node__use_parallelism():
     # THEN the node should have ran in parallel
     run_time = (end_ts - start_ts) / 10**9
     assert run_time < 0.2
+
+
+def test_map_node__empty_list():
+    # GIVEN a map node that is configured to use the parent's inputs and state
+    @MapNode.wrap(items=[])
+    class TestNode(BaseNode):
+        item = MapNode.SubworkflowInputs.item
+
+        class Outputs(BaseOutputs):
+            value: int
+
+        def run(self) -> Outputs:
+            time.sleep(0.03)
+            return self.Outputs(value=self.item + 1)
+
+    # WHEN the node is run
+    node = TestNode()
+    outputs = list(node.run())
+
+    # THEN the node should return an empty output
+    fulfilled_output = outputs[-1]
+    assert fulfilled_output == BaseOutput(name="value", value=[])

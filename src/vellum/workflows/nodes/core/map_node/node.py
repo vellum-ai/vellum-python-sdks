@@ -66,6 +66,11 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         for output_descripter in self.subworkflow.Outputs:
             mapped_items[output_descripter.name] = [None] * len(self.items)
 
+        if not self.items:
+            for output_name, output_list in mapped_items.items():
+                yield BaseOutput(name=output_name, value=output_list)
+            return
+
         self._event_queue: Queue[Tuple[int, WorkflowEvent]] = Queue()
         self._concurrency_queue: Queue[Thread] = Queue()
         fulfilled_iterations: List[bool] = []
