@@ -1,51 +1,51 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`VellumVariableField > ArrayVellumVariable snapshot 1`] = `
-"test: List[VellumValue]
+"test: Optional[List[VellumValue]]
 "
 `;
 
 exports[`VellumVariableField > ChatHistoryVellumVariable snapshot 1`] = `
-"test: List[ChatMessage]
+"test: Optional[List[ChatMessage]]
 "
 `;
 
 exports[`VellumVariableField > ErrorVellumVariable snapshot 1`] = `
-"test: VellumError
+"test: Optional[VellumError]
 "
 `;
 
 exports[`VellumVariableField > FunctionCallVellumVariable snapshot 1`] = `
-"test: FunctionCall
+"test: Optional[FunctionCall]
 "
 `;
 
 exports[`VellumVariableField > ImageVellumVariable snapshot 1`] = `
-"test: VellumImage
+"test: Optional[VellumImage]
 "
 `;
 
 exports[`VellumVariableField > JsonVellumVariable snapshot 1`] = `
-"test: Any
+"test: Optional[Any]
 "
 `;
 
 exports[`VellumVariableField > NullVellumVariable snapshot 1`] = `
-"test: None
+"test: Optional[None]
 "
 `;
 
 exports[`VellumVariableField > NumberVellumVariable snapshot 1`] = `
-"test: Union[float, int]
+"test: Optional[Union[float, int]]
 "
 `;
 
 exports[`VellumVariableField > SearchResultsVellumVariable snapshot 1`] = `
-"test: List[SearchResult]
+"test: Optional[List[SearchResult]]
 "
 `;
 
 exports[`VellumVariableField > StringVellumVariable snapshot 1`] = `
-"test: str
+"test: Optional[str]
 "
 `;

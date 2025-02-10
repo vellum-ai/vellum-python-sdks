@@ -295,5 +295,38 @@ describe("Inputs", () => {
         expect(await writer.toStringFormatted()).toMatchSnapshot();
       }
     );
+
+    it("should generate correct Optional types when required is false", async () => {
+      const inputVariables: VellumVariable[] = [
+        {
+          id: "1",
+          key: "foo",
+          type: "STRING",
+          default: { type: "STRING", value: "Example String" },
+          required: false,
+        },
+        {
+          id: "2",
+          key: "bar",
+          type: "NUMBER",
+          default: { type: "NUMBER", value: 123 },
+          required: false,
+        },
+      ];
+
+      inputVariables.forEach((inputVariableData) => {
+        workflowContext.addInputVariableContext(
+          inputVariableContextFactory({
+            inputVariableData: inputVariableData,
+            workflowContext,
+          })
+        );
+      });
+
+      const inputs = codegen.inputs({ workflowContext });
+      inputs.write(writer);
+
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });

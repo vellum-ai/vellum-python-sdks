@@ -2,35 +2,47 @@
 
 exports[`Inputs > write > should convert input variable names into valid python attributes 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Union
+from typing import Optional, Union
 
 
 class Inputs(BaseInputs):
-    my_input: str
-    my_input_1: Union[float, int]
+    my_input: Optional[str]
+    my_input_1: Optional[Union[float, int]]
+"
+`;
+
+exports[`Inputs > write > should generate correct Optional types when required is false 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from typing import Optional, Union
+
+
+class Inputs(BaseInputs):
+    foo: Optional[str] = "Example String"
+    bar: Optional[Union[float, int]] = 123
 "
 `;
 
 exports[`Inputs > write > should generate correct code for complex input variables 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Union, List
+from typing import Optional, Union, List
 from vellum import ChatMessage, SearchResult
 
 
 class Inputs(BaseInputs):
-    query: str
-    max_runtime: Union[float, int]
-    previous_chat_history: List[ChatMessage]
-    prior_results: List[SearchResult]
+    query: Optional[str]
+    max_runtime: Optional[Union[float, int]]
+    previous_chat_history: Optional[List[ChatMessage]]
+    prior_results: Optional[List[SearchResult]]
 "
 `;
 
 exports[`Inputs > write > should generate correct code when Inputs has a custom name 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 
 
 class CustomInputs(BaseInputs):
-    input1: str
+    input1: Optional[str]
 "
 `;
 
@@ -38,43 +50,45 @@ exports[`Inputs > write > should generate correct code when Inputs has no variab
 
 exports[`Inputs > write > should generate correct code when Inputs has variables 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Union
+from typing import Optional, Union
 
 
 class Inputs(BaseInputs):
-    input1: str
-    input2: Union[float, int]
+    input1: Optional[str]
+    input2: Optional[Union[float, int]]
 "
 `;
 
 exports[`Inputs > write > should generate correct code when Inputs has variables with duplicate keys 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 
 
 class Inputs(BaseInputs):
-    key_1: str
-    key_1_1: str
+    key_1: Optional[str]
+    key_1_1: Optional[str]
 "
 `;
 
 exports[`Inputs > write > should generate correct code when Inputs has variables with empty keys 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 
 
 class Inputs(BaseInputs):
-    input_: str
-    input_1: str
+    input_: Optional[str]
+    input_1: Optional[str]
 "
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'ARRAY' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import List
+from typing import Optional, List
 from vellum import VellumValue
 
 
 class Inputs(BaseInputs):
-    array_input: List[VellumValue] = [
+    array_input: Optional[List[VellumValue]] = [
         "Example String",
         123,
     ]
@@ -83,22 +97,23 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'AUDIO' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 from vellum import VellumAudio
 
 
 class Inputs(BaseInputs):
-    audio_input: VellumAudio
+    audio_input: Optional[VellumAudio]
 "
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'CHAT_HISTORY' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import List
+from typing import Optional, List
 from vellum import ChatMessage
 
 
 class Inputs(BaseInputs):
-    chat_history_input: List[ChatMessage] = [
+    chat_history_input: Optional[List[ChatMessage]] = [
         ChatMessage(role="USER", text="foo bar"),
     ]
 "
@@ -106,11 +121,12 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'ERROR' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 from vellum import VellumError
 
 
 class Inputs(BaseInputs):
-    error_input: VellumError = VellumError(
+    error_input: Optional[VellumError] = VellumError(
         message="Some 500 error", code="INTERNAL_SERVER_ERROR"
     )
 "
@@ -118,11 +134,12 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'FUNCTION_CALL' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 from vellum import FunctionCall
 
 
 class Inputs(BaseInputs):
-    function_call_input: FunctionCall = FunctionCall(
+    function_call_input: Optional[FunctionCall] = FunctionCall(
         arguments={
             "arg1": "Hello World",
         },
@@ -133,21 +150,22 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'IMAGE' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 from vellum import VellumImage
 
 
 class Inputs(BaseInputs):
-    image_input: VellumImage
+    image_input: Optional[VellumImage]
 "
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'JSON' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Any
+from typing import Optional, Any
 
 
 class Inputs(BaseInputs):
-    json_input: Any = {
+    json_input: Optional[Any] = {
         "key": "value",
     }
 "
@@ -155,22 +173,22 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'NUMBER' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Union
+from typing import Optional, Union
 
 
 class Inputs(BaseInputs):
-    number_input: Union[float, int] = 123
+    number_input: Optional[Union[float, int]] = 123
 "
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'SEARCH_RESULTS' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import List
+from typing import Optional, List
 from vellum import SearchResult, Document
 
 
 class Inputs(BaseInputs):
-    search_results_input: List[SearchResult] = [
+    search_results_input: Optional[List[SearchResult]] = [
         SearchResult(
             text="Hello, World!",
             score=1,
@@ -183,9 +201,10 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'STRING' 1`] = `
 "from vellum.workflows.inputs import BaseInputs
+from typing import Optional
 
 
 class Inputs(BaseInputs):
-    string_input: str = "Example String"
+    string_input: Optional[str] = "Example String"
 "
 `;

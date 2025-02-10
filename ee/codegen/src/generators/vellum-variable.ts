@@ -1,4 +1,5 @@
 import { python } from "@fern-api/python-ast";
+import { Type } from "@fern-api/python-ast/Type";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { VellumValue as VellumValueType } from "vellum-ai/api/types";
@@ -27,9 +28,13 @@ export class VellumVariable extends AstNode {
 
   constructor({ variable }: VellumVariable.Args) {
     super();
+
+    const baseType = getVellumVariablePrimitiveType(variable.type);
+    const finalType = !variable.required ? Type.optional(baseType) : baseType;
+
     this.field = python.field({
       name: variable.name ?? variable.key,
-      type: getVellumVariablePrimitiveType(variable.type),
+      type: finalType,
       initializer: variable.default
         ? this.generateInitializerIfDefault(variable)
         : undefined,
