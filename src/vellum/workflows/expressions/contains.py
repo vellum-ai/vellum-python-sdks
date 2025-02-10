@@ -4,6 +4,7 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.errors.types import WorkflowError
 from vellum.workflows.state.base import BaseState
 
 LHS = TypeVar("LHS")
@@ -28,7 +29,7 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         # assumes that lack of is also false
         if lhs is undefined:
             return False
-        if not isinstance(lhs, (list, tuple, set, dict, str)):
+        if not isinstance(lhs, (list, tuple, set, dict, str, WorkflowError)):
             raise InvalidExpressionException(
                 f"Expected a LHS that supported `contains`, got `{lhs.__class__.__name__}`"
             )

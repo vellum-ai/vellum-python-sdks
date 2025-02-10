@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
+from typing import Any, Dict
 
 from vellum.client.types.vellum_error import VellumError
 from vellum.client.types.vellum_error_code_enum import VellumErrorCodeEnum
@@ -25,6 +25,9 @@ class WorkflowErrorCode(Enum):
 class WorkflowError:
     message: str
     code: WorkflowErrorCode
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self.message
 
 
 _VELLUM_ERROR_CODE_TO_WORKFLOW_ERROR_CODE: Dict[VellumErrorCodeEnum, WorkflowErrorCode] = {

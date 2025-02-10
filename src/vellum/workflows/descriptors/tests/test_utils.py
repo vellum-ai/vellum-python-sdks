@@ -1,6 +1,7 @@
 import pytest
 
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.state.base import BaseState
@@ -77,6 +78,24 @@ class DummyNode(BaseNode[FixtureState]):
         (FixtureState.zeta["foo"], "bar"),
         (ConstantValueReference(1), 1),
         (FixtureState.theta[0], "baz"),
+        (
+            ConstantValueReference(
+                WorkflowError(
+                    message="This is a test",
+                    code=WorkflowErrorCode.USER_DEFINED_ERROR,
+                )
+            ).contains("test"),
+            True,
+        ),
+        (
+            ConstantValueReference(
+                WorkflowError(
+                    message="This is a test",
+                    code=WorkflowErrorCode.USER_DEFINED_ERROR,
+                )
+            ).does_not_contain("test"),
+            False,
+        ),
     ],
     ids=[
         "or",
@@ -122,6 +141,8 @@ class DummyNode(BaseNode[FixtureState]):
         "accessor",
         "constants",
         "list_index",
+        "error_contains",
+        "error_does_not_contain",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):
