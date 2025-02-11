@@ -32,10 +32,12 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
+from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 from vellum_ee.workflows.display.vellum import (
     ConstantValuePointer,
     ExecutionCounterData,
@@ -88,6 +90,9 @@ def create_node_input_value_pointer_rule(
         return NodeOutputPointer(
             data=NodeOutputData(node_id=str(upstream_node_display.node_id), output_id=str(output_display.id)),
         )
+    if isinstance(value, LazyReference):
+        child_descriptor = get_child_descriptor(value, display_context)
+        return create_node_input_value_pointer_rule(child_descriptor, display_context)
     if isinstance(value, WorkflowInputReference):
         workflow_input_display = display_context.global_workflow_input_displays[value]
         return InputVariablePointer(data=InputVariableData(input_variable_id=str(workflow_input_display.id)))

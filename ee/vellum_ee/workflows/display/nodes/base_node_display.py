@@ -44,6 +44,7 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator, primitive_to_vellum_value
 from vellum_ee.workflows.display.vellum import CodeResourceDefinition, GenericNodeDisplayData
 
@@ -343,28 +344,8 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             return self.serialize_value(display_context, value._value)
 
         if isinstance(value, LazyReference):
-            if isinstance(value._get, str):
-                reference_parts = value._get.split(".")
-                if len(reference_parts) < 3:
-                    raise Exception(
-                        f"Failed to parse lazy reference: {value._get}. Only Node Output references are supported."
-                    )
-
-                output_name = reference_parts[-1]
-                nested_class_name = reference_parts[-2]
-                if nested_class_name != "Outputs":
-                    raise Exception(
-                        f"Failed to parse lazy reference: {value._get}. Outputs are the only node reference supported."
-                    )
-
-                node_class_name = ".".join(reference_parts[:-2])
-                for node in display_context.node_displays.keys():
-                    if node.__name__ == node_class_name:
-                        return self.serialize_value(display_context, getattr(node.Outputs, output_name))
-
-                raise NotImplementedError(f"Failed to find a LazyReference for: {value._get}")
-
-            return self.serialize_value(display_context, value._get())
+            child_descriptor = get_child_descriptor(value, display_context)
+            return self.serialize_value(display_context, child_descriptor)
 
         if isinstance(value, WorkflowInputReference):
             workflow_input_display = display_context.global_workflow_input_displays[value]
