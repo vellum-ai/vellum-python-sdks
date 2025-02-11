@@ -1,10 +1,11 @@
 import io
 import os
 import re
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Tuple, Union, get_args
 
 from pydantic import BaseModel, ValidationError
 
+from vellum import VellumValue
 from vellum.client.types.code_executor_input import CodeExecutorInput
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -74,8 +75,25 @@ def run_code_inline(
 ) -> Tuple[str, Any]:
     log_buffer = io.StringIO()
 
+    VELLUM_TYPES = get_args(VellumValue)
+
+    def wrap_value(value):
+        if isinstance(value, list):
+            return ListWrapper(
+                [
+                    # Convert VellumValue to dict with its fields
+                    (
+                        item.model_dump()
+                        if isinstance(item, VELLUM_TYPES)
+                        else _clean_for_dict_wrapper(item) if isinstance(item, (dict, list)) else item
+                    )
+                    for item in value
+                ]
+            )
+        return _clean_for_dict_wrapper(value)
+
     exec_globals = {
-        "__arg__inputs": {input_value.name: _clean_for_dict_wrapper(input_value.value) for input_value in input_values},
+        "__arg__inputs": {input_value.name: wrap_value(input_value.value) for input_value in input_values},
         "__arg__out": None,
         "print": lambda *args, **kwargs: log_buffer.write(f"{' '.join(args)}\n"),
     }

@@ -2,7 +2,7 @@ import pytest
 import os
 from typing import Any
 
-from vellum import CodeExecutorResponse, NumberVellumValue, StringInput
+from vellum import CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
 from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
 from vellum.client.types.function_call import FunctionCall
@@ -493,3 +493,36 @@ def main(word: str) -> dict:
         },
         "log": "",
     }
+
+
+def test_run_node__array_input_with_vellum_values(vellum_client):
+    """Confirm that CodeExecutionNodes can handle arrays containing VellumValue objects."""
+
+    # GIVEN a node that subclasses CodeExecutionNode that processes an array of VellumValues
+    class State(BaseState):
+        pass
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, str]):
+        code = """\
+from typing import List, Dict
+def main(arg1: List[Dict]) -> str:
+    return arg1[0]["value"] + " " + arg1[1]["value"]
+"""
+        runtime = "PYTHON_3_11_6"
+
+        code_inputs = {
+            "arg1": [
+                StringVellumValue(type="STRING", value="Hello", name="First"),
+                StringVellumValue(type="STRING", value="World", name="Second"),
+            ],
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+    outputs = node.run()
+
+    # THEN the node should successfully concatenate the values
+    assert outputs == {"result": "Hello World", "log": ""}
+
+    # AND we should not have invoked the Code via Vellum since it's running inline
+    vellum_client.execute_code.assert_not_called()
