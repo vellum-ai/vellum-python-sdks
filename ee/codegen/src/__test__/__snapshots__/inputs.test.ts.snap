@@ -2,12 +2,12 @@
 
 exports[`Inputs > write > should convert input variable names into valid python attributes 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Optional, Union
+from typing import Union
 
 
 class Inputs(BaseInputs):
-    my_input: Optional[str]
-    my_input_1: Optional[Union[float, int]]
+    my_input: str
+    my_input_1: Union[float, int]
 "
 `;
 
@@ -24,25 +24,24 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code for complex input variables 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Optional, Union, List
+from typing import Union, List
 from vellum import ChatMessage, SearchResult
 
 
 class Inputs(BaseInputs):
-    query: Optional[str]
-    max_runtime: Optional[Union[float, int]]
-    previous_chat_history: Optional[List[ChatMessage]]
-    prior_results: Optional[List[SearchResult]]
+    query: str
+    max_runtime: Union[float, int]
+    previous_chat_history: List[ChatMessage]
+    prior_results: List[SearchResult]
 "
 `;
 
 exports[`Inputs > write > should generate correct code when Inputs has a custom name 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Optional
 
 
 class CustomInputs(BaseInputs):
-    input1: Optional[str]
+    input1: str
 "
 `;
 
@@ -72,12 +71,11 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when Inputs has variables with empty keys 1`] = `
 "from vellum.workflows.inputs import BaseInputs
-from typing import Optional
 
 
 class Inputs(BaseInputs):
-    input_: Optional[str]
-    input_1: Optional[str]
+    input_: str
+    input_1: str
 "
 `;
 

@@ -47,8 +47,8 @@ describe("Inputs", () => {
 
     it("should generate correct code when Inputs has variables with empty keys", async () => {
       const inputVariables: VellumVariable[] = [
-        { id: "input1", key: "", type: "STRING" },
-        { id: "input2", key: "", type: "STRING" },
+        { id: "input1", key: "", type: "STRING", required: true },
+        { id: "input2", key: "", type: "STRING", required: true },
       ];
       inputVariables.forEach((inputVariableData) => {
         workflowContext.addInputVariableContext(
@@ -85,7 +85,7 @@ describe("Inputs", () => {
 
     it("should generate correct code when Inputs has a custom name", async () => {
       const inputVariables: VellumVariable[] = [
-        { id: "input1", key: "input1", type: "STRING" },
+        { id: "input1", key: "input1", type: "STRING", required: true },
       ];
       inputVariables.forEach((inputVariableData) => {
         workflowContext.addInputVariableContext(
@@ -113,10 +113,20 @@ describe("Inputs", () => {
 
     it("should generate correct code for complex input variables", async () => {
       const inputVariables: VellumVariable[] = [
-        { id: "1", key: "query", type: "STRING" },
-        { id: "2", key: "max_runtime", type: "NUMBER" },
-        { id: "3", key: "previous_chat_history", type: "CHAT_HISTORY" },
-        { id: "4", key: "prior_results", type: "SEARCH_RESULTS" },
+        { id: "1", key: "query", type: "STRING", required: true },
+        { id: "2", key: "max_runtime", type: "NUMBER", required: true },
+        {
+          id: "3",
+          key: "previous_chat_history",
+          type: "CHAT_HISTORY",
+          required: true,
+        },
+        {
+          id: "4",
+          key: "prior_results",
+          type: "SEARCH_RESULTS",
+          required: true,
+        },
       ];
       inputVariables.forEach((inputVariableData) => {
         workflowContext.addInputVariableContext(
@@ -136,8 +146,8 @@ describe("Inputs", () => {
 
     it("should convert input variable names into valid python attributes", async () => {
       const inputVariables: VellumVariable[] = [
-        { id: "1", key: "My Input", type: "STRING" },
-        { id: "2", key: "$My*Input", type: "NUMBER" },
+        { id: "1", key: "My Input", type: "STRING", required: true },
+        { id: "2", key: "$My*Input", type: "NUMBER", required: true },
       ];
       inputVariables.forEach((inputVariableData) => {
         workflowContext.addInputVariableContext(
