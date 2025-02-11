@@ -248,7 +248,5 @@ class APINode(BaseAPINode):
         "baz": Inputs.additional_header_value_1,
     }
     api_key_header_key = None
-    api_key_header_value = "<my-api-value>"
-    bearer_token_value = "<my-bearer-token>"
 "
 `;

@@ -991,23 +991,20 @@ export function conditionalNodeFactory({
   return nodeData;
 }
 
-export type ApiNodeFactoryProps = {
+export interface ApiNodeFactoryProps {
   errorOutputId?: string;
   bearerToken?: NodeInput;
   apiKeyHeaderValue?: NodeInput;
-  additionalHeaders?: {
-    key: NodeInput;
-    value: NodeInput;
-  }[];
-  useUndefinedAuthorizationTypeInputId?: boolean;
-};
+  additionalHeaders?: { key: NodeInput; value: NodeInput }[];
+  authorizationTypeInput?: NodeInput | null;
+}
 
 export function apiNodeFactory({
   errorOutputId,
   bearerToken,
   apiKeyHeaderValue,
   additionalHeaders,
-  useUndefinedAuthorizationTypeInputId = false,
+  authorizationTypeInput,
 }: ApiNodeFactoryProps = {}): ApiNode {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
@@ -1042,9 +1039,6 @@ export function apiNodeFactory({
       combinator: "OR",
     },
   };
-
-  const defaultAuthorizationTypeInputId =
-    "de330dac-05b1-4e78-bee7-7452203af3d5";
 
   const additionalHeaderInputs =
     additionalHeaders ??
@@ -1150,6 +1144,95 @@ export function apiNodeFactory({
       },
     ] as { key: NodeInput; value: NodeInput }[]);
 
+  const defaultAuthorizationTypeInput: NodeInput = {
+    id: "de330dac-05b1-4e78-bee7-7452203af3d5",
+    key: "authorization_type",
+    value: {
+      rules: [
+        {
+          type: "CONSTANT_VALUE" as const,
+          data: {
+            type: "STRING" as const,
+            value: "API_KEY",
+          },
+        },
+      ],
+      combinator: "OR",
+    },
+  };
+
+  const inputs: NodeInput[] = [
+    {
+      id: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
+      key: "method",
+      value: {
+        rules: [
+          {
+            type: "CONSTANT_VALUE" as const,
+            data: {
+              type: "STRING" as const,
+              value: "POST",
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    },
+    {
+      id: "480a4c12-22d6-4223-a38a-85db5eda118c",
+      key: "url",
+      value: {
+        rules: [
+          {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "fasdfadsf",
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    },
+    {
+      id: "74865eb7-cdaf-4d40-a499-0a6505e72680",
+      key: "body",
+      value: {
+        rules: [
+          {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "JSON",
+              value: {},
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    },
+    ...(authorizationTypeInput !== null
+      ? [authorizationTypeInput ?? defaultAuthorizationTypeInput]
+      : []),
+    bearerTokenInput,
+    {
+      id: "96c8343d-cc94-4df0-9001-eb2905a00be7",
+      key: "api_key_header_key",
+      value: {
+        rules: [
+          {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    },
+    apiKeyHeaderValueInput,
+    ...additionalHeaderInputs.flatMap(({ key, value }) => [key, value]),
+  ];
+
   const nodeData: ApiNode = {
     id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
     type: "API",
@@ -1158,9 +1241,10 @@ export function apiNodeFactory({
       methodInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
       urlInputId: "480a4c12-22d6-4223-a38a-85db5eda118c",
       bodyInputId: "74865eb7-cdaf-4d40-a499-0a6505e72680",
-      authorizationTypeInputId: useUndefinedAuthorizationTypeInputId
-        ? undefined
-        : defaultAuthorizationTypeInputId,
+      authorizationTypeInputId:
+        authorizationTypeInput === null
+          ? undefined
+          : authorizationTypeInput?.id ?? defaultAuthorizationTypeInput.id,
       bearerTokenValueInputId: bearerTokenInput.id,
       apiKeyHeaderKeyInputId: "96c8343d-cc94-4df0-9001-eb2905a00be7",
       apiKeyHeaderValueInputId: apiKeyHeaderValueInput.id,
@@ -1175,90 +1259,7 @@ export function apiNodeFactory({
       targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
     },
-    inputs: [
-      {
-        id: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
-        key: "method",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "POST",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "480a4c12-22d6-4223-a38a-85db5eda118c",
-        key: "url",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "fasdfadsf",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "74865eb7-cdaf-4d40-a499-0a6505e72680",
-        key: "body",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "JSON",
-                value: {},
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "de330dac-05b1-4e78-bee7-7452203af3d5",
-        key: "authorization_type",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: "API_KEY",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      bearerTokenInput,
-      {
-        id: "96c8343d-cc94-4df0-9001-eb2905a00be7",
-        key: "api_key_header_key",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      apiKeyHeaderValueInput,
-      ...additionalHeaderInputs.flatMap(({ key, value }) => [key, value]),
-    ],
+    inputs: inputs,
     displayData: {
       width: 462,
       height: 288,

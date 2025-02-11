@@ -116,52 +116,51 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
           initializer: authTypeEnum,
         })
       );
-    }
+      if (this.nodeData.data.apiKeyHeaderValueInputId) {
+        const valueInput = this.nodeData.inputs.find(
+          (input) => input.id === this.nodeData.data.apiKeyHeaderValueInputId
+        );
+        if (!valueInput) {
+          throw new NodeAttributeGenerationError(
+            `No inputs have api header value id of ${this.nodeData.data.apiKeyHeaderValueInputId}`
+          );
+        }
+        const value = this.nodeInputsByKey.get(valueInput.key);
+        if (!value) {
+          throw new NodeAttributeGenerationError(
+            `No inputs have key of ${valueInput.key}`
+          );
+        }
+        statements.push(
+          python.field({
+            name: "api_key_header_value",
+            initializer: value,
+          })
+        );
+      }
 
-    if (this.nodeData.data.apiKeyHeaderValueInputId) {
-      const valueInput = this.nodeData.inputs.find(
-        (input) => input.id === this.nodeData.data.apiKeyHeaderValueInputId
-      );
-      if (!valueInput) {
-        throw new NodeAttributeGenerationError(
-          `No inputs have api header value id of ${this.nodeData.data.apiKeyHeaderValueInputId}`
+      if (this.nodeData.data.bearerTokenValueInputId) {
+        const valueInput = this.nodeData.inputs.find(
+          (input) => input.id === this.nodeData.data.bearerTokenValueInputId
+        );
+        if (!valueInput) {
+          throw new NodeAttributeGenerationError(
+            `No inputs have bearer token header value id of ${this.nodeData.data.bearerTokenValueInputId}`
+          );
+        }
+        const value = this.nodeInputsByKey.get(valueInput.key);
+        if (!value) {
+          throw new NodeAttributeGenerationError(
+            `No inputs have key of ${valueInput.key}`
+          );
+        }
+        statements.push(
+          python.field({
+            name: "bearer_token_value",
+            initializer: value,
+          })
         );
       }
-      const value = this.nodeInputsByKey.get(valueInput.key);
-      if (!value) {
-        throw new NodeAttributeGenerationError(
-          `No inputs have key of ${valueInput.key}`
-        );
-      }
-      statements.push(
-        python.field({
-          name: "api_key_header_value",
-          initializer: value,
-        })
-      );
-    }
-
-    if (this.nodeData.data.bearerTokenValueInputId) {
-      const valueInput = this.nodeData.inputs.find(
-        (input) => input.id === this.nodeData.data.bearerTokenValueInputId
-      );
-      if (!valueInput) {
-        throw new NodeAttributeGenerationError(
-          `No inputs have bearer token header value id of ${this.nodeData.data.bearerTokenValueInputId}`
-        );
-      }
-      const value = this.nodeInputsByKey.get(valueInput.key);
-      if (!value) {
-        throw new NodeAttributeGenerationError(
-          `No inputs have key of ${valueInput.key}`
-        );
-      }
-      statements.push(
-        python.field({
-          name: "bearer_token_value",
-          initializer: value,
-        })
-      );
     }
 
     return statements;

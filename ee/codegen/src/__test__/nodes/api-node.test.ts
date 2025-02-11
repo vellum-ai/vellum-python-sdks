@@ -226,9 +226,7 @@ describe("ApiNode", () => {
 
   describe("skip authorization type input id field if undefined", () => {
     beforeEach(async () => {
-      const nodeData = apiNodeFactory({
-        useUndefinedAuthorizationTypeInputId: true,
-      });
+      const nodeData = apiNodeFactory({ authorizationTypeInput: null });
 
       const nodeContext = (await createNodeContext({
         workflowContext,
