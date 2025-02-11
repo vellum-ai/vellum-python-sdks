@@ -109,14 +109,14 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
     }
 
     const authTypeEnum = this.convertAuthTypeValueToEnum();
-    statements.push(
-      python.field({
-        name: "authorization_type",
-        initializer: authTypeEnum
-          ? authTypeEnum
-          : python.TypeInstantiation.none(),
-      })
-    );
+    if (authTypeEnum) {
+      statements.push(
+        python.field({
+          name: "authorization_type",
+          initializer: authTypeEnum,
+        })
+      );
+    }
 
     if (this.nodeData.data.apiKeyHeaderValueInputId) {
       const valueInput = this.nodeData.inputs.find(
@@ -452,6 +452,10 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
   }
 
   private convertAuthTypeValueToEnum(): AstNode | undefined {
+    if (isNil(this.nodeData.data.authorizationTypeInputId)) {
+      return undefined;
+    }
+
     const authValue = this.nodeData.inputs
       .find((input) => input.id === this.nodeData.data.authorizationTypeInputId)
       ?.value.rules.find(

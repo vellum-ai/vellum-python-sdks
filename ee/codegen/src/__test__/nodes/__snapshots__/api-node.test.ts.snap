@@ -231,3 +231,24 @@ class APINode(BaseAPINode):
     bearer_token_value = "<my-bearer-token>"
 "
 `;
+
+exports[`ApiNode > skip authorization type input id field if undefined > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+from vellum.workflows.constants import APIRequestMethod
+from ..inputs import Inputs
+
+
+class APINode(BaseAPINode):
+    url = "fasdfadsf"
+    method = APIRequestMethod.POST
+    json = {}
+    headers = {
+        "foo": Inputs.additional_header_value,
+        "bar": Inputs.additional_header_value_1,
+        "baz": Inputs.additional_header_value_1,
+    }
+    api_key_header_key = None
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
+"
+`;

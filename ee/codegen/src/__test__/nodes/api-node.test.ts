@@ -223,4 +223,27 @@ describe("ApiNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("skip authorization type input id field if undefined", () => {
+    beforeEach(async () => {
+      const nodeData = apiNodeFactory({
+        useUndefinedAuthorizationTypeInputId: true,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      node = new ApiNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
