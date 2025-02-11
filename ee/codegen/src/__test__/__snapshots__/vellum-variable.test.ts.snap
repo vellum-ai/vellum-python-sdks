@@ -31,7 +31,7 @@ exports[`VellumVariableField > JsonVellumVariable snapshot 1`] = `
 `;
 
 exports[`VellumVariableField > NullVellumVariable snapshot 1`] = `
-"test: Optional[None]
+"test: None
 "
 `;
 

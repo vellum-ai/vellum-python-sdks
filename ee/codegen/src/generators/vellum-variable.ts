@@ -30,7 +30,10 @@ export class VellumVariable extends AstNode {
     super();
 
     const baseType = getVellumVariablePrimitiveType(variable.type);
-    const finalType = !variable.required ? Type.optional(baseType) : baseType;
+    const finalType =
+      !variable.required && variable.type != "NULL"
+        ? Type.optional(baseType)
+        : baseType;
 
     this.field = python.field({
       name: variable.name ?? variable.key,
