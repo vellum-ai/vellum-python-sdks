@@ -28,8 +28,8 @@ describe("Inputs", () => {
 
     it("should generate correct code when Inputs has variables", async () => {
       const inputVariables: VellumVariable[] = [
-        { id: "input1", key: "input1", type: "STRING" },
-        { id: "input2", key: "input2", type: "NUMBER" },
+        { id: "input1", key: "input1", type: "STRING", required: true },
+        { id: "input2", key: "input2", type: "NUMBER", required: true },
       ];
       inputVariables.forEach((inputVariableData) => {
         workflowContext.addInputVariableContext(
@@ -66,8 +66,8 @@ describe("Inputs", () => {
 
     it("should generate correct code when Inputs has variables with duplicate keys", async () => {
       const inputVariables: VellumVariable[] = [
-        { id: "input1", key: "key-1", type: "STRING" },
-        { id: "input2", key: "key-1", type: "STRING" },
+        { id: "input1", key: "key-1", type: "STRING", required: true },
+        { id: "input2", key: "key-1", type: "STRING", required: true },
       ];
       inputVariables.forEach((inputVariableData) => {
         workflowContext.addInputVariableContext(
@@ -284,7 +284,7 @@ describe("Inputs", () => {
             id: "some-id",
             key,
             type,
-            required: false,
+            required: true,
             default: defaultValue,
             extensions: extensions,
           },
