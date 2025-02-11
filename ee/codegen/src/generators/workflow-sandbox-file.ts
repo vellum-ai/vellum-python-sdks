@@ -1,5 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
@@ -79,17 +80,19 @@ if __name__ != "__main__":
         name: "Inputs",
         modulePath: getGeneratedInputsModulePath(this.workflowContext),
       }),
-      arguments_: inputs.map((input) => {
-        const inputVariableContext =
-          this.workflowContext.getInputVariableContextByRawName(input.name);
+      arguments_: inputs
+        .filter((input) => !isNil(input.value))
+        .map((input) => {
+          const inputVariableContext =
+            this.workflowContext.getInputVariableContextByRawName(input.name);
 
-        return python.methodArgument({
-          name: inputVariableContext.name,
-          value: vellumValue({
-            vellumValue: input,
-          }),
-        });
-      }),
+          return python.methodArgument({
+            name: inputVariableContext.name,
+            value: vellumValue({
+              vellumValue: input,
+            }),
+          });
+        }),
     });
   }
 }

@@ -40,7 +40,7 @@ export class VellumVariable extends AstNode {
   private generateInitializerIfDefault(
     variable: VellumVariableWithName
   ): AstNode | undefined {
-    return variable.default
+    return variable.default && variable.default.value
       ? new VellumValue({
           vellumValue: variable.default,
         })

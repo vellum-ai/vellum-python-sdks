@@ -10,7 +10,8 @@ import { WorkflowSandboxInputs } from "src/types/vellum";
 
 describe("Workflow Sandbox", () => {
   const generateSandboxFile = async (
-    inputVariables: VellumVariable[]
+    inputVariables: VellumVariable[],
+    generateSandboxInput: boolean = true
   ): Promise<string> => {
     const writer = new Writer();
     const uniqueWorkflowContext = workflowContextFactory();
@@ -26,13 +27,20 @@ describe("Workflow Sandbox", () => {
 
     const sandboxInputs: WorkflowSandboxInputs[] = inputVariables.map(
       (inputVariableData) => {
-        return [
-          {
-            name: inputVariableData.key,
-            type: "STRING",
-            value: "some-value",
-          },
-        ] as StringInput[];
+        return generateSandboxInput
+          ? [
+              {
+                name: inputVariableData.key,
+                type: "STRING",
+                value: "some-value",
+              },
+            ]
+          : ([
+              {
+                name: inputVariableData.key,
+                type: "STRING",
+              },
+            ] as StringInput[]);
       }
     );
 
@@ -73,6 +81,21 @@ describe("Workflow Sandbox", () => {
       // Assert that both results match the same snapshot
       expect(snakeCasedResult).toEqual(camelCasedResult);
       expect(snakeCasedResult).toMatchSnapshot();
+    });
+
+    it("should generate correct code given optional input with default of null string value", async () => {
+      const inputVariables: VellumVariable[] = [
+        {
+          id: "1",
+          key: "some_foo",
+          type: "STRING",
+          required: false,
+          default: { type: "STRING" },
+        },
+      ];
+
+      const sandboxFile = await generateSandboxFile(inputVariables, false);
+      expect(sandboxFile).toMatchSnapshot();
     });
   });
 });
