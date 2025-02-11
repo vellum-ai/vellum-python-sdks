@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { isNil } from "lodash";
 import { VellumValue as VellumValueType } from "vellum-ai/api/types";
 
 import { VellumValue } from "src/generators/vellum-variable-value";
@@ -40,7 +41,7 @@ export class VellumVariable extends AstNode {
   private generateInitializerIfDefault(
     variable: VellumVariableWithName
   ): AstNode | undefined {
-    return variable.default && variable.default.value
+    return variable.default && !isNil(variable.default.value)
       ? new VellumValue({
           vellumValue: variable.default,
         })
