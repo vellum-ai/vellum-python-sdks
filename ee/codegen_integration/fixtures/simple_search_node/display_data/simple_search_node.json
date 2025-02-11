@@ -399,7 +399,7 @@
         "type": "STRING",
         "value": "Search node query default"
       },
-      "required": false,
+      "required": true,
       "extensions": {
         "color": "someColor"
       }
@@ -408,7 +408,7 @@
       "id": "c95cccdc-8881-4528-bc63-97d9df6e1d87",
       "key": "var1",
       "type": "STRING",
-      "required": false,
+      "required": true,
       "default": null,
       "extensions": {
         "color": "someColor"

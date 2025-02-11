@@ -246,7 +246,7 @@
       "id": "2915dbdd-c4fa-4b52-a35c-11625bb47cbf",
       "key": "input",
       "type": "STRING",
-      "required": false,
+      "required": true,
       "default": null,
       "extensions": {
         "color": null
