@@ -1,7 +1,7 @@
 import io
 import os
 import re
-from typing import Any, List, Tuple, Union, get_args
+from typing import Any, List, Tuple, Union, get_args, get_origin
 
 from pydantic import BaseModel, ValidationError
 
@@ -110,7 +110,14 @@ __arg__out = main({", ".join(run_args)})
     result = exec_globals["__arg__out"]
 
     if output_type != Any:
-        if issubclass(output_type, BaseModel) and not isinstance(result, output_type):
+        if get_origin(output_type) is Union:
+            allowed_types = get_args(output_type)
+            if not isinstance(result, allowed_types):
+                raise NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message=f"Expected output to be in types {allowed_types}, but received '{type(result).__name__}'",
+                )
+        elif issubclass(output_type, BaseModel) and not isinstance(result, output_type):
             try:
                 result = output_type.model_validate(result)
             except ValidationError as e:
@@ -118,12 +125,10 @@ __arg__out = main({", ".join(run_args)})
                     code=WorkflowErrorCode.INVALID_OUTPUTS,
                     message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
                 ) from e
-
-        if not isinstance(result, output_type):
+        elif not isinstance(result, output_type):
             raise NodeException(
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message=f"Expected an output of type '{output_type.__name__}',"
-                f" but received '{result.__class__.__name__}'",
+                message=f"Expected an output of type '{output_type.__name__}', but received '{type(result).__name__}'",
             )
 
     return logs, result

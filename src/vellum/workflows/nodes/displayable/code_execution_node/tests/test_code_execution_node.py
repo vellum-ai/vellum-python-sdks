@@ -1,6 +1,6 @@
 import pytest
 import os
-from typing import Any
+from typing import Any, Union
 
 from vellum import CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
 from vellum.client.types.code_execution_package import CodeExecutionPackage
@@ -523,6 +523,39 @@ def main(arg1: List[Dict]) -> str:
 
     # THEN the node should successfully concatenate the values
     assert outputs == {"result": "Hello World", "log": ""}
+
+    # AND we should not have invoked the Code via Vellum since it's running inline
+    vellum_client.execute_code.assert_not_called()
+
+
+def test_run_node__union_output_type(vellum_client):
+    """Confirm that CodeExecutionNodes can handle Union output types."""
+
+    # GIVEN a node that subclasses CodeExecutionNode that returns a Union type
+    class State(BaseState):
+        pass
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, Union[float, int]]):
+        code = """\
+from typing import List, Dict
+def main(arg1: List[Dict]) -> float:
+    return arg1[0]["value"] + arg1[1]["value"]
+"""
+        runtime = "PYTHON_3_11_6"
+
+        code_inputs = {
+            "arg1": [
+                NumberVellumValue(type="NUMBER", value=1.0, name="First"),
+                NumberVellumValue(type="NUMBER", value=2.0, name="Second"),
+            ],
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+    outputs = node.run()
+
+    # THEN the node should successfully sum the values
+    assert outputs == {"result": 3.0, "log": ""}
 
     # AND we should not have invoked the Code via Vellum since it's running inline
     vellum_client.execute_code.assert_not_called()
