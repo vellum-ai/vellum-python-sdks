@@ -1,5 +1,5 @@
 import json
-from typing import Optional, cast
+from typing import Union, cast
 
 from vellum import (
     ChatMessage,
@@ -14,6 +14,7 @@ from vellum.client.types.audio_vellum_value import AudioVellumValue
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.image_vellum_value import ImageVellumValue
+from vellum.client.types.number_input import NumberInput
 from vellum.client.types.vellum_audio import VellumAudio
 from vellum.client.types.vellum_image import VellumImage
 from vellum.prompts.blocks.exceptions import PromptCompilationError
@@ -22,15 +23,20 @@ from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS
 from vellum.utils.templating.render import render_sandboxed_jinja_template
 from vellum.utils.typing import cast_not_optional
 
+PromptInput = Union[PromptRequestInput, NumberInput]
+
 
 def compile_prompt_blocks(
     blocks: list[PromptBlock],
-    inputs: list[PromptRequestInput],
+    inputs: list[PromptInput],
     input_variables: list[VellumVariable],
 ) -> list[CompiledPromptBlock]:
     """Compiles a list of Prompt Blocks, performing all variable substitutions and Jinja templating needed."""
 
     sanitized_inputs = _sanitize_inputs(inputs)
+    inputs_by_name = {
+        (input_.name if isinstance(input_, NumberInput) else input_.key): input_ for input_ in sanitized_inputs
+    }
 
     compiled_blocks: list[CompiledPromptBlock] = []
     for block in blocks:
@@ -66,7 +72,7 @@ def compile_prompt_blocks(
 
             rendered_template = render_sandboxed_jinja_template(
                 template=block.template,
-                input_values={input_.key: input_.value for input_ in sanitized_inputs},
+                input_values={name: inp.value for name, inp in inputs_by_name.items()},
                 jinja_custom_filters=DEFAULT_JINJA_CUSTOM_FILTERS,
                 jinja_globals=DEFAULT_JINJA_CUSTOM_FILTERS,
             )
@@ -80,9 +86,7 @@ def compile_prompt_blocks(
             )
 
         elif block.block_type == "VARIABLE":
-            compiled_input: Optional[PromptRequestInput] = next(
-                (input_ for input_ in sanitized_inputs if input_.key == str(block.input_variable)), None
-            )
+            compiled_input = inputs_by_name.get(block.input_variable)
             if compiled_input is None:
                 raise PromptCompilationError(f"Input variable '{block.input_variable}' not found")
 
@@ -196,23 +200,26 @@ def _compile_chat_messages_as_prompt_blocks(chat_messages: list[ChatMessage]) ->
 
 def _compile_rich_text_block_as_value_block(
     block: RichTextPromptBlock,
-    inputs: list[PromptRequestInput],
+    inputs: list[PromptInput],
 ) -> CompiledValuePromptBlock:
     value: str = ""
+    inputs_by_name = {(input_.name if isinstance(input_, NumberInput) else input_.key): input_ for input_ in inputs}
     for child_block in block.blocks:
         if child_block.block_type == "PLAIN_TEXT":
             value += child_block.text
         elif child_block.block_type == "VARIABLE":
-            variable = next((input_ for input_ in inputs if input_.key == str(child_block.input_variable)), None)
-            if variable is None:
+            input = inputs_by_name.get(child_block.input_variable)
+            if input is None:
                 raise PromptCompilationError(f"Input variable '{child_block.input_variable}' not found")
-            elif variable.type == "STRING":
-                value += str(variable.value)
-            elif variable.type == "JSON":
-                value += json.dumps(variable.value, indent=4)
+            elif input.type == "STRING":
+                value += str(input.value)
+            elif input.type == "JSON":
+                value += json.dumps(input.value, indent=4)
+            elif input.type == "NUMBER":
+                value += str(input.value)
             else:
                 raise PromptCompilationError(
-                    f"Input variable '{child_block.input_variable}' must be of type STRING or JSON"
+                    f"Input variable '{child_block.input_variable}' has an invalid type: {input.type}"
                 )
         else:
             raise PromptCompilationError(f"Invalid child block_type for RICH_TEXT: {child_block.block_type}")
@@ -220,8 +227,8 @@ def _compile_rich_text_block_as_value_block(
     return CompiledValuePromptBlock(content=StringVellumValue(value=value), cache_config=block.cache_config)
 
 
-def _sanitize_inputs(inputs: list[PromptRequestInput]) -> list[PromptRequestInput]:
-    sanitized_inputs: list[PromptRequestInput] = []
+def _sanitize_inputs(inputs: list[PromptInput]) -> list[PromptInput]:
+    sanitized_inputs: list[PromptInput] = []
     for input_ in inputs:
         if input_.type == "CHAT_HISTORY" and input_.value is None:
             sanitized_inputs.append(input_.model_copy(update={"value": cast(list[ChatMessage], [])}))

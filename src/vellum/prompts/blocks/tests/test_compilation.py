@@ -10,6 +10,7 @@ from vellum import (
     VariablePromptBlock,
     VellumVariable,
 )
+from vellum.client.types.number_input import NumberInput
 from vellum.prompts.blocks.compilation import compile_prompt_blocks
 from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, CompiledValuePromptBlock
 
@@ -94,6 +95,33 @@ from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, Compiled
                 ),
             ],
         ),
+        (
+            [
+                ChatMessagePromptBlock(
+                    chat_role="USER",
+                    blocks=[
+                        RichTextPromptBlock(
+                            blocks=[
+                                PlainTextPromptBlock(text="Count to "),
+                                VariablePromptBlock(input_variable="count"),
+                            ]
+                        )
+                    ],
+                )
+            ],
+            [
+                # TODO: We don't yet have PromptRequestNumberInput. We should either add it or migrate
+                # Prompts to using these more generic inputs.
+                NumberInput(name="count", value=10),
+            ],
+            [VellumVariable(id="901ec2d6-430c-4341-b963-ca689006f5cc", type="NUMBER", key="count")],
+            [
+                CompiledChatMessagePromptBlock(
+                    role="USER",
+                    blocks=[CompiledValuePromptBlock(content=StringVellumValue(value="Count to 10.0"))],
+                ),
+            ],
+        ),
     ],
     ids=[
         "empty",
@@ -102,6 +130,7 @@ from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, Compiled
         "rich-text-no-variables",
         "rich-text-with-variables",
         "chat-message",
+        "number-input",
     ],
 )
 def test_compile_prompt_blocks__happy(blocks, inputs, input_variables, expected):
