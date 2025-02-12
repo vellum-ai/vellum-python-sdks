@@ -1,6 +1,6 @@
 import pytest
 import json
-from typing import List
+from typing import List, Union
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.function_call import FunctionCall
@@ -177,3 +177,19 @@ def test_templating_node__blank_json_input():
         node.run()
 
     assert "Unable to render jinja template:\nCannot run json.loads() on empty input" in str(exc_info.value)
+
+
+def test_templating_node__union_float_int_output():
+    # GIVEN a templating node that outputs either a float or an int
+    class UnionTemplateNode(TemplatingNode[BaseState, Union[float, int]]):
+        template = """{{ obj[\"score\"] | float }}"""
+        inputs = {
+            "obj": {"score": 42.5},
+        }
+
+    # WHEN the node is run
+    node = UnionTemplateNode()
+    outputs = node.run()
+
+    # THEN it should correctly parse as a float
+    assert outputs.result == 42.5
