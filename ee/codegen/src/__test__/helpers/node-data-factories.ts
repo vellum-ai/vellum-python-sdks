@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { PromptParameters, VellumVariableType } from "vellum-ai/api";
 
+import { edgesFactory } from "./edge-data-factories";
+
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   AdornmentNode,
@@ -1558,6 +1560,8 @@ export function finalOutputNodeFactory({
 }
 
 export function mapNodeDataFactory(): MapNode {
+  const entrypoint = entrypointNodeDataFactory();
+  const templatingNode = templatingNodeFactory();
   return {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "MAP",
@@ -1565,55 +1569,8 @@ export function mapNodeDataFactory(): MapNode {
       variant: "INLINE",
       label: "Map Node",
       workflowRawData: {
-        nodes: [
-          {
-            id: "817b520f-a6f6-40c9-8e98-68a4586360d6",
-            type: "TEMPLATING",
-            data: {
-              label: "Templating Node with Reference",
-              outputId: "db5bcad3-d9f9-4314-a198-8748f4a824a2",
-              sourceHandleId: "7ac839c3-e443-4eee-8897-aeb4c82531c2",
-              targetHandleId: "d85e6190-3353-4e1e-9098-97f828eef712",
-              templateNodeInputId: "3211e289-efce-451f-a12a-311f05f3dbf0",
-              outputType: "STRING",
-            },
-            inputs: [
-              {
-                id: "4271329e-f375-4245-9b62-3d300b9b5cfa",
-                key: "example_var_1",
-                value: {
-                  rules: [],
-                  combinator: "OR",
-                },
-              },
-              {
-                id: "1a11b7c8-7b04-43bf-a9b3-a9669464b6d0",
-                key: "template",
-                value: {
-                  rules: [
-                    {
-                      type: "CONSTANT_VALUE",
-                      data: {
-                        type: "STRING",
-                        value: "{{ example_var_1 }}",
-                      },
-                    },
-                  ],
-                  combinator: "OR",
-                },
-              },
-            ],
-            displayData: {
-              position: {
-                x: 405.85703120354856,
-                y: 140.63171864439244,
-              },
-              width: 480.0,
-              height: 224.0,
-            },
-          },
-        ],
-        edges: [],
+        nodes: [entrypoint, templatingNode],
+        edges: edgesFactory([[entrypoint, templatingNode]]),
       },
       inputVariables: [
         {
@@ -1653,9 +1610,10 @@ export function mapNodeDataFactory(): MapNode {
         value: {
           rules: [
             {
-              type: "INPUT_VARIABLE",
+              type: "CONSTANT_VALUE",
               data: {
-                inputVariableId: "ce97c6fd-4a41-40c4-bd4b-9b264c58d2d1",
+                type: "JSON",
+                value: ["apple", "banana", "cherry"],
               },
             },
           ],

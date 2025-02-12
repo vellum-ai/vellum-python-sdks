@@ -193,6 +193,7 @@ export class WorkflowContext {
       workflowRawEdges,
       codeExecutionNodeCodeRepresentationOverride:
         this.codeExecutionNodeCodeRepresentationOverride,
+      strict: this.strict,
     });
   }
 

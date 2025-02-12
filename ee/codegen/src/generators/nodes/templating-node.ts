@@ -99,7 +99,7 @@ export class TemplatingNode extends BaseSingleFileNode<
       (input) => input.id === this.nodeData.data.templateNodeInputId
     );
     if (!templatingInput) {
-      throw new NodeAttributeGenerationError("Templating input not found");
+      throw new NodeAttributeGenerationError(`Templating input not found`);
     }
 
     const templateRule = templatingInput.value.rules[0];

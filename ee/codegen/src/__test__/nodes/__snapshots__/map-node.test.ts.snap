@@ -1,0 +1,50 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MapNode > basic > map node display file 1`] = `
+"# flake8: noqa: F401, F403
+
+from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseMapNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ....nodes.map_node import MapNode
+from .nodes import *
+from .workflow import *
+
+
+class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
+    label = "Map Node"
+    node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
+    target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
+    node_input_ids_by_name = {"items": UUID("f34872c2-5c0e-45a3-b204-3af22d1028d3")}
+    output_display = {
+        MapNode.Outputs.final_output: NodeOutputDisplay(
+            id=UUID("edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb"), name="final-output"
+        )
+    }
+    port_displays = {MapNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`MapNode > basic > map node file 1`] = `
+"from vellum.workflows.nodes.displayable import MapNode as BaseMapNode
+
+from .workflow import MapNodeWorkflow
+
+
+class MapNode(BaseMapNode):
+    items = [
+        "apple",
+        "banana",
+        "cherry",
+    ]
+    subworkflow = MapNodeWorkflow
+    max_concurrency = 4
+
+    class Outputs(BaseMapNode.Outputs):
+        pass
+"
+`;
