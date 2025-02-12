@@ -97,8 +97,11 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         output_type = self.__class__.get_output_type()
         code = self._resolve_code()
         if not self.packages and self.runtime == "PYTHON_3_11_6":
-            logs, result = run_code_inline(code, input_values, output_type)
-            return self.Outputs(result=result, log=logs)
+            try:
+                logs, result = run_code_inline(code, input_values, output_type)
+                return self.Outputs(result=result, log=logs)
+            except NodeException as e:
+                raise e
         else:
             expected_output_type = primitive_type_to_vellum_variable_type(output_type)
 

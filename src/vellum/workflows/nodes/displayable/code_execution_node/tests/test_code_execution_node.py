@@ -7,6 +7,7 @@ from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.number_input import NumberInput
+from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
@@ -559,3 +560,31 @@ def main(arg1: List[Dict]) -> float:
 
     # AND we should not have invoked the Code via Vellum since it's running inline
     vellum_client.execute_code.assert_not_called()
+
+
+def test_run_node__code_execution_error(vellum_client):
+    # GIVEN a node that will raise an error during execution
+    class State(BaseState):
+        pass
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, int]):
+        code = """\
+def main(arg1: int, arg2: int) -> int:
+    return arg1 + arg2 + arg3
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "arg1": 1,
+            "arg2": 2,
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+
+    # THEN it should raise a NodeException with the execution error
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # AND the error should contain the execution error details
+    assert "name 'arg3' is not defined" in str(exc_info.value)
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_CODE

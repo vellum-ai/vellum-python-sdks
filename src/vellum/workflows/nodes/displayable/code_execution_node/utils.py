@@ -103,8 +103,13 @@ def run_code_inline(
 
 __arg__out = main({", ".join(run_args)})
 """
-
-    exec(execution_code, exec_globals)
+    try:
+        exec(execution_code, exec_globals)
+    except Exception as e:
+        raise NodeException(
+            code=WorkflowErrorCode.INVALID_CODE,
+            message=str(e),
+        )
 
     logs = log_buffer.getvalue()
     result = exec_globals["__arg__out"]
