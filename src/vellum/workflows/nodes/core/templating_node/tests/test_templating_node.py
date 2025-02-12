@@ -1,8 +1,10 @@
+import pytest
 import json
 from typing import List
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.function_call import FunctionCall
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.state import BaseState
@@ -155,3 +157,23 @@ def test_templating_node__function_call_output():
 
     # THEN the output is the expected function call
     assert outputs.result == FunctionCall(name="test", arguments={"key": "value"})
+
+
+def test_templating_node__blank_json_input():
+    """Test that templating node properly handles blank JSON input."""
+
+    # GIVEN a templating node that tries to parse blank JSON
+    class BlankJsonTemplateNode(TemplatingNode[BaseState, Json]):
+        template = "{{ json.loads(data) }}"
+        inputs = {
+            "data": "",  # Blank input
+        }
+
+    # WHEN the node is run
+    node = BlankJsonTemplateNode()
+
+    # THEN it should raise an appropriate error
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert "Unable to render jinja template:\nCannot run json.loads() on empty input" in str(exc_info.value)

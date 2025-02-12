@@ -42,6 +42,8 @@ def render_sandboxed_jinja_template(
 
         rendered_template = jinja_template.render(input_values)
     except json.JSONDecodeError as e:
+        if not e.doc:
+            raise JinjaTemplateError("Unable to render jinja template:\n" "Cannot run json.loads() on empty input")
         if e.msg == "Invalid control character at":
             raise JinjaTemplateError(
                 "Unable to render jinja template:\n"
