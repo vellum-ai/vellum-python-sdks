@@ -14,6 +14,27 @@ def finalize(obj: Any) -> str:
     return str(obj)
 
 
+def custom_replace(s, old, new):
+    """
+    Custom replace filter that uses DefaultStateEncoder for conversion
+    """
+    import json
+
+    from vellum.workflows.state.encoder import DefaultStateEncoder
+
+    def encode(obj):
+        try:
+            return json.dumps(obj, cls=DefaultStateEncoder)
+        except TypeError:
+            return str(obj)
+
+    s_str = encode(s)
+    old_str = encode(old)
+    new_str = encode(new)
+
+    return s_str.replace(old_str, new_str)
+
+
 def render_sandboxed_jinja_template(
     *,
     template: str,
@@ -34,6 +55,8 @@ def render_sandboxed_jinja_template(
 
         if jinja_custom_filters:
             environment.filters.update(jinja_custom_filters)
+
+        environment.filters["replace"] = custom_replace
 
         jinja_template = environment.from_string(template)
 

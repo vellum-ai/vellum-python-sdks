@@ -4,6 +4,7 @@ from typing import List, Union
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
@@ -193,3 +194,29 @@ def test_templating_node__union_float_int_output():
 
     # THEN it should correctly parse as a float
     assert outputs.result == 42.5
+
+
+def test_templating_node__replace_filter():
+    # GIVEN a templating node that outputs a complex object
+    class ReplaceFilterTemplateNode(TemplatingNode[BaseState, Json]):
+        template = """{{- prompt_outputs | selectattr(\'type\', \'equalto\', \'FUNCTION_CALL\') \
+        | list | replace(\"\\n\",\",\") -}}"""
+        inputs = {
+            "prompt_outputs": [FunctionCallVellumValue(value=FunctionCall(name="test", arguments={"key": "value"}))]
+        }
+
+    # WHEN the node is run
+    node = ReplaceFilterTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected JSON
+    assert outputs.result == [
+        {
+            "type": "FUNCTION_CALL",
+            "value": {
+                "name": "test",
+                "arguments": {"key": "value"},
+                "id": None,
+            },
+        }
+    ]
