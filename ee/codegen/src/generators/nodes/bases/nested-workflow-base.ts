@@ -23,10 +23,6 @@ export abstract class BaseNestedWorkflowNode<
   protected abstract getInnerWorkflowData(): WorkflowRawData;
 
   constructor(args: BaseNode.Args<T, V>) {
-    console.log(
-      "constructor",
-      args.workflowContext.absolutePathToOutputDirectory
-    );
     super(args);
 
     this.nestedWorkflowContextsByName = this.generateNestedWorkflowContexts();
