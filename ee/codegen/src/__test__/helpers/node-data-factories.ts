@@ -1,5 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
-import { PromptParameters, VellumVariableType } from "vellum-ai/api";
+import {
+  PromptParameters,
+  VellumVariable,
+  VellumVariableType,
+} from "vellum-ai/api";
 
 import { edgesFactory } from "./edge-data-factories";
 
@@ -1559,7 +1563,9 @@ export function finalOutputNodeFactory({
   return nodeData;
 }
 
-export function mapNodeDataFactory(): MapNode {
+export function mapNodeDataFactory({
+  outputVariables,
+}: { outputVariables?: VellumVariable[] } = {}): MapNode {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory();
   return {
@@ -1589,7 +1595,7 @@ export function mapNodeDataFactory(): MapNode {
           type: "NUMBER",
         },
       ],
-      outputVariables: [
+      outputVariables: outputVariables ?? [
         {
           id: "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb",
           key: "final-output",

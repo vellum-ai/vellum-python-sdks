@@ -7,11 +7,7 @@ import { MapNodeContext } from "src/context/node-context/map-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
-import {
-  InlineMapNodeData,
-  MapNode as MapNodeType,
-  WorkflowRawData,
-} from "src/types/vellum";
+import { MapNode as MapNodeType, WorkflowRawData } from "src/types/vellum";
 
 export class MapNode extends BaseNestedWorkflowNode<
   MapNodeType,
@@ -158,43 +154,47 @@ export class MapNode extends BaseNestedWorkflowNode<
   }
 
   protected getOutputDisplay(): python.Field {
-    let nodeData: InlineMapNodeData;
-    if (this.nodeData.data.variant !== "INLINE") {
-      throw new NodeDefinitionGenerationError(
-        `MapNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
-      );
-    } else {
-      nodeData = this.nodeData.data;
-    }
+    const nestedWorkflowContext = this.getNestedWorkflowContextByName(
+      BaseNestedWorkflowNode.subworkflowNestedProjectName
+    );
+    const outputVariableContexts = Array.from(
+      nestedWorkflowContext.outputVariableContextsById.values()
+    );
 
     return python.field({
       name: "output_display",
       initializer: python.TypeInstantiation.dict(
-        nodeData.outputVariables.map((output) => ({
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "final_output"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
+        outputVariableContexts.map((outputContext) => {
+          return {
+            key: python.reference({
+              name: this.nodeContext.nodeClassName,
+              modulePath: this.nodeContext.nodeModulePath,
+              attribute: [OUTPUTS_CLASS_NAME, outputContext.name],
             }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(output.id),
+            value: python.instantiateClass({
+              classReference: python.reference({
+                name: "NodeOutputDisplay",
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_TYPES_MODULE_PATH,
               }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str(output.key),
-              }),
-            ],
-          }),
-        }))
+              arguments_: [
+                python.methodArgument({
+                  name: "id",
+                  value: python.TypeInstantiation.uuid(
+                    outputContext.getOutputVariableId()
+                  ),
+                }),
+                python.methodArgument({
+                  name: "name",
+                  value: python.TypeInstantiation.str(
+                    outputContext.getRawName()
+                  ),
+                }),
+              ],
+            }),
+          };
+        })
       ),
     });
   }

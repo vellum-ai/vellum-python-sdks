@@ -5,7 +5,6 @@ import {
   WorkflowOutputValue as WorkflowOutputValueType,
   WorkflowValueDescriptor,
 } from "src/types/vellum";
-import { getNodeIdFromNodeOutputWorkflowReference } from "src/utils/nodes";
 
 export declare namespace WorkflowOutputContext {
   export type Args = {
@@ -30,25 +29,6 @@ export class WorkflowOutputContext {
     this.terminalNodeData = terminalNodeData;
     this.workflowOutputValue = workflowOutputValue;
     this.name = this.getOutputVariableName();
-  }
-
-  public getOutputNodeId(): string {
-    let outputNodeId: string | undefined;
-    if (this.workflowOutputValue) {
-      outputNodeId = getNodeIdFromNodeOutputWorkflowReference(
-        this.workflowOutputValue
-      );
-    }
-    if (this.terminalNodeData) {
-      outputNodeId = this.terminalNodeData.id;
-    }
-
-    if (!outputNodeId) {
-      throw new WorkflowOutputGenerationError(
-        "Expected output node id in either output values or terminal data"
-      );
-    }
-    return outputNodeId;
   }
 
   public getFinalOutputNodeData():
