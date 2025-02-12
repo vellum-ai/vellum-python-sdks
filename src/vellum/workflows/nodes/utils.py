@@ -2,7 +2,7 @@ from functools import cache
 import json
 import sys
 from types import ModuleType
-from typing import Any, Callable, Optional, Type, TypeVar, get_args, get_origin
+from typing import Any, Callable, Optional, Type, TypeVar, Union, get_args, get_origin
 
 from pydantic import BaseModel
 
@@ -112,6 +112,15 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
             return json.loads(result_as_str)
         except json.JSONDecodeError:
             raise ValueError("Invalid JSON format for result_as_str")
+
+    if get_origin(output_type) is Union:
+        for inner_type in get_args(output_type):
+            try:
+                return parse_type_from_str(result_as_str, inner_type)
+            except ValueError:
+                continue
+        raise ValueError(f"Could not parse with any of the Union types: {output_type}")
+
 
     if issubclass(output_type, BaseModel):
         try:
