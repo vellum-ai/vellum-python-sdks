@@ -121,7 +121,6 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
                 continue
         raise ValueError(f"Could not parse with any of the Union types: {output_type}")
 
-
     if issubclass(output_type, BaseModel):
         try:
             data = json.loads(result_as_str)
