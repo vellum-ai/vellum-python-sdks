@@ -1,5 +1,5 @@
 import json
-from typing import Union, cast
+from typing import Sequence, Union, cast
 
 from vellum import (
     ChatMessage,
@@ -28,7 +28,7 @@ PromptInput = Union[PromptRequestInput, NumberInput]
 
 def compile_prompt_blocks(
     blocks: list[PromptBlock],
-    inputs: list[PromptInput],
+    inputs: Sequence[PromptInput],
     input_variables: list[VellumVariable],
 ) -> list[CompiledPromptBlock]:
     """Compiles a list of Prompt Blocks, performing all variable substitutions and Jinja templating needed."""
@@ -227,7 +227,7 @@ def _compile_rich_text_block_as_value_block(
     return CompiledValuePromptBlock(content=StringVellumValue(value=value), cache_config=block.cache_config)
 
 
-def _sanitize_inputs(inputs: list[PromptInput]) -> list[PromptInput]:
+def _sanitize_inputs(inputs: Sequence[PromptInput]) -> list[PromptInput]:
     sanitized_inputs: list[PromptInput] = []
     for input_ in inputs:
         if input_.type == "CHAT_HISTORY" and input_.value is None:
