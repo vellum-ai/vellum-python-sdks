@@ -304,10 +304,9 @@ export class WorkflowContext {
       outputVariableId,
       outputVariableContext
     );
+
     // This was added from the workflow output context. We should remove this once terminal node data is removed from data
-    if (!this.outputVariableNames.has(outputVariableContext.name)) {
-      this.addUsedOutputVariableName(outputVariableContext.name);
-    }
+    this.addUsedOutputVariableName(outputVariableContext.name);
   }
 
   public getOutputVariableContextById(

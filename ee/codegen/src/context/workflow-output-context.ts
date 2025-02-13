@@ -77,28 +77,15 @@ export class WorkflowOutputContext {
       const outputVariable = this.workflowContext.getOutputVariableContextById(
         this.workflowOutputValue.outputVariableId
       );
-      rawOutputVariableName = outputVariable.name;
+      return outputVariable.name;
     } else {
       throw new WorkflowOutputGenerationError(
         "Expected either workflow output value or terminal node data to be defined"
       );
     }
 
-    const initialOutputVariableName =
-      !isNil(rawOutputVariableName) && !isEmpty(rawOutputVariableName)
-        ? toPythonSafeSnakeCase(rawOutputVariableName, "output")
-        : defaultName;
-
-    // Deduplicate the output variable name if it's already in use
-    let sanitizedName = initialOutputVariableName;
-    let numRenameAttempts = 0;
-    while (this.workflowContext.isOutputVariableNameUsed(sanitizedName)) {
-      sanitizedName = `${initialOutputVariableName}${
-        initialOutputVariableName.endsWith("_") ? "" : "_"
-      }${numRenameAttempts + 1}`;
-      numRenameAttempts += 1;
-    }
-
-    return sanitizedName;
+    return !isNil(rawOutputVariableName) && !isEmpty(rawOutputVariableName)
+      ? toPythonSafeSnakeCase(rawOutputVariableName, "output")
+      : defaultName;
   }
 }
