@@ -60,6 +60,5 @@ class MapNodeWorkflowDisplay(VellumWorkflowDisplay[MapNodeWorkflow]):
             node_id=UUID("d9d29911-dd45-45d5-9ac8-1a06bb596c2f"),
             name="final-output",
             label="Final Output",
-            display_data=NodeDisplayData(position=NodeDisplayPosition(x=2750, y=210), width=463, height=234),
         )
     }

@@ -176,6 +176,14 @@ class VellumWorkflowDisplay(
                     except IndexError:
                         source_node_display = None
 
+                synthetic_target_handle_id = (
+                    str(workflow_output_display.target_handle_id)
+                    if workflow_output_display.target_handle_id
+                    else str(uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{workflow_output_display.name}"))
+                )
+                synthetic_display_data = (
+                    workflow_output_display.display_data.dict() if workflow_output_display.display_data else {}
+                )
                 nodes.append(
                     {
                         "id": str(final_output_node_id),
@@ -183,13 +191,13 @@ class VellumWorkflowDisplay(
                         "data": {
                             "label": workflow_output_display.label,
                             "name": workflow_output_display.name,
-                            "target_handle_id": str(workflow_output_display.target_handle_id),
+                            "target_handle_id": synthetic_target_handle_id,
                             "output_id": str(workflow_output_display.id),
                             "output_type": inferred_type,
                             "node_input_id": str(node_input.id),
                         },
                         "inputs": [node_input.dict()],
-                        "display_data": workflow_output_display.display_data.dict(),
+                        "display_data": synthetic_display_data,
                         "base": final_output_node_base,
                         "definition": None,
                     }
@@ -211,7 +219,7 @@ class VellumWorkflowDisplay(
                             "source_node_id": str(source_node_display.node_id),
                             "source_handle_id": str(source_handle_id),
                             "target_node_id": str(workflow_output_display.node_id),
-                            "target_handle_id": str(workflow_output_display.target_handle_id),
+                            "target_handle_id": synthetic_target_handle_id,
                             "type": "DEFAULT",
                         }
                     )
@@ -372,15 +380,12 @@ class VellumWorkflowDisplay(
 
         output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
         node_id = uuid4_from_hash(f"{self.workflow_id}|node_id|{output.name}")
-        target_handle_id = uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{output.name}")
 
         return WorkflowOutputVellumDisplay(
             id=output_id,
             node_id=node_id,
             name=output.name,
             label="Final Output",
-            target_handle_id=target_handle_id,
-            display_data=NodeDisplayData(),
         )
 
     def _generate_edge_display(
