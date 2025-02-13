@@ -41,9 +41,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
       initializer: nestedWorkflowReference,
     });
 
-    const outputsClass = this.generateOutputsClass();
-
-    return [subworkflowField, outputsClass];
+    return [subworkflowField];
   }
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
@@ -80,41 +78,6 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     );
 
     return statements;
-  }
-
-  private generateOutputsClass(): python.Class {
-    const nodeBaseClassRef = this.getNodeBaseClass();
-    const outputsClass = python.class_({
-      name: OUTPUTS_CLASS_NAME,
-      extends_: [
-        python.reference({
-          name: nodeBaseClassRef.name,
-          modulePath: nodeBaseClassRef.modulePath,
-          alias: nodeBaseClassRef.alias,
-          attribute: [OUTPUTS_CLASS_NAME],
-        }),
-      ],
-    });
-
-    const nestedWorkflowContext = this.getNestedWorkflowContextByName(
-      BaseNestedWorkflowNode.subworkflowNestedProjectName
-    );
-
-    nestedWorkflowContext.workflowOutputContexts.forEach((outputContext) => {
-      const outputName = outputContext.name;
-      const outputField = python.field({
-        name: outputName,
-        initializer: python.reference({
-          name: nestedWorkflowContext.workflowClassName,
-          modulePath: nestedWorkflowContext.modulePath,
-          attribute: [OUTPUTS_CLASS_NAME, outputName],
-        }),
-      });
-
-      outputsClass.add(outputField);
-    });
-
-    return outputsClass;
   }
 
   protected getOutputDisplay(): python.Field {

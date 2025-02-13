@@ -36,8 +36,5 @@ from .workflow import InlineSubworkflowNodeWorkflow
 
 class InlineSubworkflowNode(BaseInlineSubworkflowNode):
     subworkflow = InlineSubworkflowNodeWorkflow
-
-    class Outputs(BaseInlineSubworkflowNode.Outputs):
-        pass
 "
 `;
