@@ -2,28 +2,20 @@ import io
 import json
 import os
 from pathlib import Path
-from uuid import UUID
 import zipfile
-from typing import Optional, Union
+from typing import Optional
 
 from dotenv import load_dotenv
 from pydash import snake_case
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import VellumCliConfig, WorkflowConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
 
 ERROR_LOG_FILE_NAME = "error.log"
 METADATA_FILE_NAME = "metadata.json"
-
-
-def _is_valid_uuid(val: Union[str, UUID, None]) -> bool:
-    try:
-        UUID(str(val))
-        return True
-    except (ValueError, TypeError):
-        return False
 
 
 class WorkflowConfigResolutionResult(UniversalBaseModel):
@@ -88,7 +80,7 @@ def _resolve_workflow_config(
     elif workflow_deployment:
         module = (
             f"workflow_{workflow_deployment.split('-')[0]}"
-            if _is_valid_uuid(workflow_deployment)
+            if is_valid_uuid(workflow_deployment)
             else snake_case(workflow_deployment)
         )
         workflow_config = WorkflowConfig(
