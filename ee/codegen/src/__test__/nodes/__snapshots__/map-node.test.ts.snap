@@ -43,9 +43,6 @@ class MapNode(BaseMapNode):
     ]
     subworkflow = MapNodeWorkflow
     max_concurrency = 4
-
-    class Outputs(BaseMapNode.Outputs):
-        pass
 "
 `;
 
@@ -95,8 +92,5 @@ class MapNode(BaseMapNode):
     ]
     subworkflow = MapNodeWorkflow
     max_concurrency = 4
-
-    class Outputs(BaseMapNode.Outputs):
-        pass
 "
 `;

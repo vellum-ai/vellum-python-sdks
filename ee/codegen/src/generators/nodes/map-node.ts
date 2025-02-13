@@ -2,7 +2,6 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
-import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { MapNodeContext } from "src/context/node-context/map-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
@@ -60,9 +59,6 @@ export class MapNode extends BaseNestedWorkflowNode<
       statements.push(concurrencyField);
     }
 
-    const outputsClass = this.generateOutputsClass();
-    statements.push(outputsClass);
-
     return statements;
   }
 
@@ -93,41 +89,6 @@ export class MapNode extends BaseNestedWorkflowNode<
     );
 
     return statements;
-  }
-
-  private generateOutputsClass(): python.Class {
-    const nodeBaseClassRef = this.getNodeBaseClass();
-    const outputsClass = python.class_({
-      name: OUTPUTS_CLASS_NAME,
-      extends_: [
-        python.reference({
-          name: nodeBaseClassRef.name,
-          modulePath: nodeBaseClassRef.modulePath,
-          alias: nodeBaseClassRef.alias,
-          attribute: [OUTPUTS_CLASS_NAME],
-        }),
-      ],
-    });
-
-    const nestedWorkflowContext = this.getNestedWorkflowContextByName(
-      BaseNestedWorkflowNode.subworkflowNestedProjectName
-    );
-
-    nestedWorkflowContext.workflowOutputContexts.forEach((outputContext) => {
-      const outputName = outputContext.name;
-      const outputField = python.field({
-        name: outputName,
-        initializer: python.reference({
-          name: nestedWorkflowContext.workflowClassName,
-          modulePath: nestedWorkflowContext.modulePath,
-          attribute: [OUTPUTS_CLASS_NAME, outputName],
-        }),
-      });
-
-      outputsClass.add(outputField);
-    });
-
-    return outputsClass;
   }
 
   protected getNestedWorkflowProject(): WorkflowProjectGenerator {
