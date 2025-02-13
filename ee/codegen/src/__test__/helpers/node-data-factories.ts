@@ -1623,3 +1623,31 @@ export function mapNodeDataFactory(): MapNode {
     ],
   };
 }
+
+export function inlineSubworkflowNodeDataFactory(): SubworkflowNode {
+  const entrypoint = entrypointNodeDataFactory();
+  const templatingNode = templatingNodeFactory();
+  return {
+    id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
+    type: "SUBWORKFLOW",
+    data: {
+      variant: "INLINE",
+      label: "Inline Subworkflow Node",
+      workflowRawData: {
+        nodes: [entrypoint, templatingNode],
+        edges: edgesFactory([[entrypoint, templatingNode]]),
+      },
+      inputVariables: [],
+      outputVariables: [
+        {
+          id: "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb",
+          key: "final-output",
+          type: "STRING",
+        },
+      ],
+      sourceHandleId: "4878f525-d4a3-4e3d-9221-e146f282a96a",
+      targetHandleId: "3fe4b4a6-5ed2-4307-ac1c-02389337c4f2",
+    },
+    inputs: [],
+  };
+}

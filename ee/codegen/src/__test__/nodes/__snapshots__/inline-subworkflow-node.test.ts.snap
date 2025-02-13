@@ -1,0 +1,43 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`InlineSubworkflowNode > basic > inline subworkflow node display file 1`] = `
+"# flake8: noqa: F401, F403
+
+from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ....nodes.inline_subworkflow_node import InlineSubworkflowNode
+from .nodes import *
+from .workflow import *
+
+
+class InlineSubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[InlineSubworkflowNode]):
+    label = "Inline Subworkflow Node"
+    node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
+    target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
+    workflow_input_ids_by_name = {}
+    node_input_ids_by_name = {}
+    output_display = {}
+    port_displays = {
+        InlineSubworkflowNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`InlineSubworkflowNode > basic > inline subworkflow node file 1`] = `
+"from vellum.workflows.nodes.displayable import InlineSubworkflowNode as BaseInlineSubworkflowNode
+
+from .workflow import InlineSubworkflowNodeWorkflow
+
+
+class InlineSubworkflowNode(BaseInlineSubworkflowNode):
+    subworkflow = InlineSubworkflowNodeWorkflow
+
+    class Outputs(BaseInlineSubworkflowNode.Outputs):
+        pass
+"
+`;
