@@ -21,7 +21,8 @@ def custom_replace(s, old, new):
 
     def encode(obj):
         try:
-            return json.dumps(obj, cls=DefaultStateEncoder)
+            if not isinstance(s, str):
+                return json.dumps(obj, cls=DefaultStateEncoder)
         except TypeError:
             return str(obj)
 
