@@ -14,8 +14,26 @@ export type CodegenErrorCode =
   | "POST_PROCESSING_ERROR"
   | "VALUE_GENERATION_ERROR";
 
+export type CodegenErrorSeverity = "ERROR" | "WARNING";
+
 export abstract class BaseCodegenError extends Error {
   abstract code: CodegenErrorCode;
+
+  public readonly severity: CodegenErrorSeverity;
+
+  constructor(message: string, severity?: CodegenErrorSeverity) {
+    super(message);
+
+    this.severity = severity ?? "ERROR";
+  }
+
+  public log() {
+    if (this.severity === "ERROR") {
+      console.error(this.message);
+    } else {
+      console.warn(this.message);
+    }
+  }
 }
 
 /**

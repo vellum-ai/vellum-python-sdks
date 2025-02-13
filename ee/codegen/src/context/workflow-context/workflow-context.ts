@@ -10,6 +10,7 @@ import { SDK_MODULE_PATHS } from "src/context/workflow-context/types";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import {
   BaseCodegenError,
+  CodegenErrorSeverity,
   NodeDefinitionGenerationError,
   NodeNotFoundError,
   NodePortGenerationError,
@@ -444,8 +445,11 @@ export class WorkflowContext {
   }
 
   public addError(error: BaseCodegenError): void {
-    if (this.strict) {
+    if (this.strict && error.severity === "ERROR") {
       throw error;
+    }
+    if (error.severity === "WARNING") {
+      error.log();
     }
     const errorExists = this.errors.some(
       (existingError) => existingError.message === error.message
@@ -456,8 +460,12 @@ export class WorkflowContext {
     }
   }
 
-  public getErrors(): BaseCodegenError[] {
-    return [...this.errors];
+  public getErrors(severity?: CodegenErrorSeverity): BaseCodegenError[] {
+    const allErrors = [...this.errors];
+    if (!severity) {
+      return allErrors;
+    }
+    return allErrors.filter((error) => error.severity === severity);
   }
 
   public isClassNameUsed(className: string): boolean {

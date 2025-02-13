@@ -15,7 +15,7 @@ export class ErrorLogFile extends BasePersistedFile {
   }
 
   public async persist(): Promise<void> {
-    const errors = this.workflowContext.getErrors();
+    const errors = this.workflowContext.getErrors("ERROR");
     if (errors.length === 0) {
       return;
     }
