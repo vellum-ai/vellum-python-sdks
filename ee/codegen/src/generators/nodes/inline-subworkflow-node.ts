@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
-import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
@@ -77,52 +76,6 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     );
 
     return statements;
-  }
-
-  protected getOutputDisplay(): python.Field {
-    const nestedWorkflowContext = this.getNestedWorkflowContextByName(
-      BaseNestedWorkflowNode.subworkflowNestedProjectName
-    );
-    const outputVariableContexts = Array.from(
-      nestedWorkflowContext.outputVariableContextsById.values()
-    );
-
-    return python.field({
-      name: "output_display",
-      initializer: python.TypeInstantiation.dict(
-        outputVariableContexts.map((outputContext) => {
-          return {
-            key: python.reference({
-              name: this.nodeContext.nodeClassName,
-              modulePath: this.nodeContext.nodeModulePath,
-              attribute: [OUTPUTS_CLASS_NAME, outputContext.name],
-            }),
-            value: python.instantiateClass({
-              classReference: python.reference({
-                name: "NodeOutputDisplay",
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .NODE_DISPLAY_TYPES_MODULE_PATH,
-              }),
-              arguments_: [
-                python.methodArgument({
-                  name: "id",
-                  value: python.TypeInstantiation.uuid(
-                    outputContext.getOutputVariableId()
-                  ),
-                }),
-                python.methodArgument({
-                  name: "name",
-                  value: python.TypeInstantiation.str(
-                    outputContext.getRawName()
-                  ),
-                }),
-              ],
-            }),
-          };
-        })
-      ),
-    });
   }
 
   protected getNestedWorkflowProject(): WorkflowProjectGenerator {

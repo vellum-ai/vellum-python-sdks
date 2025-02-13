@@ -153,52 +153,6 @@ export class MapNode extends BaseNestedWorkflowNode<
     });
   }
 
-  protected getOutputDisplay(): python.Field {
-    const nestedWorkflowContext = this.getNestedWorkflowContextByName(
-      BaseNestedWorkflowNode.subworkflowNestedProjectName
-    );
-    const outputVariableContexts = Array.from(
-      nestedWorkflowContext.outputVariableContextsById.values()
-    );
-
-    return python.field({
-      name: "output_display",
-      initializer: python.TypeInstantiation.dict(
-        outputVariableContexts.map((outputContext) => {
-          return {
-            key: python.reference({
-              name: this.nodeContext.nodeClassName,
-              modulePath: this.nodeContext.nodeModulePath,
-              attribute: [OUTPUTS_CLASS_NAME, outputContext.name],
-            }),
-            value: python.instantiateClass({
-              classReference: python.reference({
-                name: "NodeOutputDisplay",
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .NODE_DISPLAY_TYPES_MODULE_PATH,
-              }),
-              arguments_: [
-                python.methodArgument({
-                  name: "id",
-                  value: python.TypeInstantiation.uuid(
-                    outputContext.getOutputVariableId()
-                  ),
-                }),
-                python.methodArgument({
-                  name: "name",
-                  value: python.TypeInstantiation.str(
-                    outputContext.getRawName()
-                  ),
-                }),
-              ],
-            }),
-          };
-        })
-      ),
-    });
-  }
-
   protected getErrorOutputId(): string | undefined {
     return this.nodeData.data.errorOutputId;
   }

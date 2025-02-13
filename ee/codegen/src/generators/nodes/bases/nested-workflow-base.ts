@@ -1,5 +1,8 @@
+import { python } from "@fern-api/python-ast";
+
 import { BaseNode } from "./base";
 
+import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
@@ -81,5 +84,51 @@ export abstract class BaseNestedWorkflowNode<
         nestedWorkflowContext,
       ],
     ]);
+  }
+
+  protected getOutputDisplay(): python.Field {
+    const nestedWorkflowContext = this.getNestedWorkflowContextByName(
+      BaseNestedWorkflowNode.subworkflowNestedProjectName
+    );
+    const outputVariableContexts = Array.from(
+      nestedWorkflowContext.outputVariableContextsById.values()
+    );
+
+    return python.field({
+      name: "output_display",
+      initializer: python.TypeInstantiation.dict(
+        outputVariableContexts.map((outputContext) => {
+          return {
+            key: python.reference({
+              name: this.nodeContext.nodeClassName,
+              modulePath: this.nodeContext.nodeModulePath,
+              attribute: [OUTPUTS_CLASS_NAME, outputContext.name],
+            }),
+            value: python.instantiateClass({
+              classReference: python.reference({
+                name: "NodeOutputDisplay",
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_TYPES_MODULE_PATH,
+              }),
+              arguments_: [
+                python.methodArgument({
+                  name: "id",
+                  value: python.TypeInstantiation.uuid(
+                    outputContext.getOutputVariableId()
+                  ),
+                }),
+                python.methodArgument({
+                  name: "name",
+                  value: python.TypeInstantiation.str(
+                    outputContext.getRawName()
+                  ),
+                }),
+              ],
+            }),
+          };
+        })
+      ),
+    });
   }
 }
