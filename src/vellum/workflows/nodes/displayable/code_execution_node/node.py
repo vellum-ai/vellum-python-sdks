@@ -93,14 +93,14 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         log: str
 
     def run(self) -> Outputs:
-        input_values = self._compile_code_inputs()
         output_type = self.__class__.get_output_type()
         code = self._resolve_code()
         if not self.packages and self.runtime == "PYTHON_3_11_6":
-            logs, result = run_code_inline(code, input_values, output_type)
+            logs, result = run_code_inline(code, self.code_inputs, output_type)
             return self.Outputs(result=result, log=logs)
 
         else:
+            input_values = self._compile_code_inputs()
             expected_output_type = primitive_type_to_vellum_variable_type(output_type)
 
             code_execution_result = self._context.vellum_client.execute_code(
@@ -132,7 +132,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                 compiled_inputs.append(
                     StringInput(
                         name=input_name,
-                        value=str(input_value),
+                        value=input_value,
                     )
                 )
             elif isinstance(input_value, VellumSecret):
@@ -194,7 +194,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                 )
             else:
                 raise NodeException(
-                    message=f"Unrecognized input type for input '{input_name}'",
+                    message=f"Unrecognized input type for input '{input_name}': {input_value.__class__.__name__}",
                     code=WorkflowErrorCode.INVALID_INPUTS,
                 )
 

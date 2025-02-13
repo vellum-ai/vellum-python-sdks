@@ -562,7 +562,7 @@ def main(arg1: List[Dict]) -> float:
     vellum_client.execute_code.assert_not_called()
 
 
-def test_run_node__code_execution_error(vellum_client):
+def test_run_node__code_execution_error():
     # GIVEN a node that will raise an error during execution
     class State(BaseState):
         pass
@@ -588,3 +588,25 @@ def main(arg1: int, arg2: int) -> int:
     # AND the error should contain the execution error details
     assert "name 'arg3' is not defined" in str(exc_info.value)
     assert exc_info.value.code == WorkflowErrorCode.INVALID_CODE
+
+
+def test_run_node__array_of_bools_input():
+    # GIVEN a node that will raise an error during execution
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, int]):
+        code = """\
+def main(arg1: list[bool]) -> int:
+    return len(arg1)
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "arg1": [True, False, True],
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+
+    # THEN it should raise a NodeException with the execution error
+    outputs = node.run()
+
+    # AND the error should contain the execution error details
+    assert outputs == {"result": 3, "log": ""}

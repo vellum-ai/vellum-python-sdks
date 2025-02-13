@@ -1,14 +1,13 @@
 import io
 import os
 import re
-from typing import Any, List, Tuple, Union, get_args, get_origin
+from typing import Any, Tuple, Union, get_args, get_origin
 
 from pydantic import BaseModel, ValidationError
 
-from vellum import VellumValue
-from vellum.client.types.code_executor_input import CodeExecutorInput
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.types.core import EntityInputsInterface
 
 
 def read_file_from_path(node_filepath: str, script_filepath: str) -> Union[str, None]:
@@ -70,12 +69,10 @@ def _clean_for_dict_wrapper(obj):
 
 def run_code_inline(
     code: str,
-    input_values: List[CodeExecutorInput],
+    inputs: EntityInputsInterface,
     output_type: Any,
 ) -> Tuple[str, Any]:
     log_buffer = io.StringIO()
-
-    VELLUM_TYPES = get_args(VellumValue)
 
     def wrap_value(value):
         if isinstance(value, list):
@@ -84,7 +81,7 @@ def run_code_inline(
                     # Convert VellumValue to dict with its fields
                     (
                         item.model_dump()
-                        if isinstance(item, VELLUM_TYPES)
+                        if isinstance(item, BaseModel)
                         else _clean_for_dict_wrapper(item) if isinstance(item, (dict, list)) else item
                     )
                     for item in value
@@ -93,11 +90,11 @@ def run_code_inline(
         return _clean_for_dict_wrapper(value)
 
     exec_globals = {
-        "__arg__inputs": {input_value.name: wrap_value(input_value.value) for input_value in input_values},
+        "__arg__inputs": {name: wrap_value(value) for name, value in inputs.items()},
         "__arg__out": None,
         "print": lambda *args, **kwargs: log_buffer.write(f"{' '.join(args)}\n"),
     }
-    run_args = [f"{input_value.name}=__arg__inputs['{input_value.name}']" for input_value in input_values]
+    run_args = [f"{name}=__arg__inputs['{name}']" for name in inputs.keys()]
     execution_code = f"""\
 {code}
 
