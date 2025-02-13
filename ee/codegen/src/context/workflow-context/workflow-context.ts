@@ -47,8 +47,9 @@ export declare namespace WorkflowContext {
     portContextByName?: PortContextById;
     vellumApiKey: string;
     workflowRawEdges: WorkflowEdge[];
-    strict?: boolean;
-    codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
+    strict: boolean;
+    codeExecutionNodeCodeRepresentationOverride: "STANDALONE" | "INLINE";
+    disableFormatting: boolean;
   };
 }
 
@@ -113,8 +114,9 @@ export class WorkflowContext {
 
   public readonly codeExecutionNodeCodeRepresentationOverride:
     | "STANDALONE"
-    | "INLINE"
-    | undefined;
+    | "INLINE";
+
+  public readonly disableFormatting: boolean;
 
   // Track what class names are used within this workflow so that we can ensure name uniqueness
   private readonly classNames: Set<string> = new Set();
@@ -131,8 +133,9 @@ export class WorkflowContext {
     portContextByName,
     vellumApiKey,
     workflowRawEdges,
-    strict = false,
+    strict,
     codeExecutionNodeCodeRepresentationOverride,
+    disableFormatting,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -165,6 +168,8 @@ export class WorkflowContext {
     this.codeExecutionNodeCodeRepresentationOverride =
       codeExecutionNodeCodeRepresentationOverride;
 
+    this.disableFormatting = disableFormatting;
+
     this.outputVariableContextsById = new Map();
     this.globalOutputVariableContextsById =
       globalOutputVariableContextsById ?? new Map();
@@ -194,6 +199,7 @@ export class WorkflowContext {
       codeExecutionNodeCodeRepresentationOverride:
         this.codeExecutionNodeCodeRepresentationOverride,
       strict: this.strict,
+      disableFormatting: this.disableFormatting,
     });
   }
 

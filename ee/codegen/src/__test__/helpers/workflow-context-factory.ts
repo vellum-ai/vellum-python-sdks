@@ -1,17 +1,14 @@
 import { WorkflowContext } from "src/context";
 
-export function workflowContextFactory(
-  {
-    absolutePathToOutputDirectory,
-    moduleName,
-    workflowClassName,
-    workflowRawEdges,
-    codeExecutionNodeCodeRepresentationOverride,
-    strict = true,
-  }: Partial<WorkflowContext.Args> = {
-    codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
-  }
-): WorkflowContext {
+export function workflowContextFactory({
+  absolutePathToOutputDirectory,
+  moduleName,
+  workflowClassName,
+  workflowRawEdges,
+  codeExecutionNodeCodeRepresentationOverride = "STANDALONE",
+  strict = true,
+  disableFormatting = true,
+}: Partial<WorkflowContext.Args> = {}): WorkflowContext {
   return new WorkflowContext({
     absolutePathToOutputDirectory:
       absolutePathToOutputDirectory || "./src/__tests__/",
@@ -21,5 +18,6 @@ export function workflowContextFactory(
     workflowRawEdges: workflowRawEdges || [],
     strict,
     codeExecutionNodeCodeRepresentationOverride,
+    disableFormatting,
   });
 }

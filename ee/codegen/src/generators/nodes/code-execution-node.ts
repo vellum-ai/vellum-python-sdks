@@ -21,10 +21,7 @@ export class CodeExecutionNode extends BaseSingleFileNode<
 > {
   public declare readonly nodeContext: CodeExecutionContext;
   private readonly scriptFileContents: string;
-  private readonly codeRepresentationOverride:
-    | "STANDALONE"
-    | "INLINE"
-    | undefined;
+  private readonly codeRepresentationOverride: "STANDALONE" | "INLINE";
 
   constructor({
     workflowContext,

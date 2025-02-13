@@ -186,9 +186,11 @@ ${errors.slice(0, 3).map((err) => {
         workflowClassName,
         vellumApiKey,
         workflowRawEdges: rawEdges,
-        strict: rest.strict,
+        strict: rest.strict ?? false,
         codeExecutionNodeCodeRepresentationOverride:
-          rest.options?.codeExecutionNodeCodeRepresentationOverride,
+          rest.options?.codeExecutionNodeCodeRepresentationOverride ??
+          "STANDALONE",
+        disableFormatting: rest.options?.disableFormatting ?? false,
       });
       this.sandboxInputs = rest.sandboxInputs;
       this.options = rest.options;
@@ -241,7 +243,7 @@ ${errors.slice(0, 3).map((err) => {
     // collects errors raised by the rest of the codegen process
     await this.generateErrorLogFile().persist();
 
-    if (!this.options?.disableFormatting) {
+    if (!this.workflowContext.disableFormatting) {
       const setupCfgPath = this.resolvePythonConfigFilePath();
       const isortCmd = process.env.ISORT_CMD ?? "isort";
 

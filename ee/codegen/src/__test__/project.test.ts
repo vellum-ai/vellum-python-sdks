@@ -207,6 +207,9 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
       });
 
       await project.generateCode();
@@ -250,6 +253,9 @@ Encountered 1 error(s) while generating code:
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
         strict: true,
       });
 
@@ -332,6 +338,9 @@ Encountered 1 error(s) while generating code:
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
       });
 
       await project.generateCode();
@@ -452,6 +461,9 @@ class BadNode(TemplatingNode[BaseState, str]):
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
         sandboxInputs: [
           [
             {
@@ -593,6 +605,9 @@ class BadNode(TemplatingNode[BaseState, str]):
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
       });
 
       await project.generateCode();
@@ -710,6 +725,9 @@ class BadNode(TemplatingNode[BaseState, str]):
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
       });
 
       await project.generateCode();
@@ -807,6 +825,9 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
         strict: true,
       });
 
@@ -928,6 +949,9 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
         strict: false,
       });
 
@@ -1071,6 +1095,9 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
         strict: true,
       });
 

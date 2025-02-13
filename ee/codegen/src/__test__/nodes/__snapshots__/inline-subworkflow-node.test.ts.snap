@@ -3,13 +3,11 @@
 exports[`InlineSubworkflowNode > basic > inline subworkflow node display file 1`] = `
 "# flake8: noqa: F401, F403
 
-from uuid import UUID
-
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
+from ....nodes.inline_subworkflow_node import InlineSubworkflowNode
+from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
-
-from ....nodes.inline_subworkflow_node import InlineSubworkflowNode
 from .nodes import *
 from .workflow import *
 
@@ -34,7 +32,6 @@ class InlineSubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[InlineSubwor
 
 exports[`InlineSubworkflowNode > basic > inline subworkflow node file 1`] = `
 "from vellum.workflows.nodes.displayable import InlineSubworkflowNode as BaseInlineSubworkflowNode
-
 from .workflow import InlineSubworkflowNodeWorkflow
 
 

@@ -23,11 +23,10 @@ baz = foo + bar
 `;
 
 exports[`WorkflowProjectGenerator > inlude sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
-"from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
-from vellum.workflows.sandbox import WorkflowSandboxRunner
-
-from .inputs import Inputs
+"from vellum.workflows.sandbox import WorkflowSandboxRunner
 from .workflow import Workflow
+from .inputs import Inputs
+from vellum import ChatMessage, StringChatMessageContent, ArrayChatMessageContent
 
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
@@ -71,7 +70,6 @@ runner.run()
 exports[`WorkflowProjectGenerator > nodes with output values > should prioritize terminal node data over output values 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
-
 from .templating_node import TemplatingNode
 
 
