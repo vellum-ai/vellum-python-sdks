@@ -182,7 +182,9 @@ class VellumWorkflowDisplay(
                     else str(uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{workflow_output_display.name}"))
                 )
                 synthetic_display_data = (
-                    workflow_output_display.display_data.dict() if workflow_output_display.display_data else {}
+                    workflow_output_display.display_data.dict()
+                    if workflow_output_display.display_data
+                    else NodeDisplayData().dict()
                 )
                 nodes.append(
                     {

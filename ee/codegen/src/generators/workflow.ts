@@ -25,7 +25,6 @@ import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
 import {
-  NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
   WorkflowDisplayData,
   WorkflowEdge,
