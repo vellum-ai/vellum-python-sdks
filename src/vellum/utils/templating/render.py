@@ -1,8 +1,9 @@
 import json
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 from jinja2.sandbox import SandboxedEnvironment
 
+from vellum.utils.templating.constants import FilterFunc
 from vellum.utils.templating.exceptions import JinjaTemplateError
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
@@ -18,7 +19,7 @@ def render_sandboxed_jinja_template(
     *,
     template: str,
     input_values: Dict[str, Any],
-    jinja_custom_filters: Optional[Dict[str, Callable[[Union[str, bytes]], bool]]] = None,
+    jinja_custom_filters: Optional[Dict[str, FilterFunc]] = None,
     jinja_globals: Optional[Dict[str, Any]] = None,
 ) -> str:
     """Render a Jinja template within a sandboxed environment."""

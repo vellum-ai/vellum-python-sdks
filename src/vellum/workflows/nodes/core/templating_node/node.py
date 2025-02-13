@@ -1,6 +1,6 @@
-from typing import Any, Callable, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, Union, get_args
+from typing import Any, ClassVar, Dict, Generic, Mapping, Tuple, Type, TypeVar, get_args
 
-from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS
+from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS, FilterFunc
 from vellum.utils.templating.exceptions import JinjaTemplateError
 from vellum.utils.templating.render import render_sandboxed_jinja_template
 from vellum.workflows.errors import WorkflowErrorCode
@@ -54,7 +54,7 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
     inputs: ClassVar[EntityInputsInterface]
 
     jinja_globals: Dict[str, Any] = DEFAULT_JINJA_GLOBALS
-    jinja_custom_filters: Mapping[str, Callable[[Union[str, bytes]], bool]] = DEFAULT_JINJA_CUSTOM_FILTERS
+    jinja_custom_filters: Mapping[str, FilterFunc] = DEFAULT_JINJA_CUSTOM_FILTERS
 
     class Outputs(BaseNode.Outputs):
         """
