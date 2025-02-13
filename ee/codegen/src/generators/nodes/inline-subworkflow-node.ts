@@ -10,7 +10,6 @@ import {
   SubworkflowNode as SubworkflowNodeType,
   WorkflowRawData,
 } from "src/types/vellum";
-import { getNodeOutputIdFromNodeOutputWorkflowReference } from "src/utils/nodes";
 
 export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
   SubworkflowNodeType,
@@ -84,26 +83,19 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     const nestedWorkflowContext = this.getNestedWorkflowContextByName(
       BaseNestedWorkflowNode.subworkflowNestedProjectName
     );
+    const outputVariableContexts = Array.from(
+      nestedWorkflowContext.outputVariableContextsById.values()
+    );
 
     return python.field({
       name: "output_display",
       initializer: python.TypeInstantiation.dict(
-        nestedWorkflowContext.workflowOutputContexts.map((outputContext) => {
-          const outputName = outputContext.name;
-          const finalOutput = outputContext.getFinalOutputNodeData();
-          let outputId;
-          if ("type" in finalOutput) {
-            outputId = finalOutput.data.outputId;
-          } else {
-            outputId =
-              getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
-          }
-
+        outputVariableContexts.map((outputContext) => {
           return {
             key: python.reference({
               name: this.nodeContext.nodeClassName,
               modulePath: this.nodeContext.nodeModulePath,
-              attribute: [OUTPUTS_CLASS_NAME, outputName],
+              attribute: [OUTPUTS_CLASS_NAME, outputContext.name],
             }),
             value: python.instantiateClass({
               classReference: python.reference({
@@ -115,11 +107,15 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
               arguments_: [
                 python.methodArgument({
                   name: "id",
-                  value: python.TypeInstantiation.uuid(outputId),
+                  value: python.TypeInstantiation.uuid(
+                    outputContext.getOutputVariableId()
+                  ),
                 }),
                 python.methodArgument({
                   name: "name",
-                  value: python.TypeInstantiation.str(outputName),
+                  value: python.TypeInstantiation.str(
+                    outputContext.getRawName()
+                  ),
                 }),
               ],
             }),

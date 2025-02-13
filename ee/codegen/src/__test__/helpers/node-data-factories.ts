@@ -1627,6 +1627,7 @@ export function mapNodeDataFactory(): MapNode {
 export function inlineSubworkflowNodeDataFactory(): SubworkflowNode {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory();
+  const outputVariableId = "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb";
   return {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "SUBWORKFLOW",
@@ -1636,11 +1637,21 @@ export function inlineSubworkflowNodeDataFactory(): SubworkflowNode {
       workflowRawData: {
         nodes: [entrypoint, templatingNode],
         edges: edgesFactory([[entrypoint, templatingNode]]),
+        outputValues: [
+          {
+            outputVariableId,
+            value: {
+              type: "NODE_OUTPUT",
+              nodeId: templatingNode.id,
+              nodeOutputId: templatingNode.data.outputId,
+            },
+          },
+        ],
       },
       inputVariables: [],
       outputVariables: [
         {
-          id: "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb",
+          id: outputVariableId,
           key: "final-output",
           type: "STRING",
         },

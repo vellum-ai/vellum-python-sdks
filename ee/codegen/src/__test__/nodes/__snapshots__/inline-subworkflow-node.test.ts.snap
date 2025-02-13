@@ -6,7 +6,7 @@ exports[`InlineSubworkflowNode > basic > inline subworkflow node display file 1`
 from uuid import UUID
 
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ....nodes.inline_subworkflow_node import InlineSubworkflowNode
@@ -20,7 +20,11 @@ class InlineSubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[InlineSubwor
     target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     workflow_input_ids_by_name = {}
     node_input_ids_by_name = {}
-    output_display = {}
+    output_display = {
+        InlineSubworkflowNode.Outputs.final_output: NodeOutputDisplay(
+            id=UUID("edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb"), name="final-output"
+        )
+    }
     port_displays = {
         InlineSubworkflowNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))
     }

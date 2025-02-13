@@ -362,6 +362,14 @@ ${errors.slice(0, 3).map((err) => {
       this.workflowContext.addInputVariableContext(inputVariableContext);
     });
 
+    this.workflowVersionExecConfig.outputVariables.forEach((outputVariable) => {
+      const outputVariableContext = new OutputVariableContext({
+        outputVariableData: outputVariable,
+        workflowContext: this.workflowContext,
+      });
+      this.workflowContext.addOutputVariableContext(outputVariableContext);
+    });
+
     const entrypointNodes =
       this.workflowVersionExecConfig.workflowRawData.nodes.filter(
         (n): n is EntrypointNode => n.type === "ENTRYPOINT"
@@ -423,13 +431,6 @@ ${errors.slice(0, 3).map((err) => {
 
     const inputs = codegen.inputs({
       workflowContext: this.workflowContext,
-    });
-
-    this.workflowVersionExecConfig.outputVariables.forEach((outputVariable) => {
-      const outputVariableContext = new OutputVariableContext({
-        outputVariableData: outputVariable,
-      });
-      this.workflowContext.addOutputVariableContext(outputVariableContext);
     });
 
     const nodeIds = nodesToGenerate.map((nodeData) => nodeData.id);
