@@ -18,9 +18,6 @@ def custom_replace(s, old, new):
     """
     Custom replace filter that uses DefaultStateEncoder for conversion
     """
-    import json
-
-    from vellum.workflows.state.encoder import DefaultStateEncoder
 
     def encode(obj):
         try:
