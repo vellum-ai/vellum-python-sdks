@@ -104,12 +104,10 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
         this.nodeData.type === "SUBWORKFLOW" &&
         this.nodeData.data.variant === "DEPLOYMENT"
       ) {
-        this.workflowContext.addError(
-          new NodeOutputNotFoundError(
-            `Could not find subworkflow deployment output with id ${outputId}`
-          )
+        console.warn(
+          `Could not find subworkflow deployment output with id ${outputId}`
         );
-        return;
+        return undefined;
       }
 
       throw new NodeOutputNotFoundError(
