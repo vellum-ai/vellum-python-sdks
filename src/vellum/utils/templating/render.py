@@ -14,25 +14,6 @@ def finalize(obj: Any) -> str:
     return str(obj)
 
 
-def custom_replace(s, old, new):
-    """
-    Custom replace filter that uses DefaultStateEncoder for conversion
-    """
-
-    def encode(obj):
-        try:
-            if not isinstance(s, str):
-                return json.dumps(obj, cls=DefaultStateEncoder)
-        except TypeError:
-            return str(obj)
-
-    s_str = encode(s)
-    old_str = encode(old)
-    new_str = encode(new)
-
-    return s_str.replace(old_str, new_str)
-
-
 def render_sandboxed_jinja_template(
     *,
     template: str,
@@ -51,7 +32,6 @@ def render_sandboxed_jinja_template(
             "cls": DefaultStateEncoder,
         }
 
-        environment.filters["replace"] = custom_replace
         if jinja_custom_filters:
             environment.filters.update(jinja_custom_filters)
 

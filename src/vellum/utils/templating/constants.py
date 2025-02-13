@@ -10,7 +10,7 @@ import pydash
 import pytz
 import yaml
 
-from vellum.utils.templating.custom_filters import is_valid_json_string
+from vellum.utils.templating.custom_filters import is_valid_json_string, replace
 
 DEFAULT_JINJA_GLOBALS: Dict[str, Any] = {
     "datetime": datetime,
@@ -25,4 +25,5 @@ DEFAULT_JINJA_GLOBALS: Dict[str, Any] = {
 }
 DEFAULT_JINJA_CUSTOM_FILTERS: Dict[str, Callable[[Union[str, bytes]], bool]] = {
     "is_valid_json_string": is_valid_json_string,
+    "replace": replace,
 }
