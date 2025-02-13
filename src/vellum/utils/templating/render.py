@@ -50,10 +50,9 @@ def render_sandboxed_jinja_template(
             "cls": DefaultStateEncoder,
         }
 
+        environment.filters["replace"] = custom_replace
         if jinja_custom_filters:
             environment.filters.update(jinja_custom_filters)
-
-        environment.filters["replace"] = custom_replace
 
         jinja_template = environment.from_string(template)
 
