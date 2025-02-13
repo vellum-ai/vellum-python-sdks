@@ -5,7 +5,7 @@ import {
 } from "vellum-ai/api";
 import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
-import { beforeEach, vi } from "vitest";
+import { beforeEach, expect, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
@@ -354,7 +354,10 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
   it("workflow context should have the error logged", async () => {
     const errors = workflowContext.getErrors();
     expect(errors).toHaveLength(1);
-    expect(errors[0]?.message).toContain(
+
+    const error = errors[0];
+    expect(error?.severity).toBe("WARNING");
+    expect(error?.message).toContain(
       "Could not find subworkflow deployment output with id some-non-existent-subworkflow-output-id"
     );
   });
