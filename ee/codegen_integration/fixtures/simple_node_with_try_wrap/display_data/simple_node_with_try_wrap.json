@@ -142,7 +142,8 @@
             "<adornment>"
           ],
           "name": "TryNode"
-        }
+        },
+        "adornments": []
       },
       {
         "id": "54803ff7-9afd-4eb1-bff3-242345d3443d",

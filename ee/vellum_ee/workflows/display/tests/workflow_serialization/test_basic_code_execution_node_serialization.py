@@ -596,6 +596,7 @@ def test_serialize_workflow__try_wrapped():
             ],
             "name": "TryNode",
         },
+        "adornments": [],
     }
 
     final_output_nodes = workflow_raw_data["nodes"][2:]

@@ -23,6 +23,7 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
+        adornments = None
 
         inner_node = get_wrapped_node(node)
         if not inner_node:
@@ -39,6 +40,9 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
                 pass
 
             return TryBaseNodeDisplay().serialize(display_context)
+        else:
+            # If the wrapped node is a Vellum node, we backfill adornments
+            adornments = []
 
         # We need the node display class of the underlying node because
         # it contains the logic for serializing the node and potential display overrides
@@ -61,6 +65,8 @@ class BaseTryNodeDisplay(BaseNodeVellumDisplay[_TryNodeType], Generic[_TryNodeTy
                     ]
                 )
                 serialized_node_definition["name"] = node.__name__
+
+        serialized_node["adornments"] = adornments
 
         return serialized_node
 
