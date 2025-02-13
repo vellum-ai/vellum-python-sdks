@@ -20,6 +20,8 @@ import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-fa
 import { workflowOutputContextFactory } from "src/__test__/helpers/workflow-output-context-factory";
 import * as codegen from "src/codegen";
 import { createNodeContext, WorkflowContext } from "src/context";
+import { OutputVariableContext } from "src/context/output-variable-context";
+import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { WorkflowGenerationError } from "src/generators/errors";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { WorkflowEdge } from "src/types/vellum";
@@ -90,6 +92,16 @@ describe("Workflow", () => {
 
       const inputs = codegen.inputs({ workflowContext });
 
+      workflowContext.addOutputVariableContext(
+        new OutputVariableContext({
+          outputVariableData: {
+            id: "output-id",
+            key: "query",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
       workflowContext.addWorkflowOutputContext(
         workflowOutputContextFactory({ workflowContext })
       );
@@ -301,6 +313,54 @@ describe("Workflow", () => {
       );
 
       const inputs = codegen.inputs({ workflowContext });
+      const workflow = codegen.workflow({
+        moduleName,
+        workflowContext,
+        inputs,
+      });
+
+      workflow.getWorkflowFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should generate correct code with an output variable mapped to an input variable", async () => {
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "input-variable-id",
+            key: "query",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      const inputs = codegen.inputs({ workflowContext });
+
+      workflowContext.addOutputVariableContext(
+        new OutputVariableContext({
+          outputVariableData: {
+            id: "output-variable-id",
+            key: "passthrough",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      workflowContext.addWorkflowOutputContext(
+        new WorkflowOutputContext({
+          workflowOutputValue: {
+            outputVariableId: "output-variable-id",
+            value: {
+              type: "WORKFLOW_INPUT",
+              inputVariableId: "input-variable-id",
+            },
+          },
+          workflowContext,
+        })
+      );
+
       const workflow = codegen.workflow({
         moduleName,
         workflowContext,

@@ -3,7 +3,8 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { OUTPUTS_CLASS_NAME } from "src/constants";
+import { WorkflowValueDescriptor } from "./workflow-value-descriptor";
+
 import { WorkflowContext } from "src/context";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
 
@@ -29,16 +30,12 @@ export class WorkflowOutput extends AstNode {
   }
 
   private generateWorkflowOutput(): Field {
-    const terminalNodeId = this.workflowOutputContext.getOutputNodeId();
-    const terminalNodeContext =
-      this.workflowContext.getNodeContext(terminalNodeId);
-
     const workflowOutput = python.field({
       name: this.workflowOutputContext.name,
-      initializer: python.reference({
-        name: terminalNodeContext.nodeClassName,
-        modulePath: terminalNodeContext.nodeModulePath,
-        attribute: [OUTPUTS_CLASS_NAME, "value"],
+      initializer: new WorkflowValueDescriptor({
+        workflowContext: this.workflowContext,
+        workflowValueDescriptor:
+          this.workflowOutputContext.getWorkflowValueDescriptor(),
       }),
     });
 

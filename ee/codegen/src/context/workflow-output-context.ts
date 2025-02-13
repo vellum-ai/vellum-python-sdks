@@ -1,12 +1,10 @@
-import { isEmpty, isNil } from "lodash";
-
 import { WorkflowContext } from "src/context/workflow-context";
 import { WorkflowOutputGenerationError } from "src/generators/errors";
 import {
   FinalOutputNode as FinalOutputNodeType,
   WorkflowOutputValue as WorkflowOutputValueType,
+  WorkflowValueDescriptor,
 } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getNodeIdFromNodeOutputWorkflowReference } from "src/utils/nodes";
 
 export declare namespace WorkflowOutputContext {
@@ -24,14 +22,14 @@ export class WorkflowOutputContext {
   public readonly name: string;
 
   constructor({
-    terminalNodeData,
     workflowContext,
+    terminalNodeData,
     workflowOutputValue,
   }: WorkflowOutputContext.Args) {
     this.workflowContext = workflowContext;
     this.terminalNodeData = terminalNodeData;
     this.workflowOutputValue = workflowOutputValue;
-    this.name = this.generateSanitizedOutputVariableName();
+    this.name = this.getOutputVariableName();
   }
 
   public getOutputNodeId(): string {
@@ -67,12 +65,28 @@ export class WorkflowOutputContext {
     }
   }
 
-  private generateSanitizedOutputVariableName(): string {
-    const defaultName = "output_";
+  public getWorkflowValueDescriptor(): WorkflowValueDescriptor {
+    if (this.workflowOutputValue) {
+      return this.workflowOutputValue.value;
+    } else if (this.terminalNodeData) {
+      return {
+        type: "NODE_OUTPUT",
+        nodeId: this.terminalNodeData.id,
+        nodeOutputId: this.terminalNodeData.data.outputId,
+      };
+    } else {
+      throw new WorkflowOutputGenerationError(
+        "Expected workflow output value or terminal node data to be defined"
+      );
+    }
+  }
 
-    let rawOutputVariableName: string;
+  private getOutputVariableName(): string {
     if (this.terminalNodeData) {
-      rawOutputVariableName = this.terminalNodeData.data.name;
+      const outputVariable = this.workflowContext.getOutputVariableContextById(
+        this.terminalNodeData.data.outputId
+      );
+      return outputVariable.name;
     } else if (this.workflowOutputValue) {
       const outputVariable = this.workflowContext.getOutputVariableContextById(
         this.workflowOutputValue.outputVariableId
@@ -83,9 +97,5 @@ export class WorkflowOutputContext {
         "Expected either workflow output value or terminal node data to be defined"
       );
     }
-
-    return !isNil(rawOutputVariableName) && !isEmpty(rawOutputVariableName)
-      ? toPythonSafeSnakeCase(rawOutputVariableName, "output")
-      : defaultName;
   }
 }

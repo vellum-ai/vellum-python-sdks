@@ -359,7 +359,6 @@ export class WorkflowContext {
     workflowOutputContext: WorkflowOutputContext
   ): void {
     this.workflowOutputContexts.push(workflowOutputContext);
-    this.addUsedOutputVariableName(workflowOutputContext.name);
   }
 
   public isNodeModuleNameUsed(nodeModuleName: string): boolean {

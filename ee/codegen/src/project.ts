@@ -17,6 +17,7 @@ import {
 } from "./constants";
 import { createNodeContext, WorkflowContext } from "./context";
 import { InputVariableContext } from "./context/input-variable-context";
+import { WorkflowOutputContext } from "./context/workflow-output-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "./generators";
 import {
   NodeDefinitionGenerationError,
@@ -48,7 +49,6 @@ import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subwo
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import { OutputVariableContext } from "src/context/output-variable-context";
-import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { ApiNode } from "src/generators/nodes/api-node";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
@@ -362,13 +362,60 @@ ${errors.slice(0, 3).map((err) => {
       this.workflowContext.addInputVariableContext(inputVariableContext);
     });
 
-    this.workflowVersionExecConfig.outputVariables.forEach((outputVariable) => {
-      const outputVariableContext = new OutputVariableContext({
-        outputVariableData: outputVariable,
-        workflowContext: this.workflowContext,
+    // TODO: Invert / remove this logic once output values are default and terminal nodes don't exist.
+    // We are prioritizing terminal nodes as a temporary workaround to bad data from output values lingering in workflows.
+    const terminalNodes =
+      this.workflowVersionExecConfig.workflowRawData.nodes.filter(
+        (nodeData): nodeData is FinalOutputNodeType =>
+          nodeData.type === "TERMINAL"
+      );
+
+    if (terminalNodes.length > 0) {
+      // Create from terminal nodes
+      terminalNodes.forEach((nodeData) => {
+        const outputVariableContext = new OutputVariableContext({
+          outputVariableData: {
+            id: nodeData.data.outputId,
+            key: nodeData.data.name,
+            type: nodeData.data.outputType,
+          },
+          workflowContext: this.workflowContext,
+        });
+        this.workflowContext.addOutputVariableContext(outputVariableContext);
+
+        const workflowOutputContext = new WorkflowOutputContext({
+          workflowContext: this.workflowContext,
+          terminalNodeData: nodeData,
+        });
+        this.workflowContext.addWorkflowOutputContext(workflowOutputContext);
       });
-      this.workflowContext.addOutputVariableContext(outputVariableContext);
-    });
+    } else if (!isNilOrEmpty(this.workflowVersionExecConfig.outputVariables)) {
+      const outputValuesById = Object.fromEntries(
+        this.workflowVersionExecConfig.workflowRawData.outputValues?.map(
+          (outputValue) => [outputValue.outputVariableId, outputValue]
+        ) ?? []
+      );
+      this.workflowVersionExecConfig.outputVariables.forEach(
+        (outputVariable) => {
+          const outputVariableContext = new OutputVariableContext({
+            outputVariableData: outputVariable,
+            workflowContext: this.workflowContext,
+          });
+          this.workflowContext.addOutputVariableContext(outputVariableContext);
+
+          const workflowOutput = outputValuesById[outputVariable.id];
+          if (workflowOutput) {
+            const workflowOutputContext = new WorkflowOutputContext({
+              workflowContext: this.workflowContext,
+              workflowOutputValue: workflowOutput,
+            });
+            this.workflowContext.addWorkflowOutputContext(
+              workflowOutputContext
+            );
+          }
+        }
+      );
+    }
 
     const entrypointNodes =
       this.workflowVersionExecConfig.workflowRawData.nodes.filter(
@@ -393,41 +440,6 @@ ${errors.slice(0, 3).map((err) => {
         return nodeData;
       })
     );
-
-    // TODO: Invert / remove this logic once output values are default and terminal nodes don't exist.
-    // We are prioritizing terminal nodes as a temporary workaround to bad data from output values lingering in workflows.
-    const terminalNodes =
-      this.workflowVersionExecConfig.workflowRawData.nodes.filter(
-        (nodeData) => nodeData.type === "TERMINAL"
-      );
-
-    if (terminalNodes.length > 0) {
-      // Create from terminal nodes
-      terminalNodes.forEach((nodeData) => {
-        this.workflowContext.addWorkflowOutputContext(
-          new WorkflowOutputContext({
-            workflowContext: this.workflowContext,
-            terminalNodeData: nodeData as FinalOutputNodeType,
-          })
-        );
-      });
-    } else if (
-      !isNilOrEmpty(this.workflowVersionExecConfig.workflowRawData.outputValues)
-    ) {
-      // Fall back to output values if no terminal nodes
-      this.workflowVersionExecConfig.workflowRawData.outputValues?.forEach(
-        (outputValue) => {
-          if (outputValue) {
-            this.workflowContext.addWorkflowOutputContext(
-              new WorkflowOutputContext({
-                workflowContext: this.workflowContext,
-                workflowOutputValue: outputValue,
-              })
-            );
-          }
-        }
-      );
-    }
 
     const inputs = codegen.inputs({
       workflowContext: this.workflowContext,
