@@ -21,7 +21,7 @@ import { WorkflowProjectGenerator } from "src/project";
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
 
-  function expectProjectFileToMatcheSnapshot(
+  function expectProjectFileToMatchSnapshot(
     project: WorkflowProjectGenerator,
     filePath: string[]
   ) {
@@ -32,6 +32,29 @@ describe("WorkflowProjectGenerator", () => {
     );
     expect(fs.existsSync(completeFilePath)).toBe(true);
     expect(fs.readFileSync(completeFilePath, "utf-8")).toMatchSnapshot();
+  }
+
+  function expectProjectFileToExist(
+    project: WorkflowProjectGenerator,
+    filePath: string[]
+  ) {
+    const completeFilePath = join(
+      tempDir,
+      project.getModuleName(),
+      ...filePath
+    );
+    expect(fs.existsSync(completeFilePath)).toBe(true);
+  }
+
+  function expectErrorLog(
+    project: WorkflowProjectGenerator,
+    expectedContents: string = ""
+  ) {
+    const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
+    const errorLog = fs.existsSync(errorLogPath)
+      ? fs.readFileSync(errorLogPath, "utf-8")
+      : "";
+    expect(errorLog).toBe(expectedContents);
   }
 
   beforeEach(async () => {
@@ -227,37 +250,17 @@ describe("WorkflowProjectGenerator", () => {
 
       await project.generateCode();
 
-      expect(
-        fs.existsSync(join(tempDir, project.getModuleName(), "workflow.py"))
-      ).toBe(true);
-      expect(
-        fs.existsSync(join(tempDir, project.getModuleName(), "nodes"))
-      ).toBe(true);
+      expectProjectFileToExist(project, ["workflow.py"]);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "bad_node.py"]);
 
-      const badNodePath = join(
-        tempDir,
-        project.getModuleName(),
-        "nodes",
-        "bad_node.py"
-      );
-      expect(fs.existsSync(badNodePath)).toBe(true);
-      expect(fs.readFileSync(badNodePath, "utf-8")).toBe(`\
-from vellum.workflows.nodes.displayable import TemplatingNode
-from vellum.workflows.state import BaseState
-
-
-class BadNode(TemplatingNode[BaseState, str]):
-    template = """foo"""
-    inputs = {}
-`);
-
-      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
-      expect(fs.existsSync(errorLogPath)).toBe(true);
-      expect(fs.readFileSync(errorLogPath, "utf-8")).toBe(`\
+      expectErrorLog(
+        project,
+        `\
 Encountered 1 error(s) while generating code:
 
 - Failed to generate attribute 'BadNode.inputs.other': Failed to find node with id 'node_that_doesnt_exist'
-`);
+`
+      );
     });
 
     it("should fail to generate code if a node fails in strict mode", async () => {
@@ -358,32 +361,11 @@ Encountered 1 error(s) while generating code:
 
       await project.generateCode();
 
-      expect(
-        fs.existsSync(join(tempDir, project.getModuleName(), "workflow.py"))
-      ).toBe(true);
-      expect(
-        fs.existsSync(join(tempDir, project.getModuleName(), "nodes"))
-      ).toBe(true);
-
-      const badNodePath = join(
-        tempDir,
-        project.getModuleName(),
-        "nodes",
-        "bad_node.py"
-      );
-      expect(fs.existsSync(badNodePath)).toBe(true);
-      expect(fs.readFileSync(badNodePath, "utf-8")).toBe(`\
-from vellum.workflows.nodes.displayable import TemplatingNode
-from vellum.workflows.state import BaseState
-
-
-class BadNode(TemplatingNode[BaseState, str]):
-    template = """foo"""
-    inputs = {}
-`);
+      expectProjectFileToExist(project, ["workflow.py"]);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "bad_node.py"]);
     });
   });
-  describe("inlude sandbox", () => {
+  describe("include sandbox", () => {
     const displayData = {
       workflow_raw_data: {
         nodes: [
@@ -547,9 +529,7 @@ class BadNode(TemplatingNode[BaseState, str]):
 
       await project.generateCode();
 
-      const sandboxPath = join(tempDir, project.getModuleName(), "sandbox.py");
-      expect(fs.existsSync(sandboxPath)).toBe(true);
-      expect(fs.readFileSync(sandboxPath, "utf-8")).toMatchSnapshot();
+      expectProjectFileToMatchSnapshot(project, ["sandbox.py"]);
     });
   });
   describe("runner config with no container image", () => {
@@ -625,12 +605,7 @@ class BadNode(TemplatingNode[BaseState, str]):
 
       await project.generateCode();
 
-      const workflowPath = join(
-        tempDir,
-        project.getModuleName(),
-        "workflow.py"
-      );
-      expect(fs.existsSync(workflowPath)).toBe(true);
+      expectProjectFileToMatchSnapshot(project, ["workflow.py"]);
     });
   });
 
@@ -745,10 +720,8 @@ class BadNode(TemplatingNode[BaseState, str]):
 
       await project.generateCode();
 
-      const nodesPath = join(tempDir, project.getModuleName(), "nodes");
-      const nodeFiles = fs.readdirSync(nodesPath);
-      expect(nodeFiles).toContain("templating_node.py");
-      expect(nodeFiles).toContain("templating_node_1.py");
+      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
+      expectProjectFileToExist(project, ["nodes", "templating_node_1.py"]);
     });
   });
 
@@ -846,15 +819,11 @@ baz = foo + bar
 
       await project.generateCode();
 
-      const scriptPath = join(
-        tempDir,
-        project.getModuleName(),
+      expectProjectFileToMatchSnapshot(project, [
         "nodes",
         "code_execution_node",
-        "script.py"
-      );
-      expect(fs.existsSync(scriptPath)).toBe(true);
-      expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
+        "script.py",
+      ]);
     });
   });
 
@@ -970,20 +939,8 @@ baz = foo + bar
 
       await project.generateCode();
 
-      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
-      const errorLog = fs.existsSync(errorLogPath)
-        ? fs.readFileSync(errorLogPath, "utf-8")
-        : "";
-      expect(errorLog).toBe("");
-
-      const scriptPath = join(
-        tempDir,
-        project.getModuleName(),
-        "nodes",
-        "first_node.py"
-      );
-      expect(fs.existsSync(scriptPath)).toBe(true);
-      expect(fs.readFileSync(scriptPath, "utf-8")).toMatchSnapshot();
+      expectErrorLog(project);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "first_node.py"]);
     });
   });
 
@@ -1116,14 +1073,8 @@ baz = foo + bar
 
       await project.generateCode();
 
-      const nodesPath = join(tempDir, project.getModuleName(), "nodes");
-      const nodeFiles = fs.readdirSync(nodesPath);
-      expect(nodeFiles).toContain("templating_node.py");
-      expect(nodeFiles).toContain("final_output.py");
-
-      const finalOutputPath = join(nodesPath, "final_output.py");
-      expect(fs.existsSync(finalOutputPath)).toBe(true);
-      expect(fs.readFileSync(finalOutputPath, "utf-8")).toMatchSnapshot();
+      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
     });
   });
 
@@ -1131,7 +1082,6 @@ baz = foo + bar
     const firstNodeId = uuidv4();
     const secondNodeId = uuidv4();
     const secondNodeOutputId = uuidv4();
-    const firstNodeDefaultPortId = uuidv4();
     const firstNodeTriggerId = uuidv4();
     const secondNodeTriggerId = uuidv4();
     const displayData = {
@@ -1216,28 +1166,24 @@ baz = foo + bar
       await project.generateCode();
 
       // There should be no errors
-      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
-      const errorLog = fs.existsSync(errorLogPath)
-        ? fs.readFileSync(errorLogPath, "utf-8")
-        : "";
-      expect(errorLog).toBe("");
+      expectErrorLog(project);
 
       // We should have generated a Workflow that has a graph containing only the first node
-      expectProjectFileToMatcheSnapshot(project, ["workflow.py"]);
+      expectProjectFileToMatchSnapshot(project, ["workflow.py"]);
 
       // We should have generated a file for the second node, even though it's not in the graph
-      expectProjectFileToMatcheSnapshot(project, ["nodes", "second_node.py"]);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "second_node.py"]);
 
       // We should have generated a display file for the second node
-      expectProjectFileToMatcheSnapshot(project, [
+      expectProjectFileToMatchSnapshot(project, [
         "display",
         "nodes",
         "second_node.py",
       ]);
 
       // We should have included the second node in our init files
-      expectProjectFileToMatcheSnapshot(project, ["nodes", "__init__.py"]);
-      expectProjectFileToMatcheSnapshot(project, [
+      expectProjectFileToMatchSnapshot(project, ["nodes", "__init__.py"]);
+      expectProjectFileToMatchSnapshot(project, [
         "display",
         "nodes",
         "__init__.py",

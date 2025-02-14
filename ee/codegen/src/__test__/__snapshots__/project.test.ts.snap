@@ -73,7 +73,29 @@ baz = foo + bar
 "
 `;
 
-exports[`WorkflowProjectGenerator > inlude sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
+exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to find invalid ports and target nodes 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class BadNode(TemplatingNode[BaseState, str]):
+    template = """foo"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to generate 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class BadNode(TemplatingNode[BaseState, str]):
+    template = """foo"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
 from .workflow import Workflow
 from .inputs import Inputs
@@ -127,5 +149,15 @@ from .templating_node import TemplatingNode
 class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = TemplatingNode.Outputs.result
+"
+`;
+
+exports[`WorkflowProjectGenerator > runner config with no container image > should handle a runner config with no container image 1`] = `
+"from vellum.workflows import BaseWorkflow
+from .nodes.templating_node import TemplatingNode
+
+
+class Workflow(BaseWorkflow):
+    graph = TemplatingNode
 "
 `;
