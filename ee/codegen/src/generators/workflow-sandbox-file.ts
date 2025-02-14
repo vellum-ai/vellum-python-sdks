@@ -5,8 +5,8 @@ import { isNil } from "lodash";
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { WorkflowSandboxInputs } from "src/types/vellum";
+import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
-import {removeEscapeCharacters} from "src/utils/casing";
 
 export declare namespace WorkflowSandboxFile {
   interface Args extends BasePersistedFile.Args {

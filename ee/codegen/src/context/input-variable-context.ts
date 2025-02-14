@@ -2,7 +2,10 @@ import { isEmpty, isNil } from "lodash";
 import { VellumVariable } from "vellum-ai/api/types";
 
 import { WorkflowContext } from "src/context/workflow-context";
-import {removeEscapeCharacters, toPythonSafeSnakeCase} from "src/utils/casing";
+import {
+  removeEscapeCharacters,
+  toPythonSafeSnakeCase,
+} from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
 export declare namespace InputVariableContext {
