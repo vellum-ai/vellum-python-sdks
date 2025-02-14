@@ -19,7 +19,7 @@ from vellum.client.types.vellum_audio import VellumAudio
 from vellum.client.types.vellum_image import VellumImage
 from vellum.prompts.blocks.exceptions import PromptCompilationError
 from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, CompiledPromptBlock, CompiledValuePromptBlock
-from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS
+from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS
 from vellum.utils.templating.render import render_sandboxed_jinja_template
 from vellum.utils.typing import cast_not_optional
 
@@ -74,7 +74,7 @@ def compile_prompt_blocks(
                 template=block.template,
                 input_values={name: inp.value for name, inp in inputs_by_name.items()},
                 jinja_custom_filters=DEFAULT_JINJA_CUSTOM_FILTERS,
-                jinja_globals=DEFAULT_JINJA_CUSTOM_FILTERS,
+                jinja_globals=DEFAULT_JINJA_GLOBALS,
             )
             jinja_content = StringVellumValue(value=rendered_template)
 

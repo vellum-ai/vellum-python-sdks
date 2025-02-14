@@ -37,6 +37,14 @@ from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, Compiled
                 CompiledValuePromptBlock(content=StringVellumValue(value="Repeat back to me Hello, world!")),
             ],
         ),
+        (
+            [JinjaPromptBlock(template="{{ re.search('test', message).group() }}")],
+            [PromptRequestStringInput(key="message", value="testing")],
+            [VellumVariable(id="1", type="STRING", key="message")],
+            [
+                CompiledValuePromptBlock(content=StringVellumValue(value="test")),
+            ],
+        ),
         # Rich Text
         (
             [
@@ -127,6 +135,7 @@ from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, Compiled
         "empty",
         "jinja-no-variables",
         "jinja-with-variables",
+        "jinja-with-custom-global",
         "rich-text-no-variables",
         "rich-text-with-variables",
         "chat-message",
