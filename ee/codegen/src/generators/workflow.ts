@@ -462,13 +462,13 @@ export class Workflow {
         initializer: python.TypeInstantiation.dict(
           this.workflowContext.workflowOutputContexts.map(
             (workflowOutputContext) => {
-              const outputId = workflowOutputContext.getOutputVariableId();
+              const outputVariable = workflowOutputContext.getOutputVariable();
 
               return {
                 key: python.reference({
                   name: this.workflowContext.workflowClassName,
                   modulePath: this.workflowContext.modulePath,
-                  attribute: [OUTPUTS_CLASS_NAME, workflowOutputContext.name],
+                  attribute: [OUTPUTS_CLASS_NAME, outputVariable.name],
                 }),
                 value: python.instantiateClass({
                   classReference: python.reference({
@@ -478,14 +478,16 @@ export class Workflow {
                   arguments_: [
                     python.methodArgument({
                       name: "id",
-                      value: python.TypeInstantiation.uuid(outputId),
+                      value: python.TypeInstantiation.uuid(
+                        outputVariable.getOutputVariableId()
+                      ),
                     }),
                     python.methodArgument({
                       name: "name",
                       value: python.TypeInstantiation.str(
                         // Intentionally use the raw name from the terminal node
                         // Rather than the sanitized name from the output context
-                        workflowOutputContext.name
+                        outputVariable.getRawName()
                       ),
                     }),
                   ],

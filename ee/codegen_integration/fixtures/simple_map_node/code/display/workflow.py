@@ -53,6 +53,6 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
     }
     output_displays = {
         Workflow.Outputs.final_output: WorkflowOutputDisplay(
-            id=UUID("d9269719-a7a2-4388-9b85-73e329a78d16"), name="final_output"
+            id=UUID("d9269719-a7a2-4388-9b85-73e329a78d16"), name="final-output"
         )
     }

@@ -31,7 +31,7 @@ export class WorkflowOutput extends AstNode {
 
   private generateWorkflowOutput(): Field {
     const workflowOutput = python.field({
-      name: this.workflowOutputContext.name,
+      name: this.workflowOutputContext.getOutputVariable().name,
       initializer: new WorkflowValueDescriptor({
         workflowContext: this.workflowContext,
         workflowValueDescriptor:

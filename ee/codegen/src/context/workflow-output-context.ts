@@ -1,3 +1,5 @@
+import { OutputVariableContext } from "./output-variable-context";
+
 import { WorkflowContext } from "src/context/workflow-context";
 import { WorkflowOutputGenerationError } from "src/generators/errors";
 import {
@@ -18,7 +20,6 @@ export class WorkflowOutputContext {
   private readonly workflowContext: WorkflowContext;
   private readonly terminalNodeData?: FinalOutputNodeType;
   private readonly workflowOutputValue?: WorkflowOutputValueType;
-  public readonly name: string;
 
   constructor({
     workflowContext,
@@ -28,10 +29,9 @@ export class WorkflowOutputContext {
     this.workflowContext = workflowContext;
     this.terminalNodeData = terminalNodeData;
     this.workflowOutputValue = workflowOutputValue;
-    this.name = this.getOutputVariableName();
   }
 
-  public getOutputVariableId(): string {
+  private getOutputVariableId(): string {
     if (this.workflowOutputValue) {
       return this.workflowOutputValue.outputVariableId;
     } else if (this.terminalNodeData) {
@@ -59,10 +59,8 @@ export class WorkflowOutputContext {
     }
   }
 
-  private getOutputVariableName(): string {
+  public getOutputVariable(): OutputVariableContext {
     const outputVariableId = this.getOutputVariableId();
-    const outputVariable =
-      this.workflowContext.getOutputVariableContextById(outputVariableId);
-    return outputVariable.name;
+    return this.workflowContext.getOutputVariableContextById(outputVariableId);
   }
 }
