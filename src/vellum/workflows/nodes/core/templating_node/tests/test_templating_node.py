@@ -220,3 +220,17 @@ def test_templating_node__replace_filter():
             },
         }
     ]
+
+
+def test_templating_node__last_chat_message():
+    # GIVEN a templating node that outputs a complex object
+    class LastChatMessageTemplateNode(TemplatingNode[BaseState, List[ChatMessage]]):
+        template = """{{ chat_history[:-1] }}"""
+        inputs = {"chat_history": [ChatMessage(role="USER", text="Hello"), ChatMessage(role="ASSISTANT", text="World")]}
+
+    # WHEN the node is run
+    node = LastChatMessageTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected JSON
+    assert outputs.result == [ChatMessage(role="USER", text="Hello")]
