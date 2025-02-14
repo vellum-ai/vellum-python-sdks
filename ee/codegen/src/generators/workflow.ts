@@ -17,7 +17,7 @@ import { BaseState } from "src/generators/base-state";
 import {
   BaseCodegenError,
   NodeNotFoundError,
-  NodePortGenerationError,
+  NodePortNotFoundError,
   WorkflowGenerationError,
 } from "src/generators/errors";
 import { GraphAttribute } from "src/generators/graph-attribute";
@@ -389,7 +389,7 @@ export class Workflow {
             sourcePortContext =
               this.workflowContext.getPortContextById(sourcePortId);
           } catch (e) {
-            if (e instanceof NodePortGenerationError) {
+            if (e instanceof NodePortNotFoundError) {
               console.warn(e.message);
             } else {
               throw e;

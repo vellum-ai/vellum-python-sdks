@@ -6,6 +6,7 @@ export type CodegenErrorCode =
   | "NODE_DEFINITION_GENERATION_ERROR"
   | "NODE_ATTRIBUTE_GENERATION_ERROR"
   | "NODE_PORT_GENERATION_ERROR"
+  | "NODE_PORT_NOT_FOUND_ERROR"
   | "NODE_NOT_FOUND_ERROR"
   | "NODE_OUTPUT_NOT_FOUND_ERROR"
   | "NODE_INPUT_NOT_FOUND_ERROR"
@@ -87,6 +88,13 @@ export class NodeAttributeGenerationError extends BaseCodegenError {
  */
 export class NodePortGenerationError extends BaseCodegenError {
   code = "NODE_PORT_GENERATION_ERROR" as const;
+}
+
+/**
+ * An error that raises when unable to find a node port.
+ */
+export class NodePortNotFoundError extends BaseCodegenError {
+  code = "NODE_PORT_NOT_FOUND_ERROR" as const;
 }
 
 /**

@@ -14,6 +14,7 @@ import {
   NodeDefinitionGenerationError,
   NodeNotFoundError,
   NodePortGenerationError,
+  NodePortNotFoundError,
   WorkflowGenerationError,
   WorkflowInputGenerationError,
   WorkflowOutputGenerationError,
@@ -418,7 +419,7 @@ export class WorkflowContext {
       this.portContextById.get(portId);
 
     if (!portContext) {
-      throw new NodePortGenerationError(
+      throw new NodePortNotFoundError(
         `Port context not found for port id: ${portId}`
       );
     }
