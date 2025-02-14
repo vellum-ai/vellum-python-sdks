@@ -13,7 +13,7 @@ from vellum_ee.workflows.display.base import (
     StateValueDisplayType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplayType,
-    WorkflowOutputDisplayType,
+    WorkflowOutputDisplay,
 )
 
 if TYPE_CHECKING:
@@ -45,7 +45,6 @@ class WorkflowDisplayContext(
         StateValueDisplayType,
         NodeDisplayType,
         EntrypointDisplayType,
-        WorkflowOutputDisplayType,
         EdgeDisplayType,
     ]
 ):
@@ -63,6 +62,6 @@ class WorkflowDisplayContext(
         default_factory=dict
     )
     entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = field(default_factory=dict)
-    workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplayType] = field(default_factory=dict)
+    workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = field(default_factory=dict)
     edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplayType] = field(default_factory=dict)
     port_displays: Dict[Port, "PortDisplay"] = field(default_factory=dict)

@@ -18,7 +18,6 @@ import {
   BaseCodegenError,
   NodeNotFoundError,
   NodePortNotFoundError,
-  WorkflowGenerationError,
 } from "src/generators/errors";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { Inputs } from "src/generators/inputs";
@@ -29,10 +28,6 @@ import {
   WorkflowDisplayData,
   WorkflowEdge,
 } from "src/types/vellum";
-import {
-  getNodeIdFromNodeOutputWorkflowReference,
-  getNodeOutputIdFromNodeOutputWorkflowReference,
-} from "src/utils/nodes";
 import { isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
@@ -466,34 +461,7 @@ export class Workflow {
         initializer: python.TypeInstantiation.dict(
           this.workflowContext.workflowOutputContexts.map(
             (workflowOutputContext) => {
-              const finalOutput =
-                workflowOutputContext.getFinalOutputNodeData();
-              let outputId: string;
-              let name: string;
-
-              // Final output node
-              if ("type" in finalOutput) {
-                outputId = finalOutput.data.outputId;
-                name = finalOutput.data.name;
-              } else {
-                const nodeId =
-                  getNodeIdFromNodeOutputWorkflowReference(finalOutput);
-                // Workflow output value
-                const referencedNode =
-                  this.workflowContext.getNodeContext(nodeId);
-                if (!referencedNode) {
-                  throw new WorkflowGenerationError(
-                    `Could not find node ${finalOutput.value}`
-                  );
-                }
-                const referencedOutput =
-                  this.workflowContext.getOutputVariableContextById(
-                    finalOutput.outputVariableId
-                  );
-                outputId =
-                  getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
-                name = referencedOutput.name;
-              }
+              const outputId = workflowOutputContext.getOutputVariableId();
 
               return {
                 key: python.reference({
@@ -503,7 +471,7 @@ export class Workflow {
                 }),
                 value: python.instantiateClass({
                   classReference: python.reference({
-                    name: "WorkflowOutputVellumDisplayOverrides",
+                    name: "WorkflowOutputDisplay",
                     modulePath:
                       this.workflowContext.sdkModulePathNames
                         .VELLUM_TYPES_MODULE_PATH,
@@ -518,7 +486,7 @@ export class Workflow {
                       value: python.TypeInstantiation.str(
                         // Intentionally use the raw name from the terminal node
                         // Rather than the sanitized name from the output context
-                        name
+                        workflowOutputContext.name
                       ),
                     }),
                   ],

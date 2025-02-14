@@ -31,13 +31,11 @@ export class WorkflowOutputContext {
     this.name = this.getOutputVariableName();
   }
 
-  public getFinalOutputNodeData():
-    | FinalOutputNodeType
-    | WorkflowOutputValueType {
+  public getOutputVariableId(): string {
     if (this.workflowOutputValue) {
-      return this.workflowOutputValue;
+      return this.workflowOutputValue.outputVariableId;
     } else if (this.terminalNodeData) {
-      return this.terminalNodeData;
+      return this.terminalNodeData.data.outputId;
     } else {
       throw new WorkflowOutputGenerationError(
         "Expected either workflow output value or terminal node data to be defined"
@@ -62,20 +60,9 @@ export class WorkflowOutputContext {
   }
 
   private getOutputVariableName(): string {
-    if (this.terminalNodeData) {
-      const outputVariable = this.workflowContext.getOutputVariableContextById(
-        this.terminalNodeData.data.outputId
-      );
-      return outputVariable.name;
-    } else if (this.workflowOutputValue) {
-      const outputVariable = this.workflowContext.getOutputVariableContextById(
-        this.workflowOutputValue.outputVariableId
-      );
-      return outputVariable.name;
-    } else {
-      throw new WorkflowOutputGenerationError(
-        "Expected either workflow output value or terminal node data to be defined"
-      );
-    }
+    const outputVariableId = this.getOutputVariableId();
+    const outputVariable =
+      this.workflowContext.getOutputVariableContextById(outputVariableId);
+    return outputVariable.name;
   }
 }

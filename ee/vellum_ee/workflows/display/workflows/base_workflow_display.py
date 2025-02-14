@@ -28,8 +28,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplayType,
     WorkflowMetaDisplayOverridesType,
     WorkflowMetaDisplayType,
-    WorkflowOutputDisplayOverridesType,
-    WorkflowOutputDisplayType,
+    WorkflowOutputDisplay,
 )
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
@@ -58,8 +57,6 @@ class BaseWorkflowDisplay(
         EntrypointDisplayOverridesType,
         EdgeDisplayType,
         EdgeDisplayOverridesType,
-        WorkflowOutputDisplayType,
-        WorkflowOutputDisplayOverridesType,
     ]
 ):
     # Used to specify the display data for a workflow.
@@ -75,7 +72,7 @@ class BaseWorkflowDisplay(
     entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayOverridesType] = {}
 
     # Used to explicitly specify display data for a workflow's outputs.
-    output_displays: Dict[BaseDescriptor, WorkflowOutputDisplayOverridesType] = {}
+    output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = {}
 
     # Used to explicitly specify display data for a workflow's edges.
     edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplayOverridesType] = {}
@@ -101,7 +98,6 @@ class BaseWorkflowDisplay(
                 StateValueDisplayType,
                 NodeDisplayType,
                 EntrypointDisplayType,
-                WorkflowOutputDisplayType,
                 EdgeDisplayType,
             ]
         ] = None,
@@ -202,7 +198,6 @@ class BaseWorkflowDisplay(
         StateValueDisplayType,
         NodeDisplayType,
         EntrypointDisplayType,
-        WorkflowOutputDisplayType,
         EdgeDisplayType,
     ]:
         workflow_display = self._generate_workflow_meta_display()
@@ -285,7 +280,7 @@ class BaseWorkflowDisplay(
                 edge, node_displays, port_displays, overrides=edge_display_overrides
             )
 
-        workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplayType] = {}
+        workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = {}
         for workflow_output in self._workflow.Outputs:
             if workflow_output in workflow_output_displays:
                 continue
@@ -298,9 +293,9 @@ class BaseWorkflowDisplay(
             ):
                 raise ValueError("Expected to find a descriptor instance on the workflow output")
 
-            workflow_output_display_overrides = self.output_displays.get(workflow_output)
-            workflow_output_displays[workflow_output] = self._generate_workflow_output_display(
-                workflow_output, overrides=workflow_output_display_overrides
+            workflow_output_display = self.output_displays.get(workflow_output)
+            workflow_output_displays[workflow_output] = (
+                workflow_output_display or self._generate_workflow_output_display(workflow_output)
             )
 
         return WorkflowDisplayContext(
@@ -345,13 +340,10 @@ class BaseWorkflowDisplay(
     ) -> EntrypointDisplayType:
         pass
 
-    @abstractmethod
-    def _generate_workflow_output_display(
-        self,
-        output: BaseDescriptor,
-        overrides: Optional[WorkflowOutputDisplayOverridesType] = None,
-    ) -> WorkflowOutputDisplayType:
-        pass
+    def _generate_workflow_output_display(self, output: BaseDescriptor) -> WorkflowOutputDisplay:
+        output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
+
+        return WorkflowOutputDisplay(id=output_id, name=output.name)
 
     @abstractmethod
     def _generate_edge_display(

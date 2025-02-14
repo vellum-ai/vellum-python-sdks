@@ -74,14 +74,15 @@ EntrypointDisplayOverridesType = TypeVar("EntrypointDisplayOverridesType", bound
 
 
 @dataclass
-class WorkflowOutputDisplayOverrides:
+class WorkflowOutputDisplay:
     id: UUID
+    name: str
 
 
 @dataclass
-class WorkflowOutputDisplay(WorkflowOutputDisplayOverrides):
+class WorkflowOutputDisplayOverrides(WorkflowOutputDisplay):
+    """
+    DEPRECATED: Use WorkflowOutputDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
-
-
-WorkflowOutputDisplayType = TypeVar("WorkflowOutputDisplayType", bound=WorkflowOutputDisplay)
-WorkflowOutputDisplayOverridesType = TypeVar("WorkflowOutputDisplayOverridesType", bound=WorkflowOutputDisplayOverrides)

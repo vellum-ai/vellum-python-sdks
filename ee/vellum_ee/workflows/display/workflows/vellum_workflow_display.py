@@ -31,8 +31,6 @@ from vellum_ee.workflows.display.vellum import (
     WorkflowInputsVellumDisplayOverrides,
     WorkflowMetaVellumDisplay,
     WorkflowMetaVellumDisplayOverrides,
-    WorkflowOutputVellumDisplay,
-    WorkflowOutputVellumDisplayOverrides,
 )
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
@@ -53,8 +51,6 @@ class VellumWorkflowDisplay(
         EntrypointVellumDisplayOverrides,
         EdgeVellumDisplay,
         EdgeVellumDisplayOverrides,
-        WorkflowOutputVellumDisplay,
-        WorkflowOutputVellumDisplayOverrides,
     ]
 ):
     node_display_base_class = BaseNodeDisplay
@@ -144,9 +140,7 @@ class VellumWorkflowDisplay(
 
         # Add a synthetic Terminal Node and track the Workflow's output variables for each Workflow output
         for workflow_output, workflow_output_display in self.display_context.workflow_output_displays.items():
-            final_output_node_id = workflow_output_display.node_id or uuid4_from_hash(
-                f"{self.workflow_id}|node_id|{workflow_output.name}"
-            )
+            final_output_node_id = uuid4_from_hash(f"{self.workflow_id}|node_id|{workflow_output.name}")
             inferred_type = infer_vellum_variable_type(workflow_output)
 
             # Remove the terminal node output from the unreferenced set
@@ -178,19 +172,11 @@ class VellumWorkflowDisplay(
                     except IndexError:
                         source_node_display = None
 
-                synthetic_target_handle_id = (
-                    str(workflow_output_display.target_handle_id)
-                    if workflow_output_display.target_handle_id
-                    else str(uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{workflow_output_display.name}"))
+                synthetic_target_handle_id = str(
+                    uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{workflow_output_display.name}")
                 )
-                synthetic_display_data = (
-                    workflow_output_display.display_data.dict()
-                    if workflow_output_display.display_data
-                    else NodeDisplayData().dict()
-                )
-                synthetic_node_label = (
-                    workflow_output_display.label if workflow_output_display.label is not None else "Final Output"
-                )
+                synthetic_display_data = NodeDisplayData().dict()
+                synthetic_node_label = "Final Output"
                 nodes.append(
                     {
                         "id": str(final_output_node_id),
@@ -369,28 +355,6 @@ class VellumWorkflowDisplay(
         )
 
         return EntrypointVellumDisplay(id=entrypoint_id, edge_display=edge_display)
-
-    def _generate_workflow_output_display(
-        self,
-        output: BaseDescriptor,
-        overrides: Optional[WorkflowOutputVellumDisplayOverrides] = None,
-    ) -> WorkflowOutputVellumDisplay:
-        if overrides:
-            return WorkflowOutputVellumDisplay(
-                id=overrides.id,
-                name=overrides.name,
-                label=overrides.label,
-                node_id=overrides.node_id,
-                target_handle_id=overrides.target_handle_id,
-                display_data=overrides.display_data,
-            )
-
-        output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
-
-        return WorkflowOutputVellumDisplay(
-            id=output_id,
-            name=output.name,
-        )
 
     def _generate_edge_display(
         self,

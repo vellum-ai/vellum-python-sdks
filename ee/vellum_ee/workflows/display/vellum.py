@@ -20,7 +20,6 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplayOverrides,
     WorkflowMetaDisplay,
     WorkflowMetaDisplayOverrides,
-    WorkflowOutputDisplay,
     WorkflowOutputDisplayOverrides,
 )
 
@@ -123,8 +122,11 @@ class EntrypointVellumDisplay(EntrypointVellumDisplayOverrides):
 
 
 @dataclass
-class WorkflowOutputVellumDisplayOverrides(WorkflowOutputDisplay, WorkflowOutputDisplayOverrides):
-    name: str
+class WorkflowOutputVellumDisplayOverrides(WorkflowOutputDisplayOverrides):
+    """
+    DEPRECATED: Use WorkflowOutputDisplay instead. Will be removed in 0.15.0
+    """
+
     label: Optional[str] = None
     node_id: Optional[UUID] = None
     display_data: Optional[NodeDisplayData] = None
@@ -133,6 +135,10 @@ class WorkflowOutputVellumDisplayOverrides(WorkflowOutputDisplay, WorkflowOutput
 
 @dataclass
 class WorkflowOutputVellumDisplay(WorkflowOutputVellumDisplayOverrides):
+    """
+    DEPRECATED: Use WorkflowOutputDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 
