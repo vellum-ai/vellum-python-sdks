@@ -9,7 +9,7 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 
 
 def finalize(obj: Any) -> str:
-    if isinstance(obj, dict):
+    if isinstance(obj, (dict, list)):
         return json.dumps(obj, cls=DefaultStateEncoder)
 
     return str(obj)
