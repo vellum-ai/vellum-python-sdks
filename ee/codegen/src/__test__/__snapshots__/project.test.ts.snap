@@ -1,5 +1,56 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 1`] = `
+"from vellum.workflows import BaseWorkflow
+from .nodes.first_node import FirstNode
+
+
+class Workflow(BaseWorkflow):
+    graph = FirstNode
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 2`] = `
+"from vellum.workflows.nodes.displayable import BaseNode
+
+
+class SecondNode(BaseNode):
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ATTRIBUTES"
+
+    class Outputs(BaseNode.Outputs):
+        output: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 3`] = `
+"from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from ...nodes.second_node import SecondNode
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+
+class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
+    node_input_ids_by_name = {}
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 4`] = `
+"from .first_node import FirstNode
+from .second_node import SecondNode
+
+__all__ = ["FirstNode", "SecondNode"]
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 5`] = `
+"from .first_node import FirstNodeDisplay
+from .second_node import SecondNodeDisplay
+
+__all__ = ["FirstNodeDisplay", "SecondNodeDisplay"]
+"
+`;
+
 exports[`WorkflowProjectGenerator > Nodes with forward references > should generate a proper Lazy Reference for the first node 1`] = `
 "from vellum.workflows.nodes.displayable import BaseNode
 from vellum.workflows.references import LazyReference

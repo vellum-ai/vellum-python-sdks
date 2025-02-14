@@ -21,6 +21,19 @@ import { WorkflowProjectGenerator } from "src/project";
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
 
+  function expectProjectFileToMatcheSnapshot(
+    project: WorkflowProjectGenerator,
+    filePath: string[]
+  ) {
+    const completeFilePath = join(
+      tempDir,
+      project.getModuleName(),
+      ...filePath
+    );
+    expect(fs.existsSync(completeFilePath)).toBe(true);
+    expect(fs.readFileSync(completeFilePath, "utf-8")).toMatchSnapshot();
+  }
+
   beforeEach(async () => {
     vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
       mockDocumentIndexFactory() as unknown as DocumentIndexRead
@@ -1111,6 +1124,124 @@ baz = foo + bar
       const finalOutputPath = join(nodesPath, "final_output.py");
       expect(fs.existsSync(finalOutputPath)).toBe(true);
       expect(fs.readFileSync(finalOutputPath, "utf-8")).toMatchSnapshot();
+    });
+  });
+
+  describe("Nodes present but not in graph", () => {
+    const firstNodeId = uuidv4();
+    const secondNodeId = uuidv4();
+    const secondNodeOutputId = uuidv4();
+    const firstNodeDefaultPortId = uuidv4();
+    const firstNodeTriggerId = uuidv4();
+    const secondNodeTriggerId = uuidv4();
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: firstNodeId,
+            type: "GENERIC",
+            label: "First Node",
+            attributes: [],
+            trigger: {
+              id: firstNodeTriggerId,
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            ports: [],
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+            outputs: [],
+          },
+          {
+            id: secondNodeId,
+            type: "GENERIC",
+            label: "Second Node",
+            attributes: [],
+            outputs: [
+              {
+                id: secondNodeOutputId,
+                name: "output",
+                type: "STRING",
+              },
+            ],
+            ports: [],
+            trigger: {
+              id: secondNodeTriggerId,
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: firstNodeId,
+            target_handle_id: firstNodeTriggerId,
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+        ],
+      },
+      input_variables: [],
+      output_variables: [],
+      runner_config: {},
+    };
+    it("should still generate a file for the second node", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+        strict: false,
+      });
+
+      await project.generateCode();
+
+      // There should be no errors
+      const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
+      const errorLog = fs.existsSync(errorLogPath)
+        ? fs.readFileSync(errorLogPath, "utf-8")
+        : "";
+      expect(errorLog).toBe("");
+
+      // We should have generated a Workflow that has a graph containing only the first node
+      expectProjectFileToMatcheSnapshot(project, ["workflow.py"]);
+
+      // We should have generated a file for the second node, even though it's not in the graph
+      expectProjectFileToMatcheSnapshot(project, ["nodes", "second_node.py"]);
+
+      // We should have generated a display file for the second node
+      expectProjectFileToMatcheSnapshot(project, [
+        "display",
+        "nodes",
+        "second_node.py",
+      ]);
+
+      // We should have included the second node in our init files
+      expectProjectFileToMatcheSnapshot(project, ["nodes", "__init__.py"]);
+      expectProjectFileToMatcheSnapshot(project, [
+        "display",
+        "nodes",
+        "__init__.py",
+      ]);
     });
   });
 });
