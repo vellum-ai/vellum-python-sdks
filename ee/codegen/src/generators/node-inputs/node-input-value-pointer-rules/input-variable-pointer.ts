@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { NodeInputNotFoundError } from "src/generators/errors";
 import { InputVariablePointer } from "src/types/vellum";
 
 export class InputVariablePointerRule extends BaseNodeInputValuePointerRule<InputVariablePointer> {
@@ -14,8 +15,11 @@ export class InputVariablePointerRule extends BaseNodeInputValuePointerRule<Inpu
       );
 
     if (!inputVariableContext) {
-      console.warn(
-        `Could not find input variable context with id ${inputVariablePointerRuleData.inputVariableId}`
+      this.workflowContext.addError(
+        new NodeInputNotFoundError(
+          `Could not find input variable context with id ${inputVariablePointerRuleData.inputVariableId}`,
+          "WARNING"
+        )
       );
       return python.TypeInstantiation.none();
     }

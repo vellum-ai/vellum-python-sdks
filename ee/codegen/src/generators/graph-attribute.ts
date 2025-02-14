@@ -7,7 +7,10 @@ import {
   PORTS_CLASS_NAME,
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
-import { NodeNotFoundError } from "src/generators/errors";
+import {
+  NodeDefinitionGenerationError,
+  NodeNotFoundError,
+} from "src/generators/errors";
 import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
 
 import type { WorkflowContext } from "src/context";
@@ -115,8 +118,11 @@ export class GraphAttribute extends AstNode {
       return this.workflowContext.getNodeContext(nodeId);
     } catch (error) {
       if (error instanceof NodeNotFoundError) {
-        console.warn(
-          `Failed to find target node with ID '${nodeId}' referenced from edge ${edgeId}`
+        this.workflowContext.addError(
+          new NodeDefinitionGenerationError(
+            `Failed to find target node with ID '${nodeId}' referenced from edge ${edgeId}`,
+            "WARNING"
+          )
         );
         return null;
       } else {

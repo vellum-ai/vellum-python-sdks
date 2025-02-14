@@ -3,6 +3,7 @@ import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deploy
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { PromptNode } from "src/types/vellum";
 import { isVellumErrorWithDetail } from "src/utils/nodes";
 
@@ -46,8 +47,11 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
       );
     } catch (error) {
       if (isVellumErrorWithDetail(error)) {
-        console.warn(
-          `Could not find prompt deployment with id: ${this.nodeData.data.promptDeploymentId}, falling back to id`
+        this.workflowContext.addError(
+          new NodeDefinitionGenerationError(
+            `Could not find prompt deployment with id: ${this.nodeData.data.promptDeploymentId}, falling back to id`,
+            "WARNING"
+          )
         );
       } else {
         throw error;
