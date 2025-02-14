@@ -370,5 +370,36 @@ describe("Workflow", () => {
       workflow.getWorkflowFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should generate correct display code when there are input variables with escape characters", async () => {
+      const entrypointNode = entrypointNodeDataFactory();
+      workflowContext = workflowContextFactory();
+      workflowContext.addEntrypointNode(entrypointNode);
+
+      const nodeData = terminalNodeDataFactory();
+      await createNodeContext({
+        workflowContext,
+        nodeData,
+      });
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "5f64210f-ec43-48ce-ae40-40a9ba4c4c11",
+            key: 'Bad \\"Input\\"',
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+      const inputs = codegen.inputs({ workflowContext });
+      const workflow = codegen.workflow({
+        moduleName,
+        workflowContext,
+        inputs,
+      });
+
+      workflow.getWorkflowDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });

@@ -9,6 +9,17 @@ class TestWorkflow(BaseWorkflow):
 "
 `;
 
+exports[`Workflow > write > should generate correct code when there are input variables with escape characters 1`] = `
+"from vellum.workflows import BaseWorkflow
+from .inputs import Inputs
+from vellum.workflows.state import BaseState
+
+
+class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
+    pass
+"
+`;
+
 exports[`Workflow > write > should generate correct code when there are no input variables 1`] = `
 "from vellum.workflows import BaseWorkflow
 
@@ -40,6 +51,46 @@ from vellum.workflows.state import BaseState
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
     class Outputs(BaseWorkflow.Outputs):
         passthrough = Inputs.query
+"
+`;
+
+exports[`Workflow > write > should generate correct display code when there are input variables with escape characters 1`] = `
+"from vellum_ee.workflows.display.workflows.vellum_workflow_display import (
+    VellumWorkflowDisplay,
+)
+from ..workflow import TestWorkflow
+from vellum_ee.workflows.display.vellum import (
+    WorkflowMetaVellumDisplayOverrides,
+    NodeDisplayData,
+    NodeDisplayPosition,
+    WorkflowDisplayData,
+    WorkflowDisplayDataViewport,
+    WorkflowInputsVellumDisplayOverrides,
+)
+from uuid import UUID
+from ..inputs import Inputs
+
+
+class TestWorkflowDisplay(VellumWorkflowDisplay[TestWorkflow]):
+    workflow_display = WorkflowMetaVellumDisplayOverrides(
+        entrypoint_node_id=UUID("entrypoint"),
+        entrypoint_node_source_handle_id=UUID("<source_handle_id>"),
+        entrypoint_node_display=NodeDisplayData(
+            position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+        ),
+        display_data=WorkflowDisplayData(
+            viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=0)
+        ),
+    )
+    inputs_display = {
+        Inputs.bad_input: WorkflowInputsVellumDisplayOverrides(
+            id=UUID("5f64210f-ec43-48ce-ae40-40a9ba4c4c11"),
+            name='Bad "Input"',
+            required=False,
+        )
+    }
+    entrypoint_displays = {}
+    output_displays = {}
 "
 `;
 

@@ -2,7 +2,7 @@ import { isEmpty, isNil } from "lodash";
 import { VellumVariable } from "vellum-ai/api/types";
 
 import { WorkflowContext } from "src/context/workflow-context";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
+import {removeEscapeCharacters, toPythonSafeSnakeCase} from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
 export declare namespace InputVariableContext {
@@ -39,7 +39,8 @@ export class InputVariableContext {
   }
 
   public getRawName(): string {
-    return this.inputVariableData.key;
+    // This is for an edge case where there are escape characters in the variable
+    return removeEscapeCharacters(this.inputVariableData.key);
   }
 
   private generateSanitizedInputVariableName(): string {

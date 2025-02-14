@@ -87,3 +87,7 @@ export function toPythonSafeSnakeCase(
       : `${safetyPrefix}${safetyPrefix.endsWith("_") ? "" : "_"}`;
   return startsWithUnsafe ? cleanedSafetyPrefix + snakeCase : snakeCase;
 }
+
+export function removeEscapeCharacters(str: string): string {
+  return str.replace(/\\"/g, '"');
+}

@@ -273,7 +273,7 @@ export class Workflow {
                   value: python.TypeInstantiation.str(
                     // Intentionally use the raw name from the input variable data
                     // rather than the sanitized name from the input variable context
-                    inputVariableContext.getInputVariableData().key
+                    inputVariableContext.getRawName()
                   ),
                 })
               );
