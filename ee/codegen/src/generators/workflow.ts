@@ -470,13 +470,11 @@ export class Workflow {
                 workflowOutputContext.getFinalOutputNodeData();
               let outputId: string;
               let name: string;
-              let label: string;
 
               // Final output node
               if ("type" in finalOutput) {
                 outputId = finalOutput.data.outputId;
                 name = finalOutput.data.name;
-                label = finalOutput.data.label;
               } else {
                 const nodeId =
                   getNodeIdFromNodeOutputWorkflowReference(finalOutput);
@@ -495,7 +493,6 @@ export class Workflow {
                 outputId =
                   getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
                 name = referencedOutput.name;
-                label = this.getLabel(referencedNode.nodeData);
               }
 
               return {
@@ -523,10 +520,6 @@ export class Workflow {
                         // Rather than the sanitized name from the output context
                         name
                       ),
-                    }),
-                    python.methodArgument({
-                      name: "label",
-                      value: python.TypeInstantiation.str(label),
                     }),
                   ],
                 }),

@@ -125,7 +125,7 @@ class EntrypointVellumDisplay(EntrypointVellumDisplayOverrides):
 @dataclass
 class WorkflowOutputVellumDisplayOverrides(WorkflowOutputDisplay, WorkflowOutputDisplayOverrides):
     name: str
-    label: str
+    label: Optional[str] = None
     node_id: Optional[UUID] = None
     display_data: Optional[NodeDisplayData] = None
     target_handle_id: Optional[UUID] = None

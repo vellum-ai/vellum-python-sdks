@@ -188,12 +188,15 @@ class VellumWorkflowDisplay(
                     if workflow_output_display.display_data
                     else NodeDisplayData().dict()
                 )
+                synthetic_node_label = (
+                    workflow_output_display.label if workflow_output_display.label is not None else "Final Output"
+                )
                 nodes.append(
                     {
                         "id": str(final_output_node_id),
                         "type": "TERMINAL",
                         "data": {
-                            "label": workflow_output_display.label,
+                            "label": synthetic_node_label,
                             "name": workflow_output_display.name,
                             "target_handle_id": synthetic_target_handle_id,
                             "output_id": str(workflow_output_display.id),
@@ -387,7 +390,6 @@ class VellumWorkflowDisplay(
         return WorkflowOutputVellumDisplay(
             id=output_id,
             name=output.name,
-            label="Final Output",
         )
 
     def _generate_edge_display(
