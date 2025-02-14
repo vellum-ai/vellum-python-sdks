@@ -468,14 +468,12 @@ export class Workflow {
             (workflowOutputContext) => {
               const finalOutput =
                 workflowOutputContext.getFinalOutputNodeData();
-              let outputNodeId: string;
               let outputId: string;
               let name: string;
               let label: string;
 
               // Final output node
               if ("type" in finalOutput) {
-                outputNodeId = finalOutput.id;
                 outputId = finalOutput.data.outputId;
                 name = finalOutput.data.name;
                 label = finalOutput.data.label;
@@ -494,7 +492,6 @@ export class Workflow {
                   this.workflowContext.getOutputVariableContextById(
                     finalOutput.outputVariableId
                   );
-                outputNodeId = referencedNode.nodeData.id;
                 outputId =
                   getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
                 name = referencedOutput.name;
@@ -518,10 +515,6 @@ export class Workflow {
                     python.methodArgument({
                       name: "id",
                       value: python.TypeInstantiation.uuid(outputId),
-                    }),
-                    python.methodArgument({
-                      name: "node_id",
-                      value: python.TypeInstantiation.uuid(outputNodeId),
                     }),
                     python.methodArgument({
                       name: "name",

@@ -107,7 +107,6 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
     output_displays = {
         Workflow.Outputs.answer: WorkflowOutputVellumDisplayOverrides(
             id=UUID("8c6e5464-8916-4039-b911-cf707855d372"),
-            node_id=UUID("f9c5254c-b86d-420d-811a-a1674df273cd"),
             name="answer",
             label="Final Output 2",
         )

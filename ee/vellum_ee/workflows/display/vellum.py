@@ -126,7 +126,7 @@ class EntrypointVellumDisplay(EntrypointVellumDisplayOverrides):
 class WorkflowOutputVellumDisplayOverrides(WorkflowOutputDisplay, WorkflowOutputDisplayOverrides):
     name: str
     label: str
-    node_id: UUID
+    node_id: Optional[UUID] = None
     display_data: Optional[NodeDisplayData] = None
     target_handle_id: Optional[UUID] = None
 

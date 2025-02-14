@@ -144,7 +144,9 @@ class VellumWorkflowDisplay(
 
         # Add a synthetic Terminal Node and track the Workflow's output variables for each Workflow output
         for workflow_output, workflow_output_display in self.display_context.workflow_output_displays.items():
-            final_output_node_id = workflow_output_display.node_id
+            final_output_node_id = workflow_output_display.node_id or uuid4_from_hash(
+                f"{self.workflow_id}|node_id|{workflow_output.name}"
+            )
             inferred_type = infer_vellum_variable_type(workflow_output)
 
             # Remove the terminal node output from the unreferenced set
@@ -220,7 +222,7 @@ class VellumWorkflowDisplay(
                             "id": str(uuid4_from_hash(f"{self.workflow_id}|edge_id|{workflow_output_display.name}")),
                             "source_node_id": str(source_node_display.node_id),
                             "source_handle_id": str(source_handle_id),
-                            "target_node_id": str(workflow_output_display.node_id),
+                            "target_node_id": str(final_output_node_id),
                             "target_handle_id": synthetic_target_handle_id,
                             "type": "DEFAULT",
                         }
@@ -381,11 +383,9 @@ class VellumWorkflowDisplay(
             )
 
         output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
-        node_id = uuid4_from_hash(f"{self.workflow_id}|node_id|{output.name}")
 
         return WorkflowOutputVellumDisplay(
             id=output_id,
-            node_id=node_id,
             name=output.name,
             label="Final Output",
         )
