@@ -10,6 +10,7 @@ import {
   GENERATED_WORKFLOW_MODULE_NAME,
   OUTPUTS_CLASS_NAME,
   PORTS_CLASS_NAME,
+  VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
@@ -472,9 +473,7 @@ export class Workflow {
                 value: python.instantiateClass({
                   classReference: python.reference({
                     name: "WorkflowOutputDisplay",
-                    modulePath:
-                      this.workflowContext.sdkModulePathNames
-                        .VELLUM_TYPES_MODULE_PATH,
+                    modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                   }),
                   arguments_: [
                     python.methodArgument({
