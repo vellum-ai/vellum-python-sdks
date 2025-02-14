@@ -73,7 +73,7 @@ import {
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
-import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
+import { assertUnreachable, isDefined, isNilOrEmpty } from "src/utils/typing";
 
 export interface WorkflowProjectGeneratorOptions {
   /**
@@ -521,6 +521,23 @@ ${errors.slice(0, 3).map((err) => {
         });
       });
     }
+
+    // Include at the end nodes that are included in the workflow, but not referenced in the graph
+    // For example, Note Nodes.
+    const unprocessedNodes: WorkflowDataNode[] = rawData.nodes
+      .map<WorkflowDataNode | undefined>((node: WorkflowNode) => {
+        if (
+          processedNodeIds.has(node.id) ||
+          node.type === "ENTRYPOINT" ||
+          node.type === "TERMINAL"
+        ) {
+          return undefined;
+        }
+        return node;
+      })
+      .filter(isDefined);
+
+    orderedNodes.push(...unprocessedNodes);
 
     return orderedNodes;
   }
