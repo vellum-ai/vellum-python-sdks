@@ -112,6 +112,7 @@ GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
 class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
     graph: ClassVar[GraphAttribute]
+    unused: ClassVar[List[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
     emitters: List[BaseWorkflowEmitter]
     resolvers: List[BaseWorkflowResolver]
 
@@ -195,6 +196,40 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                 if node not in nodes:
                     nodes.add(node)
                     yield node
+
+    @classmethod
+    def get_nodes_not_in_graph(cls) -> Iterator[Type[BaseNode]]:
+        """
+        Returns an iterator over the nodes that are defined but not used in the graph.
+        """
+        if not hasattr(cls, "unused"):
+            yield from ()
+        else:
+            nodes = set()
+            for item in cls.unused:
+                if isinstance(item, Graph):
+                    # Item is a graph
+                    for node in item.nodes:
+                        if node not in nodes:
+                            nodes.add(node)
+                            yield node
+                elif isinstance(item, set):
+                    # Item is a set of graphs or nodes
+                    for subitem in item:
+                        if isinstance(subitem, Graph):
+                            for node in subitem.nodes:
+                                if node not in nodes:
+                                    nodes.add(node)
+                                    yield node
+                        elif issubclass(subitem, BaseNode):
+                            if subitem not in nodes:
+                                nodes.add(subitem)
+                                yield subitem
+                elif issubclass(item, BaseNode):
+                    # Item is a node
+                    if item not in nodes:
+                        nodes.add(item)
+                        yield item
 
     @classmethod
     def get_entrypoints(cls) -> Iterable[Type[BaseNode]]:

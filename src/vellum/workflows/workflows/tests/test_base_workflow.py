@@ -78,3 +78,62 @@ def test_subworkflow__inherit_base_outputs():
     # TEST that the outputs are correct
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
     assert terminal_event.outputs == {"output": "bar"}
+
+
+def test_workflow_nodes_not_in_graph():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    # WHEN we create a workflow with multiple unused nodes
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA
+        unused = [NodeB, NodeC]
+
+    # TEST that all nodes from unused are collected
+    unused = set(TestWorkflow.get_nodes_not_in_graph())
+    assert unused == {NodeB, NodeC}
+
+
+def test_workflow_unused_graph():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    # WHEN we create a workflow with unused nodes in a graph
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA
+        unused = [NodeB >> NodeC, NodeD]
+
+    # TEST that all nodes from unused are collected
+    unused = set(TestWorkflow.get_nodes_not_in_graph())
+    assert unused == {NodeB, NodeC, NodeD}
+
+
+def test_workflow_no_unused_nodes():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    # WHEN we create a workflow with no unused nodes
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA >> NodeB
+
+    # TEST that nodes_not_in_graph is empty
+    nodes = set(TestWorkflow.get_nodes_not_in_graph())
+    assert nodes == set()
