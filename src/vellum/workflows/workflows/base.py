@@ -113,9 +113,7 @@ class _BaseWorkflowMeta(type):
             elif issubclass(graph_item, BaseNode):
                 nodes.add(graph_item)
             else:
-                raise ValueError(
-                    f"Invalid graph item: {graph_item}. Must be Graph, BaseNode subclass, or set of these types."
-                )
+                raise ValueError(f"Unexpected graph type: {graph_item.__class__}")
             return nodes
 
         graph_nodes = collect_nodes(dct.get("graph", set()))
