@@ -100,6 +100,32 @@ class _BaseWorkflowMeta(type):
                     new_dct,
                 )
 
+        def collect_nodes(graph_item: Union[GraphAttribute, Set[GraphAttribute]]) -> Set[Type[BaseNode]]:
+            nodes: Set[Type[BaseNode]] = set()
+            if isinstance(graph_item, Graph):
+                nodes.update(node for node in graph_item.nodes)
+            elif isinstance(graph_item, set):
+                for item in graph_item:
+                    if isinstance(item, Graph):
+                        nodes.update(node for node in item.nodes)
+                    elif inspect.isclass(item) and issubclass(item, BaseNode):
+                        nodes.add(item)
+            elif issubclass(graph_item, BaseNode):
+                nodes.add(graph_item)
+            else:
+                raise ValueError(
+                    f"Invalid graph item: {graph_item}. Must be Graph, BaseNode subclass, or set of these types."
+                )
+            return nodes
+
+        graph_nodes = collect_nodes(dct.get("graph", set()))
+        unused_nodes = collect_nodes(dct.get("unused_graph", set()))
+
+        overlap = graph_nodes & unused_nodes
+        if overlap:
+            node_names = [node.__name__ for node in overlap]
+            raise ValueError(f"Node(s) {', '.join(node_names)} cannot appear in both graph and unused_graph")
+
         cls = super().__new__(mcs, name, bases, dct)
         workflow_class = cast(Type["BaseWorkflow"], cls)
         workflow_class.__id__ = uuid4_from_hash(workflow_class.__qualname__)
@@ -112,7 +138,7 @@ GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
 class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
     graph: ClassVar[GraphAttribute]
-    unused: ClassVar[List[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
+    unused_graph: ClassVar[Set[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
     emitters: List[BaseWorkflowEmitter]
     resolvers: List[BaseWorkflowResolver]
 
@@ -198,15 +224,15 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     yield node
 
     @classmethod
-    def get_nodes_not_in_graph(cls) -> Iterator[Type[BaseNode]]:
+    def get_unused_nodes(cls) -> Iterator[Type[BaseNode]]:
         """
         Returns an iterator over the nodes that are defined but not used in the graph.
         """
-        if not hasattr(cls, "unused"):
+        if not hasattr(cls, "unused_graph"):
             yield from ()
         else:
             nodes = set()
-            for item in cls.unused:
+            for item in cls.unused_graph:
                 if isinstance(item, Graph):
                     # Item is a graph
                     for node in item.nodes:
