@@ -9,7 +9,7 @@ class StartNode(BaseNode):
         value: str
 
     def run(self) -> Outputs:
-        time.sleep(0.1)
+        time.sleep(0.2)
         return self.Outputs(value="hello world")
 
 
