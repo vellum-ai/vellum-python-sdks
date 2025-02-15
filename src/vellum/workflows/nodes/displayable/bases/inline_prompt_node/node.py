@@ -17,6 +17,7 @@ from vellum import (
 )
 from vellum.client import RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
+from vellum.client.types.prompt_settings import PromptSettings
 from vellum.workflows.constants import OMIT
 from vellum.workflows.context import get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
@@ -53,6 +54,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = OMIT
 
+    settings: Optional[PromptSettings] = None
+
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
@@ -60,6 +63,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         input_variables, input_values = self._compile_prompt_inputs()
         parent_context = get_parent_context()
         request_options = self.request_options or RequestOptions()
+        if self.settings and self.settings.timeout is not None:
+            request_options["timeout_in_seconds"] = int(self.settings.timeout)
+
         request_options["additional_body_parameters"] = {
             "execution_context": {"parent_context": parent_context},
             **request_options.get("additional_body_parameters", {}),
