@@ -95,14 +95,14 @@ def test_workflow__nodes_not_in_graph():
     # WHEN we create a workflow with multiple unused nodes
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = NodeA
-        unused_graph = {NodeB, NodeC}
+        unused_graphs = {NodeB, NodeC}
 
-    # TEST that all nodes from unused_graph are collected
-    unused_graph = set(TestWorkflow.get_unused_nodes())
-    assert unused_graph == {NodeB, NodeC}
+    # TEST that all nodes from unused_graphs are collected
+    unused_graphs = set(TestWorkflow.get_unused_nodes())
+    assert unused_graphs == {NodeB, NodeC}
 
 
-def test_workflow__unused_graph():
+def test_workflow__unused_graphs():
     class NodeA(BaseNode):
         pass
 
@@ -124,11 +124,11 @@ def test_workflow__unused_graph():
     # WHEN we create a workflow with unused nodes in a graph
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = NodeA
-        unused_graph = {NodeB >> {NodeC >> NodeD}, NodeE, NodeF}
+        unused_graphs = {NodeB >> {NodeC >> NodeD}, NodeE, NodeF}
 
-    # TEST that all nodes from unused_graph are collected
-    unused_graph = set(TestWorkflow.get_unused_nodes())
-    assert unused_graph == {NodeB, NodeC, NodeD, NodeE, NodeF}
+    # TEST that all nodes from unused_graphs are collected
+    unused_graphs = set(TestWorkflow.get_unused_nodes())
+    assert unused_graphs == {NodeB, NodeC, NodeD, NodeE, NodeF}
 
 
 def test_workflow__no_unused_nodes():
@@ -162,7 +162,7 @@ def test_workflow__node_in_both_graph_and_unused():
 
         class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
             graph = NodeA >> NodeB
-            unused_graph = {NodeA >> NodeC}
+            unused_graphs = {NodeA >> NodeC}
 
     # THEN it should raise an error
-    assert "Node(s) NodeA cannot appear in both graph and unused_graph" in str(exc_info.value)
+    assert "Node(s) NodeA cannot appear in both graph and unused_graphs" in str(exc_info.value)

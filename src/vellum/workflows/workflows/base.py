@@ -117,12 +117,12 @@ class _BaseWorkflowMeta(type):
             return nodes
 
         graph_nodes = collect_nodes(dct.get("graph", set()))
-        unused_nodes = collect_nodes(dct.get("unused_graph", set()))
+        unused_nodes = collect_nodes(dct.get("unused_graphs", set()))
 
         overlap = graph_nodes & unused_nodes
         if overlap:
             node_names = [node.__name__ for node in overlap]
-            raise ValueError(f"Node(s) {', '.join(node_names)} cannot appear in both graph and unused_graph")
+            raise ValueError(f"Node(s) {', '.join(node_names)} cannot appear in both graph and unused_graphs")
 
         cls = super().__new__(mcs, name, bases, dct)
         workflow_class = cast(Type["BaseWorkflow"], cls)
@@ -136,7 +136,7 @@ GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
 class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
     graph: ClassVar[GraphAttribute]
-    unused_graph: ClassVar[Set[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
+    unused_graphs: ClassVar[Set[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
     emitters: List[BaseWorkflowEmitter]
     resolvers: List[BaseWorkflowResolver]
 
@@ -226,11 +226,11 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         """
         Returns an iterator over the nodes that are defined but not used in the graph.
         """
-        if not hasattr(cls, "unused_graph"):
+        if not hasattr(cls, "unused_graphs"):
             yield from ()
         else:
             nodes = set()
-            for item in cls.unused_graph:
+            for item in cls.unused_graphs:
                 if isinstance(item, Graph):
                     # Item is a graph
                     for node in item.nodes:
