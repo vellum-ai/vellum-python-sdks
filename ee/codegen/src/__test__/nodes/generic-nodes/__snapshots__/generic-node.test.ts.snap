@@ -70,6 +70,21 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with default node trigger > getNodeFile 1`] = `
+"from vellum.workflows.nodes import BaseNode
+
+from ..inputs import Inputs
+
+
+class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.count
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with generic node output as attribute > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
 

@@ -251,4 +251,27 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("basic with default node trigger", () => {
+    it("getNodeFile", async () => {
+      const nodeData = genericNodeFactory({
+        nodeTrigger: {
+          id: "trigger-1",
+          mergeBehavior: "AWAIT_ATTRIBUTES",
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

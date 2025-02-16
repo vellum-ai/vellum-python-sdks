@@ -58,11 +58,16 @@ export class GenericNode extends BaseSingleFileNode<
       );
     });
 
+    if (this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES") {
+      statements.push(
+        new NodeTrigger({
+          nodeTrigger: this.nodeData.trigger,
+          nodeContext: this.nodeContext,
+        })
+      );
+    }
+
     statements.push(
-      new NodeTrigger({
-        nodeTrigger: this.nodeData.trigger,
-        nodeContext: this.nodeContext,
-      }),
       new NodePorts({
         nodePorts: this.nodeData.ports,
         nodeContext: this.nodeContext,
