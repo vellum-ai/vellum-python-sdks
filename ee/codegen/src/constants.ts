@@ -13,6 +13,11 @@ export const VELLUM_WORKFLOW_GRAPH_MODULE_PATH = [
   "workflows",
   "graph",
 ] as const;
+export const VELLUM_WORKFLOW_NODES_MODULE_PATH = [
+  "vellum",
+  "workflows",
+  "nodes",
+] as const;
 export const VELLUM_WORKFLOW_CONSTANTS_PATH = [
   "vellum",
   "workflows",

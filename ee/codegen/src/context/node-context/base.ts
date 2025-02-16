@@ -1,3 +1,4 @@
+import { VELLUM_WORKFLOW_NODES_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
 import { NodeOutputNotFoundError } from "src/generators/errors";
@@ -47,7 +48,9 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     this.importOrder = args.importOrder;
 
     this.baseNodeClassModulePath =
-      this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;
+      args.nodeData.type === "GENERIC"
+        ? VELLUM_WORKFLOW_NODES_MODULE_PATH
+        : this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;
     this.baseNodeDisplayClassModulePath =
       this.workflowContext.sdkModulePathNames.NODE_DISPLAY_MODULE_PATH;
 

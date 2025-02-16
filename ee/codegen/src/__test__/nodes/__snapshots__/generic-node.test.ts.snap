@@ -15,7 +15,7 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
 `;
 
 exports[`GenericNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import BaseNode
+"from vellum.workflows.nodes import BaseNode
 
 
 class MyCustomNode(BaseNode):

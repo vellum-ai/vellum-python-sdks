@@ -11,7 +11,7 @@ class Workflow(BaseWorkflow):
 `;
 
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 2`] = `
-"from vellum.workflows.nodes.displayable import BaseNode
+"from vellum.workflows.nodes import BaseNode
 
 
 class SecondNode(BaseNode):
@@ -52,7 +52,7 @@ __all__ = ["FirstNodeDisplay", "SecondNodeDisplay"]
 `;
 
 exports[`WorkflowProjectGenerator > Nodes with forward references > should generate a proper Lazy Reference for the first node 1`] = `
-"from vellum.workflows.nodes.displayable import BaseNode
+"from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references import LazyReference
 
 
