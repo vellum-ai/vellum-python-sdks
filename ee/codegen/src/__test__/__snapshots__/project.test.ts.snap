@@ -16,9 +16,6 @@ exports[`WorkflowProjectGenerator > Nodes present but not in graph > should stil
 
 
 class SecondNode(BaseNode):
-    class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ATTRIBUTES"
-
     class Outputs(BaseNode.Outputs):
         output: str
 "
@@ -60,9 +57,6 @@ from vellum.workflows.references import LazyReference
 
 class FirstNode(BaseNode):
     forward = LazyReference("SecondNode.Outputs.output")
-
-    class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ATTRIBUTES"
 
     class Outputs(BaseNode.Outputs):
         pass
