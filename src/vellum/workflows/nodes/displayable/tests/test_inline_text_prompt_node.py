@@ -91,6 +91,7 @@ def test_inline_text_prompt_node__basic(vellum_adhoc_prompt_client):
             custom_parameters=None,
         ),
         request_options=mock.ANY,
+        settings=None,
     )
 
 
