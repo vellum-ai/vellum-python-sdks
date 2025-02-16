@@ -9,17 +9,6 @@ class TestWorkflow(BaseWorkflow):
 "
 `;
 
-exports[`Workflow > write > should generate correct code when there are input variables with escape characters 1`] = `
-"from vellum.workflows import BaseWorkflow
-from .inputs import Inputs
-from vellum.workflows.state import BaseState
-
-
-class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-    pass
-"
-`;
-
 exports[`Workflow > write > should generate correct code when there are no input variables 1`] = `
 "from vellum.workflows import BaseWorkflow
 
