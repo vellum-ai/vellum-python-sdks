@@ -63,8 +63,6 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         input_variables, input_values = self._compile_prompt_inputs()
         parent_context = get_parent_context()
         request_options = self.request_options or RequestOptions()
-        if self.settings and self.settings.timeout is not None:
-            request_options["timeout_in_seconds"] = int(self.settings.timeout)
 
         request_options["additional_body_parameters"] = {
             "execution_context": {"parent_context": parent_context},
@@ -85,6 +83,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             input_variables=input_variables,
             parameters=self.parameters,
             blocks=self.blocks,
+            settings=self.settings,
             functions=normalized_functions,
             expand_meta=self.expand_meta,
             request_options=request_options,
