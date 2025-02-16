@@ -2,8 +2,9 @@
 
 exports[`GenericNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from ...nodes.my_custom_node import MyCustomNode
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.my_custom_node import MyCustomNode
 
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
@@ -16,6 +17,7 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
 
 exports[`GenericNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
+
 from ..inputs import Inputs
 
 
@@ -33,8 +35,9 @@ class MyCustomNode(BaseNode):
 
 exports[`GenericNode > basic with adornments > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from ...nodes.my_custom_node import MyCustomNode
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.my_custom_node import MyCustomNode
 
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
@@ -49,6 +52,7 @@ exports[`GenericNode > basic with adornments > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.core.map_node.node import MapNode
+
 from ..inputs import Inputs
 
 
@@ -68,6 +72,7 @@ class MyCustomNode(BaseNode):
 
 exports[`GenericNode > basic with generic node output as attribute > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
+
 from .my_custom_node import ReferencedNode
 
 
@@ -84,8 +89,9 @@ class MyCustomNode(BaseNode):
 
 exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from ...nodes.my_custom_node import MyCustomNode
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.my_custom_node import MyCustomNode
 
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
@@ -98,6 +104,7 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
 
 exports[`GenericNode > basic with node output as attribute > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
+
 from .prompt_node import PromptNode
 
 

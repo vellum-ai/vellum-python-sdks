@@ -1,11 +1,13 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`MergeNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseMergeNodeDisplay
-from ...nodes.merge_node import MergeNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseMergeNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.merge_node import MergeNode
 
 
 class MergeNodeDisplay(BaseMergeNodeDisplay[MergeNode]):

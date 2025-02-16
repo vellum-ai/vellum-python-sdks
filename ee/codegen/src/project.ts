@@ -1,4 +1,3 @@
-import { exec } from "child_process";
 import fs from "fs";
 import { mkdir } from "fs/promises";
 import { join } from "path";
@@ -242,24 +241,6 @@ ${errors.slice(0, 3).map((err) => {
     // error.log - this gets generated separately from the other files because it
     // collects errors raised by the rest of the codegen process
     await this.generateErrorLogFile().persist();
-
-    if (!this.workflowContext.disableFormatting) {
-      const setupCfgPath = this.resolvePythonConfigFilePath();
-      const isortCmd = process.env.ISORT_CMD ?? "isort";
-
-      await new Promise((resolve, reject) => {
-        exec(
-          `${isortCmd} --sp ${setupCfgPath} --skip script.py ${this.workflowContext.absolutePathToOutputDirectory}`,
-          (error: Error | null) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(undefined);
-            }
-          }
-        );
-      });
-    }
   }
 
   private generateRootInitFile(): InitFile {

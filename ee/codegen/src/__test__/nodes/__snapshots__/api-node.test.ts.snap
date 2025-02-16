@@ -1,14 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ApiNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay
-from ...nodes.api_node import APINode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.api_node import APINode
 
 
 class APINodeDisplay(BaseAPINodeDisplay[APINode]):
@@ -72,8 +74,9 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
 `;
 
 exports[`ApiNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
 from ..inputs import Inputs
 
 
@@ -94,10 +97,11 @@ class APINode(BaseAPINode):
 `;
 
 exports[`ApiNode > basic auth secret node > secret ids should show names 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-from vellum.workflows.constants import APIRequestMethod, AuthorizationType
-from ..inputs import Inputs
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 from vellum.workflows.references import VellumSecretReference
+
+from ..inputs import Inputs
 
 
 class APINode(BaseAPINode):
@@ -117,8 +121,8 @@ class APINode(BaseAPINode):
 `;
 
 exports[`ApiNode > basic auth secret node > should generate Workspace secrets for header values 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 from vellum.workflows.references import VellumSecretReference
 
 
@@ -137,14 +141,16 @@ class APINode(BaseAPINode):
 `;
 
 exports[`ApiNode > reject on error enabled > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay, BaseTryNodeDisplay
-from ...nodes.api_node import APINode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay, BaseTryNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.api_node import APINode
 
 
 @BaseTryNodeDisplay.wrap(error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"))
@@ -209,9 +215,10 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
 `;
 
 exports[`ApiNode > reject on error enabled > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.core import TryNode
-from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
 from ..inputs import Inputs
 
 
@@ -233,8 +240,9 @@ class APINode(BaseAPINode):
 `;
 
 exports[`ApiNode > skip authorization type input id field if undefined > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-from vellum.workflows.constants import APIRequestMethod
+"from vellum.workflows.constants import APIRequestMethod
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
 from ..inputs import Inputs
 
 

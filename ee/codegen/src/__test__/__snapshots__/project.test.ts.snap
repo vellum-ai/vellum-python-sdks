@@ -2,6 +2,7 @@
 
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 1`] = `
 "from vellum.workflows import BaseWorkflow
+
 from .nodes.first_node import FirstNode
 
 
@@ -25,8 +26,9 @@ class SecondNode(BaseNode):
 
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 3`] = `
 "from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from ...nodes.second_node import SecondNode
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.second_node import SecondNode
 
 
 class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
@@ -96,10 +98,11 @@ class BadNode(TemplatingNode[BaseState, str]):
 `;
 
 exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
-"from vellum.workflows.sandbox import WorkflowSandboxRunner
-from .workflow import Workflow
+"from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
 from .inputs import Inputs
-from vellum import ChatMessage, StringChatMessageContent, ArrayChatMessageContent
+from .workflow import Workflow
 
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
@@ -143,6 +146,7 @@ runner.run()
 exports[`WorkflowProjectGenerator > nodes with output values > should prioritize terminal node data over output values 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
+
 from .templating_node import TemplatingNode
 
 
@@ -154,6 +158,7 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
 
 exports[`WorkflowProjectGenerator > runner config with no container image > should handle a runner config with no container image 1`] = `
 "from vellum.workflows import BaseWorkflow
+
 from .nodes.templating_node import TemplatingNode
 
 

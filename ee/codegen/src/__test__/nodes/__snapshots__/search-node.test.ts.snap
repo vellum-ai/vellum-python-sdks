@@ -1,14 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`TextSearchNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
-from ...nodes.search_node import SearchNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
@@ -59,14 +61,15 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
 `;
 
 exports[`TextSearchNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
-from ..inputs import Inputs
-from vellum import SearchWeightsRequest, SearchResultMergingRequest
+"from vellum import SearchResultMergingRequest, SearchWeightsRequest
+from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from vellum.workflows.nodes.displayable.bases.types import (
-    SearchFilters,
-    MetadataLogicalConditionGroup,
     MetadataLogicalCondition,
+    MetadataLogicalConditionGroup,
+    SearchFilters,
 )
+
+from ..inputs import Inputs
 
 
 class SearchNode(BaseSearchNode):
@@ -100,14 +103,15 @@ class SearchNode(BaseSearchNode):
 `;
 
 exports[`TextSearchNode > limit param should cast string to int > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
-from ..inputs import Inputs
-from vellum import SearchWeightsRequest, SearchResultMergingRequest
+"from vellum import SearchResultMergingRequest, SearchWeightsRequest
+from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from vellum.workflows.nodes.displayable.bases.types import (
-    SearchFilters,
-    MetadataLogicalConditionGroup,
     MetadataLogicalCondition,
+    MetadataLogicalConditionGroup,
+    SearchFilters,
 )
+
+from ..inputs import Inputs
 
 
 class SearchNode(BaseSearchNode):
@@ -141,14 +145,16 @@ class SearchNode(BaseSearchNode):
 `;
 
 exports[`TextSearchNode > metadata filters > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
-from ...nodes.search_node import SearchNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
@@ -211,14 +217,15 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
 `;
 
 exports[`TextSearchNode > metadata filters > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
-from ..inputs import Inputs
-from vellum import SearchWeightsRequest, SearchResultMergingRequest
+"from vellum import SearchResultMergingRequest, SearchWeightsRequest
+from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from vellum.workflows.nodes.displayable.bases.types import (
-    SearchFilters,
-    MetadataLogicalConditionGroup,
     MetadataLogicalCondition,
+    MetadataLogicalConditionGroup,
+    SearchFilters,
 )
+
+from ..inputs import Inputs
 
 
 class SearchNode(BaseSearchNode):
@@ -248,14 +255,16 @@ class SearchNode(BaseSearchNode):
 `;
 
 exports[`TextSearchNode > reject on error enabled > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay, BaseTryNodeDisplay
-from ...nodes.search_node import SearchNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay, BaseTryNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.search_node import SearchNode
 
 
 @BaseTryNodeDisplay.wrap(error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"))
@@ -307,15 +316,16 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
 `;
 
 exports[`TextSearchNode > reject on error enabled > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
+"from vellum import SearchResultMergingRequest, SearchWeightsRequest
 from vellum.workflows.nodes.core import TryNode
-from ..inputs import Inputs
-from vellum import SearchWeightsRequest, SearchResultMergingRequest
+from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from vellum.workflows.nodes.displayable.bases.types import (
-    SearchFilters,
-    MetadataLogicalConditionGroup,
     MetadataLogicalCondition,
+    MetadataLogicalConditionGroup,
+    SearchFilters,
 )
+
+from ..inputs import Inputs
 
 
 @TryNode.wrap()
@@ -350,14 +360,16 @@ class SearchNode(BaseSearchNode):
 `;
 
 exports[`TextSearchNode > should codegen successfully without document index id input > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
-from ...nodes.search_node import SearchNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
@@ -407,12 +419,12 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
 `;
 
 exports[`TextSearchNode > should codegen successfully without document index id input > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
-from vellum import SearchWeightsRequest, SearchResultMergingRequest
+"from vellum import SearchResultMergingRequest, SearchWeightsRequest
+from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
 from vellum.workflows.nodes.displayable.bases.types import (
-    SearchFilters,
-    MetadataLogicalConditionGroup,
     MetadataLogicalCondition,
+    MetadataLogicalConditionGroup,
+    SearchFilters,
 )
 
 

@@ -1,10 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ErrorNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseErrorNodeDisplay
-from ...nodes.error_node import ErrorNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseErrorNodeDisplay
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.error_node import ErrorNode
 
 
 class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
@@ -23,8 +25,8 @@ class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
 `;
 
 exports[`ErrorNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import ErrorNode as BaseErrorNode
-from vellum import VellumError
+"from vellum import VellumError
+from vellum.workflows.nodes.displayable import ErrorNode as BaseErrorNode
 
 
 class ErrorNode(BaseErrorNode):
@@ -33,10 +35,12 @@ class ErrorNode(BaseErrorNode):
 `;
 
 exports[`ErrorNode > should codegen successfully without error source inputs > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseErrorNodeDisplay
-from ...nodes.error_node import ErrorNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseErrorNodeDisplay
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.error_node import ErrorNode
 
 
 class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):

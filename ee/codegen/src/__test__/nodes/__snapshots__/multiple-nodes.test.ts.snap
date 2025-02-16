@@ -1,14 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`InlinePromptNode referenced by Conditional Node > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
-from ...nodes.conditional_node import ConditionalNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
-    RuleIdMap,
     ConditionId,
+    RuleIdMap,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
@@ -61,6 +63,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
 exports[`InlinePromptNode referenced by Conditional Node > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from .prompt_node import PromptNode
 
 
@@ -72,14 +75,16 @@ class ConditionalNode(BaseConditionalNode):
 `;
 
 exports[`InlinePromptNode referenced by Templating Node > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
-from ...nodes.templating_node import TemplatingNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
@@ -110,6 +115,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
 exports[`InlinePromptNode referenced by Templating Node > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
 from vellum.workflows.state import BaseState
+
 from .prompt_node import PromptNode
 
 
@@ -122,14 +128,16 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 `;
 
 exports[`Non-existent Subworkflow Deployment Node referenced by Templating Node > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
-from ...nodes.templating_node import TemplatingNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
@@ -160,6 +168,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
 exports[`Non-existent Subworkflow Deployment Node referenced by Templating Node > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
 from vellum.workflows.state import BaseState
+
 from .prompt_node import PromptNode
 
 
@@ -172,14 +181,16 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 `;
 
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDisplayFile with 'takes array output id' 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
-from ...nodes.conditional_node import ConditionalNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
-    RuleIdMap,
     ConditionId,
+    RuleIdMap,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
@@ -230,14 +241,16 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
 `;
 
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDisplayFile with 'takes error output id' 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
-from ...nodes.conditional_node import ConditionalNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
-    RuleIdMap,
     ConditionId,
+    RuleIdMap,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
@@ -288,14 +301,16 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
 `;
 
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeDisplayFile with 'takes output id' 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
-from ...nodes.conditional_node import ConditionalNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
-    RuleIdMap,
     ConditionId,
+    RuleIdMap,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
@@ -348,6 +363,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeFile with 'takes array output id' 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from .prompt_deployment_node import PromptDeploymentNode
 
 
@@ -361,6 +377,7 @@ class ConditionalNode(BaseConditionalNode):
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeFile with 'takes error output id' 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from .prompt_deployment_node import PromptDeploymentNode
 
 
@@ -374,6 +391,7 @@ class ConditionalNode(BaseConditionalNode):
 exports[`Prompt Deployment Node referenced by Conditional Node > getNodeFile with 'takes output id' 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from .prompt_deployment_node import PromptDeploymentNode
 
 

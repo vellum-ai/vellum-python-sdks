@@ -1,14 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`GuardrailNode > basic > getNodeDisplayFile - multiple output variables 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
-from ...nodes.guardrail_node import GuardrailNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.guardrail_node import GuardrailNode
 
 
 class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
@@ -43,14 +45,16 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
 `;
 
 exports[`GuardrailNode > basic > getNodeDisplayFile - single output variable 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
-from ...nodes.guardrail_node import GuardrailNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.guardrail_node import GuardrailNode
 
 
 class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
@@ -83,6 +87,7 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
 
 exports[`GuardrailNode > basic > getNodeFile - multiple output variables 1`] = `
 "from vellum.workflows.nodes.displayable import GuardrailNode as BaseGuardrailNode
+
 from ..inputs import Inputs
 
 
@@ -98,6 +103,7 @@ class GuardrailNode(BaseGuardrailNode):
 
 exports[`GuardrailNode > basic > getNodeFile - single output variable 1`] = `
 "from vellum.workflows.nodes.displayable import GuardrailNode as BaseGuardrailNode
+
 from ..inputs import Inputs
 
 
@@ -112,17 +118,19 @@ class GuardrailNode(BaseGuardrailNode):
 `;
 
 exports[`GuardrailNode > reject on error enabled > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import (
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import (
     BaseGuardrailNodeDisplay,
     BaseTryNodeDisplay,
 )
-from ...nodes.guardrail_node import GuardrailNode
-from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.guardrail_node import GuardrailNode
 
 
 @BaseTryNodeDisplay.wrap(error_output_id=UUID("38361ff1-c826-49b8-aa8d-28179c3684cc"))
@@ -158,8 +166,9 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
 `;
 
 exports[`GuardrailNode > reject on error enabled > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import GuardrailNode as BaseGuardrailNode
-from vellum.workflows.nodes.core import TryNode
+"from vellum.workflows.nodes.core import TryNode
+from vellum.workflows.nodes.displayable import GuardrailNode as BaseGuardrailNode
+
 from ..inputs import Inputs
 
 

@@ -2,8 +2,9 @@
 
 exports[`NoteNode > basic > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseNoteNodeDisplay
-from ...nodes.note_node import NoteNode
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.note_node import NoteNode
 
 
 class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):

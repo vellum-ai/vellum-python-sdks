@@ -2,8 +2,9 @@
 
 exports[`Workflow Sandbox > write > should generate correct and same code for snake and camel casing of input names 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
-from .workflow import TestWorkflow
+
 from .inputs import Inputs
+from .workflow import TestWorkflow
 
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
@@ -23,8 +24,9 @@ runner.run()
 
 exports[`Workflow Sandbox > write > should generate correct code given inputs 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
-from .workflow import TestWorkflow
+
 from .inputs import Inputs
+from .workflow import TestWorkflow
 
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
@@ -44,8 +46,9 @@ runner.run()
 
 exports[`Workflow Sandbox > write > should generate correct code given optional input with default of null string value 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
-from .workflow import TestWorkflow
+
 from .inputs import Inputs
+from .workflow import TestWorkflow
 
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")

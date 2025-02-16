@@ -3,6 +3,7 @@
 exports[`Conditional Node with numeric operator casts rhs to NUMBER > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from ..inputs import Inputs
 
 
@@ -13,14 +14,16 @@ class ConditionalNode(BaseConditionalNode):
 `;
 
 exports[`ConditionalNode > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
-from ...nodes.conditional_node import ConditionalNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
-    RuleIdMap,
     ConditionId,
+    RuleIdMap,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
@@ -91,6 +94,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
 exports[`ConditionalNode > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from ..inputs import Inputs
 
 
@@ -103,14 +107,16 @@ class ConditionalNode(BaseConditionalNode):
 `;
 
 exports[`ConditionalNode with invalid uuid for field and value node input ids > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
-from ...nodes.conditional_node import ConditionalNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
-    RuleIdMap,
     ConditionId,
+    RuleIdMap,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
@@ -159,6 +165,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
 exports[`ConditionalNode with invalid uuid for field and value node input ids > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from ..inputs import Inputs
 
 
@@ -170,14 +177,16 @@ class ConditionalNode(BaseConditionalNode):
 `;
 
 exports[`ConditionalNode with null operator > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
-from ...nodes.conditional_node import ConditionalNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
-    RuleIdMap,
     ConditionId,
+    RuleIdMap,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
@@ -232,6 +241,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
 exports[`ConditionalNode with null operator > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
+
 from ..inputs import Inputs
 from .templating_node import TemplatingNode
 

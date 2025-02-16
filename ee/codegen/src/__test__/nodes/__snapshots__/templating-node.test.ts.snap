@@ -1,14 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`TemplatingNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
-from ...nodes.templating_node import TemplatingNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
@@ -45,14 +47,16 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 `;
 
 exports[`TemplatingNode > basic with json output type > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
-from ...nodes.templating_node import TemplatingNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
@@ -90,17 +94,19 @@ class TemplatingNode(BaseTemplatingNode[BaseState, Json]):
 `;
 
 exports[`TemplatingNode > reject on error enabled > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import (
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import (
     BaseTemplatingNodeDisplay,
     BaseTryNodeDisplay,
 )
-from ...nodes.templating_node import TemplatingNode
-from uuid import UUID
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.templating_node import TemplatingNode
 
 
 @BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
@@ -127,9 +133,9 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
 `;
 
 exports[`TemplatingNode > reject on error enabled > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+"from vellum.workflows.nodes.core import TryNode
+from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
 from vellum.workflows.state import BaseState
-from vellum.workflows.nodes.core import TryNode
 
 
 @TryNode.wrap()
@@ -142,6 +148,7 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 exports[`TemplatingNode > reject on error enabled > should generate the node file for a dependency correctly 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode
 from vellum.workflows.state import BaseState
+
 from .templating_node import TemplatingNode as TemplatingNodeTemplatingNode
 
 

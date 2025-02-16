@@ -20,8 +20,9 @@ class TestWorkflow(BaseWorkflow):
 
 exports[`Workflow > write > should generate correct code with Search Results as an output variable 1`] = `
 "from vellum.workflows import BaseWorkflow
-from .inputs import Inputs
 from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
 from .nodes.final_output import FinalOutput
 
 
@@ -33,8 +34,9 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 
 exports[`Workflow > write > should generate correct code with an output variable mapped to an input variable 1`] = `
 "from vellum.workflows import BaseWorkflow
-from .inputs import Inputs
 from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
 
 
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
@@ -44,20 +46,22 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 `;
 
 exports[`Workflow > write > should generate correct display code when there are input variables with escape characters 1`] = `
-"from vellum_ee.workflows.display.workflows.vellum_workflow_display import (
-    VellumWorkflowDisplay,
-)
-from ..workflow import TestWorkflow
+"from uuid import UUID
+
 from vellum_ee.workflows.display.vellum import (
-    WorkflowMetaVellumDisplayOverrides,
     NodeDisplayData,
     NodeDisplayPosition,
     WorkflowDisplayData,
     WorkflowDisplayDataViewport,
     WorkflowInputsVellumDisplayOverrides,
+    WorkflowMetaVellumDisplayOverrides,
 )
-from uuid import UUID
+from vellum_ee.workflows.display.workflows.vellum_workflow_display import (
+    VellumWorkflowDisplay,
+)
+
 from ..inputs import Inputs
+from ..workflow import TestWorkflow
 
 
 class TestWorkflowDisplay(VellumWorkflowDisplay[TestWorkflow]):
@@ -85,8 +89,9 @@ class TestWorkflowDisplay(VellumWorkflowDisplay[TestWorkflow]):
 
 exports[`Workflow > write > should handle edges pointing to non-existent nodes 1`] = `
 "from vellum.workflows import BaseWorkflow
-from .inputs import Inputs
 from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
 from .nodes.search_node import SearchNode
 
 
@@ -97,11 +102,12 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 
 exports[`Workflow > write > should handle loops of conditionals and import Graph.from_set properly 1`] = `
 "from vellum.workflows import BaseWorkflow
+from vellum.workflows.graph import Graph
+
+from .nodes.final_output_node import FinalOutputNode
+from .nodes.loop_check_node import LoopCheckNode
 from .nodes.start_node import StartNode
 from .nodes.top_node import TopNode
-from vellum.workflows.graph import Graph
-from .nodes.loop_check_node import LoopCheckNode
-from .nodes.final_output_node import FinalOutputNode
 
 
 class TestWorkflow(BaseWorkflow):
@@ -119,6 +125,7 @@ class TestWorkflow(BaseWorkflow):
 
 exports[`Workflow > write > should handle the case of multiple nodes with the same label 1`] = `
 "from vellum.workflows import BaseWorkflow
+
 from .nodes.templating_node import TemplatingNode
 from .nodes.templating_node_1 import TemplatingNode1
 

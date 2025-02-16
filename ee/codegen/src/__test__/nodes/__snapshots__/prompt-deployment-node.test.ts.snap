@@ -1,14 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`PromptDeploymentNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BasePromptDeploymentNodeDisplay
-from ...nodes.prompt_deployment_node import PromptDeploymentNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BasePromptDeploymentNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.prompt_deployment_node import PromptDeploymentNode
 
 
 class PromptDeploymentNodeDisplay(

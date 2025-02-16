@@ -1,14 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`CodeExecutionNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseCodeExecutionNodeDisplay
-from ...nodes.code_execution_node import CodeExecutionNode
-from uuid import UUID
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseCodeExecutionNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ...nodes.code_execution_node import CodeExecutionNode
 
 
 class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
@@ -58,11 +60,12 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 `;
 
 exports[`CodeExecutionNode > basic representation > should accept int and float 1`] = `
-"from vellum.workflows.nodes.displayable import (
+"from typing import Union
+
+from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
 from vellum.workflows.state import BaseState
-from typing import Union
 
 
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, Union[float, int]]):
@@ -77,8 +80,8 @@ exports[`CodeExecutionNode > basic secret node > secret ids should show names 1`
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
-from vellum.workflows.state import BaseState
 from vellum.workflows.references import VellumSecretReference
+from vellum.workflows.state import BaseState
 
 
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):

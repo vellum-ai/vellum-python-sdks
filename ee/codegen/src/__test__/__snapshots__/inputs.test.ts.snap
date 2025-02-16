@@ -1,8 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Inputs > write > should convert input variable names into valid python attributes 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import Union
+"from typing import Union
+
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -12,8 +13,9 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct Optional types when required is false 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import Optional, Union
+"from typing import Optional, Union
+
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -23,9 +25,10 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code for complex input variables 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import Union, List
+"from typing import List, Union
+
 from vellum import ChatMessage, SearchResult
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -48,8 +51,9 @@ class CustomInputs(BaseInputs):
 exports[`Inputs > write > should generate correct code when Inputs has no variables 1`] = `""`;
 
 exports[`Inputs > write > should generate correct code when Inputs has variables 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import Union
+"from typing import Union
+
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -79,9 +83,10 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'ARRAY' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import List
+"from typing import List
+
 from vellum import VellumValue
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -93,8 +98,8 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'AUDIO' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from vellum import VellumAudio
+"from vellum import VellumAudio
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -103,9 +108,10 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'CHAT_HISTORY' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import List
+"from typing import List
+
 from vellum import ChatMessage
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -116,8 +122,8 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'ERROR' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from vellum import VellumError
+"from vellum import VellumError
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -128,8 +134,8 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'FUNCTION_CALL' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from vellum import FunctionCall
+"from vellum import FunctionCall
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -143,8 +149,8 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'IMAGE' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from vellum import VellumImage
+"from vellum import VellumImage
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -153,8 +159,9 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'JSON' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import Any
+"from typing import Any
+
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -165,8 +172,9 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'NUMBER' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import Union
+"from typing import Union
+
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
@@ -175,9 +183,10 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'SEARCH_RESULTS' 1`] = `
-"from vellum.workflows.inputs import BaseInputs
-from typing import List
-from vellum import SearchResult, Document
+"from typing import List
+
+from vellum import Document, SearchResult
+from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
