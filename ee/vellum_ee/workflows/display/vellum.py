@@ -93,17 +93,21 @@ class StateValueVellumDisplay(StateValueVellumDisplayOverrides):
 
 
 @dataclass
-class EdgeVellumDisplayOverrides(EdgeDisplay, EdgeDisplayOverrides):
+class EdgeVellumDisplayOverrides(EdgeDisplayOverrides):
+    """
+    DEPRECATED: Use EdgeDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 
 @dataclass
 class EdgeVellumDisplay(EdgeVellumDisplayOverrides):
-    source_node_id: UUID
-    source_handle_id: UUID
-    target_node_id: UUID
-    target_handle_id: UUID
-    type: Literal["DEFAULT"] = "DEFAULT"
+    """
+    DEPRECATED: Use EdgeDisplay instead. Will be removed in 0.15.0
+    """
+
+    pass
 
 
 @dataclass
