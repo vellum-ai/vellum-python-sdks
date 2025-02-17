@@ -228,12 +228,19 @@ export class WorkflowContext {
       (n): n is EntrypointNode => n.type === "ENTRYPOINT"
     );
     if (entrypointNodes.length > 1) {
-      throw new WorkflowGenerationError("Multiple entrypoint nodes found");
+      this.addError(
+        new WorkflowGenerationError(
+          "Multiple entrypoint nodes found",
+          "WARNING"
+        )
+      );
     }
 
     const entrypointNode = entrypointNodes[0];
     if (!entrypointNode) {
-      throw new WorkflowGenerationError("Entrypoint node not found");
+      this.addError(
+        new WorkflowGenerationError("Entrypoint node not found", "WARNING")
+      );
     }
     this.entrypointNode = entrypointNode;
 
@@ -272,8 +279,11 @@ export class WorkflowContext {
     const inputVariableId = inputVariableContext.getInputVariableId();
 
     if (this.globalInputVariableContextsById.get(inputVariableId)) {
-      throw new WorkflowInputGenerationError(
-        `Input variable context already exists for input variable ID: ${inputVariableId}`
+      this.addError(
+        new WorkflowInputGenerationError(
+          `Input variable context already exists for input variable ID: ${inputVariableId}`,
+          "WARNING"
+        )
       );
     }
 
@@ -303,8 +313,11 @@ export class WorkflowContext {
     const outputVariableId = outputVariableContext.getOutputVariableId();
 
     if (this.globalOutputVariableContextsById.get(outputVariableId)) {
-      throw new WorkflowOutputGenerationError(
-        `Output variable context already exists for output variable ID: ${outputVariableId}`
+      this.addError(
+        new WorkflowOutputGenerationError(
+          `Output variable context already exists for output variable ID: ${outputVariableId}`,
+          "WARNING"
+        )
       );
     }
 
@@ -328,8 +341,9 @@ export class WorkflowContext {
       this.findOutputVariableContextById(outputVariableId);
 
     if (!outputVariableContext) {
-      throw new WorkflowInputGenerationError(
-        `Output variable context not found for ID: ${outputVariableId}`
+      throw new WorkflowOutputGenerationError(
+        `Output variable context not found for ID: ${outputVariableId}`,
+        "WARNING"
       );
     }
 
@@ -370,8 +384,11 @@ export class WorkflowContext {
     const nodeId = nodeContext.nodeData.id;
 
     if (this.globalNodeContextsByNodeId.get(nodeId)) {
-      throw new NodeDefinitionGenerationError(
-        `Node context already exists for node ID: ${nodeId}`
+      this.addError(
+        new NodeDefinitionGenerationError(
+          `Node context already exists for node ID: ${nodeId}`,
+          "WARNING"
+        )
       );
     }
 
@@ -401,8 +418,11 @@ export class WorkflowContext {
     const portId = portContext.portId;
 
     if (this.portContextById.get(portId)) {
-      throw new NodePortGenerationError(
-        `Port context already exists for port id: ${portId}`
+      this.addError(
+        new NodePortGenerationError(
+          `Port context already exists for port id: ${portId}`,
+          "WARNING"
+        )
       );
     }
     this.portContextById.set(portId, portContext);

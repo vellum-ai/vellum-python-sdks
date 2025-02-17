@@ -14,7 +14,7 @@ export class Json extends AstNode {
     try {
       JSON.stringify(value);
     } catch {
-      throw new ValueGenerationError("Value is not JSON serializable");
+      throw new ValueGenerationError("Value is not JSON serializable", "WARNING");
     }
 
     this.astNode = this.generateAstNode(value);
@@ -70,7 +70,8 @@ export class Json extends AstNode {
     }
 
     throw new ValueGenerationError(
-      `Unsupported JSON value type: ${typeof value}`
+      `Unsupported JSON value type: ${typeof value}`,
+      "WARNING"
     );
   }
 

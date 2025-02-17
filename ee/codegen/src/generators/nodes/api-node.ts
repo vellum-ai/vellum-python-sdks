@@ -12,6 +12,8 @@ import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";
 const BODY_INPUT_KEY = "body";
 const JSON_ATTRIBUTE_NAME = "json";
 
+type DictEntry = Parameters<typeof python.TypeInstantiation.dict>[0][number];
+
 export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     if (nodeInputKey === BODY_INPUT_KEY) {
@@ -58,33 +60,40 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
         python.field({
           name: "headers",
           initializer: python.TypeInstantiation.dict(
-            additionalHeaders.map((header) => {
-              const keyInput = this.nodeData.inputs.find(
-                (input) => input.id === header.headerKeyInputId
-              );
-              const valueInput = this.nodeData.inputs.find(
-                (input) => input.id === header.headerValueInputId
-              );
-
-              if (!keyInput || !valueInput) {
-                throw new NodeAttributeGenerationError(
-                  `Input not found for header: ${JSON.stringify(header)}`
+            additionalHeaders
+              .map((header) => {
+                const keyInput = this.nodeData.inputs.find(
+                  (input) => input.id === header.headerKeyInputId
                 );
-              }
-              const key = new NodeInput({
-                nodeContext: this.nodeContext,
-                nodeInputData: keyInput,
-              });
-              const value = new NodeInput({
-                nodeContext: this.nodeContext,
-                nodeInputData: valueInput,
-              });
+                const valueInput = this.nodeData.inputs.find(
+                  (input) => input.id === header.headerValueInputId
+                );
 
-              return {
-                key,
-                value,
-              };
-            }),
+                if (!keyInput || !valueInput) {
+                  this.workflowContext.addError(
+                    new NodeAttributeGenerationError(
+                      `Input not found for header: ${JSON.stringify(header)}`,
+                      "WARNING"
+                    )
+                  );
+                  return null;
+                } else {
+                  const key = new NodeInput({
+                    nodeContext: this.nodeContext,
+                    nodeInputData: keyInput,
+                  });
+                  const value = new NodeInput({
+                    nodeContext: this.nodeContext,
+                    nodeInputData: valueInput,
+                  });
+
+                  return {
+                    key,
+                    value,
+                  } as DictEntry;
+                }
+              })
+              .filter((entry): entry is DictEntry => entry !== null),
             {
               endWithComma: true,
             }
@@ -99,14 +108,20 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
         (input) => input.id === apiKeyHeaderKeyInput
       );
       if (!keyInput) {
-        throw new NodeAttributeGenerationError(
-          `No inputs have api header key id of ${apiKeyHeaderKeyInput}`
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `No inputs have api header key id of ${this.nodeData.data.apiKeyHeaderKeyInputId}`,
+            "WARNING"
+          )
         );
       }
       const key = this.nodeInputsByKey.get(keyInput.key);
       if (!key) {
-        throw new NodeAttributeGenerationError(
-          `No inputs have key of ${keyInput.key}`
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `No inputs have key of ${keyInput.key}`,
+            "WARNING"
+          )
         );
       }
       statements.push(
@@ -130,14 +145,20 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
           (input) => input.id === this.nodeData.data.apiKeyHeaderValueInputId
         );
         if (!valueInput) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have api header value id of ${this.nodeData.data.apiKeyHeaderValueInputId}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `No inputs have api header value id of ${this.nodeData.data.apiKeyHeaderValueInputId}`,
+              "WARNING"
+            )
           );
         }
         const value = this.nodeInputsByKey.get(valueInput.key);
         if (!value) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have key of ${valueInput.key}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `No inputs have key of ${valueInput.key}`,
+              "WARNING"
+            )
           );
         }
         statements.push(
@@ -153,14 +174,20 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
           (input) => input.id === this.nodeData.data.bearerTokenValueInputId
         );
         if (!valueInput) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have bearer token header value id of ${this.nodeData.data.bearerTokenValueInputId}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `No inputs have bearer token header value id of ${this.nodeData.data.bearerTokenValueInputId}`,
+              "WARNING"
+            )
           );
         }
         const value = this.nodeInputsByKey.get(valueInput.key);
         if (!value) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have key of ${valueInput.key}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `No inputs have key of ${valueInput.key}`,
+              "WARNING"
+            )
           );
         }
         statements.push(
@@ -212,8 +239,11 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
               );
 
               if (!nodeInput) {
-                throw new NodeAttributeGenerationError(
-                  `Node input with ID ${header.headerKeyInputId} not found`
+                this.workflowContext.addError(
+                  new NodeAttributeGenerationError(
+                    `Node input with ID ${header.headerKeyInputId} not found`,
+                    "WARNING"
+                  )
                 );
               }
               const key = new NodeInput({
@@ -242,8 +272,11 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
               );
 
               if (!nodeInput) {
-                throw new NodeAttributeGenerationError(
-                  `Node input with ID ${header.headerKeyInputId} not found`
+                this.workflowContext.addError(
+                  new NodeAttributeGenerationError(
+                    `Node input with ID ${header.headerKeyInputId} not found`,
+                    "WARNING"
+                  )
                 );
               }
               const key = new NodeInput({
@@ -365,8 +398,11 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       ) as ConstantValuePointer;
 
     if (!methodValue) {
-      throw new NodeAttributeGenerationError(
-        `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`,
+          "WARNING"
+        )
       );
     }
     const methodEnum = methodValue.data.value as string;
@@ -393,8 +429,11 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       ) as ConstantValuePointer;
 
     if (!authValue) {
-      throw new NodeAttributeGenerationError(
-        `No auth type input found for input id ${this.nodeData.data.authorizationTypeInputId} and of type "CONSTANT_VALUE"`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `No auth type input found for input id ${this.nodeData.data.authorizationTypeInputId} and of type "CONSTANT_VALUE"`,
+          "WARNING"
+        )
       );
     }
 

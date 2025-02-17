@@ -76,7 +76,8 @@ export class Expression extends AstNode {
     let rawLhs = base;
     if (!rhs) {
       throw new NodeAttributeGenerationError(
-        "rhs must be defined if base is defined"
+        "rhs must be defined if base is defined",
+        "WARNING"
       );
     }
     if (

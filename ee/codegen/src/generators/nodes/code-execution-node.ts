@@ -212,8 +212,11 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       codeInputRule.type !== "CONSTANT_VALUE" ||
       codeInputRule.data.type !== "STRING"
     ) {
-      throw new NodeAttributeGenerationError(
-        "Expected to find code input with constant string value"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Expected to find code input with constant string value",
+          "WARNING"
+        )
       );
     }
 
@@ -232,7 +235,8 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     ) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          "Expected to find runtime input with constant string value"
+          "Expected to find runtime input with constant string value",
+          "WARNING"
         )
       );
       runtime = "";

@@ -17,7 +17,8 @@ export class WorkflowInputReference extends BaseNodeInputWorkflowReference<Workf
     if (!inputVariableContext) {
       this.workflowContext.addError(
         new NodeInputNotFoundError(
-          `Could not find input variable context with id ${workflowInputReference.inputVariableId}`
+          `Could not find input variable context with id ${workflowInputReference.inputVariableId}`,
+          "WARNING"
         )
       );
       return python.TypeInstantiation.none();

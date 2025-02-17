@@ -45,8 +45,11 @@ export abstract class BaseNestedWorkflowNode<
     const nestedWorkflowContext = this.nestedWorkflowContextsByName.get(name);
 
     if (!nestedWorkflowContext) {
-      throw new NodeAttributeGenerationError(
-        `Nested workflow context not found for attribute name: ${name}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Nested workflow context not found for attribute name: ${name}`,
+          "WARNING"
+        )
       );
     }
 

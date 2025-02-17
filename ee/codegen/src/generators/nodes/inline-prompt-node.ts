@@ -30,8 +30,11 @@ export class InlinePromptNode extends BaseSingleFileNode<
     const statements: AstNode[] = [];
 
     if (this.nodeData.data.variant !== "INLINE") {
-      throw new NodeAttributeGenerationError(
-        `InlinePromptNode only supports INLINE variant. Received ${this.nodeData.data.variant}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `InlinePromptNode only supports INLINE variant. Received ${this.nodeData.data.variant}`,
+          "WARNING"
+        )
       );
     }
 
