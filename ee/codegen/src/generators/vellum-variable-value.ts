@@ -252,7 +252,8 @@ class ArrayVellumValue extends AstNode {
   ): AstNode {
     if (!Array.isArray(value)) {
       throw new ValueGenerationError(
-        "Expected array value for ArrayVellumValue"
+        "Expected array value for ArrayVellumValue",
+        "WARNING"
       );
     }
 
