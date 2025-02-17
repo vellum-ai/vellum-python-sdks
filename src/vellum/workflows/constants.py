@@ -3,6 +3,15 @@ from typing import Any, cast
 
 
 class _UndefMeta(type):
+    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> type:
+        cls.__name__ = "undefined"
+        cls.__qualname__ = "undefined"
+
+        undefined_class = super().__new__(cls, name, bases, attrs)
+        undefined_class.__name__ = "undefined"
+        undefined_class.__qualname__ = "undefined"
+        return undefined_class
+
     def __repr__(cls) -> str:
         return "undefined"
 
