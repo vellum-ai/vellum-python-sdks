@@ -272,8 +272,8 @@ class BaseWorkflowDisplay(
                 continue
 
             edge_display_overrides = self.edge_displays.get((edge.from_port, edge.to_node))
-            edge_displays[(edge.from_port, edge.to_node)] = self._generate_edge_display(
-                edge, node_displays, overrides=edge_display_overrides
+            edge_displays[(edge.from_port, edge.to_node)] = edge_display_overrides or self._generate_edge_display(
+                edge, node_displays
             )
 
         for edge in self._workflow.get_unused_edges():
@@ -281,8 +281,8 @@ class BaseWorkflowDisplay(
                 continue
 
             edge_display_overrides = self.edge_displays.get((edge.from_port, edge.to_node))
-            edge_displays[(edge.from_port, edge.to_node)] = self._generate_edge_display(
-                edge, node_displays, overrides=edge_display_overrides
+            edge_displays[(edge.from_port, edge.to_node)] = edge_display_overrides or self._generate_edge_display(
+                edge, node_displays
             )
 
         workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = {}
@@ -443,30 +443,20 @@ class BaseWorkflowDisplay(
 
         return additional_node_displays
 
-    def _generate_edge_display(
-        self,
-        edge: Edge,
-        node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
-        overrides: Optional[EdgeDisplay] = None,
-    ) -> EdgeDisplay:
+    def _generate_edge_display(self, edge: Edge, node_displays: Dict[Type[BaseNode], BaseNodeDisplay]) -> EdgeDisplay:
         source_node = get_unadorned_node(edge.from_port.node_class)
         target_node = get_unadorned_node(edge.to_node)
 
         source_node_id = node_displays[source_node].node_id
         target_node_id = node_displays[target_node].node_id
 
-        return self._generate_edge_display_from_source(source_node_id, target_node_id, overrides)
+        return self._generate_edge_display_from_source(source_node_id, target_node_id)
 
     def _generate_edge_display_from_source(
         self,
         source_node_id: UUID,
         target_node_id: UUID,
-        overrides: Optional[EdgeDisplay] = None,
     ) -> EdgeDisplay:
-        edge_id: UUID
-        if overrides:
-            edge_id = overrides.id
-        else:
-            edge_id = uuid4_from_hash(f"{self.workflow_id}|id|{source_node_id}|{target_node_id}")
-
-        return EdgeDisplay(id=edge_id)
+        return EdgeDisplay(
+            id=uuid4_from_hash(f"{self.workflow_id}|id|{source_node_id}|{target_node_id}"),
+        )
