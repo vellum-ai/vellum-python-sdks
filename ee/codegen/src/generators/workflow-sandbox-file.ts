@@ -82,11 +82,18 @@ if __name__ != "__main__":
         modulePath: getGeneratedInputsModulePath(this.workflowContext),
       }),
       arguments_: inputs
-        .filter((input) => !isNil(input.value))
         .map((input) => {
+          if (isNil(input.value)) {
+            return null;
+          }
+
           const rawName = removeEscapeCharacters(input.name);
           const inputVariableContext =
-            this.workflowContext.getInputVariableContextByRawName(rawName);
+            this.workflowContext.findInputVariableContextByRawName(rawName);
+
+          if (isNil(inputVariableContext)) {
+            return null;
+          }
 
           return python.methodArgument({
             name: inputVariableContext.name,
@@ -94,7 +101,10 @@ if __name__ != "__main__":
               vellumValue: input,
             }),
           });
-        }),
+        })
+        .filter(
+          (argument): argument is python.MethodArgument => !isNil(argument)
+        ),
     });
   }
 }

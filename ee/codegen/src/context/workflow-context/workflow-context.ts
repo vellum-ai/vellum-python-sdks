@@ -278,21 +278,6 @@ export class WorkflowContext {
     return this.globalOutputVariableContextsById.get(outputVariableId);
   }
 
-  public getInputVariableContextById(
-    inputVariableId: string
-  ): InputVariableContext {
-    const inputVariableContext =
-      this.findInputVariableContextById(inputVariableId);
-
-    if (!inputVariableContext) {
-      throw new WorkflowInputGenerationError(
-        `Input variable context not found for ID: ${inputVariableId}`
-      );
-    }
-
-    return inputVariableContext;
-  }
-
   public addOutputVariableContext(
     outputVariableContext: OutputVariableContext
   ): void {
@@ -338,21 +323,6 @@ export class WorkflowContext {
     return Array.from(this.inputVariableContextsById.values()).find(
       (inputContext) => inputContext.getRawName() === rawName
     );
-  }
-
-  public getInputVariableContextByRawName(
-    rawName: string
-  ): InputVariableContext {
-    const inputVariableContext =
-      this.findInputVariableContextByRawName(rawName);
-
-    if (!inputVariableContext) {
-      throw new WorkflowInputGenerationError(
-        `Input variable context not found for raw name: ${rawName}`
-      );
-    }
-
-    return inputVariableContext;
   }
 
   public isOutputVariableNameUsed(outputVariableName: string): boolean {
