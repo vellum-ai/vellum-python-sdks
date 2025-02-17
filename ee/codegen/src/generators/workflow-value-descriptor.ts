@@ -131,14 +131,19 @@ export class WorkflowValueDescriptor extends AstNode {
       };
       const value = operatorMappings[operator];
       if (!value) {
-        throw new NodePortGenerationError(
-          `This operator: ${operator} is not supported`
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `This operator: ${operator} is not supported`,
+            "WARNING"
+          )
         );
       }
       return value;
     } else {
-      throw new NodeAttributeGenerationError(
-        `Operators should exist on expression and not be null`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Operators should exist on expression and not be null`
+        )
       );
     }
   }

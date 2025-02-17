@@ -27,7 +27,8 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     if (!this.nodeContext.workflowDeploymentHistoryItem) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          `Failed to generate attribute: ${this.nodeData.data.label}.deployment`
+          `Failed to generate attribute: ${this.nodeData.data.label}.deployment`,
+          "WARNING"
         )
       );
     } else {
@@ -77,7 +78,8 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     if (!this.nodeContext.workflowDeploymentHistoryItem) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          `Failed to generate ${this.nodeData.data.label}.Outputs class`
+          `Failed to generate ${this.nodeData.data.label}.Outputs class`,
+          "WARNING"
         )
       );
       return null;
@@ -163,8 +165,11 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
               output.id
             );
             if (!outputName) {
-              throw new NodeAttributeGenerationError(
-                `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
+              this.workflowContext.addError(
+                new NodeAttributeGenerationError(
+                  `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`,
+                  "WARNING"
+                )
               );
             }
             return {

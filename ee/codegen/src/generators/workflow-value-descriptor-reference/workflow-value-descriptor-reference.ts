@@ -80,7 +80,8 @@ export class WorkflowValueDescriptorReference extends AstNode {
       case "WORKFLOW_STATE":
         this.workflowContext.addError(
           new ValueGenerationError(
-            "WORKFLOW_STATE reference pointers is not implemented"
+            "WORKFLOW_STATE reference pointers is not implemented",
+            "WARNING"
           )
         );
         return undefined;

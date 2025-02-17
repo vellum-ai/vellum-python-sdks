@@ -101,12 +101,20 @@ export class Workflow {
 
     this.workflowContext.workflowOutputContexts.forEach(
       (workflowOutputContext) => {
-        outputsClass.add(
-          new WorkflowOutput({
-            workflowContext: this.workflowContext,
-            workflowOutputContext,
-          })
-        );
+        try {
+          outputsClass.add(
+            new WorkflowOutput({
+              workflowContext: this.workflowContext,
+              workflowOutputContext,
+            })
+          );
+        } catch (error) {
+          if (error instanceof BaseCodegenError) {
+            this.workflowContext.addError(error);
+          } else {
+            throw error;
+          }
+        }
       }
     );
 
@@ -386,7 +394,7 @@ export class Workflow {
               this.workflowContext.getPortContextById(sourcePortId);
           } catch (e) {
             if (e instanceof NodePortNotFoundError) {
-              console.warn(e.message);
+              this.workflowContext.addError(e);
             } else {
               throw e;
             }
@@ -400,7 +408,7 @@ export class Workflow {
             targetNode = this.workflowContext.getNodeContext(targetNodeId);
           } catch (e) {
             if (e instanceof NodeNotFoundError) {
-              console.warn(e.message);
+              this.workflowContext.addError(e);
             } else {
               throw e;
             }
