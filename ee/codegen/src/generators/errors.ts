@@ -133,13 +133,6 @@ export class NodeInputNotFoundError extends BaseCodegenError {
 }
 
 /**
- * An error that raises when the code fails to post process
- */
-export class PostProcessingError extends BaseCodegenError {
-  code = "POST_PROCESSING_ERROR" as const;
-}
-
-/**
  * An error that raises when a value fails to generate
  */
 export class ValueGenerationError extends BaseCodegenError {

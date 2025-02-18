@@ -1,4 +1,3 @@
-import fs from "fs";
 import { mkdir } from "fs/promises";
 import { join } from "path";
 
@@ -20,7 +19,6 @@ import { WorkflowOutputContext } from "./context/workflow-output-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "./generators";
 import {
   NodeDefinitionGenerationError,
-  PostProcessingError,
   ProjectSerializationError,
   WorkflowGenerationError,
 } from "./generators/errors";
@@ -785,55 +783,5 @@ ${errors.slice(0, 3).map((err) => {
       workflowContext: this.workflowContext,
       sandboxInputs: this.sandboxInputs ?? [],
     });
-  }
-
-  private resolvePythonConfigFilePath(): string {
-    if (
-      process.env.ISORT_SETUP_CFG &&
-      fs.existsSync(process.env.ISORT_SETUP_CFG)
-    ) {
-      return process.env.ISORT_SETUP_CFG;
-    }
-
-    const cwdPyProjectTomlPath = join(process.cwd(), "pyproject.toml");
-    if (fs.existsSync(cwdPyProjectTomlPath)) {
-      return cwdPyProjectTomlPath;
-    }
-
-    const parentDirPyProjectTomlPath = join(
-      process.cwd(),
-      "..",
-      "pyproject.toml"
-    );
-    if (fs.existsSync(parentDirPyProjectTomlPath)) {
-      return parentDirPyProjectTomlPath;
-    }
-
-    const rootDirPyProjectTomlPath = join(
-      process.cwd(),
-      "..",
-      "..",
-      "pyproject.toml"
-    );
-    if (fs.existsSync(rootDirPyProjectTomlPath)) {
-      return rootDirPyProjectTomlPath;
-    }
-
-    const cwdSetupCfgPath = join(process.cwd(), "setup.cfg");
-    if (fs.existsSync(cwdSetupCfgPath)) {
-      return cwdSetupCfgPath;
-    }
-
-    const parentDirSetupCfgPath = join(process.cwd(), "..", "setup.cfg");
-    if (fs.existsSync(parentDirSetupCfgPath)) {
-      return parentDirSetupCfgPath;
-    }
-
-    const rootDirSetupCfgPath = join(process.cwd(), "..", "..", "setup.cfg");
-    if (fs.existsSync(rootDirSetupCfgPath)) {
-      return rootDirSetupCfgPath;
-    }
-
-    throw new PostProcessingError("No isort Config file found");
   }
 }
