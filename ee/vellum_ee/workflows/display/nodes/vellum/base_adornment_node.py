@@ -1,21 +1,43 @@
-from typing import Any, Generic, TypeVar
+from uuid import UUID
+from typing import Any, Callable, Generic, Optional, TypeVar
 
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
+from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
+from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _BaseAdornmentNodeType = TypeVar("_BaseAdornmentNodeType", bound=BaseAdornmentNode)
 
 
 class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Generic[_BaseAdornmentNodeType]):
-    def serialize(self, display_context: WorkflowDisplayContext, adornment: JsonObject, **kwargs: Any) -> dict:
-        wrapped_node = self._node.__wrapped_node__
+    def serialize(
+        self,
+        display_context: WorkflowDisplayContext,
+        adornment: JsonObject,
+        get_additional_kwargs: Optional[Callable[[UUID], dict]] = None,
+        **kwargs: Any,
+    ) -> dict:
+        node = self._node
+
+        wrapped_node = get_wrapped_node(node)
+        if not wrapped_node:
+            subworkflow = raise_if_descriptor(node.subworkflow)
+            if not isinstance(subworkflow.graph, type) or not issubclass(subworkflow.graph, BaseNode):
+                raise NotImplementedError(
+                    "Unable to serialize Try Nodes that wrap subworkflows containing more than one Node."
+                )
+
+            wrapped_node = subworkflow.graph
+
         wrapped_node_display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
         wrapped_node_display = wrapped_node_display_class()
-        serialized_wrapped_node = wrapped_node_display.serialize(display_context)
+        additional_kwargs = get_additional_kwargs(wrapped_node_display.node_id) if get_additional_kwargs else {}
+        serialized_wrapped_node = wrapped_node_display.serialize(display_context, **kwargs, **additional_kwargs)
 
         adornments = serialized_wrapped_node.get("adornments") or []
         serialized_wrapped_node["adornments"] = adornments + [adornment]

@@ -596,7 +596,20 @@ def test_serialize_workflow__try_wrapped():
             ],
             "name": "TryNode",
         },
-        "adornments": [],
+        "adornments": [
+            {
+                "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
+                "label": "TryNode",
+                "base": {"name": "TryNode", "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"]},
+                "attributes": [
+                    {
+                        "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
+                        "name": "on_error_code",
+                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                    }
+                ],
+            }
+        ],
     }
 
     final_output_nodes = workflow_raw_data["nodes"][2:]
