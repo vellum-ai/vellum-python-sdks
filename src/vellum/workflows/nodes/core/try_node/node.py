@@ -18,6 +18,7 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     Used to execute a Subworkflow and handle errors.
 
     on_error_code: Optional[WorkflowErrorCode] = None - The error code to handle
+    subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
     on_error_code: Optional[WorkflowErrorCode] = None

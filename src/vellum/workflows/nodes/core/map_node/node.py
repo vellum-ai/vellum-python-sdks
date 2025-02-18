@@ -43,6 +43,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     items: List[MapNodeItemType] - The items to map over
     max_concurrency: Optional[int] = None - The maximum number of concurrent subworkflow executions
+    subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
     items: List[MapNodeItemType]
