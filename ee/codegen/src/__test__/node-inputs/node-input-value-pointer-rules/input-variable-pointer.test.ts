@@ -49,7 +49,7 @@ describe("InputVariablePointer", () => {
   });
 
   it("should handle when it's referencing an input variable that no longer exists", async () => {
-    const workflowContext = workflowContextFactory();
+    const workflowContext = workflowContextFactory({ strict: false });
     const nodeContext = await nodeContextFactory({ workflowContext });
 
     const inputVariablePointer = new InputVariablePointerRule({

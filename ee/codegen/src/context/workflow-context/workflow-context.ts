@@ -416,12 +416,12 @@ export class WorkflowContext {
   }
 
   public addError(error: BaseCodegenError): void {
-    if (this.strict && error.severity === "ERROR") {
+    if (this.strict) {
       throw error;
-    }
-    if (error.severity === "WARNING") {
+    } else {
       error.log();
     }
+
     const errorExists = this.errors.some(
       (existingError) => existingError.message === error.message
     );

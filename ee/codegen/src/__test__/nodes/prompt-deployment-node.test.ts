@@ -100,7 +100,7 @@ describe("PromptDeploymentNode", () => {
         })
       );
       writer = new Writer();
-      workflowContext = workflowContextFactory();
+      workflowContext = workflowContextFactory({ strict: false });
       const nodeData = promptDeploymentNodeDataFactory();
 
       const nodeContext = (await createNodeContext({
