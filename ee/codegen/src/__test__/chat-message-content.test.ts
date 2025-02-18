@@ -24,8 +24,7 @@ describe("ChatMessageContent", () => {
         chatMessageContent: {
           type: "STRING",
           value:
-            /* prettier-ignore */
-            "{\"tool_calls\":[{\"id\":\"call_123\",\"type\":\"function\",\"function\":{\"name\":\"generate_query\",\"arguments\":\"{\\\"query\\\":\\\"SELECT * FROM users WHERE id = 1\\\"}\"}}]}",
+            '{"tool_calls":[{"id":"call_123","type":"function","function":{"name":"generate_query","arguments":"{\\"query\\":\\"SELECT * FROM users WHERE id = 1\\"}"}}]}',
         },
       });
       chatMessageContent.write(writer);
