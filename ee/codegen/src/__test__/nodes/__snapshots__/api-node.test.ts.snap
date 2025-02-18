@@ -77,17 +77,15 @@ exports[`ApiNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
-from ..inputs import Inputs
-
 
 class APINode(BaseAPINode):
     url = "fasdfadsf"
     method = APIRequestMethod.POST
     json = {}
     headers = {
-        "foo": Inputs.additional_header_value,
-        "bar": Inputs.additional_header_value_1,
-        "baz": Inputs.additional_header_value_1,
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
     }
     api_key_header_key = None
     authorization_type = AuthorizationType.API_KEY
@@ -101,17 +99,15 @@ exports[`ApiNode > basic auth secret node > secret ids should show names 1`] = `
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 from vellum.workflows.references import VellumSecretReference
 
-from ..inputs import Inputs
-
 
 class APINode(BaseAPINode):
     url = "fasdfadsf"
     method = APIRequestMethod.POST
     json = {}
     headers = {
-        "foo": Inputs.additional_header_value,
-        "bar": Inputs.additional_header_value_1,
-        "baz": Inputs.additional_header_value_1,
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
     }
     api_key_header_key = None
     authorization_type = AuthorizationType.API_KEY
@@ -219,8 +215,6 @@ exports[`ApiNode > reject on error enabled > getNodeFile 1`] = `
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
-from ..inputs import Inputs
-
 
 @TryNode.wrap()
 class APINode(BaseAPINode):
@@ -228,9 +222,9 @@ class APINode(BaseAPINode):
     method = APIRequestMethod.POST
     json = {}
     headers = {
-        "foo": Inputs.additional_header_value,
-        "bar": Inputs.additional_header_value_1,
-        "baz": Inputs.additional_header_value_1,
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
     }
     api_key_header_key = None
     authorization_type = AuthorizationType.API_KEY
@@ -243,7 +237,24 @@ exports[`ApiNode > skip authorization type input id field if undefined > getNode
 "from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
-from ..inputs import Inputs
+
+class APINode(BaseAPINode):
+    url = "fasdfadsf"
+    method = APIRequestMethod.POST
+    json = {}
+    headers = {
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
+    }
+    api_key_header_key = None
+"
+`;
+
+exports[`ApiNode > skip bearer token if secret not found > getNodeFile 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+from vellum.workflows.references import VellumSecretReference
 
 
 class APINode(BaseAPINode):
@@ -251,10 +262,13 @@ class APINode(BaseAPINode):
     method = APIRequestMethod.POST
     json = {}
     headers = {
-        "foo": Inputs.additional_header_value,
-        "bar": Inputs.additional_header_value_1,
-        "baz": Inputs.additional_header_value_1,
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
     }
     api_key_header_key = None
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = VellumSecretReference("some-non-existent-workspace-secret-id")
 "
 `;

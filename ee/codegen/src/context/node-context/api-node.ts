@@ -50,7 +50,10 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
     } catch (e) {
       if (e instanceof VellumError && e.statusCode === 404) {
         this.workflowContext.addError(
-          new EntityNotFoundError(`Workspace Secret "${input.key}" not found.`)
+          new EntityNotFoundError(
+            `Workspace Secret for attribute "${input.key}" not found.`,
+            "WARNING"
+          )
         );
       } else {
         throw e;

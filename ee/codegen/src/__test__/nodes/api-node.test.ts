@@ -2,6 +2,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
+import { VellumError } from "vellum-ai/errors/VellumError";
 import { beforeEach, describe } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -13,6 +14,7 @@ import {
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
+import { EntityNotFoundError } from "src/generators/errors";
 import { ApiNode } from "src/generators/nodes/api-node";
 
 describe("ApiNode", () => {
@@ -242,6 +244,52 @@ describe("ApiNode", () => {
     it("getNodeFile", async () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("skip bearer token if secret not found", () => {
+    it("getNodeFile", async () => {
+      vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
+        async (idOrName) => {
+          throw new VellumError({
+            message: `Workspace secret '${idOrName}' not found`,
+            statusCode: 404,
+          });
+        }
+      );
+      const nodeData = apiNodeFactory({
+        bearerToken: nodeInputFactory({
+          key: "bearer_token_value",
+          value: {
+            type: "WORKSPACE_SECRET",
+            data: {
+              type: "STRING",
+              workspaceSecretId: "some-non-existent-workspace-secret-id",
+            },
+          },
+        }),
+      });
+
+      const workflowContext = workflowContextFactory({ strict: false });
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      node = new ApiNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(workflowContext.getErrors()).toHaveLength(1);
+      const error = workflowContext.getErrors()[0];
+      expect(error).toBeInstanceOf(EntityNotFoundError);
+      expect(error?.message).toContain(
+        'Workspace Secret for attribute "bearer_token_value" not found.'
+      );
+      expect(error?.severity).toBe("WARNING");
     });
   });
 });

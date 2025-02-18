@@ -1075,9 +1075,10 @@ export function apiNodeFactory({
           value: {
             rules: [
               {
-                type: "INPUT_VARIABLE",
+                type: "CONSTANT_VALUE",
                 data: {
-                  inputVariableId: "5f64210f-ec43-48ce-ae40-40a9ba4c4c11",
+                  type: "STRING",
+                  value: "foo-value",
                 },
               },
             ],
@@ -1108,9 +1109,10 @@ export function apiNodeFactory({
           value: {
             rules: [
               {
-                type: "INPUT_VARIABLE",
+                type: "CONSTANT_VALUE",
                 data: {
-                  inputVariableId: "b81c5c88-9528-47d0-8106-14a75520ed47",
+                  type: "STRING",
+                  value: "bar-value",
                 },
               },
             ],
@@ -1141,9 +1143,10 @@ export function apiNodeFactory({
           value: {
             rules: [
               {
-                type: "INPUT_VARIABLE",
+                type: "CONSTANT_VALUE",
                 data: {
-                  inputVariableId: "b81c5c88-9528-47d0-8106-14a75520ed47",
+                  type: "STRING",
+                  value: "baz-value",
                 },
               },
             ],
