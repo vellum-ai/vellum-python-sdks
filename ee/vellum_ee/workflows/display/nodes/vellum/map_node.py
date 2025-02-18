@@ -3,8 +3,8 @@ from typing import Dict, Generic, List, Optional, TypeVar, cast
 
 from vellum.workflows.nodes import MapNode
 from vellum.workflows.types.core import JsonObject
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
+from vellum_ee.workflows.display.nodes.vellum.base_adornment_node import BaseAdornmentNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -12,7 +12,7 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 _MapNodeType = TypeVar("_MapNodeType", bound=MapNode)
 
 
-class BaseMapNodeDisplay(BaseNodeVellumDisplay[_MapNodeType], Generic[_MapNodeType]):
+class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNodeType]):
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:

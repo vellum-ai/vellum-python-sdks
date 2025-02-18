@@ -1,4 +1,5 @@
 from .api_node import BaseAPINodeDisplay
+from .base_adornment_node import BaseAdornmentNodeDisplay
 from .code_execution_node import BaseCodeExecutionNodeDisplay
 from .conditional_node import BaseConditionalNodeDisplay
 from .error_node import BaseErrorNodeDisplay
@@ -18,6 +19,7 @@ from .try_node import BaseTryNodeDisplay
 
 # All node display classes must be imported here to be registered in BaseNodeDisplay's node display registry
 __all__ = [
+    "BaseAdornmentNodeDisplay",
     "BaseAPINodeDisplay",
     "BaseCodeExecutionNodeDisplay",
     "BaseConditionalNodeDisplay",
