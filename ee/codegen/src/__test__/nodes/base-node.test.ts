@@ -68,7 +68,8 @@ describe("BaseNode", () => {
         });
       }).toThrow(
         new NodeAttributeGenerationError(
-          "Failed to generate attribute 'TemplatingNode.inputs.text': Failed to find node with id '12345678-1234-5678-1234-567812345678'"
+          "Failed to generate attribute 'TemplatingNode.inputs.text': Failed to find node with id '12345678-1234-5678-1234-567812345678'",
+          "WARNING"
         )
       );
     });
@@ -134,7 +135,8 @@ describe("BaseNode", () => {
         });
       }).toThrow(
         new NodeAttributeGenerationError(
-          "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find output value TemplatingNode.Outputs given id '90abcdef-90ab-cdef-90ab-cdef90abcdef'"
+          "Failed to generate attribute 'TemplatingNode2.inputs.text': Failed to find TemplatingNode Output with id '90abcdef-90ab-cdef-90ab-cdef90abcdef'",
+          "WARNING"
         )
       );
     });

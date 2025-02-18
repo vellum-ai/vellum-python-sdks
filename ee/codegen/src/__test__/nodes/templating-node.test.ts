@@ -8,6 +8,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import { templatingNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
+import { NodeNotFoundError } from "src/generators/errors";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
 
@@ -168,6 +169,75 @@ describe("TemplatingNode", () => {
       });
 
       nextTemplatingNodeAst.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("referencing an invalid node", () => {
+    it("getNodeFile", async () => {
+      const workflowContext = workflowContextFactory({ strict: false });
+      const templateNodeInputId = uuidv4();
+      const nodeData = templatingNodeFactory({
+        templateNodeInputId,
+        inputs: [
+          {
+            id: uuidv4(),
+            key: "text",
+            value: {
+              rules: [
+                {
+                  type: "NODE_OUTPUT",
+                  data: {
+                    nodeId: uuidv4(), // invalid node id
+                    outputId: uuidv4(),
+                  },
+                },
+                {
+                  type: "CONSTANT_VALUE",
+                  data: {
+                    type: "JSON",
+                    value: {},
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+          {
+            id: templateNodeInputId,
+            key: "template",
+            value: {
+              rules: [
+                {
+                  type: "CONSTANT_VALUE",
+                  data: {
+                    type: "STRING",
+                    value: "Hello, World!",
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+        ],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TemplatingNodeContext;
+
+      const node = new TemplatingNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+
+      expect(workflowContext.getErrors()).toHaveLength(1);
+      expect(workflowContext.getErrors()[0]).toBeInstanceOf(NodeNotFoundError);
+      expect(workflowContext.getErrors()[0]?.message).toContain(
+        "Failed to find node with id "
+      );
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });

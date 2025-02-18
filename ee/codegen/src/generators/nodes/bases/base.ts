@@ -167,7 +167,8 @@ export abstract class BaseNode<
       } catch (error) {
         if (error instanceof BaseCodegenError) {
           const nodeAttributeGenerationError = new NodeAttributeGenerationError(
-            `Failed to generate attribute '${this.nodeContext.nodeClassName}.inputs.${nodeInputData.key}': ${error.message}`
+            `Failed to generate attribute '${this.nodeContext.nodeClassName}.inputs.${nodeInputData.key}': ${error.message}`,
+            "WARNING"
           );
           this.workflowContext.addError(nodeAttributeGenerationError);
         } else {

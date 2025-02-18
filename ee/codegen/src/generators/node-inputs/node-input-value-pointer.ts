@@ -6,6 +6,7 @@ import { isNil } from "lodash";
 import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node-input-value-pointer-rule";
 
 import { BaseNodeContext } from "src/context/node-context/base";
+import { BaseCodegenError } from "src/generators/errors";
 import {
   NodeInputValuePointer as NodeInputValuePointerType,
   WorkflowDataNode,
@@ -42,17 +43,25 @@ export class NodeInputValuePointer extends AstNode {
   private generateRules(): NodeInputValuePointerRule[] {
     return this.nodeInputValuePointerData.rules
       .map((ruleData) => {
-        const rule = new NodeInputValuePointerRule({
-          nodeContext: this.nodeContext,
-          nodeInputValuePointerRuleData: ruleData,
-        });
-        if (rule.astNode) {
-          this.inheritReferences(rule);
-          return rule;
+        try {
+          const rule = new NodeInputValuePointerRule({
+            nodeContext: this.nodeContext,
+            nodeInputValuePointerRuleData: ruleData,
+          });
+          if (rule.astNode) {
+            this.inheritReferences(rule);
+            return rule;
+          }
+        } catch (error) {
+          if (error instanceof BaseCodegenError) {
+            this.nodeContext.workflowContext.addError(error);
+          } else {
+            throw error;
+          }
         }
         return undefined;
       })
-      .filter((rule) => !isNil(rule));
+      .filter((rule): rule is NodeInputValuePointerRule => !isNil(rule));
   }
 
   private generateAstNode(): AstNode {

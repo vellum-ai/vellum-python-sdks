@@ -358,7 +358,7 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
     const error = errors[0];
     expect(error?.severity).toBe("WARNING");
     expect(error?.message).toContain(
-      "Could not find subworkflow deployment output with id some-non-existent-subworkflow-output-id"
+      "Could not find Subworkflow Deployment Output with id some-non-existent-subworkflow-output-id"
     );
   });
 });

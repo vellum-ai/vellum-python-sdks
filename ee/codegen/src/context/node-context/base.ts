@@ -109,7 +109,7 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       ) {
         this.workflowContext.addError(
           new NodeOutputNotFoundError(
-            `Could not find subworkflow deployment output with id ${outputId}`,
+            `Could not find Subworkflow Deployment Output with id ${outputId}`,
             "WARNING"
           )
         );
@@ -117,7 +117,8 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       }
 
       throw new NodeOutputNotFoundError(
-        `Failed to find output value ${this.nodeClassName}.Outputs given id '${outputId}'`
+        `Failed to find ${this.nodeClassName} Output with id '${outputId}'`,
+        "WARNING"
       );
     }
 

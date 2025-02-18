@@ -93,6 +93,19 @@ class TemplatingNode(BaseTemplatingNode[BaseState, Json]):
 "
 `;
 
+exports[`TemplatingNode > referencing an invalid node > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {
+        "text": {},
+    }
+"
+`;
+
 exports[`TemplatingNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

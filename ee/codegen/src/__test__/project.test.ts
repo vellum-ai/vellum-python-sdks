@@ -258,7 +258,7 @@ describe("WorkflowProjectGenerator", () => {
         `\
 Encountered 1 error(s) while generating code:
 
-- Failed to generate attribute 'BadNode.inputs.other': Failed to find node with id 'node_that_doesnt_exist'
+- Failed to find node with id 'node_that_doesnt_exist'
 `
       );
     });

@@ -676,6 +676,7 @@ export function templatingNodeFactory({
   targetHandleId,
   errorOutputId,
   outputType = VellumVariableType.String,
+  templateNodeInputId,
   inputs,
   template,
 }: {
@@ -685,6 +686,7 @@ export function templatingNodeFactory({
   targetHandleId?: string;
   errorOutputId?: string;
   outputType?: VellumVariableType;
+  templateNodeInputId?: string;
   inputs?: NodeInput[];
   template?: ConstantValuePointer;
 } = {}): TemplatingNode {
@@ -721,7 +723,8 @@ export function templatingNodeFactory({
       errorOutputId,
       sourceHandleId: sourceHandleId ?? "6ee2c814-d0a5-4ec9-83b6-45156e2f22c4",
       targetHandleId: targetHandleId ?? "3960c8e1-9baa-4b9c-991d-e399d16a45aa",
-      templateNodeInputId: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+      templateNodeInputId:
+        templateNodeInputId ?? "7b8af68b-cf60-4fca-9c57-868042b5b616",
       outputType: outputType,
     },
     inputs: nodeInputs,
