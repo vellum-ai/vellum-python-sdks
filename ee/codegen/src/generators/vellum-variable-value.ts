@@ -18,6 +18,7 @@ import { ValueGenerationError } from "./errors";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
 import { IterableConfig } from "src/types/vellum";
+import { removeEscapeCharacters } from "src/utils/casing";
 import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
@@ -106,7 +107,9 @@ class ChatHistoryVellumValue extends AstNode {
         arguments_.push(
           python.methodArgument({
             name: "text",
-            value: python.TypeInstantiation.str(chatMessage.text),
+            value: python.TypeInstantiation.str(
+              removeEscapeCharacters(chatMessage.text)
+            ),
           })
         );
       }

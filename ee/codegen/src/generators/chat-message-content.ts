@@ -18,6 +18,7 @@ import {
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
+import { removeEscapeCharacters } from "src/utils/casing";
 import { assertUnreachable } from "src/utils/typing";
 
 class StringChatMessageContent extends AstNode {
@@ -37,7 +38,7 @@ class StringChatMessageContent extends AstNode {
       arguments_: [
         python.methodArgument({
           name: "value",
-          value: python.TypeInstantiation.str(value),
+          value: python.TypeInstantiation.str(removeEscapeCharacters(value)),
         }),
       ],
     });

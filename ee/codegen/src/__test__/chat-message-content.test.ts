@@ -18,6 +18,21 @@ describe("ChatMessageContent", () => {
       expect(await writer.toString()).toMatchSnapshot();
       expect(chatMessageContent.getReferences()).toHaveLength(1);
     });
+
+    it("should write a string with nested quotes correctly", async () => {
+      const chatMessageContent = new ChatMessageContent({
+        chatMessageContent: {
+          type: "STRING",
+          value:
+            /* eslint-disable-next-line */
+          /* prettier-ignore */
+            "{\"tool_calls\":[{\"id\":\"call_123\",\"type\":\"function\",\"function\":{\"name\":\"generate_query\",\"arguments\":\"{\\\"query\\\":\\\"SELECT * FROM users WHERE id = 1\\\"}\"}}]}",
+        },
+      });
+      chatMessageContent.write(writer);
+      expect(await writer.toString()).toMatchSnapshot();
+      expect(chatMessageContent.getReferences()).toHaveLength(1);
+    });
   });
 
   describe("FUNCTION_CALL", () => {
