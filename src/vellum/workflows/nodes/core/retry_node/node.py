@@ -19,7 +19,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
     max_attempts: int - The maximum number of attempts to retry the Subworkflow
     delay: float = None - The number of seconds to wait between retries
-    retry_on_error_code: Optional[VellumErrorCode] = None - The error code to retry on
+    retry_on_error_code: Optional[WorkflowErrorCode] = None - The error code to retry on
     retry_on_condition: Optional[BaseDescriptor] = None - The condition to retry on
     """
 
