@@ -54,7 +54,7 @@ from vellum.workflows.state import BaseState
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     filepath = "./script.py"
     code_inputs = {}
-    runtime = "PYTHON_3_11"
+    runtime = "PYTHON_3_11_6"
     packages = None
 "
 `;
@@ -71,7 +71,7 @@ from vellum.workflows.state import BaseState
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, Union[float, int]]):
     filepath = "./script.py"
     code_inputs = {}
-    runtime = "PYTHON_3_11"
+    runtime = "PYTHON_3_11_6"
     packages = None
 "
 `;
@@ -89,7 +89,7 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     code_inputs = {
         "secret_arg": VellumSecretReference("test-secret"),
     }
-    runtime = "PYTHON_3_11"
+    runtime = "PYTHON_3_11_6"
     packages = None
 "
 `;
@@ -104,7 +104,7 @@ from vellum.workflows.state import BaseState
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     code = """print(\\'Hello, World!\\')"""
     code_inputs = {}
-    runtime = "PYTHON_3_11"
+    runtime = "PYTHON_3_11_6"
     packages = None
 "
 `;
@@ -119,7 +119,7 @@ from vellum.workflows.state import BaseState
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     filepath = "./script.py"
     code_inputs = {}
-    runtime = "PYTHON_3_11"
+    runtime = "PYTHON_3_11_6"
     packages = None
 "
 `;
@@ -134,7 +134,37 @@ from vellum.workflows.state import BaseState
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     filepath = "./script.py"
     code_inputs = {}
-    runtime = "PYTHON_3_11"
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > failure cases > fallback to python 3.11.6 if runtime input is not valid 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > failure cases > fallback to python 3.11.6 if runtime input is not valid 2`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
     packages = None
 "
 `;

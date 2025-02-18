@@ -5,12 +5,15 @@ import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/clien
 import { beforeEach, describe } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
-import { codeExecutionNodeFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  codeExecutionNodeFactory,
+  nodeInputFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
-import { NodeInputValuePointerRule } from "src/types/vellum";
+import { NodeInput, NodeInputValuePointerRule } from "src/types/vellum";
 
 describe("CodeExecutionNode", () => {
   let workflowContext: WorkflowContext;
@@ -122,6 +125,49 @@ describe("CodeExecutionNode", () => {
         )
       );
     });
+
+    it.each<NodeInput>([
+      nodeInputFactory({
+        value: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "NUMBER",
+            value: 1,
+          },
+        },
+      }),
+      nodeInputFactory({
+        value: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "INVALID_RUNTIME",
+          },
+        },
+      }),
+    ])(
+      "fallback to python 3.11.6 if runtime input is not valid",
+      async (runtimeInput) => {
+        const workflowContext = workflowContextFactory({
+          strict: false,
+        });
+        const nodeData = codeExecutionNodeFactory({
+          runtimeInput,
+        });
+        const nodeContext = (await createNodeContext({
+          workflowContext,
+          nodeData,
+        })) as CodeExecutionContext;
+
+        node = new CodeExecutionNode({
+          workflowContext,
+          nodeContext,
+        });
+
+        node.getNodeFile().write(writer);
+        expect(await writer.toStringFormatted()).toMatchSnapshot();
+      }
+    );
   });
   describe("with runtime set", () => {
     it.each<"PYTHON_3_11_6" | "TYPESCRIPT_5_3_3">([
@@ -145,7 +191,16 @@ describe("CodeExecutionNode", () => {
 
       const nodeData = codeExecutionNodeFactory({
         codeInputValueRule: overrideInputValue,
-        runtime: override,
+        runtimeInput: nodeInputFactory({
+          key: "runtime",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: override,
+            },
+          },
+        }),
       });
 
       const nodeContext = (await createNodeContext({

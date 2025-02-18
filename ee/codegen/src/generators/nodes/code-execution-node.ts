@@ -108,13 +108,13 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       })
     );
 
-    const runtime = this.getNodeInputByName("runtime");
+    const runtime = this.nodeContext.getRuntime();
 
     if (runtime) {
       statements.push(
         python.field({
           name: "runtime",
-          initializer: runtime,
+          initializer: python.TypeInstantiation.str(runtime),
         })
       );
     }

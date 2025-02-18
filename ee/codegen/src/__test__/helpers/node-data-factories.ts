@@ -1287,12 +1287,30 @@ export function apiNodeFactory({
 export function codeExecutionNodeFactory({
   codeInputValueRule,
   codeOutputValueType,
-  runtime,
+  runtimeInput,
 }: {
   codeInputValueRule?: NodeInputValuePointerRule;
   codeOutputValueType?: VellumVariableType;
-  runtime?: string;
+  runtimeInput?: NodeInput;
 } = {}): CodeExecutionNode {
+  const runtime =
+    runtimeInput ??
+    ({
+      id: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
+      key: "runtime",
+      value: {
+        combinator: "OR",
+        rules: [
+          {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "PYTHON_3_11_6",
+            },
+          },
+        ],
+      },
+    } as NodeInput);
   const nodeData: CodeExecutionNode = {
     id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
     type: "CODE_EXECUTION",
@@ -1301,7 +1319,7 @@ export function codeExecutionNodeFactory({
       codeInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
       outputId: "81b270c0-4deb-4db3-aae5-138f79531b2b",
       outputType: codeOutputValueType ?? "STRING",
-      runtimeInputId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
+      runtimeInputId: runtime.id,
       targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
     },
@@ -1324,22 +1342,7 @@ export function codeExecutionNodeFactory({
               ],
         },
       },
-      {
-        id: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
-        key: "runtime",
-        value: {
-          combinator: "OR",
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "STRING",
-                value: runtime ? runtime : "PYTHON_3_11",
-              },
-            },
-          ],
-        },
-      },
+      runtime,
     ],
     displayData: {
       width: 462,

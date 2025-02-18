@@ -1,3 +1,4 @@
+import { CodeExecutionRuntime } from "vellum-ai/api";
 import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { VellumError } from "vellum-ai/errors";
 
@@ -11,6 +12,7 @@ import {
 import {
   CodeExecutionNode as CodeExecutionNodeType,
   NodeInput,
+  WorkspaceSecretPointer,
 } from "src/types/vellum";
 
 export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType> {
@@ -44,37 +46,59 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
     ];
   }
 
+  public getRuntime(): CodeExecutionRuntime {
+    const runtimeNodeInput = this.nodeData.inputs.find(
+      (nodeInput) => nodeInput.key === "runtime"
+    );
+
+    const runtimeNodeInputRule = runtimeNodeInput?.value.rules[0];
+
+    if (
+      !runtimeNodeInputRule ||
+      runtimeNodeInputRule.type !== "CONSTANT_VALUE" ||
+      runtimeNodeInputRule.data.type !== "STRING"
+    ) {
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Expected runtime node input to be a constant string value"
+        )
+      );
+      return "PYTHON_3_11_6";
+    }
+
+    const runtime = runtimeNodeInputRule.data.value;
+    if (runtime !== "PYTHON_3_11_6" && runtime !== "TYPESCRIPT_5_3_3") {
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Unsupported runtime: ${runtime}`,
+          "WARNING"
+        )
+      );
+      return "PYTHON_3_11_6";
+    }
+
+    return runtime;
+  }
+
   private getFilepath(): string {
     let filePath: string;
     if (this.nodeData.data.filepath) {
       filePath = this.nodeData.data.filepath;
     } else {
-      const runtimeNodeInput = this.nodeData.inputs.find(
-        (nodeInput) => nodeInput.key === "runtime"
-      );
-
-      const runtimeNodeInputRule = runtimeNodeInput?.value.rules[0];
-
-      if (
-        !runtimeNodeInputRule ||
-        runtimeNodeInputRule.type !== "CONSTANT_VALUE" ||
-        runtimeNodeInputRule.data.type !== "STRING"
-      ) {
-        throw new NodeAttributeGenerationError(
-          "Expected runtime node input to be a constant string value"
-        );
-      }
-
-      const runtime = runtimeNodeInputRule.data.value;
+      const runtime = this.getRuntime();
       let filetype: string;
-      if (runtime?.includes("PYTHON")) {
+      if (runtime === "PYTHON_3_11_6") {
         filetype = "py";
-      } else if (runtime?.includes("TYPESCRIPT")) {
+      } else if (runtime === "TYPESCRIPT_5_3_3") {
         filetype = "ts";
       } else {
-        throw new NodeAttributeGenerationError(
-          `Unsupported runtime: ${runtime}`
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `Unsupported runtime: ${runtime}`,
+            "WARNING"
+          )
         );
+        filetype = "py";
       }
       filePath = `./script.${filetype}`;
     }
@@ -84,7 +108,7 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
 
   private async processSecretInput(input: NodeInput): Promise<void> {
     const inputRule = input?.value.rules.find(
-      (rule) => rule.type == "WORKSPACE_SECRET"
+      (rule): rule is WorkspaceSecretPointer => rule.type == "WORKSPACE_SECRET"
     );
     if (!inputRule || !inputRule.data?.workspaceSecretId) {
       return;
