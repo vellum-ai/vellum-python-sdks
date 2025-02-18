@@ -33,7 +33,7 @@ class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode.__wrapp
     pass
 
 
-class OuterRetryNodeDisplay(BaseRetryNodeDisplay[InnerRetryGenericNode]):
+class OuterRetryNodeDisplay(BaseRetryNodeDisplay[InnerRetryGenericNode]):  # type: ignore
     pass
 
 

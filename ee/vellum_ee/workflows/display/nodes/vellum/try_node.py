@@ -23,7 +23,7 @@ _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
 class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNodeType]):
     error_output_id: ClassVar[Optional[UUID]] = None
 
-    def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
+    def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

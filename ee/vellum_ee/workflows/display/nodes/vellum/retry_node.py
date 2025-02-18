@@ -39,4 +39,4 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
             "attributes": attributes,
         }
 
-        return super().serialize(display_context, adornment)
+        return super().serialize(display_context, adornment=adornment)
