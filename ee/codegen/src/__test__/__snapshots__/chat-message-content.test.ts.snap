@@ -27,6 +27,19 @@ exports[`ChatMessageContent > AUDIO > should write an audio content correctly 1`
 "
 `;
 
+exports[`ChatMessageContent > FUNCTION_CALL > should write a function call content with id as null correctly 1`] = `
+"FunctionCallChatMessageContent(
+    value=FunctionCallChatMessageContentValue(
+        name="get_weather",
+        arguments={
+            "location": "New York",
+            "unit": "celsius",
+        },
+    )
+)
+"
+`;
+
 exports[`ChatMessageContent > FUNCTION_CALL > should write a function call content with id correctly 1`] = `
 "FunctionCallChatMessageContent(
     value=FunctionCallChatMessageContentValue(

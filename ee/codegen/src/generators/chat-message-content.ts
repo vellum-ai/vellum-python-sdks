@@ -71,7 +71,7 @@ class FunctionCallChatMessageContentValue extends AstNode {
   ): AstNode {
     const functionCallChatMessageContentValueArgs: MethodArgument[] = [];
 
-    if (value.id !== undefined) {
+    if (!isNil(value.id)) {
       functionCallChatMessageContentValueArgs.push(
         new MethodArgument({
           name: "id",

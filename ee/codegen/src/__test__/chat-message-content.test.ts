@@ -57,6 +57,25 @@ describe("ChatMessageContent", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
       expect(chatMessageContent.getReferences()).toHaveLength(2);
     });
+
+    it("should write a function call content with id as null correctly", async () => {
+      const chatMessageContent = new ChatMessageContent({
+        chatMessageContent: {
+          type: "FUNCTION_CALL",
+          value: {
+            id: null as unknown as string,
+            name: "get_weather",
+            arguments: {
+              location: "New York",
+              unit: "celsius",
+            },
+          },
+        },
+      });
+      chatMessageContent.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(chatMessageContent.getReferences()).toHaveLength(2);
+    });
   });
   describe("ARRAY", () => {
     it("should write an array of content correctly", async () => {
