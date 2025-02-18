@@ -1,13 +1,16 @@
+import inspect
 from uuid import UUID
 from typing import Any, Callable, ClassVar, Generic, Optional, Tuple, Type, TypeVar, cast
 
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME, get_wrapped_node
 from vellum.workflows.references.output import OutputReference
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
@@ -23,6 +26,7 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
+        node_id = self.node_id
         adornments = None
 
         inner_node = get_wrapped_node(node)
@@ -35,11 +39,29 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
 
             inner_node = subworkflow.graph
         elif inner_node.__bases__[0] is BaseNode:
-            # If the wrapped node is a generic node, we let generic node do adornment handling
-            class TryBaseNodeDisplay(BaseNodeDisplay[node]):  # type: ignore[valid-type]
-                pass
+            attributes: JsonArray = []
+            for attribute in node:
+                if inspect.isclass(attribute.instance) and issubclass(attribute.instance, BaseWorkflow):
+                    # We don't need to serialize attributes that are workflows
+                    continue
 
-            return TryBaseNodeDisplay().serialize(display_context)
+                id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
+                attributes.append(
+                    {
+                        "id": id,
+                        "name": attribute.name,
+                        "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
+                    }
+                )
+
+            adornment: JsonObject = {
+                "id": str(node_id),
+                "label": node.__qualname__,
+                "base": self.get_base().dict(),
+                "attributes": attributes,
+            }
+
+            return super().serialize(display_context, adornment)
         else:
             # If the wrapped node is a Vellum node, we backfill adornments
             adornments = []
