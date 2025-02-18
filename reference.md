@@ -1131,7 +1131,7 @@ client.submit_completion_actuals(
 
     Used to submit feedback regarding the quality of previous workflow execution and its outputs.
 
-    **Note:** Uses a base url of `https://predict.vellum.ai`.
+    **Note:** Uses a base url of `https://predict.vellum.ai`.    
 </dd>
 </dl>
 </dd>
@@ -2331,8 +2331,8 @@ client.document_indexes.list()
 
 Filter down to only document indices that have a status matching the status specified
 
-- `ACTIVE` - Active
-- `ARCHIVED` - Archived
+* `ACTIVE` - Active
+* `ARCHIVED` - Archived
     
 </dd>
 </dl>
@@ -3359,7 +3359,6 @@ Upload a document to be indexed and used for search.
 **Note:** Uses a base url of `https://documents.vellum.ai`.
 
 This is a multipart/form-data request. The `contents` field should be a file upload. It also expects a JSON body with the following fields:
-
 - `add_to_index_names: list[str]` - Optionally include the names of all indexes that you'd like this document to be included in
 - `external_id: str | None` - Optionally include an external ID for this document. This is useful if you want to re-upload the same document later when its contents change and would like it to be re-indexed.
 - `label: str` - A human-friendly name for this document. Typically the filename.
@@ -3521,7 +3520,6 @@ Filter down to only those entities whose parent folder has the specified ID.
 
 To filter by an entity's parent folder, provide the ID of the parent folder. To filter by the root directory, provide
 a string representing the entity type of the root directory. Supported root directories include:
-
 - PROMPT_SANDBOX
 - WORKFLOW_SANDBOX
 - DOCUMENT_INDEX
@@ -3537,8 +3535,8 @@ a string representing the entity type of the root directory. Supported root dire
 
 Filter down to only those objects whose entities have a status matching the status specified.
 
-- `ACTIVE` - Active
-- `ARCHIVED` - Archived
+* `ACTIVE` - Active
+* `ARCHIVED` - Archived
     
 </dd>
 </dl>
@@ -3639,7 +3637,6 @@ client.folder_entities.add_entity_to_folder(
 
 The ID of the folder to which the entity should be added. This can be a UUID of a folder, or the name of a root
 directory. Supported root directories include:
-
 - PROMPT_SANDBOX
 - WORKFLOW_SANDBOX
 - DOCUMENT_INDEX
@@ -4456,7 +4453,6 @@ client.test_suite_runs.list_executions(
 **expand:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` 
 
 The response fields to expand for more information.
-
 - 'results.metric_results.metric_label' expands the metric label for each metric result.
 - 'results.metric_results.metric_definition' expands the metric definition for each metric result.
 - 'results.metric_results.metric_definition.name' expands the metric definition name for each metric result.
