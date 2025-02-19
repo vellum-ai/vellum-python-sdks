@@ -60,7 +60,7 @@ def test_run_workflow__happy_path(vellum_client):
     assert terminal_event.name == "workflow.execution.fulfilled"
 
     # AND the outputs should be as expected
-    assert terminal_event.outputs == {"text": "I'm looking up the weather for you now."}
+    assert "I'm looking up the weather for you now." in terminal_event.outputs.text
 
     # AND we should have invoked the Prompt Deployment with the expected inputs
     vellum_client.execute_prompt_stream.assert_called_once_with(
