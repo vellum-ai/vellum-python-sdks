@@ -1,9 +1,11 @@
+import pytest
+
 from deepdiff import DeepDiff
 
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-from tests.workflows.basic_try_node.workflow import SimpleTryExample
+from tests.workflows.basic_try_node.workflow import SimpleTryExample, StandaloneTryExample
 
 
 def test_serialize_workflow():
@@ -69,3 +71,19 @@ def test_serialize_workflow():
 
     try_node = workflow_raw_data["nodes"][1]
     assert try_node["id"] == "1381c078-efa2-4255-89a1-7b4cb742c7fc"
+
+
+def test_serialize_workflow__standalone():
+    # GIVEN a Workflow with a standalone TryNode
+    # WHEN we serialize it
+    with pytest.raises(NotImplementedError) as exc:
+        workflow_display = get_workflow_display(
+            base_display_class=VellumWorkflowDisplay, workflow_class=StandaloneTryExample
+        )
+        workflow_display.serialize()
+
+    # THEN we should get an error
+    assert (
+        exc.value.args[0]
+        == "Unable to serialize standalone adornment nodes. Please use adornment nodes as a decorator."
+    )

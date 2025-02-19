@@ -5,6 +5,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 
 
+@TryNode.wrap()
 class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         value: int
@@ -16,20 +17,39 @@ class StartNode(BaseNode):
         return self.Outputs(value=arg)
 
 
-class Subworkflow(BaseWorkflow):
+class SimpleTryExample(BaseWorkflow):
     graph = StartNode
 
-    class Outputs(StartNode.Outputs):
+    class Outputs(BaseWorkflow.Outputs):
+        final_value = StartNode.Outputs.value
+        error = StartNode.Outputs.error
+
+
+class StandaloneStartNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        value: int
+
+    def run(self) -> Outputs:
+        arg = random.randint(0, 10)
+        if arg < 5:
+            raise Exception("This is a flaky node")
+        return self.Outputs(value=arg)
+
+
+class StandaloneSubworkflow(BaseWorkflow):
+    graph = StandaloneStartNode
+
+    class Outputs(StandaloneStartNode.Outputs):
         pass
 
 
-class TryableNode(TryNode):
-    subworkflow = Subworkflow
+class StandaloneTryableNode(TryNode):
+    subworkflow = StandaloneSubworkflow
 
 
-class SimpleTryExample(BaseWorkflow):
-    graph = TryableNode
+class StandaloneTryExample(BaseWorkflow):
+    graph = StandaloneTryableNode
 
     class Outputs(BaseWorkflow.Outputs):
-        final_value = TryableNode.Outputs.value
-        error = TryableNode.Outputs.error
+        final_value = StandaloneTryableNode.Outputs.value
+        error = StandaloneTryableNode.Outputs.error
