@@ -1,5 +1,6 @@
 import pytest
 
+from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
@@ -166,3 +167,49 @@ def test_workflow__node_in_both_graph_and_unused():
 
     # THEN it should raise an error
     assert "Node(s) NodeA cannot appear in both graph and unused_graphs" in str(exc_info.value)
+
+
+def test_workflow__get_unused_edges():
+    """
+    Test that get_unused_edges correctly identifies edges that are defined but not used in the workflow graph.
+    """
+
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
+    class NodeF(BaseNode):
+        pass
+
+    class NodeG(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA >> NodeB
+        unused_graphs = {NodeC >> {NodeD >> NodeE, NodeF} >> NodeG}
+
+    edge_c_to_d = Edge(from_port=list(NodeC.Ports)[0], to_node=NodeD)
+    edge_c_to_f = Edge(from_port=list(NodeC.Ports)[0], to_node=NodeF)
+    edge_d_to_e = Edge(from_port=list(NodeD.Ports)[0], to_node=NodeE)
+    edge_e_to_g = Edge(from_port=list(NodeE.Ports)[0], to_node=NodeG)
+    edge_f_to_g = Edge(from_port=list(NodeF.Ports)[0], to_node=NodeG)
+
+    # Collect unused edges
+    unused_edges = set(TestWorkflow.get_unused_edges())
+
+    # Expected unused edges
+    expected_unused_edges = {edge_c_to_d, edge_c_to_f, edge_d_to_e, edge_e_to_g, edge_f_to_g}
+
+    # TEST that unused edges are correctly identified
+    assert unused_edges == expected_unused_edges, f"Expected {expected_unused_edges}, but got {unused_edges}"

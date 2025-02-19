@@ -222,6 +222,28 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     yield node
 
     @classmethod
+    def get_unused_subgraphs(cls) -> List[Graph]:
+        """
+        Returns a list of subgraphs that are defined but not used in the graph
+        """
+        if not hasattr(cls, "unused_graphs"):
+            return []
+
+        graphs = []
+        for item in cls.unused_graphs:
+            if isinstance(item, Graph):
+                graphs.append(item)
+            elif isinstance(item, set):
+                for subitem in item:
+                    if isinstance(subitem, Graph):
+                        graphs.append(subitem)
+                    elif issubclass(subitem, BaseNode):
+                        graphs.append(Graph.from_node(subitem))
+            elif issubclass(item, BaseNode):
+                graphs.append(Graph.from_node(item))
+        return graphs
+
+    @classmethod
     def get_unused_nodes(cls) -> Iterator[Type[BaseNode]]:
         """
         Returns an iterator over the nodes that are defined but not used in the graph.
@@ -230,30 +252,25 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             yield from ()
         else:
             nodes = set()
-            for item in cls.unused_graphs:
-                if isinstance(item, Graph):
-                    # Item is a graph
-                    for node in item.nodes:
-                        if node not in nodes:
-                            nodes.add(node)
-                            yield node
-                elif isinstance(item, set):
-                    # Item is a set of graphs or nodes
-                    for subitem in item:
-                        if isinstance(subitem, Graph):
-                            for node in subitem.nodes:
-                                if node not in nodes:
-                                    nodes.add(node)
-                                    yield node
-                        elif issubclass(subitem, BaseNode):
-                            if subitem not in nodes:
-                                nodes.add(subitem)
-                                yield subitem
-                elif issubclass(item, BaseNode):
-                    # Item is a node
-                    if item not in nodes:
-                        nodes.add(item)
-                        yield item
+            subgraphs = cls.get_unused_subgraphs()
+            for subgraph in subgraphs:
+                for node in subgraph.nodes:
+                    if node not in nodes:
+                        nodes.add(node)
+                        yield node
+
+    @classmethod
+    def get_unused_edges(cls) -> Iterator[Edge]:
+        """
+        Returns an iterator over edges that are defined but not used in the graph.
+        """
+        edges = set()
+        subgraphs = cls.get_unused_subgraphs()
+        for subgraph in subgraphs:
+            for edge in subgraph.edges:
+                if edge not in edges:
+                    edges.add(edge)
+                    yield edge
 
     @classmethod
     def get_entrypoints(cls) -> Iterable[Type[BaseNode]]:
