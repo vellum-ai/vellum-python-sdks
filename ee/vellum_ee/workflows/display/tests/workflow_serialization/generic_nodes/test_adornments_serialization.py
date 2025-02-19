@@ -1,3 +1,4 @@
+import pytest
 from uuid import uuid4
 
 from deepdiff import DeepDiff
@@ -214,3 +215,25 @@ def test_serialize_node__try(serialize_node):
         },
         serialized_node,
     )
+
+
+@pytest.mark.skip(reason="Not implemented")
+def test_serialize_node__stacked():
+    @TryNode.wrap()
+    @RetryNode.wrap(max_attempts=5)
+    class InnerStackedGenericNode(BaseNode):
+        pass
+
+    # AND a workflow that uses the adornment node
+    class StackedWorkflow(BaseWorkflow):
+        graph = InnerStackedGenericNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=StackedWorkflow,
+    )
+    exec_config = workflow_display.serialize()
+
+    # THEN the workflow display is created successfully
+    assert exec_config is not None
