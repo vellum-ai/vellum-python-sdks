@@ -79,6 +79,7 @@ def _get_type_name(obj: Any) -> str:
 
 
 def _cast_to_output_type(result: Any, output_type: Any) -> Any:
+    is_valid_output_type = isinstance(output_type, type)
     if get_origin(output_type) is Union:
         allowed_types = get_args(output_type)
         for allowed_type in allowed_types:
@@ -86,7 +87,11 @@ def _cast_to_output_type(result: Any, output_type: Any) -> Any:
                 return _cast_to_output_type(result, allowed_type)
             except NodeException:
                 continue
-    elif issubclass(output_type, BaseModel) and not isinstance(result, output_type):
+    elif get_origin(output_type) is list:
+        allowed_item_type = get_args(output_type)[0]
+        if isinstance(result, list):
+            return [_cast_to_output_type(item, allowed_item_type) for item in result]
+    elif is_valid_output_type and issubclass(output_type, BaseModel) and not isinstance(result, output_type):
         try:
             return output_type.model_validate(result)
         except ValidationError as e:
@@ -94,7 +99,7 @@ def _cast_to_output_type(result: Any, output_type: Any) -> Any:
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
                 message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
             ) from e
-    elif isinstance(result, output_type):
+    elif is_valid_output_type and isinstance(result, output_type):
         return result
 
     output_type_name = _get_type_name(output_type)

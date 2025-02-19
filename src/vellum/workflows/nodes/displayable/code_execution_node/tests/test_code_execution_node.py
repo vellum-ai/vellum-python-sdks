@@ -1,14 +1,16 @@
 import pytest
 import os
-from typing import Any, Union
+from typing import Any, List, Union
 
 from pydantic import BaseModel
 
 from vellum import CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
+from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.number_input import NumberInput
+from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
@@ -659,3 +661,32 @@ def main():
 
     # AND the error should contain the execution error details
     assert exc_info.value.message == "Expected an output of type 'int | float', but received 'str'"
+
+
+def test_run_node__chat_history_output_type():
+    # GIVEN a node that that has a chat history return type
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, List[ChatMessage]]):
+        code = """\
+def main():
+    return [
+        {
+            "role": "USER",
+            "content": {
+                "type": "STRING",
+                "value": "Hello, world!",
+            }
+        }
+    ]
+"""
+        code_inputs = {}
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # AND the error should contain the execution error details
+    assert outputs == {
+        "result": [ChatMessage(role="USER", content=StringChatMessageContent(value="Hello, world!"))],
+        "log": "",
+    }
