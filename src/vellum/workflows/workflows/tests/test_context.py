@@ -47,6 +47,7 @@ def test_context_trace_and_parent():
             ),
         ),
     )
+    # When using execution context , if we set trace id within
     with execution_context(parent_context=parent_context, trace_id=trace_id):
         test = get_execution_context()
         assert test.trace_id == trace_id
@@ -55,12 +56,14 @@ def test_context_trace_and_parent():
             test1 = get_execution_context()
             assert test1.trace_id == trace_id
             assert test1.parent_context == second_parent_context
+            # then we can assume trace id will not change
             with execution_context(trace_id=uuid4()):
                 test3 = get_execution_context()
                 assert test3.trace_id == trace_id
             with execution_context(parent_context=parent_context, trace_id=uuid4()):
                 test3 = get_execution_context()
                 assert test3.trace_id == trace_id
+    # and if we have a new context, the trace will differ
     with execution_context(parent_context=parent_context, trace_id=uuid4()):
         test = get_execution_context()
         assert test.trace_id != trace_id
