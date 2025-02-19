@@ -521,10 +521,11 @@ class WorkflowRunner(Generic[StateType]):
             parent=self._parent_context,
             type="WORKFLOW",
         )
+        current_trace_id = self._initial_state.meta.trace_id
         for node_cls in self._entrypoints:
             try:
                 if not self._max_concurrency or len(self._active_nodes_by_execution_id) < self._max_concurrency:
-                    with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
+                    with execution_context(parent_context=current_parent, trace_id=current_trace_id):
                         self._run_node_if_ready(self._initial_state, node_cls)
                 else:
                     self._concurrency_queue.put((self._initial_state, node_cls, None))
@@ -551,7 +552,7 @@ class WorkflowRunner(Generic[StateType]):
 
             self._workflow_event_outer_queue.put(event)
 
-            with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
+            with execution_context(parent_context=current_parent, trace_id=current_trace_id):
                 rejection_error = self._handle_work_item_event(event)
 
             if rejection_error:
@@ -562,7 +563,7 @@ class WorkflowRunner(Generic[StateType]):
             while event := self._workflow_event_inner_queue.get_nowait():
                 self._workflow_event_outer_queue.put(event)
 
-                with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
+                with execution_context(parent_context=current_parent, trace_id=current_trace_id):
                     rejection_error = self._handle_work_item_event(event)
 
                 if rejection_error:
