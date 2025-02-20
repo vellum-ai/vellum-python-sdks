@@ -142,7 +142,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             yield BaseOutput(name=output_name, value=output_list)
 
     def _context_run_subworkflow(
-        self, *, item: MapNodeItemType, index: int, current_execution_context: Optional[ExecutionContext] = None
+        self, *, item: MapNodeItemType, index: int, current_execution_context: ExecutionContext
     ) -> None:
         parent_context = current_execution_context.parent_context
         trace_id = current_execution_context.trace_id
