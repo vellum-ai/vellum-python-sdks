@@ -329,7 +329,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             external_inputs=external_inputs,
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
-            parent_context=self._context.parent_context,
             max_concurrency=max_concurrency,
         ).stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
@@ -440,7 +439,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             external_inputs=external_inputs,
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
-            parent_context=self.context.parent_context,
             max_concurrency=max_concurrency,
         ).stream():
             if should_yield(self.__class__, event):

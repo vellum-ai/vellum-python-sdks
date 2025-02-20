@@ -27,7 +27,7 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
         error: Optional[WorkflowError] = None
 
     def run(self) -> Iterator[BaseOutput]:
-        parent_context = get_parent_context() or self._context.parent_context
+        parent_context = get_parent_context()
         with execution_context(parent_context=parent_context):
             subworkflow = self.subworkflow(
                 parent_state=self.state,

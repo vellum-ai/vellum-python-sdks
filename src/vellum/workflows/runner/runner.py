@@ -29,7 +29,7 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
+from vellum.workflows.events.types import BaseEvent, NodeParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionInitiatedBody,
@@ -75,7 +75,6 @@ class WorkflowRunner(Generic[StateType]):
         external_inputs: Optional[ExternalInputsArg] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
-        parent_context: Optional[ParentContext] = None,
         max_concurrency: Optional[int] = None,
     ):
         if state and external_inputs:
@@ -133,7 +132,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
-        self._parent_context = get_parent_context() or parent_context
+        self._parent_context = get_parent_context()
 
         setattr(
             self._initial_state,
@@ -196,7 +195,7 @@ class WorkflowRunner(Generic[StateType]):
                     break
 
             if not was_mocked:
-                with execution_context(parent_context=updated_parent_context):
+                with execution_context(parent_context=updated_parent_context, trace_id=node.state.meta.trace_id):
                     node_run_response = node.run()
 
             ports = node.Ports()
@@ -243,7 +242,7 @@ class WorkflowRunner(Generic[StateType]):
                         ),
                     )
 
-                with execution_context(parent_context=updated_parent_context):
+                with execution_context(parent_context=updated_parent_context, trace_id=node.state.meta.trace_id):
                     for output in node_run_response:
                         invoked_ports = output > ports
                         if output.is_initiated:
@@ -346,7 +345,7 @@ class WorkflowRunner(Generic[StateType]):
         if parent_context is None:
             parent_context = get_parent_context() or self._parent_context
 
-        with execution_context(parent_context=parent_context):
+        with execution_context(parent_context=parent_context, trace_id=node.state.meta.trace_id):
             self._run_work_item(node, span_id)
 
     def _handle_invoked_ports(self, state: StateType, ports: Optional[Iterable[Port]]) -> None:
@@ -524,7 +523,7 @@ class WorkflowRunner(Generic[StateType]):
         for node_cls in self._entrypoints:
             try:
                 if not self._max_concurrency or len(self._active_nodes_by_execution_id) < self._max_concurrency:
-                    with execution_context(parent_context=current_parent):
+                    with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
                         self._run_node_if_ready(self._initial_state, node_cls)
                 else:
                     self._concurrency_queue.put((self._initial_state, node_cls, None))
@@ -551,7 +550,7 @@ class WorkflowRunner(Generic[StateType]):
 
             self._workflow_event_outer_queue.put(event)
 
-            with execution_context(parent_context=current_parent):
+            with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
                 rejection_error = self._handle_work_item_event(event)
 
             if rejection_error:
@@ -562,7 +561,7 @@ class WorkflowRunner(Generic[StateType]):
             while event := self._workflow_event_inner_queue.get_nowait():
                 self._workflow_event_outer_queue.put(event)
 
-                with execution_context(parent_context=current_parent):
+                with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
                     rejection_error = self._handle_work_item_event(event)
 
                 if rejection_error:

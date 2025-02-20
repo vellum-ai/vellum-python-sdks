@@ -76,7 +76,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         fulfilled_iterations: List[bool] = []
         for index, item in enumerate(self.items):
             fulfilled_iterations.append(False)
-            parent_context = get_parent_context() or self._context.parent_context
+            parent_context = get_parent_context()
             thread = Thread(
                 target=self._context_run_subworkflow,
                 kwargs={
@@ -145,7 +145,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
     def _context_run_subworkflow(
         self, *, item: MapNodeItemType, index: int, parent_context: Optional[ParentContext] = None
     ) -> None:
-        parent_context = parent_context or self._context.parent_context
+        parent_context = parent_context
         with execution_context(parent_context=parent_context):
             self._run_subworkflow(item=item, index=index)
 
