@@ -179,7 +179,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         return self._context
 
     @staticmethod
-    def _resolve_graph(graph: Any) -> List[Graph]:
+    def _resolve_graph(graph: GraphAttribute) -> List[Graph]:
         """
         Resolves a single graph source to a list of Graph objects.
         """
