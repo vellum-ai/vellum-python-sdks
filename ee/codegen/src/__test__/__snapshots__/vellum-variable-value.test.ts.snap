@@ -18,6 +18,8 @@ exports[`VellumValue > CHAT_HISTORY > should write a CHAT_HISTORY value with a s
 
 exports[`VellumValue > CHAT_HISTORY > should write a CHAT_HISTORY value with just text 1`] = `"[ChatMessage(role="USER", text="Hello, AI!"),]"`;
 
+exports[`VellumValue > CHAT_HISTORY > should write nothing when CHAT_HISTORY value is empty list 1`] = `"None"`;
+
 exports[`VellumValue > CHAT_HISTORY > should write nothing when CHAT_HISTORY value is null 1`] = `"None"`;
 
 exports[`VellumValue > ERROR > should write a ERROR value correctly 1`] = `

@@ -75,7 +75,7 @@ class JsonVellumValue extends AstNode {
 }
 
 class ChatHistoryVellumValue extends AstNode {
-  private astNode: AstNode | undefined;
+  public astNode: AstNode | undefined;
 
   public constructor({
     value,
@@ -473,12 +473,14 @@ export class VellumValue extends AstNode {
       case "JSON":
         this.astNode = new JsonVellumValue(vellumValue.value);
         break;
-      case "CHAT_HISTORY":
-        this.astNode = new ChatHistoryVellumValue({
+      case "CHAT_HISTORY": {
+        const chatHistoryValue = new ChatHistoryVellumValue({
           value: vellumValue.value,
           isRequestType,
         });
+        this.astNode = chatHistoryValue.astNode ? chatHistoryValue : null;
         break;
+      }
       case "ERROR":
         this.astNode = new ErrorVellumValue(vellumValue.value);
         break;
@@ -501,7 +503,7 @@ export class VellumValue extends AstNode {
         assertUnreachable(vellumValue);
     }
 
-    this.inheritReferences(this.astNode);
+    this.inheritReferences(this.astNode ?? undefined);
   }
 
   public write(writer: Writer): void {
@@ -509,7 +511,6 @@ export class VellumValue extends AstNode {
       python.TypeInstantiation.none().write(writer);
       return;
     }
-
     this.astNode.write(writer);
   }
 }
