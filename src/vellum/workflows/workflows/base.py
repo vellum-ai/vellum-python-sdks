@@ -195,7 +195,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                 else:
                     raise ValueError(f"Unexpected graph type: {type(item)}")
             return graphs
-        if inspect.isclass(graph) and issubclass(graph, BaseNode):
+        if issubclass(graph, BaseNode):
             return [Graph.from_node(graph)]
         raise ValueError(f"Unexpected graph type: {type(graph)}")
 
