@@ -119,7 +119,10 @@ export abstract class BaseNode<
     const nodeInput = this.findNodeInputByName(name);
     if (!nodeInput) {
       this.workflowContext.addError(
-        new NodeAttributeGenerationError(`No input found named "${name}"`)
+        new NodeAttributeGenerationError(
+          `No input found named "${name}"`,
+          "WARNING"
+        )
       );
     }
 

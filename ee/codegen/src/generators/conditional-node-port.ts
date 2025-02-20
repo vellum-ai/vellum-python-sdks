@@ -145,8 +145,11 @@ export class ConditionalNodePort extends AstNode {
     const lhsKey = this.inputFieldKeysByRuleId.get(ruleId);
     let rhsKey;
     if (isNil(lhsKey)) {
-      throw new NodeAttributeGenerationError(
-        `Could not find input field key given ruleId: ${ruleId} on rule index: ${ruleIdx} on condition index: ${this.conditionalNodeDataIndex} for node: ${this.nodeLabel}`
+      this.portContext.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Could not find input field key given ruleId: ${ruleId} on rule index: ${ruleIdx} on condition index: ${this.conditionalNodeDataIndex} for node: ${this.nodeLabel}`,
+          "WARNING"
+        )
       );
     }
     if (conditionData.valueNodeInputId) {
@@ -154,16 +157,22 @@ export class ConditionalNodePort extends AstNode {
     }
     const lhs = this.nodeInputsByKey.get(lhsKey);
     if (isNil(lhs)) {
-      throw new NodePortGenerationError(
-        `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey} for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+      this.portContext.workflowContext.addError(
+        new NodePortGenerationError(
+          `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey} for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`,
+          "WARNING"
+        )
       );
     }
     const operator = conditionData.operator
       ? this.convertOperatorToMethod(conditionData.operator, lhs)
       : undefined;
     if (isNil(operator)) {
-      throw new NodePortGenerationError(
-        `Node ${this.nodeLabel} is missing required operator for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+      this.portContext.workflowContext.addError(
+        new NodePortGenerationError(
+          `Node ${this.nodeLabel} is missing required operator for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`,
+          "WARNING"
+        )
       );
     }
 
@@ -182,7 +191,8 @@ export class ConditionalNodePort extends AstNode {
       const castedValue = Number(nodeValue.data.value);
       if (isNaN(castedValue)) {
         const error = new ValueGenerationError(
-          `Failed to cast constant value ${nodeValue.data.value} to NUMBER for attribute ${this.nodeLabel}.${rhsKey}`
+          `Failed to cast constant value ${nodeValue.data.value} to NUMBER for attribute ${this.nodeLabel}.${rhsKey}`,
+          "WARNING"
         );
         this.portContext.workflowContext.addError(error);
       } else {
