@@ -83,7 +83,7 @@ describe("VellumValue", () => {
       expect(chatHistoryValue.getReferences()).toHaveLength(0);
     });
 
-    it("should write nothing when CHAT_HISTORY value is empty list", async () => {
+    it("should write empty list when CHAT_HISTORY value is empty list", async () => {
       const chatHistoryValue = codegen.vellumValue({
         vellumValue: {
           type: "CHAT_HISTORY",

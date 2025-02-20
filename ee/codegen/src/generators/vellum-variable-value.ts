@@ -19,7 +19,7 @@ import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
 import { IterableConfig } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
-import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
+import { assertUnreachable } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
   private astNode: AstNode;
@@ -75,7 +75,7 @@ class JsonVellumValue extends AstNode {
 }
 
 class ChatHistoryVellumValue extends AstNode {
-  public astNode: AstNode | undefined;
+  private astNode: AstNode | undefined;
 
   public constructor({
     value,
@@ -92,7 +92,7 @@ class ChatHistoryVellumValue extends AstNode {
     value: ChatMessageRequest[],
     isRequestType: boolean
   ): AstNode | undefined {
-    if (isNilOrEmpty(value)) {
+    if (isNil(value)) {
       return undefined;
     }
     const chatMessages = value.map((chatMessage) => {
@@ -473,14 +473,12 @@ export class VellumValue extends AstNode {
       case "JSON":
         this.astNode = new JsonVellumValue(vellumValue.value);
         break;
-      case "CHAT_HISTORY": {
-        const chatHistoryValue = new ChatHistoryVellumValue({
+      case "CHAT_HISTORY":
+        this.astNode = new ChatHistoryVellumValue({
           value: vellumValue.value,
           isRequestType,
         });
-        this.astNode = chatHistoryValue.astNode ? chatHistoryValue : null;
         break;
-      }
       case "ERROR":
         this.astNode = new ErrorVellumValue(vellumValue.value);
         break;
@@ -503,7 +501,7 @@ export class VellumValue extends AstNode {
         assertUnreachable(vellumValue);
     }
 
-    this.inheritReferences(this.astNode ?? undefined);
+    this.inheritReferences(this.astNode);
   }
 
   public write(writer: Writer): void {
