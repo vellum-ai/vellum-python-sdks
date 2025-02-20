@@ -19,7 +19,7 @@ from vellum.client import RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.workflows.constants import OMIT
-from vellum.workflows.context import get_parent_context
+from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
@@ -61,11 +61,13 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
     def _get_prompt_event_stream(self) -> Iterator[AdHocExecutePromptEvent]:
         input_variables, input_values = self._compile_prompt_inputs()
-        parent_context = get_parent_context()
+        current_context = get_execution_context()
+        parent_context = current_context.parent_context
+        trace_id = current_context.trace_id
         request_options = self.request_options or RequestOptions()
 
         request_options["additional_body_parameters"] = {
-            "execution_context": {"parent_context": parent_context},
+            "execution_context": {"parent_context": parent_context, "trace_id": trace_id},
             **request_options.get("additional_body_parameters", {}),
         }
         normalized_functions = (
