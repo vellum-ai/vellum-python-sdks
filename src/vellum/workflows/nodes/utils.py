@@ -1,11 +1,10 @@
 from functools import cache
 import json
-import re
 import sys
 from types import ModuleType
-from typing import Any, Callable, ForwardRef, Optional, Type, TypeVar, Union, get_args, get_origin
+from typing import Any, Callable, Dict, ForwardRef, List, Optional, Type, TypeVar, Union, get_args, get_origin
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, create_model
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -157,37 +156,42 @@ def _get_type_name(obj: Any) -> str:
     return str(obj)
 
 
-def cast_to_output_type(result: Any, output_type: Any) -> Any:
-    if isinstance(output_type, ForwardRef) or output_type is Any:
-        # Treat ForwardRefs as Any for now
-        return result
-
-    is_valid_output_type = isinstance(output_type, type)
+def _clean_output_type(output_type: Any) -> Any:
+    """
+    pydantic currently has a bug where it doesn't support forward references in the create_model function. It will
+    fail due to a max recursion depth error. This negatively impacts our `Json` type, but could also apply to other
+    user defined ForwardRef types.
+    """
     if get_origin(output_type) is Union:
-        allowed_types = get_args(output_type)
-        for allowed_type in allowed_types:
-            try:
-                return cast_to_output_type(result, allowed_type)
-            except NodeException:
-                continue
-    elif get_origin(output_type) is list:
-        allowed_item_type = get_args(output_type)[0]
-        if isinstance(result, list):
-            return [cast_to_output_type(item, allowed_item_type) for item in result]
-    elif is_valid_output_type and issubclass(output_type, BaseModel) and not isinstance(result, output_type):
-        try:
-            return output_type.model_validate(result)
-        except ValidationError as e:
-            raise NodeException(
-                code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
-            ) from e
-    elif is_valid_output_type and isinstance(result, output_type):
-        return result
+        clean_args = [_clean_output_type(child) for child in get_args(output_type)]
+        return Union[tuple(clean_args)]
 
-    output_type_name = _get_type_name(output_type)
-    result_type_name = _get_type_name(type(result))
-    raise NodeException(
-        code=WorkflowErrorCode.INVALID_OUTPUTS,
-        message=f"Expected an output of type '{output_type_name}', but received '{result_type_name}'",
-    )
+    if isinstance(output_type, ForwardRef):
+        # Here is where we prevent the max recursion depth error
+        return Any
+
+    if get_origin(output_type) is list:
+        clean_args = [_clean_output_type(child) for child in get_args(output_type)]
+        return List[clean_args[0]]  # type: ignore[valid-type]
+
+    if get_origin(output_type) is dict:
+        clean_args = [_clean_output_type(child) for child in get_args(output_type)]
+        return Dict[clean_args[0], clean_args[1]]  # type: ignore[valid-type]
+
+    return output_type
+
+
+def cast_to_output_type(result: Any, output_type: Any) -> Any:
+    clean_output_type = _clean_output_type(output_type)
+    DynamicModel = create_model("Output", output_type=(clean_output_type, ...))
+
+    try:
+        # mypy doesn't realize that this dynamic model has the output_type field defined above
+        return DynamicModel.model_validate({"output_type": result}).output_type  # type: ignore[attr-defined]
+    except Exception:
+        output_type_name = _get_type_name(output_type)
+        result_type_name = _get_type_name(type(result))
+        raise NodeException(
+            code=WorkflowErrorCode.INVALID_OUTPUTS,
+            message=f"Expected an output of type '{output_type_name}', but received '{result_type_name}'",
+        )

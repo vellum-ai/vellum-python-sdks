@@ -458,16 +458,7 @@ def main(word: str) -> int:
         node.run()
 
     # THEN the node should have produced the exception we expected
-    assert (
-        exc_info.value.message
-        == """\
-2 validation errors for FunctionCall
-arguments
-  Field required [type=missing, input_value={'n': 'hello', 'a': {}}, input_type=dict]
-name
-  Field required [type=missing, input_value={'n': 'hello', 'a': {}}, input_type=dict]\
-"""
-    )
+    assert exc_info.value.message == "Expected an output of type 'FunctionCall', but received 'dict'"
 
 
 def test_run_node__run_inline__valid_dict_to_pydantic_any_type():
