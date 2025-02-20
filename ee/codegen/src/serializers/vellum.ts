@@ -1624,13 +1624,13 @@ export const UnaryWorkflowExpressionSerializer: ObjectSchema<
   UnaryWorkflowExpressionSerializer.Raw,
   Omit<UnaryWorkflowExpression, "type">
 > = objectSchema({
-  lhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
   operator: LogicalOperatorSerializer,
 });
 
 export declare namespace UnaryWorkflowExpressionSerializer {
   interface Raw {
-    lhs: WorkflowValueDescriptorSerializer.Raw;
+    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
     operator: LogicalOperatorSerializer.Raw;
   }
 }
@@ -1639,16 +1639,16 @@ export const BinaryWorkflowExpressionSerializer: ObjectSchema<
   BinaryWorkflowExpressionSerializer.Raw,
   Omit<BinaryWorkflowExpression, "type">
 > = objectSchema({
-  lhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
   operator: LogicalOperatorSerializer,
-  rhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+  rhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
 });
 
 export declare namespace BinaryWorkflowExpressionSerializer {
   interface Raw {
-    lhs: WorkflowValueDescriptorSerializer.Raw;
+    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
     operator: LogicalOperatorSerializer.Raw;
-    rhs: WorkflowValueDescriptorSerializer.Raw;
+    rhs?: WorkflowValueDescriptorSerializer.Raw | null;
   }
 }
 
@@ -1656,18 +1656,18 @@ export const TernaryWorkflowExpressionSerializer: ObjectSchema<
   TernaryWorkflowExpressionSerializer.Raw,
   Omit<TernaryWorkflowExpression, "type">
 > = objectSchema({
-  base: lazySchema(() => WorkflowValueDescriptorSerializer),
+  base: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
   operator: LogicalOperatorSerializer,
-  lhs: lazySchema(() => WorkflowValueDescriptorSerializer),
-  rhs: lazySchema(() => WorkflowValueDescriptorSerializer),
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
+  rhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
 });
 
 export declare namespace TernaryWorkflowExpressionSerializer {
   interface Raw {
-    base: WorkflowValueDescriptorSerializer.Raw;
+    base?: WorkflowValueDescriptorSerializer.Raw | null;
     operator: LogicalOperatorSerializer.Raw;
-    lhs: WorkflowValueDescriptorSerializer.Raw;
-    rhs: WorkflowValueDescriptorSerializer.Raw;
+    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
+    rhs?: WorkflowValueDescriptorSerializer.Raw | null;
   }
 }
 
@@ -1900,14 +1900,14 @@ export const NodeAttributeSerializer: ObjectSchema<
 > = objectSchema({
   id: stringSchema(),
   name: stringSchema(),
-  value: WorkflowValueDescriptorSerializer,
+  value: WorkflowValueDescriptorSerializer.optional(),
 });
 
 export declare namespace NodeAttributeSerializer {
   interface Raw {
     id: string;
     name: string;
-    value: WorkflowValueDescriptorSerializer.Raw;
+    value?: WorkflowValueDescriptorSerializer.Raw | null;
   }
 }
 
@@ -2054,7 +2054,7 @@ export declare namespace WorkflowEdgeSerializer {
 export declare namespace WorkflowOutputValueSerializer {
   interface Raw {
     output_variable_id: string;
-    value: WorkflowValueDescriptorSerializer.Raw;
+    value?: WorkflowValueDescriptorSerializer.Raw | null;
   }
 }
 
@@ -2063,7 +2063,7 @@ export const WorkflowOutputValueSerializer: ObjectSchema<
   WorkflowOutputValue
 > = objectSchema({
   outputVariableId: propertySchema("output_variable_id", stringSchema()),
-  value: WorkflowValueDescriptorSerializer,
+  value: WorkflowValueDescriptorSerializer.optional(),
 });
 
 export const WorkflowRawDataSerializer: ObjectSchema<
