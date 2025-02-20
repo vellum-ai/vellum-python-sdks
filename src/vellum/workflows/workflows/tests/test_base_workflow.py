@@ -83,6 +83,57 @@ def test_subworkflow__inherit_base_outputs():
     assert terminal_event.outputs == {"output": "bar"}
 
 
+def test_workflow__get_nodes():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA >> {NodeB >> NodeC}, NodeD >> NodeE}
+
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA, NodeB, NodeC, NodeD, NodeE}
+
+
+def test_workflow__get_edges():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA >> {NodeB >> NodeC} >> NodeD >> NodeE}
+
+    edges = set(TestWorkflow.get_edges())
+    assert edges == {
+        Edge(from_port=NodeA.Ports.default, to_node=NodeB),
+        Edge(from_port=NodeB.Ports.default, to_node=NodeC),
+        Edge(from_port=NodeC.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeD.Ports.default, to_node=NodeE),
+    }
+
+
 def test_workflow__nodes_not_in_graph():
     class NodeA(BaseNode):
         pass
