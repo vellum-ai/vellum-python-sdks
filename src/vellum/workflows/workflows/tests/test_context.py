@@ -36,16 +36,7 @@ def test_context_trace_and_parent():
         ),
     )
     second_parent_context = WorkflowParentContext(
-        workflow_definition=MockWorkflow,
-        span_id=uuid4(),
-        parent=NodeParentContext(
-            node_definition=MockNode,
-            span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-            parent=WorkflowParentContext(
-                workflow_definition=MockWorkflow,
-                span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-            ),
-        ),
+        workflow_definition=MockWorkflow, span_id=uuid4(), parent=parent_context
     )
     # When using execution context , if we set trace id within
     with execution_context(parent_context=parent_context, trace_id=trace_id):
