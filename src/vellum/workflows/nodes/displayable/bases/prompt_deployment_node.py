@@ -15,7 +15,7 @@ from vellum import (
 from vellum.client import RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
-from vellum.workflows.context import get_parent_context
+from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
@@ -55,11 +55,12 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
     def _get_prompt_event_stream(self) -> Iterator[ExecutePromptEvent]:
-        current_parent_context = get_parent_context()
-        parent_context = current_parent_context.model_dump() if current_parent_context else None
+        current_context = get_execution_context()
+        trace_id = current_context.trace_id
+        parent_context = current_context.parent_context.model_dump() if current_context.parent_context else None
         request_options = self.request_options or RequestOptions()
         request_options["additional_body_parameters"] = {
-            "execution_context": {"parent_context": parent_context},
+            "execution_context": {"parent_context": parent_context, "trace_id": trace_id},
             **request_options.get("additional_body_parameters", {}),
         }
         return self._context.vellum_client.execute_prompt_stream(

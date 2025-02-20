@@ -16,10 +16,9 @@ from typing import (
     overload,
 )
 
-from vellum.workflows.context import execution_context, get_parent_context
+from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.events.types import ParentContext
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
@@ -76,13 +75,13 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         fulfilled_iterations: List[bool] = []
         for index, item in enumerate(self.items):
             fulfilled_iterations.append(False)
-            parent_context = get_parent_context()
+            current_execution_context = get_execution_context()
             thread = Thread(
                 target=self._context_run_subworkflow,
                 kwargs={
                     "item": item,
                     "index": index,
-                    "parent_context": parent_context,
+                    "current_execution_context": current_execution_context,
                 },
             )
             if self.max_concurrency is None:
@@ -143,10 +142,11 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             yield BaseOutput(name=output_name, value=output_list)
 
     def _context_run_subworkflow(
-        self, *, item: MapNodeItemType, index: int, parent_context: Optional[ParentContext] = None
+        self, *, item: MapNodeItemType, index: int, current_execution_context: Optional[ExecutionContext] = None
     ) -> None:
-        parent_context = parent_context
-        with execution_context(parent_context=parent_context):
+        parent_context = current_execution_context.parent_context
+        trace_id = current_execution_context.trace_id
+        with execution_context(parent_context=parent_context, trace_id=trace_id):
             self._run_subworkflow(item=item, index=index)
 
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
