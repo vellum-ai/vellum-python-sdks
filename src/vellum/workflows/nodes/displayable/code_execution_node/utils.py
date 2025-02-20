@@ -67,6 +67,44 @@ def _clean_for_dict_wrapper(obj):
     return obj
 
 
+def _get_type_name(obj: Any) -> str:
+    if isinstance(obj, type):
+        return obj.__name__
+
+    if get_origin(obj) is Union:
+        children = [_get_type_name(child) for child in get_args(obj)]
+        return " | ".join(children)
+
+    return str(obj)
+
+
+def _cast_to_output_type(result: Any, output_type: Any) -> Any:
+    if get_origin(output_type) is Union:
+        allowed_types = get_args(output_type)
+        for allowed_type in allowed_types:
+            try:
+                return _cast_to_output_type(result, allowed_type)
+            except NodeException:
+                continue
+    elif issubclass(output_type, BaseModel) and not isinstance(result, output_type):
+        try:
+            return output_type.model_validate(result)
+        except ValidationError as e:
+            raise NodeException(
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+                message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
+            ) from e
+    elif isinstance(result, output_type):
+        return result
+
+    output_type_name = _get_type_name(output_type)
+    result_type_name = _get_type_name(type(result))
+    raise NodeException(
+        code=WorkflowErrorCode.INVALID_OUTPUTS,
+        message=f"Expected an output of type '{output_type_name}', but received '{result_type_name}'",
+    )
+
+
 def run_code_inline(
     code: str,
     inputs: EntityInputsInterface,
@@ -112,25 +150,6 @@ __arg__out = main({", ".join(run_args)})
     result = exec_globals["__arg__out"]
 
     if output_type != Any:
-        if get_origin(output_type) is Union:
-            allowed_types = get_args(output_type)
-            if not isinstance(result, allowed_types):
-                raise NodeException(
-                    code=WorkflowErrorCode.INVALID_OUTPUTS,
-                    message=f"Expected output to be in types {allowed_types}, but received '{type(result).__name__}'",
-                )
-        elif issubclass(output_type, BaseModel) and not isinstance(result, output_type):
-            try:
-                result = output_type.model_validate(result)
-            except ValidationError as e:
-                raise NodeException(
-                    code=WorkflowErrorCode.INVALID_OUTPUTS,
-                    message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
-                ) from e
-        elif not isinstance(result, output_type):
-            raise NodeException(
-                code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message=f"Expected an output of type '{output_type.__name__}', but received '{type(result).__name__}'",
-            )
+        result = _cast_to_output_type(result, output_type)
 
     return logs, result

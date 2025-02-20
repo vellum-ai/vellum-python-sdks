@@ -2,6 +2,8 @@ import pytest
 import os
 from typing import Any, Union
 
+from pydantic import BaseModel
+
 from vellum import CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
 from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
@@ -610,3 +612,50 @@ def main(arg1: list[bool]) -> int:
 
     # AND the error should contain the execution error details
     assert outputs == {"result": 3, "log": ""}
+
+
+def test_run_node__union_output_type__pydantic_children():
+    # GIVEN a node that is a union type with a pydantic child
+    class OptionOne(BaseModel):
+        foo: str
+
+    class OptionTwo(BaseModel):
+        bar: int
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Union[OptionOne, OptionTwo]]):
+        code = """\
+def main():
+    return { "foo": "hello" }
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {}
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+
+    # THEN it should run successfully
+    outputs = node.run()
+
+    # AND the result should be the correct type
+    assert outputs == {"result": OptionOne(foo="hello"), "log": ""}
+
+
+def test_run_node__union_output_type__miss():
+    # GIVEN a node that is a union type
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Union[int, float]]):
+        code = """\
+def main():
+    return "hello"
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {}
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+
+    # THEN it should raise a NodeException with the execution error
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # AND the error should contain the execution error details
+    assert exc_info.value.message == "Expected an output of type 'int | float', but received 'str'"
