@@ -178,19 +178,48 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     def context(self) -> WorkflowContext:
         return self._context
 
+    @staticmethod
+    def _resolve_graph(graph: Any) -> List[Graph]:
+        """
+        Resolves a single graph source to a list of Graph objects.
+        """
+        if isinstance(graph, Graph):
+            return [graph]
+        if isinstance(graph, set):
+            graphs = []
+            for item in graph:
+                if isinstance(item, Graph):
+                    graphs.append(item)
+                elif inspect.isclass(item) and issubclass(item, BaseNode):
+                    graphs.append(Graph.from_node(item))
+                else:
+                    raise ValueError(f"Unexpected graph type: {type(item)}")
+            return graphs
+        if inspect.isclass(graph) and issubclass(graph, BaseNode):
+            return [Graph.from_node(graph)]
+        raise ValueError(f"Unexpected graph type: {type(graph)}")
+
+    @staticmethod
+    def _get_edges_from_subgraphs(subgraphs: Iterable[Graph]) -> Iterator[Any]:
+        edges = set()
+        for subgraph in subgraphs:
+            for edge in subgraph.edges:
+                if edge not in edges:
+                    edges.add(edge)
+                    yield edge
+
+    @staticmethod
+    def _get_nodes_from_subgraphs(subgraphs: Iterable[Graph]) -> Iterator[Type[BaseNode]]:
+        nodes = set()
+        for subgraph in subgraphs:
+            for node in subgraph.nodes:
+                if node not in nodes:
+                    nodes.add(node)
+                    yield node
+
     @classmethod
     def get_subgraphs(cls) -> List[Graph]:
-        original_graph = cls.graph
-        if isinstance(original_graph, Graph):
-            return [original_graph]
-        if isinstance(original_graph, set):
-            return [
-                subgraph if isinstance(subgraph, Graph) else Graph.from_node(subgraph) for subgraph in original_graph
-            ]
-        if issubclass(original_graph, BaseNode):
-            return [Graph.from_node(original_graph)]
-
-        raise ValueError(f"Unexpected graph type: {original_graph.__class__}")
+        return cls._resolve_graph(cls.graph)
 
     @classmethod
     def get_edges(cls) -> Iterator[Edge]:
@@ -198,14 +227,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         Returns an iterator over the edges in the workflow. We use a set to
         ensure uniqueness, and the iterator to preserve order.
         """
-
-        edges = set()
-        subgraphs = cls.get_subgraphs()
-        for subgraph in subgraphs:
-            for edge in subgraph.edges:
-                if edge not in edges:
-                    edges.add(edge)
-                    yield edge
+        return cls._get_edges_from_subgraphs(cls.get_subgraphs())
 
     @classmethod
     def get_nodes(cls) -> Iterator[Type[BaseNode]]:
@@ -213,13 +235,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         Returns an iterator over the nodes in the workflow. We use a set to
         ensure uniqueness, and the iterator to preserve order.
         """
-
-        nodes = set()
-        for subgraph in cls.get_subgraphs():
-            for node in subgraph.nodes:
-                if node not in nodes:
-                    nodes.add(node)
-                    yield node
+        return cls._get_nodes_from_subgraphs(cls.get_subgraphs())
 
     @classmethod
     def get_unused_subgraphs(cls) -> List[Graph]:
@@ -228,19 +244,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         """
         if not hasattr(cls, "unused_graphs"):
             return []
-
         graphs = []
         for item in cls.unused_graphs:
-            if isinstance(item, Graph):
-                graphs.append(item)
-            elif isinstance(item, set):
-                for subitem in item:
-                    if isinstance(subitem, Graph):
-                        graphs.append(subitem)
-                    elif issubclass(subitem, BaseNode):
-                        graphs.append(Graph.from_node(subitem))
-            elif issubclass(item, BaseNode):
-                graphs.append(Graph.from_node(item))
+            graphs.extend(cls._resolve_graph(item))
         return graphs
 
     @classmethod
@@ -248,29 +254,14 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         """
         Returns an iterator over the nodes that are defined but not used in the graph.
         """
-        if not hasattr(cls, "unused_graphs"):
-            yield from ()
-        else:
-            nodes = set()
-            subgraphs = cls.get_unused_subgraphs()
-            for subgraph in subgraphs:
-                for node in subgraph.nodes:
-                    if node not in nodes:
-                        nodes.add(node)
-                        yield node
+        return cls._get_nodes_from_subgraphs(cls.get_unused_subgraphs())
 
     @classmethod
     def get_unused_edges(cls) -> Iterator[Edge]:
         """
         Returns an iterator over edges that are defined but not used in the graph.
         """
-        edges = set()
-        subgraphs = cls.get_unused_subgraphs()
-        for subgraph in subgraphs:
-            for edge in subgraph.edges:
-                if edge not in edges:
-                    edges.add(edge)
-                    yield edge
+        return cls._get_edges_from_subgraphs(cls.get_unused_subgraphs())
 
     @classmethod
     def get_entrypoints(cls) -> Iterable[Type[BaseNode]]:
