@@ -43,7 +43,7 @@ export class WorkflowOutputContext {
     }
   }
 
-  public getWorkflowValueDescriptor(): WorkflowValueDescriptor {
+  public getWorkflowValueDescriptor(): WorkflowValueDescriptor | undefined {
     if (this.workflowOutputValue) {
       return this.workflowOutputValue.value;
     } else if (this.terminalNodeData) {
