@@ -70,7 +70,7 @@ class InlineSubworkflowNode(
     subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[undefined]]] = undefined
 
     def run(self) -> Iterator[BaseOutput]:
-        with execution_context(parent_context=get_parent_context() or self._context.parent_context):
+        with execution_context(parent_context=get_parent_context()):
             subworkflow = self.subworkflow(
                 parent_state=self.state,
                 context=WorkflowContext(vellum_client=self._context.vellum_client),
