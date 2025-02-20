@@ -3,7 +3,7 @@ import os
 import re
 from typing import Any, Tuple, Union, get_args, get_origin
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, create_model
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -79,35 +79,23 @@ def _get_type_name(obj: Any) -> str:
 
 
 def _cast_to_output_type(result: Any, output_type: Any) -> Any:
-    is_valid_output_type = isinstance(output_type, type)
-    if get_origin(output_type) is Union:
-        allowed_types = get_args(output_type)
-        for allowed_type in allowed_types:
-            try:
-                return _cast_to_output_type(result, allowed_type)
-            except NodeException:
-                continue
-    elif get_origin(output_type) is list:
-        allowed_item_type = get_args(output_type)[0]
-        if isinstance(result, list):
-            return [_cast_to_output_type(item, allowed_item_type) for item in result]
-    elif is_valid_output_type and issubclass(output_type, BaseModel) and not isinstance(result, output_type):
-        try:
-            return output_type.model_validate(result)
-        except ValidationError as e:
-            raise NodeException(
-                code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
-            ) from e
-    elif is_valid_output_type and isinstance(result, output_type):
-        return result
+    DynamicModel = create_model("Output", output_type=(output_type, ...))
 
-    output_type_name = _get_type_name(output_type)
-    result_type_name = _get_type_name(type(result))
-    raise NodeException(
-        code=WorkflowErrorCode.INVALID_OUTPUTS,
-        message=f"Expected an output of type '{output_type_name}', but received '{result_type_name}'",
-    )
+    try:
+        # mypy doesn't realize that this dynamic model has the output_type field defined above
+        return DynamicModel.model_validate({"output_type": result}).output_type  # type: ignore[attr-defined]
+    except ValidationError as e:
+        raise NodeException(
+            code=WorkflowErrorCode.INVALID_OUTPUTS,
+            message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
+        ) from e
+    except Exception:
+        output_type_name = _get_type_name(output_type)
+        result_type_name = _get_type_name(type(result))
+        raise NodeException(
+            code=WorkflowErrorCode.INVALID_OUTPUTS,
+            message=f"Expected an output of type '{output_type_name}', but received '{result_type_name}'",
+        )
 
 
 def run_code_inline(

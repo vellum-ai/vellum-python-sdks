@@ -403,7 +403,15 @@ def main(word: str) -> int:
         node.run()
 
     # THEN the node should have produced the exception we expected
-    assert exc_info.value.message == "Expected an output of type 'int', but received 'str'"
+    error_data = "[type=int_parsing, input_value='hello', input_type=str]"  # Used to workaround flake8
+    assert (
+        exc_info.value.message
+        == f"""\
+1 validation error for Output
+output_type
+  Input should be a valid integer, unable to parse string as an integer {error_data}\
+"""
+    )
 
 
 def test_run_node__run_inline__valid_dict_to_pydantic():
@@ -459,10 +467,10 @@ def main(word: str) -> int:
     assert (
         exc_info.value.message
         == """\
-2 validation errors for FunctionCall
-arguments
+2 validation errors for Output
+output_type.arguments
   Field required [type=missing, input_value={'n': 'hello', 'a': {}}, input_type=dict]
-name
+output_type.name
   Field required [type=missing, input_value={'n': 'hello', 'a': {}}, input_type=dict]\
 """
     )
@@ -660,7 +668,16 @@ def main():
         node.run()
 
     # AND the error should contain the execution error details
-    assert exc_info.value.message == "Expected an output of type 'int | float', but received 'str'"
+    error_data = "[type=int_parsing, input_value='hello', input_type=str]"  # Used to workaround flake8
+    assert exc_info.value.message == (
+        f"""\
+2 validation errors for Output
+output_type.int
+  Input should be a valid integer, unable to parse string as an integer {error_data}
+output_type.float
+  Input should be a valid number, unable to parse string as a number {error_data}
+"""
+    )
 
 
 def test_run_node__chat_history_output_type():
