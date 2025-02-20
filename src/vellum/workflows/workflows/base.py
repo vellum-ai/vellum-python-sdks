@@ -190,7 +190,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             for item in graph:
                 if isinstance(item, Graph):
                     graphs.append(item)
-                elif inspect.isclass(item) and issubclass(item, BaseNode):
+                elif issubclass(item, BaseNode):
                     graphs.append(Graph.from_node(item))
                 else:
                     raise ValueError(f"Unexpected graph type: {type(item)}")
