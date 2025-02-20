@@ -127,10 +127,20 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             "execution_context": {"parent_context": parent_context},
             **request_options.get("additional_body_parameters", {}),
         }
+
+        try:
+            deployment_id = str(self.deployment) if isinstance(self.deployment, UUID) else None
+            deployment_name = self.deployment if isinstance(self.deployment, str) else None
+        except AttributeError:
+            raise NodeException(
+                code=WorkflowErrorCode.NODE_EXECUTION,
+                message="Expected subworkflow deployment attribute to be either a UUID or STR, got None instead",
+            )
+
         subworkflow_stream = self._context.vellum_client.execute_workflow_stream(
             inputs=self._compile_subworkflow_inputs(),
-            workflow_deployment_id=str(self.deployment) if isinstance(self.deployment, UUID) else None,
-            workflow_deployment_name=self.deployment if isinstance(self.deployment, str) else None,
+            workflow_deployment_id=deployment_id,
+            workflow_deployment_name=deployment_name,
             release_tag=self.release_tag,
             external_id=self.external_id,
             event_types=["WORKFLOW"],

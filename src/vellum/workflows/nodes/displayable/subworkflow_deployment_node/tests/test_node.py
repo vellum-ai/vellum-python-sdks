@@ -11,6 +11,8 @@ from vellum.client.types.workflow_request_chat_history_input_request import Work
 from vellum.client.types.workflow_request_json_input_request import WorkflowRequestJsonInputRequest
 from vellum.client.types.workflow_result_event import WorkflowResultEvent
 from vellum.client.types.workflow_stream_event import WorkflowStreamEvent
+from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 
 
@@ -129,3 +131,24 @@ def test_run_workflow__any_array(vellum_client):
     assert call_kwargs["inputs"] == [
         WorkflowRequestJsonInputRequest(name="fruits", value=["apple", "banana", "cherry"]),
     ]
+
+
+def test_run_workflow__no_deployment():
+    """Confirm that we raise error when running a subworkflow deployment node with no deployment attribute set"""
+
+    # GIVEN a Subworkflow Deployment Node
+    class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        subworkflow_inputs = {
+            "fruits": ["apple", "banana", "cherry"],
+        }
+
+    # WHEN/THEN running the node should raise a NodeException
+    node = ExampleSubworkflowDeploymentNode()
+    with pytest.raises(NodeException) as exc_info:
+        list(node.run())
+
+    # AND the error message should be correct
+    assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
+    assert "Expected subworkflow deployment attribute to be either a UUID or STR, got None instead" in str(
+        exc_info.value
+    )
