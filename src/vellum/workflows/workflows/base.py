@@ -200,7 +200,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         raise ValueError(f"Unexpected graph type: {type(graph)}")
 
     @staticmethod
-    def _get_edges_from_subgraphs(subgraphs: Iterable[Graph]) -> Iterator[Any]:
+    def _get_edges_from_subgraphs(subgraphs: Iterable[Graph]) -> Iterator[Edge]:
         edges = set()
         for subgraph in subgraphs:
             for edge in subgraph.edges:
