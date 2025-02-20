@@ -250,17 +250,17 @@ def test_workflow__get_unused_edges():
         graph = NodeA >> NodeB
         unused_graphs = {NodeC >> {NodeD >> NodeE, NodeF} >> NodeG}
 
-    edge_c_to_d = Edge(from_port=NodeC.Ports.default, to_node=NodeD)
-    edge_c_to_f = Edge(from_port=NodeC.Ports.default, to_node=NodeF)
-    edge_d_to_e = Edge(from_port=NodeD.Ports.default, to_node=NodeE)
-    edge_e_to_g = Edge(from_port=NodeE.Ports.default, to_node=NodeG)
-    edge_f_to_g = Edge(from_port=NodeF.Ports.default, to_node=NodeG)
-
     # Collect unused edges
     unused_edges = set(TestWorkflow.get_unused_edges())
 
     # Expected unused edges
-    expected_unused_edges = {edge_c_to_d, edge_c_to_f, edge_d_to_e, edge_e_to_g, edge_f_to_g}
+    expected_unused_edges = {
+        Edge(from_port=NodeC.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeC.Ports.default, to_node=NodeF),
+        Edge(from_port=NodeD.Ports.default, to_node=NodeE),
+        Edge(from_port=NodeE.Ports.default, to_node=NodeG),
+        Edge(from_port=NodeF.Ports.default, to_node=NodeG),
+    }
 
     # TEST that unused edges are correctly identified
     assert unused_edges == expected_unused_edges, f"Expected {expected_unused_edges}, but got {unused_edges}"
