@@ -276,7 +276,7 @@ client.execute_prompt(
 <dl>
 <dd>
 
-**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Prompt Deployment.
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
     
 </dd>
 </dl>
@@ -417,7 +417,7 @@ for chunk in response:
 <dl>
 <dd>
 
-**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Prompt Deployment.
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
     
 </dd>
 </dl>
@@ -564,7 +564,7 @@ client.execute_workflow(
 <dl>
 <dd>
 
-**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique for a given workflow deployment.
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
     
 </dd>
 </dl>
@@ -689,7 +689,7 @@ for chunk in response:
 <dl>
 <dd>
 
-**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique for a given workflow deployment.
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
     
 </dd>
 </dl>
@@ -5492,6 +5492,98 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **release_tags:** `typing.Optional[typing.Sequence[str]]` — Optionally provide the release tags that you'd like to be associated with the latest release of the created/updated Prompt Deployment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.workflow_sandboxes.<a href="src/vellum/resources/workflow_sandboxes/client.py">list_workflow_sandbox_examples</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List Workflow Sandbox examples that were previously cloned into the User's Workspace
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.workflow_sandboxes.list_workflow_sandbox_examples()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**limit:** `typing.Optional[int]` — Number of results to return per page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offset:** `typing.Optional[int]` — The initial index from which to return the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tag:** `typing.Optional[ListWorkflowSandboxExamplesRequestTag]` 
     
 </dd>
 </dl>
