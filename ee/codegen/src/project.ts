@@ -21,6 +21,7 @@ import {
   NodeDefinitionGenerationError,
   ProjectSerializationError,
   WorkflowGenerationError,
+  WorkflowGenerationWarning,
 } from "./generators/errors";
 import { BaseNode } from "./generators/nodes/bases";
 import { GuardrailNode } from "./generators/nodes/guardrail-node";
@@ -403,7 +404,9 @@ ${errors.slice(0, 3).map((err) => {
         (n): n is EntrypointNode => n.type === "ENTRYPOINT"
       );
     if (entrypointNodes.length > 1) {
-      throw new WorkflowGenerationError("Multiple entrypoint nodes found");
+      this.workflowContext.addError(
+        new WorkflowGenerationWarning("Multiple entrypoint nodes found")
+      );
     }
 
     const entrypointNode = entrypointNodes[0];

@@ -121,7 +121,10 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
     } catch (e) {
       if (e instanceof VellumError && e.statusCode === 404) {
         this.workflowContext.addError(
-          new EntityNotFoundError(`Workspace Secret "${input.key}" not found.`)
+          new EntityNotFoundError(
+            `Workspace Secret "${input.key}" not found.`,
+            "WARNING"
+          )
         );
       } else {
         throw e;
