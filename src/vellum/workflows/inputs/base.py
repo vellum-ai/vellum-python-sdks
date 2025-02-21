@@ -1,9 +1,11 @@
-from typing import Any, Iterator, Tuple, Type
+from typing import Any, Iterator, Tuple, Type, Union, get_args, get_origin
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.references import ExternalInputReference, WorkflowInputReference
 from vellum.workflows.references.input import InputReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
@@ -41,12 +43,33 @@ class BaseInputs(metaclass=_BaseInputsMeta):
 
     def __init__(self, **kwargs: Any) -> None:
         for name, value in kwargs.items():
+            field_type = self.__class__.__annotations__.get(name)
+            self._validate_input(value, field_type)
             setattr(self, name, value)
 
     def __iter__(self) -> Iterator[Tuple[InputReference, Any]]:
         for input_descriptor in self.__class__:
             if hasattr(self, input_descriptor.name):
                 yield (input_descriptor, getattr(self, input_descriptor.name))
+
+    def _validate_input(self, value: Any, field_type: Any) -> None:
+        if value is None:
+            # Check if field_type is Optional
+            origin = get_origin(field_type)
+            args = get_args(field_type)
+            if not (origin is Union and type(None) in args):
+                raise NodeException(
+                    message="Required input variables should have defined value",
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
+        if isinstance(value, str) and value == "":
+            origin = get_origin(field_type)
+            args = get_args(field_type)
+            if not (origin is Union and type(None) in args):
+                raise NodeException(
+                    message="Empty string not allowed for required string input",
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
 
     @classmethod
     def __get_pydantic_core_schema__(
