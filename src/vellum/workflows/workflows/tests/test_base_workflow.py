@@ -123,13 +123,14 @@ def test_workflow__get_edges():
         pass
 
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-        graph = {NodeA >> {NodeB >> NodeC} >> NodeD >> NodeE}
+        graph = {NodeA >> {NodeB >> NodeC, NodeD} >> NodeE}
 
     edges = set(TestWorkflow.get_edges())
     assert edges == {
         Edge(from_port=NodeA.Ports.default, to_node=NodeB),
         Edge(from_port=NodeB.Ports.default, to_node=NodeC),
-        Edge(from_port=NodeC.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeA.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeC.Ports.default, to_node=NodeE),
         Edge(from_port=NodeD.Ports.default, to_node=NodeE),
     }
 
