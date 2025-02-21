@@ -1,9 +1,9 @@
-from tests.workflows.basic_ports.else_with_no_if.workflow import ElseWithNoIfWorkflow
+from tests.workflows.basic_ports.else_with_no_if.workflow import ElseWithNoIfWorkflow, Inputs
 
 
 def test_run_workflow():
     workflow = ElseWithNoIfWorkflow()
-    terminal_event = workflow.run()
+    terminal_event = workflow.run(inputs=Inputs(value="foo"))
     assert terminal_event.name == "workflow.execution.rejected"
     base_module = __name__.split(".")[:-2]
     assert (

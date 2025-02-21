@@ -1,6 +1,6 @@
 from vellum.workflows.errors.types import WorkflowErrorCode
 
-from tests.workflows.missing_workflow_inputs.workflow import Inputs, MissingInputsWorkflow
+from tests.workflows.missing_workflow_inputs.workflow import MissingInputsWorkflow
 
 
 def test_run_workflow__happy_path():
@@ -8,7 +8,7 @@ def test_run_workflow__happy_path():
     workflow = MissingInputsWorkflow()
 
     # WHEN we run the workflow
-    terminal_event = workflow.run(inputs=Inputs())  # type: ignore[call-arg]
+    terminal_event = workflow.run()
 
     # THEN the workflow should have completed with a failure
     assert terminal_event.name == "workflow.execution.rejected", terminal_event

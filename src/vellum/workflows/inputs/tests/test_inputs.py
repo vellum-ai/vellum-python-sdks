@@ -30,7 +30,7 @@ def test_base_inputs_empty_value():
 
     # WHEN we try to omit a required field
     with pytest.raises(WorkflowInitializationException) as exc_info:
-        TestInputs(optional_string="ok")
+        TestInputs(optional_string="ok")  # type: ignore
 
     # THEN it should raise a NodeException with the correct error message and code
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
