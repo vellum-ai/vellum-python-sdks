@@ -83,6 +83,58 @@ def test_subworkflow__inherit_base_outputs():
     assert terminal_event.outputs == {"output": "bar"}
 
 
+def test_workflow__get_nodes():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA >> {NodeB >> NodeC}, NodeD >> NodeE}
+
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA, NodeB, NodeC, NodeD, NodeE}
+
+
+def test_workflow__get_edges():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA >> {NodeB >> NodeC, NodeD} >> NodeE}
+
+    edges = set(TestWorkflow.get_edges())
+    assert edges == {
+        Edge(from_port=NodeA.Ports.default, to_node=NodeB),
+        Edge(from_port=NodeB.Ports.default, to_node=NodeC),
+        Edge(from_port=NodeA.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeC.Ports.default, to_node=NodeE),
+        Edge(from_port=NodeD.Ports.default, to_node=NodeE),
+    }
+
+
 def test_workflow__nodes_not_in_graph():
     class NodeA(BaseNode):
         pass
@@ -199,17 +251,17 @@ def test_workflow__get_unused_edges():
         graph = NodeA >> NodeB
         unused_graphs = {NodeC >> {NodeD >> NodeE, NodeF} >> NodeG}
 
-    edge_c_to_d = Edge(from_port=NodeC.Ports.default, to_node=NodeD)
-    edge_c_to_f = Edge(from_port=NodeC.Ports.default, to_node=NodeF)
-    edge_d_to_e = Edge(from_port=NodeD.Ports.default, to_node=NodeE)
-    edge_e_to_g = Edge(from_port=NodeE.Ports.default, to_node=NodeG)
-    edge_f_to_g = Edge(from_port=NodeF.Ports.default, to_node=NodeG)
-
     # Collect unused edges
     unused_edges = set(TestWorkflow.get_unused_edges())
 
     # Expected unused edges
-    expected_unused_edges = {edge_c_to_d, edge_c_to_f, edge_d_to_e, edge_e_to_g, edge_f_to_g}
+    expected_unused_edges = {
+        Edge(from_port=NodeC.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeC.Ports.default, to_node=NodeF),
+        Edge(from_port=NodeD.Ports.default, to_node=NodeE),
+        Edge(from_port=NodeE.Ports.default, to_node=NodeG),
+        Edge(from_port=NodeF.Ports.default, to_node=NodeG),
+    }
 
     # TEST that unused edges are correctly identified
     assert unused_edges == expected_unused_edges, f"Expected {expected_unused_edges}, but got {unused_edges}"
