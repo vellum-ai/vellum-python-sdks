@@ -42,6 +42,18 @@ class BaseInputs(metaclass=_BaseInputsMeta):
     __parent_class__: Type = type(None)
 
     def __init__(self, **kwargs: Any) -> None:
+        for name, field_type in self.__class__.__annotations__.items():
+            if name not in kwargs:
+                origin = get_origin(field_type)
+                args = get_args(field_type)
+                has_default = name in vars(self.__class__)
+                if not has_default and not (origin is Union and type(None) in args):
+                    raise WorkflowInitializationException(
+                        message="Required input variables should have defined value",
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                    )
+
+        # Then validate and set the provided values
         for name, value in kwargs.items():
             field_type = self.__class__.__annotations__.get(name)
             self._validate_input(value, field_type)
@@ -60,14 +72,6 @@ class BaseInputs(metaclass=_BaseInputsMeta):
             if not (origin is Union and type(None) in args):
                 raise WorkflowInitializationException(
                     message="Required input variables should have defined value",
-                    code=WorkflowErrorCode.INVALID_INPUTS,
-                )
-        if isinstance(value, str) and value == "":
-            origin = get_origin(field_type)
-            args = get_args(field_type)
-            if not (origin is Union and type(None) in args):
-                raise WorkflowInitializationException(
-                    message="Empty string not allowed for required string input",
                     code=WorkflowErrorCode.INVALID_INPUTS,
                 )
 

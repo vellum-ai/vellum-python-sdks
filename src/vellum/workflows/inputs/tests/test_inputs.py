@@ -28,25 +28,22 @@ def test_base_inputs_empty_value():
         required_string: str
         optional_string: Optional[str]
 
-    # WHEN we try to assign None to a required field
+    # WHEN we try to omit a required field
     with pytest.raises(WorkflowInitializationException) as exc_info:
-        TestInputs(required_string=None, optional_string="ok")  # type: ignore
+        TestInputs(optional_string="ok")
 
     # THEN it should raise a NodeException with the correct error message and code
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "Required input variables should have defined value" in str(exc_info.value)
 
 
-def test_base_inputs_empty_string():
-    # GIVEN some input class with required and optional string fields
+def test_base_inputs_with_default():
+    # GIVEN some input class with a field that has a default value
     class TestInputs(BaseInputs):
-        required_string: str
-        optional_string: Optional[str]
+        string_with_default: str = "default_value"
 
-    # WHEN we try to assign an empty string to a required string field
-    with pytest.raises(WorkflowInitializationException) as exc_info:
-        TestInputs(required_string="", optional_string="ok")
+    # WHEN we create an instance without providing the field
+    inputs = TestInputs()
 
-    # THEN it should raise a NodeException with the correct error message and code
-    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "Empty string not allowed for required string input" in str(exc_info.value)
+    # THEN it should use the default value
+    assert inputs.string_with_default == "default_value"
