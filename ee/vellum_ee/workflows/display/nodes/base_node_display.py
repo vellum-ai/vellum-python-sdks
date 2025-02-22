@@ -47,7 +47,7 @@ from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_di
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator, primitive_to_vellum_value
-from vellum_ee.workflows.display.vellum import CodeResourceDefinition, GenericNodeDisplayData
+from vellum_ee.workflows.display.vellum import CodeResourceDefinition, NodeDisplayData
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -295,9 +295,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         cls._node_display_registry[node_class] = cls
 
-    def _get_generic_node_display_data(self) -> GenericNodeDisplayData:
-        explicit_value = self._get_explicit_node_display_attr("display_data", GenericNodeDisplayData)
-        return explicit_value if explicit_value else GenericNodeDisplayData()
+    def _get_generic_node_display_data(self) -> NodeDisplayData:
+        explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
+        return explicit_value if explicit_value else NodeDisplayData()
 
     def serialize_condition(self, display_context: "WorkflowDisplayContext", condition: BaseDescriptor) -> JsonObject:
         if isinstance(
