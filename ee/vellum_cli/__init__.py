@@ -4,6 +4,7 @@ import click
 
 from vellum_cli.aliased_group import ClickAliasedGroup
 from vellum_cli.image_push import image_push_command
+from vellum_cli.init import init_command
 from vellum_cli.ping import ping_command
 from vellum_cli.pull import pull_command
 from vellum_cli.push import push_command
@@ -329,6 +330,13 @@ def images() -> None:
 def image_push(image: str, tag: Optional[List[str]] = None) -> None:
     """Push Docker image to Vellum"""
     image_push_command(image, tag)
+
+
+@workflows.command(name="init")
+def workflows_init() -> None:
+    """Initialize a new Vellum project"""
+
+    init_command()
 
 
 if __name__ == "__main__":
