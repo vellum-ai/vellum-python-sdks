@@ -859,7 +859,7 @@ describe("Workflow", () => {
       ]);
     });
 
-    it.skip("Should solve a case with a branched node within a set into a merge node", async () => {
+    it("Should solve a case with a branched node within a set into a merge node", async () => {
       const EntrypointNode = entrypointNodeDataFactory();
 
       const StartNode = genericNodeFactory({
