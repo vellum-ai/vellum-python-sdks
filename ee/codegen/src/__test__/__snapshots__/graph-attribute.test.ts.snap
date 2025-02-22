@@ -45,6 +45,19 @@ exports[`Workflow > graph > Should handle two branches from a node to a node 1`]
 "
 `;
 
+exports[`Workflow > graph > Should solve a case with a branched node within a set into a merge node 1`] = `
+"(
+    StartNode
+    >> {
+        TopNode,
+        BottomNode,
+        BottomNode >> SecondBottomNode,
+    }
+    >> MergeNode
+)
+"
+`;
+
 exports[`Workflow > graph > should be able to create a proper else edge when there are three ports pointing to a set 1`] = `
 "{
     FirstCheckNode.Ports.if_port

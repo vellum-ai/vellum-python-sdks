@@ -858,5 +858,39 @@ describe("Workflow", () => {
         [fourthNode, fifthNode],
       ]);
     });
+
+    it.skip("Should solve a case with a branched node within a set into a merge node", async () => {
+      const EntrypointNode = entrypointNodeDataFactory();
+
+      const StartNode = genericNodeFactory({
+        label: "StartNode",
+      });
+
+      const TopNode = genericNodeFactory({
+        label: "TopNode",
+      });
+
+      const BottomNode = genericNodeFactory({
+        label: "BottomNode",
+      });
+
+      const SecondBottomNode = genericNodeFactory({
+        label: "SecondBottomNode",
+      });
+
+      const MergeNode = genericNodeFactory({
+        label: "MergeNode",
+      });
+
+      await runGraphTest([
+        [EntrypointNode, StartNode],
+        [StartNode, TopNode],
+        [StartNode, BottomNode],
+        [TopNode, MergeNode],
+        [BottomNode, MergeNode],
+        [SecondBottomNode, MergeNode],
+        [BottomNode, SecondBottomNode],
+      ]);
+    });
   });
 });
