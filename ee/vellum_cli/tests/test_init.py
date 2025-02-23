@@ -176,3 +176,68 @@ def test_init_command__no_templates(vellum_client, mock_module, base_command):
         with open(vellum_lock_json) as f:
             lock_data = json.load(f)
             assert lock_data["workflows"] == []
+
+
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["workflows", "init"],
+    ],
+    ids=["workflows_init"],
+)
+def test_init_command_target_directory_exists(vellum_client, mock_module, base_command):
+    """
+    GIVEN a target directory already exists
+    WHEN the user tries to run the `init` command
+    THEN the command should fail and exit without modifying existing files
+    """
+    temp_dir = mock_module.temp_dir
+    existing_workflow_dir = os.path.join(temp_dir, "example_workflow")
+
+    # Create the target directory to simulate it already existing
+    os.makedirs(existing_workflow_dir, exist_ok=True)
+
+    # Ensure directory exists before command execution
+    assert os.path.exists(existing_workflow_dir)
+
+    # GIVEN the vellum client returns a list of template workflows
+    fake_templates = [
+        MockTemplate(id="template-1", label="Example Workflow"),
+    ]
+    vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                }
+            )
+        ]
+    )
+
+    # WHEN the user runs the `init` command and selects the template
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command, input="1\n")
+
+    # THEN the command should detect the existing directory and abort
+    assert result.exit_code == 0
+    assert f"{existing_workflow_dir} already exists." in result.output
+
+    # Ensure the directory still exists (wasn't deleted or modified)
+    assert os.path.exists(existing_workflow_dir)
+
+    # AND `vellum_client.workflows.pull` is not called
+    vellum_client.workflows.pull.assert_not_called()
+
+    # AND no workflow files are created
+    workflow_py = os.path.join(temp_dir, "example_workflow", "workflow.py")
+    assert not os.path.exists(workflow_py)
+
+    # AND the lock file remains empty
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    if os.path.exists(vellum_lock_json):
+        with open(vellum_lock_json) as f:
+            lock_data = json.load(f)
+            assert lock_data["workflows"] == []

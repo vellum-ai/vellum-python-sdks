@@ -1,7 +1,6 @@
 import io
 import json
 import os
-from pathlib import Path
 import zipfile
 from typing import Optional
 
@@ -58,6 +57,11 @@ def init_command():
     if not pk:
         raise ValueError("No workflow sandbox ID found in project to pull from.")
 
+    target_dir = os.path.join(os.getcwd(), workflow_config.module)
+    if os.path.exists(target_dir):
+        click.echo(click.style(f"{target_dir} already exists.", fg="red"))
+        return
+
     logger.info(f"Pulling workflow into {workflow_config.module}...")
 
     query_parameters = {
@@ -93,30 +97,6 @@ def init_command():
 
         if not workflow_config.module:
             raise ValueError(f"Failed to resolve a module name for Workflow {pk}")
-
-        target_dir = os.path.join(os.getcwd(), *workflow_config.module.split("."))
-
-        # Delete files in target_dir that aren't in the zip file
-        if os.path.exists(target_dir):
-            ignore_patterns = (
-                workflow_config.ignore
-                if isinstance(workflow_config.ignore, list)
-                else [workflow_config.ignore] if isinstance(workflow_config.ignore, str) else []
-            )
-            existing_files = []
-            for root, _, files in os.walk(target_dir):
-                for file in files:
-                    rel_path = os.path.relpath(os.path.join(root, file), target_dir)
-                    existing_files.append(rel_path)
-
-            for file in existing_files:
-                if any(Path(file).match(ignore_pattern) for ignore_pattern in ignore_patterns):
-                    continue
-
-                if file not in zip_file.namelist():
-                    file_path = os.path.join(target_dir, file)
-                    logger.info(f"Deleting {file_path}...")
-                    os.remove(file_path)
 
         for file_name in zip_file.namelist():
             with zip_file.open(file_name) as source:
