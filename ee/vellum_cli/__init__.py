@@ -334,7 +334,7 @@ def image_push(image: str, tag: Optional[List[str]] = None) -> None:
 
 @workflows.command(name="init")
 def workflows_init() -> None:
-    """Initialize a new Vellum project"""
+    """Initialize a new Vellum Workflow using a predefined template"""
 
     init_command()
 
