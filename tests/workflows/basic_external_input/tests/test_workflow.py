@@ -56,7 +56,7 @@ def test_workflow__happy_path_multi_stop_invalid_external_input():
     assert InputNode.ExternalInputs.message == external_inputs[0]
     assert len(external_inputs) == 1
 
-    # WHEN we resume the workflow
+    # WHEN we resume the workflow with invalid external input
     with pytest.raises(NodeException) as exc_info:
         final_terminal_event = workflow.run(  # noqa: F841
             external_inputs={
@@ -64,6 +64,7 @@ def test_workflow__happy_path_multi_stop_invalid_external_input():
             },
         )
 
+    # THEN we should get a rejected workflow event with the correct error
     assert "Invalid external input type for message" == str(exc_info.value)
 
 
@@ -95,25 +96,27 @@ def test_workflow__happy_path_multi_stop_union_type():
     assert InputNode.ExternalInputs.message == external_inputs[0]
     assert len(external_inputs) == 1
 
-    # WHEN we resume the workflow
+    # WHEN we resume the workflow with valid external input
     final_terminal_event = workflow.run(
         external_inputs={
             InputNode.ExternalInputs.message: "hello",
         },
     )
 
-    # THEN we should get a rejected workflow event with the correct error
+    # THEN we should get a fulfilled workflow event
     assert final_terminal_event.name == "workflow.execution.fulfilled"
 
+    # WHEN we resume the workflow with valid external input
     final_terminal_event = workflow.run(
         external_inputs={
             InputNode.ExternalInputs.message: 12,
         },
     )
 
-    # THEN we should get a rejected workflow event with the correct error
+    # THEN we should get a fulfilled workflow event
     assert final_terminal_event.name == "workflow.execution.fulfilled"
 
+    # WHEN we resume the workflow with invalid external input
     with pytest.raises(NodeException) as exc_info:
         final_terminal_event = workflow.run(  # noqa: F841
             external_inputs={
@@ -121,4 +124,5 @@ def test_workflow__happy_path_multi_stop_union_type():
             },
         )
 
+    # THEN we should get a rejected workflow event with the correct error
     assert "Invalid external input type for message" == str(exc_info.value)
