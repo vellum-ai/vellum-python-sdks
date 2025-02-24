@@ -1190,4 +1190,65 @@ baz = foo + bar
       ]);
     });
   });
+
+  describe("initialization case", () => {
+    it("should handle workflow with only ENTRYPOINT and TERMINAL nodes", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "terminal-node",
+              type: "TERMINAL",
+              data: {
+                label: "Final Output",
+                name: "final-output",
+                target_handle_id: "terminal_target",
+                output_id: "terminal_output_id",
+                output_type: "STRING",
+                node_input_id: "terminal_input",
+              },
+              inputs: [
+                {
+                  id: "terminal_input",
+                  key: "node_input",
+                  value: {
+                    rules: [],
+                    combinator: "OR",
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(project, ["nodes", "final_output.py"]);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
+    });
+  });
 });

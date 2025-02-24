@@ -137,6 +137,17 @@ runner.run()
 "
 `;
 
+exports[`WorkflowProjectGenerator > initialization case > should handle workflow with only ENTRYPOINT and TERMINAL nodes 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+
+class FinalOutput(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        pass
+"
+`;
+
 exports[`WorkflowProjectGenerator > nodes with output values > should prioritize terminal node data over output values 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState

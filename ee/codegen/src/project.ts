@@ -445,6 +445,18 @@ ${errors.slice(0, 3).map((err) => {
    */
   private getOrderedNodes(): WorkflowDataNode[] {
     const rawData = this.workflowVersionExecConfig.workflowRawData;
+
+    // Edge case: Workflow init only has two nodes of ENTRYPOINT and TERMINAL with no edge between them
+    if (
+      rawData.edges.length === 0 &&
+      rawData.nodes.length === 2 &&
+      rawData.nodes.some((node) => node.type === "ENTRYPOINT")
+    ) {
+      return rawData.nodes.filter(
+        (node): node is WorkflowDataNode => node.type === "TERMINAL"
+      );
+    }
+
     const nodesById = Object.fromEntries(
       rawData.nodes.map((node) => [node.id, node])
     );
