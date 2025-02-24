@@ -112,6 +112,133 @@ def test_pull__second_module(vellum_client, mock_module):
         assert f.read() == "print('hello')"
 
 
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["pull"],
+        ["workflows", "pull"],
+    ],
+    ids=["pull", "workflows_pull"],
+)
+def test_pull__with_target_dir(vellum_client, mock_module, base_command):
+    # GIVEN a module on the user's filesystem
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND a target directory
+    target_dir = os.path.join(temp_dir, "dir")
+    os.makedirs(target_dir, exist_ok=True)
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+
+    # WHEN the user runs the pull command with target-dir
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + [module, "--target-dir", target_dir])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the workflow.py file is written to the target directory
+    module_path = os.path.join(target_dir, *module.split("."))
+    workflow_py = os.path.join(module_path, "workflow.py")
+    assert os.path.exists(workflow_py)
+    with open(workflow_py) as f:
+        assert f.read() == "print('hello')"
+
+    # AND the files are not in the default module directory
+    default_module_path = os.path.join(temp_dir, *module.split("."), "workflow.py")
+    assert not os.path.exists(default_module_path)
+
+    # AND the vellum.lock.json file is still updated
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+    with open(vellum_lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data == {
+            "version": "1.0",
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": workflow_sandbox_id,
+                    "container_image_name": None,
+                    "container_image_tag": None,
+                    "ignore": None,
+                    "deployments": [],
+                    "workspace": "default",
+                }
+            ],
+            "workspaces": [],
+        }
+
+
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["pull"],
+        ["workflows", "pull"],
+    ],
+    ids=["pull", "workflows_pull"],
+)
+def test_pull__with_nested_target_dir(vellum_client, mock_module, base_command):
+    # GIVEN a module on the user's filesystem
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND a nested target directory that doesn't exist yet
+    nested_target_dir = os.path.join(temp_dir, "dir-1", "dir-2")
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+
+    # WHEN the user runs the pull command with nested target-dir
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + [module, "--target-dir", nested_target_dir])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the nested directory with module subdirectory should be created
+    module_path = os.path.join(nested_target_dir, *module.split("."))
+    assert os.path.exists(module_path)
+
+    # AND the nested directory should be created
+    assert os.path.exists(module_path)
+
+    # AND the workflow.py file is written to the nested target directory
+    workflow_py = os.path.join(module_path, "workflow.py")
+    assert os.path.exists(workflow_py)
+    with open(workflow_py) as f:
+        assert f.read() == "print('hello')"
+
+    # AND the files are not in the default module directory
+    default_module_path = os.path.join(temp_dir, *module.split("."), "workflow.py")
+    assert not os.path.exists(default_module_path)
+
+    # AND the vellum.lock.json file is still updated
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+    with open(vellum_lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data == {
+            "version": "1.0",
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": workflow_sandbox_id,
+                    "container_image_name": None,
+                    "container_image_tag": None,
+                    "ignore": None,
+                    "deployments": [],
+                    "workspace": "default",
+                }
+            ],
+            "workspaces": [],
+        }
+
+
 def test_pull__sandbox_id_with_no_config(vellum_client):
     # GIVEN a workflow sandbox id
     workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"

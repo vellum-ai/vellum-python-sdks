@@ -194,12 +194,20 @@ Should only be used for debugging purposes.""",
     help="""Generates a runnable sandbox.py file containing test data from the Resource's sandbox. \
 Helpful for running and debugging workflows locally.""",
 )
+@click.option(
+    "--target-dir",
+    "target_directory",  # Internal parameter name is target_directory
+    type=str,
+    help="""Directory to pull the workflow into. If not specified, \
+the workflow will be pulled into the current working directory.""",
+)
 def pull(
     ctx: click.Context,
     include_json: Optional[bool],
     exclude_code: Optional[bool],
     strict: Optional[bool],
     include_sandbox: Optional[bool],
+    target_directory: Optional[str],
 ) -> None:
     """Pull Resources from Vellum"""
 
@@ -209,6 +217,7 @@ def pull(
             exclude_code=exclude_code,
             strict=strict,
             include_sandbox=include_sandbox,
+            target_directory=target_directory,
         )
 
 
@@ -243,6 +252,13 @@ Should only be used for debugging purposes.""",
     help="""Generates a runnable sandbox.py file containing test data from the Resource's sandbox. \
 Helpful for running and debugging workflows locally.""",
 )
+@click.option(
+    "--target-dir",
+    "target_directory",  # Internal parameter name is target_directory
+    type=str,
+    help="""Directory to pull the workflow into. If not specified, \
+the workflow will be pulled into the current working directory.""",
+)
 def workflows_pull(
     module: Optional[str],
     include_json: Optional[bool],
@@ -251,6 +267,7 @@ def workflows_pull(
     exclude_code: Optional[bool],
     strict: Optional[bool],
     include_sandbox: Optional[bool],
+    target_directory: Optional[str],
 ) -> None:
     """
     Pull Workflows from Vellum. If a module is provided, only the Workflow for that module will be pulled.
@@ -265,6 +282,7 @@ def workflows_pull(
         exclude_code=exclude_code,
         strict=strict,
         include_sandbox=include_sandbox,
+        target_directory=target_directory,
     )
 
 
@@ -293,12 +311,20 @@ Should only be used for debugging purposes.""",
     help="""Generates a runnable sandbox.py file containing test data from the Resource's sandbox. \
 Helpful for running and debugging resources locally.""",
 )
+@click.option(
+    "--target-dir",
+    "target_directory",  # Internal parameter name is target_directory
+    type=str,
+    help="""Directory to pull the workflow into. If not specified, \
+the workflow will be pulled into the current working directory.""",
+)
 def pull_module(
     ctx: click.Context,
     include_json: Optional[bool],
     exclude_code: Optional[bool],
     strict: Optional[bool],
     include_sandbox: Optional[bool],
+    target_directory: Optional[str],
 ) -> None:
     """Pull a specific module from Vellum"""
 
@@ -309,6 +335,7 @@ def pull_module(
             exclude_code=exclude_code,
             strict=strict,
             include_sandbox=include_sandbox,
+            target_directory=target_directory,
         )
 
 
