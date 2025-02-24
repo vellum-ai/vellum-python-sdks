@@ -40,7 +40,7 @@ def test_workflow__happy_path_multi_stop():
 
 def test_workflow__happy_path_multi_stop_invalid_external_input():
     """
-    Runs the non-streamed execution of a Workflow with a single Nodes defining ExternalInputs.
+    Runs the non-streamed execution of a Workflow with a single Nodes defining invalid ExternalInputs.
     """
 
     # GIVEN a workflow that uses an Input Node
@@ -70,7 +70,8 @@ def test_workflow__happy_path_multi_stop_invalid_external_input():
 
 def test_workflow__happy_path_multi_stop_union_type():
     """
-    Runs the non-streamed execution of a Workflow with a single Nodes defining ExternalInputs.
+    Runs the non-streamed execution of a Workflow with a single Nodes defining ExternalInputs with Union type.
+    Should fail if the input is not in the defined Union type.
     """
 
     class InputNode(BaseNode):
