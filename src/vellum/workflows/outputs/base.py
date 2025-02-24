@@ -32,7 +32,7 @@ class BaseOutput(Generic[_Delta, _Accumulated]):
         if value is not undefined and delta is not undefined:
             raise ValueError("Cannot set both value and delta")
 
-        self._name = name
+        self._name = name.replace("-", "_")  # Convert hyphens to underscores for valid python variable names
         self._value = value
         self._delta = delta
 

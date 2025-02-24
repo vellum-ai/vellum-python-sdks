@@ -155,6 +155,60 @@ def test_run_workflow__no_deployment():
     )
 
 
+def test_run_workflow__hyphenated_output(vellum_client):
+    """Confirm that we can successfully handle subworkflow outputs with hyphenated names"""
+
+    # GIVEN a Subworkflow Deployment Node
+    class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {
+            "test_input": "test_value",
+        }
+
+        class Outputs(SubworkflowDeploymentNode.Outputs):
+            final_output_copy: str
+
+    # AND we know what the Subworkflow Deployment will respond with
+    def generate_subworkflow_events(*args: Any, **kwargs: Any) -> Iterator[WorkflowStreamEvent]:
+        execution_id = str(uuid4())
+        expected_events: List[WorkflowStreamEvent] = [
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="INITIATED",
+                    ts=datetime.now(),
+                ),
+            ),
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="FULFILLED",
+                    ts=datetime.now(),
+                    outputs=[
+                        WorkflowOutputString(
+                            id=str(uuid4()),
+                            name="final-output_copy",  # Note the hyphen here
+                            value="test success",
+                        )
+                    ],
+                ),
+            ),
+        ]
+        yield from expected_events
+
+    vellum_client.execute_workflow_stream.side_effect = generate_subworkflow_events
+
+    # WHEN we run the node
+    node = ExampleSubworkflowDeploymentNode()
+    events = list(node.run())
+
+    # THEN the node should have completed successfully
+    assert events[-1].name == "final_output_copy"  # Note the underscore here
+    assert events[-1].value == "test success"
+
+
 @pytest.mark.parametrize(
     ["exception", "expected_code", "expected_message"],
     [
