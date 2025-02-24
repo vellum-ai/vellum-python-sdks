@@ -7,7 +7,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
 from vellum.workflows.constants import undefined
-from vellum.workflows.context import execution_context, get_parent_context
+from vellum.workflows.context import execution_context, get_execution_context, get_parent_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
@@ -137,7 +137,8 @@ class WorkflowRunner(Generic[StateType]):
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
-        self._parent_context = get_parent_context()
+        self._execution_context = get_execution_context()
+        self._parent_context = self._execution_context.parent_context
 
         setattr(
             self._initial_state,

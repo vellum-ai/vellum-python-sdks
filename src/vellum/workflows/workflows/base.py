@@ -24,6 +24,7 @@ from typing import (
     get_args,
 )
 
+from vellum.workflows.context import execution_context, get_execution_context
 from vellum.workflows.edges import Edge
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
@@ -311,17 +312,18 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             without limiting concurrency. This configuration only applies to the current Workflow and not to any
             subworkflows or nodes that utilizes threads.
         """
-
-        events = WorkflowRunner(
-            self,
-            inputs=inputs,
-            state=state,
-            entrypoint_nodes=entrypoint_nodes,
-            external_inputs=external_inputs,
-            cancel_signal=cancel_signal,
-            node_output_mocks=node_output_mocks,
-            max_concurrency=max_concurrency,
-        ).stream()
+        current_context = self._context.execution_context or get_execution_context()
+        with execution_context(parent_context=current_context.parent_context, trace_id=current_context.trace_id):
+            events = WorkflowRunner(
+                self,
+                inputs=inputs,
+                state=state,
+                entrypoint_nodes=entrypoint_nodes,
+                external_inputs=external_inputs,
+                cancel_signal=cancel_signal,
+                node_output_mocks=node_output_mocks,
+                max_concurrency=max_concurrency,
+            ).stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
         last_event = None
         for event in events:
@@ -422,18 +424,20 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         """
 
         should_yield = event_filter or workflow_event_filter
-        for event in WorkflowRunner(
-            self,
-            inputs=inputs,
-            state=state,
-            entrypoint_nodes=entrypoint_nodes,
-            external_inputs=external_inputs,
-            cancel_signal=cancel_signal,
-            node_output_mocks=node_output_mocks,
-            max_concurrency=max_concurrency,
-        ).stream():
-            if should_yield(self.__class__, event):
-                yield event
+        current_context = self._context.execution_context or get_execution_context()
+        with execution_context(parent_context=current_context.parent_context, trace_id=current_context.trace_id):
+            for event in WorkflowRunner(
+                self,
+                inputs=inputs,
+                state=state,
+                entrypoint_nodes=entrypoint_nodes,
+                external_inputs=external_inputs,
+                cancel_signal=cancel_signal,
+                node_output_mocks=node_output_mocks,
+                max_concurrency=max_concurrency,
+            ).stream():
+                if should_yield(self.__class__, event):
+                    yield event
 
     def validate(self) -> None:
         """
