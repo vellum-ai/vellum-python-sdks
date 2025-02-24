@@ -97,6 +97,11 @@ class WorkflowRunner(Generic[StateType]):
         elif external_inputs:
             self._initial_state = self.workflow.get_most_recent_state()
             for descriptor, value in external_inputs.items():
+                if not any(isinstance(value, type_) for type_ in descriptor.types):
+                    raise NodeException(
+                        f"Invalid external input type for {descriptor.name}",
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                    )
                 self._initial_state.meta.external_inputs[descriptor] = value
 
             self._entrypoints = [
