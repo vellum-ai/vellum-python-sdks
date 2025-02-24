@@ -574,7 +574,7 @@ export class GraphAttribute extends AstNode {
 
       return {
         type: "right_shift",
-        lhs: newLhs,
+        lhs: this.flattenSet(newLhs),
         rhs: longestRhs,
       };
     }

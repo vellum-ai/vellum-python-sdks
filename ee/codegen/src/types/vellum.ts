@@ -719,7 +719,7 @@ export interface WorkflowDisplayData {
 
 export interface WorkflowOutputValue {
   outputVariableId: string;
-  value: WorkflowValueDescriptor;
+  value?: WorkflowValueDescriptor;
 }
 
 export interface WorkflowRawData {
@@ -751,23 +751,23 @@ export type WorkflowSandboxInputs = WorkflowSandboxInput[];
 
 export interface UnaryWorkflowExpression {
   type: "UNARY_EXPRESSION";
-  lhs: WorkflowValueDescriptor;
+  lhs?: WorkflowValueDescriptor;
   operator: LogicalOperator;
 }
 
 export interface BinaryWorkflowExpression {
   type: "BINARY_EXPRESSION";
-  lhs: WorkflowValueDescriptor;
+  lhs?: WorkflowValueDescriptor;
   operator: LogicalOperator;
-  rhs: WorkflowValueDescriptor;
+  rhs?: WorkflowValueDescriptor;
 }
 
 export interface TernaryWorkflowExpression {
   type: "TERNARY_EXPRESSION";
-  base: WorkflowValueDescriptor;
+  base?: WorkflowValueDescriptor;
   operator: LogicalOperator;
-  lhs: WorkflowValueDescriptor;
-  rhs: WorkflowValueDescriptor;
+  lhs?: WorkflowValueDescriptor;
+  rhs?: WorkflowValueDescriptor;
 }
 
 export interface NodeOutputWorkflowReference {
@@ -821,7 +821,7 @@ export type WorkflowValueDescriptor =
 export interface NodeAttribute {
   id: string;
   name: string;
-  value: WorkflowValueDescriptor;
+  value?: WorkflowValueDescriptor;
 }
 
 export interface AdornmentNode {

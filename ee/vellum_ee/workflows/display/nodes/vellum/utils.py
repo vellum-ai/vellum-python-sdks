@@ -5,8 +5,10 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.references import NodeReference
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 from vellum_ee.workflows.display.utils.vellum import create_node_input_value_pointer_rule
 from vellum_ee.workflows.display.vellum import (
     ConstantValuePointer,
@@ -55,6 +57,12 @@ def create_node_input_value_pointer_rules(
             if not value.instance:
                 raise ValueError(f"Expected NodeReference {value.name} to have an instance")
             value = cast(BaseDescriptor, value.instance)
+
+        if isinstance(value, LazyReference):
+            child_descriptor = get_child_descriptor(value, display_context)
+            return create_node_input_value_pointer_rules(
+                child_descriptor, display_context, [], pointer_type=pointer_type
+            )
 
         if isinstance(value, CoalesceExpression):
             # Recursively handle the left-hand side

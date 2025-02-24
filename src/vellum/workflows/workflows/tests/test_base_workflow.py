@@ -83,7 +83,46 @@ def test_subworkflow__inherit_base_outputs():
     assert terminal_event.outputs == {"output": "bar"}
 
 
-def test_workflow__nodes_not_in_graph():
+def test_workflow__single_node():
+    class NodeA(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA
+
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA}
+
+
+def test_workflow__multiple_nodes():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA, NodeB}
+
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA, NodeB}
+
+
+def test_workflow__single_graph():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA >> NodeB
+
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA, NodeB}
+
+
+def test_workflow__multiple_graphs():
     class NodeA(BaseNode):
         pass
 
@@ -93,17 +132,49 @@ def test_workflow__nodes_not_in_graph():
     class NodeC(BaseNode):
         pass
 
-    # WHEN we create a workflow with multiple unused nodes
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-        graph = NodeA
-        unused_graphs = {NodeB, NodeC}
+        graph = NodeA >> {NodeB >> NodeC, NodeD} >> NodeE
 
-    # TEST that all nodes from unused_graphs are collected
-    unused_graphs = set(TestWorkflow.get_unused_nodes())
-    assert unused_graphs == {NodeB, NodeC}
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA, NodeB, NodeC, NodeD, NodeE}
 
 
-def test_workflow__unused_graphs():
+def test_workflow__get_edges():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA >> {NodeB >> NodeC, NodeD} >> NodeE}
+
+    edges = set(TestWorkflow.get_edges())
+    assert edges == {
+        Edge(from_port=NodeA.Ports.default, to_node=NodeB),
+        Edge(from_port=NodeB.Ports.default, to_node=NodeC),
+        Edge(from_port=NodeA.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeC.Ports.default, to_node=NodeE),
+        Edge(from_port=NodeD.Ports.default, to_node=NodeE),
+    }
+
+
+def test_workflow__get_unused_nodes():
     class NodeA(BaseNode):
         pass
 
@@ -122,51 +193,15 @@ def test_workflow__unused_graphs():
     class NodeF(BaseNode):
         pass
 
-    # WHEN we create a workflow with unused nodes in a graph
+    class NodeG(BaseNode):
+        pass
+
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = NodeA
-        unused_graphs = {NodeB >> {NodeC >> NodeD}, NodeE, NodeF}
+        unused_graphs = {NodeB >> NodeC, NodeD >> {NodeE >> NodeF, NodeG}}
 
-    # TEST that all nodes from unused_graphs are collected
     unused_graphs = set(TestWorkflow.get_unused_nodes())
-    assert unused_graphs == {NodeB, NodeC, NodeD, NodeE, NodeF}
-
-
-def test_workflow__no_unused_nodes():
-    class NodeA(BaseNode):
-        pass
-
-    class NodeB(BaseNode):
-        pass
-
-    # WHEN we create a workflow with no unused nodes
-    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-        graph = NodeA >> NodeB
-
-    # TEST that nodes not in the graph are empty
-    nodes = set(TestWorkflow.get_unused_nodes())
-    assert nodes == set()
-
-
-def test_workflow__node_in_both_graph_and_unused():
-    class NodeA(BaseNode):
-        pass
-
-    class NodeB(BaseNode):
-        pass
-
-    class NodeC(BaseNode):
-        pass
-
-    # WHEN we try to create a workflow where NodeA appears in both graph and unused
-    with pytest.raises(ValueError) as exc_info:
-
-        class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-            graph = NodeA >> NodeB
-            unused_graphs = {NodeA >> NodeC}
-
-    # THEN it should raise an error
-    assert "Node(s) NodeA cannot appear in both graph and unused_graphs" in str(exc_info.value)
+    assert unused_graphs == {NodeB, NodeC, NodeD, NodeE, NodeF, NodeG}
 
 
 def test_workflow__get_unused_edges():
@@ -195,21 +230,77 @@ def test_workflow__get_unused_edges():
     class NodeG(BaseNode):
         pass
 
+    class NodeH(BaseNode):
+        pass
+
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = NodeA >> NodeB
-        unused_graphs = {NodeC >> {NodeD >> NodeE, NodeF} >> NodeG}
-
-    edge_c_to_d = Edge(from_port=NodeC.Ports.default, to_node=NodeD)
-    edge_c_to_f = Edge(from_port=NodeC.Ports.default, to_node=NodeF)
-    edge_d_to_e = Edge(from_port=NodeD.Ports.default, to_node=NodeE)
-    edge_e_to_g = Edge(from_port=NodeE.Ports.default, to_node=NodeG)
-    edge_f_to_g = Edge(from_port=NodeF.Ports.default, to_node=NodeG)
+        unused_graphs = {NodeC >> NodeD, NodeE >> {NodeF, NodeG} >> NodeH}
 
     # Collect unused edges
     unused_edges = set(TestWorkflow.get_unused_edges())
 
     # Expected unused edges
-    expected_unused_edges = {edge_c_to_d, edge_c_to_f, edge_d_to_e, edge_e_to_g, edge_f_to_g}
+    expected_unused_edges = {
+        Edge(from_port=NodeC.Ports.default, to_node=NodeD),
+        Edge(from_port=NodeE.Ports.default, to_node=NodeF),
+        Edge(from_port=NodeE.Ports.default, to_node=NodeG),
+        Edge(from_port=NodeF.Ports.default, to_node=NodeH),
+        Edge(from_port=NodeG.Ports.default, to_node=NodeH),
+    }
 
     # TEST that unused edges are correctly identified
     assert unused_edges == expected_unused_edges, f"Expected {expected_unused_edges}, but got {unused_edges}"
+
+
+def test_workflow__no_unused_nodes():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    # WHEN we create a workflow with no unused nodes
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA >> NodeB
+
+    # TEST that nodes not in the graph are empty
+    nodes = set(TestWorkflow.get_unused_nodes())
+    assert nodes == set()
+
+
+def test_workflow__no_unused_edges():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    # WHEN we create a workflow with no unused edges
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA >> NodeB
+
+    # TEST that unused edges are empty
+    edges = set(TestWorkflow.get_unused_edges())
+    assert edges == set()
+
+
+def test_workflow__node_in_both_graph_and_unused():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    # WHEN we try to create a workflow where NodeA appears in both graph and unused
+    with pytest.raises(ValueError) as exc_info:
+
+        class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+            graph = NodeA >> NodeB
+            unused_graphs = {NodeA >> NodeC}
+
+    # THEN it should raise an error
+    assert "Node(s) NodeA cannot appear in both graph and unused_graphs" in str(exc_info.value)

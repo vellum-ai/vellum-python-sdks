@@ -5,10 +5,6 @@ import { isNil } from "lodash";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
-import {
-  NodeAttributeGenerationError,
-  NodePortGenerationError,
-} from "src/generators/errors";
 import { Expression } from "src/generators/expression";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
@@ -22,7 +18,7 @@ import { assertUnreachable } from "src/utils/typing";
 export namespace WorkflowValueDescriptor {
   export interface Args {
     nodeContext?: BaseNodeContext<WorkflowDataNode>;
-    workflowValueDescriptor: WorkflowValueDescriptorType;
+    workflowValueDescriptor?: WorkflowValueDescriptorType;
     workflowContext: WorkflowContext;
     iterableConfig?: IterableConfig;
   }
@@ -47,7 +43,7 @@ export class WorkflowValueDescriptor extends AstNode {
   }
 
   private generateWorkflowValueDescriptor(
-    workflowValueDescriptor: WorkflowValueDescriptorType
+    workflowValueDescriptor: WorkflowValueDescriptorType | undefined
   ): AstNode {
     if (isNil(workflowValueDescriptor)) {
       return python.TypeInstantiation.none();
@@ -56,8 +52,12 @@ export class WorkflowValueDescriptor extends AstNode {
   }
 
   private buildExpression(
-    workflowValueDescriptor: WorkflowValueDescriptorType
+    workflowValueDescriptor: WorkflowValueDescriptorType | undefined
   ): AstNode {
+    if (!workflowValueDescriptor) {
+      return python.TypeInstantiation.none();
+    }
+
     // Base case
     if (this.isReference(workflowValueDescriptor)) {
       return new WorkflowValueDescriptorReference({
@@ -107,40 +107,37 @@ export class WorkflowValueDescriptor extends AstNode {
   private convertOperatorType(
     workflowValueDescriptor: WorkflowValueDescriptorType
   ): OperatorMapping {
-    if (this.isExpression(workflowValueDescriptor)) {
-      const operator = workflowValueDescriptor.operator;
-      const operatorMappings: Record<string, OperatorMapping> = {
-        "=": "equals",
-        "!=": "does_not_equal",
-        "<": "less_than",
-        ">": "greater_than",
-        "<=": "less_than_or_equal_to",
-        ">=": "greater_than_or_equal_to",
-        contains: "contains",
-        beginsWith: "begins_with",
-        endsWith: "ends_with",
-        doesNotContain: "does_not_contain",
-        doesNotBeginWith: "does_not_begin_with",
-        doesNotEndWith: "does_not_end_with",
-        null: "is_null",
-        notNull: "is_not_null",
-        in: "in",
-        notIn: "not_in",
-        between: "between",
-        notBetween: "not_between",
-      };
-      const value = operatorMappings[operator];
-      if (!value) {
-        throw new NodePortGenerationError(
-          `This operator: ${operator} is not supported`
-        );
-      }
-      return value;
-    } else {
-      throw new NodeAttributeGenerationError(
-        `Operators should exist on expression and not be null`
-      );
+    if (!this.isExpression(workflowValueDescriptor)) {
+      return "equals"; // default operator if not an expression
     }
+
+    const operator = workflowValueDescriptor.operator;
+    if (!operator) {
+      return "equals"; // default operator if operator is null
+    }
+
+    const operatorMappings: Record<string, OperatorMapping> = {
+      "=": "equals",
+      "!=": "does_not_equal",
+      "<": "less_than",
+      ">": "greater_than",
+      "<=": "less_than_or_equal_to",
+      ">=": "greater_than_or_equal_to",
+      contains: "contains",
+      beginsWith: "begins_with",
+      endsWith: "ends_with",
+      doesNotContain: "does_not_contain",
+      doesNotBeginWith: "does_not_begin_with",
+      doesNotEndWith: "does_not_end_with",
+      null: "is_null",
+      notNull: "is_not_null",
+      in: "in",
+      notIn: "not_in",
+      between: "between",
+      notBetween: "not_between",
+    };
+
+    return operatorMappings[operator] || "equals"; // return default operator if not found
   }
 
   private isExpression(workflowValueDescriptor: WorkflowValueDescriptorType) {

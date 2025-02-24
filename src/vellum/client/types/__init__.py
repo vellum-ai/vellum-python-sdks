@@ -267,6 +267,7 @@ from .paginated_slim_workflow_deployment_list import PaginatedSlimWorkflowDeploy
 from .paginated_test_suite_run_execution_list import PaginatedTestSuiteRunExecutionList
 from .paginated_test_suite_test_case_list import PaginatedTestSuiteTestCaseList
 from .paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
+from .paginated_workflow_sandbox_example_list import PaginatedWorkflowSandboxExampleList
 from .pdf_search_result_meta_source import PdfSearchResultMetaSource
 from .pdf_search_result_meta_source_request import PdfSearchResultMetaSourceRequest
 from .plain_text_prompt_block import PlainTextPromptBlock
@@ -519,6 +520,7 @@ from .workflow_result_event_output_data_json import WorkflowResultEventOutputDat
 from .workflow_result_event_output_data_number import WorkflowResultEventOutputDataNumber
 from .workflow_result_event_output_data_search_results import WorkflowResultEventOutputDataSearchResults
 from .workflow_result_event_output_data_string import WorkflowResultEventOutputDataString
+from .workflow_sandbox_example import WorkflowSandboxExample
 from .workflow_stream_event import WorkflowStreamEvent
 from .workspace_read import WorkspaceRead
 from .workspace_secret_read import WorkspaceSecretRead
@@ -779,6 +781,7 @@ __all__ = [
     "PaginatedTestSuiteRunExecutionList",
     "PaginatedTestSuiteTestCaseList",
     "PaginatedWorkflowReleaseTagReadList",
+    "PaginatedWorkflowSandboxExampleList",
     "PdfSearchResultMetaSource",
     "PdfSearchResultMetaSourceRequest",
     "PlainTextPromptBlock",
@@ -1015,6 +1018,7 @@ __all__ = [
     "WorkflowResultEventOutputDataNumber",
     "WorkflowResultEventOutputDataSearchResults",
     "WorkflowResultEventOutputDataString",
+    "WorkflowSandboxExample",
     "WorkflowStreamEvent",
     "WorkspaceRead",
     "WorkspaceSecretRead",

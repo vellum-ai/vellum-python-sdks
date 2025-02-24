@@ -61,13 +61,13 @@ test = ["astroid (>=2,<4)", "pytest", "pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "attrs"
-version = "24.3.0"
+version = "25.1.0"
 description = "Classes Without Boilerplate"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "attrs-24.3.0-py3-none-any.whl", hash = "sha256:ac96cd038792094f438ad1f6ff80837353805ac950cd2aa0e0625ef19850c308"},
-    {file = "attrs-24.3.0.tar.gz", hash = "sha256:8f5c07333d543103541ba7be0e2ce16eeee8130cb0b3f9238ab904ce1e85baff"},
+    {file = "attrs-25.1.0-py3-none-any.whl", hash = "sha256:c75a69e28a550a7e93789579c22aa26b0f5b83b75dc4e08fe092980051e1090a"},
+    {file = "attrs-25.1.0.tar.gz", hash = "sha256:1c97078a80c814273a76b2a298a932eb681c87415c11dee0a6921de7f1b02c3e"},
 ]
 
 [package.extras]
@@ -859,17 +859,17 @@ files = [
 
 [[package]]
 name = "jsii"
-version = "1.106.0"
+version = "1.107.0"
 description = "Python client for jsii runtime"
 optional = false
 python-versions = "~=3.8"
 files = [
-    {file = "jsii-1.106.0-py3-none-any.whl", hash = "sha256:5a44d7c3a5a326fa3d9befdb3770b380057e0a61e3804e7c4907f70d76afaaa2"},
-    {file = "jsii-1.106.0.tar.gz", hash = "sha256:c79c47899f53a7c3c4b20f80d3cd306628fe9ed1852eee970324c71eba1d974e"},
+    {file = "jsii-1.107.0-py3-none-any.whl", hash = "sha256:bd59b5aa5d27cd7979113ae8e4623e5386bf78adf81de375e29e915f502a1603"},
+    {file = "jsii-1.107.0.tar.gz", hash = "sha256:039ea4b0687ef2eafdded2df1184fef5e926c86316bd4851e3d32fab084b780b"},
 ]
 
 [package.dependencies]
-attrs = ">=21.2,<25.0"
+attrs = ">=21.2,<26.0"
 cattrs = ">=1.8,<24.2"
 importlib-resources = ">=5.2.0"
 publication = ">=0.0.3"

@@ -8,6 +8,8 @@ from ...core.jsonable_encoder import jsonable_encoder
 from ...core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
+from .types.list_workflow_sandbox_examples_request_tag import ListWorkflowSandboxExamplesRequestTag
+from ...types.paginated_workflow_sandbox_example_list import PaginatedWorkflowSandboxExampleList
 from ...core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -89,6 +91,74 @@ class WorkflowSandboxesClient:
                     WorkflowDeploymentRead,
                     parse_obj_as(
                         type_=WorkflowDeploymentRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_workflow_sandbox_examples(
+        self,
+        *,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        tag: typing.Optional[ListWorkflowSandboxExamplesRequestTag] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedWorkflowSandboxExampleList:
+        """
+        List Workflow Sandbox examples that were previously cloned into the User's Workspace
+
+        Parameters
+        ----------
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        tag : typing.Optional[ListWorkflowSandboxExamplesRequestTag]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PaginatedWorkflowSandboxExampleList
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_key="YOUR_API_KEY",
+        )
+        client.workflow_sandboxes.list_workflow_sandbox_examples()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/workflow-sandboxes/examples",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "limit": limit,
+                "offset": offset,
+                "ordering": ordering,
+                "tag": tag,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PaginatedWorkflowSandboxExampleList,
+                    parse_obj_as(
+                        type_=PaginatedWorkflowSandboxExampleList,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -181,6 +251,82 @@ class AsyncWorkflowSandboxesClient:
                     WorkflowDeploymentRead,
                     parse_obj_as(
                         type_=WorkflowDeploymentRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_workflow_sandbox_examples(
+        self,
+        *,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        tag: typing.Optional[ListWorkflowSandboxExamplesRequestTag] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedWorkflowSandboxExampleList:
+        """
+        List Workflow Sandbox examples that were previously cloned into the User's Workspace
+
+        Parameters
+        ----------
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        tag : typing.Optional[ListWorkflowSandboxExamplesRequestTag]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PaginatedWorkflowSandboxExampleList
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflow_sandboxes.list_workflow_sandbox_examples()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/workflow-sandboxes/examples",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "limit": limit,
+                "offset": offset,
+                "ordering": ordering,
+                "tag": tag,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PaginatedWorkflowSandboxExampleList,
+                    parse_obj_as(
+                        type_=PaginatedWorkflowSandboxExampleList,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
