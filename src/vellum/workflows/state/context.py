@@ -24,7 +24,7 @@ class WorkflowContext:
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
         self._execution_context = get_execution_context()
-        if not self._execution_context.parent_context:
+        if not self._execution_context.parent_context and execution_context:
             self._execution_context = execution_context
 
     @cached_property
