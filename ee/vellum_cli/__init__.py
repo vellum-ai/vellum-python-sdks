@@ -361,10 +361,17 @@ def image_push(image: str, tag: Optional[List[str]] = None) -> None:
 
 @workflows.command(name="init")
 @click.argument("template_name", required=False)
-def workflows_init(template_name: Optional[str] = None) -> None:
+@click.option(
+    "--target-dir",
+    "target_directory",  # Internal parameter name is target_directory
+    type=str,
+    help="""Directory to pull the workflow into. If not specified, \
+the workflow will be pulled into the current working directory.""",
+)
+def workflows_init(template_name: Optional[str] = None, target_directory: Optional[str] = None) -> None:
     """Initialize a new Vellum Workflow using a predefined template"""
 
-    init_command(template_name=template_name)
+    init_command(template_name=template_name, target_directory=target_directory)
 
 
 if __name__ == "__main__":

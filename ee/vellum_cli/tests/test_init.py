@@ -353,3 +353,221 @@ def test_init_command_with_nonexistent_template_name(vellum_client, mock_module,
         with open(vellum_lock_json) as f:
             lock_data = json.load(f)
             assert lock_data["workflows"] == []
+
+
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["workflows", "init"],
+    ],
+    ids=["workflows_init"],
+)
+def test_init__with_target_dir(vellum_client, mock_module, base_command):
+    # GIVEN a module on the user's filesystem
+    temp_dir = mock_module.temp_dir
+    mock_module.set_pyproject_toml({"workflows": []})
+
+    # GIVEN the vellum client returns a list of template workflows
+    fake_templates = [
+        MockTemplate(id="template-1", label="Example Workflow"),
+    ]
+    vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                }
+            )
+        ]
+    )
+
+    # AND a target directory
+    target_dir = os.path.join(temp_dir, "dir")
+    os.makedirs(target_dir, exist_ok=True)
+
+    # WHEN the user runs the init command with target-dir
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + ["--target-dir", target_dir], input="1\n")
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the `workflow.py` file should be created in the target directory
+    module_path = os.path.join(target_dir, "example_workflow")
+    workflow_py = os.path.join(module_path, "workflow.py")
+    assert os.path.exists(workflow_py)
+    with open(workflow_py) as f:
+        assert f.read() == "print('hello')"
+
+    # AND the files are not in the default module directory
+    default_module_path = os.path.join(temp_dir, "example_workflow", "workflow.py")
+    assert not os.path.exists(default_module_path)
+
+    # AND the vellum.lock.json file should be created in the original directory
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+    with open(vellum_lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data["workflows"] == [
+            {
+                "module": "example_workflow",
+                "workflow_sandbox_id": "template-1",
+                "ignore": None,
+                "deployments": [],
+                "container_image_name": None,
+                "container_image_tag": None,
+                "workspace": "default",
+            }
+        ]
+
+
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["workflows", "init"],
+    ],
+    ids=["workflows_init"],
+)
+def test_init__with_nested_target_dir(vellum_client, mock_module, base_command):
+    # GIVEN a module on the user's filesystem
+    temp_dir = mock_module.temp_dir
+    mock_module.set_pyproject_toml({"workflows": []})
+
+    # GIVEN the vellum client returns a list of template workflows
+    fake_templates = [
+        MockTemplate(id="template-1", label="Example Workflow"),
+    ]
+    vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                }
+            )
+        ]
+    )
+
+    # AND a nested target directory that doesn't exist yet
+    nested_target_dir = os.path.join(temp_dir, "dir-1", "dir-2")
+
+    # WHEN the user runs the init command with nested target-dir
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + ["--target-dir", nested_target_dir], input="1\n")
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the nested directory with module subdirectory should be created
+    module_path = os.path.join(nested_target_dir, "example_workflow")
+    assert os.path.exists(module_path)
+
+    # AND the workflow.py file is written to the nested target directory
+    workflow_py = os.path.join(module_path, "workflow.py")
+    assert os.path.exists(workflow_py)
+    with open(workflow_py) as f:
+        assert f.read() == "print('hello')"
+
+    # AND the files are not in the default module directory
+    default_module_path = os.path.join(temp_dir, "example_workflow", "workflow.py")
+    assert not os.path.exists(default_module_path)
+
+    # AND the vellum.lock.json file is still updated
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+    with open(vellum_lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data["workflows"] == [
+            {
+                "module": "example_workflow",
+                "workflow_sandbox_id": "template-1",
+                "ignore": None,
+                "deployments": [],
+                "container_image_name": None,
+                "container_image_tag": None,
+                "workspace": "default",
+            }
+        ]
+
+
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["workflows", "init"],
+    ],
+    ids=["workflows_init"],
+)
+def test_init__with_template_name_and_target_dir(vellum_client, mock_module, base_command):
+    # GIVEN a module on the user's filesystem
+    temp_dir = mock_module.temp_dir
+    mock_module.set_pyproject_toml({"workflows": []})
+
+    # GIVEN the vellum client returns a list of template workflows
+    fake_templates = [
+        MockTemplate(id="template-1", label="Example Workflow"),
+        MockTemplate(id="template-2", label="Another Workflow"),
+    ]
+    vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                }
+            )
+        ]
+    )
+
+    # AND a target directory
+    target_dir = os.path.join(temp_dir, "dir")
+    os.makedirs(target_dir, exist_ok=True)
+
+    # WHEN the user runs the init command with a specific template name and target-dir
+    template_name = snake_case("Another Workflow")
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + [template_name, "--target-dir", target_dir])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND `vellum_client.workflows.pull` is called with the correct template ID
+    vellum_client.workflows.pull.assert_called_once_with(
+        "template-2",  # ID of "Another Workflow"
+        request_options={"additional_query_parameters": {"include_sandbox": True}},
+    )
+
+    # AND the workflow files should be created in the target directory with the correct module subdirectory
+    module_path = os.path.join(target_dir, "another_workflow")
+    workflow_py = os.path.join(module_path, "workflow.py")
+    assert os.path.exists(workflow_py)
+    with open(workflow_py) as f:
+        assert f.read() == "print('hello')"
+
+    # AND the files are not in the default module directory
+    default_module_path = os.path.join(temp_dir, "another_workflow", "workflow.py")
+    assert not os.path.exists(default_module_path)
+
+    # AND the vellum.lock.json file should be created with the correct data
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+
+    with open(vellum_lock_json) as f:
+        lock_data = json.load(f)
+        assert lock_data["workflows"] == [
+            {
+                "module": "another_workflow",
+                "workflow_sandbox_id": "template-2",
+                "ignore": None,
+                "deployments": [],
+                "container_image_name": None,
+                "container_image_tag": None,
+                "workspace": "default",
+            }
+        ]
