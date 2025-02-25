@@ -172,7 +172,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._context = context or WorkflowContext()
         self._store = Store()
-        self._execution_context = self._context.execution_context or get_execution_context()
+        self._execution_context = self._context.execution_context
 
         self.validate()
 
