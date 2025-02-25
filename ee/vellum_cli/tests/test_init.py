@@ -52,15 +52,8 @@ def test_init_command(vellum_client, mock_module, base_command):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {
-                    "workflow.py": "print('hello')",
-                }
-            )
-        ]
-    )
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+
     # WHEN the user runs the `init` command and selects the first template
     runner = CliRunner()
     result = runner.invoke(cli_main, base_command, input="1\n")
@@ -208,15 +201,7 @@ def test_init_command_target_directory_exists(vellum_client, mock_module, base_c
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {
-                    "workflow.py": "print('hello')",
-                }
-            )
-        ]
-    )
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the `init` command and selects the template
     runner = CliRunner()
@@ -372,15 +357,7 @@ def test_init__with_target_dir(vellum_client, mock_module, base_command):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {
-                    "workflow.py": "print('hello')",
-                }
-            )
-        ]
-    )
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND a target directory
     target_dir = os.path.join(temp_dir, "dir")
@@ -441,15 +418,7 @@ def test_init__with_nested_target_dir(vellum_client, mock_module, base_command):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {
-                    "workflow.py": "print('hello')",
-                }
-            )
-        ]
-    )
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND a nested target directory that doesn't exist yet
     nested_target_dir = os.path.join(temp_dir, "dir-1", "dir-2")
@@ -513,15 +482,7 @@ def test_init__with_template_name_and_target_dir(vellum_client, mock_module, bas
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {
-                    "workflow.py": "print('hello')",
-                }
-            )
-        ]
-    )
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND a target directory
     target_dir = os.path.join(temp_dir, "dir")
