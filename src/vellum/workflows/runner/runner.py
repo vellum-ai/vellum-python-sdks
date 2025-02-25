@@ -76,7 +76,7 @@ class WorkflowRunner(Generic[StateType]):
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
-        current_execution_context: Optional[ExecutionContext] = None,
+        init_execution_context: Optional[ExecutionContext] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -138,7 +138,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
-        self._execution_context = current_execution_context or get_execution_context()
+        self._execution_context = init_execution_context or get_execution_context()
         self._parent_context = self._execution_context.parent_context
 
         setattr(
