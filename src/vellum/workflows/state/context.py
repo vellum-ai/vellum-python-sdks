@@ -23,7 +23,9 @@ class WorkflowContext:
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
-        self._execution_context = execution_context or get_execution_context()
+        self._execution_context = get_execution_context()
+        if not self._execution_context.parent_context:
+            self._execution_context = execution_context
 
     @cached_property
     def vellum_client(self) -> Vellum:
@@ -34,10 +36,7 @@ class WorkflowContext:
 
     @cached_property
     def execution_context(self) -> ExecutionContext:
-        if self._execution_context:
-            return self._execution_context
-        else:
-            return ExecutionContext()
+        return self._execution_context
 
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
