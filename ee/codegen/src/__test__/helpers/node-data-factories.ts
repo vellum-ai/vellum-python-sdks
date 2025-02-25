@@ -35,7 +35,8 @@ import {
   SearchNode,
   SubworkflowNode,
   TemplatingNode,
-  VellumLogicalConditionGroup, WorkflowDataNode,
+  VellumLogicalConditionGroup,
+  WorkflowDataNode,
   WorkflowNodeType,
 } from "src/types/vellum";
 
