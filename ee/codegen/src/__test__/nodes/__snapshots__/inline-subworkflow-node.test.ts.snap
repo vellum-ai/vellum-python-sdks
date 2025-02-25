@@ -42,3 +42,79 @@ class InlineSubworkflowNode(BaseInlineSubworkflowNode):
     subworkflow = InlineSubworkflowNodeWorkflow
 "
 `;
+
+exports[`InlineSubworkflowNode > name collision > should handle subworkflow with same name as internal node 1`] = `
+"from vellum.workflows.nodes.displayable import InlineSubworkflowNode
+
+from .workflow import MyNodeWorkflow
+
+
+class MyNode(InlineSubworkflowNode):
+    subworkflow = MyNodeWorkflow
+"
+`;
+
+exports[`InlineSubworkflowNode > name collision > should handle subworkflow with same name as internal node 2`] = `
+"# flake8: noqa: F401, F403
+
+from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from ....nodes.my_node import MyNode
+from .nodes import *
+from .workflow import *
+
+
+class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
+    label = "My node"
+    node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
+    target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
+    workflow_input_ids_by_name = {}
+    node_input_ids_by_name = {}
+    output_display = {
+        MyNode.Outputs.final_output: NodeOutputDisplay(
+            id=UUID("edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb"), name="final-output"
+        )
+    }
+    port_displays = {MyNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`InlineSubworkflowNode > name collision > should handle subworkflow with same name as internal node 3`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class MyNode1(TemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {}
+"
+`;
+
+exports[`InlineSubworkflowNode > name collision > should handle subworkflow with same name as internal node 4`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+
+from .....nodes.my_node.nodes.my_node import MyNode1
+
+
+class MyNode1Display(BaseTemplatingNodeDisplay[MyNode1]):
+    label = "My node"
+    node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
+    template_input_id = UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")
+    node_input_ids_by_name = {"template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
+    output_display = {
+        MyNode1.Outputs.result: NodeOutputDisplay(id=UUID("2d4f1826-de75-499a-8f84-0a690c8136ad"), name="result")
+    }
+    port_displays = {MyNode1.Ports.default: PortDisplayOverrides(id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4"))}
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;

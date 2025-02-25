@@ -52,6 +52,7 @@ export declare namespace WorkflowContext {
     strict: boolean;
     codeExecutionNodeCodeRepresentationOverride: "STANDALONE" | "INLINE";
     disableFormatting: boolean;
+    classNames?: Set<string>;
   };
 }
 
@@ -121,7 +122,7 @@ export class WorkflowContext {
   public readonly disableFormatting: boolean;
 
   // Track what class names are used within this workflow so that we can ensure name uniqueness
-  private readonly classNames: Set<string> = new Set();
+  public readonly classNames: Set<string>;
 
   constructor({
     absolutePathToOutputDirectory,
@@ -138,6 +139,7 @@ export class WorkflowContext {
     strict,
     codeExecutionNodeCodeRepresentationOverride,
     disableFormatting,
+    classNames,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -175,6 +177,8 @@ export class WorkflowContext {
     this.outputVariableContextsById = new Map();
     this.globalOutputVariableContextsById =
       globalOutputVariableContextsById ?? new Map();
+
+    this.classNames = classNames ?? new Set<string>();
   }
 
   /* Create a new workflow context for a nested workflow from its parent */
@@ -182,10 +186,12 @@ export class WorkflowContext {
     parentNode,
     workflowClassName,
     workflowRawEdges,
+    classNames,
   }: {
     parentNode: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
     workflowClassName: string;
     workflowRawEdges: WorkflowEdge[];
+    classNames?: Set<string>;
   }) {
     return new WorkflowContext({
       absolutePathToOutputDirectory: this.absolutePathToOutputDirectory,
@@ -202,6 +208,7 @@ export class WorkflowContext {
         this.codeExecutionNodeCodeRepresentationOverride,
       strict: this.strict,
       disableFormatting: this.disableFormatting,
+      classNames,
     });
   }
 

@@ -4,7 +4,10 @@ import { join } from "path";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
-import { inlineSubworkflowNodeDataFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  inlineSubworkflowNodeDataFactory,
+  templatingNodeFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext } from "src/context";
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
@@ -68,6 +71,69 @@ describe("InlineSubworkflowNode", () => {
             "nodes",
             "inline_subworkflow_node",
             "__init__.py"
+          ),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("name collision", () => {
+    beforeEach(async () => {
+      const workflowContext = workflowContextFactory({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+      });
+      const nodeData = inlineSubworkflowNodeDataFactory({
+        label: "My node",
+        nodes: [templatingNodeFactory({ label: "My node" })],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlineSubworkflowNodeContext;
+
+      const node = new InlineSubworkflowNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      await node.persist();
+    });
+
+    it(`should handle subworkflow with same name as internal node`, async () => {
+      expect(
+        await readFile(
+          join(tempDir, "code", "nodes", "my_node", "__init__.py"),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+
+      expect(
+        await readFile(
+          join(tempDir, "code", "display", "nodes", "my_node", "__init__.py"),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+
+      expect(
+        await readFile(
+          join(tempDir, "code", "nodes", "my_node", "nodes", "my_node.py"),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+
+      expect(
+        await readFile(
+          join(
+            tempDir,
+            "code",
+            "display",
+            "nodes",
+            "my_node",
+            "nodes",
+            "my_node.py"
           ),
           "utf-8"
         )

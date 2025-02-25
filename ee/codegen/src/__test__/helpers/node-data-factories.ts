@@ -35,7 +35,7 @@ import {
   SearchNode,
   SubworkflowNode,
   TemplatingNode,
-  VellumLogicalConditionGroup,
+  VellumLogicalConditionGroup, WorkflowDataNode,
   WorkflowNodeType,
 } from "src/types/vellum";
 
@@ -1636,18 +1636,27 @@ export function mapNodeDataFactory({
   };
 }
 
-export function inlineSubworkflowNodeDataFactory(): SubworkflowNode {
+export function inlineSubworkflowNodeDataFactory({
+  label,
+  nodes,
+}: {
+  label?: string;
+  nodes?: Array<WorkflowDataNode>;
+} = {}): SubworkflowNode {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory();
   const outputVariableId = "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb";
+
+  const workflowNodes = [entrypoint, ...(nodes ?? [templatingNode])];
+
   return {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "SUBWORKFLOW",
     data: {
       variant: "INLINE",
-      label: "Inline Subworkflow Node",
+      label: label ?? "Inline Subworkflow Node",
       workflowRawData: {
-        nodes: [entrypoint, templatingNode],
+        nodes: workflowNodes,
         edges: edgesFactory([[entrypoint, templatingNode]]),
         outputValues: [
           {
