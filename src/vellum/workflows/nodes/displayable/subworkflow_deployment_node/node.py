@@ -12,6 +12,7 @@ from vellum import (
     WorkflowRequestNumberInputRequest,
     WorkflowRequestStringInputRequest,
 )
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.core import RequestOptions
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
@@ -137,17 +138,26 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 message="Expected subworkflow deployment attribute to be either a UUID or STR, got None instead",
             )
 
-        subworkflow_stream = self._context.vellum_client.execute_workflow_stream(
-            inputs=self._compile_subworkflow_inputs(),
-            workflow_deployment_id=deployment_id,
-            workflow_deployment_name=deployment_name,
-            release_tag=self.release_tag,
-            external_id=self.external_id,
-            event_types=["WORKFLOW"],
-            metadata=self.metadata,
-            request_options=request_options,
-        )
-        # for some reason execution context isn't showing as an option? ^ failing mypy
+        try:
+            subworkflow_stream = self._context.vellum_client.execute_workflow_stream(
+                inputs=self._compile_subworkflow_inputs(),
+                workflow_deployment_id=deployment_id,
+                workflow_deployment_name=deployment_name,
+                release_tag=self.release_tag,
+                external_id=self.external_id,
+                event_types=["WORKFLOW"],
+                metadata=self.metadata,
+                request_options=request_options,
+            )
+        except ApiError as e:
+            self._handle_api_error(e)
+
+        # We don't use the INITIATED event anyway, so we can just skip it
+        # and use the exception handling to catch other api level errors
+        try:
+            next(subworkflow_stream)
+        except ApiError as e:
+            self._handle_api_error(e)
 
         outputs: Optional[List[WorkflowOutput]] = None
         fulfilled_output_names: Set[str] = set()
@@ -195,3 +205,15 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                     name=output.name,
                     value=output.value,
                 )
+
+    def _handle_api_error(self, e: ApiError):
+        if e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
+            raise NodeException(
+                message=e.body.get("detail", "Failed to execute Subworkflow Deployment"),
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            ) from e
+
+        raise NodeException(
+            message="Failed to execute Subworkflow Deployment",
+            code=WorkflowErrorCode.INTERNAL_ERROR,
+        ) from e

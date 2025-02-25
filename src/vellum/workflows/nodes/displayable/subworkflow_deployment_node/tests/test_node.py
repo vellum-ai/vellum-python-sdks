@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import uuid4
 from typing import Any, Iterator, List
 
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.workflow_execution_workflow_result_event import WorkflowExecutionWorkflowResultEvent
@@ -152,3 +153,90 @@ def test_run_workflow__no_deployment():
     assert "Expected subworkflow deployment attribute to be either a UUID or STR, got None instead" in str(
         exc_info.value
     )
+
+
+@pytest.mark.parametrize(
+    ["exception", "expected_code", "expected_message"],
+    [
+        (
+            ApiError(status_code=400, body={"detail": "Missing required input variable: 'foo'"}),
+            WorkflowErrorCode.INVALID_INPUTS,
+            "Missing required input variable: 'foo'",
+        ),
+        (
+            ApiError(status_code=400, body={"message": "Missing required input variable: 'foo'"}),
+            WorkflowErrorCode.INVALID_INPUTS,
+            "Failed to execute Subworkflow Deployment",
+        ),
+        (
+            ApiError(status_code=400, body="Missing required input variable: 'foo'"),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute Subworkflow Deployment",
+        ),
+        (
+            ApiError(status_code=None, body={"detail": "Missing required input variable: 'foo'"}),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute Subworkflow Deployment",
+        ),
+        (
+            ApiError(status_code=500, body={"detail": "Missing required input variable: 'foo'"}),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute Subworkflow Deployment",
+        ),
+    ],
+    ids=["400", "invalid_dict", "invalid_body", "no_status_code", "500"],
+)
+def test_subworkflow_deployment_node__api_error__invalid_inputs_node_exception(
+    vellum_client, exception, expected_code, expected_message
+):
+    # GIVEN a prompt node with an invalid model name
+    class MyNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {
+            "not_foo": "bar",
+        }
+
+    # AND the Subworkflow Deployment API call fails
+    def _side_effect(*args: Any, **kwargs: Any) -> Iterator[WorkflowStreamEvent]:
+        if kwargs.get("_mock_condition_to_induce_an_error"):
+            yield WorkflowExecutionWorkflowResultEvent(
+                execution_id=str(uuid4()),
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="INITIATED",
+                    ts=datetime.now(),
+                ),
+            )
+        else:
+            raise exception
+
+    # AND the vellum client execute workflow stream raises a 4xx error
+    vellum_client.execute_workflow_stream.side_effect = _side_effect
+
+    # WHEN the node is run
+    with pytest.raises(NodeException) as e:
+        list(MyNode().run())
+
+    # THEN the node raises the correct NodeException
+    assert e.value.code == expected_code
+    assert e.value.message == expected_message
+
+
+def test_subworkflow_deployment_node__immediate_api_error__node_exception(vellum_client):
+    # GIVEN a prompt node with an invalid model name
+    class MyNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {
+            "not_foo": "bar",
+        }
+
+    # AND the vellum client execute workflow stream raises a 4xx error
+    vellum_client.execute_workflow_stream.side_effect = ApiError(status_code=404, body={"detail": "Not found"})
+
+    # WHEN the node is run
+    with pytest.raises(NodeException) as e:
+        list(MyNode().run())
+
+    # THEN the node raises the correct NodeException
+    assert e.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert e.value.message == "Not found"

@@ -146,22 +146,22 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
         (
             ApiError(status_code=404, body={"message": "Model not found"}),
             WorkflowErrorCode.INVALID_INPUTS,
-            "Failed to execute prompt",
+            "Failed to execute Prompt",
         ),
         (
             ApiError(status_code=404, body="Model not found"),
             WorkflowErrorCode.INTERNAL_ERROR,
-            "Failed to execute prompt",
+            "Failed to execute Prompt",
         ),
         (
             ApiError(status_code=None, body={"detail": "Model not found"}),
             WorkflowErrorCode.INTERNAL_ERROR,
-            "Failed to execute prompt",
+            "Failed to execute Prompt",
         ),
         (
             ApiError(status_code=500, body={"detail": "Model not found"}),
             WorkflowErrorCode.INTERNAL_ERROR,
-            "Failed to execute prompt",
+            "Failed to execute Prompt",
         ),
     ],
     ids=["404", "invalid_dict", "invalid_body", "no_status_code", "500"],
