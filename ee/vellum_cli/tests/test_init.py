@@ -264,9 +264,7 @@ def test_init_command_with_template_name(vellum_client, mock_module, base_comman
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter(
-        [_zip_file_map({"workflow.py": "print('hello')", "README.md": "# Another Workflow\nThis is a test template."})]
-    )
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the `init` command with a specific template name
     template_name = snake_case("Another Workflow")
