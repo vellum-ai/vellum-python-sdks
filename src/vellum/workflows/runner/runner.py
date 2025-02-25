@@ -7,7 +7,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
 from vellum.workflows.constants import undefined
-from vellum.workflows.context import execution_context, get_parent_context
+from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context, get_parent_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
@@ -76,6 +76,7 @@ class WorkflowRunner(Generic[StateType]):
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
+        current_execution_context: Optional[ExecutionContext] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -137,7 +138,8 @@ class WorkflowRunner(Generic[StateType]):
 
         self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
         self._cancel_signal = cancel_signal
-        self._parent_context = get_parent_context()
+        self._execution_context = current_execution_context or get_execution_context()
+        self._parent_context = self._execution_context.parent_context
 
         setattr(
             self._initial_state,

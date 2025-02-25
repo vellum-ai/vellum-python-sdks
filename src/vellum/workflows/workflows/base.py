@@ -172,6 +172,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._context = context or WorkflowContext()
         self._store = Store()
+        self._execution_context = self._context.execution_context or get_execution_context()
 
         self.validate()
 
@@ -322,6 +323,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
+            current_execution_context=self._execution_context,
         ).stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
         last_event = None
@@ -432,6 +434,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
+            current_execution_context=self._execution_context,
         ).stream():
             if should_yield(self.__class__, event):
                 yield event
