@@ -447,13 +447,9 @@ ${errors.slice(0, 3).map((err) => {
     const rawData = this.workflowVersionExecConfig.workflowRawData;
 
     // Edge case: Workflow init only has two nodes of ENTRYPOINT and TERMINAL with no edge between them
-    if (
-      rawData.edges.length === 0 &&
-      rawData.nodes.length === 2 &&
-      rawData.nodes.some((node) => node.type === "ENTRYPOINT")
-    ) {
+    if (rawData.edges.length === 0) {
       return rawData.nodes.filter(
-        (node): node is WorkflowDataNode => node.type === "TERMINAL"
+        (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
       );
     }
 
