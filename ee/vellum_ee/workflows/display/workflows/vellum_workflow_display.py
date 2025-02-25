@@ -126,6 +126,18 @@ class VellumWorkflowDisplay(
 
             nodes.append(serialized_node)
 
+        # Add all unused nodes in the workflow
+        for node in self._workflow.get_unused_nodes():
+            node_display = self.display_context.node_displays[node]
+
+            try:
+                serialized_node = node_display.serialize(self.display_context)
+            except NotImplementedError as e:
+                self.add_error(e)
+                continue
+
+            nodes.append(serialized_node)
+
         synthetic_output_edges: JsonArray = []
         output_variables: JsonArray = []
         final_output_nodes = [

@@ -1,4 +1,5 @@
 from uuid import UUID
+from typing import Dict
 
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
@@ -145,3 +146,85 @@ def test_vellum_workflow_display_serialize_valid_handle_ids_for_base_nodes():
         assert (
             node["trigger"]["id"] in edge_target_handle_ids
         ), f"Trigger {node['trigger']['id']} from node {node['label']} not found in edge target handle ids"
+
+
+def test_vellum_workflow_display__serialize_with_unused_nodes_and_edges():
+    # GIVEN a workflow with active and unused nodes
+    class NodeA(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    # AND A workflow that uses them correctly
+    class Workflow(BaseWorkflow):
+        graph = NodeA
+        unused_graphs = {NodeB >> NodeC}
+
+        class Outputs(BaseWorkflow.Outputs):
+            final = NodeA.Outputs.result
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=Workflow,
+    )
+
+    # WHEN we serialize the workflow
+    exec_config = workflow_display.serialize()
+
+    # THEN the serialized workflow contains the expected nodes and edges
+    raw_data = exec_config["workflow_raw_data"]
+    assert isinstance(raw_data, dict)
+
+    nodes = raw_data["nodes"]
+    edges = raw_data["edges"]
+
+    assert isinstance(nodes, list)
+    assert isinstance(edges, list)
+
+    # Find nodes by their definition name
+    node_ids: Dict[str, str] = {}
+
+    for node in nodes:
+        assert isinstance(node, dict)
+        definition = node.get("definition")
+        if definition is None:
+            continue
+
+        assert isinstance(definition, dict)
+        name = definition.get("name")
+        if not isinstance(name, str):
+            continue
+
+        if name in ["NodeA", "NodeB", "NodeC"]:
+            node_id = node.get("id")
+            if isinstance(node_id, str):
+                node_ids[name] = node_id
+
+    # Verify all nodes are present
+    assert "NodeA" in node_ids, "Active node NodeA not found in serialized output"
+    assert "NodeB" in node_ids, "Unused node NodeB not found in serialized output"
+    assert "NodeC" in node_ids, "Unused node NodeC not found in serialized output"
+
+    # Verify the edge between NodeB and NodeC is present
+    edge_found = False
+    for edge in edges:
+        assert isinstance(edge, dict)
+        source_id = edge.get("source_node_id")
+        target_id = edge.get("target_node_id")
+
+        if (
+            isinstance(source_id, str)
+            and isinstance(target_id, str)
+            and source_id == node_ids["NodeB"]
+            and target_id == node_ids["NodeC"]
+        ):
+            edge_found = True
+            break
+
+    assert edge_found, "Edge between unused nodes NodeB and NodeC not found in serialized output"

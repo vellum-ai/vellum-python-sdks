@@ -235,6 +235,25 @@ class BaseWorkflowDisplay(
             self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
             self._enrich_node_port_displays(node, node_display, port_displays)
 
+        for node in self._workflow.get_unused_nodes():
+            node_display = self._get_node_display(node)
+
+            if node not in node_displays:
+                node_displays[node] = node_display
+
+            if node not in global_node_displays:
+                global_node_displays[node] = node_display
+
+            # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
+            inner_node = get_wrapped_node(node)
+            if inner_node:
+                inner_node_display = self._get_node_display(inner_node)
+                node_displays[inner_node] = inner_node_display
+                global_node_displays[inner_node] = inner_node_display
+
+            self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
+            self._enrich_node_port_displays(node, node_display, port_displays)
+
         workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {}
         # If we're dealing with a nested workflow, then it should have access to the inputs of its parents.
         global_workflow_input_displays = (
@@ -272,6 +291,15 @@ class BaseWorkflowDisplay(
 
         edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplayType] = {}
         for edge in self._workflow.get_edges():
+            if edge in edge_displays:
+                continue
+
+            edge_display_overrides = self.edge_displays.get((edge.from_port, edge.to_node))
+            edge_displays[(edge.from_port, edge.to_node)] = self._generate_edge_display(
+                edge, node_displays, port_displays, overrides=edge_display_overrides
+            )
+
+        for edge in self._workflow.get_unused_edges():
             if edge in edge_displays:
                 continue
 
