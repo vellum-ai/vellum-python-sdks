@@ -24,6 +24,7 @@ from typing import (
     get_args,
 )
 
+from vellum.workflows.context import get_execution_context
 from vellum.workflows.edges import Edge
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
@@ -477,10 +478,19 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         return self.get_inputs_class()()
 
     def get_default_state(self, workflow_inputs: Optional[InputsType] = None) -> StateType:
+        execution_context = get_execution_context()
         return self.get_state_class()(
-            meta=StateMeta(
-                parent=self._parent_state,
-                workflow_inputs=workflow_inputs or self.get_default_inputs(),
+            meta=(
+                StateMeta(
+                    parent=self._parent_state,
+                    workflow_inputs=workflow_inputs or self.get_default_inputs(),
+                    trace_id=execution_context.trace_id,
+                )
+                if execution_context and execution_context.trace_id
+                else StateMeta(
+                    parent=self._parent_state,
+                    workflow_inputs=workflow_inputs or self.get_default_inputs(),
+                )
             )
         )
 
