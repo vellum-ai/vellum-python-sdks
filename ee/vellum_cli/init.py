@@ -67,6 +67,7 @@ def init_command(template_name: Optional[str] = None, target_directory: Optional
     # Use target_directory if provided, otherwise use current working directory
     base_dir = os.path.join(os.getcwd(), target_directory) if target_directory else os.getcwd()
     target_dir = os.path.join(base_dir, *workflow_config.module.split("."))
+    workflow_config.target_directory = target_dir if target_directory else None
 
     if os.path.exists(target_dir):
         click.echo(click.style(f"{target_dir} already exists.", fg="red"))

@@ -50,6 +50,7 @@ class WorkflowConfig(UniversalBaseModel):
     container_image_name: Optional[str] = None
     container_image_tag: Optional[str] = None
     workspace: str = DEFAULT_WORKSPACE_CONFIG.name
+    target_directory: Optional[str] = None
 
     def merge(self, other: "WorkflowConfig") -> "WorkflowConfig":
         self_deployment_by_id = {

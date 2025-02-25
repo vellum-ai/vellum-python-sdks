@@ -79,6 +79,7 @@ def test_init_command(vellum_client, mock_module):
                 "container_image_name": None,
                 "container_image_tag": None,
                 "workspace": "default",
+                "target_directory": None,
             }
         ]
 
@@ -252,6 +253,7 @@ def test_init_command_with_template_name(vellum_client, mock_module):
                 "container_image_name": None,
                 "container_image_tag": None,
                 "workspace": "default",
+                "target_directory": None,
             }
         ]
 
@@ -345,6 +347,7 @@ def test_init__with_target_dir(vellum_client, mock_module):
                 "container_image_name": None,
                 "container_image_tag": None,
                 "workspace": "default",
+                "target_directory": module_path,
             }
         ]
 
@@ -401,6 +404,7 @@ def test_init__with_nested_target_dir(vellum_client, mock_module):
                 "container_image_name": None,
                 "container_image_tag": None,
                 "workspace": "default",
+                "target_directory": module_path,
             }
         ]
 
@@ -464,5 +468,6 @@ def test_init__with_template_name_and_target_dir(vellum_client, mock_module):
                 "container_image_name": None,
                 "container_image_tag": None,
                 "workspace": "default",
+                "target_directory": module_path,
             }
         ]

@@ -508,6 +508,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
             "container_image_tag": None,
             "deployments": [],
             "ignore": None,
+            "target_directory": None,
         }
 
 

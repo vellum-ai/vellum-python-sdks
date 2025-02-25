@@ -73,6 +73,7 @@ def test_pull(vellum_client, mock_module, base_command):
                     "ignore": None,
                     "deployments": [],
                     "workspace": "default",
+                    "target_directory": None,
                 }
             ],
             "workspaces": [],
@@ -167,6 +168,7 @@ def test_pull__with_target_dir(vellum_client, mock_module, base_command):
                     "ignore": None,
                     "deployments": [],
                     "workspace": "default",
+                    "target_directory": module_path,
                 }
             ],
             "workspaces": [],
@@ -233,6 +235,7 @@ def test_pull__with_nested_target_dir(vellum_client, mock_module, base_command):
                     "ignore": None,
                     "deployments": [],
                     "workspace": "default",
+                    "target_directory": module_path,
                 }
             ],
             "workspaces": [],
@@ -289,6 +292,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
                     "container_image_tag": None,
                     "container_image_name": None,
                     "workspace": "default",
+                    "target_directory": None,
                 }
             ],
         }
@@ -372,6 +376,7 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
                     "container_image_tag": None,
                     "container_image_name": None,
                     "workspace": "default",
+                    "target_directory": None,
                 }
             ],
             "workspaces": [],
@@ -619,6 +624,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "container_image_name": None,
                 "container_image_tag": None,
                 "workspace": "default",
+                "target_directory": None,
             },
             {
                 "module": "super_cool_workflow",
@@ -628,6 +634,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                 "container_image_name": "test",
                 "container_image_tag": "1.0",
                 "workspace": "default",
+                "target_directory": None,
             },
         ]
 
@@ -771,6 +778,7 @@ def test_pull__module_not_in_config(vellum_client, mock_module):
                 "container_image_name": None,
                 "container_image_tag": None,
                 "workspace": "default",
+                "target_directory": None,
             }
         ]
 
