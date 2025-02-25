@@ -2,12 +2,13 @@ import io
 import json
 import os
 import zipfile
-from typing import Optional
+from typing import Optional, cast
 
 import click
 from dotenv import load_dotenv
 from pydash import snake_case
 
+from vellum.client.types.workflow_sandbox_example import WorkflowSandboxExample
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import WorkflowConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
@@ -17,7 +18,7 @@ ERROR_LOG_FILE_NAME = "error.log"
 METADATA_FILE_NAME = "metadata.json"
 
 
-def init_command():
+def init_command(template_name: Optional[str] = None):
     load_dotenv()
     logger = load_cli_logger()
     config = load_vellum_cli_config()
@@ -30,16 +31,22 @@ def init_command():
         logger.error("No templates available")
         return
 
-    click.echo(click.style("Available Templates", bold=True, fg="green"))
-    for idx, template in enumerate(templates, 1):
-        click.echo(f"{idx}. {template.label}")
+    if template_name:
+        selected_template = next((t for t in templates if snake_case(t.label) == template_name), None)
+        if not selected_template:
+            logger.error(f"Template {template_name} not found")
+            return
+    else:
+        click.echo(click.style("Available Templates", bold=True, fg="green"))
+        for idx, template in enumerate(templates, 1):
+            click.echo(f"{idx}. {template.label}")
 
-    choice = click.prompt(
-        f"Please select a template number (1-{len(templates)})", type=click.IntRange(1, len(templates))
-    )
-    selected_template = templates[choice - 1]
+        choice = click.prompt(
+            f"Please select a template number (1-{len(templates)})", type=click.IntRange(1, len(templates))
+        )
+        selected_template = cast(WorkflowSandboxExample, templates[choice - 1])
 
-    click.echo(click.style(f"\nYou selected: {selected_template.label}\n", bold=True, fg="cyan"))
+        click.echo(click.style(f"\nYou selected: {selected_template.label}\n", bold=True, fg="cyan"))
 
     # Create workflow config with module name from template label
     workflow_config = WorkflowConfig(

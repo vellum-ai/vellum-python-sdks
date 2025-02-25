@@ -333,10 +333,11 @@ def image_push(image: str, tag: Optional[List[str]] = None) -> None:
 
 
 @workflows.command(name="init")
-def workflows_init() -> None:
+@click.argument("template_name", required=False)
+def workflows_init(template_name: Optional[str] = None) -> None:
     """Initialize a new Vellum Workflow using a predefined template"""
 
-    init_command()
+    init_command(template_name=template_name)
 
 
 if __name__ == "__main__":
