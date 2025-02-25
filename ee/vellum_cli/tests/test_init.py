@@ -1,4 +1,3 @@
-import pytest
 import io
 import json
 import os
@@ -33,14 +32,7 @@ class MockTemplate:
         self.label = label
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init_command(vellum_client, mock_module, base_command):
+def test_init_command(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -56,7 +48,7 @@ def test_init_command(vellum_client, mock_module, base_command):
 
     # WHEN the user runs the `init` command and selects the first template
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command, input="1\n")
+    result = runner.invoke(cli_main, ["workflows", "init"], input="1\n")
 
     # THEN the command returns successfully
     assert result.exit_code == 0
@@ -91,14 +83,7 @@ def test_init_command(vellum_client, mock_module, base_command):
         ]
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init_command__invalid_template_id(vellum_client, mock_module, base_command):
+def test_init_command__invalid_template_id(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -114,7 +99,7 @@ def test_init_command__invalid_template_id(vellum_client, mock_module, base_comm
     # Mock click.prompt to raise a KeyboardInterrupt (simulating Ctrl+C)
     with patch("click.prompt", side_effect=KeyboardInterrupt):
         runner = CliRunner()
-        result = runner.invoke(cli_main, base_command)
+        result = runner.invoke(cli_main, ["workflows", "init"])
 
     # THEN the command is aborted
     assert result.exit_code != 0
@@ -135,14 +120,7 @@ def test_init_command__invalid_template_id(vellum_client, mock_module, base_comm
             assert lock_data["workflows"] == []
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init_command__no_templates(vellum_client, mock_module, base_command):
+def test_init_command__no_templates(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -151,7 +129,7 @@ def test_init_command__no_templates(vellum_client, mock_module, base_command):
 
     # WHEN the user runs the `init` command
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command)
+    result = runner.invoke(cli_main, ["workflows", "init"])
 
     # THEN the command gracefully exits
     assert result.exit_code == 0
@@ -172,14 +150,7 @@ def test_init_command__no_templates(vellum_client, mock_module, base_command):
             assert lock_data["workflows"] == []
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init_command_target_directory_exists(vellum_client, mock_module, base_command):
+def test_init_command_target_directory_exists(vellum_client, mock_module):
     """
     GIVEN a target directory already exists
     WHEN the user tries to run the `init` command
@@ -205,7 +176,7 @@ def test_init_command_target_directory_exists(vellum_client, mock_module, base_c
 
     # WHEN the user runs the `init` command and selects the template
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command, input="1\n")
+    result = runner.invoke(cli_main, ["workflows", "init"], input="1\n")
 
     # THEN the command should detect the existing directory and abort
     assert result.exit_code == 0
@@ -229,14 +200,7 @@ def test_init_command_target_directory_exists(vellum_client, mock_module, base_c
             assert lock_data["workflows"] == []
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init_command_with_template_name(vellum_client, mock_module, base_command):
+def test_init_command_with_template_name(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -254,7 +218,7 @@ def test_init_command_with_template_name(vellum_client, mock_module, base_comman
     # WHEN the user runs the `init` command with a specific template name
     template_name = snake_case("Another Workflow")
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command + [template_name])
+    result = runner.invoke(cli_main, ["workflows", "init", template_name])
 
     # THEN the command returns successfully
     assert result.exit_code == 0
@@ -292,14 +256,7 @@ def test_init_command_with_template_name(vellum_client, mock_module, base_comman
         ]
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init_command_with_nonexistent_template_name(vellum_client, mock_module, base_command):
+def test_init_command_with_nonexistent_template_name(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -314,7 +271,7 @@ def test_init_command_with_nonexistent_template_name(vellum_client, mock_module,
     # WHEN the user runs the `init` command with a non-existent template name
     nonexistent_template = "nonexistent_template"
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command + [nonexistent_template])
+    result = runner.invoke(cli_main, ["workflows", "init", nonexistent_template])
 
     # THEN the command should indicate the template was not found
     assert result.exit_code == 0
@@ -338,14 +295,7 @@ def test_init_command_with_nonexistent_template_name(vellum_client, mock_module,
             assert lock_data["workflows"] == []
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init__with_target_dir(vellum_client, mock_module, base_command):
+def test_init__with_target_dir(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -365,7 +315,7 @@ def test_init__with_target_dir(vellum_client, mock_module, base_command):
 
     # WHEN the user runs the init command with target-dir
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command + ["--target-dir", target_dir], input="1\n")
+    result = runner.invoke(cli_main, ["workflows", "init", "--target-dir", target_dir], input="1\n")
 
     # THEN the command returns successfully
     assert result.exit_code == 0
@@ -399,14 +349,7 @@ def test_init__with_target_dir(vellum_client, mock_module, base_command):
         ]
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init__with_nested_target_dir(vellum_client, mock_module, base_command):
+def test_init__with_nested_target_dir(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -425,7 +368,7 @@ def test_init__with_nested_target_dir(vellum_client, mock_module, base_command):
 
     # WHEN the user runs the init command with nested target-dir
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command + ["--target-dir", nested_target_dir], input="1\n")
+    result = runner.invoke(cli_main, ["workflows", "init", "--target-dir", nested_target_dir], input="1\n")
 
     # THEN the command returns successfully
     assert result.exit_code == 0
@@ -462,14 +405,7 @@ def test_init__with_nested_target_dir(vellum_client, mock_module, base_command):
         ]
 
 
-@pytest.mark.parametrize(
-    "base_command",
-    [
-        ["workflows", "init"],
-    ],
-    ids=["workflows_init"],
-)
-def test_init__with_template_name_and_target_dir(vellum_client, mock_module, base_command):
+def test_init__with_template_name_and_target_dir(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     temp_dir = mock_module.temp_dir
     mock_module.set_pyproject_toml({"workflows": []})
@@ -491,7 +427,7 @@ def test_init__with_template_name_and_target_dir(vellum_client, mock_module, bas
     # WHEN the user runs the init command with a specific template name and target-dir
     template_name = snake_case("Another Workflow")
     runner = CliRunner()
-    result = runner.invoke(cli_main, base_command + [template_name, "--target-dir", target_dir])
+    result = runner.invoke(cli_main, ["workflows", "init", template_name, "--target-dir", target_dir])
 
     # THEN the command returns successfully
     assert result.exit_code == 0
