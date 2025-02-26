@@ -222,6 +222,7 @@ export class GraphAttribute extends AstNode {
     if (graphMutableAst.type === "empty") return componentGraph;
     if (componentGraph.type === "empty") return graphMutableAst;
 
+    // If both are sets, merge their values
     if (graphMutableAst.type === "set" && componentGraph.type === "set") {
       return {
         type: "set",
@@ -229,20 +230,22 @@ export class GraphAttribute extends AstNode {
       };
     }
 
+    // If only one is a set, add the other element into it
     if (graphMutableAst.type === "set") {
       return {
         type: "set",
-        values: [...graphMutableAst.values, componentGraph], // No push() to avoid modifying existing set
+        values: [...graphMutableAst.values, componentGraph],
       };
     }
 
     if (componentGraph.type === "set") {
       return {
         type: "set",
-        values: [graphMutableAst, ...componentGraph.values], // No push() to avoid modifying existing set
+        values: [graphMutableAst, ...componentGraph.values],
       };
     }
 
+    // Otherwise, create a new set containing both
     return { type: "set", values: [graphMutableAst, componentGraph] };
   }
 
