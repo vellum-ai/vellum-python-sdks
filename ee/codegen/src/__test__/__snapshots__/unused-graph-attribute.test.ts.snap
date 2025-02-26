@@ -3,29 +3,29 @@
 exports[`Workflow > unused_graphs > should be empty when all nodes are connected to entrypoint 1`] = `
 "from vellum.workflows import BaseWorkflow
 
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_2 import TemplatingNode2
+from .nodes.my_custom_node import ConnectedNode1
+from .nodes.my_custom_node_1 import ConnectedNode2
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode >> TemplatingNode2
+    graph = ConnectedNode1 >> ConnectedNode2
 "
 `;
 
 exports[`Workflow > unused_graphs > should identify multiple disconnected graphs 1`] = `
 "from vellum.workflows import BaseWorkflow
 
-from .nodes.disconnected_node_1 import DisconnectedNode1
-from .nodes.disconnected_node_2 import DisconnectedNode2
-from .nodes.disconnected_node_3 import DisconnectedNode3
-from .nodes.disconnected_node_4 import DisconnectedNode4
-from .nodes.disconnected_node_5 import DisconnectedNode5
-from .nodes.disconnected_node_6 import DisconnectedNode6
-from .nodes.templating_node import TemplatingNode
+from .nodes.my_custom_node import ConnectedNode
+from .nodes.my_custom_node_1 import DisconnectedNode1
+from .nodes.my_custom_node_2 import DisconnectedNode2
+from .nodes.my_custom_node_3 import DisconnectedNode3
+from .nodes.my_custom_node_4 import DisconnectedNode4
+from .nodes.my_custom_node_5 import DisconnectedNode5
+from .nodes.my_custom_node_6 import DisconnectedNode6
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode
+    graph = ConnectedNode
     unused_graphs = {
         DisconnectedNode1
         >> {
@@ -40,13 +40,13 @@ class TestWorkflow(BaseWorkflow):
 exports[`Workflow > unused_graphs > should identify simple disconnected graph 1`] = `
 "from vellum.workflows import BaseWorkflow
 
-from .nodes.templating_node import TemplatingNode
-from .nodes.templating_node_1 import TemplatingNode1
-from .nodes.templating_node_2 import TemplatingNode2
+from .nodes.my_custom_node import ConnectedNode
+from .nodes.my_custom_node_1 import DisconnectedNode1
+from .nodes.my_custom_node_2 import DisconnectedNode2
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = TemplatingNode
-    unused_graphs = TemplatingNode1 >> TemplatingNode2
+    graph = ConnectedNode
+    unused_graphs = DisconnectedNode1 >> DisconnectedNode2
 "
 `;

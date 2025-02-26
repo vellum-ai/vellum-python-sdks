@@ -1,5 +1,4 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { v4 as uuidv4 } from "uuid";
 
 import { workflowContextFactory } from "./helpers";
 import {
@@ -7,8 +6,8 @@ import {
   edgesFactory,
 } from "./helpers/edge-data-factories";
 import {
-  templatingNodeFactory,
   entrypointNodeDataFactory,
+  genericNodeFactory,
 } from "./helpers/node-data-factories";
 
 import * as codegen from "src/codegen";
@@ -61,12 +60,11 @@ describe("Workflow", () => {
     };
 
     it("should be empty when all nodes are connected to entrypoint", async () => {
-      const connectedNode1 = templatingNodeFactory();
-      const connectedNode2 = templatingNodeFactory({
-        id: uuidv4(),
-        label: "Templating Node 2",
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const connectedNode1 = genericNodeFactory({
+        label: "ConnectedNode1",
+      });
+      const connectedNode2 = genericNodeFactory({
+        label: "ConnectedNode2",
       });
 
       await runUnusedGraphsWorkflowTest([
@@ -76,18 +74,16 @@ describe("Workflow", () => {
     });
 
     it("should identify simple disconnected graph", async () => {
-      const connectedNode = templatingNodeFactory();
-
-      const disconnectedNode1 = templatingNodeFactory({
-        id: uuidv4(),
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const connectedNode = genericNodeFactory({
+        label: "ConnectedNode",
       });
 
-      const disconnectedNode2 = templatingNodeFactory({
-        id: uuidv4(),
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const disconnectedNode1 = genericNodeFactory({
+        label: "DisconnectedNode1",
+      });
+
+      const disconnectedNode2 = genericNodeFactory({
+        label: "DisconnectedNode2",
       });
 
       await runUnusedGraphsWorkflowTest([
@@ -97,48 +93,32 @@ describe("Workflow", () => {
     });
 
     it("should identify multiple disconnected graphs", async () => {
-      const connectedNode = templatingNodeFactory();
-
-      const disconnectedNode1 = templatingNodeFactory({
-        id: uuidv4(),
-        label: "Disconnected Node 1",
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const connectedNode = genericNodeFactory({
+        label: "ConnectedNode",
       });
 
-      const disconnectedNode2 = templatingNodeFactory({
-        id: uuidv4(),
-        label: "Disconnected Node 2",
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const disconnectedNode1 = genericNodeFactory({
+        label: "DisconnectedNode1",
       });
 
-      const disconnectedNode3 = templatingNodeFactory({
-        id: uuidv4(),
-        label: "Disconnected Node 3",
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const disconnectedNode2 = genericNodeFactory({
+        label: "DisconnectedNode2",
       });
 
-      const disconnectedNode4 = templatingNodeFactory({
-        id: uuidv4(),
-        label: "Disconnected Node 4",
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const disconnectedNode3 = genericNodeFactory({
+        label: "DisconnectedNode3",
       });
 
-      const disconnectedNode5 = templatingNodeFactory({
-        id: uuidv4(),
-        label: "Disconnected Node 5",
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const disconnectedNode4 = genericNodeFactory({
+        label: "DisconnectedNode4",
       });
 
-      const disconnectedNode6 = templatingNodeFactory({
-        id: uuidv4(),
-        label: "Disconnected Node 6",
-        sourceHandleId: uuidv4(),
-        targetHandleId: uuidv4(),
+      const disconnectedNode5 = genericNodeFactory({
+        label: "DisconnectedNode5",
+      });
+
+      const disconnectedNode6 = genericNodeFactory({
+        label: "DisconnectedNode6",
       });
 
       await runUnusedGraphsWorkflowTest([
