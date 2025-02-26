@@ -26,6 +26,7 @@ export abstract class BaseCodegenError extends Error {
     super(message);
 
     this.severity = severity ?? "ERROR";
+    this.name = this.constructor.name;
   }
 
   public log() {
