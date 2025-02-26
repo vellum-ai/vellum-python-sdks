@@ -44,7 +44,6 @@ type GraphMutableAst =
 export declare namespace GraphAttribute {
   interface Args {
     workflowContext: WorkflowContext;
-    isUnused?: boolean;
     unusedEdges?: Set<WorkflowEdge>;
   }
 }
