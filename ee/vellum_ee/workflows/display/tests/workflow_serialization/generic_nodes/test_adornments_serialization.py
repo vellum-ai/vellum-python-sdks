@@ -1,4 +1,3 @@
-import pytest
 from uuid import uuid4
 
 from deepdiff import DeepDiff
@@ -217,7 +216,6 @@ def test_serialize_node__try(serialize_node):
     )
 
 
-@pytest.mark.skip(reason="Not implemented")
 def test_serialize_node__stacked():
     @TryNode.wrap()
     @RetryNode.wrap(max_attempts=5)

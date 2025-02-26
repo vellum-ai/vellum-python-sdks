@@ -217,42 +217,30 @@ class BaseWorkflowDisplay(
         # TODO: We should still serialize nodes that are in the workflow's directory but aren't used in the graph.
         # https://app.shortcut.com/vellum/story/5394
         for node in self._workflow.get_nodes():
-            node_display = self._get_node_display(node)
+            extracted_node_displays = self._extract_node_displays(node)
 
-            if node not in node_displays:
-                node_displays[node] = node_display
+            for extracted_node, extracted_node_display in extracted_node_displays.items():
+                if extracted_node not in node_displays:
+                    node_displays[extracted_node] = extracted_node_display
 
-            if node not in global_node_displays:
-                global_node_displays[node] = node_display
+                if extracted_node not in global_node_displays:
+                    global_node_displays[extracted_node] = extracted_node_display
 
-            # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
-            inner_node = get_wrapped_node(node)
-            if inner_node:
-                inner_node_display = self._get_node_display(inner_node)
-                node_displays[inner_node] = inner_node_display
-                global_node_displays[inner_node] = inner_node_display
-
-            self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
-            self._enrich_node_port_displays(node, node_display, port_displays)
+            self._enrich_global_node_output_displays(node, extracted_node_displays[node], global_node_output_displays)
+            self._enrich_node_port_displays(node, extracted_node_displays[node], port_displays)
 
         for node in self._workflow.get_unused_nodes():
-            node_display = self._get_node_display(node)
+            extracted_node_displays = self._extract_node_displays(node)
 
-            if node not in node_displays:
-                node_displays[node] = node_display
+            for extracted_node, extracted_node_display in extracted_node_displays.items():
+                if extracted_node not in node_displays:
+                    node_displays[extracted_node] = extracted_node_display
 
-            if node not in global_node_displays:
-                global_node_displays[node] = node_display
+                if extracted_node not in global_node_displays:
+                    global_node_displays[extracted_node] = extracted_node_display
 
-            # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
-            inner_node = get_wrapped_node(node)
-            if inner_node:
-                inner_node_display = self._get_node_display(inner_node)
-                node_displays[inner_node] = inner_node_display
-                global_node_displays[inner_node] = inner_node_display
-
-            self._enrich_global_node_output_displays(node, node_display, global_node_output_displays)
-            self._enrich_node_port_displays(node, node_display, port_displays)
+            self._enrich_global_node_output_displays(node, extracted_node_displays[node], global_node_output_displays)
+            self._enrich_node_port_displays(node, extracted_node_displays[node], port_displays)
 
         workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {}
         # If we're dealing with a nested workflow, then it should have access to the inputs of its parents.
@@ -437,3 +425,20 @@ class BaseWorkflowDisplay(
             node_displays=temp_node_displays,
         )
         return display_meta
+
+    def _extract_node_displays(self, node: Type[BaseNode]) -> Dict[Type[BaseNode], NodeDisplayType]:
+        node_display = self._get_node_display(node)
+        additional_node_displays: Dict[Type[BaseNode], NodeDisplayType] = {
+            node: node_display,
+        }
+
+        # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
+        inner_node = get_wrapped_node(node)
+        if inner_node:
+            inner_node_displays = self._extract_node_displays(inner_node)
+
+            for node, display in inner_node_displays.items():
+                if node not in additional_node_displays:
+                    additional_node_displays[node] = display
+
+        return additional_node_displays
