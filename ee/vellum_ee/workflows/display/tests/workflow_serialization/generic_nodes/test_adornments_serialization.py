@@ -234,4 +234,121 @@ def test_serialize_node__stacked():
     exec_config = workflow_display.serialize()
 
     # THEN the workflow display is created successfully
-    assert exec_config is not None
+    assert not DeepDiff(
+        {
+            "workflow_raw_data": {
+                "nodes": [
+                    {
+                        "id": "c14c1c9b-a7a4-4d2c-84fb-c940cfb09525",
+                        "type": "ENTRYPOINT",
+                        "inputs": [],
+                        "data": {
+                            "label": "Entrypoint Node",
+                            "source_handle_id": "51a5eb25-af14-4bee-9ced-d2aa534ea8e9",
+                        },
+                        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                        "base": None,
+                        "definition": None,
+                    },
+                    {
+                        "id": "074833b0-e142-4bbc-8dec-209a35e178a3",
+                        "label": "test_serialize_node__stacked.<locals>.InnerStackedGenericNode",
+                        "type": "GENERIC",
+                        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                        "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+                        "definition": {
+                            "name": "InnerStackedGenericNode",
+                            "module": [
+                                "vellum_ee",
+                                "workflows",
+                                "display",
+                                "tests",
+                                "workflow_serialization",
+                                "generic_nodes",
+                                "test_adornments_serialization",
+                            ],
+                        },
+                        "trigger": {"id": "f206358d-04a5-41c9-beee-0871a074fa48", "merge_behavior": "AWAIT_ATTRIBUTES"},
+                        "ports": [{"id": "408cd5fb-3a3e-4eb2-9889-61111bd6a129", "name": "default", "type": "DEFAULT"}],
+                        "adornments": [
+                            {
+                                "id": "5be7d260-74f7-4734-b31b-a46a94539586",
+                                "label": "RetryNode",
+                                "base": {
+                                    "name": "RetryNode",
+                                    "module": ["vellum", "workflows", "nodes", "core", "retry_node", "node"],
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "c91782e3-140f-4938-9c23-d2a7b85dcdd8",
+                                        "name": "retry_on_error_code",
+                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                    },
+                                    {
+                                        "id": "f388e93b-8c68-4f54-8577-bbd0c9091557",
+                                        "name": "max_attempts",
+                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5}},
+                                    },
+                                    {
+                                        "id": "8a07dc58-3fed-41d4-8ca6-31ee0bb86c61",
+                                        "name": "delay",
+                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                    },
+                                    {
+                                        "id": "73a02e62-4535-4e1f-97b5-1264ca8b1d71",
+                                        "name": "retry_on_condition",
+                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                    },
+                                ],
+                            },
+                            {
+                                "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
+                                "label": "TryNode",
+                                "base": {
+                                    "name": "TryNode",
+                                    "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"],
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
+                                        "name": "on_error_code",
+                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                    }
+                                ],
+                            },
+                        ],
+                        "attributes": [],
+                        "outputs": [],
+                    },
+                ],
+                "edges": [
+                    {
+                        "id": "e8bd50dd-37a0-49b0-8b7b-f1dd8eb478b9",
+                        "source_node_id": "c14c1c9b-a7a4-4d2c-84fb-c940cfb09525",
+                        "source_handle_id": "51a5eb25-af14-4bee-9ced-d2aa534ea8e9",
+                        "target_node_id": "074833b0-e142-4bbc-8dec-209a35e178a3",
+                        "target_handle_id": "f206358d-04a5-41c9-beee-0871a074fa48",
+                        "type": "DEFAULT",
+                    }
+                ],
+                "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
+                "definition": {
+                    "name": "StackedWorkflow",
+                    "module": [
+                        "vellum_ee",
+                        "workflows",
+                        "display",
+                        "tests",
+                        "workflow_serialization",
+                        "generic_nodes",
+                        "test_adornments_serialization",
+                    ],
+                },
+            },
+            "input_variables": [],
+            "state_variables": [],
+            "output_variables": [],
+        },
+        exec_config,
+        ignore_order=True,
+    )
