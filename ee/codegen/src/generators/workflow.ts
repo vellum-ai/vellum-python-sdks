@@ -24,11 +24,7 @@ import { GraphAttribute } from "src/generators/graph-attribute";
 import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
-import {
-  WorkflowDataNode,
-  WorkflowDisplayData,
-  WorkflowEdge,
-} from "src/types/vellum";
+import { WorkflowDisplayData, WorkflowEdge } from "src/types/vellum";
 import { isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
@@ -111,14 +107,6 @@ export class Workflow {
     );
 
     return outputsClass;
-  }
-
-  private getLabel(nodeData: WorkflowDataNode): string {
-    if (nodeData.type === "GENERIC") {
-      return nodeData.label;
-    } else {
-      return nodeData.data.label;
-    }
   }
 
   public generateWorkflowClass(): python.Class {
