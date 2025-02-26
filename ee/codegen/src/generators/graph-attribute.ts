@@ -44,16 +44,26 @@ type GraphMutableAst =
 export declare namespace GraphAttribute {
   interface Args {
     workflowContext: WorkflowContext;
+    isUnused?: boolean;
+    unusedEdges?: WorkflowEdge[];
   }
 }
 
 export class GraphAttribute extends AstNode {
   private readonly workflowContext: WorkflowContext;
   private readonly astNode: python.AstNode;
+  private readonly isUnused: boolean;
+  private readonly unusedEdges: WorkflowEdge[];
 
-  public constructor({ workflowContext }: GraphAttribute.Args) {
+  public constructor({
+    workflowContext,
+    isUnused = false,
+    unusedEdges = [],
+  }: GraphAttribute.Args) {
     super();
     this.workflowContext = workflowContext;
+    this.isUnused = isUnused;
+    this.unusedEdges = unusedEdges;
 
     this.astNode = this.generateGraphAttribute();
   }
@@ -69,6 +79,35 @@ export class GraphAttribute extends AstNode {
    */
   public generateGraphMutableAst(): GraphMutableAst {
     let graphMutableAst: GraphMutableAst = { type: "empty" };
+    if (this.isUnused) {
+      // Group the unreachable edges into connected components
+      // [A >> B, B >> C, D >> E] => [[A >> B, B >> C], [D >> E]]
+      const components = this.groupEdgesByConnectedComponents(this.unusedEdges);
+      // Process components as usual
+      for (const componentEdges of components) {
+        const rootNodeIds = this.findRootNodes(componentEdges);
+        for (const rootNodeId of rootNodeIds) {
+          try {
+            const componentGraph = this.buildComponentGraph(
+              rootNodeId,
+              componentEdges
+            );
+            graphMutableAst = this.mergeGraphComponents(
+              graphMutableAst,
+              componentGraph
+            );
+          } catch (error) {
+            console.warn(
+              `Failed to build component graph for root node ${rootNodeId}:`,
+              error
+            );
+          }
+        }
+      }
+
+      return graphMutableAst;
+    }
+
     const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
     const processedEdges = new Set<WorkflowEdge>();
@@ -108,6 +147,154 @@ export class GraphAttribute extends AstNode {
     }
 
     return graphMutableAst;
+  }
+
+  private groupEdgesByConnectedComponents(
+    edges: WorkflowEdge[]
+  ): WorkflowEdge[][] {
+    const components: WorkflowEdge[][] = [];
+    const edgeVisited = new Set<string>();
+    const adjacencyList = new Map<string, WorkflowEdge[]>();
+
+    edges.forEach((edge) => {
+      adjacencyList.set(edge.sourceNodeId, [
+        ...(adjacencyList.get(edge.sourceNodeId) || []),
+        edge,
+      ]);
+      adjacencyList.set(edge.targetNodeId, [
+        ...(adjacencyList.get(edge.targetNodeId) || []),
+        edge,
+      ]);
+    });
+
+    for (const edge of edges) {
+      if (edgeVisited.has(edge.id)) continue;
+
+      const component: WorkflowEdge[] = [];
+      const queue: WorkflowEdge[] = [edge];
+
+      while (queue.length > 0) {
+        const currentEdge = queue.shift();
+        if (!currentEdge || edgeVisited.has(currentEdge.id)) continue;
+
+        edgeVisited.add(currentEdge.id);
+        component.push(currentEdge);
+
+        adjacencyList.get(currentEdge.sourceNodeId)?.forEach((nextEdge) => {
+          if (!edgeVisited.has(nextEdge.id)) queue.push(nextEdge);
+        });
+
+        adjacencyList.get(currentEdge.targetNodeId)?.forEach((nextEdge) => {
+          if (!edgeVisited.has(nextEdge.id)) queue.push(nextEdge);
+        });
+      }
+
+      components.push(component);
+    }
+
+    return components;
+  }
+
+  private findRootNodes(componentEdges: WorkflowEdge[]): string[] {
+    const incomingEdges = new Map<string, number>();
+
+    // Count incoming edges
+    componentEdges.forEach((edge) => {
+      incomingEdges.set(
+        edge.targetNodeId,
+        (incomingEdges.get(edge.targetNodeId) || 0) + 1
+      );
+      if (!incomingEdges.has(edge.sourceNodeId)) {
+        incomingEdges.set(edge.sourceNodeId, 0);
+      }
+    });
+
+    // Return nodes with zero incoming edges
+    return Array.from(incomingEdges.entries())
+      .filter(([_, count]) => count === 0)
+      .map(([nodeId, _]) => nodeId);
+  }
+
+  private mergeGraphComponents(
+    graphMutableAst: GraphMutableAst,
+    componentGraph: GraphMutableAst
+  ): GraphMutableAst {
+    if (graphMutableAst.type === "empty") return componentGraph;
+    if (componentGraph.type === "empty") return graphMutableAst;
+
+    if (graphMutableAst.type === "set" && componentGraph.type === "set") {
+      return {
+        type: "set",
+        values: [...graphMutableAst.values, ...componentGraph.values],
+      };
+    }
+
+    if (graphMutableAst.type === "set") {
+      return {
+        type: "set",
+        values: [...graphMutableAst.values, componentGraph], // No push() to avoid modifying existing set
+      };
+    }
+
+    if (componentGraph.type === "set") {
+      return {
+        type: "set",
+        values: [graphMutableAst, ...componentGraph.values], // No push() to avoid modifying existing set
+      };
+    }
+
+    return { type: "set", values: [graphMutableAst, componentGraph] };
+  }
+
+  private buildComponentGraph(
+    rootNodeId: string,
+    componentEdges: WorkflowEdge[]
+  ): GraphMutableAst {
+    try {
+      const rootNode = this.workflowContext.getNodeContext(rootNodeId);
+      let graph: GraphMutableAst = {
+        type: "node_reference",
+        reference: rootNode,
+      };
+
+      // Use BFS/queue to traverse the component fully
+      const queue: WorkflowEdge[] = componentEdges.filter(
+        (edge) => edge.sourceNodeId === rootNodeId
+      );
+      const visitedNodes = new Set<string>([rootNodeId]);
+
+      while (queue.length > 0) {
+        const edge = queue.shift();
+        if (!edge) continue;
+
+        const newGraph = this.addEdgeToGraph({
+          edge,
+          mutableAst: graph,
+          graphSourceNode: null,
+        });
+
+        if (newGraph) {
+          graph = newGraph;
+        }
+
+        // Find next edges where this target node is the source
+        const nextEdges = componentEdges.filter(
+          (e) =>
+            e.sourceNodeId === edge.targetNodeId &&
+            !visitedNodes.has(e.targetNodeId)
+        );
+
+        nextEdges.forEach((e) => {
+          visitedNodes.add(e.targetNodeId);
+          queue.push(e);
+        });
+      }
+
+      return graph;
+    } catch (error) {
+      console.warn(`Failed to process node ${rootNodeId}:`, error);
+      return { type: "empty" };
+    }
   }
 
   private resolveNodeId(
