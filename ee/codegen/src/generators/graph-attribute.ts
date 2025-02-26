@@ -45,25 +45,23 @@ export declare namespace GraphAttribute {
   interface Args {
     workflowContext: WorkflowContext;
     isUnused?: boolean;
-    unusedEdges?: WorkflowEdge[];
+    unusedEdges?: Set<WorkflowEdge>;
   }
 }
 
 export class GraphAttribute extends AstNode {
   private readonly workflowContext: WorkflowContext;
   private readonly astNode: python.AstNode;
-  private readonly isUnused: boolean;
-  private readonly unusedEdges: WorkflowEdge[];
+  private readonly unusedEdges: Set<WorkflowEdge>;
+  private readonly usedEdges = new Set<WorkflowEdge>();
 
   public constructor({
     workflowContext,
-    isUnused = false,
-    unusedEdges = [],
+    unusedEdges = new Set(),
   }: GraphAttribute.Args) {
     super();
     this.workflowContext = workflowContext;
-    this.isUnused = isUnused;
-    this.unusedEdges = unusedEdges;
+    this.unusedEdges = unusedEdges; // This will only have value after used graph is generated
 
     this.astNode = this.generateGraphAttribute();
   }
@@ -79,30 +77,26 @@ export class GraphAttribute extends AstNode {
    */
   public generateGraphMutableAst(): GraphMutableAst {
     let graphMutableAst: GraphMutableAst = { type: "empty" };
-    if (this.isUnused) {
+    if (this.unusedEdges.size > 0) {
+      const nextEdge = this.unusedEdges.values().next().value;
+      if (!nextEdge) {
+        // this should never happen as we check the size of the set
+        return { type: "empty" };
+      }
       // Group the unreachable edges into connected components
-      // [A >> B, B >> C, D >> E] => [[A >> B, B >> C], [D >> E]]
-      const components = this.groupEdgesByConnectedComponents(this.unusedEdges);
-      // Process components as usual
-      for (const componentEdges of components) {
-        const rootNodeIds = this.findRootNodes(componentEdges);
-        for (const rootNodeId of rootNodeIds) {
-          try {
-            const componentGraph = this.buildComponentGraph(
-              rootNodeId,
-              componentEdges
-            );
-            graphMutableAst = this.mergeGraphComponents(
-              graphMutableAst,
-              componentGraph
-            );
-          } catch (error) {
-            console.warn(
-              `Failed to build component graph for root node ${rootNodeId}:`,
-              error
-            );
-          }
-        }
+      const componentEdges = this.findConnectedComponent(
+        nextEdge,
+        this.unusedEdges
+      );
+      const rootNode = this.findRootNodes(componentEdges);
+
+      try {
+        graphMutableAst = this.buildComponentGraph(rootNode, componentEdges);
+      } catch (error) {
+        console.warn(
+          `Failed to build component graph for node ${rootNode}:`,
+          error
+        );
       }
 
       return graphMutableAst;
@@ -149,56 +143,18 @@ export class GraphAttribute extends AstNode {
     return graphMutableAst;
   }
 
-  private groupEdgesByConnectedComponents(
-    edges: WorkflowEdge[]
-  ): WorkflowEdge[][] {
-    const components: WorkflowEdge[][] = [];
-    const edgeVisited = new Set<string>();
-    const adjacencyList = new Map<string, WorkflowEdge[]>();
-
-    edges.forEach((edge) => {
-      adjacencyList.set(edge.sourceNodeId, [
-        ...(adjacencyList.get(edge.sourceNodeId) || []),
-        edge,
-      ]);
-      adjacencyList.set(edge.targetNodeId, [
-        ...(adjacencyList.get(edge.targetNodeId) || []),
-        edge,
-      ]);
-    });
-
-    for (const edge of edges) {
-      if (edgeVisited.has(edge.id)) continue;
-
-      const component: WorkflowEdge[] = [];
-      const queue: WorkflowEdge[] = [edge];
-
-      while (queue.length > 0) {
-        const currentEdge = queue.shift();
-        if (!currentEdge || edgeVisited.has(currentEdge.id)) continue;
-
-        edgeVisited.add(currentEdge.id);
-        component.push(currentEdge);
-
-        adjacencyList.get(currentEdge.sourceNodeId)?.forEach((nextEdge) => {
-          if (!edgeVisited.has(nextEdge.id)) queue.push(nextEdge);
-        });
-
-        adjacencyList.get(currentEdge.targetNodeId)?.forEach((nextEdge) => {
-          if (!edgeVisited.has(nextEdge.id)) queue.push(nextEdge);
-        });
-      }
-
-      components.push(component);
-    }
-
-    return components;
+  public getUsedEdges(): Set<WorkflowEdge> {
+    return this.usedEdges;
   }
 
-  private findRootNodes(componentEdges: WorkflowEdge[]): string[] {
+  /**
+   * findRootNodes is used to handle all orderings of the component
+   *
+   * If there is a cycle, we arbitrarily pick the first edge as the root node
+   */
+  private findRootNodes(componentEdges: Set<WorkflowEdge>): string {
     const incomingEdges = new Map<string, number>();
 
-    // Count incoming edges
     componentEdges.forEach((edge) => {
       incomingEdges.set(
         edge.targetNodeId,
@@ -209,49 +165,65 @@ export class GraphAttribute extends AstNode {
       }
     });
 
-    // Return nodes with zero incoming edges
-    return Array.from(incomingEdges.entries())
-      .filter(([_, count]) => count === 0)
-      .map(([nodeId, _]) => nodeId);
+    // Identify nodes with zero incoming edges (roots)
+    const rootNodes = new Set<string>();
+    incomingEdges.forEach((count, nodeId) => {
+      if (count === 0) {
+        rootNodes.add(nodeId);
+      }
+    });
+
+    const rootNode = rootNodes.values().next().value;
+    if (!rootNode) {
+      // Cycle detected, pick any node as the root
+      const arbitraryEdge = componentEdges.values().next().value;
+      if (arbitraryEdge) {
+        return arbitraryEdge.sourceNodeId;
+      }
+
+      throw new Error("Failed to find any edge in the component");
+    }
+
+    return rootNode;
   }
 
-  private mergeGraphComponents(
-    graphMutableAst: GraphMutableAst,
-    componentGraph: GraphMutableAst
-  ): GraphMutableAst {
-    if (graphMutableAst.type === "empty") return componentGraph;
-    if (componentGraph.type === "empty") return graphMutableAst;
+  private findConnectedComponent(
+    startEdge: WorkflowEdge,
+    edges: Set<WorkflowEdge>
+  ): Set<WorkflowEdge> {
+    const component = new Set<WorkflowEdge>();
+    const queue = [startEdge];
 
-    // If both are sets, merge their values
-    if (graphMutableAst.type === "set" && componentGraph.type === "set") {
-      return {
-        type: "set",
-        values: [...graphMutableAst.values, ...componentGraph.values],
-      };
+    const nodesInComponent = new Set<string>([
+      startEdge.sourceNodeId,
+      startEdge.targetNodeId,
+    ]);
+
+    while (queue.length > 0) {
+      const edge = queue.shift();
+      if (!edge || component.has(edge)) continue;
+
+      component.add(edge);
+      nodesInComponent.add(edge.sourceNodeId);
+      nodesInComponent.add(edge.targetNodeId);
+
+      for (const edge of edges) {
+        if (
+          !component.has(edge) &&
+          (nodesInComponent.has(edge.sourceNodeId) ||
+            nodesInComponent.has(edge.targetNodeId))
+        ) {
+          queue.push(edge);
+        }
+      }
     }
 
-    // If only one is a set, add the other element into it
-    if (graphMutableAst.type === "set") {
-      return {
-        type: "set",
-        values: [...graphMutableAst.values, componentGraph],
-      };
-    }
-
-    if (componentGraph.type === "set") {
-      return {
-        type: "set",
-        values: [graphMutableAst, ...componentGraph.values],
-      };
-    }
-
-    // Otherwise, create a new set containing both
-    return { type: "set", values: [graphMutableAst, componentGraph] };
+    return component;
   }
 
   private buildComponentGraph(
     rootNodeId: string,
-    componentEdges: WorkflowEdge[]
+    componentEdges: Set<WorkflowEdge>
   ): GraphMutableAst {
     try {
       const rootNode = this.workflowContext.getNodeContext(rootNodeId);
@@ -260,16 +232,21 @@ export class GraphAttribute extends AstNode {
         reference: rootNode,
       };
 
-      // Use BFS/queue to traverse the component fully
-      const queue: WorkflowEdge[] = componentEdges.filter(
-        (edge) => edge.sourceNodeId === rootNodeId
-      );
-      const visitedNodes = new Set<string>([rootNodeId]);
+      const queue: WorkflowEdge[] = [];
+      const visitedEdges = new Set<WorkflowEdge>();
+
+      componentEdges.forEach((edge) => {
+        if (edge.sourceNodeId === rootNodeId) {
+          queue.push(edge);
+          visitedEdges.add(edge);
+        }
+      });
 
       while (queue.length > 0) {
         const edge = queue.shift();
         if (!edge) continue;
 
+        this.usedEdges.add(edge);
         const newGraph = this.addEdgeToGraph({
           edge,
           mutableAst: graph,
@@ -280,16 +257,12 @@ export class GraphAttribute extends AstNode {
           graph = newGraph;
         }
 
-        // Find next edges where this target node is the source
-        const nextEdges = componentEdges.filter(
-          (e) =>
-            e.sourceNodeId === edge.targetNodeId &&
-            !visitedNodes.has(e.targetNodeId)
-        );
-
-        nextEdges.forEach((e) => {
-          visitedNodes.add(e.targetNodeId);
-          queue.push(e);
+        // Keep processing all edges in the component even cycles
+        componentEdges.forEach((e) => {
+          if (!visitedEdges.has(e)) {
+            visitedEdges.add(e);
+            queue.push(e);
+          }
         });
       }
 
@@ -342,6 +315,7 @@ export class GraphAttribute extends AstNode {
     mutableAst: GraphMutableAst;
     graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
   }): GraphMutableAst | undefined {
+    this.usedEdges.add(edge);
     const entrypointNodeId = this.workflowContext.getEntrypointNode().id;
 
     let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
@@ -1131,7 +1105,7 @@ export class GraphAttribute extends AstNode {
   /**
    * Translates our mutable graph AST into a Fern-native Python AST node.
    */
-  private getGraphAttributeAstNode(
+  public getGraphAttributeAstNode(
     mutableAst: GraphMutableAst,
     useWrap: boolean = false
   ): AstNode {

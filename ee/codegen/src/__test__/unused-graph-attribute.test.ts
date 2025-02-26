@@ -129,5 +129,54 @@ describe("Workflow", () => {
         [disconnectedNode5, disconnectedNode6],
       ]);
     });
+
+    it("should identify multiple disconnected graphs with flipped edges", async () => {
+      const connectedNode = genericNodeFactory({
+        label: "ConnectedNode",
+      });
+
+      const disconnectedNode1 = genericNodeFactory({
+        label: "DisconnectedNode1",
+      });
+
+      const disconnectedNode2 = genericNodeFactory({
+        label: "DisconnectedNode2",
+      });
+
+      const disconnectedNode3 = genericNodeFactory({
+        label: "DisconnectedNode3",
+      });
+
+      await runUnusedGraphsWorkflowTest([
+        [entrypointNode, connectedNode],
+        [disconnectedNode2, disconnectedNode3],
+        [disconnectedNode1, disconnectedNode2],
+      ]);
+    });
+
+    it("should handle circular graphs", async () => {
+      const connectedNode = genericNodeFactory({
+        label: "ConnectedNode",
+      });
+
+      const disconnectedNode1 = genericNodeFactory({
+        label: "DisconnectedNode1",
+      });
+
+      const disconnectedNode2 = genericNodeFactory({
+        label: "DisconnectedNode2",
+      });
+
+      const disconnectedNode3 = genericNodeFactory({
+        label: "DisconnectedNode3",
+      });
+
+      await runUnusedGraphsWorkflowTest([
+        [entrypointNode, connectedNode],
+        [disconnectedNode1, disconnectedNode2],
+        [disconnectedNode2, disconnectedNode3],
+        [disconnectedNode3, disconnectedNode1],
+      ]);
+    });
   });
 });

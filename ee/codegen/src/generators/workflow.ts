@@ -48,10 +48,12 @@ export class Workflow {
   public readonly workflowContext: WorkflowContext;
   private readonly inputs: Inputs;
   private readonly displayData: WorkflowDisplayData | undefined;
+  private readonly unusedEdges: Set<WorkflowEdge>;
   constructor({ workflowContext, inputs, displayData }: Workflow.Args) {
     this.workflowContext = workflowContext;
     this.inputs = inputs;
     this.displayData = displayData;
+    this.unusedEdges = new Set();
   }
 
   private generateParentWorkflowClass(): python.Reference {
@@ -507,71 +509,31 @@ export class Workflow {
     return this.workflowContext.workflowRawEdges;
   }
 
-  private getUnusedEdges(): WorkflowEdge[] {
-    const reachableEdges = new Set<string>();
-    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
-    // If there's no entrypoint, treat all edges as unreachable
-    if (!edgesQueue) {
-      return this.getEdges();
-    }
-
-    const edgesByPortId = this.workflowContext.getEdgesByPortId();
-
-    while (edgesQueue.length > 0) {
-      const edge = edgesQueue.shift();
-      if (!edge) continue;
-
-      reachableEdges.add(edge.id);
-
-      // Check if the target node exists before accessing it
-      const targetNode = this.workflowContext.getNodeContext(edge.targetNodeId);
-      targetNode.portContextsById.forEach((portContext) => {
-        const edges = edgesByPortId.get(portContext.portId);
-        edges?.forEach((nextEdge) => {
-          if (
-            !reachableEdges.has(nextEdge.id) &&
-            !edgesQueue.includes(nextEdge)
-          ) {
-            edgesQueue.push(nextEdge);
-          }
-        });
-      });
-    }
-
-    // Get all unreachable edges
-    const unreachableEdges = this.getEdges().filter(
-      (edge) => !reachableEdges.has(edge.id)
-    );
-
-    // Filter out edges that reference nonexistent nodes
-    return unreachableEdges.filter((edge) => {
-      try {
-        this.workflowContext.getNodeContext(edge.sourceNodeId);
-        this.workflowContext.getNodeContext(edge.targetNodeId);
-        return true;
-      } catch (e) {
-        if (e instanceof NodeNotFoundError) {
-          return false;
-        }
-        throw e;
-      }
-    });
-  }
-
   private addGraph(workflowClass: python.Class): void {
     if (this.getEdges().length === 0) {
       return;
     }
 
     try {
+      const graph = new GraphAttribute({
+        workflowContext: this.workflowContext,
+      });
+
       const graphField = python.field({
         name: "graph",
-        initializer: new GraphAttribute({
-          workflowContext: this.workflowContext,
-        }),
+        initializer: graph,
       });
 
       workflowClass.add(graphField);
+
+      // update the graph with the unused edges
+      const usedEdges = graph.getUsedEdges();
+      const allEdges = this.getEdges();
+      allEdges.forEach((edge) => {
+        if (!usedEdges.has(edge)) {
+          this.unusedEdges.add(edge);
+        }
+      });
     } catch (error) {
       if (error instanceof BaseCodegenError) {
         this.workflowContext.addError(error);
@@ -583,31 +545,51 @@ export class Workflow {
   }
 
   private addUnusedGraphs(workflowClass: python.Class): void {
-    const unusedEdges = this.getUnusedEdges();
-    if (unusedEdges.length === 0) {
+    // Filter out edges that reference non-existent nodes
+    const validUnusedEdges = new Set<WorkflowEdge>();
+
+    this.unusedEdges.forEach((edge) => {
+      try {
+        this.workflowContext.getNodeContext(edge.sourceNodeId);
+        this.workflowContext.getNodeContext(edge.targetNodeId);
+        validUnusedEdges.add(edge);
+      } catch (e) {
+        if (e instanceof NodeNotFoundError) {
+          console.warn(e.message);
+        } else {
+          throw e;
+        }
+      }
+    });
+
+    if (validUnusedEdges.size === 0) {
       return;
     }
 
-    try {
-      // We don't need to do any edge analysis here since GraphAttribute will handle it
-      // Just create a field with a single GraphAttribute that knows it's for unused nodes
-      const unusedGraphsField = python.field({
-        name: "unused_graphs",
-        initializer: new GraphAttribute({
-          workflowContext: this.workflowContext,
-          isUnused: true, // This flag tells GraphAttribute to handle unused nodes
-          unusedEdges,
-        }),
+    let remainingEdges = validUnusedEdges;
+
+    // set of unused graphs
+    const unusedGraphs: GraphAttribute[] = [];
+    while (remainingEdges.size > 0) {
+      const unusedGraph = new GraphAttribute({
+        workflowContext: this.workflowContext,
+        unusedEdges: remainingEdges,
       });
 
-      workflowClass.add(unusedGraphsField);
-    } catch (error) {
-      if (error instanceof BaseCodegenError) {
-        this.workflowContext.addError(error);
-        return;
-      }
-      throw error;
+      const processedEdges = unusedGraph.getUsedEdges();
+      remainingEdges = new Set(
+        [...remainingEdges].filter((edge) => !processedEdges.has(edge))
+      );
+
+      unusedGraphs.push(unusedGraph);
     }
+
+    const unusedGraphsField = python.field({
+      name: "unused_graphs",
+      initializer: python.TypeInstantiation.set(unusedGraphs),
+    });
+
+    workflowClass.add(unusedGraphsField);
   }
 
   public getWorkflowFile(): WorkflowFile {

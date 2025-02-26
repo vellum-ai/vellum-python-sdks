@@ -12,6 +12,23 @@ class TestWorkflow(BaseWorkflow):
 "
 `;
 
+exports[`Workflow > unused_graphs > should handle circular graphs 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.my_custom_node import ConnectedNode
+from .nodes.my_custom_node_1 import DisconnectedNode1
+from .nodes.my_custom_node_2 import DisconnectedNode2
+from .nodes.my_custom_node_3 import DisconnectedNode3
+
+
+class TestWorkflow(BaseWorkflow):
+    graph = ConnectedNode
+    unused_graphs = {
+        DisconnectedNode1 >> DisconnectedNode2 >> DisconnectedNode3 >> DisconnectedNode1
+    }
+"
+`;
+
 exports[`Workflow > unused_graphs > should identify multiple disconnected graphs 1`] = `
 "from vellum.workflows import BaseWorkflow
 
@@ -37,6 +54,21 @@ class TestWorkflow(BaseWorkflow):
 "
 `;
 
+exports[`Workflow > unused_graphs > should identify multiple disconnected graphs with flipped edges 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.my_custom_node import ConnectedNode
+from .nodes.my_custom_node_1 import DisconnectedNode2
+from .nodes.my_custom_node_2 import DisconnectedNode3
+from .nodes.my_custom_node_3 import DisconnectedNode1
+
+
+class TestWorkflow(BaseWorkflow):
+    graph = ConnectedNode
+    unused_graphs = {DisconnectedNode1 >> DisconnectedNode2 >> DisconnectedNode3}
+"
+`;
+
 exports[`Workflow > unused_graphs > should identify simple disconnected graph 1`] = `
 "from vellum.workflows import BaseWorkflow
 
@@ -47,6 +79,6 @@ from .nodes.my_custom_node_2 import DisconnectedNode2
 
 class TestWorkflow(BaseWorkflow):
     graph = ConnectedNode
-    unused_graphs = DisconnectedNode1 >> DisconnectedNode2
+    unused_graphs = {DisconnectedNode1 >> DisconnectedNode2}
 "
 `;
