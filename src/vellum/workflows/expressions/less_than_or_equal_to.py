@@ -27,4 +27,4 @@ class LessThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         try:
             return lhs <= rhs  # type: ignore[operator]
         except TypeError:
-            raise InvalidExpressionException(f"Cannot compare {lhs.__class__.__name__} <= {rhs.__class__.__name__}")
+            raise InvalidExpressionException(f"Cannot compare '{lhs.__class__.__name__}' <= '{rhs.__class__.__name__}'")

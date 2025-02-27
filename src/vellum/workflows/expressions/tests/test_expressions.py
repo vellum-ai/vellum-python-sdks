@@ -94,7 +94,7 @@ def test_greater_than_or_equal_to_invalid():
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable >= str"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' >= 'str'"
 
 
 def test_greater_than_or_equal_to_non_comparable():
@@ -108,12 +108,12 @@ def test_greater_than_or_equal_to_non_comparable():
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable >= NonComparable"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' >= 'NonComparable'"
 
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare NonComparable >= Comparable"
+    assert str(exc_info.value) == "Cannot compare 'NonComparable' >= 'Comparable'"
 
 
 def test_greater_than():
@@ -146,7 +146,7 @@ def test_greater_than_invalid():
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable > str"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' > 'str'"
 
 
 def test_greater_than_non_comparable():
@@ -160,12 +160,12 @@ def test_greater_than_non_comparable():
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable > NonComparable"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' > 'NonComparable'"
 
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanExpression(lhs=obj2, rhs=obj1).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare NonComparable > Comparable"
+    assert str(exc_info.value) == "Cannot compare 'NonComparable' > 'Comparable'"
 
 
 def test_less_than_or_equal_to():
@@ -198,7 +198,7 @@ def test_less_than_or_equal_to_invalid():
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable <= str"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' <= 'str'"
 
 
 def test_less_than_or_equal_to_non_comparable():
@@ -212,12 +212,12 @@ def test_less_than_or_equal_to_non_comparable():
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable <= NonComparable"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' <= 'NonComparable'"
 
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare NonComparable <= Comparable"
+    assert str(exc_info.value) == "Cannot compare 'NonComparable' <= 'Comparable'"
 
 
 def test_less_than():
@@ -250,7 +250,7 @@ def test_less_than_invalid():
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable < str"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' < 'str'"
 
 
 def test_less_than_non_comparable():
@@ -264,9 +264,9 @@ def test_less_than_non_comparable():
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare Comparable < NonComparable"
+    assert str(exc_info.value) == "Cannot compare 'Comparable' < 'NonComparable'"
 
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanExpression(lhs=obj2, rhs=obj1).resolve(state)
 
-    assert str(exc_info.value) == "Cannot compare NonComparable < Comparable"
+    assert str(exc_info.value) == "Cannot compare 'NonComparable' < 'Comparable'"
