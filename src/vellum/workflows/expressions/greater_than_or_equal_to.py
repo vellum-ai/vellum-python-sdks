@@ -1,4 +1,5 @@
-from typing import Generic, TypeVar, Union
+from typing import Any, Generic, Protocol, TypeVar, Union, runtime_checkable
+from typing_extensions import TypeGuard
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
@@ -7,6 +8,15 @@ from vellum.workflows.state.base import BaseState
 
 LHS = TypeVar("LHS")
 RHS = TypeVar("RHS")
+
+
+@runtime_checkable
+class SupportsGreaterThanOrEqualTo(Protocol):
+    def __ge__(self, other: Any) -> bool: ...
+
+
+def has_ge(obj: Any) -> TypeGuard[SupportsGreaterThanOrEqualTo]:
+    return hasattr(obj, "__ge__")
 
 
 class GreaterThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
@@ -24,7 +34,7 @@ class GreaterThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         lhs = resolve_value(self._lhs, state)
         rhs = resolve_value(self._rhs, state)
 
-        try:
-            return lhs >= rhs  # type: ignore[operator]
-        except TypeError:
-            raise InvalidExpressionException(f"Cannot compare '{lhs.__class__.__name__}' >= '{rhs.__class__.__name__}'")
+        if not has_ge(lhs):
+            raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '>=' operator")
+
+        return lhs >= rhs
