@@ -96,6 +96,7 @@ class DummyNode(BaseNode[FixtureState]):
             ).does_not_contain("test"),
             False,
         ),
+        (ConstantValueReference('{"foo": "bar"}').parse_json(), {"foo": "bar"}),
     ],
     ids=[
         "or",
@@ -143,6 +144,7 @@ class DummyNode(BaseNode[FixtureState]):
         "list_index",
         "error_contains",
         "error_does_not_contain",
+        "parse_json_constant",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):

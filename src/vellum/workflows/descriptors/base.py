@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.not_between import NotBetweenExpression
     from vellum.workflows.expressions.not_in import NotInExpression
     from vellum.workflows.expressions.or_ import OrExpression
+    from vellum.workflows.expressions.parse_json import ParseJsonExpression
     from vellum.workflows.nodes.bases import BaseNode
     from vellum.workflows.state.base import BaseState
 
@@ -349,3 +350,8 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.is_not_blank import IsNotBlankExpression
 
         return IsNotBlankExpression(expression=self)
+
+    def parse_json(self) -> "ParseJsonExpression[_T]":
+        from vellum.workflows.expressions.parse_json import ParseJsonExpression
+
+        return ParseJsonExpression(expression=self)
