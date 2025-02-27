@@ -89,7 +89,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
                 url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
             )
         except ApiError as e:
-            NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.NODE_EXECUTION)
+            raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.NODE_EXECUTION)
 
         return self.Outputs(
             json=vellum_response.json_,
