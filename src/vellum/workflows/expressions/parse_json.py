@@ -21,7 +21,7 @@ class ParseJsonExpression(BaseDescriptor[Any], Generic[_T]):
     def resolve(self, state: "BaseState") -> Any:
         value = resolve_value(self._expression, state)
 
-        if not isinstance(value, str):
+        if not isinstance(value, (str, bytes, bytearray)):
             raise InvalidExpressionException(f"Expected a string, but got {value} of type {type(value)}")
 
         try:
