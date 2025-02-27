@@ -447,6 +447,25 @@ class WorkflowRunner(Generic[StateType]):
 
         if event.name == "node.execution.fulfilled":
             self._active_nodes_by_execution_id.pop(event.span_id)
+            for node_output_descriptor, node_output_value in event.outputs:
+                for workflow_output_descriptor in self.workflow.Outputs:
+                    node_output_descriptor = workflow_output_descriptor.instance
+                    if not isinstance(node_output_descriptor, OutputReference):
+                        continue
+                    if node_output_descriptor.outputs_class != event.node_definition.Outputs:
+                        continue
+                    if node_output_descriptor.name != node_output_descriptor.name:
+                        continue
+
+                    self._workflow_event_outer_queue.put(
+                        self._stream_workflow_event(
+                            BaseOutput(
+                                name=workflow_output_descriptor.name,
+                                value=node_output_value,
+                            )
+                        )
+                    )
+
             self._handle_invoked_ports(node.state, event.invoked_ports)
 
             return None
