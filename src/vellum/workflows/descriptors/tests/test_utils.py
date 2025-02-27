@@ -97,6 +97,9 @@ class DummyNode(BaseNode[FixtureState]):
             False,
         ),
         (ConstantValueReference('{"foo": "bar"}').parse_json(), {"foo": "bar"}),
+        (ConstantValueReference('{"foo": "bar"}').parse_json()["foo"], "bar"),
+        (ConstantValueReference("[1, 2, 3]").parse_json(), [1, 2, 3]),
+        (ConstantValueReference("[1, 2, 3]").parse_json()[0], 1),
     ],
     ids=[
         "or",
@@ -145,6 +148,9 @@ class DummyNode(BaseNode[FixtureState]):
         "error_contains",
         "error_does_not_contain",
         "parse_json_constant",
+        "parse_json_accessor",
+        "parse_json_list",
+        "parse_json_list_index",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):

@@ -18,13 +18,9 @@ def test_parse_json_array():
     # Test parsing a JSON array
     state = BaseState()
     expression = ConstantValueReference("[1, 2, 3]").parse_json()
+    result = expression.resolve(state)
 
-    # This should raise an exception because we've defined types=(dict,)
-    with pytest.raises(InvalidExpressionException) as exc_info:
-        expression.resolve(state)
-
-    # Verify the error message mentions the expected type
-    assert "Expected JSON to parse to a dictionary, but got list" == str(exc_info.value)
+    assert result == [1, 2, 3]
 
 
 def test_parse_json_invalid_json():
