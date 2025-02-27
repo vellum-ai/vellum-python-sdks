@@ -26,5 +26,5 @@ class ParseJsonExpression(BaseDescriptor[Any], Generic[_T]):
 
         try:
             return json.loads(value)
-        except json.JSONDecodeError:
-            raise InvalidExpressionException(f"Failed to parse JSON: {value}")
+        except json.JSONDecodeError as e:
+            raise InvalidExpressionException(f"Failed to parse JSON: {e}") from e

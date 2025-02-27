@@ -6,11 +6,14 @@ from vellum.workflows.state.base import BaseState
 
 
 def test_parse_json_success():
-    # Test successful JSON parsing
+    # GIVEN a valid JSON string
     state = BaseState()
     expression = ConstantValueReference('{"key": "value"}').parse_json()
+
+    # WHEN we attempt to resolve the expression
     result = expression.resolve(state)
 
+    # THEN the JSON should be parsed successfully
     assert result == {"key": "value"}
 
 
@@ -24,24 +27,26 @@ def test_parse_json_array():
 
 
 def test_parse_json_invalid_json():
-    # Test with invalid JSON
+    # GIVEN an invalid JSON string
     state = BaseState()
     expression = ConstantValueReference('{"key": value}').parse_json()
 
+    # WHEN we attempt to resolve the expression
     with pytest.raises(InvalidExpressionException) as exc_info:
         expression.resolve(state)
 
-    # Verify the error message indicates JSON parsing failure
-    assert 'Failed to parse JSON: {"key": value}' == str(exc_info.value)
+    # THEN an exception should be raised
+    assert "Failed to parse JSON" in str(exc_info.value)
 
 
 def test_parse_json_non_string():
-    # Test with a non-string value
+    # GIVEN a non-string value
     state = BaseState()
     expression = ConstantValueReference(123).parse_json()
 
+    # WHEN we attempt to resolve the expression
     with pytest.raises(InvalidExpressionException) as exc_info:
         expression.resolve(state)
 
-    # Verify the error message indicates type error
+    # THEN an exception should be raised
     assert "Expected a string, but got 123 of type <class 'int'>" == str(exc_info.value)
