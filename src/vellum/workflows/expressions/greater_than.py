@@ -25,6 +25,6 @@ class GreaterThanExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         rhs = resolve_value(self._rhs, state)
 
         try:
-            return lhs > rhs  # type: ignore[operator]
+            return lhs > rhs
         except TypeError:
             raise InvalidExpressionException(f"Cannot compare '{lhs.__class__.__name__}' > '{rhs.__class__.__name__}'")
