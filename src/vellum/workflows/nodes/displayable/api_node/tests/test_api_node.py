@@ -1,5 +1,9 @@
+import pytest
+
 from vellum import ExecuteApiResponse, VellumSecret as ClientVellumSecret
+from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes import APINode
 from vellum.workflows.state import BaseState
 from vellum.workflows.types.core import VellumSecret
@@ -32,3 +36,32 @@ def test_run_workflow__secrets(vellum_client):
     bearer_token = vellum_client.execute_api.call_args.kwargs["bearer_token"]
     assert bearer_token == ClientVellumSecret(name="secret")
     assert terminal.headers == {"X-Response-Header": "bar"}
+
+
+def test_api_node_raises_error_when_api_call_fails(vellum_client):
+    # Mock the vellum_client to raise an ApiError
+    vellum_client.execute_api.side_effect = ApiError(status_code=400, body="API Error")
+
+    class SimpleAPINode(APINode):
+        method = APIRequestMethod.GET
+        authorization_type = AuthorizationType.BEARER_TOKEN
+        url = "https://api.vellum.ai"
+        body = {
+            "key": "value",
+        }
+        headers = {
+            "X-Test-Header": "foo",
+        }
+        bearer_token_value = VellumSecret(name="api_key")
+
+    node = SimpleAPINode(state=BaseState())
+
+    # Assert that the NodeException is raised
+    with pytest.raises(NodeException) as excinfo:
+        node.run()
+
+    # Verify that the exception contains some error message
+    assert "Failed to prepare HTTP request" in str(excinfo.value)
+
+    # Verify the vellum_client was called
+    assert vellum_client.execute_api.call_count == 1
