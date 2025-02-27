@@ -1,3 +1,4 @@
+import pytest
 from uuid import UUID
 from typing import Dict
 
@@ -228,3 +229,33 @@ def test_vellum_workflow_display__serialize_with_unused_nodes_and_edges():
             break
 
     assert edge_found, "Edge between unused nodes NodeB and NodeC not found in serialized output"
+
+
+def test_parse_json_not_supported_in_ui():
+    """
+    Test that verifies ParseJsonExpression is not yet supported in the UI.
+    This test should fail once UI support is added, at which point it should be updated.
+    """
+    # GIVEN a workflow that uses the parse_json function
+    from vellum.workflows.references.constant import ConstantValueReference
+
+    class JsonNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            json_result = ConstantValueReference('{"key": "value"}').parse_json()
+
+    class Workflow(BaseWorkflow):
+        graph = JsonNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final = JsonNode.Outputs.json_result
+
+    # WHEN we attempt to serialize it
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=Workflow,
+    )
+
+    with pytest.raises(ValueError) as exc_info:
+        workflow_display.serialize()
+
+    assert "ParseJsonExpression is not supported in the UI" == str(exc_info.value)

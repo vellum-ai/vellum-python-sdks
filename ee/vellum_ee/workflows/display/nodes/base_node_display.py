@@ -386,6 +386,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 "node_id": str(node_class_display.node_id),
             }
 
+        if value.__class__.__name__ == "ParseJsonExpression":
+            raise ValueError("ParseJsonExpression is not supported in the UI")
+
         if not isinstance(value, BaseDescriptor):
             vellum_value = primitive_to_vellum_value(value)
             return {
