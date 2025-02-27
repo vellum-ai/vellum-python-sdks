@@ -318,9 +318,12 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
             original_base = get_original_base(self.__class__)
 
             args = get_args(original_base)
-            state_type = args[0]
 
-            if isinstance(state_type, TypeVar):
+            if args and len(args) > 0:
+                state_type = args[0]
+                if isinstance(state_type, TypeVar):
+                    state_type = BaseState
+            else:
                 state_type = BaseState
 
             self.state = state_type()
