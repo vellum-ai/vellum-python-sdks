@@ -1104,7 +1104,7 @@ export class GraphAttribute extends AstNode {
   /**
    * Translates our mutable graph AST into a Fern-native Python AST node.
    */
-  public getGraphAttributeAstNode(
+  private getGraphAttributeAstNode(
     mutableAst: GraphMutableAst,
     useWrap: boolean = false
   ): AstNode {
