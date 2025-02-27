@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from vellum.workflows.nodes.bases import BaseNode
     from vellum.workflows.state.base import BaseState
 
+
 _T = TypeVar("_T", covariant=True)
 _O = TypeVar("_O")
 _O2 = TypeVar("_O2")

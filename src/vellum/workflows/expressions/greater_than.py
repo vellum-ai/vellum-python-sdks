@@ -21,14 +21,11 @@ class GreaterThanExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         self._rhs = rhs
 
     def resolve(self, state: "BaseState") -> bool:
-        # Support any type that implements the > operator
-        # https://app.shortcut.com/vellum/story/4658
         lhs = resolve_value(self._lhs, state)
-        if not isinstance(lhs, (int, float)):
-            raise InvalidExpressionException(f"Expected a numeric lhs value, got: {lhs.__class__.__name__}")
-
         rhs = resolve_value(self._rhs, state)
-        if not isinstance(rhs, (int, float)):
-            raise InvalidExpressionException(f"Expected a numeric rhs value, got: {rhs.__class__.__name__}")
 
-        return lhs > rhs
+        try:
+            return lhs > rhs  # type: ignore[operator]
+        except TypeError:
+            # This catches incompatible types
+            raise InvalidExpressionException(f"Cannot compare {lhs.__class__.__name__} > {rhs.__class__.__name__}")
