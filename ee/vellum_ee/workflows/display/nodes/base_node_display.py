@@ -27,6 +27,7 @@ from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpressi
 from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
+from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.ports import Port
@@ -386,7 +387,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 "node_id": str(node_class_display.node_id),
             }
 
-        if value.__class__.__name__ == "ParseJsonExpression":
+        if isinstance(value, ParseJsonExpression):
             raise ValueError("ParseJsonExpression is not supported in the UI")
 
         if not isinstance(value, BaseDescriptor):
