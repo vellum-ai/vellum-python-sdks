@@ -4,10 +4,12 @@ exports[`WorkflowProjectGenerator > Nodes present but not in graph > should stil
 "from vellum.workflows import BaseWorkflow
 
 from .nodes.first_node import FirstNode
+from .nodes.second_node import SecondNode
 
 
 class Workflow(BaseWorkflow):
     graph = FirstNode
+    unused_graphs = {SecondNode}
 "
 `;
 

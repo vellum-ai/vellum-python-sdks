@@ -515,6 +515,10 @@ export class Workflow {
   private addGraph(workflowClass: python.Class): void {
     if (this.getEdges().length === 0) {
       this.workflowContext.workflowRawData.nodes.forEach((node) => {
+        if (node.type === "ENTRYPOINT") {
+          return;
+        }
+
         this.unusedNodes.add(node);
       });
       return;
@@ -546,7 +550,7 @@ export class Workflow {
       });
 
       this.workflowContext.workflowRawData.nodes.forEach((node) => {
-        if (!usedNodeIds.has(node.id)) {
+        if (!usedNodeIds.has(node.id) && node.type !== "ENTRYPOINT") {
           this.unusedNodes.add(node);
         }
       });
