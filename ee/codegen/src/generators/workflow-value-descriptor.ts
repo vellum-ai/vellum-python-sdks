@@ -12,6 +12,7 @@ import {
   OperatorMapping,
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
+  WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -60,12 +61,18 @@ export class WorkflowValueDescriptor extends AstNode {
 
     // Base case
     if (this.isReference(workflowValueDescriptor)) {
-      return new WorkflowValueDescriptorReference({
+      const reference = new WorkflowValueDescriptorReference({
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
         workflowValueReferencePointer: workflowValueDescriptor,
         iterableConfig: this.iterableConfig,
       });
+
+      if (!reference.astNode) {
+        return python.TypeInstantiation.none();
+      }
+
+      return reference;
     }
 
     switch (workflowValueDescriptor.type) {
@@ -148,7 +155,9 @@ export class WorkflowValueDescriptor extends AstNode {
     );
   }
 
-  private isReference(workflowValueDescriptor: WorkflowValueDescriptorType) {
+  private isReference(
+    workflowValueDescriptor: WorkflowValueDescriptorType
+  ): workflowValueDescriptor is WorkflowValueDescriptorReferenceType {
     return (
       workflowValueDescriptor.type === "NODE_OUTPUT" ||
       workflowValueDescriptor.type === "WORKFLOW_INPUT" ||

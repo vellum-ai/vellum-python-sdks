@@ -25,7 +25,7 @@ import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
 import { WorkflowDisplayData, WorkflowEdge } from "src/types/vellum";
-import { isDefined } from "src/utils/typing";
+import { DictEntry, isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
   interface Args {
@@ -311,48 +311,55 @@ export class Workflow {
       python.field({
         name: "entrypoint_displays",
         initializer: python.TypeInstantiation.dict(
-          this.workflowContext.getEntrypointNodeEdges().map((edge) => {
-            const defaultEntrypointNodeContext =
-              this.workflowContext.getNodeContext(edge.targetNodeId);
+          this.workflowContext
+            .getEntrypointNodeEdges()
+            .map((edge): DictEntry | null => {
+              const defaultEntrypointNodeContext =
+                this.workflowContext.findNodeContext(edge.targetNodeId);
 
-            return {
-              key: python.reference({
-                name: defaultEntrypointNodeContext.nodeClassName,
-                modulePath: defaultEntrypointNodeContext.nodeModulePath,
-              }),
-              value: python.instantiateClass({
-                classReference: python.reference({
-                  name: "EntrypointVellumDisplayOverrides",
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .VELLUM_TYPES_MODULE_PATH,
+              if (!defaultEntrypointNodeContext) {
+                return null;
+              }
+
+              return {
+                key: python.reference({
+                  name: defaultEntrypointNodeContext.nodeClassName,
+                  modulePath: defaultEntrypointNodeContext.nodeModulePath,
                 }),
-                arguments_: [
-                  python.methodArgument({
-                    name: "id",
-                    value: python.TypeInstantiation.uuid(entrypointNode.id),
+                value: python.instantiateClass({
+                  classReference: python.reference({
+                    name: "EntrypointVellumDisplayOverrides",
+                    modulePath:
+                      this.workflowContext.sdkModulePathNames
+                        .VELLUM_TYPES_MODULE_PATH,
                   }),
-                  python.methodArgument({
-                    name: "edge_display",
-                    value: python.instantiateClass({
-                      classReference: python.reference({
-                        name: "EdgeVellumDisplayOverrides",
-                        modulePath:
-                          this.workflowContext.sdkModulePathNames
-                            .VELLUM_TYPES_MODULE_PATH,
-                      }),
-                      arguments_: [
-                        python.methodArgument({
-                          name: "id",
-                          value: python.TypeInstantiation.uuid(edge.id),
-                        }),
-                      ],
+                  arguments_: [
+                    python.methodArgument({
+                      name: "id",
+                      value: python.TypeInstantiation.uuid(entrypointNode.id),
                     }),
-                  }),
-                ],
-              }),
-            };
-          })
+                    python.methodArgument({
+                      name: "edge_display",
+                      value: python.instantiateClass({
+                        classReference: python.reference({
+                          name: "EdgeVellumDisplayOverrides",
+                          modulePath:
+                            this.workflowContext.sdkModulePathNames
+                              .VELLUM_TYPES_MODULE_PATH,
+                        }),
+                        arguments_: [
+                          python.methodArgument({
+                            name: "id",
+                            value: python.TypeInstantiation.uuid(edge.id),
+                          }),
+                        ],
+                      }),
+                    }),
+                  ],
+                }),
+              };
+            })
+            .filter((entry): entry is DictEntry => entry !== null)
         ),
       })
     );
@@ -388,7 +395,7 @@ export class Workflow {
           const targetNodeId = edge.targetNodeId;
           let targetNode;
           try {
-            targetNode = this.workflowContext.getNodeContext(targetNodeId);
+            targetNode = this.workflowContext.findNodeContext(targetNodeId);
           } catch (e) {
             if (e instanceof NodeNotFoundError) {
               console.warn(e.message);
@@ -537,16 +544,13 @@ export class Workflow {
     const validUnusedEdges = new Set<WorkflowEdge>();
 
     this.unusedEdges.forEach((edge) => {
-      try {
-        this.workflowContext.getNodeContext(edge.sourceNodeId);
-        this.workflowContext.getNodeContext(edge.targetNodeId);
+      if (
+        this.workflowContext.globalNodeContextsByNodeId.has(
+          edge.sourceNodeId
+        ) &&
+        this.workflowContext.globalNodeContextsByNodeId.has(edge.targetNodeId)
+      ) {
         validUnusedEdges.add(edge);
-      } catch (e) {
-        if (e instanceof NodeNotFoundError) {
-          console.warn(e.message);
-        } else {
-          throw e;
-        }
       }
     });
 

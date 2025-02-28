@@ -3,14 +3,13 @@ import { python } from "@fern-api/python-ast";
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
-import { BaseNodeContext } from "src/context/node-context/base";
-import { NodeOutputPointer, WorkflowDataNode } from "src/types/vellum";
+import { NodeOutputPointer } from "src/types/vellum";
 
 export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOutputPointer> {
-  getReferencedNodeContext(): BaseNodeContext<WorkflowDataNode> {
+  getReferencedNodeContext() {
     const nodeOutputPointerRuleData = this.nodeInputValuePointerRule.data;
 
-    return this.workflowContext.getNodeContext(
+    return this.workflowContext.findNodeContext(
       nodeOutputPointerRuleData.nodeId
     );
   }
@@ -19,6 +18,10 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
     const nodeOutputPointerRuleData = this.nodeInputValuePointerRule.data;
 
     const nodeContext = this.getReferencedNodeContext();
+
+    if (!nodeContext) {
+      return undefined;
+    }
 
     const nodeOutputName = nodeContext.getNodeOutputNameById(
       nodeOutputPointerRuleData.outputId

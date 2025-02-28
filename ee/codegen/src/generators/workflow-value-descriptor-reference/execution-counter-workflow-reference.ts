@@ -9,9 +9,13 @@ export class ExecutionCounterWorkflowReference extends BaseNodeInputWorkflowRefe
     const executionCounterNodeId =
       this.nodeInputWorkflowReferencePointer.nodeId;
 
-    const nodeContext = this.workflowContext.getNodeContext(
+    const nodeContext = this.workflowContext.findNodeContext(
       executionCounterNodeId
     );
+
+    if (!nodeContext) {
+      return undefined;
+    }
 
     return python.reference({
       name: nodeContext.nodeClassName,

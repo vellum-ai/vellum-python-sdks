@@ -32,6 +32,18 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 "
 `;
 
+exports[`Workflow > write > should generate correct code with an output variable mapped to a non-existent node 1`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
+    class Outputs(BaseWorkflow.Outputs):
+        passthrough = None
+
+"
+`;
+
 exports[`Workflow > write > should generate correct code with an output variable mapped to an input variable 1`] = `
 "from vellum.workflows import BaseWorkflow
 from vellum.workflows.state import BaseState

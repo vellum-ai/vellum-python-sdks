@@ -9,9 +9,13 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
   getAstNode(): AstNode | undefined {
     const nodeOutputPointer = this.nodeInputWorkflowReferencePointer;
 
-    const nodeContext = this.workflowContext.getNodeContext(
+    const nodeContext = this.workflowContext.findNodeContext(
       nodeOutputPointer.nodeId
     );
+
+    if (!nodeContext) {
+      return undefined;
+    }
 
     const nodeOutputName = nodeContext.getNodeOutputNameById(
       nodeOutputPointer.nodeOutputId

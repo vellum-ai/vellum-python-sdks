@@ -1,3 +1,4 @@
+import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { ValueGenerationError } from "src/generators/errors";
@@ -29,4 +30,9 @@ export function isNilOrEmpty<T>(
   }
 
   return false;
+}
+
+export interface DictEntry {
+  key: AstNode;
+  value: AstNode;
 }

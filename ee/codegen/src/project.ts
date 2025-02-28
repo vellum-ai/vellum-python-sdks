@@ -538,7 +538,11 @@ ${errors.slice(0, 3).map((err) => {
       nodeIds.map(async (nodeId) => {
         let node: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
 
-        const nodeContext = this.workflowContext.getNodeContext(nodeId);
+        const nodeContext = this.workflowContext.findNodeContext(nodeId);
+        if (!nodeContext) {
+          return;
+        }
+
         const nodeData = nodeContext.nodeData;
 
         const nodeType = nodeData.type;

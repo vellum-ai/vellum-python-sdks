@@ -225,7 +225,11 @@ export class GraphAttribute extends AstNode {
     componentEdges: Set<WorkflowEdge>
   ): GraphMutableAst {
     try {
-      const rootNode = this.workflowContext.getNodeContext(rootNodeId);
+      const rootNode = this.workflowContext.findNodeContext(rootNodeId);
+      if (!rootNode) {
+        return { type: "empty" };
+      }
+
       let graph: GraphMutableAst = {
         type: "node_reference",
         reference: rootNode,
@@ -277,7 +281,7 @@ export class GraphAttribute extends AstNode {
     edgeId: string
   ): BaseNodeContext<WorkflowDataNode> | null {
     try {
-      return this.workflowContext.getNodeContext(nodeId);
+      return this.workflowContext.findNodeContext(nodeId) ?? null;
     } catch (error) {
       if (error instanceof NodeNotFoundError) {
         this.workflowContext.addError(

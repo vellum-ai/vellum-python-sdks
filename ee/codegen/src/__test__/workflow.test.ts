@@ -401,5 +401,62 @@ describe("Workflow", () => {
       workflow.getWorkflowDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should generate correct code with an output variable mapped to a non-existent node", async () => {
+      const workflowContext = workflowContextFactory({ strict: false });
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "input-variable-id",
+            key: "query",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      const inputs = codegen.inputs({ workflowContext });
+
+      workflowContext.addOutputVariableContext(
+        new OutputVariableContext({
+          outputVariableData: {
+            id: "output-variable-id",
+            key: "passthrough",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      workflowContext.addWorkflowOutputContext(
+        new WorkflowOutputContext({
+          workflowOutputValue: {
+            outputVariableId: "output-variable-id",
+            value: {
+              type: "NODE_OUTPUT",
+              nodeId: "non-existent-node-id",
+              nodeOutputId: "output-id",
+            },
+          },
+          workflowContext,
+        })
+      );
+
+      const workflow = codegen.workflow({
+        moduleName,
+        workflowContext,
+        inputs,
+      });
+
+      workflow.getWorkflowFile().write(writer);
+      expect(await writer.toString()).toMatchSnapshot();
+      const errors = workflowContext.getErrors();
+
+      expect(errors.length).toEqual(1);
+      expect(errors[0]?.message).toEqual(
+        "Failed to find node with id 'non-existent-node-id'"
+      );
+      expect(errors[0]?.severity).toEqual("WARNING");
+    });
   });
 });

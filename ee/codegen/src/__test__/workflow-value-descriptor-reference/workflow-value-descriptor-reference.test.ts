@@ -49,7 +49,7 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
   });
 
   it("should generate correct AST for NODE_OUTPUT reference", async () => {
-    vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
+    vi.spyOn(workflowContext, "findNodeContext").mockReturnValue({
       nodeClassName: "TestNode",
       path: ["nodes", "test-node-path"],
       getNodeOutputNameById: vi.fn().mockReturnValue("my_output"),

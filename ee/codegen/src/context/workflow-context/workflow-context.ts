@@ -368,16 +368,21 @@ export class WorkflowContext {
     this.addUsedNodeModuleName(nodeContext.nodeModuleName);
   }
 
-  public getNodeContext<T extends WorkflowDataNode>(
+  public findNodeContext(
     nodeId: string
-  ): BaseNodeContext<T> {
+  ): BaseNodeContext<WorkflowDataNode> | undefined {
     const nodeContext = this.globalNodeContextsByNodeId.get(nodeId);
 
     if (!nodeContext) {
-      throw new NodeNotFoundError(`Failed to find node with id '${nodeId}'`);
+      this.addError(
+        new NodeNotFoundError(
+          `Failed to find node with id '${nodeId}'`,
+          "WARNING"
+        )
+      );
     }
 
-    return nodeContext as BaseNodeContext<T>;
+    return nodeContext;
   }
 
   public addPortContext(portContext: PortContext): void {

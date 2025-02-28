@@ -2,18 +2,21 @@ import { python } from "@fern-api/python-ast";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
-import { BaseNodeContext } from "src/context/node-context/base";
-import { ExecutionCounterPointer, WorkflowDataNode } from "src/types/vellum";
+import { ExecutionCounterPointer } from "src/types/vellum";
 
 export class ExecutionCounterPointerRule extends BaseNodeInputValuePointerRule<ExecutionCounterPointer> {
-  getReferencedNodeContext(): BaseNodeContext<WorkflowDataNode> {
+  getReferencedNodeContext() {
     const executionCounterData = this.nodeInputValuePointerRule.data;
 
-    return this.workflowContext.getNodeContext(executionCounterData.nodeId);
+    return this.workflowContext.findNodeContext(executionCounterData.nodeId);
   }
 
-  getAstNode(): python.Reference {
+  getAstNode(): python.Reference | undefined {
     const nodeContext = this.getReferencedNodeContext();
+
+    if (!nodeContext) {
+      return undefined;
+    }
 
     return python.reference({
       name: nodeContext.nodeClassName,
