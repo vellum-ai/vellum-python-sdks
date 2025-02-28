@@ -2,6 +2,7 @@ import json
 from typing import Any, Dict, Optional
 
 from jinja2.sandbox import SandboxedEnvironment
+from pydantic import BaseModel
 
 from vellum.utils.templating.constants import FilterFunc
 from vellum.utils.templating.exceptions import JinjaTemplateError
@@ -11,6 +12,9 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 def finalize(obj: Any) -> str:
     if isinstance(obj, (dict, list)):
         return json.dumps(obj, cls=DefaultStateEncoder)
+
+    if isinstance(obj, BaseModel):
+        return json.dumps(obj.model_dump(), cls=DefaultStateEncoder)
 
     return str(obj)
 
@@ -23,7 +27,6 @@ def render_sandboxed_jinja_template(
     jinja_globals: Optional[Dict[str, Any]] = None,
 ) -> str:
     """Render a Jinja template within a sandboxed environment."""
-
     try:
         environment = SandboxedEnvironment(
             keep_trailing_newline=True,

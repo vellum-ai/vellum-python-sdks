@@ -109,7 +109,11 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
 
     if output_type is Json:
         try:
-            return json.loads(result_as_str)
+            data = json.loads(result_as_str)
+            # If we got a FunctionCallVellumValue, return just the value
+            if isinstance(data, dict) and data.get("type") == "FUNCTION_CALL" and "value" in data:
+                return data["value"]
+            return data
         except json.JSONDecodeError:
             raise ValueError("Invalid JSON format for result_as_str")
 
@@ -124,9 +128,16 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
     if issubclass(output_type, BaseModel):
         try:
             data = json.loads(result_as_str)
+            # If we got a FunctionCallVellumValue extract FunctionCall,
+            if (
+                hasattr(output_type, "__name__")
+                and output_type.__name__ == "FunctionCall"
+                and isinstance(data, dict)
+                and "value" in data
+            ):
+                data = data["value"]
+            return output_type.model_validate(data)
         except json.JSONDecodeError:
             raise ValueError("Invalid JSON format for result_as_str")
-
-        return output_type.model_validate(data)
 
     raise ValueError(f"Unsupported output type: {output_type}")

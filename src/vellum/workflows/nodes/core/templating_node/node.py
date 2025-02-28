@@ -82,7 +82,6 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
     def run(self) -> Outputs:
         rendered_template = self._render_template()
         result = self._cast_rendered_template(rendered_template)
-
         return self.Outputs(result=result)
 
     def _render_template(self) -> str:

@@ -234,3 +234,52 @@ def test_templating_node__last_chat_message():
 
     # THEN the output is the expected JSON
     assert outputs.result == [ChatMessage(role="USER", text="Hello")]
+
+
+def test_templating_node__function_call_value_input():
+    # GIVEN a templating node that receives a FunctionCallVellumValue
+    class FunctionCallTemplateNode(TemplatingNode[BaseState, FunctionCall]):
+        template = """{{ function_call }}"""
+        inputs = {
+            "function_call": FunctionCallVellumValue(
+                type="FUNCTION_CALL",
+                value=FunctionCall(name="test_function", arguments={"key": "value"}, id="test_id", state="FULFILLED"),
+            )
+        }
+
+    # WHEN the node is run
+    node = FunctionCallTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected function call
+    assert outputs.result == FunctionCall(
+        name="test_function", arguments={"key": "value"}, id="test_id", state="FULFILLED"
+    )
+
+
+def test_templating_node__function_call_as_json():
+    # GIVEN a node that receives a FunctionCallVellumValue but outputs as Json
+    class JsonOutputNode(TemplatingNode[BaseState, Json]):
+        template = """{{ function_call }}"""
+        inputs = {
+            "function_call": FunctionCallVellumValue(
+                type="FUNCTION_CALL",
+                value=FunctionCall(name="test_function", arguments={"key": "value"}, id="test_id", state="FULFILLED"),
+            )
+        }
+
+    # WHEN the node is run
+    node = JsonOutputNode()
+    outputs = node.run()
+
+    # THEN we get just the FunctionCall data as JSON
+    assert outputs.result == {
+        "name": "test_function",
+        "arguments": {"key": "value"},
+        "id": "test_id",
+        "state": "FULFILLED",
+    }
+
+    # AND we can access fields directly
+    assert outputs.result["arguments"] == {"key": "value"}
+    assert outputs.result["name"] == "test_function"
