@@ -116,24 +116,7 @@ describe("Workflow", () => {
     });
 
     it("should handle edges pointing to non-existent nodes", async () => {
-      workflowContext.addInputVariableContext(
-        inputVariableContextFactory({
-          inputVariableData: {
-            id: "input-variable-id",
-            key: "query",
-            type: "STRING",
-          },
-          workflowContext,
-        })
-      );
-
-      const inputs = codegen.inputs({ workflowContext });
-
       const searchNodeData = searchNodeDataFactory();
-      await createNodeContext({
-        workflowContext: workflowContext,
-        nodeData: searchNodeData,
-      });
 
       const edges: WorkflowEdge[] = [
         {
@@ -153,8 +136,30 @@ describe("Workflow", () => {
           targetHandleId: "some-target-handle",
         },
       ];
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes: [entrypointNode, searchNodeData],
+          edges,
+        },
+      });
 
-      workflowContext.addWorkflowEdges(edges);
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "input-variable-id",
+            key: "query",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      const inputs = codegen.inputs({ workflowContext });
+
+      await createNodeContext({
+        workflowContext: workflowContext,
+        nodeData: searchNodeData,
+      });
 
       const workflow = codegen.workflow({
         moduleName,
@@ -173,20 +178,12 @@ describe("Workflow", () => {
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
       });
-      await createNodeContext({
-        workflowContext: workflowContext,
-        nodeData: templatingNodeData1,
-      });
 
       const templatingNodeData2 = templatingNodeFactory({
         id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
         label: "Templating Node",
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
-      await createNodeContext({
-        workflowContext: workflowContext,
-        nodeData: templatingNodeData2,
       });
 
       const edges: WorkflowEdge[] = [
@@ -207,7 +204,22 @@ describe("Workflow", () => {
           targetHandleId: templatingNodeData2.data.targetHandleId,
         },
       ];
-      workflowContext.addWorkflowEdges(edges);
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes: [entrypointNode, templatingNodeData1, templatingNodeData2],
+          edges,
+        },
+      });
+
+      await createNodeContext({
+        workflowContext: workflowContext,
+        nodeData: templatingNodeData1,
+      });
+
+      await createNodeContext({
+        workflowContext: workflowContext,
+        nodeData: templatingNodeData2,
+      });
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
@@ -228,17 +240,11 @@ describe("Workflow", () => {
         throw new WorkflowGenerationError("test");
       });
 
-      const workflowContext = workflowContextFactory({ strict: false });
-
       const templatingNodeData1 = templatingNodeFactory({
         id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
         label: "Templating Node",
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
-      });
-      await createNodeContext({
-        workflowContext: workflowContext,
-        nodeData: templatingNodeData1,
       });
 
       const edges: WorkflowEdge[] = [
@@ -251,7 +257,18 @@ describe("Workflow", () => {
           targetHandleId: templatingNodeData1.data.targetHandleId,
         },
       ];
-      workflowContext.addWorkflowEdges(edges);
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes: [entrypointNode, templatingNodeData1],
+          edges,
+        },
+        strict: false,
+      });
+
+      await createNodeContext({
+        workflowContext: workflowContext,
+        nodeData: templatingNodeData1,
+      });
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
@@ -268,10 +285,6 @@ describe("Workflow", () => {
       const startNode = conditionalNodeFactory({
         label: "Start Node",
       });
-      await createNodeContext({
-        workflowContext,
-        nodeData: startNode,
-      });
 
       const loopCheckNode = conditionalNodeFactory({
         id: uuidv4(),
@@ -280,35 +293,54 @@ describe("Workflow", () => {
         elseSourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
       });
+
+      const finalOutput = finalOutputNodeFactory();
+
+      const topNode = templatingNodeFactory({
+        label: "Top Node",
+      });
+
+      const edges = edgesFactory([
+        [entrypointNode, startNode],
+        [[startNode, "0"], topNode],
+        [[startNode, "1"], loopCheckNode],
+        [[loopCheckNode, "0"], startNode],
+        [[loopCheckNode, "1"], finalOutput],
+        [[topNode, "0"], loopCheckNode],
+      ]);
+
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes: [
+            entrypointNode,
+            startNode,
+            loopCheckNode,
+            finalOutput,
+            topNode,
+          ],
+          edges,
+        },
+      });
+
+      await createNodeContext({
+        workflowContext,
+        nodeData: startNode,
+      });
+
       await createNodeContext({
         workflowContext,
         nodeData: loopCheckNode,
       });
 
-      const finalOutput = finalOutputNodeFactory();
       await createNodeContext({
         workflowContext,
         nodeData: finalOutput,
       });
 
-      const topNode = templatingNodeFactory({
-        label: "Top Node",
-      });
       await createNodeContext({
         workflowContext,
         nodeData: topNode,
       });
-
-      workflowContext.addWorkflowEdges(
-        edgesFactory([
-          [entrypointNode, startNode],
-          [[startNode, "0"], topNode],
-          [[startNode, "1"], loopCheckNode],
-          [[loopCheckNode, "0"], startNode],
-          [[loopCheckNode, "1"], finalOutput],
-          [[topNode, "0"], loopCheckNode],
-        ])
-      );
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({

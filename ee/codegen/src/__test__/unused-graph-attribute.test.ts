@@ -12,40 +12,44 @@ import {
 
 import * as codegen from "src/codegen";
 import { createNodeContext } from "src/context";
-import { WorkflowDataNode } from "src/types/vellum";
 
 describe("Workflow", () => {
   const entrypointNode = entrypointNodeDataFactory();
   describe("unused_graphs", () => {
     const runUnusedGraphsWorkflowTest = async (
-      edges: EdgeFactoryNodePair[]
+      edgeFactoryNodePairs: EdgeFactoryNodePair[]
     ) => {
-      const workflowContext = workflowContextFactory();
       const writer = new Writer();
 
       const nodes = Array.from(
         new Set(
-          edges
-            .flatMap(([source, target]) => [
-              Array.isArray(source) ? source[0] : source,
-              Array.isArray(target) ? target[0] : target,
-            ])
-            .filter(
-              (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
-            )
+          edgeFactoryNodePairs.flatMap(([source, target]) => [
+            Array.isArray(source) ? source[0] : source,
+            Array.isArray(target) ? target[0] : target,
+          ])
         )
       );
 
+      const edges = edgesFactory(edgeFactoryNodePairs);
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes,
+          edges,
+        },
+      });
+
       await Promise.all(
         nodes.map((node) => {
+          if (node.type === "ENTRYPOINT") {
+            return;
+          }
+
           createNodeContext({
             workflowContext,
             nodeData: node,
           });
         })
       );
-
-      workflowContext.addWorkflowEdges(edgesFactory(edges));
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({

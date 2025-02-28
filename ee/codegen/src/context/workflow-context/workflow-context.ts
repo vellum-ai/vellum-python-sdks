@@ -429,10 +429,6 @@ export class WorkflowContext {
     return mlModel.name;
   }
 
-  public addWorkflowEdges(edges: WorkflowEdge[]): void {
-    this.workflowRawData.edges.push(...edges);
-  }
-
   public addError(error: BaseCodegenError): void {
     if (this.strict) {
       throw error;

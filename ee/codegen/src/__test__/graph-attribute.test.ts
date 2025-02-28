@@ -18,37 +18,41 @@ import {
 
 import { createNodeContext } from "src/context";
 import { GraphAttribute } from "src/generators/graph-attribute";
-import { WorkflowDataNode } from "src/types/vellum";
 
 describe("Workflow", () => {
   const entrypointNode = entrypointNodeDataFactory();
-  const runGraphTest = async (edges: EdgeFactoryNodePair[]) => {
-    const workflowContext = workflowContextFactory();
+  const runGraphTest = async (edgeFactoryNodePairs: EdgeFactoryNodePair[]) => {
     const writer = new Writer();
 
     const nodes = Array.from(
       new Set(
-        edges
-          .flatMap(([source, target]) => [
-            Array.isArray(source) ? source[0] : source,
-            Array.isArray(target) ? target[0] : target,
-          ])
-          .filter(
-            (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
-          )
+        edgeFactoryNodePairs.flatMap(([source, target]) => [
+          Array.isArray(source) ? source[0] : source,
+          Array.isArray(target) ? target[0] : target,
+        ])
       )
     );
+    const edges = edgesFactory(edgeFactoryNodePairs);
+
+    const workflowContext = workflowContextFactory({
+      workflowRawData: {
+        nodes,
+        edges,
+      },
+    });
 
     await Promise.all(
       nodes.map((node) => {
+        if (node.type === "ENTRYPOINT") {
+          return;
+        }
+
         createNodeContext({
           workflowContext,
           nodeData: node,
         });
       })
     );
-
-    workflowContext.addWorkflowEdges(edgesFactory(edges));
 
     new GraphAttribute({ workflowContext }).write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
