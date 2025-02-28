@@ -19,6 +19,7 @@ from vellum import (
     VellumError,
     VellumValue,
 )
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
 from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -103,14 +104,23 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
             input_values = self._compile_code_inputs()
             expected_output_type = primitive_type_to_vellum_variable_type(output_type)
 
-            code_execution_result = self._context.vellum_client.execute_code(
-                input_values=input_values,
-                code=code,
-                runtime=self.runtime,
-                output_type=expected_output_type,
-                packages=self.packages or [],
-                request_options=self.request_options,
-            )
+            try:
+                code_execution_result = self._context.vellum_client.execute_code(
+                    input_values=input_values,
+                    code=code,
+                    runtime=self.runtime,
+                    output_type=expected_output_type,
+                    packages=self.packages or [],
+                    request_options=self.request_options,
+                )
+            except ApiError as e:
+                if e.status_code == 400 and isinstance(e.body, dict) and "message" in e.body:
+                    raise NodeException(
+                        message=e.body["message"],
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                    )
+
+                raise
 
             if code_execution_result.output.type != expected_output_type:
                 actual_type = code_execution_result.output.type

@@ -5,6 +5,7 @@ from typing import Any, List, Union
 from pydantic import BaseModel
 
 from vellum import CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
+from vellum.client.errors.bad_request_error import BadRequestError
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
@@ -17,6 +18,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.state.base import BaseState, StateMeta
+from vellum.workflows.types.core import Json
 
 
 def test_run_node__happy_path(vellum_client):
@@ -690,3 +692,54 @@ def main():
         "result": [ChatMessage(role="USER", content=StringChatMessageContent(value="Hello, world!"))],
         "log": "",
     }
+
+
+def test_run_node__execute_code_api_fails__node_exception(vellum_client):
+    # GIVEN a node that will throw a JSON.parse error
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Json]):
+        code = """\
+async function main(inputs: {
+  data: string,
+}): Promise<string> {
+  return JSON.parse(inputs.data)
+}
+"""
+        code_inputs = {
+            "data": "not a valid json string",
+        }
+        runtime = "TYPESCRIPT_5_3_3"
+
+    # AND the execute_code API will fail
+    message = """\
+Code execution error (exit code 1): undefined:1
+not a valid json string
+ ^
+
+SyntaxError: Unexpected token 'o', \"not a valid\"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at Object.eval (eval at execute (/workdir/runner.js:16:18), <anonymous>:40:40)
+    at step (eval at execute (/workdir/runner.js:16:18), <anonymous>:32:23)
+    at Object.eval [as next] (eval at execute (/workdir/runner.js:16:18), <anonymous>:13:53)
+    at eval (eval at execute (/workdir/runner.js:16:18), <anonymous>:7:71)
+    at new Promise (<anonymous>)
+    at __awaiter (eval at execute (/workdir/runner.js:16:18), <anonymous>:3:12)
+    at Object.main (eval at execute (/workdir/runner.js:16:18), <anonymous>:38:12)
+    at execute (/workdir/runner.js:17:33)
+    at Interface.<anonymous> (/workdir/runner.js:58:5)
+
+Node.js v21.7.3
+"""
+    vellum_client.execute_code.side_effect = BadRequestError(
+        body={
+            "message": message,
+            "log": "",
+        }
+    )
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # AND the error should contain the execution error details
+    assert exc_info.value.message == message
