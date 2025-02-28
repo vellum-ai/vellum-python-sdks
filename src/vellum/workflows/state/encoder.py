@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, Type
 
 from pydantic import BaseModel
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
@@ -22,7 +23,7 @@ class DefaultStateEncoder(JSONEncoder):
             return dict(obj)
 
         if isinstance(obj, (BaseInputs, BaseOutputs)):
-            return {descriptor.name: value for descriptor, value in obj}
+            return {descriptor.name: value for descriptor, value in obj if value is not undefined}
 
         if isinstance(obj, (BaseOutput, Port)):
             return obj.serialize()

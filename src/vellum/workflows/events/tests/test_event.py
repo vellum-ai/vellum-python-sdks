@@ -4,6 +4,7 @@ from uuid import UUID
 
 from deepdiff import DeepDiff
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events.node import (
     NodeExecutionFulfilledBody,
@@ -330,6 +331,43 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                 "parent": None,
             },
         ),
+        (
+            NodeExecutionFulfilledEvent(
+                id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                body=NodeExecutionFulfilledBody(
+                    node_definition=MockNode,
+                    outputs=MockNode.Outputs(
+                        example=undefined,  # type: ignore[arg-type]
+                    ),
+                    invoked_ports={MockNode.Ports.default},
+                ),
+            ),
+            {
+                "id": "123e4567-e89b-12d3-a456-426614174000",
+                "api_version": "2024-10-25",
+                "timestamp": "2024-01-01T12:00:00",
+                "trace_id": "123e4567-e89b-12d3-a456-426614174000",
+                "span_id": "123e4567-e89b-12d3-a456-426614174000",
+                "name": "node.execution.fulfilled",
+                "body": {
+                    "node_definition": {
+                        "id": mock_node_uuid,
+                        "name": "MockNode",
+                        "module": module_root + ["events", "tests", "test_event"],
+                    },
+                    "outputs": {},
+                    "invoked_ports": [
+                        {
+                            "name": "default",
+                        }
+                    ],
+                },
+                "parent": None,
+            },
+        ),
     ],
     ids=[
         "workflow.execution.initiated",
@@ -339,6 +377,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         "workflow.execution.rejected",
         "node.execution.streaming",
         "node.execution.fulfilled",
+        "fulfilled_node_with_undefined_outputs",
     ],
 )
 def test_event_serialization(event, expected_json):
