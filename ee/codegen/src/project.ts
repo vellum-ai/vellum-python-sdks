@@ -170,7 +170,6 @@ ${errors.slice(0, 3).map((err) => {
       }
 
       this.workflowVersionExecConfig = workflowVersionExecConfigResult.value;
-      const rawEdges = this.workflowVersionExecConfig.workflowRawData.edges;
 
       const workflowClassName =
         this.workflowVersionExecConfig.workflowRawData.definition?.name ||
@@ -182,7 +181,7 @@ ${errors.slice(0, 3).map((err) => {
         moduleName,
         workflowClassName,
         vellumApiKey,
-        workflowRawEdges: rawEdges,
+        workflowRawData: this.workflowVersionExecConfig.workflowRawData,
         strict: rest.strict ?? false,
         codeExecutionNodeCodeRepresentationOverride:
           rest.options?.codeExecutionNodeCodeRepresentationOverride ??

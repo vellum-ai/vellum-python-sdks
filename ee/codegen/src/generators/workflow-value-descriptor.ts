@@ -11,6 +11,7 @@ import {
   IterableConfig,
   OperatorMapping,
   WorkflowDataNode,
+  WorkflowExpression as WorkflowExpressionType,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
   WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
 } from "src/types/vellum";
@@ -147,7 +148,9 @@ export class WorkflowValueDescriptor extends AstNode {
     return operatorMappings[operator] || "equals"; // return default operator if not found
   }
 
-  private isExpression(workflowValueDescriptor: WorkflowValueDescriptorType) {
+  private isExpression(
+    workflowValueDescriptor: WorkflowValueDescriptorType
+  ): workflowValueDescriptor is WorkflowExpressionType {
     return (
       workflowValueDescriptor.type === "UNARY_EXPRESSION" ||
       workflowValueDescriptor.type === "BINARY_EXPRESSION" ||

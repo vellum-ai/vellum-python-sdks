@@ -501,7 +501,7 @@ export class Workflow {
   }
 
   private getEdges(): WorkflowEdge[] {
-    return this.workflowContext.workflowRawEdges;
+    return this.workflowContext.workflowRawData.edges;
   }
 
   private addGraph(workflowClass: python.Class): void {

@@ -24,6 +24,7 @@ import {
   EntrypointNode,
   WorkflowDataNode,
   WorkflowEdge,
+  WorkflowRawData,
 } from "src/types/vellum";
 import { createPythonClassName } from "src/utils/casing";
 
@@ -48,7 +49,7 @@ export declare namespace WorkflowContext {
     workflowsSdkModulePath?: readonly string[];
     portContextByName?: PortContextById;
     vellumApiKey: string;
-    workflowRawEdges: WorkflowEdge[];
+    workflowRawData: WorkflowRawData;
     strict: boolean;
     codeExecutionNodeCodeRepresentationOverride: "STANDALONE" | "INLINE";
     disableFormatting: boolean;
@@ -113,7 +114,7 @@ export class WorkflowContext {
   private readonly mlModelNamesById: Record<string, string> = {};
   private readonly errors: BaseCodegenError[] = [];
 
-  public readonly workflowRawEdges: WorkflowEdge[];
+  public readonly workflowRawData: WorkflowRawData;
 
   public readonly codeExecutionNodeCodeRepresentationOverride:
     | "STANDALONE"
@@ -135,7 +136,7 @@ export class WorkflowContext {
     workflowsSdkModulePath = ["vellum", "workflows"] as const,
     portContextByName,
     vellumApiKey,
-    workflowRawEdges,
+    workflowRawData,
     strict,
     codeExecutionNodeCodeRepresentationOverride,
     disableFormatting,
@@ -164,7 +165,7 @@ export class WorkflowContext {
     this.parentNode = parentNode;
 
     this.sdkModulePathNames = generateSdkModulePaths(workflowsSdkModulePath);
-    this.workflowRawEdges = workflowRawEdges;
+    this.workflowRawData = workflowRawData;
 
     this.strict = strict;
     this.errors = [];
@@ -185,12 +186,12 @@ export class WorkflowContext {
   public createNestedWorkflowContext({
     parentNode,
     workflowClassName,
-    workflowRawEdges,
+    workflowRawData,
     classNames,
   }: {
     parentNode: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
     workflowClassName: string;
-    workflowRawEdges: WorkflowEdge[];
+    workflowRawData: WorkflowRawData;
     classNames?: Set<string>;
   }) {
     return new WorkflowContext({
@@ -203,7 +204,7 @@ export class WorkflowContext {
       parentNode,
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,
-      workflowRawEdges,
+      workflowRawData,
       codeExecutionNodeCodeRepresentationOverride:
         this.codeExecutionNodeCodeRepresentationOverride,
       strict: this.strict,
@@ -230,14 +231,14 @@ export class WorkflowContext {
 
   public getEntrypointNodeEdges(): WorkflowEdge[] {
     const entrypointNodeId = this.getEntrypointNode().id;
-    return this.workflowRawEdges.filter(
+    return this.workflowRawData.edges.filter(
       (edge) => edge.sourceNodeId === entrypointNodeId
     );
   }
 
   public getEdgesByPortId(): Map<string, WorkflowEdge[]> {
     const edgesByPortId = new Map<string, WorkflowEdge[]>();
-    this.workflowRawEdges.forEach((edge) => {
+    this.workflowRawData.edges.forEach((edge) => {
       const portId = edge.sourceHandleId;
       const edges = edgesByPortId.get(portId) ?? [];
       edges.push(edge);
@@ -424,7 +425,7 @@ export class WorkflowContext {
   }
 
   public addWorkflowEdges(edges: WorkflowEdge[]): void {
-    this.workflowRawEdges.push(...edges);
+    this.workflowRawData.edges.push(...edges);
   }
 
   public addError(error: BaseCodegenError): void {

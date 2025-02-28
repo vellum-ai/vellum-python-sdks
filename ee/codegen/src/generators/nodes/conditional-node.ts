@@ -322,7 +322,7 @@ export class ConditionalNode extends BaseSingleFileNode<
           return;
         }
 
-        const edge = this.workflowContext.workflowRawEdges.find(
+        const edge = this.workflowContext.workflowRawData.edges.find(
           (edge) => edge.sourceHandleId === portId
         );
 
