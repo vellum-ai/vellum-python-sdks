@@ -477,7 +477,7 @@ describe("Workflow", () => {
       });
 
       workflow.getWorkflowFile().write(writer);
-      expect(await writer.toString()).toMatchSnapshot();
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
       const errors = workflowContext.getErrors();
 
       expect(errors.length).toEqual(1);
@@ -485,6 +485,56 @@ describe("Workflow", () => {
         "Failed to find node with id 'non-existent-node-id'"
       );
       expect(errors[0]?.severity).toEqual("WARNING");
+    });
+
+    it("should generate correct code with an output variable mapped to an unused terminal node", async () => {
+      const terminalNode = terminalNodeDataFactory();
+      const workflowContext = workflowContextFactory({
+        strict: false,
+        workflowRawData: {
+          nodes: [terminalNode],
+          edges: [],
+        },
+      });
+      const inputs = codegen.inputs({ workflowContext });
+      await createNodeContext({
+        workflowContext,
+        nodeData: terminalNode,
+      });
+
+      workflowContext.addOutputVariableContext(
+        new OutputVariableContext({
+          outputVariableData: {
+            id: "output-variable-id",
+            key: "passthrough",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      workflowContext.addWorkflowOutputContext(
+        new WorkflowOutputContext({
+          workflowOutputValue: {
+            outputVariableId: "output-variable-id",
+            value: {
+              type: "NODE_OUTPUT",
+              nodeId: terminalNode.id,
+              nodeOutputId: terminalNode.data.outputId,
+            },
+          },
+          workflowContext,
+        })
+      );
+
+      const workflow = codegen.workflow({
+        moduleName,
+        workflowContext,
+        inputs,
+      });
+
+      workflow.getWorkflowFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 });

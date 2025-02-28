@@ -24,7 +24,11 @@ import { GraphAttribute } from "src/generators/graph-attribute";
 import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
-import { WorkflowDisplayData, WorkflowEdge } from "src/types/vellum";
+import {
+  WorkflowDisplayData,
+  WorkflowEdge,
+  WorkflowNode,
+} from "src/types/vellum";
 import { DictEntry, isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
@@ -44,11 +48,15 @@ export class Workflow {
   public readonly workflowContext: WorkflowContext;
   private readonly inputs: Inputs;
   private readonly displayData: WorkflowDisplayData | undefined;
+
+  private readonly unusedNodes: Set<WorkflowNode>;
   private readonly unusedEdges: Set<WorkflowEdge>;
   constructor({ workflowContext, inputs, displayData }: Workflow.Args) {
     this.workflowContext = workflowContext;
     this.inputs = inputs;
     this.displayData = displayData;
+
+    this.unusedNodes = new Set();
     this.unusedEdges = new Set();
   }
 
@@ -506,6 +514,9 @@ export class Workflow {
 
   private addGraph(workflowClass: python.Class): void {
     if (this.getEdges().length === 0) {
+      this.workflowContext.workflowRawData.nodes.forEach((node) => {
+        this.unusedNodes.add(node);
+      });
       return;
     }
 
@@ -523,10 +534,20 @@ export class Workflow {
 
       // update the graph with the unused edges
       const usedEdges = graph.getUsedEdges();
+      const usedNodeIds = new Set<string>(
+        Array.from(usedEdges).flatMap((e) => [e.sourceNodeId, e.targetNodeId])
+      );
+
       const allEdges = this.getEdges();
       allEdges.forEach((edge) => {
         if (!usedEdges.has(edge)) {
           this.unusedEdges.add(edge);
+        }
+      });
+
+      this.workflowContext.workflowRawData.nodes.forEach((node) => {
+        if (!usedNodeIds.has(node.id)) {
+          this.unusedNodes.add(node);
         }
       });
     } catch (error) {
@@ -541,7 +562,11 @@ export class Workflow {
 
   private addUnusedGraphs(workflowClass: python.Class): void {
     // Filter out edges that reference non-existent nodes
-    const validUnusedEdges = new Set<WorkflowEdge>();
+    const remainingUnusedEdges = new Set<WorkflowEdge>();
+    const remainingUnusedNodes = new Set<WorkflowNode>(this.unusedNodes);
+    const remainingUnusedNodesById = Object.fromEntries(
+      Array.from(remainingUnusedNodes).map((node) => [node.id, node])
+    );
 
     this.unusedEdges.forEach((edge) => {
       if (
@@ -550,31 +575,51 @@ export class Workflow {
         ) &&
         this.workflowContext.globalNodeContextsByNodeId.has(edge.targetNodeId)
       ) {
-        validUnusedEdges.add(edge);
+        remainingUnusedEdges.add(edge);
       }
     });
 
-    if (validUnusedEdges.size === 0) {
+    if (remainingUnusedEdges.size === 0 && remainingUnusedNodes.size === 0) {
       return;
     }
 
-    let remainingEdges = validUnusedEdges;
-
     // set of unused graphs
-    const unusedGraphs: GraphAttribute[] = [];
-    while (remainingEdges.size > 0) {
+    const unusedGraphs: (GraphAttribute | python.Reference)[] = [];
+    while (remainingUnusedEdges.size > 0) {
       const unusedGraph = new GraphAttribute({
         workflowContext: this.workflowContext,
-        unusedEdges: remainingEdges,
+        unusedEdges: remainingUnusedEdges,
       });
 
       const processedEdges = unusedGraph.getUsedEdges();
-      remainingEdges = new Set(
-        [...remainingEdges].filter((edge) => !processedEdges.has(edge))
-      );
+      for (const edge of processedEdges) {
+        remainingUnusedEdges.delete(edge);
+        const sourceNode = remainingUnusedNodesById[edge.sourceNodeId];
+        const targetNode = remainingUnusedNodesById[edge.targetNodeId];
+        if (sourceNode) {
+          remainingUnusedNodes.delete(sourceNode);
+        }
+        if (targetNode) {
+          remainingUnusedNodes.delete(targetNode);
+        }
+      }
 
       unusedGraphs.push(unusedGraph);
     }
+
+    remainingUnusedNodes.forEach((node) => {
+      const nodeContext = this.workflowContext.findNodeContext(node.id);
+      if (!nodeContext) {
+        return;
+      }
+
+      unusedGraphs.push(
+        python.reference({
+          name: nodeContext.nodeClassName,
+          modulePath: nodeContext.nodeModulePath,
+        })
+      );
+    });
 
     const unusedGraphsField = python.field({
       name: "unused_graphs",

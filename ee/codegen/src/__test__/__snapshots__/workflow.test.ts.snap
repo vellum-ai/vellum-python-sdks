@@ -37,10 +37,11 @@ exports[`Workflow > write > should generate correct code with an output variable
 from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
+
+
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
     class Outputs(BaseWorkflow.Outputs):
         passthrough = None
-
 "
 `;
 
@@ -54,6 +55,20 @@ from .inputs import Inputs
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
     class Outputs(BaseWorkflow.Outputs):
         passthrough = Inputs.query
+"
+`;
+
+exports[`Workflow > write > should generate correct code with an output variable mapped to an unused terminal node 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.final_output import FinalOutput
+
+
+class TestWorkflow(BaseWorkflow):
+    unused_graphs = {FinalOutput}
+
+    class Outputs(BaseWorkflow.Outputs):
+        passthrough = FinalOutput.Outputs.value
 "
 `;
 
