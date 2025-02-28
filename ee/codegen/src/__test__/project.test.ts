@@ -253,14 +253,12 @@ describe("WorkflowProjectGenerator", () => {
       expectProjectFileToExist(project, ["workflow.py"]);
       expectProjectFileToMatchSnapshot(project, ["nodes", "bad_node.py"]);
 
-      expectErrorLog(
-        project,
-        `\
-Encountered 1 error(s) while generating code:
-
-- Failed to find node with id 'node_that_doesnt_exist'
-`
+      const errors = project.workflowContext.getErrors();
+      expect(errors.length).toBe(1);
+      expect(errors[0]?.message).toBe(
+        "Failed to find node with id 'node_that_doesnt_exist'"
       );
+      expect(errors[0]?.severity).toBe("WARNING");
     });
 
     it("should fail to generate code if a node fails in strict mode", async () => {
