@@ -1,5 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
+from dataclasses import dataclass
 import logging
 from queue import Empty, Queue
 from threading import Event as ThreadingEvent, Thread
@@ -61,6 +62,12 @@ logger = logging.getLogger(__name__)
 RunFromNodeArg = Sequence[Type[BaseNode]]
 ExternalInputsArg = Dict[ExternalInputReference, Any]
 BackgroundThreadItem = Union[BaseState, WorkflowEvent, None]
+
+
+@dataclass
+class ActiveNode(Generic[StateType]):
+    node: BaseNode[StateType]
+    was_outputs_streamed: bool = False
 
 
 class WorkflowRunner(Generic[StateType]):
@@ -136,7 +143,7 @@ class WorkflowRunner(Generic[StateType]):
         self._dependencies: Dict[Type[BaseNode], Set[Type[BaseNode]]] = defaultdict(set)
         self._state_forks: Set[StateType] = {self._initial_state}
 
-        self._active_nodes_by_execution_id: Dict[UUID, BaseNode[StateType]] = {}
+        self._active_nodes_by_execution_id: Dict[UUID, ActiveNode[StateType]] = {}
         self._cancel_signal = cancel_signal
         self._execution_context = init_execution_context or get_execution_context()
         self._parent_context = self._execution_context.parent_context
@@ -404,7 +411,7 @@ class WorkflowRunner(Generic[StateType]):
             current_parent = get_parent_context()
             node = node_class(state=state, context=self.workflow.context)
             state.meta.node_execution_cache.initiate_node_execution(node_class, node_span_id)
-            self._active_nodes_by_execution_id[node_span_id] = node
+            self._active_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
 
             worker_thread = Thread(
                 target=self._context_run_work_item,
@@ -413,10 +420,11 @@ class WorkflowRunner(Generic[StateType]):
             worker_thread.start()
 
     def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[WorkflowError]:
-        node = self._active_nodes_by_execution_id.get(event.span_id)
-        if not node:
+        active_node = self._active_nodes_by_execution_id.get(event.span_id)
+        if not active_node:
             return None
 
+        node = active_node.node
         if event.name == "node.execution.rejected":
             self._active_nodes_by_execution_id.pop(event.span_id)
             return event.error
@@ -431,6 +439,7 @@ class WorkflowRunner(Generic[StateType]):
                 if node_output_descriptor.name != event.output.name:
                     continue
 
+                active_node.was_outputs_streamed = True
                 self._workflow_event_outer_queue.put(
                     self._stream_workflow_event(
                         BaseOutput(
@@ -447,24 +456,25 @@ class WorkflowRunner(Generic[StateType]):
 
         if event.name == "node.execution.fulfilled":
             self._active_nodes_by_execution_id.pop(event.span_id)
-            for node_output_descriptor, node_output_value in event.outputs:
-                for workflow_output_descriptor in self.workflow.Outputs:
-                    node_output_descriptor = workflow_output_descriptor.instance
-                    if not isinstance(node_output_descriptor, OutputReference):
-                        continue
-                    if node_output_descriptor.outputs_class != event.node_definition.Outputs:
-                        continue
-                    if node_output_descriptor.name != node_output_descriptor.name:
-                        continue
+            if not active_node.was_outputs_streamed:
+                for event_node_output_descriptor, node_output_value in event.outputs:
+                    for workflow_output_descriptor in self.workflow.Outputs:
+                        node_output_descriptor = workflow_output_descriptor.instance
+                        if not isinstance(node_output_descriptor, OutputReference):
+                            continue
+                        if node_output_descriptor.outputs_class != event.node_definition.Outputs:
+                            continue
+                        if node_output_descriptor.name != event_node_output_descriptor.name:
+                            continue
 
-                    self._workflow_event_outer_queue.put(
-                        self._stream_workflow_event(
-                            BaseOutput(
-                                name=workflow_output_descriptor.name,
-                                value=node_output_value,
+                        self._workflow_event_outer_queue.put(
+                            self._stream_workflow_event(
+                                BaseOutput(
+                                    name=workflow_output_descriptor.name,
+                                    value=node_output_value,
+                                )
                             )
                         )
-                    )
 
             self._handle_invoked_ports(node.state, event.invoked_ports)
 

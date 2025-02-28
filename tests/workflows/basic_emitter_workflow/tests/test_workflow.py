@@ -148,10 +148,14 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     assert events[7].node_definition == NextNode
     assert events[7].outputs == {"final_value": "Score: 13"}
 
-    assert events[8].name == "workflow.execution.fulfilled"
-    assert events[8].outputs == {"final_value": "Score: 13"}
+    assert events[8].name == "workflow.execution.streaming"
+    assert events[8].output.name == "final_value"
+    assert events[8].output.value == "Score: 13"
 
-    assert len(events) == 9, final_event
+    assert events[9].name == "workflow.execution.fulfilled"
+    assert events[9].outputs == {"final_value": "Score: 13"}
+
+    assert len(events) == 10, final_event
 
     # AND the emitter should have emitted all of the expected state snapshots
     state_snapshots = list(emitter.state_snapshots)
