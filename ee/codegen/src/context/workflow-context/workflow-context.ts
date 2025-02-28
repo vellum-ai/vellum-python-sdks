@@ -213,18 +213,23 @@ export class WorkflowContext {
     });
   }
 
-  public addEntrypointNode(entrypointNode: EntrypointNode): void {
+  public getEntrypointNode(): EntrypointNode {
     if (this.entrypointNode) {
-      throw new WorkflowGenerationError("Entrypoint node already exists");
+      return this.entrypointNode;
     }
 
-    this.entrypointNode = entrypointNode;
-  }
+    const entrypointNodes = this.workflowRawData.nodes.filter(
+      (n): n is EntrypointNode => n.type === "ENTRYPOINT"
+    );
+    if (entrypointNodes.length > 1) {
+      throw new WorkflowGenerationError("Multiple entrypoint nodes found");
+    }
 
-  public getEntrypointNode(): EntrypointNode {
-    if (!this.entrypointNode) {
+    const entrypointNode = entrypointNodes[0];
+    if (!entrypointNode) {
       throw new WorkflowGenerationError("Entrypoint node not found");
     }
+    this.entrypointNode = entrypointNode;
 
     return this.entrypointNode;
   }

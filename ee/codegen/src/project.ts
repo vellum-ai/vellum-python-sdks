@@ -20,7 +20,6 @@ import { ErrorLogFile, InitFile, Inputs, Workflow } from "./generators";
 import {
   NodeDefinitionGenerationError,
   ProjectSerializationError,
-  WorkflowGenerationError,
 } from "./generators/errors";
 import { BaseNode } from "./generators/nodes/bases";
 import { GuardrailNode } from "./generators/nodes/guardrail-node";
@@ -61,7 +60,6 @@ import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-depl
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
-  EntrypointNode,
   FinalOutputNode as FinalOutputNodeType,
   WorkflowDataNode,
   WorkflowEdge,
@@ -396,20 +394,6 @@ ${errors.slice(0, 3).map((err) => {
         }
       );
     }
-
-    const entrypointNodes =
-      this.workflowVersionExecConfig.workflowRawData.nodes.filter(
-        (n): n is EntrypointNode => n.type === "ENTRYPOINT"
-      );
-    if (entrypointNodes.length > 1) {
-      throw new WorkflowGenerationError("Multiple entrypoint nodes found");
-    }
-
-    const entrypointNode = entrypointNodes[0];
-    if (!entrypointNode) {
-      throw new WorkflowGenerationError("Entrypoint node not found");
-    }
-    this.workflowContext.addEntrypointNode(entrypointNode);
 
     const nodesToGenerate = await Promise.all(
       this.getOrderedNodes().map(async (nodeData) => {

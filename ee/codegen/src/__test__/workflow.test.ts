@@ -38,7 +38,6 @@ describe("Workflow", () => {
     );
 
     workflowContext = workflowContextFactory();
-    workflowContext.addEntrypointNode(entrypointNode);
 
     const nodeData = terminalNodeDataFactory();
     await createNodeContext({
@@ -230,7 +229,6 @@ describe("Workflow", () => {
       });
 
       const workflowContext = workflowContextFactory({ strict: false });
-      workflowContext.addEntrypointNode(entrypointNode);
 
       const templatingNodeData1 = templatingNodeFactory({
         id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
@@ -372,9 +370,7 @@ describe("Workflow", () => {
     });
 
     it("should generate correct display code when there are input variables with escape characters", async () => {
-      const entrypointNode = entrypointNodeDataFactory();
       workflowContext = workflowContextFactory();
-      workflowContext.addEntrypointNode(entrypointNode);
 
       const nodeData = terminalNodeDataFactory();
       await createNodeContext({

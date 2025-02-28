@@ -16,7 +16,7 @@ import {
   templatingNodeFactory,
 } from "./helpers/node-data-factories";
 
-import { WorkflowContext, createNodeContext } from "src/context";
+import { createNodeContext } from "src/context";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { WorkflowDataNode } from "src/types/vellum";
 
@@ -25,7 +25,6 @@ describe("Workflow", () => {
   const runGraphTest = async (edges: EdgeFactoryNodePair[]) => {
     const workflowContext = workflowContextFactory();
     const writer = new Writer();
-    workflowContext.addEntrypointNode(entrypointNode);
 
     const nodes = Array.from(
       new Set(
@@ -54,13 +53,6 @@ describe("Workflow", () => {
     new GraphAttribute({ workflowContext }).write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   };
-
-  let workflowContext: WorkflowContext;
-
-  beforeEach(() => {
-    workflowContext = workflowContextFactory();
-    workflowContext.addEntrypointNode(entrypointNode);
-  });
 
   describe("graph", () => {
     it("should be correct for a basic single node case", async () => {

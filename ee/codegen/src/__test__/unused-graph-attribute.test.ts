@@ -22,7 +22,6 @@ describe("Workflow", () => {
     ) => {
       const workflowContext = workflowContextFactory();
       const writer = new Writer();
-      workflowContext.addEntrypointNode(entrypointNode);
 
       const nodes = Array.from(
         new Set(

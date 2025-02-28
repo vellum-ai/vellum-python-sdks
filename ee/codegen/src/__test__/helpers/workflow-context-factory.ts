@@ -1,3 +1,5 @@
+import { entrypointNodeDataFactory } from "./node-data-factories";
+
 import { WorkflowContext } from "src/context";
 
 export function workflowContextFactory({
@@ -16,7 +18,7 @@ export function workflowContextFactory({
     workflowClassName: workflowClassName || "TestWorkflow",
     vellumApiKey: "<TEST_API_KEY>",
     workflowRawData: workflowRawData || {
-      nodes: [],
+      nodes: [entrypointNodeDataFactory()],
       edges: [],
     },
     strict,
