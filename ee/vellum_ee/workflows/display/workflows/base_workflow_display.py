@@ -9,6 +9,7 @@ from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, Un
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
+from vellum.workflows.events.workflow import NodeDisplay, WorkflowEventDisplayContext
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.utils import get_wrapped_node
@@ -33,12 +34,7 @@ from vellum_ee.workflows.display.base import (
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.types import (
-    NodeDisplay,
-    NodeDisplayType,
-    WorkflowDisplayContext,
-    WorkflowEventDisplayContext,
-)
+from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Iterable, Literal, Type, Union
+from uuid import UUID
+from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Iterable, Literal, Optional, Type, Union
 
 from pydantic import field_serializer
 
@@ -38,8 +39,26 @@ class _BaseWorkflowEvent(BaseEvent):
         return self.body.workflow_definition
 
 
+class NodeDisplay(UniversalBaseModel):
+    input_display: Dict[str, UUID]
+    output_display: Dict[str, UUID]
+    port_display: Dict[str, UUID]
+
+
+class WorkflowEventDisplayContext(UniversalBaseModel):
+    node_displays: Dict[str, NodeDisplay]
+    workflow_inputs: Dict[str, UUID]
+    workflow_outputs: Dict[str, UUID]
+
+
 class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsType]):
     inputs: InputsType
+    # It is still the responsibility of the workflow server to populate this context. The SDK's
+    # Workflow Runner will always leave this field None.
+    #
+    # It's conceivable in a future where all `id`s are agnostic to display and reside in a third location,
+    # that the Workflow Runner can begin populating this field then.
+    display_context: Optional[WorkflowEventDisplayContext] = None
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:

@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
-from uuid import UUID
 from typing import TYPE_CHECKING, Dict, Generic, Tuple, Type, TypeVar
 
-from vellum.client.core import UniversalBaseModel
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa: F401
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
@@ -23,18 +22,6 @@ if TYPE_CHECKING:
 
 NodeDisplayType = TypeVar("NodeDisplayType", bound="BaseNodeDisplay")
 WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
-
-
-class NodeDisplay(UniversalBaseModel):
-    input_display: Dict[str, UUID]
-    output_display: Dict[str, UUID]
-    port_display: Dict[str, UUID]
-
-
-class WorkflowEventDisplayContext(UniversalBaseModel):
-    node_displays: Dict[str, NodeDisplay]
-    workflow_inputs: Dict[str, UUID]
-    workflow_outputs: Dict[str, UUID]
 
 
 @dataclass

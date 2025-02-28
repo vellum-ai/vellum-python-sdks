@@ -87,6 +87,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "inputs": {
                         "foo": "bar",
                     },
+                    "display_context": None,
                 },
                 "parent": None,
             },
