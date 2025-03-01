@@ -143,21 +143,22 @@ export class ConditionalNodePort extends AstNode {
     const ruleId = conditionData.id;
 
     const lhsKey = this.inputFieldKeysByRuleId.get(ruleId);
-    let rhsKey;
     if (isNil(lhsKey)) {
       throw new NodeAttributeGenerationError(
         `Could not find input field key given ruleId: ${ruleId} on rule index: ${ruleIdx} on condition index: ${this.conditionalNodeDataIndex} for node: ${this.nodeLabel}`
       );
     }
-    if (conditionData.valueNodeInputId) {
-      rhsKey = this.valueInputKeysByRuleId.get(ruleId);
-    }
     const lhs = this.nodeInputsByKey.get(lhsKey);
     if (isNil(lhs)) {
-      throw new NodePortGenerationError(
-        `Node ${this.nodeLabel} is missing required left-hand side input field with key: ${lhsKey} for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+      this.portContext.workflowContext.addError(
+        new NodePortGenerationError(
+          `Node ${this.nodeLabel} is missing required left-hand side input field for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`,
+          "WARNING"
+        )
       );
+      return python.TypeInstantiation.none();
     }
+
     const operator = conditionData.operator
       ? this.convertOperatorToMethod(conditionData.operator, lhs)
       : undefined;
@@ -167,6 +168,10 @@ export class ConditionalNodePort extends AstNode {
       );
     }
 
+    let rhsKey;
+    if (conditionData.valueNodeInputId) {
+      rhsKey = this.valueInputKeysByRuleId.get(ruleId);
+    }
     let rhs;
     rhs = !isNil(rhsKey) ? this.nodeInputsByKey.get(rhsKey) : undefined;
     // The following is to account for an edge case where we are getting bad data

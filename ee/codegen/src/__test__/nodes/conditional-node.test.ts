@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuid4 } from "uuid";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -455,5 +456,49 @@ describe("Conditional Node with numeric operator casts rhs to NUMBER", () => {
   it("getNodeFile", async () => {
     node.getNodeFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
+describe("Conditional Node warning cases", () => {
+  let writer: Writer;
+
+  beforeEach(async () => {
+    writer = new Writer();
+  });
+
+  it("getNodeFile should be resilient to lhs referencing a non-existent node", async () => {
+    const workflowContext = workflowContextFactory({ strict: false });
+
+    const referenceNodeId = uuid4();
+    const nodeData = conditionalNodeFactory({
+      // Non-existent node output reference
+      inputReferenceId: uuid4(),
+      inputReferenceNodeId: referenceNodeId,
+    });
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    const node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+    // Ideally, we reduce the number of warnings to 1 in the future
+    const errors = workflowContext.getErrors();
+    expect(errors.length).toBe(2);
+    expect(errors[0]?.message).toBe(
+      `Failed to find node with id '${referenceNodeId}'`
+    );
+    expect(errors[1]?.message).toBe(
+      `Node Conditional Node is missing required left-hand side input field for rule: 0 in condition: 0`
+    );
+    expect(errors[0]?.severity).toBe("WARNING");
+    expect(errors[1]?.severity).toBe("WARNING");
   });
 });
