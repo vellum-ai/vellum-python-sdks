@@ -512,6 +512,12 @@ export class Workflow {
     return this.workflowContext.workflowRawData.edges;
   }
 
+  private getNodeIds(): Set<string> {
+    return new Set(
+      this.workflowContext.workflowRawData.nodes.map((node) => node.id)
+    );
+  }
+
   private addGraph(workflowClass: python.Class): void {
     if (this.getEdges().length === 0) {
       this.workflowContext.workflowRawData.nodes.forEach((node) => {
@@ -543,15 +549,12 @@ export class Workflow {
       );
 
       const allEdges = this.getEdges();
+      const allNodeIds = this.getNodeIds();
       allEdges.forEach((edge) => {
         if (!usedEdges.has(edge)) {
           if (
-            this.workflowContext.globalNodeContextsByNodeId.has(
-              edge.sourceNodeId
-            ) &&
-            this.workflowContext.globalNodeContextsByNodeId.has(
-              edge.targetNodeId
-            )
+            allNodeIds.has(edge.sourceNodeId) &&
+            allNodeIds.has(edge.targetNodeId)
           ) {
             this.unusedEdges.add(edge);
           }
