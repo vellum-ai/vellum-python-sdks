@@ -512,15 +512,17 @@ export class Workflow {
     return this.workflowContext.workflowRawData.edges;
   }
 
+  private getNodes(): WorkflowNode[] {
+    return this.workflowContext.workflowRawData.nodes;
+  }
+
   private getNodeIds(): Set<string> {
-    return new Set(
-      this.workflowContext.workflowRawData.nodes.map((node) => node.id)
-    );
+    return new Set(this.getNodes().map((node) => node.id));
   }
 
   private addGraph(workflowClass: python.Class): void {
     if (this.getEdges().length === 0) {
-      this.workflowContext.workflowRawData.nodes.forEach((node) => {
+      this.getNodes().forEach((node) => {
         if (node.type === "ENTRYPOINT") {
           return;
         }
@@ -561,7 +563,7 @@ export class Workflow {
         }
       });
 
-      this.workflowContext.workflowRawData.nodes.forEach((node) => {
+      this.getNodes().forEach((node) => {
         if (!usedNodeIds.has(node.id) && node.type !== "ENTRYPOINT") {
           this.unusedNodes.add(node);
         }
