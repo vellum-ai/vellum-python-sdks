@@ -27,50 +27,17 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       })
     );
 
-    const methodInput = this.nodeInputsByKey.get("method");
-    if (!methodInput) {
-      throw new NodeAttributeGenerationError(
-        'Node input "method" is required but not found.'
-      );
-    }
-
-    const methodValue = this.nodeData.inputs
-      .find((input) => input.id === this.nodeData.data.methodInputId)
-      ?.value.rules.find(
-        (value) => value.type === "CONSTANT_VALUE"
-      ) as ConstantValuePointer;
-    if (!methodValue) {
-      throw new NodeAttributeGenerationError(
-        `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`
-      );
-    }
-
-    const isGetMethod = methodValue.data.value === "GET";
-    const body = this.nodeInputsByKey.get("body");
-    const hasBody = !!body;
-    const additionalHeaders = this.nodeData.data.additionalHeaders;
-    const hasHeaders = !!additionalHeaders && additionalHeaders.length > 0;
-    const hasApiKeyHeader = !!this.nodeData.data.apiKeyHeaderKeyInputId;
-
-    // If all four conditions are met (GET, no body, no headers, no API key)
-    // return with just the URL field
-    if (isGetMethod && !hasBody && !hasHeaders && !hasApiKeyHeader) {
-      return [
+    const methodValue = this.convertMethodValueToEnum();
+    if (methodValue.toString() !== "APIRequestMethod.GET") {
+      statements.push(
         python.field({
-          name: "url",
-          initializer: urlInput,
-        }),
-      ];
+          name: "method",
+          initializer: methodValue,
+        })
+      );
     }
-
-    statements.push(
-      python.field({
-        name: "method",
-        initializer: this.convertMethodValueToEnum(methodValue),
-      })
-    );
-
-    if (hasBody) {
+    const body = this.nodeInputsByKey.get("body");
+    if (body && body.toString() !== "{}") {
       statements.push(
         python.field({
           name: "json",
@@ -79,7 +46,8 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
 
-    if (hasHeaders) {
+    const additionalHeaders = this.nodeData.data.additionalHeaders;
+    if (additionalHeaders) {
       statements.push(
         python.field({
           name: "headers",
@@ -119,13 +87,14 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
 
-    if (hasApiKeyHeader) {
+    const apiKeyHeaderKeyInput = this.nodeData.data.apiKeyHeaderKeyInputId;
+    if (apiKeyHeaderKeyInput) {
       const keyInput = this.nodeData.inputs.find(
-        (input) => input.id === this.nodeData.data.apiKeyHeaderKeyInputId
+        (input) => input.id === apiKeyHeaderKeyInput
       );
       if (!keyInput) {
         throw new NodeAttributeGenerationError(
-          `No inputs have api header key id of ${this.nodeData.data.apiKeyHeaderKeyInputId}`
+          `No inputs have api header key id of ${apiKeyHeaderKeyInput}`
         );
       }
       const key = this.nodeInputsByKey.get(keyInput.key);
@@ -459,7 +428,18 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
     return this.nodeData.data.errorOutputId;
   }
 
-  private convertMethodValueToEnum(methodValue: ConstantValuePointer): AstNode {
+  private convertMethodValueToEnum(): AstNode {
+    const methodValue = this.nodeData.inputs
+      .find((input) => input.id === this.nodeData.data.methodInputId)
+      ?.value.rules.find(
+        (value) => value.type === "CONSTANT_VALUE"
+      ) as ConstantValuePointer;
+
+    if (!methodValue) {
+      throw new NodeAttributeGenerationError(
+        `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`
+      );
+    }
     const methodEnum = methodValue.data.value as string;
 
     return python.reference({

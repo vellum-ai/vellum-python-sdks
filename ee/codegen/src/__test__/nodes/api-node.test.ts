@@ -260,7 +260,7 @@ describe("ApiNode", () => {
       // THEN the generated code should contain both url and method fields
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-    it("should generate body field when body is provided", async () => {
+    it("should not generate body field when body is empty", async () => {
       // GIVEN a node with url, GET method, and body
       const inputs: NodeInput[] = [
         {
@@ -649,7 +649,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "JSON",
-                  value: {},
+                  value: { foo: "bar" },
                 },
               },
             ],
