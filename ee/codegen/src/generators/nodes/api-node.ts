@@ -47,7 +47,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
     }
 
     const additionalHeaders = this.nodeData.data.additionalHeaders;
-    if (additionalHeaders) {
+    if (additionalHeaders && additionalHeaders.length > 0) {
       statements.push(
         python.field({
           name: "headers",
