@@ -16,6 +16,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { EntityNotFoundError } from "src/generators/errors";
 import { ApiNode } from "src/generators/nodes/api-node";
+import { ApiNode as ApiNodeType, NodeInput } from "src/types/vellum";
 
 describe("ApiNode", () => {
   let workflowContext: WorkflowContext;
@@ -105,6 +106,85 @@ describe("ApiNode", () => {
       nodeContext,
     });
   };
+
+  describe("basic api node", () => {
+    it("should only generate url field", async () => {
+      // GIVEN a node with only url and GET method
+      const inputs: NodeInput[] = [
+        {
+          id: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
+          key: "method",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE" as const,
+                data: {
+                  type: "STRING" as const,
+                  value: "GET",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "480a4c12-22d6-4223-a38a-85db5eda118c",
+          key: "url",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "fasdfadsf",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "74865eb7-cdaf-4d40-a499-0a6505e72680",
+          key: "body",
+          value: {
+            rules: [],
+            combinator: "OR",
+          },
+        },
+      ];
+      const nodeData: ApiNodeType = {
+        id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
+        type: "API",
+        data: {
+          label: "API Node",
+          methodInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
+          urlInputId: "480a4c12-22d6-4223-a38a-85db5eda118c",
+          bodyInputId: "74865eb7-cdaf-4d40-a499-0a6505e72680",
+          textOutputId: "81b270c0-4deb-4db3-aae5-138f79531b2b",
+          jsonOutputId: "af576eaa-d39d-4c19-8992-1f01a65a709a",
+          statusCodeOutputId: "69250713-617d-42a4-9326-456c70d0ef20",
+          targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
+          sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
+        },
+        inputs: inputs,
+      };
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      const node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN generating the code
+      node.getNodeFile().write(writer);
+
+      // THEN the generated code should only contain the url field
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 
   describe("basic auth secret node", () => {
     it.each([{ id: "1234", name: "test-secret" }])(

@@ -27,12 +27,33 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       })
     );
 
-    statements.push(
-      python.field({
-        name: "method",
-        initializer: this.convertMethodValueToEnum(),
-      })
-    );
+    const methodInput = this.nodeInputsByKey.get("method");
+    if (!methodInput) {
+      throw new NodeAttributeGenerationError(
+        'Node input "method" is required but not found.'
+      );
+    }
+
+    const methodValue = this.nodeData.inputs
+      .find((input) => input.id === this.nodeData.data.methodInputId)
+      ?.value.rules.find(
+        (value) => value.type === "CONSTANT_VALUE"
+      ) as ConstantValuePointer;
+    if (!methodValue) {
+      throw new NodeAttributeGenerationError(
+        `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`
+      );
+    }
+
+    // if method is get, then we don't need to pass body
+    if (methodValue.data.value !== "GET") {
+      statements.push(
+        python.field({
+          name: "method",
+          initializer: this.convertMethodValueToEnum(methodValue),
+        })
+      );
+    }
 
     const body = this.nodeInputsByKey.get("body");
 
@@ -425,19 +446,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
     return this.nodeData.data.errorOutputId;
   }
 
-  private convertMethodValueToEnum(): AstNode {
-    const methodValue = this.nodeData.inputs
-      .find((input) => input.id === this.nodeData.data.methodInputId)
-      ?.value.rules.find(
-        (value) => value.type === "CONSTANT_VALUE"
-      ) as ConstantValuePointer;
-
-    if (!methodValue) {
-      throw new NodeAttributeGenerationError(
-        `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`
-      );
-    }
-
+  private convertMethodValueToEnum(methodValue: ConstantValuePointer): AstNode {
     const methodEnum = methodValue.data.value as string;
 
     return python.reference({

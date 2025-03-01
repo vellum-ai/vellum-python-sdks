@@ -94,6 +94,15 @@ class APINode(BaseAPINode):
 "
 `;
 
+exports[`ApiNode > basic api node > should only generate url field 1`] = `
+"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "fasdfadsf"
+"
+`;
+
 exports[`ApiNode > basic auth secret node > secret ids should show names 1`] = `
 "from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
