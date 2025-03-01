@@ -553,12 +553,12 @@ export class Workflow {
         Array.from(usedEdges).flatMap((e) => [e.sourceNodeId, e.targetNodeId])
       );
 
-      const allNodeIds = this.getNodeIds();
+      const nodeIds = this.getNodeIds();
       edges.forEach((edge) => {
         if (!usedEdges.has(edge)) {
           if (
-            allNodeIds.has(edge.sourceNodeId) &&
-            allNodeIds.has(edge.targetNodeId)
+            nodeIds.has(edge.sourceNodeId) &&
+            nodeIds.has(edge.targetNodeId)
           ) {
             this.unusedEdges.add(edge);
           }
