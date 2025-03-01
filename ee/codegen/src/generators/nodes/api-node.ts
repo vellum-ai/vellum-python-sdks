@@ -45,19 +45,32 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
 
-    // if method is get, then we don't need to pass body
-    if (methodValue.data.value !== "GET") {
-      statements.push(
+    const isGetMethod = methodValue.data.value === "GET";
+    const body = this.nodeInputsByKey.get("body");
+    const hasBody = !!body;
+    const additionalHeaders = this.nodeData.data.additionalHeaders;
+    const hasHeaders = !!additionalHeaders && additionalHeaders.length > 0;
+    const hasApiKeyHeader = !!this.nodeData.data.apiKeyHeaderKeyInputId;
+
+    // If all four conditions are met (GET, no body, no headers, no API key)
+    // return with just the URL field
+    if (isGetMethod && !hasBody && !hasHeaders && !hasApiKeyHeader) {
+      return [
         python.field({
-          name: "method",
-          initializer: this.convertMethodValueToEnum(methodValue),
-        })
-      );
+          name: "url",
+          initializer: urlInput,
+        }),
+      ];
     }
 
-    const body = this.nodeInputsByKey.get("body");
+    statements.push(
+      python.field({
+        name: "method",
+        initializer: this.convertMethodValueToEnum(methodValue),
+      })
+    );
 
-    if (body) {
+    if (hasBody) {
       statements.push(
         python.field({
           name: "json",
@@ -66,12 +79,12 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
 
-    if (this.nodeData.data.additionalHeaders) {
+    if (hasHeaders) {
       statements.push(
         python.field({
           name: "headers",
           initializer: python.TypeInstantiation.dict(
-            this.nodeData.data.additionalHeaders.map((header) => {
+            additionalHeaders.map((header) => {
               const keyInput = this.nodeData.inputs.find(
                 (input) => input.id === header.headerKeyInputId
               );
@@ -106,7 +119,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
 
-    if (this.nodeData.data.apiKeyHeaderKeyInputId) {
+    if (hasApiKeyHeader) {
       const keyInput = this.nodeData.inputs.find(
         (input) => input.id === this.nodeData.data.apiKeyHeaderKeyInputId
       );

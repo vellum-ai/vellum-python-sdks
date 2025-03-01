@@ -94,6 +94,75 @@ class APINode(BaseAPINode):
 "
 `;
 
+exports[`ApiNode > basic api node > should generate API key header fields when API key is provided 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://api.example.com/data"
+    method = APIRequestMethod.GET
+    api_key_header_key = "X-API-KEY"
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "my-api-key"
+"
+`;
+
+exports[`ApiNode > basic api node > should generate all fields when all conditions are provided 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://api.example.com/data"
+    method = APIRequestMethod.POST
+    json = {}
+    headers = {
+        "Content-Type": "application/json",
+    }
+    api_key_header_key = "X-API-KEY"
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "my-api-key"
+"
+`;
+
+exports[`ApiNode > basic api node > should generate body field when body is provided 1`] = `
+"from vellum.workflows.constants import APIRequestMethod
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://api.example.com/data"
+    method = APIRequestMethod.GET
+    json = {}
+"
+`;
+
+exports[`ApiNode > basic api node > should generate headers field when headers are provided 1`] = `
+"from vellum.workflows.constants import APIRequestMethod
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://api.example.com/data"
+    method = APIRequestMethod.GET
+    headers = {
+        "Content-Type": "application/json",
+    }
+"
+`;
+
+exports[`ApiNode > basic api node > should generate method field when method is POST 1`] = `
+"from vellum.workflows.constants import APIRequestMethod
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://api.example.com/data"
+    method = APIRequestMethod.POST
+"
+`;
+
 exports[`ApiNode > basic api node > should only generate url field 1`] = `
 "from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
