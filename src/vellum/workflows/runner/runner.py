@@ -328,11 +328,7 @@ class WorkflowRunner(Generic[StateType]):
                         node_definition=node.__class__,
                         error=e.error,
                     ),
-                    parent=WorkflowParentContext(
-                        span_id=span_id,
-                        workflow_definition=self.workflow.__class__,
-                        parent=self._parent_context,
-                    ),
+                    parent=parent_context,
                 )
             )
         except Exception as e:
