@@ -79,7 +79,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
     headers = {
         "foo": "foo-value",
@@ -99,7 +99,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     api_key_header_key = "X-API-KEY"
     authorization_type = AuthorizationType.API_KEY
     api_key_header_value = "my-api-key"
@@ -112,7 +112,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
     json = {
         "foo": "bar",
@@ -131,7 +131,7 @@ exports[`ApiNode > basic api node > should generate headers field when headers a
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     headers = {
         "Content-Type": "application/json",
     }
@@ -144,7 +144,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
 "
 `;
@@ -154,7 +154,7 @@ exports[`ApiNode > basic api node > should not generate body field when body is 
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
 "
 `;
 
@@ -163,7 +163,7 @@ exports[`ApiNode > basic api node > should only generate url field 1`] = `
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
 "
 `;
 
@@ -174,7 +174,7 @@ from vellum.workflows.references import VellumSecretReference
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
     headers = {
         "foo": "foo-value",
@@ -195,7 +195,7 @@ from vellum.workflows.references import VellumSecretReference
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
     headers = {
         "X-Secret-Key": VellumSecretReference("test-secret"),
@@ -289,7 +289,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 @TryNode.wrap()
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
     headers = {
         "foo": "foo-value",
@@ -309,7 +309,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
     headers = {
         "foo": "foo-value",
@@ -327,7 +327,7 @@ from vellum.workflows.references import VellumSecretReference
 
 
 class APINode(BaseAPINode):
-    url = "fasdfadsf"
+    url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
     headers = {
         "foo": "foo-value",

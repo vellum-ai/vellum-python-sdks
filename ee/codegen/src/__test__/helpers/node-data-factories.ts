@@ -1200,7 +1200,7 @@ export function apiNodeFactory({
             type: "CONSTANT_VALUE",
             data: {
               type: "STRING",
-              value: "fasdfadsf",
+              value: "https://example.vellum.ai",
             },
           },
         ],

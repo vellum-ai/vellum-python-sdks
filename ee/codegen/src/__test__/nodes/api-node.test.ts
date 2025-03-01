@@ -136,7 +136,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "fasdfadsf",
+                  value: "https://example.vellum.ai",
                 },
               },
             ],
@@ -212,7 +212,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "fasdfadsf",
+                  value: "https://example.vellum.ai",
                 },
               },
             ],
@@ -288,7 +288,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "fasdfadsf",
+                  value: "https://example.vellum.ai",
                 },
               },
             ],
@@ -376,7 +376,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "fasdfadsf",
+                  value: "https://example.vellum.ai",
                 },
               },
             ],
@@ -497,7 +497,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "fasdfadsf",
+                  value: "https://example.vellum.ai",
                 },
               },
             ],
@@ -633,7 +633,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "fasdfadsf",
+                  value: "https://example.vellum.ai",
                 },
               },
             ],
