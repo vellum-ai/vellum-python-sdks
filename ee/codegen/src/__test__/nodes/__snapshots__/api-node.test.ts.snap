@@ -100,7 +100,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "https://api.example.com/data"
+    url = "fasdfadsf"
     method = APIRequestMethod.GET
     api_key_header_key = "X-API-KEY"
     authorization_type = AuthorizationType.API_KEY
@@ -114,7 +114,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "https://api.example.com/data"
+    url = "fasdfadsf"
     method = APIRequestMethod.POST
     json = {}
     headers = {
@@ -132,7 +132,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "https://api.example.com/data"
+    url = "fasdfadsf"
     method = APIRequestMethod.GET
     json = {}
 "
@@ -144,7 +144,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "https://api.example.com/data"
+    url = "fasdfadsf"
     method = APIRequestMethod.GET
     headers = {
         "Content-Type": "application/json",
@@ -158,7 +158,7 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "https://api.example.com/data"
+    url = "fasdfadsf"
     method = APIRequestMethod.POST
 "
 `;

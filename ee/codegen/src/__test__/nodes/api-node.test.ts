@@ -212,7 +212,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "https://api.example.com/data",
+                  value: "fasdfadsf",
                 },
               },
             ],
@@ -288,7 +288,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "https://api.example.com/data",
+                  value: "fasdfadsf",
                 },
               },
             ],
@@ -376,7 +376,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "https://api.example.com/data",
+                  value: "fasdfadsf",
                 },
               },
             ],
@@ -497,7 +497,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "https://api.example.com/data",
+                  value: "fasdfadsf",
                 },
               },
             ],
@@ -633,7 +633,7 @@ describe("ApiNode", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "https://api.example.com/data",
+                  value: "fasdfadsf",
                 },
               },
             ],
