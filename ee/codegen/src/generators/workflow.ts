@@ -521,8 +521,11 @@ export class Workflow {
   }
 
   private addGraph(workflowClass: python.Class): void {
-    if (this.getEdges().length === 0) {
-      this.getNodes().forEach((node) => {
+    const nodes = this.getNodes();
+    const edges = this.getEdges();
+
+    if (edges.length === 0) {
+      nodes.forEach((node) => {
         if (node.type === "ENTRYPOINT") {
           return;
         }
@@ -550,9 +553,8 @@ export class Workflow {
         Array.from(usedEdges).flatMap((e) => [e.sourceNodeId, e.targetNodeId])
       );
 
-      const allEdges = this.getEdges();
       const allNodeIds = this.getNodeIds();
-      allEdges.forEach((edge) => {
+      edges.forEach((edge) => {
         if (!usedEdges.has(edge)) {
           if (
             allNodeIds.has(edge.sourceNodeId) &&
@@ -563,7 +565,7 @@ export class Workflow {
         }
       });
 
-      this.getNodes().forEach((node) => {
+      nodes.forEach((node) => {
         if (!usedNodeIds.has(node.id) && node.type !== "ENTRYPOINT") {
           this.unusedNodes.add(node);
         }
