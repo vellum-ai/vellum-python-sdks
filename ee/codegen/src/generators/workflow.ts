@@ -520,6 +520,50 @@ export class Workflow {
     return new Set(this.getNodes().map((node) => node.id));
   }
 
+  private markUnusedNodesAndEdges(graph: GraphAttribute): void {
+    const usedEdges = graph.getUsedEdges();
+    const usedNodeIds = new Set<string>(
+      Array.from(usedEdges).flatMap((e) => [e.sourceNodeId, e.targetNodeId])
+    );
+
+    const nodeIds = this.getNodeIds();
+
+    // Mark unused edges
+    this.getEdges().forEach((edge) => {
+      if (!usedEdges.has(edge)) {
+        if (nodeIds.has(edge.sourceNodeId) && nodeIds.has(edge.targetNodeId)) {
+          this.unusedEdges.add(edge);
+        }
+      }
+    });
+
+    // Mark unused nodes
+    this.getNodes().forEach((node) => {
+      if (!usedNodeIds.has(node.id) && node.type !== "ENTRYPOINT") {
+        this.unusedNodes.add(node);
+      }
+    });
+  }
+
+  private addRemainingUnusedNodes(
+    remainingUnusedNodes: Set<WorkflowNode>,
+    unusedGraphs: (GraphAttribute | python.Reference)[]
+  ): void {
+    remainingUnusedNodes.forEach((node) => {
+      const nodeContext = this.workflowContext.findNodeContext(node.id);
+      if (!nodeContext) {
+        return;
+      }
+
+      unusedGraphs.push(
+        python.reference({
+          name: nodeContext.nodeClassName,
+          modulePath: nodeContext.nodeModulePath,
+        })
+      );
+    });
+  }
+
   private addGraph(workflowClass: python.Class): void {
     const nodes = this.getNodes();
     const edges = this.getEdges();
@@ -547,29 +591,7 @@ export class Workflow {
 
       workflowClass.add(graphField);
 
-      // update the graph with the unused edges
-      const usedEdges = graph.getUsedEdges();
-      const usedNodeIds = new Set<string>(
-        Array.from(usedEdges).flatMap((e) => [e.sourceNodeId, e.targetNodeId])
-      );
-
-      const nodeIds = this.getNodeIds();
-      edges.forEach((edge) => {
-        if (!usedEdges.has(edge)) {
-          if (
-            nodeIds.has(edge.sourceNodeId) &&
-            nodeIds.has(edge.targetNodeId)
-          ) {
-            this.unusedEdges.add(edge);
-          }
-        }
-      });
-
-      nodes.forEach((node) => {
-        if (!usedNodeIds.has(node.id) && node.type !== "ENTRYPOINT") {
-          this.unusedNodes.add(node);
-        }
-      });
+      this.markUnusedNodesAndEdges(graph);
     } catch (error) {
       if (error instanceof BaseCodegenError) {
         this.workflowContext.addError(error);
@@ -592,7 +614,7 @@ export class Workflow {
       return;
     }
 
-    // set of unused graphs
+    // Create a graph for each set of unused edges
     const unusedGraphs: (GraphAttribute | python.Reference)[] = [];
     while (remainingUnusedEdges.size > 0) {
       const unusedGraph = new GraphAttribute({
@@ -616,19 +638,7 @@ export class Workflow {
       unusedGraphs.push(unusedGraph);
     }
 
-    remainingUnusedNodes.forEach((node) => {
-      const nodeContext = this.workflowContext.findNodeContext(node.id);
-      if (!nodeContext) {
-        return;
-      }
-
-      unusedGraphs.push(
-        python.reference({
-          name: nodeContext.nodeClassName,
-          modulePath: nodeContext.nodeModulePath,
-        })
-      );
-    });
+    this.addRemainingUnusedNodes(remainingUnusedNodes, unusedGraphs);
 
     const unusedGraphsField = python.field({
       name: "unused_graphs",
