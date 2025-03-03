@@ -118,6 +118,18 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`ConditionalNode with empty rules array > should not throw error due to empty reduce without initial value 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        branch_1 = Port.on_if(None)
+        branch_2 = Port.on_else()
+"
+`;
+
 exports[`ConditionalNode with invalid uuid for field and value node input ids > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

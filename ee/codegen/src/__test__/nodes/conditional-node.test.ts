@@ -502,3 +502,55 @@ describe("Conditional Node warning cases", () => {
     expect(errors[1]?.severity).toBe("WARNING");
   });
 });
+describe("ConditionalNode with empty rules array", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    // Creating a node where conditionData.rules is an empty array []
+    const nodeData = conditionalNodeFactory({
+      conditions: [
+        {
+          id: "empty-condition",
+          type: "IF",
+          sourceHandleId: "some-handle-id",
+          data: {
+            id: "empty-condition-data",
+            rules: [], // EMPTY RULES ARRAY
+            combinator: "AND",
+          },
+        },
+      ],
+    });
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "d2287fee-98fb-421c-9464-e54d8f70f046",
+          key: "field",
+          type: "STRING",
+        },
+        workflowContext,
+      })
+    );
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("should not throw error due to empty reduce without initial value", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});

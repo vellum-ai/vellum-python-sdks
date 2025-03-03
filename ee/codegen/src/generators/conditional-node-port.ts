@@ -120,9 +120,9 @@ export class ConditionalNodePort extends AstNode {
             });
           };
 
-    return otherConditions.reduce((prev, curr) => {
-      return combine(prev, curr);
-    });
+    return otherConditions.length > 0
+      ? otherConditions.reduce((prev, curr) => combine(prev, curr))
+      : python.TypeInstantiation.none();
   }
 
   private convertConditionTypeToPortAttribute(conditionType: string): string {

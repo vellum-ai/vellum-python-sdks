@@ -857,6 +857,7 @@ export function conditionalNodeFactory({
   inputReferenceId,
   inputReferenceNodeId,
   includeElif = false,
+  conditions = null,
 }: {
   id?: string;
   label?: string;
@@ -866,26 +867,33 @@ export function conditionalNodeFactory({
   inputReferenceId?: string;
   inputReferenceNodeId?: string;
   includeElif?: boolean;
+  conditions?: ConditionalNodeConditionData[] | null;
 } = {}): ConditionalNode {
-  const conditions: ConditionalNodeConditionData[] = [];
-  conditions.push({
-    id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
-    type: "IF",
-    sourceHandleId: ifSourceHandleId ?? "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
-    data: {
-      id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
-      rules: [
-        {
-          id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
-          rules: [],
-          fieldNodeInputId: "2cb6582e-c329-4952-8598-097830b766c7",
-          operator: "=",
-          valueNodeInputId: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+  // Some test may want to pass in conditions directly
+  if (!conditions) {
+    conditions = [
+      {
+        id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+        type: "IF",
+        sourceHandleId:
+          ifSourceHandleId ?? "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+        data: {
+          id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+          rules: [
+            {
+              id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
+              rules: [],
+              fieldNodeInputId: "2cb6582e-c329-4952-8598-097830b766c7",
+              operator: "=",
+              valueNodeInputId: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+            },
+          ],
+          combinator: "AND",
         },
-      ],
-      combinator: "AND",
-    },
-  });
+      },
+    ];
+  }
+
   if (includeElif) {
     conditions.push({
       id: "e63c3933-ef86-451f-88bc-d7ea7dce4310",
