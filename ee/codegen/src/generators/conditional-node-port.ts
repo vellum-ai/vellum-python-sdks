@@ -5,11 +5,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
-import {
-  NodeAttributeGenerationError,
-  NodePortGenerationError,
-  ValueGenerationError,
-} from "./errors";
+import { NodePortGenerationError, ValueGenerationError } from "./errors";
 
 import * as codegen from "src/codegen";
 import { PortContext } from "src/context/port-context";
@@ -144,9 +140,13 @@ export class ConditionalNodePort extends AstNode {
 
     const lhsKey = this.inputFieldKeysByRuleId.get(ruleId);
     if (isNil(lhsKey)) {
-      throw new NodeAttributeGenerationError(
-        `Could not find input field key given ruleId: ${ruleId} on rule index: ${ruleIdx} on condition index: ${this.conditionalNodeDataIndex} for node: ${this.nodeLabel}`
+      this.portContext.workflowContext.addError(
+        new NodePortGenerationError(
+          `Node ${this.nodeLabel} is missing required left-hand side input field for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`,
+          "WARNING"
+        )
       );
+      return python.TypeInstantiation.none();
     }
     const lhs = this.nodeInputsByKey.get(lhsKey);
     if (isNil(lhs)) {

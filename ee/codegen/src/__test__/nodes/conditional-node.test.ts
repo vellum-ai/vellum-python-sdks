@@ -1,6 +1,6 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuid4 } from "uuid";
-import { beforeEach } from "vitest";
+import { beforeEach, describe, it, expect } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
@@ -280,7 +280,7 @@ describe("ConditionalNode with incorrect rule id references", () => {
     } catch (error: unknown) {
       if (error instanceof Error) {
         expect(error.message).toBe(
-          "Could not find input field key given ruleId: ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc on rule index: 0 on condition index: 0 for node: Conditional Node"
+          "Node Conditional Node is missing required left-hand side input field for rule: 0 in condition: 0"
         );
       } else {
         throw new Error("Unexpected error type");
@@ -500,6 +500,33 @@ describe("Conditional Node warning cases", () => {
     );
     expect(errors[0]?.severity).toBe("WARNING");
     expect(errors[1]?.severity).toBe("WARNING");
+  });
+  it("should log warning when lhs key is missing", async () => {
+    const workflowContext = workflowContextFactory({ strict: false });
+
+    const nodeData = conditionalNodeFactory();
+    // Remove the input field key
+    nodeData.inputs = [];
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    const node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+    const errors = workflowContext.getErrors();
+    expect(errors.length).toBe(1);
+    expect(errors[0]?.message).toBe(
+      "Node Conditional Node is missing required left-hand side input field for rule: 0 in condition: 0"
+    );
+    expect(errors[0]?.severity).toBe("WARNING");
   });
 });
 describe("ConditionalNode with empty rules array", () => {

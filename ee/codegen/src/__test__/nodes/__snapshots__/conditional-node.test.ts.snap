@@ -12,6 +12,18 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`Conditional Node warning cases > should log warning when lhs key is missing 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        branch_1 = Port.on_if(None)
+        branch_2 = Port.on_else()
+"
+`;
+
 exports[`Conditional Node with numeric operator casts rhs to NUMBER > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
