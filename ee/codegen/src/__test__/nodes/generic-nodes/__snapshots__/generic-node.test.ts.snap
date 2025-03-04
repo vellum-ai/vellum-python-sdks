@@ -50,14 +50,16 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
 
 exports[`GenericNode > basic with adornments > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
-from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.core.map_node.node import MapNode
+from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 
 from ..inputs import Inputs
 
 
 @TryNode.wrap(max_attempts=3)
 @MapNode.wrap(items=[1, 2])
+@RetryNode.wrap(max_attempts=3)
 class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.count

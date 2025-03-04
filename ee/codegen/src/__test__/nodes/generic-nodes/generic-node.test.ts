@@ -170,7 +170,14 @@ describe("GenericNode", () => {
           label: "TryNodeLabel",
           base: {
             name: "TryNode",
-            module: ["vellum", "workflows", "nodes", "core"],
+            module: [
+              "vellum",
+              "workflows",
+              "nodes",
+              "core",
+              "try_node",
+              "node",
+            ],
           },
           attributes: [
             {
@@ -218,6 +225,34 @@ describe("GenericNode", () => {
                       value: 2,
                     },
                   ],
+                },
+              },
+            },
+          ],
+        },
+        {
+          id: "adornment-3",
+          label: "RetryNodeLabel",
+          base: {
+            name: "RetryNode",
+            module: [
+              "vellum",
+              "workflows",
+              "nodes",
+              "core",
+              "retry_node",
+              "node",
+            ],
+          },
+          attributes: [
+            {
+              id: "attr-1",
+              name: "max_attempts",
+              value: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 3,
                 },
               },
             },
