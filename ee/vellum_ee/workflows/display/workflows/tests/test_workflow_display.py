@@ -1,6 +1,7 @@
 import pytest
 
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
@@ -92,3 +93,29 @@ def test_serialize_workflow__node_display_class_not_registered():
 
     # THEN it should should succeed
     assert data is not None
+
+
+def test_get_event_display_context__node_display_to_include_subworkflow_display():
+    # GIVEN a simple workflow
+    class InnerNode(BaseNode):
+        pass
+
+    class Subworkflow(BaseWorkflow):
+        graph = InnerNode
+
+    # AND a workflow that includes the subworkflow
+    class SubworkflowNode(InlineSubworkflowNode):
+        subworkflow = Subworkflow
+
+    class MyWorkflow(BaseWorkflow):
+        graph = SubworkflowNode
+
+    # WHEN we gather the event display context
+    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+
+    # THEN the subworkflow display should be included
+    assert str(SubworkflowNode.__id__) in display_context.node_displays
+    node_event_display = display_context.node_displays[str(SubworkflowNode.__id__)]
+
+    assert node_event_display.subworkflow_display is not None
+    assert str(InnerNode.__id__) in node_event_display.subworkflow_display.node_displays

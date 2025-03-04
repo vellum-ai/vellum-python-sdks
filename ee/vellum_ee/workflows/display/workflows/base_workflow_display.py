@@ -9,7 +9,7 @@ from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, Un
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
-from vellum.workflows.events.workflow import NodeDisplay, WorkflowEventDisplayContext
+from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.utils import get_wrapped_node
@@ -34,7 +34,9 @@ from vellum_ee.workflows.display.base import (
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
+from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
 
@@ -383,9 +385,14 @@ class BaseWorkflowDisplay(
         except ModuleNotFoundError:
             return None
 
-        display_context = display_class.WorkflowDisplay(workflow_class).display_context
-        if not isinstance(display_context, WorkflowDisplayContext):
+        workflow_display = display_class.WorkflowDisplay(workflow_class)
+        if not isinstance(workflow_display, BaseWorkflowDisplay):
             return None
+
+        return workflow_display.get_event_display_context()
+
+    def get_event_display_context(self):
+        display_context = self.display_context
 
         workflow_outputs = {
             output.name: display_context.workflow_output_displays[output].id
@@ -398,27 +405,44 @@ class BaseWorkflowDisplay(
         node_displays = {
             str(node.__id__): display_context.node_displays[node] for node in display_context.node_displays
         }
-        temp_node_displays = {}
-        for node in node_displays:
-            current_node = node_displays[node]
+        node_event_displays = {}
+        for node_id in node_displays:
+            current_node_display = node_displays[node_id]
             input_display = {}
-            if isinstance(current_node, BaseNodeVellumDisplay):
-                input_display = current_node.node_input_ids_by_name
+            if isinstance(current_node_display, BaseNodeVellumDisplay):
+                input_display = current_node_display.node_input_ids_by_name
             node_display_meta = {
-                output.name: current_node.output_display[output].id for output in current_node.output_display
+                output.name: current_node_display.output_display[output].id
+                for output in current_node_display.output_display
             }
-            port_display_meta = {port.name: current_node.port_displays[port].id for port in current_node.port_displays}
+            port_display_meta = {
+                port.name: current_node_display.port_displays[port].id for port in current_node_display.port_displays
+            }
+            node = current_node_display._node
+            subworkflow_display_context: Optional[WorkflowEventDisplayContext] = None
+            if hasattr(node, "subworkflow"):
+                # All nodes that have a subworkflow attribute are currently expected to call them `subworkflow`
+                # This will change if in the future we decide to support multiple subworkflows on a single node
+                subworkflow_attribute = raise_if_descriptor(getattr(node, "subworkflow"))
+                if issubclass(subworkflow_attribute, BaseWorkflow):
+                    subworkflow_display = get_workflow_display(
+                        base_display_class=display_context.workflow_display_class,
+                        workflow_class=subworkflow_attribute,
+                        parent_display_context=display_context,
+                    )
+                    subworkflow_display_context = subworkflow_display.get_event_display_context()
 
-            temp_node_displays[node] = NodeDisplay(
+            node_event_displays[node_id] = NodeEventDisplayContext(
                 input_display=input_display,
                 output_display=node_display_meta,
                 port_display=port_display_meta,
+                subworkflow_display=subworkflow_display_context,
             )
 
         display_meta = WorkflowEventDisplayContext(
             workflow_outputs=workflow_outputs,
             workflow_inputs=workflow_inputs,
-            node_displays=temp_node_displays,
+            node_displays=node_event_displays,
         )
         return display_meta
 

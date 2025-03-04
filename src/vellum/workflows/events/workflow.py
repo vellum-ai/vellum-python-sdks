@@ -39,14 +39,15 @@ class _BaseWorkflowEvent(BaseEvent):
         return self.body.workflow_definition
 
 
-class NodeDisplay(UniversalBaseModel):
+class NodeEventDisplayContext(UniversalBaseModel):
     input_display: Dict[str, UUID]
     output_display: Dict[str, UUID]
     port_display: Dict[str, UUID]
+    subworkflow_display: Optional["WorkflowEventDisplayContext"] = None
 
 
 class WorkflowEventDisplayContext(UniversalBaseModel):
-    node_displays: Dict[str, NodeDisplay]
+    node_displays: Dict[str, NodeEventDisplayContext]
     workflow_inputs: Dict[str, UUID]
     workflow_outputs: Dict[str, UUID]
 
