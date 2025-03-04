@@ -56,7 +56,7 @@ from vellum.workflows.nodes.core.map_node.node import MapNode
 from ..inputs import Inputs
 
 
-@TryNode.wrap(max_attempts=3)
+@TryNode.wrap(on_error_code="USER_DEFINED_ERROR")
 @MapNode.wrap(items=[1, 2])
 class MyCustomNode(BaseNode):
     default_attribute = "default-value"

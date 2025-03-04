@@ -175,12 +175,12 @@ describe("GenericNode", () => {
           attributes: [
             {
               id: "attr-1",
-              name: "max_attempts",
+              name: "on_error_code",
               value: {
                 type: "CONSTANT_VALUE",
                 value: {
-                  type: "NUMBER",
-                  value: 3,
+                  type: "STRING",
+                  value: "USER_DEFINED_ERROR",
                 },
               },
             },
