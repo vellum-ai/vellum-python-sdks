@@ -24,9 +24,11 @@ def image_push_command(image: str, tags: Optional[List[str]] = None) -> None:
     # listing all of the architectures of the image instead of just the one that matches the machine. We can fall back
     # to using normal inspect which returns the machine image for this case though. And in the future we could figure
     # out how to call the docker host directly to do this.
+    logger.info("Validating Image...")
     docker_client = docker.from_env()
     check_architecture(docker_client, image, logger)
 
+    logger.info("Authenticating...")
     auth = vellum_client.container_images.docker_service_token()
 
     docker_client.login(
@@ -95,12 +97,12 @@ def check_architecture(docker_client: DockerClient, image: str, logger: logging.
         manifest = json.loads(result.stdout)
         architectures = [manifest_item["platform"]["architecture"] for manifest_item in manifest["manifests"]]
     except Exception:
-        logger.warning("Error parsing manifest response")
+        logger.debug("Error parsing manifest response")
         manifest_parse_failed = True
 
     # Fall back to inspect image if we errored out using docker command line
     if result.returncode != 0 or manifest_parse_failed:
-        logger.warning(f"Error inspecting manifest: {result.stderr.decode('utf-8').strip()}")
+        logger.debug(f"Error inspecting manifest: {result.stderr.decode('utf-8').strip()}")
         image_details = docker_client.api.inspect_image(image)
 
         if image_details["Architecture"] != _SUPPORTED_ARCHITECTURE:
