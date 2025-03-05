@@ -1249,4 +1249,281 @@ baz = foo + bar
       expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
     });
   });
+  describe("retry node adornment", () => {
+    it("should correctly generate code for a prompt node with retry adornment", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "6790c12c-a93e-4899-a63c-530d002c4c6f",
+              type: "DEFAULT",
+              source_node_id: "9bfb7aaf-d1b7-4fc1-9349-08f0dcc4c918",
+              target_node_id: "82d5c288-aab8-4d27-bceb-4ba7bc688c34",
+              source_handle_id: "b275fc98-4945-4e6d-bdb8-d9e9f4ca7444",
+              target_handle_id: "0f3f518a-ce24-4355-8568-94e1bf295725",
+            },
+            {
+              id: "39804f2f-ad65-471d-8d22-f37621164904",
+              type: "DEFAULT",
+              source_node_id: "82d5c288-aab8-4d27-bceb-4ba7bc688c34",
+              target_node_id: "e0dfea1e-391d-4dee-9d71-28b391106726",
+              source_handle_id: "c678ddd0-f646-4bd3-9557-9ad63f6d8f3c",
+              target_handle_id: "fd2ee2c7-e9d8-42f4-9bc6-d22fe22a3044",
+            },
+          ],
+          nodes: [
+            {
+              id: "9bfb7aaf-d1b7-4fc1-9349-08f0dcc4c918",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "b275fc98-4945-4e6d-bdb8-d9e9f4ca7444",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+              definition: null,
+              display_data: {
+                width: 124.0,
+                height: 48.0,
+                comment: null,
+                position: { x: 1545.0, y: 330.0 },
+              },
+            },
+            {
+              id: "82d5c288-aab8-4d27-bceb-4ba7bc688c34",
+              base: null,
+              data: {
+                label: "Prompt",
+                variant: "INLINE",
+                output_id: "e054f21d-33e1-4c76-8b1d-b22c393f6c7d",
+                exec_config: {
+                  settings: null,
+                  parameters: {
+                    stop: null,
+                    top_k: 0,
+                    top_p: 1.0,
+                    logit_bias: {},
+                    max_tokens: 1000,
+                    temperature: 0.0,
+                    presence_penalty: 0.0,
+                    custom_parameters: null,
+                    frequency_penalty: 0.0,
+                  },
+                  input_variables: [
+                    {
+                      id: "043a9f22-17c2-4d51-b106-753842a0c0b9",
+                      key: "text",
+                      type: "STRING",
+                      default: null,
+                      required: null,
+                      extensions: null,
+                    },
+                  ],
+                  prompt_template_block_data: {
+                    blocks: [
+                      {
+                        id: "96af896b-f415-4ae4-aa80-cead3a7d068b",
+                        state: "ENABLED",
+                        block_type: "CHAT_MESSAGE",
+                        properties: {
+                          blocks: [
+                            {
+                              id: "02870e84-9ba5-4862-a68d-14b9f86d4100",
+                              state: "ENABLED",
+                              blocks: [
+                                {
+                                  id: "cab5064b-f52b-4398-8c95-155e70b37aac",
+                                  text: "Summarize the following text: hello today is feb 7 bad weather\n\n",
+                                  state: "ENABLED",
+                                  block_type: "PLAIN_TEXT",
+                                  cache_config: null,
+                                },
+                                {
+                                  id: "df088249-3ba0-47df-997e-e6f1f4e25feb",
+                                  state: "ENABLED",
+                                  block_type: "VARIABLE",
+                                  cache_config: null,
+                                  input_variable_id:
+                                    "043a9f22-17c2-4d51-b106-753842a0c0b9",
+                                },
+                              ],
+                              block_type: "RICH_TEXT",
+                              cache_config: null,
+                            },
+                          ],
+                          chat_role: "SYSTEM",
+                          chat_source: null,
+                          chat_message_unterminated: false,
+                        },
+                        cache_config: null,
+                      },
+                    ],
+                    version: 1,
+                  },
+                },
+                ml_model_name: "gpt-4o-mini",
+                array_output_id: "191a66c6-3e38-45e0-b5dd-5e644fdec8b0",
+                error_output_id: null,
+                source_handle_id: "c678ddd0-f646-4bd3-9557-9ad63f6d8f3c",
+                target_handle_id: "0f3f518a-ce24-4355-8568-94e1bf295725",
+              },
+              type: "PROMPT",
+              ports: [
+                {
+                  id: "c678ddd0-f646-4bd3-9557-9ad63f6d8f3c",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              inputs: [
+                {
+                  id: "043a9f22-17c2-4d51-b106-753842a0c0b9",
+                  key: "text",
+                  value: {
+                    rules: [
+                      {
+                        data: {
+                          input_variable_id:
+                            "991a53e2-9e1b-4d53-b214-f62bd7084f8b",
+                        },
+                        type: "INPUT_VARIABLE",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              trigger: {
+                id: "0f3f518a-ce24-4355-8568-94e1bf295725",
+                merge_behavior: "AWAIT_ANY",
+              },
+              adornments: [
+                {
+                  id: "65483f3d-59a3-4a8d-a8ab-70e6797cc474",
+                  base: {
+                    name: "RetryNode",
+                    module: [
+                      "vellum",
+                      "workflows",
+                      "nodes",
+                      "core",
+                      "retry_node",
+                      "node",
+                    ],
+                  },
+                  label: "Retry",
+                  attributes: [
+                    {
+                      id: "25dec39b-be88-4ac5-a9ed-d9a9dd85774d",
+                      name: "retry_on_error_code",
+                      value: null,
+                    },
+                    {
+                      id: "0e56a6b8-fb8d-4d38-8a24-4b3f34b34d8a",
+                      name: "max_attempts",
+                      value: {
+                        type: "CONSTANT_VALUE",
+                        value: { type: "NUMBER", value: 5.0 },
+                      },
+                    },
+                  ],
+                },
+              ],
+              definition: {
+                name: "Prompt",
+                module: ["testing", "nodes", "prompt"],
+              },
+              display_data: {
+                width: 480.0,
+                height: 175.0,
+                comment: null,
+                position: { x: 1971.8034185919948, y: 205.60253395092258 },
+              },
+            },
+            {
+              id: "e0dfea1e-391d-4dee-9d71-28b391106726",
+              base: null,
+              data: {
+                name: "final-output",
+                label: "Final Output",
+                output_id: "162179ab-a85e-42d2-968e-79b5eb4ad683",
+                output_type: "STRING",
+                node_input_id: "cbc53e73-4246-4c28-805b-8a974fc8be48",
+                target_handle_id: "fd2ee2c7-e9d8-42f4-9bc6-d22fe22a3044",
+              },
+              type: "TERMINAL",
+              inputs: [
+                {
+                  id: "cbc53e73-4246-4c28-805b-8a974fc8be48",
+                  key: "node_input",
+                  value: {
+                    rules: [
+                      {
+                        data: {
+                          node_id: "82d5c288-aab8-4d27-bceb-4ba7bc688c34",
+                          output_id: "e054f21d-33e1-4c76-8b1d-b22c393f6c7d",
+                        },
+                        type: "NODE_OUTPUT",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              trigger: {
+                id: "fd2ee2c7-e9d8-42f4-9bc6-d22fe22a3044",
+                merge_behavior: "AWAIT_ANY",
+              },
+              definition: {
+                name: "FinalOutput",
+                module: ["testing", "nodes", "final_output"],
+              },
+              display_data: {
+                width: 449.0,
+                height: 239.0,
+                comment: null,
+                position: { x: 2750.0, y: 210.0 },
+              },
+            },
+          ],
+          definition: { name: "Workflow", module: ["testing", "workflow"] },
+          display_data: {
+            viewport: {
+              x: -1120.3947455205011,
+              y: 146.5414971968781,
+              zoom: 0.7661866549411893,
+            },
+          },
+          output_values: [
+            {
+              value: {
+                type: "NODE_OUTPUT",
+                node_id: "e0dfea1e-391d-4dee-9d71-28b391106726",
+                node_output_id: "162179ab-a85e-42d2-968e-79b5eb4ad683",
+              },
+              output_variable_id: "162179ab-a85e-42d2-968e-79b5eb4ad683",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(project, ["nodes", "prompt.py"]);
+      expectProjectFileToExist(project, ["display", "nodes", "prompt.py"]);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "prompt.py"]);
+    });
+  });
 });

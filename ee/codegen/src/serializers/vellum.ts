@@ -644,6 +644,7 @@ export declare namespace BaseDisplayableWorkflowNodeSerializer {
     id: string;
     display_data?: NodeDisplayDataSerializer.Raw | null;
     inputs: NodeInputSerializer.Raw[];
+    adornments?: AdornmentNodeSerializer.Raw[] | null;
   }
 }
 
@@ -945,27 +946,6 @@ export declare namespace PromptNodeDataSerializer {
     | InlinePromptNodeDataSerializer.Raw
     | DeploymentPromptNodeDataSerializer.Raw
     | LegacyPromptNodeDataSerializer.Raw;
-}
-
-export const PromptNodeSerializer: ObjectSchema<
-  PromptNodeSerializer.Raw,
-  Omit<PromptNode, "type">
-> = objectSchema({
-  id: stringSchema(),
-  data: PromptNodeDataSerializer,
-  inputs: listSchema(NodeInputSerializer),
-  displayData: propertySchema(
-    "display_data",
-    NodeDisplayDataSerializer.optional()
-  ),
-  base: CodeResourceDefinitionSerializer.optional(),
-  definition: CodeResourceDefinitionSerializer.optional(),
-});
-
-export declare namespace PromptNodeSerializer {
-  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
-    data: PromptNodeDataSerializer.Raw;
-  }
 }
 
 export const DeploymentMapNodeDataSerializer: ObjectSchema<
@@ -1927,6 +1907,28 @@ export declare namespace AdornmentNodeSerializer {
     label: string;
     base: CodeResourceDefinitionSerializer.Raw;
     attributes: NodeAttributeSerializer.Raw[];
+  }
+}
+
+export const PromptNodeSerializer: ObjectSchema<
+  PromptNodeSerializer.Raw,
+  Omit<PromptNode, "type">
+> = objectSchema({
+  id: stringSchema(),
+  data: PromptNodeDataSerializer,
+  inputs: listSchema(NodeInputSerializer),
+  displayData: propertySchema(
+    "display_data",
+    NodeDisplayDataSerializer.optional()
+  ),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
+});
+
+export declare namespace PromptNodeSerializer {
+  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
+    data: PromptNodeDataSerializer.Raw;
   }
 }
 
