@@ -72,7 +72,7 @@ def image_push_command(image: str, tags: Optional[List[str]] = None) -> None:
             except Exception:
                 continue
 
-    logger.info("Updating Vellum metadata and enforcing the first law of robotics...")
+    logger.info("Updating Vellum metadata and validating image works in our system...")
     image_details = docker_client.api.inspect_image(image)
     sha = image_details["Id"]
 
