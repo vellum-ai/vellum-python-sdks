@@ -746,7 +746,7 @@ Node.js v21.7.3
 
 
 def test_run_node__execute_code__list_extends():
-    # GIVEN a node that will throw a JSON.parse error
+    # GIVEN a node that will return a list with output type Json
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Json]):
         code = """\
 def main(left, right):
@@ -767,3 +767,22 @@ def main(left, right):
 
     # AND the result should be the correct output
     assert outputs == {"result": [1, 2, 3, 4, 5, 6], "log": ""}
+
+
+def test_run_node__execute_code__non_str_print():
+    # GIVEN a node that will print a non-string value
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+def main():
+    print(type(1))
+    return "hello"
+"""
+        code_inputs = {}
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # AND the result should be the correct output
+    assert outputs == {"result": "hello", "log": "<class 'int'>\n"}

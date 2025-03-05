@@ -121,6 +121,11 @@ def run_code_inline(
 ) -> Tuple[str, Any]:
     log_buffer = io.StringIO()
 
+    def _inline_print(*args: Any, **kwargs: Any) -> None:
+        str_args = [str(arg) for arg in args]
+        print_line = f"{' '.join(str_args)}\n"
+        log_buffer.write(print_line)
+
     def wrap_value(value):
         if isinstance(value, list):
             return ListWrapper(
@@ -139,7 +144,7 @@ def run_code_inline(
     exec_globals = {
         "__arg__inputs": {name: wrap_value(value) for name, value in inputs.items()},
         "__arg__out": None,
-        "print": lambda *args, **kwargs: log_buffer.write(f"{' '.join(args)}\n"),
+        "print": _inline_print,
     }
     run_args = [f"{name}=__arg__inputs['{name}']" for name in inputs.keys()]
     execution_code = f"""\
