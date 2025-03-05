@@ -100,7 +100,6 @@ describe("InlinePromptRetryNode", () => {
       let node: InlinePromptNode;
 
       beforeEach(async () => {
-        // Create a prompt node with retry adornment including delay
         const nodeData = inlinePromptNodeAdornmentsFactory({
           blockType: blockType,
           adornments: [
