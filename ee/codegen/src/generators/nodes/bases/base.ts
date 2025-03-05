@@ -13,8 +13,10 @@ import {
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { UuidOrString } from "src/generators/uuid-or-string";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import {
+  AdornmentNode,
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
@@ -255,23 +257,85 @@ export abstract class BaseNode<
     });
   }
 
+  protected getRetryAdornment(): AdornmentNode | undefined {
+    if (this.nodeData.adornments && this.nodeData.adornments.length > 0) {
+      const retryAdornment = this.nodeData.adornments.find(
+        (adornment) => adornment.base && adornment.base.name === "RetryNode"
+      );
+
+      if (retryAdornment && retryAdornment.attributes) {
+        const maxAttemptsAttr = retryAdornment.attributes.find(
+          (attr) => attr.name === "max_attempts"
+        );
+
+        if (
+          !maxAttemptsAttr ||
+          !maxAttemptsAttr.value ||
+          maxAttemptsAttr.value.type !== "CONSTANT_VALUE"
+        ) {
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `The max_attempts attribute for RetryNode must be a number`,
+              "WARNING"
+            )
+          );
+          return undefined;
+        }
+      }
+
+      return retryAdornment;
+    }
+
+    return undefined;
+  }
+
   protected getNodeDecorators(): python.Decorator[] | undefined {
-    return this.errorOutputId
-      ? [
-          python.decorator({
-            callable: python.invokeMethod({
-              methodReference: python.reference({
-                name: "TryNode",
-                attribute: ["wrap"],
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .CORE_NODES_MODULE_PATH,
-              }),
-              arguments_: [],
+    const decorators: python.Decorator[] = [];
+    const errorOutputId = this.getErrorOutputId();
+    const retryAdornment = this.getRetryAdornment();
+
+    if (errorOutputId) {
+      decorators.push(
+        python.decorator({
+          callable: python.invokeMethod({
+            methodReference: python.reference({
+              name: "TryNode",
+              attribute: ["wrap"],
+              modulePath:
+                this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH,
             }),
+            arguments_: [],
           }),
-        ]
-      : undefined;
+        })
+      );
+    }
+
+    if (retryAdornment) {
+      decorators.push(
+        python.decorator({
+          callable: python.invokeMethod({
+            methodReference: python.reference({
+              name: "RetryNode",
+              attribute: ["wrap"],
+              modulePath: retryAdornment.base.module,
+            }),
+            arguments_: retryAdornment.attributes.map((attr) =>
+              python.methodArgument({
+                name: attr.name,
+                value: new WorkflowValueDescriptor({
+                  workflowValueDescriptor: attr.value,
+                  nodeContext: this.nodeContext,
+                  workflowContext: this.workflowContext,
+                  iterableConfig: { endWithComma: false },
+                }),
+              })
+            ),
+          }),
+        })
+      );
+    }
+
+    return decorators.length > 0 ? decorators : undefined;
   }
 
   public generateNodeClass(): python.Class {
@@ -313,31 +377,64 @@ export abstract class BaseNode<
   public generateNodeDisplayClasses(): python.Class[] {
     const nodeContext = this.nodeContext;
     const errorOutputId = this.getErrorOutputId();
+    const retryAdornment = this.getRetryAdornment();
+
+    const decorators: python.Decorator[] = [];
+
+    if (errorOutputId) {
+      decorators.push(
+        python.decorator({
+          callable: python.invokeMethod({
+            methodReference: python.reference({
+              name: "BaseTryNodeDisplay",
+              attribute: ["wrap"],
+              modulePath:
+                this.workflowContext.sdkModulePathNames
+                  .NODE_DISPLAY_MODULE_PATH,
+            }),
+            arguments_: [
+              new MethodArgument({
+                name: "error_output_id",
+                value: python.TypeInstantiation.uuid(errorOutputId),
+              }),
+            ],
+          }),
+        })
+      );
+    }
+
+    if (retryAdornment) {
+      decorators.push(
+        python.decorator({
+          callable: python.invokeMethod({
+            methodReference: python.reference({
+              name: "BaseRetryNodeDisplay",
+              attribute: ["wrap"],
+              modulePath:
+                this.workflowContext.sdkModulePathNames
+                  .NODE_DISPLAY_MODULE_PATH,
+            }),
+            arguments_: retryAdornment.attributes.map(
+              (attr) =>
+                new MethodArgument({
+                  name: attr.name,
+                  value: new WorkflowValueDescriptor({
+                    workflowValueDescriptor: attr.value,
+                    nodeContext: this.nodeContext,
+                    workflowContext: this.workflowContext,
+                    iterableConfig: { endWithComma: false },
+                  }),
+                })
+            ),
+          }),
+        })
+      );
+    }
 
     const nodeClass = python.class_({
       name: nodeContext.nodeDisplayClassName,
       extends_: [this.getNodeDisplayBaseClass()],
-      decorators: errorOutputId
-        ? [
-            python.decorator({
-              callable: python.invokeMethod({
-                methodReference: python.reference({
-                  name: "BaseTryNodeDisplay",
-                  attribute: ["wrap"],
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .NODE_DISPLAY_MODULE_PATH,
-                }),
-                arguments_: [
-                  new MethodArgument({
-                    name: "error_output_id",
-                    value: python.TypeInstantiation.uuid(errorOutputId),
-                  }),
-                ],
-              }),
-            }),
-          ]
-        : undefined,
+      decorators: decorators.length > 0 ? decorators : undefined,
     });
 
     this.getNodeDisplayClassBodyStatements().forEach((statement) =>

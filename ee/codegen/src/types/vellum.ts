@@ -229,6 +229,7 @@ export interface BaseDisplayableWorkflowNode extends BaseWorkflowNode {
   type: string;
   displayData?: NodeDisplayData;
   base?: CodeResourceDefinition;
+  adornments?: AdornmentNode[];
 }
 
 export interface EntrypointNodeData {
