@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import { inlinePromptNodeAdornmentsFactory } from "src/__test__/helpers/node-data-factories";
+import { inlinePromptNodeDataInlineVariantFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
@@ -42,7 +42,7 @@ describe("InlinePromptRetryNode", () => {
 
     describe("basic", () => {
       beforeEach(async () => {
-        const nodeData = inlinePromptNodeAdornmentsFactory({
+        const nodeData = inlinePromptNodeDataInlineVariantFactory({
           blockType,
           adornments: [
             {
@@ -100,7 +100,7 @@ describe("InlinePromptRetryNode", () => {
       let node: InlinePromptNode;
 
       beforeEach(async () => {
-        const nodeData = inlinePromptNodeAdornmentsFactory({
+        const nodeData = inlinePromptNodeDataInlineVariantFactory({
           blockType: blockType,
           adornments: [
             {
@@ -173,7 +173,7 @@ describe("InlinePromptRetryNode", () => {
 
       beforeEach(async () => {
         // Create a prompt node with both errorOutputId and retry adornment
-        const nodeData = inlinePromptNodeAdornmentsFactory({
+        const nodeData = inlinePromptNodeDataInlineVariantFactory({
           blockType: blockType,
           errorOutputId: ERROR_OUTPUT_ID,
           adornments: [
