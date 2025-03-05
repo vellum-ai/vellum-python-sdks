@@ -1,7 +1,7 @@
 import io
 import os
 import re
-from typing import Any, Tuple, Union, get_args, get_origin
+from typing import Any, ForwardRef, Tuple, Union, get_args, get_origin
 
 from pydantic import BaseModel, ValidationError
 
@@ -79,6 +79,10 @@ def _get_type_name(obj: Any) -> str:
 
 
 def _cast_to_output_type(result: Any, output_type: Any) -> Any:
+    if isinstance(output_type, ForwardRef) or output_type is Any:
+        # Treat ForwardRefs as Any for now
+        return result
+
     is_valid_output_type = isinstance(output_type, type)
     if get_origin(output_type) is Union:
         allowed_types = get_args(output_type)
@@ -154,7 +158,6 @@ __arg__out = main({", ".join(run_args)})
     logs = log_buffer.getvalue()
     result = exec_globals["__arg__out"]
 
-    if output_type != Any:
-        result = _cast_to_output_type(result, output_type)
+    result = _cast_to_output_type(result, output_type)
 
     return logs, result

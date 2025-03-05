@@ -743,3 +743,27 @@ Node.js v21.7.3
 
     # AND the error should contain the execution error details
     assert exc_info.value.message == message
+
+
+def test_run_node__execute_code__list_extends():
+    # GIVEN a node that will throw a JSON.parse error
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Json]):
+        code = """\
+def main(left, right):
+    all = []
+    all.extend(left)
+    all.extend(right)
+    return all
+"""
+        code_inputs = {
+            "left": [1, 2, 3],
+            "right": [4, 5, 6],
+        }
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # AND the result should be the correct output
+    assert outputs == {"result": [1, 2, 3, 4, 5, 6], "log": ""}
