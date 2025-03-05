@@ -269,7 +269,6 @@ export abstract class BaseNode<
   protected getNodeDecorators(): python.Decorator[] | undefined {
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
-    const adornments = this.getAdornments();
 
     if (errorOutputId) {
       decorators.push(
@@ -285,32 +284,34 @@ export abstract class BaseNode<
           }),
         })
       );
-    }
+    } else {
+      const adornments = this.getAdornments();
 
-    for (const adornment of adornments) {
-      if (adornment.base) {
-        decorators.push(
-          python.decorator({
-            callable: python.invokeMethod({
-              methodReference: python.reference({
-                name: adornment.base.name,
-                attribute: ["wrap"],
-                modulePath: adornment.base.module,
+      for (const adornment of adornments) {
+        if (adornment.base) {
+          decorators.push(
+            python.decorator({
+              callable: python.invokeMethod({
+                methodReference: python.reference({
+                  name: adornment.base.name,
+                  attribute: ["wrap"],
+                  modulePath: adornment.base.module,
+                }),
+                arguments_: adornment.attributes.map((attr) =>
+                  python.methodArgument({
+                    name: attr.name,
+                    value: new WorkflowValueDescriptor({
+                      workflowValueDescriptor: attr.value,
+                      nodeContext: this.nodeContext,
+                      workflowContext: this.workflowContext,
+                      iterableConfig: { endWithComma: false },
+                    }),
+                  })
+                ),
               }),
-              arguments_: adornment.attributes.map((attr) =>
-                python.methodArgument({
-                  name: attr.name,
-                  value: new WorkflowValueDescriptor({
-                    workflowValueDescriptor: attr.value,
-                    nodeContext: this.nodeContext,
-                    workflowContext: this.workflowContext,
-                    iterableConfig: { endWithComma: false },
-                  }),
-                })
-              ),
-            }),
-          })
-        );
+            })
+          );
+        }
       }
     }
 
@@ -355,10 +356,8 @@ export abstract class BaseNode<
 
   public generateNodeDisplayClasses(): python.Class[] {
     const nodeContext = this.nodeContext;
-    const errorOutputId = this.getErrorOutputId();
-    const adornments = this.getAdornments();
-
     const decorators: python.Decorator[] = [];
+    const errorOutputId = this.getErrorOutputId();
 
     if (errorOutputId) {
       decorators.push(
@@ -380,35 +379,37 @@ export abstract class BaseNode<
           }),
         })
       );
-    }
+    } else {
+      const adornments = this.getAdornments();
 
-    for (const adornment of adornments) {
-      if (adornment.base) {
-        decorators.push(
-          python.decorator({
-            callable: python.invokeMethod({
-              methodReference: python.reference({
-                name: `Base${adornment.base.name}Display`,
-                attribute: ["wrap"],
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .NODE_DISPLAY_MODULE_PATH,
+      for (const adornment of adornments) {
+        if (adornment.base) {
+          decorators.push(
+            python.decorator({
+              callable: python.invokeMethod({
+                methodReference: python.reference({
+                  name: `Base${adornment.base.name}Display`,
+                  attribute: ["wrap"],
+                  modulePath:
+                    this.workflowContext.sdkModulePathNames
+                      .NODE_DISPLAY_MODULE_PATH,
+                }),
+                arguments_: adornment.attributes.map(
+                  (attr) =>
+                    new MethodArgument({
+                      name: attr.name,
+                      value: new WorkflowValueDescriptor({
+                        workflowValueDescriptor: attr.value,
+                        nodeContext: this.nodeContext,
+                        workflowContext: this.workflowContext,
+                        iterableConfig: { endWithComma: false },
+                      }),
+                    })
+                ),
               }),
-              arguments_: adornment.attributes.map(
-                (attr) =>
-                  new MethodArgument({
-                    name: attr.name,
-                    value: new WorkflowValueDescriptor({
-                      workflowValueDescriptor: attr.value,
-                      nodeContext: this.nodeContext,
-                      workflowContext: this.workflowContext,
-                      iterableConfig: { endWithComma: false },
-                    }),
-                  })
-              ),
-            }),
-          })
-        );
+            })
+          );
+        }
       }
     }
 
