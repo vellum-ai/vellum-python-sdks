@@ -34,12 +34,19 @@ class MyCustomNode(BaseNode):
 `;
 
 exports[`GenericNode > basic with adornments > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseNodeDisplay, BaseRetryNodeDisplay
+"from vellum_ee.workflows.display.nodes import (
+    BaseMapNodeDisplay,
+    BaseNodeDisplay,
+    BaseRetryNodeDisplay,
+    BaseTryNodeDisplay,
+)
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.my_custom_node import MyCustomNode
 
 
+@BaseTryNodeDisplay.wrap(on_error_code="USER_DEFINED_ERROR")
+@BaseMapNodeDisplay.wrap(items=[1, 2])
 @BaseRetryNodeDisplay.wrap(max_attempts=3)
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
     node_input_ids_by_name = {}

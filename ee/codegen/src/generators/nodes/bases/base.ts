@@ -257,42 +257,19 @@ export abstract class BaseNode<
     });
   }
 
-  protected getRetryAdornment(): AdornmentNode | undefined {
+  protected getAdornments(): AdornmentNode[] {
     if (this.nodeData.adornments && this.nodeData.adornments.length > 0) {
-      const retryAdornment = this.nodeData.adornments.find(
-        (adornment) => adornment.base && adornment.base.name === "RetryNode"
-      );
-
-      if (retryAdornment && retryAdornment.attributes) {
-        const maxAttemptsAttr = retryAdornment.attributes.find(
-          (attr) => attr.name === "max_attempts"
-        );
-
-        if (
-          !maxAttemptsAttr ||
-          !maxAttemptsAttr.value ||
-          maxAttemptsAttr.value.type !== "CONSTANT_VALUE"
-        ) {
-          this.workflowContext.addError(
-            new NodeAttributeGenerationError(
-              `The max_attempts attribute for RetryNode must be a number`,
-              "WARNING"
-            )
-          );
-          return undefined;
-        }
-      }
-
-      return retryAdornment;
+      // TODO: Add validation for adornments
+      return this.nodeData.adornments;
     }
 
-    return undefined;
+    return [];
   }
 
   protected getNodeDecorators(): python.Decorator[] | undefined {
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
-    const retryAdornment = this.getRetryAdornment();
+    const adornments = this.getAdornments();
 
     if (errorOutputId) {
       decorators.push(
@@ -310,29 +287,31 @@ export abstract class BaseNode<
       );
     }
 
-    if (retryAdornment) {
-      decorators.push(
-        python.decorator({
-          callable: python.invokeMethod({
-            methodReference: python.reference({
-              name: "RetryNode",
-              attribute: ["wrap"],
-              modulePath: retryAdornment.base.module,
+    for (const adornment of adornments) {
+      if (adornment.base) {
+        decorators.push(
+          python.decorator({
+            callable: python.invokeMethod({
+              methodReference: python.reference({
+                name: adornment.base.name,
+                attribute: ["wrap"],
+                modulePath: adornment.base.module,
+              }),
+              arguments_: adornment.attributes.map((attr) =>
+                python.methodArgument({
+                  name: attr.name,
+                  value: new WorkflowValueDescriptor({
+                    workflowValueDescriptor: attr.value,
+                    nodeContext: this.nodeContext,
+                    workflowContext: this.workflowContext,
+                    iterableConfig: { endWithComma: false },
+                  }),
+                })
+              ),
             }),
-            arguments_: retryAdornment.attributes.map((attr) =>
-              python.methodArgument({
-                name: attr.name,
-                value: new WorkflowValueDescriptor({
-                  workflowValueDescriptor: attr.value,
-                  nodeContext: this.nodeContext,
-                  workflowContext: this.workflowContext,
-                  iterableConfig: { endWithComma: false },
-                }),
-              })
-            ),
-          }),
-        })
-      );
+          })
+        );
+      }
     }
 
     return decorators.length > 0 ? decorators : undefined;
@@ -377,7 +356,7 @@ export abstract class BaseNode<
   public generateNodeDisplayClasses(): python.Class[] {
     const nodeContext = this.nodeContext;
     const errorOutputId = this.getErrorOutputId();
-    const retryAdornment = this.getRetryAdornment();
+    const adornments = this.getAdornments();
 
     const decorators: python.Decorator[] = [];
 
@@ -403,32 +382,34 @@ export abstract class BaseNode<
       );
     }
 
-    if (retryAdornment) {
-      decorators.push(
-        python.decorator({
-          callable: python.invokeMethod({
-            methodReference: python.reference({
-              name: "BaseRetryNodeDisplay",
-              attribute: ["wrap"],
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_MODULE_PATH,
+    for (const adornment of adornments) {
+      if (adornment.base) {
+        decorators.push(
+          python.decorator({
+            callable: python.invokeMethod({
+              methodReference: python.reference({
+                name: `Base${adornment.base.name}Display`,
+                attribute: ["wrap"],
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_MODULE_PATH,
+              }),
+              arguments_: adornment.attributes.map(
+                (attr) =>
+                  new MethodArgument({
+                    name: attr.name,
+                    value: new WorkflowValueDescriptor({
+                      workflowValueDescriptor: attr.value,
+                      nodeContext: this.nodeContext,
+                      workflowContext: this.workflowContext,
+                      iterableConfig: { endWithComma: false },
+                    }),
+                  })
+              ),
             }),
-            arguments_: retryAdornment.attributes.map(
-              (attr) =>
-                new MethodArgument({
-                  name: attr.name,
-                  value: new WorkflowValueDescriptor({
-                    workflowValueDescriptor: attr.value,
-                    nodeContext: this.nodeContext,
-                    workflowContext: this.workflowContext,
-                    iterableConfig: { endWithComma: false },
-                  }),
-                })
-            ),
-          }),
-        })
-      );
+          })
+        );
+      }
     }
 
     const nodeClass = python.class_({
