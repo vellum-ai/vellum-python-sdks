@@ -24,7 +24,7 @@ def image_push_command(image: str, tags: Optional[List[str]] = None) -> None:
     # listing all of the architectures of the image instead of just the one that matches the machine. We can fall back
     # to using normal inspect which returns the machine image for this case though. And in the future we could figure
     # out how to call the docker host directly to do this.
-    logger.info("Validating Image...")
+    logger.info("Pre-validating image...")
     docker_client = docker.from_env()
     check_architecture(docker_client, image, logger)
 
