@@ -99,7 +99,6 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
             node_class = inner_cls.infer_node_class()
             wrapped_node_class = cast(Type[BaseNode], node_class.__wrapped_node__)
 
-            # Create a specialized RetryNodeDisplay with the parameters
             class RetryNodeDisplay(BaseRetryNodeDisplay[node_class]):  # type: ignore[valid-type]
                 max_attempts = _max_attempts
                 delay = _delay
