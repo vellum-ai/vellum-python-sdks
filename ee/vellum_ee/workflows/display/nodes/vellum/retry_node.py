@@ -83,7 +83,7 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
     @classmethod
     def wrap(
         cls,
-        max_attempts: Optional[int] = None,
+        max_attempts: int,
         delay: Optional[float] = None,
         retry_on_error_code: Optional[WorkflowErrorCode] = None,
         retry_on_condition: Optional[BaseDescriptor] = None,
