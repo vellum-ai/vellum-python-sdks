@@ -495,7 +495,13 @@ export const NodeInputSerializer: ObjectSchema<
   key: stringSchema(),
   value: objectSchema({
     rules: listSchema(NodeInputValuePointerRuleSerializer),
-    combinator: stringLiteralSchema("OR"),
+    combinator: undiscriminatedUnionSchema([
+      stringLiteralSchema("OR"),
+      stringLiteralSchema("AND"),
+    ]).transform({
+      transform: () => "OR" as const,
+      untransform: () => "OR" as const,
+    }),
   }),
 });
 
@@ -505,7 +511,7 @@ export declare namespace NodeInputSerializer {
     key: string;
     value: {
       rules: NodeInputValuePointerRuleSerializer.Raw[];
-      combinator: "OR";
+      combinator: "OR" | "AND";
     };
   }
 }

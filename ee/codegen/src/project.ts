@@ -136,7 +136,7 @@ export class WorkflowProjectGenerator {
     } else {
       const workflowVersionExecConfigResult =
         WorkflowVersionExecConfigSerializer.parse(
-          this.preprocessWorkflowConfig(rest.workflowVersionExecConfigData),
+          rest.workflowVersionExecConfigData,
           {
             allowUnrecognizedUnionMembers: true,
             allowUnrecognizedEnumValues: true,
@@ -189,26 +189,6 @@ ${errors.slice(0, 3).map((err) => {
       this.sandboxInputs = rest.sandboxInputs;
       this.options = rest.options;
     }
-  }
-
-  // preprocessWorkflowConfig is used to modify the workflow config before it is used to generate the project.
-  // - Changes the combinator of any AND conditions to OR conditions, this should happen rarely and only for
-  //   resiliency reasons.
-  private preprocessWorkflowConfig(config: unknown): unknown {
-    const newConfig = JSON.parse(JSON.stringify(config));
-    if (newConfig.workflow_raw_data?.nodes) {
-      for (const node of newConfig.workflow_raw_data.nodes) {
-        if (Array.isArray(node.inputs)) {
-          for (const input of node.inputs) {
-            if (input.value?.combinator === "AND") {
-              input.value.combinator = "OR";
-            }
-          }
-        }
-      }
-    }
-
-    return newConfig;
   }
 
   public getModuleName(): string {
