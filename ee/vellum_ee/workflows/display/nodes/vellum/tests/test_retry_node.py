@@ -33,7 +33,6 @@ def test_retry_node_parameters():
         adornment for adornment in serialized_node["adornments"] if adornment["label"] == "RetryNode"
     )
 
-    # Check parameters in the adornment
     max_attempts_attribute = next(attr for attr in retry_adornment["attributes"] if attr["name"] == "max_attempts")
     assert max_attempts_attribute["value"]["value"]["value"] == 5
 
@@ -43,6 +42,6 @@ def test_retry_node_parameters():
     retry_on_error_code_attribute = next(
         attr for attr in retry_adornment["attributes"] if attr["name"] == "retry_on_error_code"
     )
-    # The error code is serialized as a string
+
     assert retry_on_error_code_attribute["value"]["value"]["type"] == "STRING"
     assert retry_on_error_code_attribute["value"]["value"]["value"] == "INVALID_INPUTS"
