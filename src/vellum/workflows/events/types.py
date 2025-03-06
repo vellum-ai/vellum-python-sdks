@@ -75,6 +75,7 @@ class BaseDeploymentParentContext(BaseParentContext):
     release_tag_id: UUID
     release_tag_name: str
     external_id: Optional[str]
+    metadata: Optional[dict]
 
 
 class WorkflowDeploymentParentContext(BaseDeploymentParentContext):
@@ -104,6 +105,10 @@ class WorkflowSandboxParentContext(BaseParentContext):
     scenario_id: UUID
 
 
+class APIRequestParentContext(BaseParentContext):
+    type: Literal["API_REQUEST"] = "API_REQUEST"
+
+
 # Define the discriminated union
 ParentContext = Annotated[
     Union[
@@ -112,6 +117,7 @@ ParentContext = Annotated[
         WorkflowDeploymentParentContext,
         PromptDeploymentParentContext,
         WorkflowSandboxParentContext,
+        APIRequestParentContext,
     ],
     Field(discriminator="type"),
 ]
