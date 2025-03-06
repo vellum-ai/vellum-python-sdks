@@ -204,13 +204,11 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
         if not isinstance(other, dict):
             return super().__eq__(other)
 
-        outputs = {
-            name: value for name, value in vars(self).items() if not name.startswith("_") and value is not undefined
-        }
+        outputs = {ref.name: value for ref, value in self if value is not undefined}
         return outputs == other
 
     def __repr__(self) -> str:
-        values = f"{', '.join(f'{k}={v}' for k, v in vars(self).items() if not k.startswith('_'))}"
+        values = f"{', '.join(f'{ref.name}={value}' for ref, value in self if value is not undefined)}"
         return f"{self.__class__.__name__}({values})"
 
     def __iter__(self) -> Iterator[Tuple[OutputReference, Any]]:
