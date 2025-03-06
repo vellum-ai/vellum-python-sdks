@@ -889,7 +889,7 @@ describe("Workflow", () => {
       ]);
     });
     it("should properly format UUID-like port names in graph references", async () => {
-      // Create a generic node with UUID-like port names
+      // Given a UUID-like port names
       const uuidPortName1 = "7d813792-04c2-4d26-a126-16de4c4cebaf";
       const uuidPortName2 = "6f909cc6-887c-46d8-966b-46547900fc9c";
 
@@ -913,7 +913,6 @@ describe("Workflow", () => {
         ],
       });
 
-      // Create target nodes
       const firstNode = genericNodeFactory({
         label: "FirstNode",
       });
@@ -922,7 +921,6 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      // Run the graph test with UUID-like port names
       await runGraphTest([
         [entrypointNode, genericNodeData],
         [[genericNodeData, uuidPortName1], firstNode],
