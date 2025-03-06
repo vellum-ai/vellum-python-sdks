@@ -14,16 +14,10 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
     const statements: AstNode[] = [];
 
     const urlInput = this.nodeInputsByKey.get("url");
-    if (!urlInput) {
-      throw new NodeAttributeGenerationError(
-        'Node input "url" is required but not found.'
-      );
-    }
-
     statements.push(
       python.field({
         name: "url",
-        initializer: urlInput,
+        initializer: urlInput || python.TypeInstantiation.str(""),
       })
     );
 

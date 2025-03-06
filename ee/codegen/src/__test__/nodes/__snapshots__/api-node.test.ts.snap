@@ -149,6 +149,15 @@ class APINode(BaseAPINode):
 "
 `;
 
+exports[`ApiNode > basic api node > should handle missing url field gracefully 1`] = `
+"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = ""
+"
+`;
+
 exports[`ApiNode > basic api node > should not generate body field when body is empty 1`] = `
 "from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
