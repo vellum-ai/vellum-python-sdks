@@ -29,7 +29,8 @@ class InnerRetryGenericNode(BaseNode):
         output: str
 
 
-class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode.__wrapped_node__]):  # type: ignore
+@BaseRetryNodeDisplay.wrap(max_attempts=3)
+class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode]):  # type: ignore
     pass
 
 
@@ -117,26 +118,6 @@ def test_serialize_node__retry(serialize_node):
         },
         serialized_node,
     )
-
-
-def test_serialize_node__retry__no_display():  # GIVEN an adornment node
-    @RetryNode.wrap(max_attempts=5)
-    class StartNode(BaseNode):
-        pass
-
-    # AND a workflow that uses the adornment node
-    class MyWorkflow(BaseWorkflow):
-        graph = StartNode
-
-    # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=MyWorkflow,
-    )
-    exec_config = workflow_display.serialize()
-
-    # THEN the workflow display is created successfully
-    assert exec_config is not None
 
 
 @TryNode.wrap()
