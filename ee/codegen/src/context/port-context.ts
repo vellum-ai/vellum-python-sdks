@@ -2,6 +2,7 @@ import { DEFAULT_PORT_NAME } from "src/constants";
 import { WorkflowContext } from "src/context/index";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { WorkflowDataNode } from "src/types/vellum";
+import { toPythonSafeSnakeCase } from "src/utils/casing";
 
 export declare namespace PortContext {
   export type Args = {
@@ -32,7 +33,7 @@ export class PortContext {
     this.nodeContext = nodeContext;
 
     this.portId = portId;
-    this.portName = portName;
+    this.portName = toPythonSafeSnakeCase(portName);
     this.isDefault = isDefault;
   }
 }
