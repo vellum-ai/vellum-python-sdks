@@ -1,12 +1,12 @@
 import io
 import os
-import re
-from typing import Any, ForwardRef, Tuple, Union, get_args, get_origin
+from typing import Any, Tuple, Union
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.nodes.utils import cast_to_output_type
 from vellum.workflows.types.core import EntityInputsInterface
 
 
@@ -67,53 +67,6 @@ def _clean_for_dict_wrapper(obj):
     return obj
 
 
-def _get_type_name(obj: Any) -> str:
-    if isinstance(obj, type):
-        return obj.__name__
-
-    if get_origin(obj) is Union:
-        children = [_get_type_name(child) for child in get_args(obj)]
-        return " | ".join(children)
-
-    return str(obj)
-
-
-def _cast_to_output_type(result: Any, output_type: Any) -> Any:
-    if isinstance(output_type, ForwardRef) or output_type is Any:
-        # Treat ForwardRefs as Any for now
-        return result
-
-    is_valid_output_type = isinstance(output_type, type)
-    if get_origin(output_type) is Union:
-        allowed_types = get_args(output_type)
-        for allowed_type in allowed_types:
-            try:
-                return _cast_to_output_type(result, allowed_type)
-            except NodeException:
-                continue
-    elif get_origin(output_type) is list:
-        allowed_item_type = get_args(output_type)[0]
-        if isinstance(result, list):
-            return [_cast_to_output_type(item, allowed_item_type) for item in result]
-    elif is_valid_output_type and issubclass(output_type, BaseModel) and not isinstance(result, output_type):
-        try:
-            return output_type.model_validate(result)
-        except ValidationError as e:
-            raise NodeException(
-                code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message=re.sub(r"\s+For further information visit [^\s]+", "", str(e)),
-            ) from e
-    elif is_valid_output_type and isinstance(result, output_type):
-        return result
-
-    output_type_name = _get_type_name(output_type)
-    result_type_name = _get_type_name(type(result))
-    raise NodeException(
-        code=WorkflowErrorCode.INVALID_OUTPUTS,
-        message=f"Expected an output of type '{output_type_name}', but received '{result_type_name}'",
-    )
-
-
 def run_code_inline(
     code: str,
     inputs: EntityInputsInterface,
@@ -163,6 +116,6 @@ __arg__out = main({", ".join(run_args)})
     logs = log_buffer.getvalue()
     result = exec_globals["__arg__out"]
 
-    result = _cast_to_output_type(result, output_type)
+    result = cast_to_output_type(result, output_type)
 
     return logs, result

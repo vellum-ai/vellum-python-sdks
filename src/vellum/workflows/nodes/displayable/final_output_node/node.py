@@ -1,7 +1,10 @@
 from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args
 
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.nodes.utils import cast_to_output_type
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
@@ -49,3 +52,13 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
         # We use our mypy plugin to override the _OutputType with the actual output type
         # for downstream references to this output.
         value: _OutputType  # type: ignore[valid-type]
+
+    def run(self) -> Outputs:
+        output_reference = self.Outputs.value
+        if not output_reference.instance:
+            raise NodeException(
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+                message=f"Must set the `value` Output on '{self.__class__.__name__}'.",
+            )
+
+        return self.Outputs(value=cast_to_output_type(output_reference.instance, self.__class__.get_output_type()))
