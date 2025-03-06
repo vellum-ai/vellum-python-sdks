@@ -30,11 +30,7 @@ class InnerRetryGenericNode(BaseNode):
 
 
 @BaseRetryNodeDisplay.wrap(max_attempts=3)
-class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode]):  # type: ignore
-    pass
-
-
-class OuterRetryNodeDisplay(BaseRetryNodeDisplay[InnerRetryGenericNode]):  # type: ignore
+class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode]):
     pass
 
 
@@ -45,7 +41,6 @@ def test_serialize_node__retry(serialize_node):
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
         global_node_displays={
             InnerRetryGenericNode.__wrapped_node__: InnerRetryGenericNodeDisplay,
-            InnerRetryGenericNode: OuterRetryNodeDisplay,
         },
     )
 
