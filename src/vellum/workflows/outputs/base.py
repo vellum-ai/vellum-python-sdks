@@ -201,7 +201,7 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
             self._outputs_post_init(**kwargs)
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, dict):
+        if not isinstance(other, (dict, BaseOutputs)):
             return super().__eq__(other)
 
         outputs = {ref.name: value for ref, value in self if value is not undefined}

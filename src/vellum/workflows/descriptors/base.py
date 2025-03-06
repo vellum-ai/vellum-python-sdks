@@ -71,6 +71,9 @@ class BaseDescriptor(Generic[_T]):
     def __hash__(self) -> int:
         return hash(self._name)
 
+    def __repr__(self) -> str:
+        return self._name
+
     @overload
     def __get__(self, instance: "BaseNode", owner: Type["BaseNode"]) -> _T: ...
 

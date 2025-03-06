@@ -6,6 +6,7 @@ from pydantic_core import core_schema
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.utils.uuids import uuid4_from_hash
 
 if TYPE_CHECKING:
     from vellum.workflows.outputs import BaseOutputs
@@ -26,6 +27,17 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
     ) -> None:
         super().__init__(name=name, types=types, instance=instance)
         self._outputs_class = outputs_class
+
+        if hasattr(outputs_class, "_node_class"):
+            node_class = getattr(outputs_class, "_node_class")
+            if hasattr(node_class, "__id__"):
+                node_id = getattr(node_class, "__id__")
+            else:
+                node_id = uuid4_from_hash(f"{node_class.__qualname__}")
+
+            self.__id__ = uuid4_from_hash(f"{node_id}|{name}")
+        else:
+            self.__id__ = uuid4_from_hash(f"{outputs_class.__qualname__}|{name}")
 
     @property
     def outputs_class(self) -> Type["BaseOutputs"]:
