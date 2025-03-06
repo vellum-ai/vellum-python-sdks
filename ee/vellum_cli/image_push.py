@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 import subprocess
 from typing import List, Optional
 
@@ -72,9 +73,29 @@ def image_push_command(image: str, tags: Optional[List[str]] = None) -> None:
             except Exception:
                 continue
 
-    logger.info("Updating Vellum metadata and validating image works in our system...")
-    image_details = docker_client.api.inspect_image(image)
-    sha = image_details["Id"]
+    result = subprocess.run(
+        ["docker", "inspect", "--format='{{index .RepoDigests 0}}'", image],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    sha = ""
+    if result.returncode == 0:
+        match = re.search(r"sha256[^']*", result.stdout.decode("utf-8"))
+        if match and match.group(0):
+            sha = match.group(0)
+
+    if not sha:
+        # Fallback to using docker client if command line fails, at least on some systems
+        # this appears to give a bad sha.
+        logger.warning(
+            "Could not determine image hash with command line docker falling back to python docker client..."
+        )
+
+        image_details = docker_client.api.inspect_image(image)
+        sha = image_details["Id"]
+
+    logger.info(f"Updating Vellum metadata and validating image works in our system with image digest: {sha}...")
 
     vellum_client.container_images.push_container_image(
         name=image_name,
