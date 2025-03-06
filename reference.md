@@ -15,6 +15,7 @@
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.execute_api(
@@ -103,6 +104,7 @@ client.execute_api(
 from vellum import CodeExecutionPackage, StringInput, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.execute_code(
@@ -219,6 +221,7 @@ Executes a deployed Prompt and returns the result.
 from vellum import StringInputRequest, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.execute_prompt(
@@ -358,6 +361,7 @@ Executes a deployed Prompt and streams back the results.
 from vellum import StringInputRequest, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 response = client.execute_prompt_stream(
@@ -499,6 +503,7 @@ Executes a deployed Workflow and returns its outputs.
 from vellum import Vellum, WorkflowRequestStringInputRequest
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.execute_workflow(
@@ -622,6 +627,7 @@ Executes a deployed Workflow and streams back its results.
 from vellum import Vellum, WorkflowRequestStringInputRequest
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 response = client.execute_workflow_stream(
@@ -758,6 +764,7 @@ Important: This endpoint is DEPRECATED and has been superseded by
 from vellum import GenerateRequest, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.generate(
@@ -859,6 +866,7 @@ Important: This endpoint is DEPRECATED and has been superseded by
 from vellum import GenerateRequest, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 response = client.generate_stream(
@@ -959,6 +967,7 @@ Perform a search against a document index.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.search(
@@ -1061,6 +1070,7 @@ Used to submit feedback regarding the quality of previously generated completion
 from vellum import SubmitCompletionActualRequest, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.submit_completion_actuals(
@@ -1149,6 +1159,7 @@ client.submit_completion_actuals(
 from vellum import Vellum, WorkflowExecutionActualStringRequest
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.submit_workflow_execution_actuals(
@@ -1228,6 +1239,7 @@ from vellum import (
 )
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 response = client.ad_hoc.adhoc_execute_prompt_stream(
@@ -1376,6 +1388,7 @@ Retrieve a list of container images for the organization.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.container_images.list()
@@ -1460,6 +1473,7 @@ Retrieve a Container Image by its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.container_images.retrieve(
@@ -1516,6 +1530,7 @@ client.container_images.retrieve(
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.container_images.docker_service_token()
@@ -1562,6 +1577,7 @@ client.container_images.docker_service_token()
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.container_images.push_container_image(
@@ -1651,6 +1667,7 @@ Used to list all Prompt Deployments.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.deployments.list()
@@ -1743,6 +1760,7 @@ Used to retrieve a Prompt Deployment given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.deployments.retrieve(
@@ -1813,6 +1831,7 @@ Retrieve a specific Deployment History Item by either its UUID or the name of a 
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.deployments.deployment_history_item_retrieve(
@@ -1892,6 +1911,7 @@ List Release Tags associated with the specified Prompt Deployment
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.deployments.list_deployment_release_tags(
@@ -1994,6 +2014,7 @@ Retrieve a Deployment Release Tag by tag name, associated with a specified Deplo
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.deployments.retrieve_deployment_release_tag(
@@ -2073,6 +2094,7 @@ Updates an existing Release Tag associated with the specified Prompt Deployment.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.deployments.update_deployment_release_tag(
@@ -2169,6 +2191,7 @@ We encourage you to seek advise from Vellum Support before integrating with this
 from vellum import StringInputRequest, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.deployments.retrieve_provider_payload(
@@ -2277,6 +2300,7 @@ Used to retrieve a list of Document Indexes.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.list()
@@ -2389,6 +2413,7 @@ from vellum import (
 )
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.create(
@@ -2524,6 +2549,7 @@ Used to retrieve a Document Index given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.retrieve(
@@ -2594,6 +2620,7 @@ Used to fully update a Document Index given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.update(
@@ -2700,6 +2727,7 @@ Used to delete a Document Index given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.destroy(
@@ -2770,6 +2798,7 @@ Used to partial update a Document Index given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.partial_update(
@@ -2875,6 +2904,7 @@ Adds a previously uploaded Document to the specified Document Index.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.add_document(
@@ -2954,6 +2984,7 @@ Removes a Document from a Document Index without deleting the Document itself.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.document_indexes.remove_document(
@@ -3034,6 +3065,7 @@ Used to list documents. Optionally filter on supported fields.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.documents.list()
@@ -3134,6 +3166,7 @@ Retrieve a Document, keying off of either its Vellum-generated ID or its externa
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.documents.retrieve(
@@ -3204,6 +3237,7 @@ Delete a Document, keying off of either its Vellum-generated ID or its external 
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.documents.destroy(
@@ -3274,6 +3308,7 @@ Update a Document, keying off of either its Vellum-generated ID or its external 
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.documents.partial_update(
@@ -3381,6 +3416,7 @@ This is a multipart/form-data request. The `contents` field should be a file upl
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.documents.upload(
@@ -3494,6 +3530,7 @@ List all folder entities within a specified folder.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.folder_entities.list(
@@ -3612,6 +3649,7 @@ Adding an entity to a folder will remove it from any other folders it might have
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.folder_entities.add_entity_to_folder(
@@ -3685,6 +3723,7 @@ directory. Supported root directories include:
 from vellum import StringInput, Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.metric_definitions.execute_metric_definition(
@@ -3763,6 +3802,7 @@ client.metric_definitions.execute_metric_definition(
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.metric_definitions.metric_definition_history_item_retrieve(
@@ -3843,6 +3883,7 @@ Retrieve details about an ML Model
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.ml_models.retrieve(
@@ -3914,6 +3955,7 @@ Retrieves information about the active Organization
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.organizations.organization_identity()
@@ -3961,6 +4003,7 @@ client.organizations.organization_identity()
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.sandboxes.deploy_prompt(
@@ -4082,6 +4125,7 @@ from vellum import (
 )
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.sandboxes.upsert_sandbox_scenario(
@@ -4192,6 +4236,7 @@ Deletes an existing scenario from a sandbox, keying off of the provided scenario
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.sandboxes.delete_sandbox_scenario(
@@ -4276,6 +4321,7 @@ from vellum import (
 )
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.test_suite_runs.create(
@@ -4366,6 +4412,7 @@ Retrieve a specific Test Suite Run by ID
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.test_suite_runs.retrieve(
@@ -4422,6 +4469,7 @@ client.test_suite_runs.retrieve(
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.test_suite_runs.list_executions(
@@ -4522,6 +4570,7 @@ List the Test Cases associated with a Test Suite
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.test_suites.list_test_suite_test_cases(
@@ -4619,6 +4668,7 @@ from vellum import (
 )
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.test_suites.upsert_test_suite_test_case(
@@ -4757,6 +4807,7 @@ from vellum import (
 )
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 response = client.test_suites.test_suite_test_cases_bulk(
@@ -4854,6 +4905,7 @@ Deletes an existing test case for a test suite, keying off of the test case id.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.test_suites.delete_test_suite_test_case(
@@ -4934,6 +4986,7 @@ Used to list all Workflow Deployments.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_deployments.list()
@@ -5026,6 +5079,7 @@ Used to retrieve a workflow deployment given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_deployments.retrieve(
@@ -5096,6 +5150,7 @@ Retrieve a specific Workflow Deployment History Item by either its UUID or the n
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_deployments.workflow_deployment_history_item_retrieve(
@@ -5175,6 +5230,7 @@ List Release Tags associated with the specified Workflow Deployment
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_deployments.list_workflow_release_tags(
@@ -5277,6 +5333,7 @@ Retrieve a Workflow Release Tag by tag name, associated with a specified Workflo
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_deployments.retrieve_workflow_release_tag(
@@ -5356,6 +5413,7 @@ Updates an existing Release Tag associated with the specified Workflow Deploymen
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_deployments.update_workflow_release_tag(
@@ -5430,6 +5488,7 @@ client.workflow_deployments.update_workflow_release_tag(
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_sandboxes.deploy_workflow(
@@ -5541,6 +5600,7 @@ List Workflow Sandbox examples that were previously cloned into the User's Works
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflow_sandboxes.list_workflow_sandbox_examples()
@@ -5620,6 +5680,7 @@ client.workflow_sandboxes.list_workflow_sandbox_examples()
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workflows.push(
@@ -5733,6 +5794,7 @@ Used to retrieve a Workspace Secret given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workspace_secrets.retrieve(
@@ -5803,6 +5865,7 @@ Used to update a Workspace Secret given its ID or name.
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workspace_secrets.partial_update(
@@ -5890,6 +5953,7 @@ Retrieves information about the active Workspace
 from vellum import Vellum
 
 client = Vellum(
+    x_api_key="YOUR_X_API_KEY",
     api_key="YOUR_API_KEY",
 )
 client.workspaces.workspace_identity()

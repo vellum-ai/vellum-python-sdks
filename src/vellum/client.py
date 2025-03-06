@@ -97,6 +97,7 @@ class Vellum:
 
 
 
+    x_api_key : str
     api_key : str
     timeout : typing.Optional[float]
         The timeout to be used, in seconds, for requests. By default there is no timeout set, unless a custom httpx client is used, in which case this default is not enforced.
@@ -112,6 +113,7 @@ class Vellum:
     from vellum import Vellum
 
     client = Vellum(
+        x_api_key="YOUR_X_API_KEY",
         api_key="YOUR_API_KEY",
     )
     """
@@ -120,6 +122,7 @@ class Vellum:
         self,
         *,
         environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
+        x_api_key: str,
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -128,6 +131,7 @@ class Vellum:
         _defaulted_timeout = timeout if timeout is not None else None if httpx_client is None else None
         self._client_wrapper = SyncClientWrapper(
             environment=environment,
+            x_api_key=x_api_key,
             api_key=api_key,
             httpx_client=httpx_client
             if httpx_client is not None
@@ -190,6 +194,7 @@ class Vellum:
         from vellum import Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.execute_api(
@@ -266,6 +271,7 @@ class Vellum:
         from vellum import CodeExecutionPackage, StringInput, Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.execute_code(
@@ -387,6 +393,7 @@ class Vellum:
         from vellum import StringInputRequest, Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.execute_prompt(
@@ -535,6 +542,7 @@ class Vellum:
         from vellum import StringInputRequest, Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         response = client.execute_prompt_stream(
@@ -685,6 +693,7 @@ class Vellum:
         from vellum import Vellum, WorkflowRequestStringInputRequest
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.execute_workflow(
@@ -815,6 +824,7 @@ class Vellum:
         from vellum import Vellum, WorkflowRequestStringInputRequest
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         response = client.execute_workflow_stream(
@@ -943,6 +953,7 @@ class Vellum:
         from vellum import GenerateRequest, Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.generate(
@@ -1066,6 +1077,7 @@ class Vellum:
         from vellum import GenerateRequest, Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         response = client.generate_stream(
@@ -1200,6 +1212,7 @@ class Vellum:
         from vellum import Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.search(
@@ -1300,6 +1313,7 @@ class Vellum:
         from vellum import SubmitCompletionActualRequest, Vellum
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.submit_completion_actuals(
@@ -1394,6 +1408,7 @@ class Vellum:
         from vellum import Vellum, WorkflowExecutionActualStringRequest
 
         client = Vellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
         client.submit_workflow_execution_actuals(
@@ -1438,6 +1453,7 @@ class AsyncVellum:
 
 
 
+    x_api_key : str
     api_key : str
     timeout : typing.Optional[float]
         The timeout to be used, in seconds, for requests. By default there is no timeout set, unless a custom httpx client is used, in which case this default is not enforced.
@@ -1453,6 +1469,7 @@ class AsyncVellum:
     from vellum import AsyncVellum
 
     client = AsyncVellum(
+        x_api_key="YOUR_X_API_KEY",
         api_key="YOUR_API_KEY",
     )
     """
@@ -1461,6 +1478,7 @@ class AsyncVellum:
         self,
         *,
         environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
+        x_api_key: str,
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -1469,6 +1487,7 @@ class AsyncVellum:
         _defaulted_timeout = timeout if timeout is not None else None if httpx_client is None else None
         self._client_wrapper = AsyncClientWrapper(
             environment=environment,
+            x_api_key=x_api_key,
             api_key=api_key,
             httpx_client=httpx_client
             if httpx_client is not None
@@ -1533,6 +1552,7 @@ class AsyncVellum:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -1617,6 +1637,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, CodeExecutionPackage, StringInput
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -1746,6 +1767,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, StringInputRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -1902,6 +1924,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, StringInputRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -2060,6 +2083,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, WorkflowRequestStringInputRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -2198,6 +2222,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, WorkflowRequestStringInputRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -2334,6 +2359,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, GenerateRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -2465,6 +2491,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, GenerateRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -2607,6 +2634,7 @@ class AsyncVellum:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -2715,6 +2743,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, SubmitCompletionActualRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
@@ -2817,6 +2846,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, WorkflowExecutionActualStringRequest
 
         client = AsyncVellum(
+            x_api_key="YOUR_X_API_KEY",
             api_key="YOUR_API_KEY",
         )
 
