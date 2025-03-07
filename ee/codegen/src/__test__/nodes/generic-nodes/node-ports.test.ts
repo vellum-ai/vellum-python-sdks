@@ -141,7 +141,7 @@ describe("NodePorts", () => {
   });
   describe("basic duplicate port names", () => {
     beforeEach(async () => {
-      // Create ports with the same name
+      // GIVEN a node with duplicate port names
       const duplicateName = "same port name";
       const nodePortsData: NodePort[] = [
         nodePortFactory({
@@ -157,7 +157,7 @@ describe("NodePorts", () => {
         }),
         nodePortFactory({
           type: "ELIF",
-          name: duplicateName, // Same name as the first port
+          name: duplicateName,
           expression: {
             type: "CONSTANT_VALUE",
             value: {
