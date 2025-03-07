@@ -31,4 +31,5 @@ def test_workflow__happy_path(mocker):
     assert end_time - start_time < ExpensiveEmitter.delay
 
     # AND the emitter was called at least once
+    time.sleep(0.01)
     assert mock_emit.call_count > 0, "Emitter was not called"
