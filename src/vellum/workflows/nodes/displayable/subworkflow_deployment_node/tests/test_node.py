@@ -10,6 +10,7 @@ from vellum.client.types.workflow_execution_workflow_result_event import Workflo
 from vellum.client.types.workflow_output_string import WorkflowOutputString
 from vellum.client.types.workflow_request_chat_history_input_request import WorkflowRequestChatHistoryInputRequest
 from vellum.client.types.workflow_request_json_input_request import WorkflowRequestJsonInputRequest
+from vellum.client.types.workflow_request_number_input_request import WorkflowRequestNumberInputRequest
 from vellum.client.types.workflow_result_event import WorkflowResultEvent
 from vellum.client.types.workflow_stream_event import WorkflowStreamEvent
 from vellum.workflows.errors import WorkflowErrorCode
@@ -131,6 +132,116 @@ def test_run_workflow__any_array(vellum_client):
     call_kwargs = vellum_client.execute_workflow_stream.call_args.kwargs
     assert call_kwargs["inputs"] == [
         WorkflowRequestJsonInputRequest(name="fruits", value=["apple", "banana", "cherry"]),
+    ]
+
+
+def test_run_workflow__empty_array(vellum_client):
+    # GIVEN a Subworkflow Deployment Node
+    class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {
+            "fruits": [],
+        }
+
+    # AND we know what the Subworkflow Deployment will respond with
+    def generate_subworkflow_events(*args: Any, **kwargs: Any) -> Iterator[WorkflowStreamEvent]:
+        execution_id = str(uuid4())
+        expected_events: List[WorkflowStreamEvent] = [
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="INITIATED",
+                    ts=datetime.now(),
+                ),
+            ),
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="FULFILLED",
+                    ts=datetime.now(),
+                    outputs=[
+                        WorkflowOutputString(
+                            id=str(uuid4()),
+                            name="greeting",
+                            value="Great!",
+                        )
+                    ],
+                ),
+            ),
+        ]
+        yield from expected_events
+
+    vellum_client.execute_workflow_stream.side_effect = generate_subworkflow_events
+
+    # WHEN we run the node
+    node = ExampleSubworkflowDeploymentNode()
+    events = list(node.run())
+
+    # THEN the node should have completed successfully
+    assert events[-1].name == "greeting"
+    assert events[-1].value == "Great!"
+
+    # AND we should have invoked the Subworkflow Deployment with the expected inputs
+    call_kwargs = vellum_client.execute_workflow_stream.call_args.kwargs
+    assert call_kwargs["inputs"] == [
+        WorkflowRequestJsonInputRequest(name="fruits", value=[]),
+    ]
+
+
+def test_run_workflow__int_input(vellum_client):
+    # GIVEN a Subworkflow Deployment Node
+    class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {
+            "number": 42,
+        }
+
+    # AND we know what the Subworkflow Deployment will respond with
+    def generate_subworkflow_events(*args: Any, **kwargs: Any) -> Iterator[WorkflowStreamEvent]:
+        execution_id = str(uuid4())
+        expected_events: List[WorkflowStreamEvent] = [
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="INITIATED",
+                    ts=datetime.now(),
+                ),
+            ),
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="FULFILLED",
+                    ts=datetime.now(),
+                    outputs=[
+                        WorkflowOutputString(
+                            id=str(uuid4()),
+                            name="greeting",
+                            value="Great!",
+                        )
+                    ],
+                ),
+            ),
+        ]
+        yield from expected_events
+
+    vellum_client.execute_workflow_stream.side_effect = generate_subworkflow_events
+
+    # WHEN we run the node
+    node = ExampleSubworkflowDeploymentNode()
+    events = list(node.run())
+
+    # THEN the node should have completed successfully
+    assert events[-1].name == "greeting"
+    assert events[-1].value == "Great!"
+
+    # AND we should have invoked the Subworkflow Deployment with the expected inputs
+    call_kwargs = vellum_client.execute_workflow_stream.call_args.kwargs
+    assert call_kwargs["inputs"] == [
+        WorkflowRequestNumberInputRequest(name="number", value=42),
     ]
 
 

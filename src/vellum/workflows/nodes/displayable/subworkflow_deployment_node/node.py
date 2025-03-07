@@ -70,8 +70,10 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                         value=input_value,
                     )
                 )
-            elif isinstance(input_value, list) and all(
-                isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
+            elif (
+                isinstance(input_value, list)
+                and len(input_value) > 0
+                and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
             ):
                 chat_history = [
                     (
@@ -95,7 +97,7 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                         value=cast(Dict[str, Any], input_value),
                     )
                 )
-            elif isinstance(input_value, float):
+            elif isinstance(input_value, (int, float)):
                 compiled_inputs.append(
                     WorkflowRequestNumberInputRequest(
                         name=input_name,
@@ -110,7 +112,6 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                         message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
                         code=WorkflowErrorCode.INVALID_INPUTS,
                     )
-
                 compiled_inputs.append(
                     WorkflowRequestJsonInputRequest(
                         name=input_name,
