@@ -42,8 +42,29 @@ class BaseInputs(metaclass=_BaseInputsMeta):
     __parent_class__: Type = type(None)
 
     def __init__(self, **kwargs: Any) -> None:
+        """
+        Initialize BaseInputs with provided keyword arguments.
+
+        Validation logic:
+        1. Ensures all required fields (non-Optional types) either:
+        - Have a value provided in kwargs, or
+        - Have a default value defined in the class
+        2. Validates that no None values are provided for required fields
+        3. Sets all provided values as attributes on the instance
+
+        Args:
+            **kwargs: Keyword arguments corresponding to the class's type annotations
+
+        Raises:
+            WorkflowInitializationException: If a required field is missing or None
+        """
         for name, field_type in self.__class__.__annotations__.items():
-            if name not in kwargs and name not in vars(self.__class__):
+            # Get the value (either from kwargs or class default)
+            value = kwargs.get(name)
+            has_default = name in vars(self.__class__)
+
+            if value is None and not has_default:
+                # Check if field_type allows None
                 origin = get_origin(field_type)
                 args = get_args(field_type)
                 if not (origin is Union and type(None) in args):
@@ -52,27 +73,14 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                         code=WorkflowErrorCode.INVALID_INPUTS,
                     )
 
-        for name, value in kwargs.items():
-            field_type = self.__class__.__annotations__.get(name)
-            if field_type:
-                self._validate_input(value, field_type)
-            setattr(self, name, value)
+            # If value provided in kwargs, set it on the instance
+            if name in kwargs:
+                setattr(self, name, value)
 
     def __iter__(self) -> Iterator[Tuple[InputReference, Any]]:
         for input_descriptor in self.__class__:
             if hasattr(self, input_descriptor.name):
                 yield (input_descriptor, getattr(self, input_descriptor.name))
-
-    def _validate_input(self, value: Any, field_type: Any) -> None:
-        if value is None:
-            # Check if field_type is Optional
-            origin = get_origin(field_type)
-            args = get_args(field_type)
-            if not (origin is Union and type(None) in args):
-                raise WorkflowInitializationException(
-                    message="Required input variables should have defined value",
-                    code=WorkflowErrorCode.INVALID_INPUTS,
-                )
 
     @classmethod
     def __get_pydantic_core_schema__(
