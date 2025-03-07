@@ -9,7 +9,6 @@ import {
   NodePort as NodePortType,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace NodePorts {
@@ -51,7 +50,7 @@ export class NodePorts extends AstNode {
       if (portExpression) {
         fields.push(
           python.field({
-            name: toPythonSafeSnakeCase(port.name),
+            name: this.nodeContext.generateSanitizedPortName(port.name),
             initializer: portExpression,
           })
         );

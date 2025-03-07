@@ -1,3 +1,5 @@
+import { isEmpty, isNil } from "lodash";
+
 import { VELLUM_WORKFLOW_NODES_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
@@ -41,6 +43,8 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
   private nodeOutputNamesById: Record<string, string> | undefined;
   public readonly portContextsById: Map<string, PortContext>;
   public readonly defaultPortContext: PortContext | undefined;
+
+  private readonly nodePortNames: Set<string> = new Set();
 
   constructor(args: BaseNodeContext.Args<T>) {
     this.workflowContext = args.workflowContext;
@@ -123,6 +127,38 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     }
 
     return toPythonSafeSnakeCase(nodeOutputName, "output");
+  }
+
+  private isPortNameUsed(portName: string): boolean {
+    return this.nodePortNames.has(portName);
+  }
+
+  private addUsedPortName(portName: string): void {
+    this.nodePortNames.add(portName);
+  }
+
+  public generateSanitizedPortName(portName: string): string {
+    const defaultName = "port_";
+    const rawPortName = portName;
+
+    const initialPortName =
+      !isNil(rawPortName) && !isEmpty(rawPortName)
+        ? toPythonSafeSnakeCase(rawPortName, "port")
+        : defaultName;
+
+    // Deduplicate the port variable name if it's already in use
+    let sanitizedName = initialPortName;
+    let numRenameAttempts = 0;
+    while (this.isPortNameUsed(sanitizedName)) {
+      sanitizedName = `${initialPortName}${
+        initialPortName.endsWith("_") ? "" : "_"
+      }${numRenameAttempts + 1}`;
+      numRenameAttempts += 1;
+    }
+
+    this.addUsedPortName(sanitizedName);
+
+    return sanitizedName;
   }
 
   /**

@@ -7,6 +7,14 @@ exports[`NodePorts > basic > generates correct ports class 1`] = `
 "
 `;
 
+exports[`NodePorts > basic duplicate port names > handles duplicate port names correctly 1`] = `
+"class Ports(BaseNode.Ports):
+    same_port_name = Port.on_if("test-value-1")
+    same_port_name_1 = Port.on_elif("test-value-2")
+    unique_name = Port.on_else(None)
+"
+`;
+
 exports[`NodePorts > basic with nested expression in port > generates correct ports class 1`] = `
 "class Ports(BaseNode.Ports):
     if_port = Port.on_if(Inputs.count.is_null())

@@ -139,4 +139,59 @@ describe("NodePorts", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+  describe("basic duplicate port names", () => {
+    beforeEach(async () => {
+      // Create ports with the same name
+      const duplicateName = "same port name";
+      const nodePortsData: NodePort[] = [
+        nodePortFactory({
+          type: "IF",
+          name: duplicateName,
+          expression: {
+            type: "CONSTANT_VALUE",
+            value: {
+              type: "STRING",
+              value: "test-value-1",
+            },
+          },
+        }),
+        nodePortFactory({
+          type: "ELIF",
+          name: duplicateName, // Same name as the first port
+          expression: {
+            type: "CONSTANT_VALUE",
+            value: {
+              type: "STRING",
+              value: "test-value-2",
+            },
+          },
+        }),
+        nodePortFactory({
+          type: "ELSE",
+          name: "unique_name",
+        }),
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "GenericNodeWithDuplicatePorts",
+        nodePorts: nodePortsData,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      nodePorts = new NodePorts({
+        nodePorts: nodePortsData,
+        nodeContext,
+        workflowContext,
+      });
+    });
+
+    it("handles duplicate port names correctly", async () => {
+      nodePorts.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
