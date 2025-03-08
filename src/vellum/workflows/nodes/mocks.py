@@ -1,6 +1,6 @@
 from functools import reduce
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, List, Literal, Sequence, Type, Union
+from typing import TYPE_CHECKING, Any, List, Literal, Optional, Sequence, Type, Union
 
 from pydantic import ConfigDict, ValidationError
 
@@ -107,9 +107,12 @@ class MockNodeExecution(UniversalBaseModel):
 
     @staticmethod
     def validate_all(
-        raw_mock_workflow_node_configs: List[Any],
+        raw_mock_workflow_node_configs: Optional[List[Any]],
         workflow: Type["BaseWorkflow"],
-    ) -> List["MockNodeExecution"]:
+    ) -> Optional[List["MockNodeExecution"]]:
+        if not raw_mock_workflow_node_configs:
+            return None
+
         ArrayVellumValue.model_rebuild()
         try:
             mock_workflow_node_configs = [
