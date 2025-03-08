@@ -8,10 +8,9 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { ModulePath } from "@fern-api/python-ast/core/types";
 
-import { PythonFile } from "./protected-python-file";
-
 import { INIT_FILE_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
+import { PythonFile } from "src/generators/extensions";
 
 export declare namespace BasePersistedFile {
   interface Args {
