@@ -119,7 +119,7 @@ class BaseNodeMeta(type):
         node_class.Trigger.node_class = node_class
         node_class.ExternalInputs.__parent_class__ = node_class
         node_class.__id__ = uuid4_from_hash(node_class.__qualname__)
-        node_class.Outputs.__ids__ = {
+        node_class.__output_ids__ = {
             ref.name: uuid4_from_hash(f"{node_class.__id__}|{ref.name}")
             for ref in node_class.Outputs
             if isinstance(ref, OutputReference)
@@ -242,6 +242,7 @@ NodeRunResponse = Union[BaseOutputs, Iterator[BaseOutput]]
 
 class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
+    __output_ids__: Dict[str, UUID] = {}
     state: StateType
     _context: WorkflowContext
     _inputs: MappingProxyType[NodeReference, Any]

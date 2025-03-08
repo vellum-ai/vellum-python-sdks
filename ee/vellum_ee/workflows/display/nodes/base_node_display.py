@@ -78,7 +78,7 @@ class BaseNodeDisplayMeta(type):
                 if not isinstance(node_output_display, NodeOutputDisplay):
                     continue
 
-                node_class.Outputs.__ids__[reference.name] = node_output_display.id
+                node_class.__output_ids__[reference.name] = node_output_display.id
 
         return cls
 
