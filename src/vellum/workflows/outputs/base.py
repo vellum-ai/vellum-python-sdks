@@ -1,3 +1,4 @@
+from dataclasses import field
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
@@ -185,7 +186,7 @@ class _BaseOutputsMeta(type):
 
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
-    __ids__: Dict[str, UUID] = {}
+    __ids__: Dict[str, UUID] = field(init=False, default_factory=dict)
 
     def __init__(self, **kwargs: Any) -> None:
         declared_fields = {descriptor.name for descriptor in self.__class__}

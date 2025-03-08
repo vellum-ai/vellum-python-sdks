@@ -53,7 +53,10 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
             )
 
         metric_outputs.pop("score")
-        return self.Outputs(score=score, **metric_outputs)
+        return self.Outputs(
+            score=score,
+            **metric_outputs,  # type: ignore[arg-type]
+        )
 
     def _compile_metric_inputs(self) -> List[MetricDefinitionInput]:
         # TODO: We may want to consolidate with prompt deployment input compilation

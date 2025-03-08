@@ -72,15 +72,6 @@ class BaseNodeMeta(type):
             else:
                 raise ValueError("Outputs class not found in base classes")
 
-        node_class_id = uuid4_from_hash(dct["__qualname__"])
-        outputs_class = dct["Outputs"]
-        if issubclass(outputs_class, BaseOutputs):
-            outputs_class.__ids__ = {
-                ref.name: uuid4_from_hash(f"{node_class_id}|{ref.name}")
-                for ref in outputs_class
-                if isinstance(ref, OutputReference)
-            }
-
         if "Ports" in dct:
             dct["Ports"] = type(
                 f"{name}.Ports",
@@ -127,7 +118,12 @@ class BaseNodeMeta(type):
         node_class.Execution.node_class = node_class
         node_class.Trigger.node_class = node_class
         node_class.ExternalInputs.__parent_class__ = node_class
-        node_class.__id__ = node_class_id
+        node_class.__id__ = uuid4_from_hash(node_class.__qualname__)
+        node_class.Outputs.__ids__ = {
+            ref.name: uuid4_from_hash(f"{node_class.__id__}|{ref.name}")
+            for ref in node_class.Outputs
+            if isinstance(ref, OutputReference)
+        }
         return node_class
 
     @property
