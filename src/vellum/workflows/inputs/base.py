@@ -69,7 +69,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                 args = get_args(field_type)
                 if not (origin is Union and type(None) in args):
                     raise WorkflowInitializationException(
-                        message="Required input variables should have defined value",
+                        message=f"Required input variable {name} should have defined value",
                         code=WorkflowErrorCode.INVALID_INPUTS,
                     )
 

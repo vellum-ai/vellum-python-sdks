@@ -34,7 +34,7 @@ def test_base_inputs_empty_value():
 
     # THEN it should raise a NodeException with the correct error message and code
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "Required input variables should have defined value" in str(exc_info.value)
+    assert "Required input variable required_string should have defined value" == str(exc_info.value)
 
 
 def test_base_inputs_with_default():
