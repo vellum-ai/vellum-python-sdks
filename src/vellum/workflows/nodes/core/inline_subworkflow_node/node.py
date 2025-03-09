@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, Option
 from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode, BaseNodeMeta
@@ -86,6 +87,12 @@ class InlineSubworkflowNode(
 
         for event in subworkflow_stream:
             self._context._emit_subworkflow_event(event)
+
+            if not is_workflow_event(event):
+                continue
+            if event.workflow_definition != self.subworkflow:
+                continue
+
             if event.name == "workflow.execution.streaming":
                 if event.output.is_fulfilled:
                     fulfilled_output_names.add(event.output.name)
