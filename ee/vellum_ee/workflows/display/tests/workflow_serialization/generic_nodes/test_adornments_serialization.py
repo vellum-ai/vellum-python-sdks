@@ -119,7 +119,8 @@ def test_serialize_node__retry(serialize_node):
     )
 
 
-def test_serialize_node__retry__no_display():  # GIVEN an adornment node
+def test_serialize_node__retry__no_display():
+    # GIVEN an adornment node
     @RetryNode.wrap(max_attempts=5)
     class StartNode(BaseNode):
         pass
@@ -216,7 +217,8 @@ def test_serialize_node__try(serialize_node):
     )
 
 
-def test_serialize_node__try__no_display():  # GIVEN an adornment node
+def test_serialize_node__try__no_display():
+    # GIVEN an adornment node
     @TryNode.wrap()
     class StartNode(BaseNode):
         pass
