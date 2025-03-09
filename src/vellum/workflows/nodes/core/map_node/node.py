@@ -107,11 +107,17 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                 subworkflow_event = map_node_event[1]
                 self._context._emit_subworkflow_event(subworkflow_event)
 
-                if subworkflow_event.name == "workflow.execution.initiated":
+                if (
+                    subworkflow_event.name == "workflow.execution.initiated"
+                    and subworkflow_event.workflow_definition == self.subworkflow
+                ):
                     for output_name in mapped_items.keys():
                         yield BaseOutput(name=output_name, delta=(None, index, "INITIATED"))
 
-                elif subworkflow_event.name == "workflow.execution.fulfilled":
+                elif (
+                    subworkflow_event.name == "workflow.execution.fulfilled"
+                    and subworkflow_event.workflow_definition == self.subworkflow
+                ):
                     for output_reference, output_value in subworkflow_event.outputs:
                         if not isinstance(output_reference, OutputReference):
                             logger.error(

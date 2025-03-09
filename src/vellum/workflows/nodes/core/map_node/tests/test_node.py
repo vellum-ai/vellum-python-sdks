@@ -3,8 +3,10 @@ import time
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.map_node.node import MapNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
 def test_map_node__use_parent_inputs_and_state():
@@ -85,3 +87,32 @@ def test_map_node__empty_list():
     # THEN the node should return an empty output
     fulfilled_output = outputs[-1]
     assert fulfilled_output == BaseOutput(name="value", value=[])
+
+
+def test_map_node__inner_try():
+    # GIVEN a try wrapped node
+    @TryNode.wrap()
+    class InnerNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow using that node
+    class SimpleMapNodeWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = InnerNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = InnerNode.Outputs.foo
+
+    # AND a map node referencing that workflow
+    class SimpleMapNode(MapNode):
+        items = ["hello", "world"]
+        subworkflow = SimpleMapNodeWorkflow
+        max_concurrency = 4
+
+    # WHEN we run the workflow
+    stream = SimpleMapNode().run()
+    outputs = list(stream)
+
+    # THEN the workflow should succeed
+    assert outputs[-1].name == "final_output"
+    assert len(outputs[-1].value) == 2
