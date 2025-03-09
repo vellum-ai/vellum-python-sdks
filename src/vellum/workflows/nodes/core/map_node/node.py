@@ -1,4 +1,5 @@
 from collections import defaultdict
+import logging
 from queue import Empty, Queue
 from threading import Thread
 from typing import (
@@ -32,6 +33,8 @@ from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
+
+logger = logging.getLogger(__name__)
 
 MapNodeItemType = TypeVar("MapNodeItemType")
 
@@ -109,14 +112,25 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                         yield BaseOutput(name=output_name, delta=(None, index, "INITIATED"))
 
                 elif subworkflow_event.name == "workflow.execution.fulfilled":
-                    workflow_output_vars = vars(subworkflow_event.outputs)
+                    for output_reference, output_value in subworkflow_event.outputs:
+                        if not isinstance(output_reference, OutputReference):
+                            logger.error(
+                                "Invalid key to map node's subworkflow event outputs",
+                                extra={"output_reference_type": type(output_reference)},
+                            )
+                            continue
 
-                    for output_name in workflow_output_vars:
-                        output_mapped_items = mapped_items[output_name]
-                        output_mapped_items[index] = workflow_output_vars[output_name]
+                        output_mapped_items = mapped_items[output_reference.name]
+                        if index < 0 or index >= len(output_mapped_items):
+                            logger.error(
+                                "Invalid map node index", extra={"index": index, "output_name": output_reference.name}
+                            )
+                            continue
+
+                        output_mapped_items[index] = output_value
                         yield BaseOutput(
-                            name=output_name,
-                            delta=(output_mapped_items[index], index, "FULFILLED"),
+                            name=output_reference.name,
+                            delta=(output_value, index, "FULFILLED"),
                         )
 
                     fulfilled_iterations[index] = True
