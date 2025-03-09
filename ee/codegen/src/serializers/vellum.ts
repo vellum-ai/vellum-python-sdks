@@ -752,27 +752,6 @@ export declare namespace SubworkflowNodeDataSerializer {
     | DeploymentSubworkflowNodeDataSerializer.Raw;
 }
 
-export const SubworkflowNodeSerializer: ObjectSchema<
-  SubworkflowNodeSerializer.Raw,
-  Omit<SubworkflowNode, "type">
-> = objectSchema({
-  id: stringSchema(),
-  data: SubworkflowNodeDataSerializer,
-  inputs: listSchema(NodeInputSerializer),
-  displayData: propertySchema(
-    "display_data",
-    NodeDisplayDataSerializer.optional()
-  ),
-  base: CodeResourceDefinitionSerializer.optional(),
-  definition: CodeResourceDefinitionSerializer.optional(),
-});
-
-export declare namespace SubworkflowNodeSerializer {
-  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
-    data: SubworkflowNodeDataSerializer.Raw;
-  }
-}
-
 export const InlinePromptNodeDataSerializer: ObjectSchema<
   InlinePromptNodeDataSerializer.Raw,
   Omit<InlinePromptNodeData, "variant">
@@ -1935,6 +1914,28 @@ export const PromptNodeSerializer: ObjectSchema<
 export declare namespace PromptNodeSerializer {
   interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
     data: PromptNodeDataSerializer.Raw;
+  }
+}
+
+export const SubworkflowNodeSerializer: ObjectSchema<
+  SubworkflowNodeSerializer.Raw,
+  Omit<SubworkflowNode, "type">
+> = objectSchema({
+  id: stringSchema(),
+  data: SubworkflowNodeDataSerializer,
+  inputs: listSchema(NodeInputSerializer),
+  displayData: propertySchema(
+    "display_data",
+    NodeDisplayDataSerializer.optional()
+  ),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
+});
+
+export declare namespace SubworkflowNodeSerializer {
+  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
+    data: SubworkflowNodeDataSerializer.Raw;
   }
 }
 

@@ -1652,9 +1652,11 @@ export function mapNodeDataFactory({
 export function inlineSubworkflowNodeDataFactory({
   label,
   nodes,
+  adornments,
 }: {
   label?: string;
   nodes?: Array<WorkflowDataNode>;
+  adornments?: AdornmentNode[];
 } = {}): SubworkflowNode {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory();
@@ -1694,5 +1696,6 @@ export function inlineSubworkflowNodeDataFactory({
       targetHandleId: "3fe4b4a6-5ed2-4307-ac1c-02389337c4f2",
     },
     inputs: [],
+    ...(adornments && { adornments }),
   };
 }

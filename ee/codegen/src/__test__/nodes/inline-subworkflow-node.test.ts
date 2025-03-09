@@ -1,6 +1,7 @@
 import { mkdir, readFile, rm } from "fs/promises";
 import { join } from "path";
 
+import { v4 as uuidv4 } from "uuid";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -135,6 +136,86 @@ describe("InlineSubworkflowNode", () => {
             "nodes",
             "my_node.py"
           ),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+    });
+  });
+  describe("adornments", () => {
+    beforeEach(async () => {
+      const workflowContext = workflowContextFactory({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+      });
+      const nodeData = inlineSubworkflowNodeDataFactory({
+        label: "My node",
+        nodes: [templatingNodeFactory({ label: "My node" })],
+        adornments: [
+          {
+            id: uuidv4(),
+            label: "RetryNodeLabel",
+            base: {
+              name: "RetryNode",
+              module: [
+                "vellum",
+                "workflows",
+                "nodes",
+                "core",
+                "retry_node",
+                "node",
+              ],
+            },
+            attributes: [
+              {
+                id: uuidv4(),
+                name: "max_attempts",
+                value: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "NUMBER",
+                    value: 3,
+                  },
+                },
+              },
+              {
+                id: uuidv4(),
+                name: "delay",
+                value: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "NUMBER",
+                    value: 2,
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlineSubworkflowNodeContext;
+
+      const node = new InlineSubworkflowNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      await node.persist();
+    });
+
+    it(`should generate adornments`, async () => {
+      expect(
+        await readFile(
+          join(tempDir, "code", "nodes", "my_node", "__init__.py"),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+      expect(
+        await readFile(
+          join(tempDir, "code", "display", "nodes", "my_node", "__init__.py"),
           "utf-8"
         )
       ).toMatchSnapshot();
