@@ -2,6 +2,7 @@ from typing import Callable, Generic, Iterator, Optional, Set, Type
 
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
+from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
@@ -45,6 +46,12 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
         for event in subworkflow_stream:
             self._context._emit_subworkflow_event(event)
             if exception:
+                continue
+
+            if not is_workflow_event(event):
+                continue
+
+            if event.workflow_definition != self.subworkflow:
                 continue
 
             if event.name == "workflow.execution.streaming":

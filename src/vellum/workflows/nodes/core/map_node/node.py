@@ -20,6 +20,7 @@ from typing import (
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
@@ -107,17 +108,17 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                 subworkflow_event = map_node_event[1]
                 self._context._emit_subworkflow_event(subworkflow_event)
 
-                if (
-                    subworkflow_event.name == "workflow.execution.initiated"
-                    and subworkflow_event.workflow_definition == self.subworkflow
-                ):
+                if not is_workflow_event(subworkflow_event):
+                    continue
+
+                if subworkflow_event.workflow_definition != self.subworkflow:
+                    continue
+
+                if subworkflow_event.name == "workflow.execution.initiated":
                     for output_name in mapped_items.keys():
                         yield BaseOutput(name=output_name, delta=(None, index, "INITIATED"))
 
-                elif (
-                    subworkflow_event.name == "workflow.execution.fulfilled"
-                    and subworkflow_event.workflow_definition == self.subworkflow
-                ):
+                elif subworkflow_event.name == "workflow.execution.fulfilled":
                     for output_reference, output_value in subworkflow_event.outputs:
                         if not isinstance(output_reference, OutputReference):
                             logger.error(

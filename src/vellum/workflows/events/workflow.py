@@ -1,5 +1,6 @@
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Iterable, Literal, Optional, Type, Union
+from typing_extensions import TypeGuard
 
 from pydantic import field_serializer
 
@@ -182,3 +183,25 @@ WorkflowEvent = Union[
 ]
 
 WorkflowEventStream = Generator[WorkflowEvent, None, None]
+
+WorkflowExecutionEvent = Union[
+    WorkflowExecutionInitiatedEvent,
+    WorkflowExecutionStreamingEvent,
+    WorkflowExecutionRejectedEvent,
+    WorkflowExecutionPausedEvent,
+    WorkflowExecutionResumedEvent,
+    WorkflowExecutionFulfilledEvent,
+    WorkflowExecutionSnapshottedEvent,
+]
+
+
+def is_workflow_event(event: WorkflowEvent) -> TypeGuard[WorkflowExecutionEvent]:
+    return (
+        event.name == "workflow.execution.initiated"
+        or event.name == "workflow.execution.fulfilled"
+        or event.name == "workflow.execution.streaming"
+        or event.name == "workflow.execution.snapshotted"
+        or event.name == "workflow.execution.paused"
+        or event.name == "workflow.execution.resumed"
+        or event.name == "workflow.execution.rejected"
+    )
