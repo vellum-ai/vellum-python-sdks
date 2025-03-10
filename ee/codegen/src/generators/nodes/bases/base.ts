@@ -10,6 +10,7 @@ import {
   BaseCodegenError,
   NodeAttributeGenerationError,
 } from "src/generators/errors";
+import { python as customPython } from "src/generators/extensions/python-utils";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { UuidOrString } from "src/generators/uuid-or-string";
@@ -337,7 +338,7 @@ export abstract class BaseNode<
       });
     }
 
-    const nodeClass = python.class_({
+    const nodeClass = customPython.class_({
       name: nodeContext.nodeClassName,
       extends_: [nodeBaseClass],
       docs: this.generateNodeComment(),

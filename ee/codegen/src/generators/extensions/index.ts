@@ -12,3 +12,6 @@
  */
 
 export * from "./protected-python-file";
+export * from "./custom-comment";
+export * from "./custom-class";
+export * from "./python-utils";
