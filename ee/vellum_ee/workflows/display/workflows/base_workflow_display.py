@@ -411,7 +411,7 @@ class BaseWorkflowDisplay(
             input_display = {}
             if isinstance(current_node_display, BaseNodeVellumDisplay):
                 input_display = current_node_display.node_input_ids_by_name
-            node_display_meta = {
+            output_display = {
                 output.name: current_node_display.output_display[output].id
                 for output in current_node_display.output_display
             }
@@ -434,7 +434,7 @@ class BaseWorkflowDisplay(
 
             node_event_displays[node_id] = NodeEventDisplayContext(
                 input_display=input_display,
-                output_display=node_display_meta,
+                output_display=output_display,
                 port_display=port_display_meta,
                 subworkflow_display=subworkflow_display_context,
             )

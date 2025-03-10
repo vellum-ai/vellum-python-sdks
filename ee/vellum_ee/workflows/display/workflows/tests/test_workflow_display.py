@@ -95,6 +95,26 @@ def test_serialize_workflow__node_display_class_not_registered():
     assert data is not None
 
 
+def test_get_event_display_context__node_display_filled_without_base_display():
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # WHEN we gather the event display context
+    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+
+    # THEN the node display should be included
+    assert str(StartNode.__id__) in display_context.node_displays
+    node_event_display = display_context.node_displays[str(StartNode.__id__)]
+
+    # AND so should their output ids
+    assert StartNode.__output_ids__ == node_event_display.output_display
+
+
 def test_get_event_display_context__node_display_to_include_subworkflow_display():
     # GIVEN a simple workflow
     class InnerNode(BaseNode):

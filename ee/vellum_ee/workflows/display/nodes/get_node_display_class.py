@@ -2,6 +2,7 @@ import types
 from typing import TYPE_CHECKING, Optional, Type
 
 from vellum.workflows.types.generics import NodeType
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import NodeDisplayType
@@ -29,4 +30,12 @@ def get_node_display_class(
         f"{node_class.__name__}Display",
         bases=(NodeDisplayBaseClass,),
     )
+    output_display = {
+        ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name)
+        for ref in node_class.Outputs
+        if ref.name in node_class.__output_ids__
+    }
+    if output_display:
+        setattr(NodeDisplayClass, "output_display", output_display)
+
     return NodeDisplayClass
