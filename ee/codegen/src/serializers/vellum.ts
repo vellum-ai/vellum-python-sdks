@@ -638,6 +638,201 @@ export declare namespace NodeDisplayDataSerializer {
   }
 }
 
+export const UnaryWorkflowExpressionSerializer: ObjectSchema<
+  UnaryWorkflowExpressionSerializer.Raw,
+  Omit<UnaryWorkflowExpression, "type">
+> = objectSchema({
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
+  operator: LogicalOperatorSerializer,
+});
+
+export declare namespace UnaryWorkflowExpressionSerializer {
+  interface Raw {
+    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
+    operator: LogicalOperatorSerializer.Raw;
+  }
+}
+
+export const BinaryWorkflowExpressionSerializer: ObjectSchema<
+  BinaryWorkflowExpressionSerializer.Raw,
+  Omit<BinaryWorkflowExpression, "type">
+> = objectSchema({
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
+  operator: LogicalOperatorSerializer,
+  rhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
+});
+
+export declare namespace BinaryWorkflowExpressionSerializer {
+  interface Raw {
+    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
+    operator: LogicalOperatorSerializer.Raw;
+    rhs?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+export const TernaryWorkflowExpressionSerializer: ObjectSchema<
+  TernaryWorkflowExpressionSerializer.Raw,
+  Omit<TernaryWorkflowExpression, "type">
+> = objectSchema({
+  base: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
+  operator: LogicalOperatorSerializer,
+  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
+  rhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
+});
+
+export declare namespace TernaryWorkflowExpressionSerializer {
+  interface Raw {
+    base?: WorkflowValueDescriptorSerializer.Raw | null;
+    operator: LogicalOperatorSerializer.Raw;
+    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
+    rhs?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+export const NodeOutputWorkflowReferenceSerializer: ObjectSchema<
+  NodeOutputWorkflowReferenceSerializer.Raw,
+  Omit<NodeOutputWorkflowReference, "type">
+> = objectSchema({
+  nodeId: propertySchema("node_id", stringSchema()),
+  nodeOutputId: propertySchema("node_output_id", stringSchema()),
+});
+
+export declare namespace NodeOutputWorkflowReferenceSerializer {
+  interface Raw {
+    node_id: string;
+    node_output_id: string;
+  }
+}
+
+export const WorkflowInputWorkflowReferenceSerializer: ObjectSchema<
+  WorkflowInputWorkflowReferenceSerializer.Raw,
+  Omit<WorkflowInputWorkflowReference, "type">
+> = objectSchema({
+  inputVariableId: propertySchema("input_variable_id", stringSchema()),
+});
+
+export declare namespace WorkflowInputWorkflowReferenceSerializer {
+  interface Raw {
+    input_variable_id: string;
+  }
+}
+
+export const WorkflowStateVariableWorkflowReferenceSerializer: ObjectSchema<
+  WorkflowStateVariableWorkflowReferenceSerializer.Raw,
+  Omit<WorkflowStateVariableWorkflowReference, "type">
+> = objectSchema({
+  stateVariableId: propertySchema("state_variable_id", stringSchema()),
+});
+
+export declare namespace WorkflowStateVariableWorkflowReferenceSerializer {
+  interface Raw {
+    state_variable_id: string;
+  }
+}
+
+export const ConstantValueWorkflowReferenceSerializer: ObjectSchema<
+  ConstantValueWorkflowReferenceSerializer.Raw,
+  Omit<ConstantValueWorkflowReference, "type">
+> = objectSchema({
+  value: VellumValueSerializer,
+});
+
+export declare namespace ConstantValueWorkflowReferenceSerializer {
+  interface Raw {
+    value: VellumValueSerializer.Raw;
+  }
+}
+
+export const VellumSecretWorkflowReferenceSerializer: ObjectSchema<
+  VellumSecretWorkflowReferenceSerializer.Raw,
+  Omit<VellumSecretWorkflowReference, "type">
+> = objectSchema({
+  vellumSecretName: propertySchema("vellum_secret_name", stringSchema()),
+});
+
+export declare namespace VellumSecretWorkflowReferenceSerializer {
+  interface Raw {
+    vellum_secret_name: string;
+  }
+}
+
+export const ExecutionCounterWorkflowReferenceSerializer: ObjectSchema<
+  ExecutionCounterWorkflowReferenceSerializer.Raw,
+  Omit<ExecutionCounterWorkflowReference, "type">
+> = objectSchema({
+  nodeId: propertySchema("node_id", stringSchema()),
+});
+
+export declare namespace ExecutionCounterWorkflowReferenceSerializer {
+  interface Raw {
+    node_id: string;
+  }
+}
+
+export const WorkflowValueDescriptorSerializer: Schema<
+  WorkflowValueDescriptorSerializer.Raw,
+  WorkflowValueDescriptor
+> = unionSchema("type", {
+  UNARY_EXPRESSION: UnaryWorkflowExpressionSerializer,
+  BINARY_EXPRESSION: BinaryWorkflowExpressionSerializer,
+  TERNARY_EXPRESSION: TernaryWorkflowExpressionSerializer,
+  NODE_OUTPUT: NodeOutputWorkflowReferenceSerializer,
+  WORKFLOW_INPUT: WorkflowInputWorkflowReferenceSerializer,
+  WORKFLOW_STATE: WorkflowStateVariableWorkflowReferenceSerializer,
+  CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
+  VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
+  EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
+});
+
+export declare namespace WorkflowValueDescriptorSerializer {
+  type Raw =
+    | UnaryWorkflowExpressionSerializer.Raw
+    | BinaryWorkflowExpressionSerializer.Raw
+    | TernaryWorkflowExpressionSerializer.Raw
+    | NodeOutputWorkflowReferenceSerializer.Raw
+    | WorkflowInputWorkflowReferenceSerializer.Raw
+    | WorkflowStateVariableWorkflowReferenceSerializer.Raw
+    | ConstantValueWorkflowReferenceSerializer.Raw
+    | VellumSecretWorkflowReferenceSerializer.Raw
+    | ExecutionCounterWorkflowReferenceSerializer.Raw;
+}
+
+export const NodeAttributeSerializer: ObjectSchema<
+  NodeAttributeSerializer.Raw,
+  NodeAttribute
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  value: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace NodeAttributeSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    value?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+export const AdornmentNodeSerializer: ObjectSchema<
+  AdornmentNodeSerializer.Raw,
+  AdornmentNode
+> = objectSchema({
+  id: stringSchema(),
+  label: stringSchema(),
+  base: CodeResourceDefinitionSerializer,
+  attributes: listSchema(NodeAttributeSerializer),
+});
+
+export declare namespace AdornmentNodeSerializer {
+  interface Raw {
+    id: string;
+    label: string;
+    base: CodeResourceDefinitionSerializer.Raw;
+    attributes: NodeAttributeSerializer.Raw[];
+  }
+}
+
 export declare namespace BaseWorkflowNodeSerializer {
   interface Raw {
     base?: CodeResourceDefinitionSerializer.Raw | null;
@@ -670,6 +865,7 @@ export const EntrypointNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace EntrypointNodeSerializer {
@@ -933,6 +1129,50 @@ export declare namespace PromptNodeDataSerializer {
     | LegacyPromptNodeDataSerializer.Raw;
 }
 
+export const PromptNodeSerializer: ObjectSchema<
+  PromptNodeSerializer.Raw,
+  Omit<PromptNode, "type">
+> = objectSchema({
+  id: stringSchema(),
+  data: PromptNodeDataSerializer,
+  inputs: listSchema(NodeInputSerializer),
+  displayData: propertySchema(
+    "display_data",
+    NodeDisplayDataSerializer.optional()
+  ),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
+});
+
+export declare namespace PromptNodeSerializer {
+  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
+    data: PromptNodeDataSerializer.Raw;
+  }
+}
+
+export const SubworkflowNodeSerializer: ObjectSchema<
+  SubworkflowNodeSerializer.Raw,
+  Omit<SubworkflowNode, "type">
+> = objectSchema({
+  id: stringSchema(),
+  data: SubworkflowNodeDataSerializer,
+  inputs: listSchema(NodeInputSerializer),
+  displayData: propertySchema(
+    "display_data",
+    NodeDisplayDataSerializer.optional()
+  ),
+  base: CodeResourceDefinitionSerializer.optional(),
+  definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
+});
+
+export declare namespace SubworkflowNodeSerializer {
+  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
+    data: SubworkflowNodeDataSerializer.Raw;
+  }
+}
+
 export const DeploymentMapNodeDataSerializer: ObjectSchema<
   DeploymentMapNodeDataSerializer.Raw,
   Omit<DeploymentMapNodeData, "variant">
@@ -1036,6 +1276,7 @@ export const MapNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace MapNodeSerializer {
@@ -1064,6 +1305,7 @@ export const GuardrailNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace GuardrailNodeSerializer {
@@ -1138,6 +1380,7 @@ export const CodeExecutionNodeSerializer: ObjectSchema<
   displayData: propertySchema("display_data", anySchema().optional()),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace CodeExecutionNodeSerializer {
@@ -1213,6 +1456,7 @@ export const SearchNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace SearchNodeSerializer {
@@ -1303,6 +1547,7 @@ export const ConditionalNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace ConditionalNodeSerializer {
@@ -1335,6 +1580,7 @@ export const TemplatingNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace TemplatingNodeSerializer {
@@ -1371,6 +1617,7 @@ export const FinalOutputNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace FinalOutputNodeSerializer {
@@ -1426,6 +1673,7 @@ export const MergeNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace MergeNodeSerializer {
@@ -1498,6 +1746,7 @@ export const ApiNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace ApiNodeSerializer {
@@ -1539,6 +1788,7 @@ export const NoteNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace NoteNodeSerializer {
@@ -1571,6 +1821,7 @@ export const ErrorNodeSerializer: ObjectSchema<
   ),
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
+  adornments: listSchema(AdornmentNodeSerializer).optional(),
 });
 
 export declare namespace ErrorNodeSerializer {
@@ -1583,165 +1834,6 @@ export declare namespace ErrorNodeSerializer {
       error_output_id: string;
     };
   }
-}
-
-export const UnaryWorkflowExpressionSerializer: ObjectSchema<
-  UnaryWorkflowExpressionSerializer.Raw,
-  Omit<UnaryWorkflowExpression, "type">
-> = objectSchema({
-  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
-  operator: LogicalOperatorSerializer,
-});
-
-export declare namespace UnaryWorkflowExpressionSerializer {
-  interface Raw {
-    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
-    operator: LogicalOperatorSerializer.Raw;
-  }
-}
-
-export const BinaryWorkflowExpressionSerializer: ObjectSchema<
-  BinaryWorkflowExpressionSerializer.Raw,
-  Omit<BinaryWorkflowExpression, "type">
-> = objectSchema({
-  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
-  operator: LogicalOperatorSerializer,
-  rhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
-});
-
-export declare namespace BinaryWorkflowExpressionSerializer {
-  interface Raw {
-    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
-    operator: LogicalOperatorSerializer.Raw;
-    rhs?: WorkflowValueDescriptorSerializer.Raw | null;
-  }
-}
-
-export const TernaryWorkflowExpressionSerializer: ObjectSchema<
-  TernaryWorkflowExpressionSerializer.Raw,
-  Omit<TernaryWorkflowExpression, "type">
-> = objectSchema({
-  base: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
-  operator: LogicalOperatorSerializer,
-  lhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
-  rhs: lazySchema(() => WorkflowValueDescriptorSerializer).optional(),
-});
-
-export declare namespace TernaryWorkflowExpressionSerializer {
-  interface Raw {
-    base?: WorkflowValueDescriptorSerializer.Raw | null;
-    operator: LogicalOperatorSerializer.Raw;
-    lhs?: WorkflowValueDescriptorSerializer.Raw | null;
-    rhs?: WorkflowValueDescriptorSerializer.Raw | null;
-  }
-}
-
-export const NodeOutputWorkflowReferenceSerializer: ObjectSchema<
-  NodeOutputWorkflowReferenceSerializer.Raw,
-  Omit<NodeOutputWorkflowReference, "type">
-> = objectSchema({
-  nodeId: propertySchema("node_id", stringSchema()),
-  nodeOutputId: propertySchema("node_output_id", stringSchema()),
-});
-
-export declare namespace NodeOutputWorkflowReferenceSerializer {
-  interface Raw {
-    node_id: string;
-    node_output_id: string;
-  }
-}
-
-export const WorkflowInputWorkflowReferenceSerializer: ObjectSchema<
-  WorkflowInputWorkflowReferenceSerializer.Raw,
-  Omit<WorkflowInputWorkflowReference, "type">
-> = objectSchema({
-  inputVariableId: propertySchema("input_variable_id", stringSchema()),
-});
-
-export declare namespace WorkflowInputWorkflowReferenceSerializer {
-  interface Raw {
-    input_variable_id: string;
-  }
-}
-
-export const WorkflowStateVariableWorkflowReferenceSerializer: ObjectSchema<
-  WorkflowStateVariableWorkflowReferenceSerializer.Raw,
-  Omit<WorkflowStateVariableWorkflowReference, "type">
-> = objectSchema({
-  stateVariableId: propertySchema("state_variable_id", stringSchema()),
-});
-
-export declare namespace WorkflowStateVariableWorkflowReferenceSerializer {
-  interface Raw {
-    state_variable_id: string;
-  }
-}
-
-export const ConstantValueWorkflowReferenceSerializer: ObjectSchema<
-  ConstantValueWorkflowReferenceSerializer.Raw,
-  Omit<ConstantValueWorkflowReference, "type">
-> = objectSchema({
-  value: VellumValueSerializer,
-});
-
-export declare namespace ConstantValueWorkflowReferenceSerializer {
-  interface Raw {
-    value: VellumValueSerializer.Raw;
-  }
-}
-
-export const VellumSecretWorkflowReferenceSerializer: ObjectSchema<
-  VellumSecretWorkflowReferenceSerializer.Raw,
-  Omit<VellumSecretWorkflowReference, "type">
-> = objectSchema({
-  vellumSecretName: propertySchema("vellum_secret_name", stringSchema()),
-});
-
-export declare namespace VellumSecretWorkflowReferenceSerializer {
-  interface Raw {
-    vellum_secret_name: string;
-  }
-}
-
-export const ExecutionCounterWorkflowReferenceSerializer: ObjectSchema<
-  ExecutionCounterWorkflowReferenceSerializer.Raw,
-  Omit<ExecutionCounterWorkflowReference, "type">
-> = objectSchema({
-  nodeId: propertySchema("node_id", stringSchema()),
-});
-
-export declare namespace ExecutionCounterWorkflowReferenceSerializer {
-  interface Raw {
-    node_id: string;
-  }
-}
-
-export const WorkflowValueDescriptorSerializer: Schema<
-  WorkflowValueDescriptorSerializer.Raw,
-  WorkflowValueDescriptor
-> = unionSchema("type", {
-  UNARY_EXPRESSION: UnaryWorkflowExpressionSerializer,
-  BINARY_EXPRESSION: BinaryWorkflowExpressionSerializer,
-  TERNARY_EXPRESSION: TernaryWorkflowExpressionSerializer,
-  NODE_OUTPUT: NodeOutputWorkflowReferenceSerializer,
-  WORKFLOW_INPUT: WorkflowInputWorkflowReferenceSerializer,
-  WORKFLOW_STATE: WorkflowStateVariableWorkflowReferenceSerializer,
-  CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
-  VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
-  EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
-});
-
-export declare namespace WorkflowValueDescriptorSerializer {
-  type Raw =
-    | UnaryWorkflowExpressionSerializer.Raw
-    | BinaryWorkflowExpressionSerializer.Raw
-    | TernaryWorkflowExpressionSerializer.Raw
-    | NodeOutputWorkflowReferenceSerializer.Raw
-    | WorkflowInputWorkflowReferenceSerializer.Raw
-    | WorkflowStateVariableWorkflowReferenceSerializer.Raw
-    | ConstantValueWorkflowReferenceSerializer.Raw
-    | VellumSecretWorkflowReferenceSerializer.Raw
-    | ExecutionCounterWorkflowReferenceSerializer.Raw;
 }
 
 export const DefaultConditionNodePortSerializer: ObjectSchema<
@@ -1856,86 +1948,6 @@ export const GenericNodeDisplayDataSerializer: ObjectSchema<
 export declare namespace GenericNodeDisplayDataSerializer {
   interface Raw {
     position?: NodeDisplayPositionSerializer.Raw | null;
-  }
-}
-
-export const NodeAttributeSerializer: ObjectSchema<
-  NodeAttributeSerializer.Raw,
-  NodeAttribute
-> = objectSchema({
-  id: stringSchema(),
-  name: stringSchema(),
-  value: WorkflowValueDescriptorSerializer.optional(),
-});
-
-export declare namespace NodeAttributeSerializer {
-  interface Raw {
-    id: string;
-    name: string;
-    value?: WorkflowValueDescriptorSerializer.Raw | null;
-  }
-}
-
-export const AdornmentNodeSerializer: ObjectSchema<
-  AdornmentNodeSerializer.Raw,
-  AdornmentNode
-> = objectSchema({
-  id: stringSchema(),
-  label: stringSchema(),
-  base: CodeResourceDefinitionSerializer,
-  attributes: listSchema(NodeAttributeSerializer),
-});
-
-export declare namespace AdornmentNodeSerializer {
-  interface Raw {
-    id: string;
-    label: string;
-    base: CodeResourceDefinitionSerializer.Raw;
-    attributes: NodeAttributeSerializer.Raw[];
-  }
-}
-
-export const PromptNodeSerializer: ObjectSchema<
-  PromptNodeSerializer.Raw,
-  Omit<PromptNode, "type">
-> = objectSchema({
-  id: stringSchema(),
-  data: PromptNodeDataSerializer,
-  inputs: listSchema(NodeInputSerializer),
-  displayData: propertySchema(
-    "display_data",
-    NodeDisplayDataSerializer.optional()
-  ),
-  base: CodeResourceDefinitionSerializer.optional(),
-  definition: CodeResourceDefinitionSerializer.optional(),
-  adornments: listSchema(AdornmentNodeSerializer).optional(),
-});
-
-export declare namespace PromptNodeSerializer {
-  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
-    data: PromptNodeDataSerializer.Raw;
-  }
-}
-
-export const SubworkflowNodeSerializer: ObjectSchema<
-  SubworkflowNodeSerializer.Raw,
-  Omit<SubworkflowNode, "type">
-> = objectSchema({
-  id: stringSchema(),
-  data: SubworkflowNodeDataSerializer,
-  inputs: listSchema(NodeInputSerializer),
-  displayData: propertySchema(
-    "display_data",
-    NodeDisplayDataSerializer.optional()
-  ),
-  base: CodeResourceDefinitionSerializer.optional(),
-  definition: CodeResourceDefinitionSerializer.optional(),
-  adornments: listSchema(AdornmentNodeSerializer).optional(),
-});
-
-export declare namespace SubworkflowNodeSerializer {
-  interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
-    data: SubworkflowNodeDataSerializer.Raw;
   }
 }
 
