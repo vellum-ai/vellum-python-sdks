@@ -95,6 +95,10 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
         return bool(result_as_str)
 
     if get_origin(output_type) is list:
+        # Handle empty string case for list types by returning an empty list
+        if not result_as_str.strip():
+            return []
+
         try:
             data = json.loads(result_as_str)
         except json.JSONDecodeError:

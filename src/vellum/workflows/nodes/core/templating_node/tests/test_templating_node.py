@@ -283,3 +283,19 @@ def test_templating_node__function_call_as_json():
     # AND we can access fields directly
     assert outputs.result["arguments"] == {"key": "value"}
     assert outputs.result["name"] == "test_function"
+
+
+def test_templating_node__empty_string_to_list():
+    """Test that an empty string output with list output type casts to an empty array."""
+
+    # GIVEN a templating node that outputs an empty string but has List output type
+    class EmptyStringToListTemplateNode(TemplatingNode[BaseState, List[str]]):
+        template = """{{ "" }}"""
+        inputs = {}
+
+    # WHEN the node is run
+    node = EmptyStringToListTemplateNode()
+    outputs = node.run()
+
+    # THEN the output should be an empty list, not raise an exception
+    assert outputs.result == []
