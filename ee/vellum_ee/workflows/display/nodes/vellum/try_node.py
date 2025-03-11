@@ -1,6 +1,6 @@
 import inspect
 from uuid import UUID
-from typing import Any, Callable, ClassVar, Generic, Optional, Tuple, Type, TypeVar, cast
+from typing import Any, ClassVar, Generic, Optional, Tuple, Type, TypeVar, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -8,7 +8,6 @@ from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
-from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -93,43 +92,3 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
 
         inner_output = getattr(inner_node.Outputs, output.name)
         return node_display.get_node_output_display(inner_output)
-
-    @classmethod
-    def wrap(cls, error_output_id: Optional[UUID] = None) -> Callable[..., Type["BaseTryNodeDisplay"]]:
-        _error_output_id = error_output_id
-
-        NodeDisplayType = TypeVar("NodeDisplayType", bound=BaseNodeDisplay)
-
-        def decorator(inner_cls: Type[NodeDisplayType]) -> Type[NodeDisplayType]:
-            node_class = inner_cls.infer_node_class()
-            wrapped_node_class = cast(Type[BaseNode], node_class.__wrapped_node__)
-
-            # Mypy gets mad about dynamic parameter types like this, but it's fine
-            class TryNodeDisplay(BaseTryNodeDisplay[node_class]):  # type: ignore[valid-type]
-                error_output_id = _error_output_id
-
-            setattr(inner_cls, "__adorned_by__", TryNodeDisplay)
-
-            # We must edit the node display class to use __wrapped_node__ everywhere it
-            # references the adorned node class, which is three places:
-
-            # 1. The node display class' parameterized type
-            original_base_node_display = get_original_base(inner_cls)
-            original_base_node_display.__args__ = (wrapped_node_class,)
-            inner_cls._node_display_registry[wrapped_node_class] = inner_cls
-
-            # 2. The node display class' output displays
-            old_outputs = list(inner_cls.output_display.keys())
-            for old_output in old_outputs:
-                new_output = getattr(wrapped_node_class.Outputs, old_output.name)
-                inner_cls.output_display[new_output] = inner_cls.output_display.pop(old_output)
-
-            # 3. The node display class' port displays
-            old_ports = list(inner_cls.port_displays.keys())
-            for old_port in old_ports:
-                new_port = getattr(wrapped_node_class.Ports, old_port.name)
-                inner_cls.port_displays[new_port] = inner_cls.port_displays.pop(old_port)
-
-            return inner_cls
-
-        return decorator
