@@ -53,5 +53,22 @@ describe("PromptBlock", () => {
       block.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+    it("should handle double quotes in jinja template", async () => {
+      const block = new PromptBlock({
+        workflowContext,
+        promptBlock: {
+          id: "1",
+          blockType: "JINJA",
+          state: "ENABLED",
+          properties: {
+            template: '"Hello" "World"',
+          },
+        },
+        inputVariableNameById: {},
+      });
+
+      block.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });

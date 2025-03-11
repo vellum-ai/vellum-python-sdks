@@ -12,3 +12,8 @@ exports[`PromptBlock > JINJA > should generate a jinja block with a cache config
 )
 "
 `;
+
+exports[`PromptBlock > JINJA > should handle double quotes in jinja template 1`] = `
+"JinjaPromptBlock(template="""\\"Hello\\" \\"World\\"""")
+"
+`;
