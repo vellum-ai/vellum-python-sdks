@@ -328,6 +328,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                             "name": "default",
                         }
                     ],
+                    "mocked": None,
                 },
                 "parent": None,
             },
@@ -365,6 +366,40 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                             "name": "default",
                         }
                     ],
+                    "mocked": None,
+                },
+                "parent": None,
+            },
+        ),
+        (
+            NodeExecutionFulfilledEvent(
+                id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                body=NodeExecutionFulfilledBody(
+                    node_definition=MockNode,
+                    outputs=MockNode.Outputs(
+                        example="foo",
+                    ),
+                    mocked=True,
+                ),
+            ),
+            {
+                "id": "123e4567-e89b-12d3-a456-426614174000",
+                "api_version": "2024-10-25",
+                "timestamp": "2024-01-01T12:00:00",
+                "trace_id": "123e4567-e89b-12d3-a456-426614174000",
+                "span_id": "123e4567-e89b-12d3-a456-426614174000",
+                "name": "node.execution.fulfilled",
+                "body": {
+                    "node_definition": {
+                        "id": mock_node_uuid,
+                        "name": "MockNode",
+                        "module": module_root + ["events", "tests", "test_event"],
+                    },
+                    "outputs": {"example": "foo"},
+                    "mocked": True,
                 },
                 "parent": None,
             },
@@ -379,6 +414,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         "node.execution.streaming",
         "node.execution.fulfilled",
         "fulfilled_node_with_undefined_outputs",
+        "mocked_node",
     ],
 )
 def test_event_serialization(event, expected_json):

@@ -93,6 +93,7 @@ class NodeExecutionStreamingEvent(_BaseNodeEvent):
 class NodeExecutionFulfilledBody(_BaseNodeExecutionBody, Generic[OutputsType]):
     outputs: OutputsType
     invoked_ports: InvokedPorts = None
+    mocked: Optional[bool] = None
 
     @field_serializer("outputs")
     def serialize_outputs(self, outputs: OutputsType, _info: Any) -> Dict[str, Any]:
@@ -116,6 +117,10 @@ class NodeExecutionFulfilledEvent(_BaseNodeEvent, Generic[OutputsType]):
     @property
     def invoked_ports(self) -> InvokedPorts:
         return self.body.invoked_ports
+
+    @property
+    def mocked(self) -> Optional[bool]:
+        return self.body.mocked
 
 
 class NodeExecutionRejectedBody(_BaseNodeExecutionBody):

@@ -200,7 +200,7 @@ class WorkflowRunner(Generic[StateType]):
                 parent=parent_context,
             )
             node_run_response: NodeRunResponse
-            was_mocked = False
+            was_mocked: Optional[bool] = None
             mock_candidates = self.workflow.context.node_output_mocks_map.get(node.Outputs) or []
             for mock_candidate in mock_candidates:
                 if mock_candidate.when_condition.resolve(node.state):
@@ -315,6 +315,7 @@ class WorkflowRunner(Generic[StateType]):
                         node_definition=node.__class__,
                         outputs=outputs,
                         invoked_ports=invoked_ports,
+                        mocked=was_mocked,
                     ),
                     parent=parent_context,
                 )
