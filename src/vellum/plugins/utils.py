@@ -1,11 +1,19 @@
-from pydantic.plugin import _loader as _pydantic_plugin_loader
+import pydantic
 
-from vellum.plugins.pydantic import pydantic_plugin
-
+IS_PYDANTIC_V1 = pydantic.VERSION.startswith("1.")
 _loaded = False
 
 
 def load_runtime_plugins() -> None:
+    if IS_PYDANTIC_V1:
+        # Pydantic plugins are only available in v2, so we defer the imports
+        # below until we confirm we are running a supported version of pydantic
+        return
+
+    from pydantic.plugin import _loader as _pydantic_plugin_loader
+
+    from vellum.plugins.pydantic import pydantic_plugin
+
     global _loaded
     if _loaded:
         return
