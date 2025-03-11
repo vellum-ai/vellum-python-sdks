@@ -442,12 +442,8 @@ export interface InlineSubworkflowNodeData {
   variant: "INLINE";
 }
 export type SubworkflowNodeData =
-  | ({
-      variant: "DEPLOYMENT";
-    } & DeploymentSubworkflowNodeData)
-  | ({
-      variant: "INLINE";
-    } & InlineSubworkflowNodeData);
+  | DeploymentSubworkflowNodeData
+  | InlineSubworkflowNodeData;
 export interface SubworkflowNode extends BaseDisplayableWorkflowNode {
   type: "SUBWORKFLOW";
   data: SubworkflowNodeData;
@@ -480,13 +476,7 @@ export interface InlineMapNodeData {
   itemInputId: string;
   indexInputId: string;
 }
-export type MapNodeData =
-  | ({
-      variant: "DEPLOYMENT";
-    } & DeploymentMapNodeData)
-  | ({
-      variant: "INLINE";
-    } & InlineMapNodeData);
+export type MapNodeData = DeploymentMapNodeData | InlineMapNodeData;
 
 export interface MapNode extends BaseDisplayableWorkflowNode {
   type: "MAP";
