@@ -218,7 +218,7 @@ export abstract class BasePersistedFile extends AstNode {
 
   private postprocessDocstrings(content: string): string {
     // Find an escaped quote followed by space(s) right before closing triple quotes
-    const fixPattern = /(\\")(\s+)(""")/g;
+    const fixPattern = /(\\")(\s)(""")/g;
 
     // Remove the extra space between escaped quote and closing triple quotes
     return content.replace(fixPattern, "$1$3");
