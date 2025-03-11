@@ -481,7 +481,16 @@ export abstract class BaseNode<
     const nodeComment = this.getNodeComment();
 
     if (nodeComment && nodeComment.value) {
-      return nodeComment.value;
+      let comment = nodeComment.value;
+      // if comment start with ", add a \ in front of it
+      if (comment.startsWith('"')) {
+        comment = `\\${comment}`;
+      }
+      // if comment end with ", add a \ in front of it
+      if (comment.endsWith('"')) {
+        comment = `${comment.slice(0, -1)}\\"`;
+      }
+      return comment;
     }
     return undefined;
   }

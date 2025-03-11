@@ -207,11 +207,20 @@ export abstract class BasePersistedFile extends AstNode {
     let contents: string;
     try {
       contents = await writer.toStringFormatted({ line_width: 120 });
+      contents = this.postprocessDocstrings(contents);
     } catch (error) {
       console.error("Error formatting", fileName, "with error", error);
       contents = writer.toString();
     }
 
     await writeFile(filepath, contents);
+  }
+
+  private postprocessDocstrings(content: string): string {
+    // Find an escaped quote followed by space(s) right before closing triple quotes
+    const fixPattern = /(\\")(\s+)(""")/g;
+
+    // Remove the extra space between escaped quote and closing triple quotes
+    return content.replace(fixPattern, "$1$3");
   }
 }

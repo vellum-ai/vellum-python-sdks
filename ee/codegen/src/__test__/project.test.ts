@@ -1599,4 +1599,189 @@ baz = foo + bar
       expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
     });
   });
+  describe("should escape special characters", () => {
+    it("should handle node comments with quotes at the beginning and end", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "test-edge-1",
+              type: "DEFAULT",
+              source_node_id: "entry-node",
+              target_node_id: "templating-node",
+              source_handle_id: "entry_source",
+              target_handle_id: "template_target",
+            },
+          ],
+          nodes: [
+            {
+              id: "entry-node",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+              },
+              inputs: [],
+              display_data: {
+                width: 124,
+                height: 48,
+                comment: null,
+                position: { x: 100, y: 100 },
+              },
+            },
+            {
+              id: "templating-node",
+              type: "TEMPLATING",
+              data: {
+                label: "Templating Node",
+                template_node_input_id: "template_input",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              inputs: [
+                {
+                  id: "template_input",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "test template",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              display_data: {
+                width: 300,
+                height: 200,
+                comment: {
+                  value: '"Hello" "World"',
+                  expanded: false,
+                },
+                position: { x: 300, y: 100 },
+              },
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot(project, [
+        "nodes",
+        "templating_node.py",
+      ]);
+    });
+
+    it("should not escape single quotes in node comments", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "test-edge-1",
+              type: "DEFAULT",
+              source_node_id: "entry-node",
+              target_node_id: "templating-node",
+              source_handle_id: "entry_source",
+              target_handle_id: "template_target",
+            },
+          ],
+          nodes: [
+            {
+              id: "entry-node",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+              },
+              inputs: [],
+              display_data: {
+                width: 124,
+                height: 48,
+                comment: null,
+                position: { x: 100, y: 100 },
+              },
+            },
+            {
+              id: "templating-node",
+              type: "TEMPLATING",
+              data: {
+                label: "Templating Node",
+                template_node_input_id: "template_input",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              inputs: [
+                {
+                  id: "template_input",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "test template",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              display_data: {
+                width: 300,
+                height: 200,
+                comment: {
+                  value: "'Hello' 'World'",
+                  expanded: false,
+                },
+                position: { x: 300, y: 100 },
+              },
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot(project, [
+        "nodes",
+        "templating_node.py",
+      ]);
+    });
+  });
 });

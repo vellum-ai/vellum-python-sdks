@@ -237,3 +237,29 @@ class Workflow(BaseWorkflow):
     graph = TemplatingNode
 "
 `;
+
+exports[`WorkflowProjectGenerator > should escape special characters > should handle node comments with quotes at the beginning and end 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    """\\"Hello" "World\\""""
+
+    template = """test template"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > should escape special characters > should not escape single quotes in node comments 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    """'Hello' 'World'"""
+
+    template = """test template"""
+    inputs = {}
+"
+`;
