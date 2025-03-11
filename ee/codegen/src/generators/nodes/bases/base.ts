@@ -294,6 +294,17 @@ export abstract class BaseNode<
         continue;
       }
 
+      // Filter out attributes that match their default values
+      const filteredAttributes = adornment.attributes.filter((attr) => {
+        if (adornment.base.name === "RetryNode") {
+          if (attr.name === "retry_on_error_code" && attr.value === undefined) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
       if (adornment.base) {
         decorators.push(
           python.decorator({
@@ -303,7 +314,7 @@ export abstract class BaseNode<
                 attribute: ["wrap"],
                 modulePath: adornment.base.module,
               }),
-              arguments_: adornment.attributes.map((attr) =>
+              arguments_: filteredAttributes.map((attr) =>
                 python.methodArgument({
                   name: attr.name,
                   value: new WorkflowValueDescriptor({

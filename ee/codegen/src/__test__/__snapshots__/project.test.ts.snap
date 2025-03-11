@@ -186,7 +186,7 @@ from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
 
-@RetryNode.wrap(retry_on_error_code=None, max_attempts=5)
+@RetryNode.wrap(max_attempts=5)
 class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
