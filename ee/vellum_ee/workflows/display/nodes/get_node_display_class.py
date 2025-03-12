@@ -1,9 +1,10 @@
 import types
-from uuid import UUID, uuid4
+from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Optional, Type
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.generics import NodeType
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
 if TYPE_CHECKING:
@@ -37,7 +38,7 @@ def get_node_display_class(
             return node_input_ids_by_name
 
         if isinstance(inst, BaseDescriptor):
-            return {path: uuid4()}
+            return {path: uuid4_from_hash(f"{node_class.__id__}|{path}")}
 
         return {}
 
