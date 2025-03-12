@@ -253,26 +253,34 @@ def test_vellum_workflow_display__serialize_with_parse_json_expression():
     # WHEN we serialize the workflow
     exec_config = workflow_display.serialize()
 
+    # THEN the serialized workflow contains the parse_json expression
     raw_data = exec_config["workflow_raw_data"]
     assert isinstance(raw_data, dict)
 
     nodes = raw_data["nodes"]
     assert isinstance(nodes, list)
 
-    json_node = next(
-        (node for node in nodes if node.get("type") == "GENERIC" and node.get("definition").get("name") == "JsonNode"),
-        None,
-    )
+    json_node = None
+    for node in nodes:
+        assert isinstance(node, dict)
+        definition = node.get("definition")
+        if node.get("type") == "GENERIC" and isinstance(definition, dict) and definition.get("name") == "JsonNode":
+            json_node = node
+            break
+
     assert json_node is not None
 
-    # THEN the node has outputs with parse_json
-    outputs = json_node.get("outputs")
+    outputs = json_node.get("outputs", [])
     assert isinstance(outputs, list)
-    assert len(outputs) > 0
-    parse_json_output = next((output for output in outputs if output.get("name") == "parse_json"), None)
-    assert parse_json_output is not None
 
-    assert parse_json_output == {
+    json_result = None
+    for output in outputs:
+        assert isinstance(output, dict)
+        if output.get("name") == "json_result":
+            json_result = output
+            break
+
+    assert json_result == {
         "id": "44c7d94c-a76a-4151-9b95-85a31764f18f",
         "name": "json_result",
         "type": "JSON",
