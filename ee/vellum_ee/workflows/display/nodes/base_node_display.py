@@ -404,7 +404,11 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             }
 
         if isinstance(value, ParseJsonExpression):
-            raise ValueError("ParseJsonExpression is not supported in the UI")
+            json_string = self.serialize_value(display_context, value._expression)
+            return {
+                "type": "PARSE_JSON",
+                "json_string": json_string,
+            }
 
         if not isinstance(value, BaseDescriptor):
             vellum_value = primitive_to_vellum_value(value)

@@ -1003,3 +1003,69 @@ def test_serialize_node__or_then_and(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+class ParseJsonGenericNode(BaseNode):
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(Inputs.input.parse_json().equals({"key": "value"}))
+
+
+def test_serialize_node__parse_json(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=ParseJsonGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "60edd9b2-9bad-470f-832c-c5f1aa9a253e",
+            "label": "ParseJsonGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "ParseJsonGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "0ccc19cb-174b-440b-8d08-6c84c571fb8f", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [
+                {
+                    "id": "abe1e6db-14df-4d3c-b059-d17933ab8c02",
+                    "type": "IF",
+                    "name": "if_branch",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "PARSE_JSON",
+                            "json_string": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": str(input_id),
+                            },
+                        },
+                        "operator": "=",
+                        "rhs": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {
+                                "type": "JSON",
+                                "value": {"key": "value"},
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
