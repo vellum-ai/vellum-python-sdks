@@ -21,20 +21,18 @@ class Inputs(BaseInputs):
     input: str
 
 
-@RetryNode.wrap(max_attempts=3)
-class InnerRetryGenericNode(BaseNode):
-    input = Inputs.input
-
-    class Outputs(BaseOutputs):
-        output: str
-
-
-@BaseRetryNodeDisplay.wrap(max_attempts=3)
-class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode]):
-    pass
-
-
 def test_serialize_node__retry(serialize_node):
+    @RetryNode.wrap(max_attempts=3)
+    class InnerRetryGenericNode(BaseNode):
+        input = Inputs.input
+
+        class Outputs(BaseOutputs):
+            output: str
+
+    @BaseRetryNodeDisplay.wrap(max_attempts=3)
+    class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode]):
+        pass
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=InnerRetryGenericNode,
@@ -49,8 +47,8 @@ def test_serialize_node__retry(serialize_node):
     )
     assert not DeepDiff(
         {
-            "id": "f2a95e79-7d4b-47ad-b986-4f648297ec65",
-            "label": "InnerRetryGenericNode",
+            "id": "188b50aa-e518-4b7b-a5e0-e2585fb1d7b5",
+            "label": "test_serialize_node__retry.<locals>.InnerRetryGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -66,8 +64,8 @@ def test_serialize_node__retry(serialize_node):
                     "test_adornments_serialization",
                 ],
             },
-            "trigger": {"id": "af9ba01c-4cde-4632-9aa1-7673b42e7bd8", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "c2ecc6c0-f353-4495-9b93-a61a47248556", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "d38a83bf-23d1-4f9d-a875-a08dc27cf397", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "078650c9-f775-4cd0-a08c-23af9983a361", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
                     "id": "5be7d260-74f7-4734-b31b-a46a94539586",
@@ -102,13 +100,13 @@ def test_serialize_node__retry(serialize_node):
             ],
             "attributes": [
                 {
-                    "id": "c363daa7-9482-4c0e-aee8-faa080602ee3",
+                    "id": "278df25e-58b5-43c3-b346-cf6444d893a5",
                     "name": "input",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
                 }
             ],
             "outputs": [
-                {"id": "8aaf6cd8-3fa5-4f17-a60f-ec7da5ec6498", "name": "output", "type": "STRING", "value": None}
+                {"id": "dc89dc0d-c0bd-47fd-88aa-ec7b262aa2f1", "name": "output", "type": "STRING", "value": None}
             ],
         },
         serialized_node,
@@ -136,20 +134,18 @@ def test_serialize_node__retry__no_display():
     assert exec_config is not None
 
 
-@TryNode.wrap()
-class InnerTryGenericNode(BaseNode):
-    input = Inputs.input
-
-    class Outputs(BaseOutputs):
-        output: str
-
-
-@BaseTryNodeDisplay.wrap()
-class InnerTryGenericNodeDisplay(BaseNodeDisplay[InnerTryGenericNode]):
-    pass
-
-
 def test_serialize_node__try(serialize_node):
+    @TryNode.wrap()
+    class InnerTryGenericNode(BaseNode):
+        input = Inputs.input
+
+        class Outputs(BaseOutputs):
+            output: str
+
+    @BaseTryNodeDisplay.wrap()
+    class InnerTryGenericNodeDisplay(BaseNodeDisplay[InnerTryGenericNode]):
+        pass
+
     input_id = uuid4()
     serialized_node = serialize_node(
         base_class=BaseNodeVellumDisplay,
@@ -163,7 +159,7 @@ def test_serialize_node__try(serialize_node):
     assert not DeepDiff(
         {
             "id": str(InnerTryGenericNode.__wrapped_node__.__id__),
-            "label": "InnerTryGenericNode",
+            "label": "test_serialize_node__try.<locals>.InnerTryGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -179,8 +175,8 @@ def test_serialize_node__try(serialize_node):
                     "test_adornments_serialization",
                 ],
             },
-            "trigger": {"id": "741f7f75-e921-47a9-8c05-9e66640d0866", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "1b8f8ab5-a656-4015-926c-80655bbd9cb8", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "16bc1522-c408-47ad-9a22-0ef136384abf", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "8d25f244-4b12-4f8b-b202-8948698679a0", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
                     "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
@@ -200,13 +196,13 @@ def test_serialize_node__try(serialize_node):
             ],
             "attributes": [
                 {
-                    "id": "4d8b4c2c-4f92-4c7a-abf0-b9c88a15a790",
+                    "id": "51aa0077-4060-496b-8e2e-e79d56ee6a32",
                     "name": "input",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
                 }
             ],
             "outputs": [
-                {"id": "63ba929b-bf79-44ee-bd1f-d259dbe8d48e", "name": "output", "type": "STRING", "value": None}
+                {"id": "ce9f8b86-6d26-4c03-8bfa-a31aa2cd97f1", "name": "output", "type": "STRING", "value": None}
             ],
         },
         serialized_node,

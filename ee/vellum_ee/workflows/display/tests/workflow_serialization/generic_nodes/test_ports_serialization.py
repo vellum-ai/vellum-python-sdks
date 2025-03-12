@@ -15,16 +15,16 @@ class Inputs(BaseInputs):
     input: str
 
 
-class BasicGenericNode(BaseNode):
-    pass
-
-
 def test_serialize_node__basic(serialize_node):
+    class BasicGenericNode(BaseNode):
+        pass
+
     serialized_node = serialize_node(BasicGenericNode)
+
     assert not DeepDiff(
         {
-            "id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
-            "label": "BasicGenericNode",
+            "id": "8d7cbfe4-72ca-4367-a401-8d28723d2f00",
+            "label": "test_serialize_node__basic.<locals>.BasicGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -40,10 +40,10 @@ def test_serialize_node__basic(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "be19c63b-3492-46b1-be9d-16f8d2e6410b", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "89dccfa5-cc1a-4612-bd87-86cb444f6dd4",
+                    "id": "8bec8d0c-113f-4110-afcb-4a6e566e7236",
                     "name": "default",
                     "type": "DEFAULT",
                 }
@@ -57,12 +57,11 @@ def test_serialize_node__basic(serialize_node):
     )
 
 
-class IfGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input.equals("hello"))
-
-
 def test_serialize_node__if(serialize_node):
+    class IfGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.equals("hello"))
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=IfGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
@@ -70,8 +69,8 @@ def test_serialize_node__if(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "31da54ae-1abb-4e9e-8a7d-6f4f30a78c72",
-            "label": "IfGenericNode",
+            "id": "bba4b15a-dea0-48c9-a79b-4e12e99db00f",
+            "label": "test_serialize_node__if.<locals>.IfGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -87,10 +86,10 @@ def test_serialize_node__if(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "a8afaebc-7333-4e3f-b221-24452b4a1d47", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "abe5abf8-9678-4606-be71-3104efc25c74", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "d713e346-b55a-4871-91de-f1470bfb3479",
+                    "id": "9889fe69-62f8-4bb3-aac6-425b75700bea",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -119,13 +118,12 @@ def test_serialize_node__if(serialize_node):
     )
 
 
-class IfElseGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input.equals("hello"))
-        else_branch = Port.on_else()
-
-
 def test_serialize_node__if_else(serialize_node):
+    class IfElseGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.equals("hello"))
+            else_branch = Port.on_else()
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=IfElseGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
@@ -133,8 +131,8 @@ def test_serialize_node__if_else(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "1f499f82-8cc0-4060-bf4d-d20ac409d4aa",
-            "label": "IfElseGenericNode",
+            "id": "25c9c3f1-4014-47ac-90cf-5216de10d05c",
+            "label": "test_serialize_node__if_else.<locals>.IfElseGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -150,10 +148,10 @@ def test_serialize_node__if_else(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "5b4f6553-69ca-4844-bbe4-9e5594bc8cae", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "b5ef0133-0605-495f-a229-169d7490cd07", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "1b02eabf-f2bd-45bd-ab26-fe4034ed5978",
+                    "id": "6fd9edea-9c1f-4463-aeb9-bfdde3231ee0",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -173,7 +171,7 @@ def test_serialize_node__if_else(serialize_node):
                     },
                 },
                 {
-                    "id": "2c858834-8f65-4b6b-89d8-07b394764666",
+                    "id": "7f9ea016-22da-49b3-be46-b80fb96beedf",
                     "type": "ELSE",
                     "name": "else_branch",
                     "expression": None,
@@ -187,23 +185,23 @@ def test_serialize_node__if_else(serialize_node):
     )
 
 
-class IfElifElseGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input.equals("hello"))
-        elif_branch = Port.on_elif(Inputs.input.equals("world"))
-        else_branch = Port.on_else()
-
-
 def test_serialize_node__if_elif_else(serialize_node):
+    class IfElifElseGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.equals("hello"))
+            elif_branch = Port.on_elif(Inputs.input.equals("world"))
+            else_branch = Port.on_else()
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=IfElifElseGenericNode,
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
     )
+
     assert not DeepDiff(
         {
-            "id": "21c49bfb-a90c-4565-a4e6-8eb5187e81ca",
-            "label": "IfElifElseGenericNode",
+            "id": "7b2b9cfc-12aa-432c-940d-cbe53e71de9c",
+            "label": "test_serialize_node__if_elif_else.<locals>.IfElifElseGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -219,10 +217,10 @@ def test_serialize_node__if_elif_else(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "22d55b5b-3545-4498-8658-9d0464202e78", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "d41d03f1-36f3-4cfe-ac9f-0f79a918a810", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "dcaa1d8e-01c6-48b4-a851-8828b49d0f57",
+                    "id": "19a1cc62-1f18-49b0-8026-7c82709e34db",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -242,7 +240,7 @@ def test_serialize_node__if_elif_else(serialize_node):
                     },
                 },
                 {
-                    "id": "e00351f8-f1f9-4f7b-bf7a-c24e3db40d6c",
+                    "id": "dc0b680e-d7b3-4a44-a37d-df22b310bda3",
                     "type": "ELIF",
                     "name": "elif_branch",
                     "expression": {
@@ -262,7 +260,7 @@ def test_serialize_node__if_elif_else(serialize_node):
                     },
                 },
                 {
-                    "id": "90caeb67-5ab7-46aa-b65e-01c27f549eed",
+                    "id": "16d0b698-1353-4eb3-9768-4a6e5ed4b1da",
                     "type": "ELSE",
                     "expression": None,
                     "name": "else_branch",
@@ -276,21 +274,18 @@ def test_serialize_node__if_elif_else(serialize_node):
     )
 
 
-class NodeWithOutput(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-
-class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
-    pass
-
-
-class GenericNodeReferencingOutput(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(NodeWithOutput.Outputs.output.equals("hello"))
-
-
 def test_serialize_node__node_output_reference(serialize_node):
+    class NodeWithOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output = Inputs.input
+
+    class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
+        pass
+
+    class GenericNodeReferencingOutput(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(NodeWithOutput.Outputs.output.equals("hello"))
+
     workflow_input_id = uuid4()
     node_output_id = uuid4()
     serialized_node = serialize_node(
@@ -304,8 +299,8 @@ def test_serialize_node__node_output_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "c1e2ce60-ac3a-4b17-915e-abe861734e03",
-            "label": "GenericNodeReferencingOutput",
+            "id": "ac067acc-6a6f-44b1-ae84-428e965ce691",
+            "label": "test_serialize_node__node_output_reference.<locals>.GenericNodeReferencingOutput",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "definition": {
@@ -321,17 +316,17 @@ def test_serialize_node__node_output_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "449072ba-f7b6-4314-ac96-682123f225e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "e949426f-9f3c-425e-a4de-8c0c5f6a8945", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "eecccf2b-82af-4559-8a1b-0c5de5890ac2",
+                    "id": "500075dc-fc65-428a-b3c0-a410f8c7f8cf",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
                             "type": "NODE_OUTPUT",
-                            "node_id": "cd954d76-0b0a-4d9b-9bdf-347179c38cb6",
+                            "node_id": "21213d1e-991c-405a-b4fa-a1e01c4dd088",
                             "node_output_id": str(node_output_id),
                         },
                         "operator": "=",
@@ -354,12 +349,11 @@ def test_serialize_node__node_output_reference(serialize_node):
     )
 
 
-class GenericNodeReferencingSecret(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(VellumSecretReference(name="hello").equals("hello"))
-
-
 def test_serialize_node__vellum_secret_reference(serialize_node):
+    class GenericNodeReferencingSecret(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(VellumSecretReference(name="hello").equals("hello"))
+
     workflow_input_id = uuid4()
     serialized_node = serialize_node(
         node_class=GenericNodeReferencingSecret,
@@ -368,8 +362,8 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "88272edd-fc81-403b-bb87-a116ef8f269e",
-            "label": "GenericNodeReferencingSecret",
+            "id": "feb4b331-e25f-4a5c-9840-c5575b1efd5c",
+            "label": "test_serialize_node__vellum_secret_reference.<locals>.GenericNodeReferencingSecret",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "definition": {
@@ -385,10 +379,10 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "2709539b-352d-455a-bb86-dba070b59aa1", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "d762741b-c137-4df4-ade6-65f31ea5a624", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "b6387c9c-2cce-4667-9567-97e433503e72",
+                    "id": "3b6b4048-8622-446d-9772-2766357d7b18",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -414,20 +408,17 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
     )
 
 
-class NodeWithExecutions(BaseNode):
-    pass
-
-
-class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
-    pass
-
-
-class GenericNodeReferencingExecutions(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(NodeWithExecutions.Execution.count.equals(5))
-
-
 def test_serialize_node__execution_count_reference(serialize_node):
+    class NodeWithExecutions(BaseNode):
+        pass
+
+    class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
+        pass
+
+    class GenericNodeReferencingExecutions(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(NodeWithExecutions.Execution.count.equals(5))
+
     workflow_input_id = uuid4()
     serialized_node = serialize_node(
         node_class=GenericNodeReferencingExecutions,
@@ -437,8 +428,8 @@ def test_serialize_node__execution_count_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "6e4d2fb7-891e-492e-97a1-adf44693f518",
-            "label": "GenericNodeReferencingExecutions",
+            "id": "0b4fe8a6-6d0c-464e-9372-10110e2b0e13",
+            "label": "test_serialize_node__execution_count_reference.<locals>.GenericNodeReferencingExecutions",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "definition": {
@@ -454,17 +445,17 @@ def test_serialize_node__execution_count_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "68a91426-4c30-4194-a4c0-cff224d3c0f3", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "d6aa7eec-6f01-41c5-9f5c-d50c53259527", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "13ab561e-09c9-48ed-b22b-a4de4d9df887",
+                    "id": "79d0cfa3-c8f9-4434-a2f8-5e416d66437a",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
                             "type": "EXECUTION_COUNTER",
-                            "node_id": "c09bd5a6-dc04-4036-90d4-580acd43c71f",
+                            "node_id": "235c66f9-c76b-4df0-9bff-cfba2ef1ad18",
                         },
                         "operator": "=",
                         "rhs": {
@@ -486,12 +477,11 @@ def test_serialize_node__execution_count_reference(serialize_node):
     )
 
 
-class NullGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input.is_null())
-
-
 def test_serialize_node__null(serialize_node):
+    class NullGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.is_null())
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=NullGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
@@ -499,8 +489,8 @@ def test_serialize_node__null(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "d5fe72cd-a2bd-4f91-ae13-44e4c617815e",
-            "label": "NullGenericNode",
+            "id": "1838ce1f-9c07-4fd0-9fd4-2a3a841ea402",
+            "label": "test_serialize_node__null.<locals>.NullGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -516,10 +506,10 @@ def test_serialize_node__null(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "26b257ed-6a7d-4ca3-a5c8-d17ba1e776ba", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "f4dcf8a3-692c-4b7c-8625-1a54eaa16ff2", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "76a2867d-dd4c-409c-b97f-94b168a2233a",
+                    "id": "7f1fb75d-0c8b-4ebc-8c59-4ae68f1a68e1",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -541,16 +531,14 @@ def test_serialize_node__null(serialize_node):
     )
 
 
-class IntegerInputs(BaseInputs):
-    input: int
-
-
-class BetweenGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(IntegerInputs.input.between(1, 10))
-
-
 def test_serialize_node__between(serialize_node):
+    class IntegerInputs(BaseInputs):
+        input: int
+
+    class BetweenGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(IntegerInputs.input.between(1, 10))
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=BetweenGenericNode,
@@ -559,8 +547,8 @@ def test_serialize_node__between(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "3ef33a2a-6ad5-415c-be75-f38cc1403dfc",
-            "label": "BetweenGenericNode",
+            "id": "f2f5a1f2-a12d-4ce0-bfe9-42190ffe5328",
+            "label": "test_serialize_node__between.<locals>.BetweenGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -576,10 +564,10 @@ def test_serialize_node__between(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "086a355e-d9ef-4039-af35-9f1211497b32", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "12f79444-890b-4e5e-93b6-6c0efaee40db", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "71493245-0778-46f2-8bda-863af50d910d",
+                    "id": "b745c089-1023-46dc-b2b6-ba75ac37563a",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -615,12 +603,12 @@ def test_serialize_node__between(serialize_node):
     )
 
 
-class OrGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input.equals("hello") | Inputs.input.equals("world"))
-
-
 def test_serialize_node__or(serialize_node):
+
+    class OrGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.equals("hello") | Inputs.input.equals("world"))
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=OrGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
@@ -628,8 +616,8 @@ def test_serialize_node__or(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "63900268-b9d0-4285-8ea4-7c478f4abf88",
-            "label": "OrGenericNode",
+            "id": "5386abad-3378-4378-b3a8-831b4b77dc23",
+            "label": "test_serialize_node__or.<locals>.OrGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -645,10 +633,10 @@ def test_serialize_node__or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "dc245f37-9be7-4097-a50a-4f7196e24313", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "fb39e80b-4032-4538-83e4-59480b1ef7ff", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "9b4511aa-2d57-44f9-8156-d41dd8b5f98e",
+                    "id": "0bd64819-b866-4333-82e0-8ac672c09b79",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -696,14 +684,13 @@ def test_serialize_node__or(serialize_node):
     )
 
 
-class AndThenOrGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(
-            Inputs.input.equals("hello") & Inputs.input.equals("then") | Inputs.input.equals("world")
-        )
-
-
 def test_serialize_node__and_then_or(serialize_node):
+    class AndThenOrGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(
+                Inputs.input.equals("hello") & Inputs.input.equals("then") | Inputs.input.equals("world")
+            )
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=AndThenOrGenericNode,
@@ -712,8 +699,8 @@ def test_serialize_node__and_then_or(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "b3908206-e540-4dac-9c64-a2e12b847b15",
-            "label": "AndThenOrGenericNode",
+            "id": "4d3995b1-437b-48d9-8878-9f57a8b725f1",
+            "label": "test_serialize_node__and_then_or.<locals>.AndThenOrGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -729,10 +716,10 @@ def test_serialize_node__and_then_or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "33cfa8f4-bfc5-40b3-8df8-ab86371c26e0", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "b2b040de-9fba-4204-a6a5-e17f6ab321b1", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "91174ae5-6ce0-4f6c-9c05-ecfbfb4058f6",
+                    "id": "8bb89da2-a752-4541-8f90-1276c44910a8",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -799,14 +786,13 @@ def test_serialize_node__and_then_or(serialize_node):
     )
 
 
-class ParenthesizedAndThenOrGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(
-            Inputs.input.equals("hello") & (Inputs.input.equals("then") | Inputs.input.equals("world"))
-        )
-
-
 def test_serialize_node__parenthesized_and_then_or(serialize_node):
+    class ParenthesizedAndThenOrGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(
+                Inputs.input.equals("hello") & (Inputs.input.equals("then") | Inputs.input.equals("world"))
+            )
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=ParenthesizedAndThenOrGenericNode,
@@ -815,8 +801,8 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "6ed0373a-13b1-4edb-b0c4-31642cf312f8",
-            "label": "ParenthesizedAndThenOrGenericNode",
+            "id": "223864c9-0088-4c05-9b7d-e5b1c9ec936d",
+            "label": "test_serialize_node__parenthesized_and_then_or.<locals>.ParenthesizedAndThenOrGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -832,10 +818,10 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "91ac3b05-c931-4a4c-bb48-c2ba0e883867", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "bfd1504d-f642-431d-a900-28b0709bd65c", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "915f923b-f398-48af-93a4-5f7e66b8aa76",
+                    "id": "30478083-924d-469e-ad55-df28bc282cdb",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -902,14 +888,13 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
     )
 
 
-class OrThenAndGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(
-            Inputs.input.equals("hello") | Inputs.input.equals("then") & Inputs.input.equals("world")
-        )
-
-
 def test_serialize_node__or_then_and(serialize_node):
+    class OrThenAndGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(
+                Inputs.input.equals("hello") | Inputs.input.equals("then") & Inputs.input.equals("world")
+            )
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=OrThenAndGenericNode,
@@ -918,8 +903,8 @@ def test_serialize_node__or_then_and(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "a0e0a35b-132e-4168-ad7d-ceb04f3203f2",
-            "label": "OrThenAndGenericNode",
+            "id": "a946342e-4ede-4e96-8e3d-f396748d9f7c",
+            "label": "test_serialize_node__or_then_and.<locals>.OrThenAndGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -935,10 +920,10 @@ def test_serialize_node__or_then_and(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "dfa53d32-36cc-4b1d-adad-d4de21ac1e5a", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "9c59699a-edf9-4618-b6bc-1074f3bfae78", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "413bba3d-6a16-4f96-ba45-b5372f819277",
+                    "id": "7f442cce-0b99-482c-aec8-8eed6ccadde2",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -1005,12 +990,12 @@ def test_serialize_node__or_then_and(serialize_node):
     )
 
 
-class ParseJsonGenericNode(BaseNode):
-    class Ports(BaseNode.Ports):
-        if_branch = Port.on_if(Inputs.input.parse_json().equals({"key": "value"}))
-
-
 def test_serialize_node__parse_json(serialize_node):
+
+    class ParseJsonGenericNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.parse_json().equals({"key": "value"}))
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=ParseJsonGenericNode,
@@ -1019,8 +1004,8 @@ def test_serialize_node__parse_json(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "60edd9b2-9bad-470f-832c-c5f1aa9a253e",
-            "label": "ParseJsonGenericNode",
+            "id": "bfc3f81b-242a-4f43-9e1c-648223d77768",
+            "label": "test_serialize_node__parse_json.<locals>.ParseJsonGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -1036,10 +1021,10 @@ def test_serialize_node__parse_json(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "0ccc19cb-174b-440b-8d08-6c84c571fb8f", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "1d3287e2-cc05-49d2-be99-150320264f24", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "abe1e6db-14df-4d3c-b059-d17933ab8c02",
+                    "id": "5a88bac8-89b3-4d81-b539-2f977a36a9c0",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {

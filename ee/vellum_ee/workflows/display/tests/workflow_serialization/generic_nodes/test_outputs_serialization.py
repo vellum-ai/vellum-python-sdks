@@ -13,18 +13,17 @@ class Inputs(BaseInputs):
     input: str
 
 
-class AnnotatedOutputGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output: int
-
-
 def test_serialize_node__annotated_output(serialize_node):
+    class AnnotatedOutputGenericNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output: int
+
     serialized_node = serialize_node(AnnotatedOutputGenericNode)
 
     assert not DeepDiff(
         {
-            "id": "c0b71cfa-0d9e-4329-bde0-967c44be5c3c",
-            "label": "AnnotatedOutputGenericNode",
+            "id": "e33ddf79-f48c-4057-ba17-d41a3a60ac98",
+            "label": "test_serialize_node__annotated_output.<locals>.AnnotatedOutputGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -40,13 +39,13 @@ def test_serialize_node__annotated_output(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "256ef76c-39a6-4a8f-8bda-922f5972a1d4", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "9f391128-5d83-4c46-a62e-2b8bd075f569", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "753f7ef1-8724-4af2-939a-794f74ffc21b", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "d83b7a5d-bbac-47ee-9277-1fbed71e83e8", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
                 {
-                    "id": "8c3c9aff-e1d5-49f4-af75-3ec2fcbb4af2",
+                    "id": "0fd1356f-ca4e-4e85-b923-8a0164bfc451",
                     "name": "output",
                     "type": "NUMBER",
                     "value": None,
@@ -58,12 +57,11 @@ def test_serialize_node__annotated_output(serialize_node):
     )
 
 
-class WorkflowInputGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-
 def test_serialize_node__workflow_input(serialize_node):
+    class WorkflowInputGenericNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output = Inputs.input
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=WorkflowInputGenericNode,
@@ -72,8 +70,8 @@ def test_serialize_node__workflow_input(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "ddfa947f-0830-476b-b07e-ac573968f9a7",
-            "label": "WorkflowInputGenericNode",
+            "id": "30116483-6f38-40e0-baf2-32de0e14e9a3",
+            "label": "test_serialize_node__workflow_input.<locals>.WorkflowInputGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -89,13 +87,13 @@ def test_serialize_node__workflow_input(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "b1a5d749-bac0-4f11-8427-191febb2198e", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "d15c7175-139c-4885-8ef8-3e4081db121b", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "dcb92d51-1fbd-4d41-ab89-c8f490d2bb38", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "20d91130-ca86-4420-b2e7-a962c0f1a509", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
                 {
-                    "id": "2c4a85c0-b017-4cea-a261-e8e8498570c9",
+                    "id": "b62c0cbe-48d5-465d-8d9e-4ff82847f8c7",
                     "name": "output",
                     "type": "STRING",
                     "value": {
@@ -110,21 +108,18 @@ def test_serialize_node__workflow_input(serialize_node):
     )
 
 
-class NodeWithOutput(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-
-class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
-    pass
-
-
-class GenericNodeReferencingOutput(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = NodeWithOutput.Outputs.output
-
-
 def test_serialize_node__node_output_reference(serialize_node):
+    class NodeWithOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output = Inputs.input
+
+    class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
+        pass
+
+    class GenericNodeReferencingOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output = NodeWithOutput.Outputs.output
+
     workflow_input_id = uuid4()
     node_output_id = uuid4()
     serialized_node = serialize_node(
@@ -138,8 +133,8 @@ def test_serialize_node__node_output_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "c1e2ce60-ac3a-4b17-915e-abe861734e03",
-            "label": "GenericNodeReferencingOutput",
+            "id": "ac067acc-6a6f-44b1-ae84-428e965ce691",
+            "label": "test_serialize_node__node_output_reference.<locals>.GenericNodeReferencingOutput",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -155,18 +150,18 @@ def test_serialize_node__node_output_reference(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "449072ba-f7b6-4314-ac96-682123f225e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "1879f33e-6efa-46a0-9281-e02bbbc1d413", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "e949426f-9f3c-425e-a4de-8c0c5f6a8945", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "383dc10a-d8f3-4bac-b995-8b95bc6deb21", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
                 {
-                    "id": "db010db3-7076-4df9-ae1b-069caa16fa20",
+                    "id": "46e6e98e-9ecf-4880-86f9-6390f0851c31",
                     "name": "output",
                     "type": "STRING",
                     "value": {
                         "type": "NODE_OUTPUT",
-                        "node_id": "cd954d76-0b0a-4d9b-9bdf-347179c38cb6",
+                        "node_id": "21213d1e-991c-405a-b4fa-a1e01c4dd088",
                         "node_output_id": str(node_output_id),
                     },
                 }

@@ -19,17 +19,16 @@ class Inputs(BaseInputs):
     input: str
 
 
-class ConstantValueGenericNode(BaseNode):
-    attr: str = "hello"
-
-
 def test_serialize_node__constant_value(serialize_node):
+    class ConstantValueGenericNode(BaseNode):
+        attr: str = "hello"
+
     serialized_node = serialize_node(ConstantValueGenericNode)
 
     assert not DeepDiff(
         {
-            "id": "be892bc8-e4de-47ef-ab89-dc9d869af1fe",
-            "label": "ConstantValueGenericNode",
+            "id": "67e07859-7f67-4287-9854-06ab4199e576",
+            "label": "test_serialize_node__constant_value.<locals>.ConstantValueGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -45,12 +44,12 @@ def test_serialize_node__constant_value(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "279e8228-9b82-43a3-8c31-affc036e3a0b", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "7cd373aa-34d1-402d-bcb4-1c8f329b63e9", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "5d41f6fc-fc1a-4a19-9a06-6a0ea9d38557", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "96ac6512-0128-4cf7-ba51-2725b4807c8f", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "4cbbfd98-9ab6-41a8-bf4e-ae65f0eafe47",
+                    "id": "84e4f91c-af1a-4f9d-a578-e3f234dea23b",
                     "name": "attr",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -68,17 +67,16 @@ def test_serialize_node__constant_value(serialize_node):
     )
 
 
-class ConstantValueReferenceGenericNode(BaseNode):
-    attr: str = ConstantValueReference("hello")
-
-
 def test_serialize_node__constant_value_reference(serialize_node):
+    class ConstantValueReferenceGenericNode(BaseNode):
+        attr: str = ConstantValueReference("hello")
+
     serialized_node = serialize_node(ConstantValueReferenceGenericNode)
 
     assert not DeepDiff(
         {
-            "id": "9271e2b1-f47e-47a4-95ae-51299dedb62f",
-            "label": "ConstantValueReferenceGenericNode",
+            "id": "73643f17-e49e-47d2-bd01-bb9c3eab6ae9",
+            "label": "test_serialize_node__constant_value_reference.<locals>.ConstantValueReferenceGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -94,12 +92,12 @@ def test_serialize_node__constant_value_reference(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "8cc0b4c4-4ae4-4248-8fd5-bfb2e658eb51", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "fe696d84-47c2-4325-8020-34a1c586a759", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "174f3a8e-99c2-4045-8327-ad2dc658889e", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "61adfacf-c3a9-4aea-a3da-bcdbc03273c6", "name": "default", "type": "DEFAULT"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "460aeb68-7369-43d2-9d3d-37caa425611f",
+                    "id": "f8e5efc6-8117-4a1c-bcea-5ba23555409a",
                     "name": "attr",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
                 }
@@ -111,17 +109,16 @@ def test_serialize_node__constant_value_reference(serialize_node):
     )
 
 
-class LazyReferenceGenericNode(BaseNode):
-    attr: str = LazyReference(lambda: ConstantValueReference("hello"))
-
-
 def test_serialize_node__lazy_reference(serialize_node):
+    class LazyReferenceGenericNode(BaseNode):
+        attr: str = LazyReference(lambda: ConstantValueReference("hello"))
+
     serialized_node = serialize_node(LazyReferenceGenericNode)
 
     assert not DeepDiff(
         {
-            "id": "29563b11-bd4d-47b0-b017-372f78aeaef5",
-            "label": "LazyReferenceGenericNode",
+            "id": "3d6bfe3b-263a-40a6-8a05-98288e9559a4",
+            "label": "test_serialize_node__lazy_reference.<locals>.LazyReferenceGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -137,12 +134,12 @@ def test_serialize_node__lazy_reference(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "56e9791a-078a-4bb7-90bc-a26c3991c70f", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "acb761a0-fcc2-4d21-bc8c-d0d560912c04", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "a3598540-7464-4965-8a2f-f022a011007d", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "2dba7224-a376-4780-8414-2b50601f9283", "name": "default", "type": "DEFAULT"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "4370b381-9165-4fb4-881e-480507abe069",
+                    "id": "7ae37eb4-18c8-49e1-b5ac-6369ce7ed5dd",
                     "name": "attr",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
                 }
@@ -191,20 +188,20 @@ def test_serialize_node__lazy_reference_with_string():
     ]
 
 
-class WorkflowInputGenericNode(BaseNode):
-    attr: str = Inputs.input
-
-
 def test_serialize_node__workflow_input(serialize_node):
+    class WorkflowInputGenericNode(BaseNode):
+        attr: str = Inputs.input
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=WorkflowInputGenericNode,
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
     )
+
     assert not DeepDiff(
         {
-            "id": "ddfa947f-0830-476b-b07e-ac573968f9a7",
-            "label": "WorkflowInputGenericNode",
+            "id": "30116483-6f38-40e0-baf2-32de0e14e9a3",
+            "label": "test_serialize_node__workflow_input.<locals>.WorkflowInputGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -220,12 +217,12 @@ def test_serialize_node__workflow_input(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "b1a5d749-bac0-4f11-8427-191febb2198e", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "d15c7175-139c-4885-8ef8-3e4081db121b", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "dcb92d51-1fbd-4d41-ab89-c8f490d2bb38", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "20d91130-ca86-4420-b2e7-a962c0f1a509", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "56d44313-cfdd-4d75-9b19-0beb94e59c4e",
+                    "id": "6b2f781b-1a70-4abc-965a-a4edb8563f0e",
                     "name": "attr",
                     "value": {
                         "type": "WORKFLOW_INPUT",
@@ -240,20 +237,17 @@ def test_serialize_node__workflow_input(serialize_node):
     )
 
 
-class NodeWithOutput(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-
-class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
-    pass
-
-
-class GenericNodeReferencingOutput(BaseNode):
-    attr = NodeWithOutput.Outputs.output
-
-
 def test_serialize_node__node_output(serialize_node):
+    class NodeWithOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output = Inputs.input
+
+    class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
+        pass
+
+    class GenericNodeReferencingOutput(BaseNode):
+        attr = NodeWithOutput.Outputs.output
+
     workflow_input_id = uuid4()
     node_output_id = uuid4()
     serialized_node = serialize_node(
@@ -267,8 +261,8 @@ def test_serialize_node__node_output(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "c1e2ce60-ac3a-4b17-915e-abe861734e03",
-            "label": "GenericNodeReferencingOutput",
+            "id": "7210742f-8c3e-4379-9800-8b4b7f5dd7ed",
+            "label": "test_serialize_node__node_output.<locals>.GenericNodeReferencingOutput",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -284,16 +278,16 @@ def test_serialize_node__node_output(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "449072ba-f7b6-4314-ac96-682123f225e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "1879f33e-6efa-46a0-9281-e02bbbc1d413", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "aa7f0dce-0413-4802-b1dd-f96a2d2eb8e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "a345665a-decd-4f6b-af38-387bd41c2643", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "73e6a103-1339-41ec-a245-42d43b0637c1",
+                    "id": "1318ab14-deb1-4254-9636-4bd783bdd9eb",
                     "name": "attr",
                     "value": {
                         "type": "NODE_OUTPUT",
-                        "node_id": "cd954d76-0b0a-4d9b-9bdf-347179c38cb6",
+                        "node_id": "48cf26cc-7b6d-49a7-a1a3-298f6d66772b",
                         "node_output_id": str(node_output_id),
                     },
                 }
@@ -305,20 +299,20 @@ def test_serialize_node__node_output(serialize_node):
     )
 
 
-class VellumSecretGenericNode(BaseNode):
-    attr = VellumSecretReference(name="hello")
-
-
 def test_serialize_node__vellum_secret(serialize_node):
+    class VellumSecretGenericNode(BaseNode):
+        attr = VellumSecretReference(name="hello")
+
     input_id = uuid4()
     serialized_node = serialize_node(
         node_class=VellumSecretGenericNode,
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
     )
+
     assert not DeepDiff(
         {
-            "id": "89aa6faa-b533-4179-8912-70a048bf0712",
-            "label": "VellumSecretGenericNode",
+            "id": "0e75bd8f-882e-4ab7-8348-061319b574f7",
+            "label": "test_serialize_node__vellum_secret.<locals>.VellumSecretGenericNode",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -334,12 +328,12 @@ def test_serialize_node__vellum_secret(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "3ea0305d-d8ea-45fe-8cf1-f6c1c85e6979", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "881abc1c-ada3-4405-8faf-e167fa2f851b", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "c5006d90-90cc-4e97-9092-f75785fa61ec", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "6d1c2139-64bd-4433-84d7-3fe08850134b", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "8edd27da-eec1-4539-8bec-629b5ef7a9f9",
+                    "id": "c2eb79e2-4cd3-4176-8da9-0d76327cbf0f",
                     "name": "attr",
                     "value": {"type": "VELLUM_SECRET", "vellum_secret_name": "hello"},
                 }
@@ -351,19 +345,16 @@ def test_serialize_node__vellum_secret(serialize_node):
     )
 
 
-class NodeWithExecutions(BaseNode):
-    pass
-
-
-class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
-    pass
-
-
-class GenericNodeReferencingExecutions(BaseNode):
-    attr: int = NodeWithExecutions.Execution.count
-
-
 def test_serialize_node__node_execution(serialize_node):
+    class NodeWithExecutions(BaseNode):
+        pass
+
+    class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
+        pass
+
+    class GenericNodeReferencingExecutions(BaseNode):
+        attr: int = NodeWithExecutions.Execution.count
+
     workflow_input_id = uuid4()
     serialized_node = serialize_node(
         node_class=GenericNodeReferencingExecutions,
@@ -373,8 +364,8 @@ def test_serialize_node__node_execution(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "6e4d2fb7-891e-492e-97a1-adf44693f518",
-            "label": "GenericNodeReferencingExecutions",
+            "id": "f42dda6b-e856-49bd-b203-46c9dd66c08b",
+            "label": "test_serialize_node__node_execution.<locals>.GenericNodeReferencingExecutions",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -390,16 +381,16 @@ def test_serialize_node__node_execution(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "68a91426-4c30-4194-a4c0-cff224d3c0f3", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "0e1f78d5-8be1-4533-b2b4-a52777a8d43d", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "2fc95236-b5bc-4574-bade-2c9f0933b18c", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "59844b72-ac5e-43c5-b3a7-9c57ba73ec8c", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "090e18d7-d5b9-4d5f-9aec-0f562e4b33a8",
+                    "id": "8be1be85-ac70-4e61-b52a-cd416f5320b9",
                     "name": "attr",
                     "value": {
                         "type": "EXECUTION_COUNTER",
-                        "node_id": "c09bd5a6-dc04-4036-90d4-580acd43c71f",
+                        "node_id": "d68cc3c3-d5dc-4a51-bbfc-1fd4b41abad0",
                     },
                 }
             ],
@@ -410,33 +401,27 @@ def test_serialize_node__node_execution(serialize_node):
     )
 
 
-class CoalesceNodeA(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output: str
-
-
-class CoalesceNodeADisplay(BaseNodeDisplay[CoalesceNodeA]):
-    pass
-
-
-class CoalesceNodeB(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output: str
-
-
-class CoalesceNodeBDisplay(BaseNodeDisplay[CoalesceNodeB]):
-    pass
-
-
-class CoalesceNodeFinal(BaseNode):
-    attr = CoalesceNodeA.Outputs.output.coalesce(CoalesceNodeB.Outputs.output)
-
-
-class CoalesceNodeFinalDisplay(BaseNodeDisplay[CoalesceNodeFinal]):
-    pass
-
-
 def test_serialize_node__coalesce(serialize_node):
+    class CoalesceNodeA(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output: str
+
+    class CoalesceNodeADisplay(BaseNodeDisplay[CoalesceNodeA]):
+        pass
+
+    class CoalesceNodeB(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            output: str
+
+    class CoalesceNodeBDisplay(BaseNodeDisplay[CoalesceNodeB]):
+        pass
+
+    class CoalesceNodeFinal(BaseNode):
+        attr = CoalesceNodeA.Outputs.output.coalesce(CoalesceNodeB.Outputs.output)
+
+    class CoalesceNodeFinalDisplay(BaseNodeDisplay[CoalesceNodeFinal]):
+        pass
+
     coalesce_node_a_output_id = uuid4()
     coalesce_node_b_output_id = uuid4()
     serialized_node = serialize_node(
@@ -460,8 +445,8 @@ def test_serialize_node__coalesce(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "84d0ce62-afd1-4186-b0e3-5dd8e5ca8b65",
-            "label": "CoalesceNodeFinal",
+            "id": "bb99f326-7d2a-4b5e-95f3-6039114798da",
+            "label": "test_serialize_node__coalesce.<locals>.CoalesceNodeFinal",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -477,24 +462,24 @@ def test_serialize_node__coalesce(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "5165f887-153b-4ecd-9219-1beb3cf4f906", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "08ab456d-f541-4400-8305-e97f30cbe745", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "0302231d-73f2-4587-8a62-8ed3640f0f91", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "9d97a0c9-6a79-433a-bcdf-e07aa10c0f3c", "name": "default", "type": "DEFAULT"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "5a22dd48-9ef3-456b-85b8-7662cf7823eb",
+                    "id": "2e25b25b-4aac-425f-91f4-f0fa55453b8c",
                     "name": "attr",
                     "value": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
                             "type": "NODE_OUTPUT",
-                            "node_id": "20c340f2-409c-4d31-b44b-eeffd76938d5",
+                            "node_id": "f6d1aa4d-c3fd-421d-9dc8-4209bddf7fd3",
                             "node_output_id": str(coalesce_node_a_output_id),
                         },
                         "operator": "coalesce",
                         "rhs": {
                             "type": "NODE_OUTPUT",
-                            "node_id": "9fac3c54-4e75-46ca-a1f2-a80fc6d8ad3f",
+                            "node_id": "d1f673fb-80e1-4f9e-9d7d-afe64599ce39",
                             "node_output_id": str(coalesce_node_b_output_id),
                         },
                     },
