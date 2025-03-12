@@ -59,17 +59,20 @@ _NodeDisplayAttrType = TypeVar("_NodeDisplayAttrType")
 class BaseNodeDisplayMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         cls = super().__new__(mcs, name, bases, dct)
+        return cls.__annotate_node__()
+
+    def __annotate_node__(cls):
         base_node_display_class = cast(Type["BaseNodeDisplay"], cls)
         node_class = base_node_display_class.infer_node_class()
         if not issubclass(node_class, BaseNode):
             return cls
 
-        display_node_id = dct.get("node_id")
+        display_node_id = getattr(cls, "node_id", None)
         if isinstance(display_node_id, UUID):
             # Display classes are able to override the id of the node class it's parameterized by
             node_class.__id__ = display_node_id
 
-        output_display = dct.get("output_display")
+        output_display = getattr(cls, "output_display", None)
         if isinstance(output_display, dict):
             # And the node class' output ids
             for reference, node_output_display in output_display.items():

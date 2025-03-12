@@ -1,5 +1,5 @@
 import types
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, get_origin
 
 from vellum.workflows.types.generics import NodeType
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
@@ -23,6 +23,9 @@ def get_node_display_class(
     base_node_display_class = get_node_display_class(
         base_class, node_class.__bases__[0], node_class if root_node_class is None else root_node_class
     )
+
+    if not get_origin(base_node_display_class):
+        return base_node_display_class
 
     # `base_node_display_class` is always a Generic class, so it's safe to index into it
     NodeDisplayBaseClass = base_node_display_class[node_class]  # type: ignore[index]

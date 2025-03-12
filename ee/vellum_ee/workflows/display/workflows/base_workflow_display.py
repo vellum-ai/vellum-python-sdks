@@ -212,8 +212,6 @@ class BaseWorkflowDisplay(
 
         port_displays: Dict[Port, PortDisplay] = {}
 
-        # TODO: We should still serialize nodes that are in the workflow's directory but aren't used in the graph.
-        # https://app.shortcut.com/vellum/story/5394
         for node in self._workflow.get_nodes():
             extracted_node_displays = self._extract_node_displays(node)
 
@@ -403,11 +401,11 @@ class BaseWorkflowDisplay(
             for input in display_context.workflow_input_displays
         }
         node_displays = {
-            str(node.__id__): display_context.node_displays[node] for node in display_context.node_displays
+            node.__id__: (node, display_context.node_displays[node]) for node in display_context.node_displays
         }
         node_event_displays = {}
         for node_id in node_displays:
-            current_node_display = node_displays[node_id]
+            node, current_node_display = node_displays[node_id]
             input_display = {}
             if isinstance(current_node_display, BaseNodeVellumDisplay):
                 input_display = current_node_display.node_input_ids_by_name
@@ -418,7 +416,6 @@ class BaseWorkflowDisplay(
             port_display_meta = {
                 port.name: current_node_display.port_displays[port].id for port in current_node_display.port_displays
             }
-            node = current_node_display._node
             subworkflow_display_context: Optional[WorkflowEventDisplayContext] = None
             if hasattr(node, "subworkflow"):
                 # All nodes that have a subworkflow attribute are currently expected to call them `subworkflow`
@@ -432,7 +429,7 @@ class BaseWorkflowDisplay(
                     )
                     subworkflow_display_context = subworkflow_display.get_event_display_context()
 
-            node_event_displays[node_id] = NodeEventDisplayContext(
+            node_event_displays[str(node_id)] = NodeEventDisplayContext(
                 input_display=input_display,
                 output_display=output_display,
                 port_display=port_display_meta,

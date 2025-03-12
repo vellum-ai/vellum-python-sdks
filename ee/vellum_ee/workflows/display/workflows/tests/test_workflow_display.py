@@ -1,9 +1,12 @@
 import pytest
+from uuid import uuid4
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
+from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -139,3 +142,30 @@ def test_get_event_display_context__node_display_to_include_subworkflow_display(
 
     assert node_event_display.subworkflow_display is not None
     assert str(InnerNode.__id__) in node_event_display.subworkflow_display.node_displays
+
+
+def test_get_event_display_context__node_display_for_adornment_nodes():
+    # GIVEN a simple workflow with a retry node adornment
+    @RetryNode.wrap(max_attempts=4)
+    class MyNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow):
+        graph = MyNode
+
+    # AND a display class for the node
+    inner_node_id = uuid4()
+
+    @BaseRetryNodeDisplay.wrap()
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        node_id = inner_node_id
+
+    # WHEN we gather the event display context
+    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+
+    # THEN the subworkflow display should be included
+    assert str(MyNode.__id__) in display_context.node_displays
+    node_event_display = display_context.node_displays[str(MyNode.__id__)]
+
+    assert node_event_display.subworkflow_display is not None
+    assert str(inner_node_id) in node_event_display.subworkflow_display.node_displays
