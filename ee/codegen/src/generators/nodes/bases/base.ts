@@ -410,18 +410,8 @@ export abstract class BaseNode<
                   this.workflowContext.sdkModulePathNames
                     .NODE_DISPLAY_MODULE_PATH,
               }),
-              arguments_: adornment.attributes.map(
-                (attr) =>
-                  new MethodArgument({
-                    name: attr.name,
-                    value: new WorkflowValueDescriptor({
-                      workflowValueDescriptor: attr.value,
-                      nodeContext: this.nodeContext,
-                      workflowContext: this.workflowContext,
-                      iterableConfig: { endWithComma: false },
-                    }),
-                  })
-              ),
+              // When we define output transformations, that's what we'd use here. eg, `error_output_id`.
+              arguments_: [],
             }),
           })
         );
