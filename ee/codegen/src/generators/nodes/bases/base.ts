@@ -12,6 +12,7 @@ import {
 } from "src/generators/errors";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
+import { NODE_DEFAULT_ATTRIBUTES } from "src/generators/nodes/constants";
 import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
@@ -295,15 +296,9 @@ export abstract class BaseNode<
       }
 
       // Filter out attributes that match their default values
-      const filteredAttributes = adornment.attributes.filter((attr) => {
-        if (adornment.base.name === "RetryNode") {
-          if (attr.name === "retry_on_error_code" && attr.value === undefined) {
-            return false;
-          }
-        }
-
-        return true;
-      });
+      const filteredAttributes = adornment.attributes.filter((attr) =>
+        this.filterAttribute(adornment.base.name, attr.name, attr.value)
+      );
 
       if (adornment.base) {
         decorators.push(
@@ -495,5 +490,23 @@ export abstract class BaseNode<
       return nodeComment.value;
     }
     return undefined;
+  }
+
+  private filterAttribute(
+    nodeName: string,
+    attributeName: string,
+    attributeValue: unknown
+  ): boolean {
+    const nodeConfig = NODE_DEFAULT_ATTRIBUTES[nodeName];
+    if (!nodeConfig) {
+      return true; // Include if no config exists for this node
+    }
+
+    const attrConfig = nodeConfig[attributeName];
+    if (!attrConfig) {
+      return true; // Include if no config exists for this attribute
+    }
+
+    return attrConfig.defaultValue !== attributeValue; // Include if value differs from default
   }
 }
