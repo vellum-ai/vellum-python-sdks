@@ -61,20 +61,20 @@ test = ["astroid (>=2,<4)", "pytest", "pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "attrs"
-version = "25.1.0"
+version = "25.2.0"
 description = "Classes Without Boilerplate"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "attrs-25.1.0-py3-none-any.whl", hash = "sha256:c75a69e28a550a7e93789579c22aa26b0f5b83b75dc4e08fe092980051e1090a"},
-    {file = "attrs-25.1.0.tar.gz", hash = "sha256:1c97078a80c814273a76b2a298a932eb681c87415c11dee0a6921de7f1b02c3e"},
+    {file = "attrs-25.2.0-py3-none-any.whl", hash = "sha256:611344ff0a5fed735d86d7784610c84f8126b95e549bcad9ff61b4242f2d386b"},
+    {file = "attrs-25.2.0.tar.gz", hash = "sha256:18a06db706db43ac232cce80443fcd9f2500702059ecf53489e3c5a3f417acaf"},
 ]
 
 [package.extras]
 benchmark = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-codspeed", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
 cov = ["cloudpickle", "coverage[toml] (>=5.3)", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
 dev = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pre-commit-uv", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
-docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
+docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier"]
 tests = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
 tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
@@ -859,13 +859,13 @@ files = [
 
 [[package]]
 name = "jsii"
-version = "1.108.0"
+version = "1.109.0"
 description = "Python client for jsii runtime"
 optional = false
-python-versions = "~=3.8"
+python-versions = "~=3.9"
 files = [
-    {file = "jsii-1.108.0-py3-none-any.whl", hash = "sha256:d6c99671ab44520069ad6198e3b07379ae9c075bcb53b8a16455c1beb10288ea"},
-    {file = "jsii-1.108.0.tar.gz", hash = "sha256:f1053a414ac117c6ecae7208c5ca4cb6d10ca3420c69e30f8b9cca64cc37e61b"},
+    {file = "jsii-1.109.0-py3-none-any.whl", hash = "sha256:100bb48c7f74b8e22b3182c5466db1c32565ddb681ed5e2bf556076a734d3f07"},
+    {file = "jsii-1.109.0.tar.gz", hash = "sha256:85e0deca8089e2918776541e986d5abab90a66d4330eedfc14e8a060dd507bad"},
 ]
 
 [package.dependencies]
@@ -1043,13 +1043,13 @@ files = [
 
 [[package]]
 name = "openai"
-version = "1.66.0"
+version = "1.66.3"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "openai-1.66.0-py3-none-any.whl", hash = "sha256:43e4a3c0c066cc5809be4e6aac456a3ebc4ec1848226ef9d1340859ac130d45a"},
-    {file = "openai-1.66.0.tar.gz", hash = "sha256:8a9e672bc6eadec60a962f0b40d7d1c09050010179c919ed65322e433e2d1025"},
+    {file = "openai-1.66.3-py3-none-any.whl", hash = "sha256:a427c920f727711877ab17c11b95f1230b27767ba7a01e5b66102945141ceca9"},
+    {file = "openai-1.66.3.tar.gz", hash = "sha256:8dde3aebe2d081258d4159c4cb27bdc13b5bb3f7ea2201d9bd940b9a89faf0c9"},
 ]
 
 [package.dependencies]

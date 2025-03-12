@@ -26,6 +26,7 @@ LogicalOperator = typing.Union[
         "notBlank",
         "coalesce",
         "accessField",
+        "parseJson",
         "and",
         "or",
     ],
