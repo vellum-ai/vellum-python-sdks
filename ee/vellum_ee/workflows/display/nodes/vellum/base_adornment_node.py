@@ -1,13 +1,14 @@
 import re
 import types
 from uuid import UUID
-from typing import Any, Callable, Generic, Optional, Type, TypeVar, cast
+from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, cast
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
@@ -52,12 +53,17 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
 
             # `mypy` is wrong here, `cls` is indexable bc it's Generic
             BaseAdornmentDisplay = cls[node_class]  # type: ignore[index]
+
+            def exec_body(ns: Dict):
+                for key, kwarg in kwargs.items():
+                    ns[key] = kwarg
+
+                if "node_id" not in kwargs:
+                    ns["node_id"] = uuid4_from_hash(node_class.__qualname__)
+
             AdornmentDisplay = types.new_class(
-                re.sub(r"^Base", "", cls.__name__),
-                bases=(BaseAdornmentDisplay,),
+                re.sub(r"^Base", "", cls.__name__), bases=(BaseAdornmentDisplay,), exec_body=exec_body
             )
-            for key, kwarg in kwargs.items():
-                setattr(AdornmentDisplay, key, kwarg)
 
             setattr(inner_cls, "__adorned_by__", AdornmentDisplay)
 
@@ -68,6 +74,7 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
             original_base_node_display = get_original_base(inner_cls)
             original_base_node_display.__args__ = (wrapped_node_class,)
             inner_cls._node_display_registry[wrapped_node_class] = inner_cls
+            inner_cls.__annotate_node__()
 
             # 2. The node display class' output displays
             old_outputs = list(inner_cls.output_display.keys())
