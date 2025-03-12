@@ -1045,11 +1045,12 @@ def test_serialize_node__parse_json(serialize_node):
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
-                            "type": "PARSE_JSON",
-                            "json_string": {
+                            "type": "UNARY_EXPRESSION",
+                            "lhs": {
                                 "type": "WORKFLOW_INPUT",
                                 "input_variable_id": str(input_id),
                             },
+                            "operator": "parseJson",
                         },
                         "operator": "=",
                         "rhs": {

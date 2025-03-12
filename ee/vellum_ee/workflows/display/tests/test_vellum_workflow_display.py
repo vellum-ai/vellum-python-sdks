@@ -285,13 +285,14 @@ def test_vellum_workflow_display__serialize_with_parse_json_expression():
         "name": "json_result",
         "type": "JSON",
         "value": {
-            "type": "PARSE_JSON",
-            "json_string": {
+            "type": "UNARY_EXPRESSION",
+            "lhs": {
                 "type": "CONSTANT_VALUE",
                 "value": {
                     "type": "STRING",
                     "value": '{"key": "value"}',
                 },
             },
+            "operator": "parseJson",
         },
     }

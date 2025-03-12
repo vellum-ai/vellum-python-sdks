@@ -28,6 +28,7 @@ from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualTo
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
+from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.references import OutputReference, WorkflowInputReference
@@ -163,5 +164,7 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperato
         return "or"
     elif isinstance(descriptor, CoalesceExpression):
         return "coalesce"
+    elif isinstance(descriptor, ParseJsonExpression):
+        return "parseJson"
     else:
         raise ValueError(f"Unsupported descriptor type: {descriptor}")

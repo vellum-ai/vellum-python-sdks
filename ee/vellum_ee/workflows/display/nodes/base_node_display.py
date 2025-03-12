@@ -326,6 +326,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 IsNotNilExpression,
                 IsUndefinedExpression,
                 IsNotUndefinedExpression,
+                ParseJsonExpression,
             ),
         ):
             lhs = self.serialize_value(display_context, condition._expression)
@@ -401,13 +402,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             return {
                 "type": "EXECUTION_COUNTER",
                 "node_id": str(node_class_display.node_id),
-            }
-
-        if isinstance(value, ParseJsonExpression):
-            json_string = self.serialize_value(display_context, value._expression)
-            return {
-                "type": "PARSE_JSON",
-                "json_string": json_string,
             }
 
         if not isinstance(value, BaseDescriptor):
