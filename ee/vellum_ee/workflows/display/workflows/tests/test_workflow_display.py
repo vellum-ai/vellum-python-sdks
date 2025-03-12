@@ -4,6 +4,7 @@ from uuid import uuid4
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
@@ -166,6 +167,27 @@ def test_get_event_display_context__node_display_for_adornment_nodes():
     # THEN the subworkflow display should be included
     assert str(MyNode.__id__) in display_context.node_displays
     node_event_display = display_context.node_displays[str(MyNode.__id__)]
-
     assert node_event_display.subworkflow_display is not None
     assert str(inner_node_id) in node_event_display.subworkflow_display.node_displays
+
+
+def test_get_event_display_context__templating_node_input_display():
+    # GIVEN a simple workflow with a templating node referencing another node output
+    class DataNode(BaseNode):
+        class Outputs:
+            bar: str
+
+    class MyNode(TemplatingNode):
+        inputs = {"foo": DataNode.Outputs.bar}
+
+    class MyWorkflow(BaseWorkflow):
+        graph = DataNode >> MyNode
+
+    # WHEN we gather the event display context
+    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+
+    # THEN the subworkflow display should be included
+    assert str(MyNode.__id__) in display_context.node_displays
+    node_event_display = display_context.node_displays[str(MyNode.__id__)]
+
+    assert node_event_display.input_display.keys() == {"inputs.foo"}
