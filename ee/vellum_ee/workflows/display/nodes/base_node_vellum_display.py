@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Optional, Union
+from typing import ClassVar, Dict, Optional
 
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.ports import Port
@@ -16,9 +16,6 @@ class BaseNodeVellumDisplay(BaseNodeDisplay[NodeType]):
 
     # Used to explicitly set the target handle id for a node
     target_handle_id: ClassVar[Optional[UUID]] = None
-
-    # Used to explicitly set the node input ids by name for a node
-    node_input_ids_by_name: ClassVar[Dict[str, Union[UUID, str]]] = {}
 
     def _get_node_display_uuid(self, attribute: str) -> UUID:
         explicit_value = self._get_explicit_node_display_attr(attribute, UUID)

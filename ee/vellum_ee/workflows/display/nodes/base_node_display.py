@@ -4,6 +4,7 @@ from uuid import UUID
 from typing import (
     TYPE_CHECKING,
     Any,
+    ClassVar,
     Dict,
     ForwardRef,
     Generic,
@@ -89,6 +90,7 @@ class BaseNodeDisplayMeta(type):
 class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     output_display: Dict[OutputReference, NodeOutputDisplay] = {}
     port_displays: Dict[Port, PortDisplayOverrides] = {}
+    node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
     # Used to store the mapping between node types and their display classes
     _node_display_registry: Dict[Type[NodeType], Type["BaseNodeDisplay"]] = {}

@@ -1,6 +1,8 @@
 import types
-from typing import TYPE_CHECKING, Optional, Type
+from uuid import UUID, uuid4
+from typing import TYPE_CHECKING, Any, Dict, Optional, Type
 
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.generics import NodeType
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -26,16 +28,39 @@ def get_node_display_class(
 
     # `base_node_display_class` is always a Generic class, so it's safe to index into it
     NodeDisplayBaseClass = base_node_display_class[node_class]  # type: ignore[index]
+
+    def _get_node_input_ids_by_ref(path: str, inst: Any):
+        if isinstance(inst, dict):
+            node_input_ids_by_name: Dict[str, UUID] = {}
+            for key, value in inst.items():
+                node_input_ids_by_name.update(_get_node_input_ids_by_ref(f"{path}.{key}", value))
+            return node_input_ids_by_name
+
+        if isinstance(inst, BaseDescriptor):
+            return {path: uuid4()}
+
+        return {}
+
+    def exec_body(ns: Dict):
+        output_display = {
+            ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name)
+            for ref in node_class.Outputs
+            if ref.name in node_class.__output_ids__
+        }
+        if output_display:
+            ns["output_display"] = output_display
+
+        node_input_ids_by_name: Dict[str, UUID] = {}
+        for ref in node_class:
+            node_input_ids_by_name.update(_get_node_input_ids_by_ref(ref.name, ref.instance))
+
+        if node_input_ids_by_name:
+            ns["node_input_ids_by_name"] = node_input_ids_by_name
+
     NodeDisplayClass = types.new_class(
         f"{node_class.__name__}Display",
         bases=(NodeDisplayBaseClass,),
+        exec_body=exec_body,
     )
-    output_display = {
-        ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name)
-        for ref in node_class.Outputs
-        if ref.name in node_class.__output_ids__
-    }
-    if output_display:
-        setattr(NodeDisplayClass, "output_display", output_display)
 
     return NodeDisplayClass
