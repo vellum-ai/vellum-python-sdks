@@ -228,3 +228,62 @@ def test_vellum_workflow_display__serialize_with_unused_nodes_and_edges():
             break
 
     assert edge_found, "Edge between unused nodes NodeB and NodeC not found in serialized output"
+
+
+def test_vellum_workflow_display__serialize_with_parse_json_expression():
+    # GIVEN a workflow that uses the parse_json function
+    from vellum.workflows.references.constant import ConstantValueReference
+
+    class JsonNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            json_result = ConstantValueReference('{"key": "value"}').parse_json()
+
+    class Workflow(BaseWorkflow):
+        graph = JsonNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final = JsonNode.Outputs.json_result
+
+    # AND a display class for this workflow
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=Workflow,
+    )
+
+    # WHEN we serialize the workflow
+    exec_config = workflow_display.serialize()
+
+    raw_data = exec_config["workflow_raw_data"]
+    assert isinstance(raw_data, dict)
+
+    nodes = raw_data["nodes"]
+    assert isinstance(nodes, list)
+
+    json_node = next(
+        (node for node in nodes if node.get("type") == "GENERIC" and node.get("definition").get("name") == "JsonNode"),
+        None,
+    )
+    assert json_node is not None
+
+    # THEN the node has outputs with parse_json
+    outputs = json_node.get("outputs")
+    assert isinstance(outputs, list)
+    assert len(outputs) > 0
+    parse_json_output = next((output for output in outputs if output.get("name") == "parse_json"), None)
+    assert parse_json_output is not None
+
+    assert parse_json_output == {
+        "id": "44c7d94c-a76a-4151-9b95-85a31764f18f",
+        "name": "json_result",
+        "type": "JSON",
+        "value": {
+            "type": "PARSE_JSON",
+            "json_string": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "STRING",
+                    "value": '{"key": "value"}',
+                },
+            },
+        },
+    }
