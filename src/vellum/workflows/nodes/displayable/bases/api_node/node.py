@@ -29,7 +29,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
     url: str
-    method: APIRequestMethod
+    method: Optional[APIRequestMethod] = APIRequestMethod.GET
     data: Optional[str] = None
     json: Optional[Json] = None
     headers: Optional[Dict[str, Union[str, VellumSecret]]] = None
@@ -45,8 +45,8 @@ class BaseAPINode(BaseNode, Generic[StateType]):
 
     def _run(
         self,
-        method: APIRequestMethod,
         url: str,
+        method: Optional[APIRequestMethod] = APIRequestMethod.GET,
         data: Optional[Union[str, Any]] = None,
         json: Any = None,
         headers: Any = None,

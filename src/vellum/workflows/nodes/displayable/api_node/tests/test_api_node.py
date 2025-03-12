@@ -64,3 +64,32 @@ def test_api_node_raises_error_when_api_call_fails(vellum_client):
 
     # AND the API call should have been made
     assert vellum_client.execute_api.call_count == 1
+
+
+def test_api_node_defaults_to_get_method(vellum_client):
+    # GIVEN a successful API response
+    vellum_client.execute_api.return_value = ExecuteApiResponse(
+        status_code=200,
+        text='{"status": 200, "data": [1, 2, 3]}',
+        json_={"data": [1, 2, 3]},
+        headers={"X-Response-Header": "bar"},
+    )
+
+    # AND an API node without a method specified
+    class SimpleAPINodeWithoutMethod(APINode):
+        authorization_type = AuthorizationType.BEARER_TOKEN
+        url = "https://api.vellum.ai"
+        headers = {
+            "X-Test-Header": "foo",
+        }
+        bearer_token_value = VellumSecret(name="secret")
+
+    node = SimpleAPINodeWithoutMethod()
+
+    # WHEN we run the node
+    node.run()
+
+    # THEN the API call should be made with GET method
+    assert vellum_client.execute_api.call_count == 1
+    method = vellum_client.execute_api.call_args.kwargs["method"]
+    assert method == APIRequestMethod.GET.value
