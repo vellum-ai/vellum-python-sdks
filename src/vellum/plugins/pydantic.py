@@ -1,11 +1,10 @@
 from functools import lru_cache
-from typing import Any, Dict, Literal, Optional, Tuple, Union
+from typing import Any, Dict, Literal, NamedTuple, Optional, Tuple, Union
 from typing_extensions import TypeAlias
 
 from pydantic.fields import FieldInfo
 from pydantic.plugin import (
     PydanticPluginProtocol,
-    SchemaTypePath,
     ValidateJsonHandlerProtocol,
     ValidatePythonHandlerProtocol,
     ValidateStringsHandlerProtocol,
@@ -14,6 +13,14 @@ from pydantic_core import CoreSchema
 
 # Redefined manually instead of imported from pydantic to support versions < 2.5
 SchemaKind: TypeAlias = Literal["BaseModel", "TypeAdapter", "dataclass", "create_model", "validate_call"]
+
+
+# Redefined manually instead of imported from pydantic to support versions < 2.5
+class SchemaTypePath(NamedTuple):
+    """Path defining where `schema_type` was defined, or where `TypeAdapter` was called."""
+
+    module: str
+    name: str
 
 
 @lru_cache(maxsize=1)
@@ -84,7 +91,7 @@ class VellumPydanticPlugin(PydanticPluginProtocol):
         self,
         schema: CoreSchema,
         schema_type: Any,
-        schema_type_path: SchemaTypePath,
+        schema_type_path: SchemaTypePath,  # type: ignore
         schema_kind: SchemaKind,
         config: Any,
         plugin_settings: Dict[str, Any],
