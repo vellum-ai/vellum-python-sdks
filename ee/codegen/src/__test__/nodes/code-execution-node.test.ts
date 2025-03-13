@@ -281,7 +281,7 @@ describe("CodeExecutionNode", () => {
     );
   });
   describe("log output id", () => {
-    it("should not generate log output id", async () => {
+    it("should not generate log output id if not given", async () => {
       const nodeData = codeExecutionNodeFactory();
 
       // GIVEN a node without a log output id
