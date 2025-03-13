@@ -1,5 +1,5 @@
 import subprocess
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from click.testing import CliRunner
 
@@ -7,9 +7,14 @@ from vellum_cli import main as cli_main
 
 
 @patch("subprocess.run")
-def test_image_push__self_hosted_happy_path(mock_run, vellum_client, monkeypatch):
+@patch("docker.from_env")
+def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_run, vellum_client, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
+
+    # Mock Docker client
+    mock_docker_client = MagicMock()
+    mock_docker_from_env.return_value = mock_docker_client
 
     mock_run.side_effect = [
         subprocess.CompletedProcess(
@@ -23,17 +28,22 @@ def test_image_push__self_hosted_happy_path(mock_run, vellum_client, monkeypatch
     runner = CliRunner()
     result = runner.invoke(cli_main, ["image", "push", "myrepo.net/myimage:latest"])
 
-    # THEN the command exits unsuccessfully
+    # THEN the command exits successfully
     assert result.exit_code == 0, result.output
 
-    # AND gives the
+    # AND gives the success message
     assert "Image successfully pushed" in result.output
 
 
 @patch("subprocess.run")
-def test_image_push__self_hosted_blocks_repo(vellum_client, monkeypatch):
+@patch("docker.from_env")
+def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, vellum_client, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
+
+    # Mock Docker client
+    mock_docker_client = MagicMock()
+    mock_docker_from_env.return_value = mock_docker_client
 
     # WHEN the user runs the image push command
     runner = CliRunner()
