@@ -1,16 +1,19 @@
 from functools import lru_cache
 from typing import Any, Dict, Literal, Optional, Tuple, Union
+from typing_extensions import TypeAlias
 
 from pydantic.fields import FieldInfo
 from pydantic.plugin import (
     PydanticPluginProtocol,
-    SchemaKind,
     SchemaTypePath,
     ValidateJsonHandlerProtocol,
     ValidatePythonHandlerProtocol,
     ValidateStringsHandlerProtocol,
 )
 from pydantic_core import CoreSchema
+
+# Redefined manually instead of imported from pydantic to support versions < 2.5
+SchemaKind: TypeAlias = Literal["BaseModel", "TypeAdapter", "dataclass", "create_model", "validate_call"]
 
 
 @lru_cache(maxsize=1)
