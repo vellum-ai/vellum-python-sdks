@@ -280,4 +280,25 @@ describe("CodeExecutionNode", () => {
       }
     );
   });
+  describe("log output id", () => {
+    it("should not generate log output id", async () => {
+      const nodeData = codeExecutionNodeFactory();
+
+      // GIVEN a node without a log output id
+      nodeData.data.logOutputId = undefined;
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      node = new CodeExecutionNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

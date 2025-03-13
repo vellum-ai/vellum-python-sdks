@@ -1332,6 +1332,7 @@ export function codeExecutionNodeFactory({
       codeInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
       outputId: "81b270c0-4deb-4db3-aae5-138f79531b2b",
       outputType: codeOutputValueType ?? "STRING",
+      logOutputId: "46abb839-400b-4766-997e-9c463b526139",
       runtimeInputId: runtime.id,
       targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",

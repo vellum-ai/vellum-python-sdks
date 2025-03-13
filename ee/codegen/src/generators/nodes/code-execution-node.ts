@@ -201,14 +201,16 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       })
     );
 
-    statements.push(
-      python.field({
-        name: "log_output_id",
-        initializer: nodeData.logOutputId
-          ? python.TypeInstantiation.uuid(nodeData.logOutputId)
-          : python.TypeInstantiation.none(),
-      })
-    );
+    if (nodeData.logOutputId) {
+      statements.push(
+        python.field({
+          name: "log_output_id",
+          initializer: nodeData.logOutputId
+            ? python.TypeInstantiation.uuid(nodeData.logOutputId)
+            : python.TypeInstantiation.none(),
+        })
+      );
+    }
 
     return statements;
   }
@@ -281,66 +283,67 @@ export class CodeExecutionNode extends BaseSingleFileNode<
   }
 
   protected getOutputDisplay(): python.Field {
+    const outputDisplayEntries = [
+      {
+        key: python.reference({
+          name: this.nodeContext.nodeClassName,
+          modulePath: this.nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, "result"],
+        }),
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeOutputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
+          }),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str("result"),
+            }),
+          ],
+        }),
+      },
+    ];
+
+    if (this.nodeData.data.logOutputId) {
+      outputDisplayEntries.push({
+        key: python.reference({
+          name: this.nodeContext.nodeClassName,
+          modulePath: this.nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, "log"],
+        }),
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeOutputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
+          }),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(
+                this.nodeData.data.logOutputId
+              ),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str("log"),
+            }),
+          ],
+        }),
+      });
+    }
+
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict([
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "result"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.outputId
-                ),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("result"),
-              }),
-            ],
-          }),
-        },
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "log"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: this.nodeData.data.logOutputId
-                  ? python.TypeInstantiation.uuid(
-                      this.nodeData.data.logOutputId
-                    )
-                  : python.TypeInstantiation.none(),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("log"),
-              }),
-            ],
-          }),
-        },
-      ]),
+      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
     });
   }
 
