@@ -2460,20 +2460,6 @@ The current status of the document index
 <dl>
 <dd>
 
-**environment:** `typing.Optional[EnvironmentEnum]` 
-
-The environment this document index is used in
-
-* `DEVELOPMENT` - Development
-* `STAGING` - Staging
-* `PRODUCTION` - Production
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **copy_documents_from_index_id:** `typing.Optional[str]` — Optionally specify the id of a document index from which you'd like to copy and re-index its documents into this newly created index
     
 </dd>
@@ -2644,20 +2630,6 @@ The current status of the document index
 <dl>
 <dd>
 
-**environment:** `typing.Optional[EnvironmentEnum]` 
-
-The environment this document index is used in
-
-* `DEVELOPMENT` - Development
-* `STAGING` - Staging
-* `PRODUCTION` - Production
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -2812,20 +2784,6 @@ The current status of the document index
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[EnvironmentEnum]` 
-
-The environment this document index is used in
-
-* `DEVELOPMENT` - Development
-* `STAGING` - Staging
-* `PRODUCTION` - Production
     
 </dd>
 </dl>
