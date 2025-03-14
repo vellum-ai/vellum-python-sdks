@@ -3,11 +3,13 @@ from typing import Sequence, Union, cast
 
 from vellum import (
     ChatMessage,
+    DocumentVellumValue,
     JsonVellumValue,
     PromptBlock,
     PromptRequestInput,
     RichTextPromptBlock,
     StringVellumValue,
+    VellumDocument,
     VellumVariable,
 )
 from vellum.client.types.audio_vellum_value import AudioVellumValue
@@ -159,6 +161,18 @@ def compile_prompt_blocks(
                 cache_config=block.cache_config,
             )
             compiled_blocks.append(audio_block)
+
+        elif block.block_type == "DOCUMENT":
+            document_block = CompiledValuePromptBlock(
+                content=DocumentVellumValue(
+                    value=VellumDocument(
+                        src=block.src,
+                        metadata=block.metadata,
+                    )
+                ),
+                cache_config=block.cache_config,
+            )
+            compiled_blocks.append(document_block)
         else:
             raise PromptCompilationError(f"Unknown block_type: {block.block_type}")
 

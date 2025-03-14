@@ -27,6 +27,7 @@ from vellum import (
     StringVellumValue,
     VellumAudio,
     VellumError,
+    VellumImage,
 )
 from vellum.prompts.blocks.compilation import compile_prompt_blocks
 from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock
@@ -202,7 +203,7 @@ class OpenAIChatCompletionNode(InlinePromptNode[StateType]):
                 json_content_item: ChatCompletionContentPartTextParam = {"type": "text", "text": json.dumps(json_value)}
                 content.append(json_content_item)
             elif block.content.type == "IMAGE":
-                image_value = cast(VellumAudio, block.content.value)
+                image_value = cast(VellumImage, block.content.value)
                 image_content_item: ChatCompletionContentPartImageParam = {
                     "type": "image_url",
                     "image_url": {"url": image_value.src},
@@ -251,6 +252,9 @@ class OpenAIChatCompletionNode(InlinePromptNode[StateType]):
                 }
 
                 content.append(audio_content_item)
+            elif block.content.type == "DOCUMENT":
+                # TODO: Fill out
+                break
             else:
                 raise NodeException(
                     code=WorkflowErrorCode.INTERNAL_ERROR,

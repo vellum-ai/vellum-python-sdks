@@ -10,6 +10,8 @@ from vellum import (
     SearchResultRequest,
     VellumAudio,
     VellumAudioRequest,
+    VellumDocument,
+    VellumDocumentRequest,
     VellumError,
     VellumErrorRequest,
     VellumImage,
@@ -62,6 +64,8 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
         return "IMAGE"
     elif _is_type_optionally_in(type_, (VellumAudio, VellumAudioRequest)):
         return "AUDIO"
+    elif _is_type_optionally_in(type_, (VellumDocument, VellumDocumentRequest)):
+        return "DOCUMENT"
     elif _is_type_optionally_in(type_, (VellumError, VellumErrorRequest)):
         return "ERROR"
     elif _is_type_optionally_in(type_, (List[ChatMessage], List[ChatMessageRequest])):
