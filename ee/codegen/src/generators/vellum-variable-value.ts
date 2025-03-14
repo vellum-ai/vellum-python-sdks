@@ -497,6 +497,10 @@ export class VellumValue extends AstNode {
       case "FUNCTION_CALL":
         this.astNode = new FunctionCallVellumValue(vellumValue.value);
         break;
+      // TODO: Implement Document vellum variable type support
+      // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
+      case "DOCUMENT":
+        return;
       default:
         assertUnreachable(vellumValue);
     }

@@ -53,20 +53,26 @@ export class NodeOutputs extends AstNode {
 
     nodeOutputs.forEach((output) => {
       const type = getVellumVariablePrimitiveType(output.type);
-      const field = output.value
-        ? python.field({
-            name: output.name,
-            initializer: new WorkflowValueDescriptor({
-              workflowValueDescriptor: output.value,
-              workflowContext,
-              nodeContext,
-            }),
-          })
-        : python.field({
-            name: output.name,
-            type: type,
-          });
-      clazz.addField(field);
+
+      if (output.value) {
+        const field = python.field({
+          name: output.name,
+          initializer: new WorkflowValueDescriptor({
+            workflowValueDescriptor: output.value,
+            workflowContext,
+            nodeContext,
+          }),
+        });
+        clazz.addField(field);
+      } else if (type !== undefined) {
+        const field = python.field({
+          name: output.name,
+          type: type,
+        });
+        clazz.addField(field);
+      } else {
+        return;
+      }
     });
 
     return clazz;

@@ -6,7 +6,7 @@ import { assertUnreachable } from "src/utils/typing";
 
 export function getVellumVariablePrimitiveType(
   vellumVariableType: Vellum.VellumVariableType
-): python.Type {
+): python.Type | undefined {
   switch (vellumVariableType) {
     case "STRING":
       return python.Type.str();
@@ -71,6 +71,10 @@ export function getVellumVariablePrimitiveType(
       );
     case "NULL":
       return python.Type.none();
+    // TODO: Implement Document vellum variable support
+    // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
+    case "DOCUMENT":
+      return;
     default: {
       assertUnreachable(vellumVariableType);
     }

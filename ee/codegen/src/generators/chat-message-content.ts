@@ -289,7 +289,7 @@ export namespace ChatMessageContent {
 }
 
 export class ChatMessageContent extends AstNode {
-  private astNode: AstNode;
+  private astNode: AstNode | undefined;
 
   public constructor({
     chatMessageContent,
@@ -302,8 +302,8 @@ export class ChatMessageContent extends AstNode {
   private generateAstNode(
     chatMessageContent: ChatMessageContentRequestType | ChatMessageContentType,
     isRequestType: boolean
-  ): AstNode {
-    let astNode: AstNode;
+  ): AstNode | undefined {
+    let astNode: AstNode | undefined;
 
     const contentType = chatMessageContent.type;
     switch (contentType) {
@@ -342,6 +342,10 @@ export class ChatMessageContent extends AstNode {
         );
         break;
       }
+      // TODO: Implement DocumentMessageContent support
+      // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
+      case "DOCUMENT":
+        break;
       default: {
         assertUnreachable(contentType);
       }
@@ -352,6 +356,8 @@ export class ChatMessageContent extends AstNode {
   }
 
   public write(writer: Writer): void {
-    this.astNode.write(writer);
+    if (this.astNode) {
+      this.astNode.write(writer);
+    }
   }
 }
