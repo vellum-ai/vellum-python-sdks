@@ -282,11 +282,9 @@ describe("CodeExecutionNode", () => {
   });
   describe("log output id", () => {
     it("should not generate log output id if not given", async () => {
-      const nodeData = codeExecutionNodeFactory();
-
-      // GIVEN a node without a log output id
-      nodeData.data.logOutputId = undefined;
-
+      const nodeData = codeExecutionNodeFactory({
+        generateLogOutputId: false,
+      });
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
