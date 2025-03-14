@@ -172,31 +172,18 @@ export class TemplatingNode extends BaseSingleFileNode<
   }
 
   private generateOutputType(outputType: VellumVariableType): python.Type {
-    if (outputType === VellumVariableType.Json) {
-      return python.Type.reference(
-        python.reference({
-          name: "Json",
-          modulePath: [
-            ...VELLUM_CLIENT_MODULE_PATH,
-            "workflows",
-            "types",
-            "core",
-          ],
-        })
-      );
-    }
-
-    const primitiveType = getVellumVariablePrimitiveType(outputType);
-    if (primitiveType === undefined) {
-      this.workflowContext.addError(
-        new NodeAttributeGenerationError(
-          `Output type for node ${this.nodeData.id} is not supported and/or not implemented.`,
-          "WARNING"
+    return outputType === VellumVariableType.Json
+      ? python.Type.reference(
+          python.reference({
+            name: "Json",
+            modulePath: [
+              ...VELLUM_CLIENT_MODULE_PATH,
+              "workflows",
+              "types",
+              "core",
+            ],
+          })
         )
-      );
-      return python.Type.none();
-    }
-
-    return primitiveType;
+      : getVellumVariablePrimitiveType(outputType);
   }
 }

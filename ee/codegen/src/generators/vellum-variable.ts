@@ -35,8 +35,7 @@ export class VellumVariable extends AstNode {
   constructor({ variable, defaultRequired }: VellumVariable.Args) {
     super();
 
-    const rawType = getVellumVariablePrimitiveType(variable.type);
-    const baseType = rawType ? rawType : Type.none();
+    const baseType = getVellumVariablePrimitiveType(variable.type);
     let finalType = baseType;
 
     // NULL type do not need to be optional

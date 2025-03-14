@@ -10,6 +10,7 @@ import {
   VellumError,
   VellumImage,
   VellumValue as VellumVariableValueType,
+  VellumDocument,
 } from "vellum-ai/api";
 
 import { ChatMessageContent } from "./chat-message-content";
@@ -441,6 +442,48 @@ class SearchResultsVellumValue extends AstNode {
   }
 }
 
+class DocumentVellumValue extends AstNode {
+  private astNode: python.AstNode;
+
+  public constructor(value: VellumDocument) {
+    super();
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: VellumDocument): AstNode {
+    const arguments_ = [
+      python.methodArgument({
+        name: "src",
+        value: python.TypeInstantiation.str(value.src),
+      }),
+    ];
+
+    if (!isNil(value.metadata)) {
+      arguments_.push(
+        python.methodArgument({
+          name: "metadata",
+          value: new Json(value.metadata),
+        })
+      );
+    }
+
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "VellumDocument",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
 export namespace VellumValue {
   export type Args = {
     vellumValue: VellumVariableValueType;
@@ -497,10 +540,11 @@ export class VellumValue extends AstNode {
       case "FUNCTION_CALL":
         this.astNode = new FunctionCallVellumValue(vellumValue.value);
         break;
+      case "DOCUMENT":
+        this.astNode = new DocumentVellumValue(vellumValue.value);
+        break;
       // TODO: Implement Document vellum variable type support
       // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
-      case "DOCUMENT":
-        return;
       default:
         assertUnreachable(vellumValue);
     }

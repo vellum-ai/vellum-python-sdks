@@ -41,6 +41,14 @@ describe("VellumVariableField", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 
+  test("DocumentVellumVariable snapshot", async () => {
+    const documentVar = codegen.vellumVariable({
+      variable: { id: "1", name: "test", type: "DOCUMENT", required: true },
+    });
+    documentVar.write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
   test("FunctionCallVellumVariable snapshot", async () => {
     const functionCallVar = codegen.vellumVariable({
       variable: {

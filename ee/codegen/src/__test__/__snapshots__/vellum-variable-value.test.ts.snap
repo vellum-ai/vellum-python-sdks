@@ -22,6 +22,11 @@ exports[`VellumValue > CHAT_HISTORY > should write empty list when CHAT_HISTORY 
 
 exports[`VellumValue > CHAT_HISTORY > should write nothing when CHAT_HISTORY value is null 1`] = `"None"`;
 
+exports[`VellumValue > DOCUMENT > should write a DOCUMENT value correctly 1`] = `
+"VellumDocument(src="https://example.com/document.pdf")
+"
+`;
+
 exports[`VellumValue > ERROR > should write a ERROR value correctly 1`] = `
 "VellumError(message="This is an error!", code="INTERNAL_SERVER_ERROR")
 "

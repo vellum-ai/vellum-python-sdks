@@ -14,6 +14,8 @@ import {
   VellumImageRequest as VellumImageRequestType,
   VellumAudio as VellumAudioType,
   VellumAudioRequest as VellumAudioRequestType,
+  VellumDocument as VellumDocumentType,
+  VellumDocumentRequest as VellumDocumentRequestType,
 } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
@@ -281,6 +283,56 @@ class AudioChatMessageContent extends AstNode {
   }
 }
 
+class DocumentChatMessageContent extends AstNode {
+  private astNode: AstNode;
+
+  public constructor(
+    value: VellumDocumentType | VellumDocumentRequestType,
+    isRequestType: boolean
+  ) {
+    super();
+    this.astNode = this.generateAstNode(value, isRequestType);
+  }
+
+  private generateAstNode(
+    value: VellumDocumentType | VellumDocumentRequestType,
+    isRequestType: boolean
+  ): AstNode {
+    const documentChatMessageContentRequestRef = python.reference({
+      name: "DocumentChatMessageContent" + (isRequestType ? "Request" : ""),
+      modulePath: VELLUM_CLIENT_MODULE_PATH,
+    });
+
+    const arguments_ = [
+      python.methodArgument({
+        name: "src",
+        value: python.TypeInstantiation.str(value.src),
+      }),
+    ];
+
+    if (!isNil(value.metadata)) {
+      const metadataJson = new Json(value.metadata);
+      arguments_.push(
+        python.methodArgument({
+          name: "metadata",
+          value: metadataJson,
+        })
+      );
+    }
+
+    const astNode = python.instantiateClass({
+      classReference: documentChatMessageContentRequestRef,
+      arguments_: arguments_,
+    });
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
 export namespace ChatMessageContent {
   export interface Args {
     chatMessageContent: ChatMessageContentRequestType | ChatMessageContentType;
@@ -289,7 +341,7 @@ export namespace ChatMessageContent {
 }
 
 export class ChatMessageContent extends AstNode {
-  private astNode: AstNode | undefined;
+  private astNode: AstNode;
 
   public constructor({
     chatMessageContent,
@@ -302,8 +354,8 @@ export class ChatMessageContent extends AstNode {
   private generateAstNode(
     chatMessageContent: ChatMessageContentRequestType | ChatMessageContentType,
     isRequestType: boolean
-  ): AstNode | undefined {
-    let astNode: AstNode | undefined;
+  ): AstNode {
+    let astNode: AstNode;
 
     const contentType = chatMessageContent.type;
     switch (contentType) {
@@ -342,10 +394,13 @@ export class ChatMessageContent extends AstNode {
         );
         break;
       }
-      // TODO: Implement DocumentMessageContent support
-      // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
-      case "DOCUMENT":
+      case "DOCUMENT": {
+        astNode = new DocumentChatMessageContent(
+          chatMessageContent.value,
+          isRequestType
+        );
         break;
+      }
       default: {
         assertUnreachable(contentType);
       }
@@ -356,8 +411,6 @@ export class ChatMessageContent extends AstNode {
   }
 
   public write(writer: Writer): void {
-    if (this.astNode) {
-      this.astNode.write(writer);
-    }
+    this.astNode.write(writer);
   }
 }

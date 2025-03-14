@@ -4,7 +4,6 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { BaseState } from "src/generators/base-state";
-import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
@@ -22,20 +21,7 @@ export class FinalOutputNode extends BaseSingleFileNode<
       this.nodeData.data.outputType
     );
 
-    const genericTypes: AstNode[] = [baseStateClassReference];
-
-    if (primitiveOutputType !== undefined) {
-      genericTypes.push(primitiveOutputType);
-    } else {
-      this.workflowContext.addError(
-        new NodeAttributeGenerationError(
-          `Output type for node ${this.nodeData.id} is not supported and/or not implemented.`,
-          "WARNING"
-        )
-      );
-    }
-
-    return genericTypes;
+    return [baseStateClassReference, primitiveOutputType];
   }
 
   getNodeClassBodyStatements(): AstNode[] {

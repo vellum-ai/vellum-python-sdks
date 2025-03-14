@@ -61,20 +61,7 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       this.nodeData.data.outputType
     );
 
-    const genericTypes: AstNode[] = [baseStateClassReference];
-
-    if (primitiveOutputType !== undefined) {
-      genericTypes.push(primitiveOutputType);
-    } else {
-      this.workflowContext.addError(
-        new NodeAttributeGenerationError(
-          `Output type for node ${this.nodeData.id} is not supported and/or not implemented.`,
-          "WARNING"
-        )
-      );
-    }
-
-    return genericTypes;
+    return [baseStateClassReference, primitiveOutputType];
   }
 
   getNodeClassBodyStatements(): AstNode[] {

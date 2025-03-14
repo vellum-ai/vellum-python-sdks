@@ -211,6 +211,22 @@ describe("VellumValue", () => {
     });
   });
 
+  describe("DOCUMENT", () => {
+    it("should write a DOCUMENT value correctly", async () => {
+      const documentValue = codegen.vellumValue({
+        vellumValue: {
+          type: "DOCUMENT",
+          value: {
+            src: "https://example.com/document.pdf",
+          },
+        },
+      });
+      documentValue.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(documentValue.getReferences()).toHaveLength(1);
+    });
+  });
+
   describe("SEARCH_RESULTS", () => {
     it("should write a SEARCH_RESULTS value correctly", async () => {
       const searchResultsValue = codegen.vellumValue({
