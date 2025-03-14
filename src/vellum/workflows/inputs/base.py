@@ -5,7 +5,7 @@ from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import WorkflowInitializationException
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.references import ExternalInputReference, WorkflowInputReference
 from vellum.workflows.references.input import InputReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
@@ -68,7 +68,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                 origin = get_origin(field_type)
                 args = get_args(field_type)
                 if not (origin is Union and type(None) in args):
-                    raise WorkflowInitializationException(
+                    raise NodeException(
                         message=f"Required input variables {name} should have defined value",
                         code=WorkflowErrorCode.INVALID_INPUTS,
                     )
