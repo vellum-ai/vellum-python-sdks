@@ -253,8 +253,10 @@ class OpenAIChatCompletionNode(InlinePromptNode[StateType]):
 
                 content.append(audio_content_item)
             elif block.content.type == "DOCUMENT":
-                # TODO: Fill out
-                break
+                raise NodeException(
+                    code=WorkflowErrorCode.PROVIDER_ERROR,
+                    message="Document chat message content type is not currently supported",
+                )
             else:
                 raise NodeException(
                     code=WorkflowErrorCode.INTERNAL_ERROR,
