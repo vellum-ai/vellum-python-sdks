@@ -28,6 +28,10 @@ class BasePromptNode(BaseNode, Generic[StateType]):
     def _get_prompt_event_stream(self) -> Union[Iterator[AdHocExecutePromptEvent], Iterator[ExecutePromptEvent]]:
         pass
 
+    @abstractmethod
+    def _validate(self) -> None:
+        pass
+
     def run(self) -> Iterator[BaseOutput]:
         outputs = yield from self._process_prompt_event_stream()
         if outputs is None:
@@ -38,6 +42,7 @@ class BasePromptNode(BaseNode, Generic[StateType]):
 
     def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
         try:
+            self._validate()
             prompt_event_stream = self._get_prompt_event_stream()
         except ApiError as e:
             self._handle_api_error(e)
