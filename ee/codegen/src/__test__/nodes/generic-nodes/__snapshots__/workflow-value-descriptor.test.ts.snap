@@ -15,6 +15,11 @@ exports[`WorkflowValueDescriptor > expressions > generates ternary expression wi
 "
 `;
 
+exports[`WorkflowValueDescriptor > expressions > generates unary expression with constant value for parse_json 1`] = `
+"ConstantValueReference('{"key": "value"}').parse_json()
+"
+`;
+
 exports[`WorkflowValueDescriptor > expressions > generates unary expression with input variable 1`] = `
 "Inputs.count.is_null()
 "

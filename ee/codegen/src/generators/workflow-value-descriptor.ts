@@ -143,6 +143,7 @@ export class WorkflowValueDescriptor extends AstNode {
       notIn: "not_in",
       between: "between",
       notBetween: "not_between",
+      parseJson: "parse_json",
     };
 
     return operatorMappings[operator] || "equals"; // return default operator if not found
