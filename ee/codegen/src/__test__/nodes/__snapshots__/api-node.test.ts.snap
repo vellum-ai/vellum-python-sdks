@@ -93,20 +93,27 @@ class APINode(BaseAPINode):
 "
 `;
 
-exports[`ApiNode > basic api node > should generate API key header fields when API key is provided 1`] = `
-"from vellum.workflows.constants import AuthorizationType
+exports[`ApiNode > basic api node > should generate empty string when url is missing 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
-    url = "https://example.vellum.ai"
-    api_key_header_key = "X-API-KEY"
+    url = ""
+    method = APIRequestMethod.POST
+    headers = {
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
+    }
+    api_key_header_key = None
     authorization_type = AuthorizationType.API_KEY
-    api_key_header_value = "my-api-key"
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
 "
 `;
 
-exports[`ApiNode > basic api node > should generate all fields when all conditions are provided 1`] = `
+exports[`ApiNode > basic api node > should not generate body field when body is None 1`] = `
 "from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
@@ -114,65 +121,34 @@ from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 class APINode(BaseAPINode):
     url = "https://example.vellum.ai"
     method = APIRequestMethod.POST
-    json = {
-        "foo": "bar",
-    }
     headers = {
-        "Content-Type": "application/json",
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
     }
-    api_key_header_key = "X-API-KEY"
+    api_key_header_key = None
     authorization_type = AuthorizationType.API_KEY
-    api_key_header_value = "my-api-key"
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
 "
 `;
 
-exports[`ApiNode > basic api node > should generate headers field when headers are provided 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-
-
-class APINode(BaseAPINode):
-    url = "https://example.vellum.ai"
-    headers = {
-        "Content-Type": "application/json",
-    }
-"
-`;
-
-exports[`ApiNode > basic api node > should generate method field when method is POST 1`] = `
-"from vellum.workflows.constants import APIRequestMethod
+exports[`ApiNode > basic api node > should not generate method field when method is GET 1`] = `
+"from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 
 
 class APINode(BaseAPINode):
     url = "https://example.vellum.ai"
-    method = APIRequestMethod.POST
-"
-`;
-
-exports[`ApiNode > basic api node > should handle missing url field gracefully 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-
-
-class APINode(BaseAPINode):
-    url = ""
-"
-`;
-
-exports[`ApiNode > basic api node > should not generate body field when body is empty 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-
-
-class APINode(BaseAPINode):
-    url = "https://example.vellum.ai"
-"
-`;
-
-exports[`ApiNode > basic api node > should only generate url field 1`] = `
-"from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-
-
-class APINode(BaseAPINode):
-    url = "https://example.vellum.ai"
+    headers = {
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
+    }
+    api_key_header_key = None
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
 "
 `;
 
