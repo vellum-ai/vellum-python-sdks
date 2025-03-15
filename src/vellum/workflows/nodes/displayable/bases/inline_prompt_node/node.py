@@ -79,11 +79,10 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         provided_variables = set(self.prompt_inputs.keys() if self.prompt_inputs else set())
 
         missing_variables = required_variables - provided_variables
-
         if missing_variables:
             missing_vars_str = ", ".join(f"'{var}'" for var in missing_variables)
             raise NodeException(
-                message=f"Missing required input variables in prompt_inputs: {missing_vars_str}",
+                message=f"Missing required input variables: {missing_vars_str}",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
 

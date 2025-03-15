@@ -63,6 +63,7 @@ def test_validation_with_missing_variables():
     test_blocks: List[PromptBlock] = [
         VariablePromptBlock(input_variable="required_var1"),
         VariablePromptBlock(input_variable="required_var2"),
+        VariablePromptBlock(input_variable="required_var3"),
     ]
 
     # GIVEN a BaseInlinePromptNode
@@ -72,6 +73,7 @@ def test_validation_with_missing_variables():
         prompt_inputs = {
             "required_var1": "value1",
             # required_var2 is missing
+            # required_var3 is missing
         }
 
     # WHEN the _validate method is called
@@ -84,6 +86,7 @@ def test_validation_with_missing_variables():
     # THEN the exception details should be as expected
     assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "required_var2" in str(excinfo.value)
+    assert "required_var3" in str(excinfo.value)
 
 
 def test_validation_with_all_variables_provided():
