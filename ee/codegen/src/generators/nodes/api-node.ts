@@ -31,7 +31,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
     const body = this.nodeInputsByKey.get("body");
-    if (body && body.toString() !== "{}") {
+    if (body && body.toString() !== "{}" && body.toString() !== "None") {
       statements.push(
         python.field({
           name: "json",
