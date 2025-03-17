@@ -37,9 +37,6 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
 
         text: str
 
-    def _validate(self) -> None:
-        pass
-
     def run(self) -> Iterator[BaseOutput]:
         outputs = yield from self._process_prompt_event_stream()
         if not outputs:

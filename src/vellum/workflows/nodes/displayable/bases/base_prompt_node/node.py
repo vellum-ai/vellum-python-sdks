@@ -28,7 +28,6 @@ class BasePromptNode(BaseNode, Generic[StateType]):
     def _get_prompt_event_stream(self) -> Union[Iterator[AdHocExecutePromptEvent], Iterator[ExecutePromptEvent]]:
         pass
 
-    @abstractmethod
     def _validate(self) -> None:
         pass
 
