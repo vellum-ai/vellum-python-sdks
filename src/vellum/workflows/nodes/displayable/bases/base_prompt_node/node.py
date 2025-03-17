@@ -41,8 +41,8 @@ class BasePromptNode(BaseNode, Generic[StateType]):
             )
 
     def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
+        self._validate()
         try:
-            self._validate()
             prompt_event_stream = self._get_prompt_event_stream()
         except ApiError as e:
             self._handle_api_error(e)
