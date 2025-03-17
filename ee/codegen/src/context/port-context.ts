@@ -1,3 +1,5 @@
+import { isEmpty, isNil } from "lodash";
+
 import { DEFAULT_PORT_NAME } from "src/constants";
 import { WorkflowContext } from "src/context/index";
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -33,7 +35,31 @@ export class PortContext {
     this.nodeContext = nodeContext;
 
     this.portId = portId;
-    this.portName = toPythonSafeSnakeCase(portName);
+    this.portName = this.generateSanitizedPortName(portName);
     this.isDefault = isDefault;
+  }
+
+  public generateSanitizedPortName(portName: string): string {
+    const defaultName = "port_";
+    const rawPortName = portName;
+
+    const initialPortName =
+      !isNil(rawPortName) && !isEmpty(rawPortName)
+        ? toPythonSafeSnakeCase(rawPortName, "port")
+        : defaultName;
+
+    // Deduplicate the port variable name if it's already in use
+    let sanitizedName = initialPortName;
+    let numRenameAttempts = 0;
+    while (this.nodeContext.isPortNameUsed(sanitizedName)) {
+      sanitizedName = `${initialPortName}${
+        initialPortName.endsWith("_") ? "" : "_"
+      }${numRenameAttempts + 1}`;
+      numRenameAttempts += 1;
+    }
+
+    this.nodeContext.addUsedPortName(sanitizedName);
+
+    return sanitizedName;
   }
 }

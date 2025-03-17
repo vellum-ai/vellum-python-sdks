@@ -50,7 +50,7 @@ export class NodePorts extends AstNode {
       if (portExpression) {
         fields.push(
           python.field({
-            name: this.nodeContext.generateSanitizedPortName(port.name),
+            name: this.getSanitizedPortName(port),
             initializer: portExpression,
           })
         );
@@ -76,6 +76,12 @@ export class NodePorts extends AstNode {
     fields.forEach((field) => clazz.add(field));
 
     return clazz;
+  }
+
+  private getSanitizedPortName(port: NodePortType): string {
+    const portContext = this.nodeContext.portContextsById.get(port.id);
+
+    return portContext?.portName ?? port.name;
   }
 
   write(writer: Writer): void {
