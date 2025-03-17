@@ -135,7 +135,7 @@ describe("ApiNode", () => {
   describe("basic api node", () => {
     it("should generate empty string when url is missing", async () => {
       const nodeData = apiNodeFactory({
-        generateUrl: false,
+        url: null,
       });
 
       const nodeContext = (await createNodeContext({

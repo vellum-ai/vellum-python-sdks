@@ -1019,7 +1019,7 @@ export interface ApiNodeFactoryProps {
   apiKeyHeaderValue?: NodeInput;
   additionalHeaders?: { key: NodeInput; value: NodeInput }[];
   authorizationTypeInput?: NodeInput | null;
-  generateUrl?: boolean;
+  url?: string | null;
   method?: string;
   body?: Record<string, unknown> | null;
 }
@@ -1030,7 +1030,7 @@ export function apiNodeFactory({
   apiKeyHeaderValue,
   additionalHeaders,
   authorizationTypeInput,
-  generateUrl = true,
+  url = "https://example.vellum.ai",
   method = "POST",
   body = {},
 }: ApiNodeFactoryProps = {}): ApiNode {
@@ -1209,7 +1209,7 @@ export function apiNodeFactory({
         combinator: "OR",
       },
     },
-    ...(generateUrl
+    ...(url
       ? [
           {
             id: "480a4c12-22d6-4223-a38a-85db5eda118c",
@@ -1220,7 +1220,7 @@ export function apiNodeFactory({
                   type: "CONSTANT_VALUE" as const,
                   data: {
                     type: "STRING" as const,
-                    value: "https://example.vellum.ai",
+                    value: url,
                   },
                 },
               ],
