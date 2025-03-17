@@ -65,8 +65,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
         for block in blocks:
             if block.block_type == "VARIABLE":
-                if hasattr(block, "input_variable"):
-                    required_variables.add(block.input_variable)
+                required_variables.add(block.input_variable)
             elif block.block_type == "CHAT_MESSAGE" and block.blocks:
                 required_variables.update(self._extract_required_input_variables(block.blocks))
             elif block.block_type == "RICH_TEXT" and block.blocks:
@@ -82,7 +81,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         if missing_variables:
             missing_vars_str = ", ".join(f"'{var}'" for var in missing_variables)
             raise NodeException(
-                message=f"Missing required input variables: {missing_vars_str}",
+                message=f"Missing required input variables by VariablePromptBlock: {missing_vars_str}",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
 
