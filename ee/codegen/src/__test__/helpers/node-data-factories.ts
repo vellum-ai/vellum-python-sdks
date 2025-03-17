@@ -1019,6 +1019,9 @@ export interface ApiNodeFactoryProps {
   apiKeyHeaderValue?: NodeInput;
   additionalHeaders?: { key: NodeInput; value: NodeInput }[];
   authorizationTypeInput?: NodeInput | null;
+  url?: string | null;
+  method?: string;
+  body?: Record<string, unknown> | null;
 }
 
 export function apiNodeFactory({
@@ -1027,6 +1030,9 @@ export function apiNodeFactory({
   apiKeyHeaderValue,
   additionalHeaders,
   authorizationTypeInput,
+  url = "https://example.vellum.ai",
+  method = "POST",
+  body = {},
 }: ApiNodeFactoryProps = {}): ApiNode {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
@@ -1196,29 +1202,33 @@ export function apiNodeFactory({
             type: "CONSTANT_VALUE" as const,
             data: {
               type: "STRING" as const,
-              value: "POST",
+              value: method,
             },
           },
         ],
         combinator: "OR",
       },
     },
-    {
-      id: "480a4c12-22d6-4223-a38a-85db5eda118c",
-      key: "url",
-      value: {
-        rules: [
+    ...(url
+      ? [
           {
-            type: "CONSTANT_VALUE",
-            data: {
-              type: "STRING",
-              value: "https://example.vellum.ai",
+            id: "480a4c12-22d6-4223-a38a-85db5eda118c",
+            key: "url",
+            value: {
+              rules: [
+                {
+                  type: "CONSTANT_VALUE" as const,
+                  data: {
+                    type: "STRING" as const,
+                    value: url,
+                  },
+                },
+              ],
+              combinator: "OR" as const,
             },
           },
-        ],
-        combinator: "OR",
-      },
-    },
+        ]
+      : []),
     {
       id: "74865eb7-cdaf-4d40-a499-0a6505e72680",
       key: "body",
@@ -1228,7 +1238,7 @@ export function apiNodeFactory({
             type: "CONSTANT_VALUE",
             data: {
               type: "JSON",
-              value: {},
+              value: body,
             },
           },
         ],
