@@ -68,6 +68,28 @@ describe("WorkflowValueDescriptor", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
+    it("generates unary expression with constant value for parse_json", async () => {
+      const descriptor: WorkflowValueDescriptorType = {
+        type: "UNARY_EXPRESSION",
+        operator: "parseJson",
+        lhs: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "STRING",
+            value: '{"key": "value"}',
+          },
+        },
+      };
+
+      const valueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: descriptor,
+        workflowContext,
+      });
+
+      valueDescriptor.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
     it("generates binary expression with node output and constant", async () => {
       const descriptor: WorkflowValueDescriptorType = {
         type: "BINARY_EXPRESSION",
