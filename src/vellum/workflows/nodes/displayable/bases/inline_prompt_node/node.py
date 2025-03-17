@@ -1,6 +1,6 @@
 import json
 from uuid import uuid4
-from typing import Callable, ClassVar, Generic, Iterator, List, Optional, Tuple, Union
+from typing import Callable, ClassVar, Generic, Iterator, List, Optional, Set, Tuple, Union
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -18,6 +18,7 @@ from vellum import (
 from vellum.client import RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.prompt_settings import PromptSettings
+from vellum.client.types.rich_text_child_block import RichTextChildBlock
 from vellum.workflows.constants import OMIT
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
@@ -58,6 +59,31 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
+
+    def _extract_required_input_variables(self, blocks: Union[List[PromptBlock], List[RichTextChildBlock]]) -> Set[str]:
+        required_variables = set()
+
+        for block in blocks:
+            if block.block_type == "VARIABLE":
+                required_variables.add(block.input_variable)
+            elif block.block_type == "CHAT_MESSAGE" and block.blocks:
+                required_variables.update(self._extract_required_input_variables(block.blocks))
+            elif block.block_type == "RICH_TEXT" and block.blocks:
+                required_variables.update(self._extract_required_input_variables(block.blocks))
+
+        return required_variables
+
+    def _validate(self) -> None:
+        required_variables = self._extract_required_input_variables(self.blocks)
+        provided_variables = set(self.prompt_inputs.keys() if self.prompt_inputs else set())
+
+        missing_variables = required_variables - provided_variables
+        if missing_variables:
+            missing_vars_str = ", ".join(f"'{var}'" for var in missing_variables)
+            raise NodeException(
+                message=f"Missing required input variables by VariablePromptBlock: {missing_vars_str}",
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
 
     def _get_prompt_event_stream(self) -> Iterator[AdHocExecutePromptEvent]:
         input_variables, input_values = self._compile_prompt_inputs()
