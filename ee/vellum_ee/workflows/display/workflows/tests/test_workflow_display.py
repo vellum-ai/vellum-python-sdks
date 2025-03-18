@@ -149,7 +149,8 @@ def test_get_event_display_context__node_display_for_adornment_nodes():
     # GIVEN a simple workflow with a retry node adornment
     @RetryNode.wrap(max_attempts=4)
     class MyNode(BaseNode):
-        pass
+        class Outputs(BaseNode.Outputs):
+            foo: str
 
     class MyWorkflow(BaseWorkflow):
         graph = MyNode

@@ -59,7 +59,16 @@ _NodeDisplayAttrType = TypeVar("_NodeDisplayAttrType")
 
 class BaseNodeDisplayMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
-        cls = super().__new__(mcs, name, bases, dct)
+        cls = cast(Type["BaseNodeDisplay"], super().__new__(mcs, name, bases, dct))
+
+        if not dct.get("output_display"):
+            node_class = cls.infer_node_class()
+            cls.output_display = {
+                ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name)
+                for ref in node_class.Outputs
+                if ref.name in node_class.__output_ids__
+            }
+
         return cls.__annotate_node__()
 
     def __annotate_node__(cls):
@@ -73,22 +82,36 @@ class BaseNodeDisplayMeta(type):
             # Display classes are able to override the id of the node class it's parameterized by
             node_class.__id__ = display_node_id
 
-        output_display = getattr(cls, "output_display", None)
-        if isinstance(output_display, dict):
-            # And the node class' output ids
-            for reference, node_output_display in output_display.items():
-                if not isinstance(reference, OutputReference):
-                    continue
-                if not isinstance(node_output_display, NodeOutputDisplay):
-                    continue
+        for reference, node_output_display in base_node_display_class.output_display.items():
+            if not isinstance(reference, OutputReference):
+                continue
+            if not isinstance(node_output_display, NodeOutputDisplay):
+                continue
 
-                node_class.__output_ids__[reference.name] = node_output_display.id
+            node_class.__output_ids__[reference.name] = node_output_display.id
 
         return cls
 
+    def infer_node_class(cls) -> Type[BaseNode]:
+        original_base = get_original_base(cls)
+        node_class = get_args(original_base)[0]
+        if isinstance(node_class, TypeVar):
+            bounded_class = node_class.__bound__
+            if inspect.isclass(bounded_class) and issubclass(bounded_class, BaseNode):
+                return bounded_class
+
+            if isinstance(bounded_class, ForwardRef) and bounded_class.__forward_arg__ == BaseNode.__name__:
+                return BaseNode
+
+        if issubclass(node_class, BaseNode):
+            return node_class
+
+        raise ValueError(f"Node {cls.__name__} must be a subclass of {BaseNode.__name__}")
+
 
 class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
-    output_display: Dict[OutputReference, NodeOutputDisplay] = {}
+    # Default values set by the metaclass
+    output_display: Dict[OutputReference, NodeOutputDisplay]
     port_displays: Dict[Port, PortDisplayOverrides] = {}
     node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
@@ -235,23 +258,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     def get_from_node_display_registry(cls, node_class: Type[NodeType]) -> Optional[Type["BaseNodeDisplay"]]:
         return cls._node_display_registry.get(node_class)
 
-    @classmethod
-    def infer_node_class(cls) -> Type[NodeType]:
-        original_base = get_original_base(cls)
-        node_class = get_args(original_base)[0]
-        if isinstance(node_class, TypeVar):
-            bounded_class = node_class.__bound__
-            if inspect.isclass(bounded_class) and issubclass(bounded_class, BaseNode):
-                return cast(Type[NodeType], bounded_class)
-
-            if isinstance(bounded_class, ForwardRef) and bounded_class.__forward_arg__ == BaseNode.__name__:
-                return cast(Type[NodeType], BaseNode)
-
-        if issubclass(node_class, BaseNode):
-            return node_class
-
-        raise ValueError(f"Node {cls.__name__} must be a subclass of {BaseNode.__name__}")
-
     @cached_property
     def node_id(self) -> UUID:
         """Can be overridden as a class attribute to specify a custom node id."""
@@ -264,7 +270,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     @property
     def _node(self) -> Type[NodeType]:
-        return self.infer_node_class()
+        return self.__class__.infer_node_class()
 
     @classmethod
     def _get_explicit_node_display_attr(
