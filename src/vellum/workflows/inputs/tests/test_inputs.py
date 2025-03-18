@@ -2,7 +2,7 @@ import pytest
 from typing import Optional
 
 from vellum.workflows.errors import WorkflowErrorCode
-from vellum.workflows.exceptions import NodeException
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.inputs import BaseInputs
 
 
@@ -29,7 +29,7 @@ def test_base_inputs_empty_value():
         optional_string: Optional[str]
 
     # WHEN we try to omit a required field
-    with pytest.raises(NodeException) as exc_info:
+    with pytest.raises(WorkflowInitializationException) as exc_info:
         TestInputs(optional_string="ok")  # type: ignore
 
     # THEN it should raise a NodeException with the correct error message and code
