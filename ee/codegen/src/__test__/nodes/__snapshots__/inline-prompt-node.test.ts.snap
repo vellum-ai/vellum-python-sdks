@@ -202,7 +202,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.prompt_node import PromptNode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+    error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+)
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -441,7 +444,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.prompt_node import PromptNode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+    error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+)
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -655,7 +661,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.prompt_node import PromptNode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+    error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+)
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -880,7 +889,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.prompt_node import PromptNode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+    error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+)
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
@@ -1099,7 +1111,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.prompt_node import PromptNode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+    error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+)
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")

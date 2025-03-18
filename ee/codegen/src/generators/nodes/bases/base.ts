@@ -382,6 +382,13 @@ export abstract class BaseNode<
                   .NODE_DISPLAY_MODULE_PATH,
             }),
             arguments_: [
+              // TODO: Node id and error output id are the same here for legacy reasons. Will no longer be the
+              // case once we define output transformations for node adornments and could remove error output id.
+              // https://linear.app/vellum/issue/APO-213/define-output-transformations-for-node-adornments
+              new MethodArgument({
+                name: "node_id",
+                value: python.TypeInstantiation.uuid(errorOutputId),
+              }),
               new MethodArgument({
                 name: "error_output_id",
                 value: python.TypeInstantiation.uuid(errorOutputId),
@@ -410,8 +417,14 @@ export abstract class BaseNode<
                   this.workflowContext.sdkModulePathNames
                     .NODE_DISPLAY_MODULE_PATH,
               }),
-              // When we define output transformations, that's what we'd use here. eg, `error_output_id`.
-              arguments_: [],
+              // TODO: When we define output transformations, that's what we'd use here. eg, `error_output_id`.
+              // https://linear.app/vellum/issue/APO-213/define-output-transformations-for-node-adornments
+              arguments_: [
+                new MethodArgument({
+                  name: "node_id",
+                  value: python.TypeInstantiation.uuid(adornment.id),
+                }),
+              ],
             }),
           })
         );

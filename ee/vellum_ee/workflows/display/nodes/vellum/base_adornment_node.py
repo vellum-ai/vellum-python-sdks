@@ -44,7 +44,7 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
         return serialized_wrapped_node
 
     @classmethod
-    def wrap(cls, **kwargs: Any) -> Callable[..., Type[BaseNodeDisplay]]:
+    def wrap(cls, node_id: Optional[UUID] = None, **kwargs: Any) -> Callable[..., Type[BaseNodeDisplay]]:
         NodeDisplayType = TypeVar("NodeDisplayType", bound=BaseNodeDisplay)
 
         def decorator(inner_cls: Type[NodeDisplayType]) -> Type[NodeDisplayType]:
@@ -58,8 +58,7 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
                 for key, kwarg in kwargs.items():
                     ns[key] = kwarg
 
-                if "node_id" not in kwargs:
-                    ns["node_id"] = uuid4_from_hash(node_class.__qualname__)
+                ns["node_id"] = node_id or uuid4_from_hash(node_class.__qualname__)
 
             AdornmentDisplay = types.new_class(
                 re.sub(r"^Base", "", cls.__name__), bases=(BaseAdornmentDisplay,), exec_body=exec_body
