@@ -797,6 +797,25 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | ExecutionCounterWorkflowReferenceSerializer.Raw;
 }
 
+export const NodeOutputSerializer: ObjectSchema<
+  NodeOutputSerializer.Raw,
+  NodeOutput
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  type: VellumVariableTypeSerializer,
+  value: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace NodeOutputSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    type: VellumVariableTypeSerializer.Raw;
+    value?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
 export const NodeAttributeSerializer: ObjectSchema<
   NodeAttributeSerializer.Raw,
   NodeAttribute
@@ -846,6 +865,7 @@ export declare namespace BaseDisplayableWorkflowNodeSerializer {
     display_data?: NodeDisplayDataSerializer.Raw | null;
     inputs: NodeInputSerializer.Raw[];
     adornments?: AdornmentNodeSerializer.Raw[] | null;
+    outputs?: NodeOutputSerializer.Raw[] | null;
   }
 }
 
@@ -1143,6 +1163,7 @@ export const PromptNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  outputs: listSchema(NodeOutputSerializer).optional(),
 });
 
 export declare namespace PromptNodeSerializer {
@@ -1948,25 +1969,6 @@ export const GenericNodeDisplayDataSerializer: ObjectSchema<
 export declare namespace GenericNodeDisplayDataSerializer {
   interface Raw {
     position?: NodeDisplayPositionSerializer.Raw | null;
-  }
-}
-
-export const NodeOutputSerializer: ObjectSchema<
-  NodeOutputSerializer.Raw,
-  NodeOutput
-> = objectSchema({
-  id: stringSchema(),
-  name: stringSchema(),
-  type: VellumVariableTypeSerializer,
-  value: WorkflowValueDescriptorSerializer.optional(),
-});
-
-export declare namespace NodeOutputSerializer {
-  interface Raw {
-    id: string;
-    name: string;
-    type: VellumVariableTypeSerializer.Raw;
-    value?: WorkflowValueDescriptorSerializer.Raw | null;
   }
 }
 

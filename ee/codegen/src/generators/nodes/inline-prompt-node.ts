@@ -116,6 +116,10 @@ export class InlinePromptNode extends BaseSingleFileNode<
   protected getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
+    const jsonOutput = this.nodeData.outputs?.find(
+      (output) => output.type === "JSON"
+    );
+
     statements.push(
       python.field({
         name: "label",
@@ -151,6 +155,15 @@ export class InlinePromptNode extends BaseSingleFileNode<
         ),
       })
     );
+
+    if (jsonOutput) {
+      statements.push(
+        python.field({
+          name: "json_output_id",
+          initializer: python.TypeInstantiation.uuid(jsonOutput.id),
+        })
+      );
+    }
 
     return statements;
   }

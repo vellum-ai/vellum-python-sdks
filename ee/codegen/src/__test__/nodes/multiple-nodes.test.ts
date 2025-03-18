@@ -22,6 +22,8 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import {NodeOutput as NodeOutputType} from "src/types/vellum";
+import {v4 as uuidv4} from "uuid";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
@@ -360,5 +362,86 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
     expect(error?.message).toContain(
       "Could not find Subworkflow Deployment Output with id some-non-existent-subworkflow-output-id"
     );
+  });
+});
+
+describe("InlinePromptNode json output referenced by TemplatingNode", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: TemplatingNode;
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const nodeOutputs: NodeOutputType[] = [
+      {
+        id: uuidv4(),
+        name: "json",
+        type: "JSON",
+      },
+    ];
+    const promptNode = inlinePromptNodeDataInlineVariantFactory({
+      outputs: nodeOutputs,
+    });
+
+    (await createNodeContext({
+      workflowContext,
+      nodeData: promptNode,
+    })) as InlinePromptNodeContext;
+
+    const templatingNode = templatingNodeFactory({
+      id: "46e221ab-a749-41a2-9242-b1f5bf31f3a5",
+      sourceHandleId: "6ee2c814-d0a5-4ec9-83b6-45156e2f22c4",
+      targetHandleId: "3960c8e1-9baa-4b9c-991d-e399d16a45aa",
+      inputs: [
+        {
+          id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+          key: "var_1",
+          value: {
+            rules: [
+              {
+                type: "NODE_OUTPUT",
+                data: {
+                  nodeId: promptNode.id,
+                  outputId: nodeOutputs[0]?.id ?? uuidv4(),
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+          key: "template",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "{{ output[0].type }}",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+    });
+
+    const templatingNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: templatingNode,
+    })) as TemplatingNodeContext;
+
+    node = new TemplatingNode({
+      workflowContext,
+      nodeContext: templatingNodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });

@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -10,7 +11,10 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
-import { PromptTemplateBlock } from "src/types/vellum";
+import {
+  NodeOutput as NodeOutputType,
+  PromptTemplateBlock,
+} from "src/types/vellum";
 
 describe("InlinePromptNode", () => {
   let workflowContext: WorkflowContext;
@@ -196,5 +200,42 @@ describe("InlinePromptNode", () => {
 
     node.getNodeFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  describe("with json output id defined", async () => {
+    let node: InlinePromptNode;
+    beforeEach(async () => {
+      const randomJsonOutputId = "some-json-output-id";
+      const nodeOutputs: NodeOutputType[] = [
+        {
+          id: randomJsonOutputId,
+          name: "json",
+          type: "JSON",
+        },
+      ];
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        outputs: nodeOutputs,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it(`getNodeDisplayFile`, async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });

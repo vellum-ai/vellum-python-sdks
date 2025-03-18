@@ -1,5 +1,20 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`InlinePromptNode json output referenced by TemplatingNode > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+from .prompt_node import PromptNode
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """{{ output[0].type }}"""
+    inputs = {
+        "var_1": PromptNode.Outputs.json,
+    }
+"
+`;
+
 exports[`InlinePromptNode referenced by Conditional Node > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

@@ -19,6 +19,7 @@ _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
     output_id: ClassVar[Optional[UUID]] = None
     array_output_id: ClassVar[Optional[UUID]] = None
+    json_output_id: ClassVar[Optional[UUID]] = None
     prompt_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
     def serialize(
