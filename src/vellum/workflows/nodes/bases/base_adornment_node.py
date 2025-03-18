@@ -73,3 +73,5 @@ class BaseAdornmentNode(
         # Subclasses of BaseAdornableNode can override this method to provider their own
         # approach to annotating the outputs class based on the `subworkflow.Outputs`
         setattr(outputs_class, reference.name, reference)
+        if cls.__wrapped_node__:
+            cls.__output_ids__[reference.name] = cls.__wrapped_node__.__output_ids__[reference.name]
