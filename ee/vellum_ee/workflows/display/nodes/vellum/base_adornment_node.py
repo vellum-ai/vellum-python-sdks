@@ -76,9 +76,17 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
             inner_cls.__annotate_node__()
 
             # 2. The node display class' output displays
-            old_outputs = list(inner_cls.output_display.keys())
-            for old_output in old_outputs:
-                new_output = getattr(wrapped_node_class.Outputs, old_output.name)
+            for old_output in node_class.Outputs:
+                new_output = getattr(wrapped_node_class.Outputs, old_output.name, None)
+                if new_output is None:
+                    # If the adornment is adding a new output, such as TryNode adding an "error" output,
+                    # we skip it, since it should not be included in the adorned node's output displays
+                    continue
+
+                if old_output not in inner_cls.output_display:
+                    # If the adorned node doesn't have an output display for this output, we skip it
+                    continue
+
                 inner_cls.output_display[new_output] = inner_cls.output_display.pop(old_output)
 
             # 3. The node display class' port displays

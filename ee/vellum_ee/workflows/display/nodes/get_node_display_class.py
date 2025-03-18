@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Type
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import NodeDisplayType
@@ -43,14 +42,6 @@ def get_node_display_class(
         return {}
 
     def exec_body(ns: Dict):
-        output_display = {
-            ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name)
-            for ref in node_class.Outputs
-            if ref.name in node_class.__output_ids__
-        }
-        if output_display:
-            ns["output_display"] = output_display
-
         node_input_ids_by_name: Dict[str, UUID] = {}
         for ref in node_class:
             node_input_ids_by_name.update(_get_node_input_ids_by_ref(ref.name, ref.instance))
