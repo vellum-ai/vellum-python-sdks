@@ -195,6 +195,10 @@ def test_get_event_display_context__node_display_for_adornment_nodes():
     assert node_event_display.subworkflow_display is not None
     assert str(inner_node_id) in node_event_display.subworkflow_display.node_displays
 
+    # AND the inner node should have the correct outputs
+    inner_node_display = node_event_display.subworkflow_display.node_displays[str(inner_node_id)]
+    assert inner_node_display.output_display.keys() == {"foo"}
+
 
 def test_get_event_display_context__templating_node_input_display():
     # GIVEN a simple workflow with a templating node referencing another node output
