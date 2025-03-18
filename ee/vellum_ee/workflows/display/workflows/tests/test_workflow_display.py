@@ -155,9 +155,10 @@ def test_get_event_display_context__node_display_for_adornment_nodes():
         graph = MyNode
 
     # AND a display class for the node
+    adornment_node_id = uuid4()
     inner_node_id = uuid4()
 
-    @BaseRetryNodeDisplay.wrap()
+    @BaseRetryNodeDisplay.wrap(node_id=adornment_node_id)
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
         node_id = inner_node_id
 
@@ -165,8 +166,8 @@ def test_get_event_display_context__node_display_for_adornment_nodes():
     display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
-    assert str(MyNode.__id__) in display_context.node_displays
-    node_event_display = display_context.node_displays[str(MyNode.__id__)]
+    assert str(adornment_node_id) in display_context.node_displays
+    node_event_display = display_context.node_displays[str(adornment_node_id)]
     assert node_event_display.subworkflow_display is not None
     assert str(inner_node_id) in node_event_display.subworkflow_display.node_displays
 

@@ -205,7 +205,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.api_node import APINode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"),
+    error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"),
+)
 class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     label = "API Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")

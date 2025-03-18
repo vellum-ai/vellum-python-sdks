@@ -267,7 +267,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.search_node import SearchNode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"),
+    error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"),
+)
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     label = "Search Node"
     node_id = UUID("search")

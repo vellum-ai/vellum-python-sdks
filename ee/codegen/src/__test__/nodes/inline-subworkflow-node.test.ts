@@ -152,7 +152,7 @@ describe("InlineSubworkflowNode", () => {
         nodes: [templatingNodeFactory({ label: "My node" })],
         adornments: [
           {
-            id: uuidv4(),
+            id: "ae49ef72-6ad7-441a-a20d-76c71ad851ef",
             label: "RetryNodeLabel",
             base: {
               name: "RetryNode",

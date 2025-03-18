@@ -122,7 +122,10 @@ from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosit
 from ...nodes.templating_node import TemplatingNode
 
 
-@BaseTryNodeDisplay.wrap(error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"))
+@BaseTryNodeDisplay.wrap(
+    node_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+    error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
+)
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
     label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
