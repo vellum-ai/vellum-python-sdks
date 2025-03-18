@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import {
   DeploymentHistoryItem,
   WorkflowDeploymentHistoryItem,
@@ -12,6 +13,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   conditionalNodeFactory,
   inlinePromptNodeDataInlineVariantFactory,
+  nodeInputFactory,
   promptDeploymentNodeDataFactory,
   subworkflowDeploymentNodeDataFactory,
   templatingNodeFactory,
@@ -22,6 +24,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import { NodeOutput as NodeOutputType } from "src/types/vellum";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
@@ -360,5 +363,73 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
     expect(error?.message).toContain(
       "Could not find Subworkflow Deployment Output with id some-non-existent-subworkflow-output-id"
     );
+  });
+});
+
+describe("InlinePromptNode json output referenced by TemplatingNode", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: TemplatingNode;
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const nodeOutputs: NodeOutputType[] = [
+      {
+        id: uuidv4(),
+        name: "json",
+        type: "JSON",
+      },
+    ];
+    const promptNode = inlinePromptNodeDataInlineVariantFactory({
+      outputs: nodeOutputs,
+    });
+
+    (await createNodeContext({
+      workflowContext,
+      nodeData: promptNode,
+    })) as InlinePromptNodeContext;
+
+    const templatingNode = templatingNodeFactory({
+      inputs: [
+        nodeInputFactory({
+          id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+          key: "var_1",
+          value: {
+            type: "NODE_OUTPUT",
+            data: {
+              nodeId: promptNode.id,
+              outputId: nodeOutputs[0]?.id ?? uuidv4(),
+            },
+          },
+        }),
+        nodeInputFactory({
+          id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+          key: "template",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "{{ output[0].type }}",
+            },
+          },
+        }),
+      ],
+    });
+
+    const templatingNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: templatingNode,
+    })) as TemplatingNodeContext;
+
+    node = new TemplatingNode({
+      workflowContext,
+      nodeContext: templatingNodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });

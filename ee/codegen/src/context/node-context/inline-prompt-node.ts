@@ -12,12 +12,17 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
   baseNodeDisplayClassName = "BaseInlinePromptNodeDisplay";
 
   protected getNodeOutputNamesById(): Record<string, string> {
+    const jsonOutput = this.nodeData.outputs?.find(
+      (output) => output.type === "JSON"
+    );
+
     return {
       [this.nodeData.data.outputId]: "text",
       ...(this.nodeData.data.errorOutputId
         ? { [this.nodeData.data.errorOutputId]: "error" }
         : {}),
       [this.nodeData.data.arrayOutputId]: "results",
+      ...(jsonOutput ? { [jsonOutput.id]: "json" } : {}),
     };
   }
 
