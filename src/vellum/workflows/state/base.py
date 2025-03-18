@@ -163,6 +163,17 @@ class NodeExecutionCache:
     def get_execution_count(self, node: Type["BaseNode"]) -> int:
         return self._node_executions_fulfilled[node].size()
 
+    def has_unfulfilled_executions(self, node: Type["BaseNode"]) -> bool:
+        """
+        Check if a node has any executions that have been initiated but not yet fulfilled.
+
+        Returns:
+            bool: True if there are unfulfilled executions for this node, False otherwise.
+        """
+        initiated_count = len(self._node_executions_initiated[node])
+        fulfilled_count = self._node_executions_fulfilled[node].size()
+        return initiated_count > fulfilled_count
+
     def dump(self) -> Dict[str, Any]:
         return {
             "dependencies_invoked": {
