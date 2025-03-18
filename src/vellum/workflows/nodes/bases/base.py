@@ -297,10 +297,8 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 when all of its dependencies have invoked this node.
                 """
                 # Check if all dependencies have invoked this node
-                all_deps_invoked = all(
-                    dep in state.meta.node_execution_cache._dependencies_invoked.get(node_span_id, set())
-                    for dep in dependencies
-                )
+                dependencies_invoked = state.meta.node_execution_cache._dependencies_invoked.get(node_span_id, set())
+                all_deps_invoked = all(dep in dependencies_invoked for dep in dependencies)
 
                 return all_deps_invoked
 
