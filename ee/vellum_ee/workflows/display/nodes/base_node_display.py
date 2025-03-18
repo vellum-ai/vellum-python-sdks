@@ -270,7 +270,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     @property
     def _node(self) -> Type[NodeType]:
-        return self.__class__.infer_node_class()
+        return cast(Type[NodeType], self.__class__.infer_node_class())
 
     @classmethod
     def _get_explicit_node_display_attr(
