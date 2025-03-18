@@ -279,8 +279,8 @@ exports[`Workflow > graph > should handle a simple edge of generic nodes 1`] = `
 
 exports[`Workflow > graph > should properly format UUID-like port names in graph references 1`] = `
 "{
-    GenericNode.Ports._7d813792_04c2_4d26_a126_16de4c4cebaf >> FirstNode,
-    GenericNode.Ports._6f909cc6_887c_46d8_966b_46547900fc9c >> SecondNode,
+    GenericNode.Ports.port_7d813792_04c2_4d26_a126_16de4c4cebaf >> FirstNode,
+    GenericNode.Ports.port_6f909cc6_887c_46d8_966b_46547900fc9c >> SecondNode,
 }
 "
 `;
