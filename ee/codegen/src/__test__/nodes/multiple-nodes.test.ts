@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import {
   DeploymentHistoryItem,
   WorkflowDeploymentHistoryItem,
@@ -22,8 +23,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
-import {NodeOutput as NodeOutputType} from "src/types/vellum";
-import {v4 as uuidv4} from "uuid";
+import { NodeOutput as NodeOutputType } from "src/types/vellum";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;

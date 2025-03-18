@@ -1,5 +1,4 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { v4 as uuidv4 } from "uuid";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
