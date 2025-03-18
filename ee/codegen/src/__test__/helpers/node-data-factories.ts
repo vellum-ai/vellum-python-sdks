@@ -557,8 +557,8 @@ export function inlinePromptNodeDataInlineVariantFactory({
       },
     ],
     // Add adornments if provided
-    ...(adornments && { adornments }),
-    ...(outputs && { outputs }),
+    adornments,
+    outputs,
   };
   return nodeData;
 }

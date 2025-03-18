@@ -116,10 +116,6 @@ export class InlinePromptNode extends BaseSingleFileNode<
   protected getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    const jsonOutput = this.nodeData.outputs?.find(
-      (output) => output.type === "JSON"
-    );
-
     statements.push(
       python.field({
         name: "label",
@@ -156,77 +152,100 @@ export class InlinePromptNode extends BaseSingleFileNode<
       })
     );
 
-    if (jsonOutput) {
-      statements.push(
-        python.field({
-          name: "json_output_id",
-          initializer: python.TypeInstantiation.uuid(jsonOutput.id),
-        })
-      );
-    }
-
     return statements;
   }
 
   protected getOutputDisplay(): python.Field {
+    const jsonOutput = this.nodeData.outputs?.find(
+      (output) => output.type === "JSON"
+    );
+
+    const outputDisplayEntries = [
+      {
+        key: python.reference({
+          name: this.nodeContext.nodeClassName,
+          modulePath: this.nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, "text"],
+        }),
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeOutputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
+          }),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str("text"),
+            }),
+          ],
+        }),
+      },
+      {
+        key: python.reference({
+          name: this.nodeContext.nodeClassName,
+          modulePath: this.nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, "results"],
+        }),
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeOutputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
+          }),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(
+                this.nodeData.data.arrayOutputId
+              ),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str("results"),
+            }),
+          ],
+        }),
+      },
+    ];
+
+    if (jsonOutput) {
+      outputDisplayEntries.push({
+        key: python.reference({
+          name: this.nodeContext.nodeClassName,
+          modulePath: this.nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, "json"],
+        }),
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeOutputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
+          }),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(jsonOutput.id),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str("json"),
+            }),
+          ],
+        }),
+      });
+    }
+
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict([
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "text"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.outputId
-                ),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("text"),
-              }),
-            ],
-          }),
-        },
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "results"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.arrayOutputId
-                ),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("results"),
-              }),
-            ],
-          }),
-        },
-      ]),
+      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
     });
   }
 

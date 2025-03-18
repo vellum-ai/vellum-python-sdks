@@ -1,6 +1,7 @@
 import json
 from typing import Any, Dict, Iterator, Optional
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BaseInlinePromptNode as BaseInlinePromptNode
@@ -34,7 +35,7 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
         """
 
         text: str
-        json: Optional[Dict[Any, Any]] = None
+        json: Optional[Dict[Any, Any]] = undefined
 
     def run(self) -> Iterator[BaseOutput]:
         outputs = yield from self._process_prompt_event_stream()

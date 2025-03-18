@@ -13,6 +13,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   conditionalNodeFactory,
   inlinePromptNodeDataInlineVariantFactory,
+  nodeInputFactory,
   promptDeploymentNodeDataFactory,
   subworkflowDeploymentNodeDataFactory,
   templatingNodeFactory,
@@ -390,42 +391,29 @@ describe("InlinePromptNode json output referenced by TemplatingNode", () => {
     })) as InlinePromptNodeContext;
 
     const templatingNode = templatingNodeFactory({
-      id: "46e221ab-a749-41a2-9242-b1f5bf31f3a5",
-      sourceHandleId: "6ee2c814-d0a5-4ec9-83b6-45156e2f22c4",
-      targetHandleId: "3960c8e1-9baa-4b9c-991d-e399d16a45aa",
       inputs: [
-        {
+        nodeInputFactory({
           id: "9feb7b5e-5947-496d-b56f-1e2627730796",
           key: "var_1",
           value: {
-            rules: [
-              {
-                type: "NODE_OUTPUT",
-                data: {
-                  nodeId: promptNode.id,
-                  outputId: nodeOutputs[0]?.id ?? uuidv4(),
-                },
-              },
-            ],
-            combinator: "OR",
+            type: "NODE_OUTPUT",
+            data: {
+              nodeId: promptNode.id,
+              outputId: nodeOutputs[0]?.id ?? uuidv4(),
+            },
           },
-        },
-        {
+        }),
+        nodeInputFactory({
           id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
           key: "template",
           value: {
-            rules: [
-              {
-                type: "CONSTANT_VALUE",
-                data: {
-                  type: "STRING",
-                  value: "{{ output[0].type }}",
-                },
-              },
-            ],
-            combinator: "OR",
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "{{ output[0].type }}",
+            },
           },
-        },
+        }),
       ],
     });
 

@@ -1244,7 +1244,6 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     array_output_id = UUID("771c6fba-5b4a-4092-9d52-693242d7b92c")
     target_handle_id = UUID("3feb7e71-ec63-4d58-82ba-c3df829a2948")
     prompt_input_ids_by_name = {"text": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
-    json_output_id = UUID("some-json-output-id")
     node_input_ids_by_name = {"text": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
     output_display = {
         PromptNode.Outputs.text: NodeOutputDisplay(
@@ -1252,6 +1251,9 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
         ),
         PromptNode.Outputs.results: NodeOutputDisplay(
             id=UUID("771c6fba-5b4a-4092-9d52-693242d7b92c"), name="results"
+        ),
+        PromptNode.Outputs.json: NodeOutputDisplay(
+            id=UUID("some-json-output-id"), name="json"
         ),
     }
     port_displays = {
