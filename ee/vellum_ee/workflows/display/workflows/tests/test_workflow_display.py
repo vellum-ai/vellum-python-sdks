@@ -5,9 +5,11 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
+from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -168,9 +170,21 @@ def test_get_event_display_context__node_display_to_include_subworkflow_display(
     assert str(InnerNode.__id__) in node_event_display.subworkflow_display.node_displays
 
 
-def test_get_event_display_context__node_display_for_adornment_nodes():
-    # GIVEN a simple workflow with a retry node adornment
-    @RetryNode.wrap(max_attempts=4)
+@pytest.mark.parametrize(
+    ["AdornmentNode", "AdornmentNodeDisplay", "expected_adornment_output_names"],
+    [
+        [RetryNode, BaseRetryNodeDisplay, {"foo"}],
+        [TryNode, BaseTryNodeDisplay, {"foo", "error"}],
+    ],
+    ids=["retry_node", "try_node"],
+)
+def test_get_event_display_context__node_display_for_adornment_nodes(
+    AdornmentNode,
+    AdornmentNodeDisplay,
+    expected_adornment_output_names,
+):
+    # GIVEN a simple workflow with an adornment
+    @AdornmentNode.wrap()
     class MyNode(BaseNode):
         class Outputs(BaseNode.Outputs):
             foo: str
@@ -182,7 +196,7 @@ def test_get_event_display_context__node_display_for_adornment_nodes():
     adornment_node_id = uuid4()
     inner_node_id = uuid4()
 
-    @BaseRetryNodeDisplay.wrap(node_id=adornment_node_id)
+    @AdornmentNodeDisplay.wrap(node_id=adornment_node_id)
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
         node_id = inner_node_id
 
@@ -198,7 +212,7 @@ def test_get_event_display_context__node_display_for_adornment_nodes():
     # AND the inner node should have the correct outputs
     inner_node_display = node_event_display.subworkflow_display.node_displays[str(inner_node_id)]
     assert inner_node_display.output_display.keys() == {"foo"}
-    assert node_event_display.output_display.keys() == {"foo"}
+    assert node_event_display.output_display.keys() == expected_adornment_output_names
 
 
 def test_get_event_display_context__templating_node_input_display():

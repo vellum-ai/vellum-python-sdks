@@ -86,6 +86,7 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
                 if new_output is None:
                     # If the adornment is adding a new output, such as TryNode adding an "error" output,
                     # we skip it, since it should not be included in the adorned node's output displays
+                    wrapped_node_display_class.output_display.pop(old_output, None)
                     continue
 
                 if old_output not in wrapped_node_display_class.output_display:

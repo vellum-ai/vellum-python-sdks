@@ -85,7 +85,7 @@ Message: {terminal_event.error.message}""",
     @classmethod
     def wrap(
         cls,
-        max_attempts: int,
+        max_attempts: int = 3,
         delay: Optional[float] = None,
         retry_on_error_code: Optional[WorkflowErrorCode] = None,
         retry_on_condition: Optional[BaseDescriptor] = None,

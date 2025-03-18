@@ -102,4 +102,4 @@ Message: {event.error.message}""",
         if reference.name == "error":
             raise ValueError("`error` is a reserved name for TryNode.Outputs")
 
-        setattr(outputs_class, reference.name, reference)
+        super().__annotate_outputs_class__(outputs_class, reference)
