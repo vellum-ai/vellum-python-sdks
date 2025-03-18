@@ -293,14 +293,14 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ALL:
                 """
-                A node utilizing an AWAIT_ALL merge strategy will only be considered ready for the Nth time
-                when all of its dependencies have been executed N times.
+                A node utilizing an AWAIT_ALL merge strategy will only be considered ready
+                when all of its dependencies have invoked this node.
                 """
-                current_node_execution_count = state.meta.node_execution_cache.get_execution_count(cls.node_class)
-                return all(
-                    state.meta.node_execution_cache.get_execution_count(dep) == current_node_execution_count + 1
-                    for dep in dependencies
-                )
+                # Check if all dependencies have invoked this node
+                dependencies_invoked = state.meta.node_execution_cache._dependencies_invoked.get(node_span_id, set())
+                all_deps_invoked = all(dep in dependencies_invoked for dep in dependencies)
+
+                return all_deps_invoked
 
             raise NodeException(
                 message="Invalid Trigger Node Specification",
