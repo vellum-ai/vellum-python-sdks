@@ -36,7 +36,7 @@ describe("InlinePromptRetryNode", () => {
         blockType: "JINJA",
         adornments: [
           {
-            id: uuidv4(),
+            id: "cc79c784-d936-44c2-a811-b86a53e6ff68",
             label: "RetryNodeLabel",
             base: {
               name: "RetryNode",
@@ -94,7 +94,7 @@ describe("InlinePromptRetryNode", () => {
         blockType: "JINJA",
         adornments: [
           {
-            id: uuidv4(),
+            id: "2076aea8-be38-4ff1-8c68-cb853e352d66",
             label: "RetryNodeLabel",
             base: {
               name: "RetryNode",
@@ -167,7 +167,7 @@ describe("InlinePromptRetryNode", () => {
         errorOutputId: ERROR_OUTPUT_ID,
         adornments: [
           {
-            id: uuidv4(),
+            id: "e5de8d57-ae0d-4a4a-afb3-eb4cd6bdb0ac",
             label: "RetryNodeLabel",
             base: {
               name: "RetryNode",
