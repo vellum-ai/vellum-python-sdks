@@ -1,5 +1,7 @@
 import pytest
 
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
@@ -87,3 +89,30 @@ def test_inline_subworkflow_node__nested_try():
     # THEN we only have the outer node's outputs
     valid_events = [e for e in events if e.name == "bar"]
     assert len(valid_events) == len(events)
+
+
+def test_inline_subworkflow_node__base_inputs_validation():
+    """Test that InlineSubworkflowNode properly validates required inputs"""
+
+    # GIVEN a real subworkflow class with a required input
+    class SubworkflowInputs(BaseInputs):
+        required_input: str  # This is a required field without a default
+
+    class TestSubworkflow(BaseWorkflow[SubworkflowInputs, BaseState]):
+        pass
+
+    # AND a node that uses this subworkflow
+    class TestNode(InlineSubworkflowNode):
+        subworkflow = TestSubworkflow
+        subworkflow_inputs = {"required_input": None}
+
+    # WHEN we try to run the node
+    node = TestNode()
+
+    # THEN it should raise a WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as e:
+        list(node.run())
+
+    # AND the error message should indicate the missing required input
+    assert e.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "Required input variables required_input should have defined value" == str(e.value)
