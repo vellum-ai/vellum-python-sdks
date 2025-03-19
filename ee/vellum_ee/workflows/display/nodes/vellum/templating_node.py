@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import ClassVar, Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.core.templating_node import TemplatingNode
 from vellum.workflows.types.core import JsonObject
@@ -11,23 +11,21 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _TemplatingNodeType = TypeVar("_TemplatingNodeType", bound=TemplatingNode)
 
-TEMPLATE_INPUT_NAME = "template"
+TEMPLATE_INPUT_NAME = TemplatingNode.template.name
 
 
 class BaseTemplatingNodeDisplay(BaseNodeVellumDisplay[_TemplatingNodeType], Generic[_TemplatingNodeType]):
-    template_input_id: ClassVar[Optional[UUID]] = None
-
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
-        template_input_id = self.template_input_id or self.node_input_ids_by_name.get(TEMPLATE_INPUT_NAME)
+        template_input_id = self.node_input_ids_by_name.get(TEMPLATE_INPUT_NAME)
 
         template_node_input = create_node_input(
             node_id=node_id,
-            input_name="template",
+            input_name=TEMPLATE_INPUT_NAME,
             value=node.template,
             display_context=display_context,
             input_id=template_input_id,
