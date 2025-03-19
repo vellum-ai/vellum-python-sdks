@@ -19,7 +19,6 @@ _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
     output_id: ClassVar[Optional[UUID]] = None
     array_output_id: ClassVar[Optional[UUID]] = None
-    json_output_id: ClassVar[Optional[UUID]] = None
     prompt_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
     def serialize(
@@ -33,6 +32,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
 
         _, output_display = display_context.global_node_output_displays[node.Outputs.text]
         _, array_display = display_context.global_node_output_displays[node.Outputs.results]
+        _, json_display = display_context.global_node_output_displays[node.Outputs.json]
         node_blocks = raise_if_descriptor(node.blocks)
         function_definitions = raise_if_descriptor(node.functions)
 
@@ -71,6 +71,11 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
+            "outputs": [
+                {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},
+                {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},
+                {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
+            ],
         }
 
     def _generate_node_and_prompt_inputs(

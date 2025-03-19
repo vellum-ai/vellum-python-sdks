@@ -46,14 +46,31 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
             )
 
         string_outputs = []
+        json_output = None
+
+        should_parse_json = False
+        if hasattr(self, "parameters"):
+            custom_params = self.parameters.custom_parameters
+            if custom_params and isinstance(custom_params, dict):
+                json_schema = custom_params.get("json_schema", {})
+                if (isinstance(json_schema, dict) and "schema" in json_schema) or custom_params.get("json_mode", {}):
+                    should_parse_json = True
+
         for output in outputs:
             if output.value is None:
                 continue
 
             if output.type == "STRING":
                 string_outputs.append(output.value)
+                if should_parse_json:
+                    try:
+                        parsed_json = json.loads(output.value)
+                        json_output = parsed_json
+                    except (json.JSONDecodeError, TypeError):
+                        pass
             elif output.type == "JSON":
                 string_outputs.append(json.dumps(output.value, indent=4))
+                json_output = output.value
             elif output.type == "FUNCTION_CALL":
                 string_outputs.append(output.value.model_dump_json(indent=4))
             else:
@@ -61,3 +78,6 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
 
         value = "\n".join(string_outputs)
         yield BaseOutput(name="text", value=value)
+
+        if json_output:
+            yield BaseOutput(name="json", value=json_output)
