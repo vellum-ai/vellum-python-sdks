@@ -74,7 +74,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
             "outputs": [
                 {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},
                 {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},
-                {"id": str(array_display.id), "name": "array", "type": "ARRAY", "value": None},
+                {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
             ],
         }
 

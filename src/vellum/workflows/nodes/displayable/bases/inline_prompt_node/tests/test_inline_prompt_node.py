@@ -256,7 +256,11 @@ def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client):
     assert results_output.name == "results"
     assert results_output.value == expected_outputs
 
-    json_output = outputs[1]
+    text_output = outputs[1]
+    assert text_output.name == "text"
+    assert text_output.value == '{"result": "Hello, world!"}'
+
+    json_output = outputs[2]
     assert json_output.name == "json"
     assert json_output.value == [expected_json]
 

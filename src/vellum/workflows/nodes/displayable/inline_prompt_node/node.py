@@ -50,10 +50,10 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
 
         should_parse_json = False
         if hasattr(self, "parameters"):
-            custom_params = getattr(self.parameters, "custom_parameters")
+            custom_params = self.parameters.custom_parameters
             if custom_params and isinstance(custom_params, dict):
                 json_schema = custom_params.get("json_schema", {})
-                if isinstance(json_schema, dict) and "schema" in json_schema:
+                if (isinstance(json_schema, dict) and "schema" in json_schema) or custom_params.get("json_mode", {}):
                     should_parse_json = True
 
         for output in outputs:
@@ -76,8 +76,8 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
             else:
                 string_outputs.append(output.value.message)
 
+        value = "\n".join(string_outputs)
+        yield BaseOutput(name="text", value=value)
+
         if json_outputs:
             yield BaseOutput(name="json", value=json_outputs)
-        else:
-            value = "\n".join(string_outputs)
-            yield BaseOutput(name="text", value=value)
