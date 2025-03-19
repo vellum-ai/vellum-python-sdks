@@ -1,5 +1,6 @@
 import pytest
 from uuid import UUID
+from typing import Type
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
@@ -8,19 +9,19 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
-def _no_display_class(TemplatingNode):
+def _no_display_class(Node: Type[TemplatingNode]):
     return None
 
 
-def _display_class_with_node_input_ids_by_name(TemplatingNode):
-    class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
+def _display_class_with_node_input_ids_by_name(Node: Type[TemplatingNode]):
+    class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[Node]):  # type: ignore[valid-type]
         node_input_ids_by_name = {"foo": UUID("fba6a4d5-835a-4e99-afb7-f6a4aed15110")}
 
     return TemplatingNodeDisplay
 
 
-def _display_class_with_node_input_ids_by_name_with_inputs_prefix(TemplatingNode):
-    class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
+def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[TemplatingNode]):
+    class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[Node]):  # type: ignore[valid-type]
         node_input_ids_by_name = {"inputs.foo": UUID("fba6a4d5-835a-4e99-afb7-f6a4aed15110")}
 
     return TemplatingNodeDisplay
