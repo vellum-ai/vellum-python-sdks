@@ -4,7 +4,7 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.workflow import is_workflow_event
-from vellum.workflows.exceptions import NodeException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode, BaseNodeMeta
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
@@ -119,19 +119,21 @@ class InlineSubworkflowNode(
 
     def _compile_subworkflow_inputs(self) -> InputsType:
         inputs_class = self.subworkflow.get_inputs_class()
-        if self.subworkflow_inputs is undefined:
-            inputs_dict = {}
-            for descriptor in inputs_class:
-                if hasattr(self, descriptor.name):
-                    inputs_dict[descriptor.name] = getattr(self, descriptor.name)
-
-            return inputs_class(**inputs_dict)
-        elif isinstance(self.subworkflow_inputs, dict):
-            return inputs_class(**self.subworkflow_inputs)
-        elif isinstance(self.subworkflow_inputs, inputs_class):
-            return self.subworkflow_inputs
-        else:
-            raise ValueError(f"Invalid subworkflow inputs type: {type(self.subworkflow_inputs)}")
+        try:
+            if self.subworkflow_inputs is undefined:
+                inputs_dict = {}
+                for descriptor in inputs_class:
+                    if hasattr(self, descriptor.name):
+                        inputs_dict[descriptor.name] = getattr(self, descriptor.name)
+                return inputs_class(**inputs_dict)
+            elif isinstance(self.subworkflow_inputs, dict):
+                return inputs_class(**self.subworkflow_inputs)
+            elif isinstance(self.subworkflow_inputs, inputs_class):
+                return self.subworkflow_inputs
+            else:
+                raise ValueError(f"Invalid subworkflow inputs type: {type(self.subworkflow_inputs)}")
+        except WorkflowInitializationException as e:
+            raise NodeException(message=str(e), code=e.code)
 
     @classmethod
     def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:

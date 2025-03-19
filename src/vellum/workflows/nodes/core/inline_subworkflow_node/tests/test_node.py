@@ -1,7 +1,7 @@
 import pytest
 
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import WorkflowInitializationException
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
@@ -109,8 +109,8 @@ def test_inline_subworkflow_node__base_inputs_validation():
     # WHEN we try to run the node
     node = TestNode()
 
-    # THEN it should raise a WorkflowInitializationException
-    with pytest.raises(WorkflowInitializationException) as e:
+    # THEN it should raise a NodeException
+    with pytest.raises(NodeException) as e:
         list(node.run())
 
     # AND the error message should indicate the missing required input
