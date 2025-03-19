@@ -262,7 +262,7 @@ def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client):
 
     json_output = outputs[2]
     assert json_output.name == "json"
-    assert json_output.value == [expected_json]
+    assert json_output.value == expected_json
 
     # AND we should have made the expected call to Vellum search
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.assert_called_once_with(
