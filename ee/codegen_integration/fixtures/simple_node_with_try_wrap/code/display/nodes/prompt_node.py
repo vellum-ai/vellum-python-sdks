@@ -21,6 +21,7 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     output_display = {
         PromptNode.Outputs.text: NodeOutputDisplay(id=UUID("13e677d3-14e7-4b0c-ab36-834bb99c930c"), name="text"),
         PromptNode.Outputs.results: NodeOutputDisplay(id=UUID("01976625-90e7-4ecb-b752-454b2cd0bb67"), name="results"),
+        PromptNode.Outputs.json: NodeOutputDisplay(id=UUID("6f89f74a-32d8-43a5-8414-fdd7ae9265b4"), name="json"),
     }
     port_displays = {PromptNode.Ports.default: PortDisplayOverrides(id=UUID("4e8bdb06-2adb-474f-9bd7-f6ee01fd4c2b"))}
     display_data = NodeDisplayData(
