@@ -194,6 +194,12 @@ WorkflowExecutionEvent = Union[
     WorkflowExecutionSnapshottedEvent,
 ]
 
+TerminalWorkflowExecutionEvent = Union[
+    WorkflowExecutionFulfilledEvent,
+    WorkflowExecutionRejectedEvent,
+    WorkflowExecutionPausedEvent,
+]
+
 
 def is_workflow_event(event: WorkflowEvent) -> TypeGuard[WorkflowExecutionEvent]:
     return (
@@ -204,4 +210,12 @@ def is_workflow_event(event: WorkflowEvent) -> TypeGuard[WorkflowExecutionEvent]
         or event.name == "workflow.execution.paused"
         or event.name == "workflow.execution.resumed"
         or event.name == "workflow.execution.rejected"
+    )
+
+
+def is_terminal_workflow_execution_event(event: WorkflowEvent) -> TypeGuard[TerminalWorkflowExecutionEvent]:
+    return (
+        event.name == "workflow.execution.fulfilled"
+        or event.name == "workflow.execution.rejected"
+        or event.name == "workflow.execution.paused"
     )

@@ -1,5 +1,9 @@
 import pytest
 import os
+import sys
+import threading
+import time
+import traceback
 from uuid import UUID, uuid4
 from typing import Any, Callable, Generator, List
 
@@ -69,3 +73,37 @@ def vellum_adhoc_prompt_client(vellum_client: Any) -> Any:
 def mock_requests() -> Any:
     with requests_mock.Mocker() as m:
         yield m
+
+
+@pytest.fixture
+def debug_threads() -> Callable[[int], None]:
+    """
+    A useful fixture for debugging threads that are hung. Use this to print out the stacktrace of all running threads.
+    Example usage:
+
+    def test_workflow_hangs(debug_threads):
+        # ...
+        debug_threads(5)
+        # ...
+
+    This will print out the stacktrace of all running threads 5 seconds after the test has finished.
+    """
+
+    logger = load_logger()
+
+    def _debug_threads(sleep_time: int = 5) -> None:
+        time.sleep(sleep_time)
+        for thread in threading.enumerate():
+            logger.info(f"\nThread {thread.name} is still running")
+
+            if not isinstance(thread.ident, int):
+                logger.info(f"Invalid Thread {thread.name} has no ident")
+                continue
+
+            # Get stacktrace for this thread
+            for frame in traceback.extract_stack(sys._current_frames()[thread.ident]):
+                logger.info(f"  File {frame.filename}, line {frame.lineno}, in {frame.name}")
+                if frame.line:
+                    logger.info(f"    {frame.line}")
+
+    return _debug_threads
