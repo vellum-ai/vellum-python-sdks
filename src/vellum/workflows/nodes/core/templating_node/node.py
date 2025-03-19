@@ -48,7 +48,7 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
     """
 
     # The Jinja template to render.
-    template: ClassVar[str]
+    template: ClassVar[str] = ""
 
     # The inputs to render the template with.
     inputs: ClassVar[EntityInputsInterface]
