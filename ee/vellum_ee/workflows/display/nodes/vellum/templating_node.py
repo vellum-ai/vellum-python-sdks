@@ -37,7 +37,8 @@ class BaseTemplatingNodeDisplay(BaseNodeVellumDisplay[_TemplatingNodeType], Gene
                 input_name=variable_name,
                 value=variable_value,
                 display_context=display_context,
-                input_id=self.node_input_ids_by_name.get(variable_name),
+                input_id=self.node_input_ids_by_name.get(f"{TemplatingNode.inputs.name}.{variable_name}")
+                or self.node_input_ids_by_name.get(variable_name),
             )
             for variable_name, variable_value in template_node_inputs.items()
             if variable_name != TEMPLATE_INPUT_NAME

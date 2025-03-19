@@ -54,7 +54,7 @@ def create_node_input_value_pointer_rules(
 
     if isinstance(value, BaseDescriptor):
         if isinstance(value, NodeReference):
-            if not value.instance:
+            if value.instance is None:
                 raise ValueError(f"Expected NodeReference {value.name} to have an instance")
             value = cast(BaseDescriptor, value.instance)
 

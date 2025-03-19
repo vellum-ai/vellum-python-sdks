@@ -51,7 +51,7 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
     template: ClassVar[str] = ""
 
     # The inputs to render the template with.
-    inputs: ClassVar[EntityInputsInterface]
+    inputs: ClassVar[EntityInputsInterface] = {}
 
     jinja_globals: Dict[str, Any] = DEFAULT_JINJA_GLOBALS
     jinja_custom_filters: Mapping[str, FilterFunc] = DEFAULT_JINJA_CUSTOM_FILTERS
