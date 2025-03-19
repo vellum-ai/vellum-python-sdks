@@ -13,8 +13,8 @@ class TemplatingNode3Display(BaseTemplatingNodeDisplay[TemplatingNode3]):
     target_handle_id = UUID("2c1e39e0-ce3e-4c2d-8baf-c5d93b244997")
     node_input_ids_by_name = {
         "template": UUID("c1cc89c9-7cb7-498d-9dda-e9e5f36fe556"),
-        "input_a": UUID("56ff5b3f-41e1-492d-80a0-493f170452a1"),
-        "input_b": UUID("553fe161-a16e-48d1-b07c-b51fe7d10bf3"),
+        "inputs.input_a": UUID("56ff5b3f-41e1-492d-80a0-493f170452a1"),
+        "inputs.input_b": UUID("553fe161-a16e-48d1-b07c-b51fe7d10bf3"),
     }
     output_display = {
         TemplatingNode3.Outputs.result: NodeOutputDisplay(
