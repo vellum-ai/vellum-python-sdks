@@ -304,6 +304,7 @@ from .rejected_execute_prompt_response import RejectedExecutePromptResponse
 from .rejected_execute_workflow_workflow_result_event import RejectedExecuteWorkflowWorkflowResultEvent
 from .rejected_prompt_execution_meta import RejectedPromptExecutionMeta
 from .rejected_workflow_node_result_event import RejectedWorkflowNodeResultEvent
+from .release import Release
 from .release_tag_source import ReleaseTagSource
 from .replace_test_suite_test_case_request import ReplaceTestSuiteTestCaseRequest
 from .rich_text_child_block import RichTextChildBlock
@@ -825,6 +826,7 @@ __all__ = [
     "RejectedExecuteWorkflowWorkflowResultEvent",
     "RejectedPromptExecutionMeta",
     "RejectedWorkflowNodeResultEvent",
+    "Release",
     "ReleaseTagSource",
     "ReplaceTestSuiteTestCaseRequest",
     "RichTextChildBlock",

@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 from .release_tag_source import ReleaseTagSource
 from .workflow_release_tag_workflow_deployment_history_item import WorkflowReleaseTagWorkflowDeploymentHistoryItem
+from .release import Release
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
@@ -24,7 +25,12 @@ class WorkflowReleaseTagRead(UniversalBaseModel):
 
     history_item: WorkflowReleaseTagWorkflowDeploymentHistoryItem = pydantic.Field()
     """
-    The Workflow Deployment History Item that this Release Tag is associated with
+    Deprecated. Reference the `release` field instead.
+    """
+
+    release: Release = pydantic.Field()
+    """
+    The Release that this Release Tag points to.
     """
 
     if IS_PYDANTIC_V2:
