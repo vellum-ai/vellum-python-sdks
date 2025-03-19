@@ -114,8 +114,8 @@ def test_get_event_display_context__node_display_filled_without_base_display():
     display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
 
     # THEN the node display should be included
-    assert str(StartNode.__id__) in display_context.node_displays
-    node_event_display = display_context.node_displays[str(StartNode.__id__)]
+    assert StartNode.__id__ in display_context.node_displays
+    node_event_display = display_context.node_displays[StartNode.__id__]
 
     # AND so should their output ids
     assert StartNode.__output_ids__ == node_event_display.output_display
@@ -137,8 +137,8 @@ def test_get_event_display_context__node_display_filled_without_output_display()
     display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
 
     # THEN the node display should be included
-    assert str(StartNode.__id__) in display_context.node_displays
-    node_event_display = display_context.node_displays[str(StartNode.__id__)]
+    assert StartNode.__id__ in display_context.node_displays
+    node_event_display = display_context.node_displays[StartNode.__id__]
 
     # AND so should their output ids
     assert node_event_display.output_display.keys() == {"foo"}
@@ -163,11 +163,11 @@ def test_get_event_display_context__node_display_to_include_subworkflow_display(
     display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
-    assert str(SubworkflowNode.__id__) in display_context.node_displays
-    node_event_display = display_context.node_displays[str(SubworkflowNode.__id__)]
+    assert SubworkflowNode.__id__ in display_context.node_displays
+    node_event_display = display_context.node_displays[SubworkflowNode.__id__]
 
     assert node_event_display.subworkflow_display is not None
-    assert str(InnerNode.__id__) in node_event_display.subworkflow_display.node_displays
+    assert InnerNode.__id__ in node_event_display.subworkflow_display.node_displays
 
 
 @pytest.mark.parametrize(
@@ -204,13 +204,13 @@ def test_get_event_display_context__node_display_for_adornment_nodes(
     display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
-    assert str(adornment_node_id) in display_context.node_displays
-    node_event_display = display_context.node_displays[str(adornment_node_id)]
+    assert adornment_node_id in display_context.node_displays
+    node_event_display = display_context.node_displays[adornment_node_id]
     assert node_event_display.subworkflow_display is not None
-    assert str(inner_node_id) in node_event_display.subworkflow_display.node_displays
+    assert inner_node_id in node_event_display.subworkflow_display.node_displays
 
     # AND the inner node should have the correct outputs
-    inner_node_display = node_event_display.subworkflow_display.node_displays[str(inner_node_id)]
+    inner_node_display = node_event_display.subworkflow_display.node_displays[inner_node_id]
     assert inner_node_display.output_display.keys() == {"foo"}
     assert node_event_display.output_display.keys() == expected_adornment_output_names
 
@@ -231,7 +231,7 @@ def test_get_event_display_context__templating_node_input_display():
     display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
-    assert str(MyNode.__id__) in display_context.node_displays
-    node_event_display = display_context.node_displays[str(MyNode.__id__)]
+    assert MyNode.__id__ in display_context.node_displays
+    node_event_display = display_context.node_displays[MyNode.__id__]
 
     assert node_event_display.input_display.keys() == {"inputs.foo"}
