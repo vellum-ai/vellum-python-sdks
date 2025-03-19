@@ -43,7 +43,7 @@ from vellum.workflows.events.workflow import (
     WorkflowExecutionSnapshottedEvent,
     WorkflowExecutionStreamingBody,
 )
-from vellum.workflows.exceptions import NodeException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import NodeRunResponse
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
@@ -332,6 +332,18 @@ class WorkflowRunner(Generic[StateType]):
                     parent=parent_context,
                 )
             )
+        except WorkflowInitializationException as e:
+            self._workflow_event_inner_queue.put(
+                NodeExecutionRejectedEvent(
+                    trace_id=node.state.meta.trace_id,
+                    span_id=span_id,
+                    body=NodeExecutionRejectedBody(
+                        node_definition=node.__class__,
+                        error=e.error,
+                    ),
+                    parent=parent_context,
+                )
+            )
         except Exception as e:
             logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
 
@@ -561,6 +573,9 @@ class WorkflowRunner(Generic[StateType]):
                 else:
                     self._concurrency_queue.put((self._initial_state, node_cls, None))
             except NodeException as e:
+                self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error))
+                return
+            except WorkflowInitializationException as e:
                 self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error))
                 return
             except Exception:
