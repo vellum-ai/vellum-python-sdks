@@ -154,6 +154,13 @@ export abstract class BaseNode<
   }
 
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    /**
+     * This method drives how we map the key to a legacy node input to the new
+     * node attribute name in the SDK.
+     *
+     * By default, we just pass through. However, legacy nodes can extend this
+     * method to customize their specific mappings.
+     */
     return nodeInputKey;
   }
 
