@@ -10,10 +10,21 @@ import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base"
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
+const TEMPLATING_INPUT_KEY = "template";
+const INPUTS_PREFIX = "inputs";
+
 export class TemplatingNode extends BaseSingleFileNode<
   TemplatingNodeType,
   TemplatingNodeContext
 > {
+  protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    if (nodeInputKey === TEMPLATING_INPUT_KEY) {
+      return nodeInputKey;
+    }
+
+    return `${INPUTS_PREFIX}.${nodeInputKey}`;
+  }
+
   protected getNodeBaseGenericTypes(): AstNode[] {
     const baseStateClassReference = new BaseState({
       workflowContext: this.workflowContext,
@@ -36,14 +47,14 @@ export class TemplatingNode extends BaseSingleFileNode<
 
     statements.push(
       python.field({
-        name: "template",
+        name: TEMPLATING_INPUT_KEY,
         initializer: this.getTemplatingInput(),
       })
     );
 
     statements.push(
       python.field({
-        name: "inputs",
+        name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           otherInputs.map((codeInput) => ({
             key: python.TypeInstantiation.str(codeInput.nodeInputData.key),

@@ -41,6 +41,7 @@ export abstract class BaseNode<
 
   protected readonly nodeInputsByKey: Map<string, NodeInput>;
   protected readonly nodeInputsById: Map<string, NodeInput>;
+  protected readonly nodeAttributeNameByNodeInputId: Map<string, string>;
 
   private readonly errorOutputId: string | undefined;
 
@@ -49,7 +50,11 @@ export abstract class BaseNode<
     this.nodeContext = nodeContext;
     this.nodeData = nodeContext.nodeData;
 
-    [this.nodeInputsByKey, this.nodeInputsById] = this.generateNodeInputs();
+    [
+      this.nodeInputsByKey,
+      this.nodeInputsById,
+      this.nodeAttributeNameByNodeInputId,
+    ] = this.generateNodeInputs();
     this.errorOutputId = this.getErrorOutputId();
   }
 
@@ -148,15 +153,28 @@ export abstract class BaseNode<
     return this.nodeContext.nodeDisplayModulePath;
   }
 
+  protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    /**
+     * This method drives how we map the key to a legacy node input to the new
+     * node attribute name in the SDK.
+     *
+     * By default, we just pass through. However, legacy nodes can extend this
+     * method to customize their specific mappings.
+     */
+    return nodeInputKey;
+  }
+
   private generateNodeInputs(): [
     Map<string, NodeInput>,
-    Map<string, NodeInput>
+    Map<string, NodeInput>,
+    Map<string, string>
   ] {
     const nodeInputsByKey = new Map<string, NodeInput>();
     const nodeInputsById = new Map<string, NodeInput>();
+    const nodeAttributeNameByNodeInputId = new Map<string, string>();
 
     if (!("inputs" in this.nodeData)) {
-      return [nodeInputsByKey, nodeInputsById];
+      return [nodeInputsByKey, nodeInputsById, nodeAttributeNameByNodeInputId];
     }
 
     this.nodeData.inputs.forEach((nodeInputData) => {
@@ -169,6 +187,13 @@ export abstract class BaseNode<
         if (!isNilOrEmpty(nodeInput.nodeInputValuePointer.rules)) {
           nodeInputsByKey.set(nodeInputData.key, nodeInput);
           nodeInputsById.set(nodeInputData.id, nodeInput);
+          const nodeAttributeName = this.getNodeAttributeNameByNodeInputKey(
+            nodeInputData.key
+          );
+          nodeAttributeNameByNodeInputId.set(
+            nodeInputData.id,
+            nodeAttributeName
+          );
         }
       } catch (error) {
         if (error instanceof BaseCodegenError) {
@@ -183,7 +208,7 @@ export abstract class BaseNode<
       }
     });
 
-    return [nodeInputsByKey, nodeInputsById];
+    return [nodeInputsByKey, nodeInputsById, nodeAttributeNameByNodeInputId];
   }
 
   protected getPortDisplay(): python.Field | undefined {
@@ -448,8 +473,11 @@ export abstract class BaseNode<
           key: AstNode;
           value: AstNode;
         }>(([key, nodeInput]) => {
+          const nodeAttributeName = this.nodeAttributeNameByNodeInputId.get(
+            nodeInput.nodeInputData.id
+          );
           return {
-            key: python.TypeInstantiation.str(key),
+            key: python.TypeInstantiation.str(nodeAttributeName ?? key),
             value: new UuidOrString(nodeInput.nodeInputData.id),
           };
         })
