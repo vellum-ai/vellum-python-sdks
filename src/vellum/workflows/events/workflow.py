@@ -48,7 +48,7 @@ class NodeEventDisplayContext(UniversalBaseModel):
 
 
 class WorkflowEventDisplayContext(UniversalBaseModel):
-    node_displays: Dict[str, NodeEventDisplayContext]
+    node_displays: Dict[UUID, NodeEventDisplayContext]
     workflow_inputs: Dict[str, UUID]
     workflow_outputs: Dict[str, UUID]
 

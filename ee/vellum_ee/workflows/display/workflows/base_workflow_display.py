@@ -429,7 +429,7 @@ class BaseWorkflowDisplay(
                     )
                     subworkflow_display_context = subworkflow_display.get_event_display_context()
 
-            node_event_displays[str(node_id)] = NodeEventDisplayContext(
+            node_event_displays[node_id] = NodeEventDisplayContext(
                 input_display=input_display,
                 output_display=output_display,
                 port_display=port_display_meta,
