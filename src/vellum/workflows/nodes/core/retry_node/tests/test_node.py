@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -154,3 +155,130 @@ Message: This is failure attempt 3"""
 
     # AND the state was updated each time
     assert node.state.count == 3
+
+
+def test_retry_node__timeout__fails_with_timeout():
+    # GIVEN a retry node configured with timeout
+    @RetryNode.wrap(max_attempts=3, timeout=0.01)
+    class SlowNode(BaseNode):
+        attempt_number = RetryNode.SubworkflowInputs.attempt_number
+
+        class Outputs(BaseOutputs):
+            execution_count: int
+
+        def run(self) -> Outputs:
+            time.sleep(0.1)
+            return self.Outputs(execution_count=self.attempt_number)
+
+    # WHEN the node is run
+    node = SlowNode(state=BaseState())
+
+    # THEN the node raises a timeout exception after max attempts
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # THEN the exception is a timeout exception
+    assert exc_info.value.code == WorkflowErrorCode.NODE_TIMEOUT
+    assert "Subworkflow timed out after 0.01 seconds on attempt 3" == str(exc_info.value)
+
+
+def test_retry_node__timeout__succeeds_within_timeout():
+    # GIVEN a retry node configured with timeout
+    @RetryNode.wrap(max_attempts=3, timeout=2)
+    class FastNode(BaseNode):
+        attempt_number = RetryNode.SubworkflowInputs.attempt_number
+
+        class Outputs(BaseOutputs):
+            execution_count: int
+
+        def run(self) -> Outputs:
+            time.sleep(0.01)
+            return self.Outputs(execution_count=self.attempt_number)
+
+    # WHEN the node is run
+    node = FastNode(state=BaseState())
+    outputs = node.run()
+
+    # THEN the node succeeds
+    assert outputs.execution_count == 1
+
+
+def test_retry_node__timeout__retries_after_timeout():
+    # GIVEN a retry node configured with timeout
+    @RetryNode.wrap(max_attempts=3, timeout=0.01)
+    class EventuallySucceedingNode(BaseNode):
+        attempt_number = RetryNode.SubworkflowInputs.attempt_number
+
+        class Outputs(BaseOutputs):
+            execution_count: int
+
+        def run(self) -> Outputs:
+            if self.attempt_number < 3:
+                # First two attempts exceed the timeout
+                time.sleep(0.1)
+
+            return self.Outputs(execution_count=self.attempt_number)
+
+    # WHEN the node is run
+    node = EventuallySucceedingNode(state=BaseState())
+    outputs = node.run()
+
+    # THEN the node eventually succeeds on the third attempt
+    assert outputs.execution_count == 3
+
+
+def test_retry_node__timeout__with_delay():
+    # GIVEN a retry node configured with timeout and delay
+    start_time = time.time()
+    delay = 0.3
+    timeout = 0.1
+    sleep_time = 0.5
+
+    @RetryNode.wrap(max_attempts=3, timeout=timeout, delay=delay)
+    class TimeoutWithDelayNode(BaseNode):
+        attempt_number = RetryNode.SubworkflowInputs.attempt_number
+
+        class Outputs(BaseOutputs):
+            execution_count: int
+
+        def run(self) -> Outputs:
+            if self.attempt_number < 3:
+                # First two attempts exceed the timeout
+                time.sleep(sleep_time)
+
+            return self.Outputs(execution_count=self.attempt_number)
+
+    # WHEN the node is run
+    node = TimeoutWithDelayNode(state=BaseState())
+    outputs = node.run()
+
+    # THEN the node succeeds after proper delays
+    elapsed_time = time.time() - start_time
+
+    # The node should have been retried 3 times, with a delay of 0.3 seconds between each attempt
+    # and a timeout of 0.1 seconds between each attempt
+    min_expected_time = 2 * delay + 2 * timeout  # The total time should be 0.3 * 2 + 0.1 * 2 = 0.8 seconds
+
+    assert outputs.execution_count == 3
+    assert elapsed_time >= min_expected_time
+
+
+def test_retry_node__timeout__null_timeout():
+    # GIVEN a retry node with no timeout specified
+    @RetryNode.wrap(max_attempts=3)
+    class NoTimeoutNode(BaseNode):
+        attempt_number = RetryNode.SubworkflowInputs.attempt_number
+
+        class Outputs(BaseOutputs):
+            execution_count: int
+
+        def run(self) -> Outputs:
+            time.sleep(0.01)
+            return self.Outputs(execution_count=self.attempt_number)
+
+    # WHEN the node is run
+    node = NoTimeoutNode(state=BaseState())
+    outputs = node.run()
+
+    # THEN the node succeeds without timing out
+    assert outputs.execution_count == 1

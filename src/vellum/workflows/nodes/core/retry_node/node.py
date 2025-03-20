@@ -1,3 +1,4 @@
+import multiprocessing.pool
 import time
 from typing import Callable, Generic, Optional, Type
 
@@ -19,6 +20,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
     max_attempts: int - The maximum number of attempts to retry the Subworkflow
     delay: float = None - The number of seconds to wait between retries
+    timeout: float = None - The number of seconds to wait for the Subworkflow to complete
     retry_on_error_code: Optional[WorkflowErrorCode] = None - The error code to retry on
     retry_on_condition: Optional[BaseDescriptor] = None - The condition to retry on
     subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
@@ -26,6 +28,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
     max_attempts: int
     delay: Optional[float] = None
+    timeout: Optional[float] = None
     retry_on_error_code: Optional[WorkflowErrorCode] = None
     retry_on_condition: Optional[BaseDescriptor] = None
 
@@ -43,10 +46,31 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
                 parent_state=self.state,
                 context=context,
             )
-            terminal_event = subworkflow.run(
-                inputs=self.SubworkflowInputs(attempt_number=attempt_number),
-                node_output_mocks=self._context._get_all_node_output_mocks(),
-            )
+
+            if self.timeout is None:
+                terminal_event = subworkflow.run(
+                    inputs=self.SubworkflowInputs(attempt_number=attempt_number),
+                    node_output_mocks=self._context._get_all_node_output_mocks(),
+                )
+            else:
+                try:
+                    with multiprocessing.pool.ThreadPool(processes=1) as pool:
+                        async_result = pool.apply_async(
+                            subworkflow.run,
+                            kwds={
+                                "inputs": self.SubworkflowInputs(attempt_number=attempt_number),
+                                "node_output_mocks": self._context._get_all_node_output_mocks(),
+                            },
+                        )
+                        terminal_event = async_result.get(timeout=self.timeout)
+                except multiprocessing.TimeoutError:
+                    last_exception = NodeException(
+                        message=f"Subworkflow timed out after {self.timeout} seconds on attempt {attempt_number}",
+                        code=WorkflowErrorCode.NODE_TIMEOUT,
+                    )
+                    if self.delay:
+                        time.sleep(self.delay)
+                    continue
             if terminal_event.name == "workflow.execution.fulfilled":
                 node_outputs = self.Outputs()
                 workflow_output_vars = vars(terminal_event.outputs)
@@ -87,6 +111,7 @@ Message: {terminal_event.error.message}""",
         cls,
         max_attempts: int = 3,
         delay: Optional[float] = None,
+        timeout: Optional[float] = None,
         retry_on_error_code: Optional[WorkflowErrorCode] = None,
         retry_on_condition: Optional[BaseDescriptor] = None,
     ) -> Callable[..., Type["RetryNode"]]:
@@ -95,6 +120,7 @@ Message: {terminal_event.error.message}""",
             attributes={
                 "max_attempts": max_attempts,
                 "delay": delay,
+                "timeout": timeout,
                 "retry_on_error_code": retry_on_error_code,
                 "retry_on_condition": retry_on_condition,
             },
