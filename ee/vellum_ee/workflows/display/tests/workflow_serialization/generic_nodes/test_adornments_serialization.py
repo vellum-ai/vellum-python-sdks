@@ -42,6 +42,10 @@ def test_serialize_node__retry(serialize_node):
         },
     )
 
+    serialized_node["adornments"][0]["attributes"] = sorted(
+        serialized_node["adornments"][0]["attributes"], key=lambda x: x["name"]
+    )
+
     assert not DeepDiff(
         {
             "id": "188b50aa-e518-4b7b-a5e0-e2585fb1d7b5",
@@ -78,11 +82,6 @@ def test_serialize_node__retry(serialize_node):
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
                         {
-                            "id": "ff6d1669-ef73-4bae-8ea7-ff4b40b41b61",
-                            "name": "timeout",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
-                        },
-                        {
                             "id": "f388e93b-8c68-4f54-8577-bbd0c9091557",
                             "name": "max_attempts",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 3.0}},
@@ -95,6 +94,11 @@ def test_serialize_node__retry(serialize_node):
                         {
                             "id": "c91782e3-140f-4938-9c23-d2a7b85dcdd8",
                             "name": "retry_on_error_code",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                        {
+                            "id": "ff6d1669-ef73-4bae-8ea7-ff4b40b41b61",
+                            "name": "timeout",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
                     ],
@@ -112,7 +116,6 @@ def test_serialize_node__retry(serialize_node):
             ],
         },
         serialized_node,
-        ignore_order=True,
     )
 
 
