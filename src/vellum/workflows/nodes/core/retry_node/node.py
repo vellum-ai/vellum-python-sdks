@@ -56,13 +56,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
                     node_output_mocks=self._context._get_all_node_output_mocks(),
                 )
 
-            if self.timeout is None:
-                o = self._run_subworkflow(subworkflow_stream, attempt_number)
-                if isinstance(o, NodeException):
-                    last_exception = o
-                else:
-                    return o
-            else:
+            if self.timeout is not None and self.timeout > 0:
                 try:
                     with multiprocessing.pool.ThreadPool(processes=1) as pool:
                         async_result = pool.apply_async(
@@ -80,6 +74,12 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
                     )
                     if self.delay:
                         time.sleep(self.delay)
+            else:
+                o = self._run_subworkflow(subworkflow_stream, attempt_number)
+                if isinstance(o, NodeException):
+                    last_exception = o
+                else:
+                    return o
 
         raise last_exception
 
