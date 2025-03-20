@@ -1,11 +1,12 @@
+import multiprocessing.pool
 import time
-from typing import Callable, Generic, Optional, Type
+from typing import Callable, Generic, Optional, Type, Union
 
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.events.workflow import is_terminal_workflow_execution_event
+from vellum.workflows.events.workflow import WorkflowEventStream, is_terminal_workflow_execution_event
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -22,6 +23,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
     max_attempts: int - The maximum number of attempts to retry the Subworkflow
     delay: float = None - The number of seconds to wait between retries
+    timeout: float = None - The number of seconds to wait for the Subworkflow to complete
     retry_on_error_code: Optional[WorkflowErrorCode] = None - The error code to retry on
     retry_on_condition: Optional[BaseDescriptor] = None - The condition to retry on
     subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
@@ -29,6 +31,7 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
     max_attempts: int
     delay: Optional[float] = None
+    timeout: Optional[float] = None
     retry_on_error_code: Optional[WorkflowErrorCode] = None
     retry_on_condition: Optional[BaseDescriptor] = None
 
@@ -53,60 +56,90 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
                     node_output_mocks=self._context._get_all_node_output_mocks(),
                 )
 
-            node_outputs: Optional[BaseNode.Outputs] = None
-            exception: Optional[NodeException] = None
-            for event in subworkflow_stream:
-                self._context._emit_subworkflow_event(event)
-
-                if not is_terminal_workflow_execution_event(event):
-                    continue
-
-                if event.workflow_definition != self.subworkflow:
-                    continue
-
-                if event.name == "workflow.execution.fulfilled":
-                    node_outputs = self.Outputs()
-
-                    for output_descriptor, output_value in event.outputs:
-                        setattr(node_outputs, output_descriptor.name, output_value)
-                elif event.name == "workflow.execution.paused":
-                    exception = NodeException(
-                        code=WorkflowErrorCode.INVALID_OUTPUTS,
-                        message=f"Subworkflow unexpectedly paused on attempt {attempt_number}",
-                    )
-                elif self.retry_on_error_code and self.retry_on_error_code != event.error.code:
-                    exception = NodeException(
-                        code=WorkflowErrorCode.INVALID_OUTPUTS,
-                        message=f"""Unexpected rejection on attempt {attempt_number}: {event.error.code.value}.
-Message: {event.error.message}""",
-                    )
-                elif self.retry_on_condition and not resolve_value(self.retry_on_condition, self.state):
-                    exception = NodeException(
-                        code=WorkflowErrorCode.INVALID_OUTPUTS,
-                        message=f"""Rejection failed on attempt {attempt_number}: {event.error.code.value}.
-Message: {event.error.message}""",
-                    )
+            if self.timeout is None:
+                o = self._run_subworkflow(subworkflow_stream, attempt_number)
+                if isinstance(o, NodeException):
+                    last_exception = o
                 else:
+                    return o
+            else:
+                try:
+                    with multiprocessing.pool.ThreadPool(processes=1) as pool:
+                        async_result = pool.apply_async(
+                            self._run_subworkflow, args=(subworkflow_stream, attempt_number)
+                        )
+                        o = async_result.get(timeout=self.timeout)
+                        if isinstance(o, NodeException):
+                            last_exception = o
+                        else:
+                            return o
+                except multiprocessing.TimeoutError:
                     last_exception = NodeException(
-                        event.error.message,
-                        code=event.error.code,
+                        code=WorkflowErrorCode.NODE_TIMEOUT,
+                        message=f"Subworkflow timed out after {self.timeout} seconds on attempt {attempt_number}",
                     )
                     if self.delay:
                         time.sleep(self.delay)
 
-            if exception:
-                raise exception
-
-            if node_outputs:
-                return node_outputs
-
         raise last_exception
+
+    def _run_subworkflow(
+        self, subworkflow_stream: WorkflowEventStream, attempt_number: int
+    ) -> Union[BaseNode.Outputs, NodeException]:
+        node_outputs: Optional[BaseNode.Outputs] = None
+        exception: Optional[NodeException] = None
+        for event in subworkflow_stream:
+            self._context._emit_subworkflow_event(event)
+
+            if not is_terminal_workflow_execution_event(event):
+                continue
+
+            if event.workflow_definition != self.subworkflow:
+                continue
+
+            if event.name == "workflow.execution.fulfilled":
+                node_outputs = self.Outputs()
+
+                for output_descriptor, output_value in event.outputs:
+                    setattr(node_outputs, output_descriptor.name, output_value)
+            elif event.name == "workflow.execution.paused":
+                exception = NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message=f"Subworkflow unexpectedly paused on attempt {attempt_number}",
+                )
+            elif self.retry_on_error_code and self.retry_on_error_code != event.error.code:
+                exception = NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message=f"""Unexpected rejection on attempt {attempt_number}: {event.error.code.value}.
+Message: {event.error.message}""",
+                )
+            elif self.retry_on_condition and not resolve_value(self.retry_on_condition, self.state):
+                exception = NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message=f"""Rejection failed on attempt {attempt_number}: {event.error.code.value}.
+Message: {event.error.message}""",
+                )
+            else:
+                last_exception = NodeException(
+                    event.error.message,
+                    code=event.error.code,
+                )
+                if self.delay:
+                    time.sleep(self.delay)
+        if exception:
+            raise exception
+
+        if node_outputs:
+            return node_outputs
+
+        return last_exception
 
     @classmethod
     def wrap(
         cls,
         max_attempts: int = 3,
         delay: Optional[float] = None,
+        timeout: Optional[float] = None,
         retry_on_error_code: Optional[WorkflowErrorCode] = None,
         retry_on_condition: Optional[BaseDescriptor] = None,
     ) -> Callable[..., Type["RetryNode"]]:
@@ -115,6 +148,7 @@ Message: {event.error.message}""",
             attributes={
                 "max_attempts": max_attempts,
                 "delay": delay,
+                "timeout": timeout,
                 "retry_on_error_code": retry_on_error_code,
                 "retry_on_condition": retry_on_condition,
             },
