@@ -114,6 +114,9 @@ export class WorkflowContext {
   private readonly mlModelNamesById: Record<string, string> = {};
   private readonly errors: BaseCodegenError[] = [];
 
+  // Track generic node files for code merging
+  private readonly genericNodeFiles: Set<string> = new Set();
+
   public readonly workflowRawData: WorkflowRawData;
 
   public readonly codeExecutionNodeCodeRepresentationOverride:
@@ -477,5 +480,21 @@ export class WorkflowContext {
 
     this.addUsedClassName(sanitizedName);
     return sanitizedName;
+  }
+
+  /**
+   * Adds a file path to the set of generic node files that need to be merged
+   * @param filePath Path to the generic node file
+   */
+  public addGenericNodeFile(filePath: string): void {
+    this.genericNodeFiles.add(filePath);
+  }
+
+  /**
+   * Gets the set of generic node file paths
+   * @returns Set of generic node file paths
+   */
+  public getGenericNodeFiles(): Set<string> {
+    return this.genericNodeFiles;
   }
 }

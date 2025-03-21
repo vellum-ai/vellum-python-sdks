@@ -779,4 +779,15 @@ ${errors.slice(0, 3).map((err) => {
       sandboxInputs: this.sandboxInputs ?? [],
     });
   }
+
+  /**
+   * Gets the generic node file paths that have been tracked during code generation
+   * @returns Object mapping file paths to booleans
+   */
+  public getGenericNodeFiles(): Record<string, boolean> {
+    const genericNodeFiles = this.workflowContext.getGenericNodeFiles();
+    return Object.fromEntries(
+      Array.from(genericNodeFiles).map((file) => [file, true])
+    );
+  }
 }

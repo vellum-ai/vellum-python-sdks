@@ -94,4 +94,22 @@ export class GenericNode extends BaseSingleFileNode<
   protected getErrorOutputId(): string | undefined {
     return undefined;
   }
+
+  private getModulePath(): string[] {
+    return this.nodeContext.nodeModulePath;
+  }
+
+  public async persist(): Promise<void> {
+    const nodeFile = this.getNodeFile();
+    const nodeDisplayFile = this.getNodeDisplayFile();
+
+    const modulePath = this.getModulePath();
+    const fileName = modulePath[modulePath.length - 1] + ".py";
+
+    const relativePath = `nodes/${fileName}`;
+
+    this.workflowContext.addGenericNodeFile(relativePath);
+
+    await Promise.all([nodeFile.persist(), nodeDisplayFile.persist()]);
+  }
 }
