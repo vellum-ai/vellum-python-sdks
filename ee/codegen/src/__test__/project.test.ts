@@ -1031,6 +1031,18 @@ baz = foo + bar
                 },
               },
             ],
+            outputs: [
+              {
+                id: "some-id",
+                name: "node_input",
+                type: "STRING",
+                value: {
+                  type: "NODE_OUTPUT",
+                  node_id: "templating-node",
+                  node_output_id: "output",
+                },
+              },
+            ],
           },
         ],
         edges: [
@@ -1588,6 +1600,20 @@ baz = foo + bar
                       },
                     ],
                     combinator: "AND", // This should be normalized to OR
+                  },
+                },
+              ],
+              outputs: [
+                {
+                  id: "some-id",
+                  name: "node_input",
+                  type: "NUMBER",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "NUMBER",
+                      value: 3.0,
+                    },
                   },
                 },
               ],

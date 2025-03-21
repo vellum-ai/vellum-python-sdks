@@ -1556,6 +1556,7 @@ export function finalOutputNodeFactory({
   label?: string;
 } = {}): FinalOutputNode {
   const inputs: NodeInput[] = [];
+  const outputs: NodeOutput[] = [];
 
   if (includeInput) {
     inputs.push({
@@ -1572,6 +1573,18 @@ export function finalOutputNodeFactory({
           },
         ],
         combinator: "OR",
+      },
+    });
+    outputs.push({
+      id: "c013440d-930d-4953-b386-1ddd7750e831",
+      name: "node_input",
+      type: "STRING",
+      value: {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "STRING",
+          value: "<my-output>",
+        },
       },
     });
   }
@@ -1596,6 +1609,7 @@ export function finalOutputNodeFactory({
         y: 234.65663468515768,
       },
     },
+    outputs: outputs,
   };
   return nodeData;
 }

@@ -138,7 +138,18 @@
             "final_output"
           ],
           "name": "FinalOutput"
-        }
+        },
+        "outputs": [
+          {
+            "id": "c013440d-930d-4953-b386-1ddd7750e831",
+            "name": "node_input",
+            "type": "STRING",
+            "value": {
+              "type": "EXECUTION_COUNTER",
+              "node_id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871"
+            }
+          }
+        ]
       }
     ],
     "edges": [

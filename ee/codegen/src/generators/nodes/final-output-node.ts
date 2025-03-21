@@ -5,6 +5,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { BaseState } from "src/generators/base-state";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
@@ -42,12 +43,19 @@ export class FinalOutputNode extends BaseSingleFileNode<
       ],
     });
 
-    const nodeInput = this.getNodeInputByName("node_input");
+    // We are going to only get the first value
+    const descriptor = this.nodeData.outputs?.map((output) => output.value)[0];
 
-    if (nodeInput) {
+    if (descriptor) {
+      const workflowValueDescriptor = new WorkflowValueDescriptor({
+        nodeContext: this.nodeContext,
+        workflowValueDescriptor: descriptor,
+        workflowContext: this.workflowContext,
+      });
+
       const outputField = python.field({
         name: "value",
-        initializer: nodeInput,
+        initializer: workflowValueDescriptor,
       });
       outputsClass.add(outputField);
     }

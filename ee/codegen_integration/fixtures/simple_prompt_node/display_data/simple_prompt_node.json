@@ -219,7 +219,19 @@
           },
           "width": 474,
           "height": 234
-        }
+        },
+        "outputs": [
+          {
+            "id": "c013440d-930d-4953-b386-1ddd7750e831",
+            "name": "node_input",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
+              "node_output_id": "2d4f1826-de75-499a-8f84-0a690c8136ad"
+            }
+          }
+        ]
       }
     ],
     "edges": [

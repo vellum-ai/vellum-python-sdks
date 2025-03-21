@@ -125,7 +125,19 @@
         "trigger": {
           "id": "52b9ff71-e090-4c68-a713-fd72d194b992",
           "merge_behavior": "AWAIT_ANY"
-        }
+        },
+        "outputs": [
+          {
+            "id": "c013440d-930d-4953-b386-1ddd7750e831",
+            "name": "node_input",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
+              "node_output_id": "c66c362b-bb83-4333-a691-b72dc9a8734d"
+            }
+          }
+        ]
       }
     ],
     "edges": [
