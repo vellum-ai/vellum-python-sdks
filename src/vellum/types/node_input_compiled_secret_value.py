@@ -2,15 +2,16 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .function_call import FunctionCall
+from .vellum_secret import VellumSecret
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class TemplatingNodeFunctionCallResult(UniversalBaseModel):
-    id: str
-    type: typing.Literal["FUNCTION_CALL"] = "FUNCTION_CALL"
-    value: typing.Optional[FunctionCall] = None
+class NodeInputCompiledSecretValue(UniversalBaseModel):
+    node_input_id: str
+    key: str
+    type: typing.Literal["SECRET"] = "SECRET"
+    value: VellumSecret
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
