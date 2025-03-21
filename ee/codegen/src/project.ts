@@ -781,13 +781,10 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   /**
-   * Gets the generic node file paths that have been tracked during code generation
-   * @returns Object mapping file paths to booleans
+   * Gets the node file paths that have been tracked during code generation that will be merged by codegen-service
+   * @returns Set of node file paths
    */
-  public getGenericNodeFiles(): Record<string, boolean> {
-    const genericNodeFiles = this.workflowContext.getGenericNodeFiles();
-    return Object.fromEntries(
-      Array.from(genericNodeFiles).map((file) => [file, true])
-    );
+  public getPythonCodeMergeableNodeFiles(): Set<string> {
+    return this.workflowContext.getPythonCodeMergeableNodeFiles();
   }
 }

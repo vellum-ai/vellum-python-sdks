@@ -114,8 +114,8 @@ export class WorkflowContext {
   private readonly mlModelNamesById: Record<string, string> = {};
   private readonly errors: BaseCodegenError[] = [];
 
-  // Track generic node files for code merging
-  private readonly genericNodeFiles: Set<string> = new Set();
+  // Track node files that will be merged by codegen-service
+  private readonly pythonCodeMergeableNodeFiles: Set<string> = new Set();
 
   public readonly workflowRawData: WorkflowRawData;
 
@@ -483,18 +483,18 @@ export class WorkflowContext {
   }
 
   /**
-   * Adds a file path to the set of generic node files that need to be merged
-   * @param filePath Path to the generic node file
+   * Adds a file path to the set of node files that need to be merged by codegen-service
+   * @param filePath Path to the node file
    */
-  public addGenericNodeFile(filePath: string): void {
-    this.genericNodeFiles.add(filePath);
+  public addPythonCodeMergeableNodeFile(filePath: string): void {
+    this.pythonCodeMergeableNodeFiles.add(filePath);
   }
 
   /**
-   * Gets the set of generic node file paths
-   * @returns Set of generic node file paths
+   * Gets the set of node file paths that will be merged by codegen-service
+   * @returns Set of node file paths
    */
-  public getGenericNodeFiles(): Set<string> {
-    return this.genericNodeFiles;
+  public getPythonCodeMergeableNodeFiles(): Set<string> {
+    return this.pythonCodeMergeableNodeFiles;
   }
 }
