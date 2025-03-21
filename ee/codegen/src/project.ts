@@ -779,4 +779,12 @@ ${errors.slice(0, 3).map((err) => {
       sandboxInputs: this.sandboxInputs ?? [],
     });
   }
+
+  /**
+   * Gets the node file paths that have been tracked during code generation that will be merged by codegen-service
+   * @returns Set of node file paths
+   */
+  public getPythonCodeMergeableNodeFiles(): Set<string> {
+    return this.workflowContext.getPythonCodeMergeableNodeFiles();
+  }
 }

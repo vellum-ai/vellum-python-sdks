@@ -1784,4 +1784,163 @@ baz = foo + bar
       ]);
     });
   });
+  describe("Get generic node files", () => {
+    it("should get generic node files", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "generic-node",
+              type: "GENERIC",
+              label: "Generic Node",
+              attributes: [
+                {
+                  id: uuidv4(),
+                  name: "forward",
+                  value: {
+                    type: "NODE_OUTPUT",
+                    node_id: "generic-node",
+                    node_output_id: "output",
+                  },
+                },
+              ],
+              trigger: {
+                id: "generic-node-trigger",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: "generic-node-default-port",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              base: {
+                name: "BaseNode",
+                module: ["vellum", "workflows", "nodes", "bases", "base"],
+              },
+              outputs: [],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "generic-node",
+              target_handle_id: "generic-node-trigger",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+        runner_config: {},
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "generic_test",
+        vellumApiKey: "<TEST_API_KEY>",
+        workflowVersionExecConfigData: displayData,
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+      const pythonCodeMergeableNodeFiles =
+        project.getPythonCodeMergeableNodeFiles();
+      expect(pythonCodeMergeableNodeFiles).toEqual(
+        new Set(["nodes/generic_node.py"])
+      );
+    });
+
+    it("should not get generic node files", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "some-node-id",
+              type: "TEMPLATING",
+              data: {
+                label: "Bad Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "foo",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              id: "edge_1",
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "some-node-id",
+              target_handle_id: "template_target",
+              type: "DEFAULT",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+        runner_config: {},
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "generic_test",
+        vellumApiKey: "<TEST_API_KEY>",
+        workflowVersionExecConfigData: displayData,
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+      const pythonCodeMergeableNodeFiles =
+        project.getPythonCodeMergeableNodeFiles();
+      expect(pythonCodeMergeableNodeFiles).toEqual(new Set());
+    });
+  });
 });

@@ -94,4 +94,19 @@ export class GenericNode extends BaseSingleFileNode<
   protected getErrorOutputId(): string | undefined {
     return undefined;
   }
+
+  private getModulePath(): string[] {
+    return this.nodeContext.nodeModulePath;
+  }
+
+  public async persist(): Promise<void> {
+    const modulePath = this.getModulePath();
+    const fileName = modulePath[modulePath.length - 1] + ".py";
+
+    const relativePath = `nodes/${fileName}`;
+
+    this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+
+    await super.persist();
+  }
 }
