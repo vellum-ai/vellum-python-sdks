@@ -108,7 +108,7 @@ class EdgeVellumDisplay(EdgeVellumDisplayOverrides):
 
 @dataclass
 class EntrypointVellumDisplayOverrides(EntrypointDisplay, EntrypointDisplayOverrides):
-    edge_display: EdgeVellumDisplayOverrides
+    edge_display: EdgeDisplay
 
 
 @dataclass
