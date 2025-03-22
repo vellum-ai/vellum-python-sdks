@@ -6,21 +6,22 @@ import logging
 from uuid import UUID
 from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, Union, get_args
 
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.utils import get_wrapped_node
+from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.base import (
-    EdgeDisplayOverridesType,
-    EdgeDisplayType,
+    EdgeDisplay,
     EntrypointDisplayOverridesType,
     EntrypointDisplayType,
     StateValueDisplayOverridesType,
@@ -53,8 +54,6 @@ class BaseWorkflowDisplay(
         NodeDisplayType,
         EntrypointDisplayType,
         EntrypointDisplayOverridesType,
-        EdgeDisplayType,
-        EdgeDisplayOverridesType,
     ]
 ):
     # Used to specify the display data for a workflow.
@@ -73,7 +72,7 @@ class BaseWorkflowDisplay(
     output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = {}
 
     # Used to explicitly specify display data for a workflow's edges.
-    edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplayOverridesType] = {}
+    edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = {}
 
     # Used to explicitly specify display data for a workflow's ports.
     port_displays: Dict[Port, PortDisplayOverrides] = {}
@@ -96,7 +95,6 @@ class BaseWorkflowDisplay(
                 StateValueDisplayType,
                 NodeDisplayType,
                 EntrypointDisplayType,
-                EdgeDisplayType,
             ]
         ] = None,
         dry_run: bool = False,
@@ -196,7 +194,6 @@ class BaseWorkflowDisplay(
         StateValueDisplayType,
         NodeDisplayType,
         EntrypointDisplayType,
-        EdgeDisplayType,
     ]:
         workflow_display = self._generate_workflow_meta_display()
 
@@ -273,14 +270,14 @@ class BaseWorkflowDisplay(
                 entrypoint, workflow_display, node_displays, overrides=entrypoint_display_overrides
             )
 
-        edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplayType] = {}
+        edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = {}
         for edge in self._workflow.get_edges():
             if edge in edge_displays:
                 continue
 
             edge_display_overrides = self.edge_displays.get((edge.from_port, edge.to_node))
-            edge_displays[(edge.from_port, edge.to_node)] = self._generate_edge_display(
-                edge, node_displays, port_displays, overrides=edge_display_overrides
+            edge_displays[(edge.from_port, edge.to_node)] = edge_display_overrides or self._generate_edge_display(
+                edge, node_displays, port_displays
             )
 
         for edge in self._workflow.get_unused_edges():
@@ -357,15 +354,48 @@ class BaseWorkflowDisplay(
 
         return WorkflowOutputDisplay(id=output_id, name=output.name)
 
-    @abstractmethod
     def _generate_edge_display(
         self,
         edge: Edge,
-        node_displays: Dict[Type[BaseNode], NodeDisplayType],
+        node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
         port_displays: Dict[Port, PortDisplay],
-        overrides: Optional[EdgeDisplayOverridesType] = None,
-    ) -> EdgeDisplayType:
-        pass
+    ) -> EdgeDisplay:
+        source_node = get_unadorned_node(edge.from_port.node_class)
+        target_node = get_unadorned_node(edge.to_node)
+
+        source_node_id = node_displays[source_node].node_id
+        from_port = get_unadorned_port(edge.from_port)
+        source_handle_id = port_displays[from_port].id
+
+        target_node_display = node_displays[target_node]
+        target_node_id = target_node_display.node_id
+
+        if isinstance(target_node_display, BaseNodeVellumDisplay):
+            target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(source_node_id)
+        else:
+            target_handle_id = target_node_display.get_trigger_id()
+
+        return self._generate_edge_display_from_source(
+            source_node_id,
+            source_handle_id,
+            target_node_id,
+            target_handle_id,
+        )
+
+    def _generate_edge_display_from_source(
+        self,
+        source_node_id: UUID,
+        source_handle_id: UUID,
+        target_node_id: UUID,
+        target_handle_id: UUID,
+    ) -> EdgeDisplay:
+        return EdgeDisplay(
+            id=uuid4_from_hash(f"{self.workflow_id}|id|{source_node_id}|{target_node_id}"),
+            source_node_id=source_node_id,
+            target_node_id=target_node_id,
+            source_handle_id=source_handle_id,
+            target_handle_id=target_handle_id,
+        )
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)

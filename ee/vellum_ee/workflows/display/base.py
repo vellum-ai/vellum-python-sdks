@@ -28,7 +28,9 @@ class WorkflowInputsDisplay(WorkflowInputsDisplayOverrides):
 
 
 WorkflowInputsDisplayType = TypeVar("WorkflowInputsDisplayType", bound=WorkflowInputsDisplay)
-WorkflowInputsDisplayOverridesType = TypeVar("WorkflowInputsDisplayOverridesType", bound=WorkflowInputsDisplayOverrides)
+WorkflowInputsDisplayOverridesType = TypeVar(
+    "WorkflowInputsDisplayOverridesType", bound=WorkflowInputsDisplayOverrides
+)
 
 
 @dataclass
@@ -46,17 +48,21 @@ StateValueDisplayOverridesType = TypeVar("StateValueDisplayOverridesType", bound
 
 
 @dataclass
-class EdgeDisplayOverrides:
+class EdgeDisplay:
     id: UUID
+    source_node_id: UUID
+    source_handle_id: UUID
+    target_node_id: UUID
+    target_handle_id: UUID
 
 
 @dataclass
-class EdgeDisplay(EdgeDisplayOverrides):
+class EdgeDisplayOverrides(EdgeDisplay):
+    """
+    DEPRECATED: Use EdgeDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
-
-
-EdgeDisplayType = TypeVar("EdgeDisplayType", bound=EdgeDisplay)
-EdgeDisplayOverridesType = TypeVar("EdgeDisplayOverridesType", bound=EdgeDisplayOverrides)
 
 
 @dataclass
