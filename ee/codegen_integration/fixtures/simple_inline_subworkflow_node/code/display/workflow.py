@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import WorkflowOutputDisplay
+from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowOutputDisplay
 from vellum_ee.workflows.display.vellum import (
     EdgeVellumDisplayOverrides,
     EntrypointVellumDisplayOverrides,
@@ -36,7 +36,7 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
     entrypoint_displays = {
         SubworkflowNode: EntrypointVellumDisplayOverrides(
             id=UUID("48134634-f654-4a45-9f00-4e9378ab1f32"),
-            edge_display=EdgeVellumDisplayOverrides(id=UUID("ff1e812c-a62d-4ab2-90cb-0f2617d2121b")),
+            edge_display=EdgeDisplay(id=UUID("ff1e812c-a62d-4ab2-90cb-0f2617d2121b")),
         )
     }
     edge_displays = {

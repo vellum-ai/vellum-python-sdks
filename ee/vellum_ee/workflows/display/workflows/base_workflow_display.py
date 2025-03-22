@@ -19,6 +19,7 @@ from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
     EntrypointDisplayOverridesType,
     EntrypointDisplayType,
     StateValueDisplayOverridesType,
@@ -475,7 +476,7 @@ class BaseWorkflowDisplay(
         source_handle_id: UUID,
         target_node_id: UUID,
         target_handle_id: UUID,
-        overrides: Optional[EdgeVellumDisplayOverrides] = None,
+        overrides: Optional[EdgeDisplay] = None,
     ) -> EdgeVellumDisplay:
         edge_id: UUID
         if overrides:
