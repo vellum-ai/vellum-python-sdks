@@ -430,10 +430,8 @@ export class Workflow {
               ]),
               value: python.instantiateClass({
                 classReference: python.reference({
-                  name: "EdgeVellumDisplayOverrides",
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .VELLUM_TYPES_MODULE_PATH,
+                  name: "EdgeDisplay",
+                  modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                 }),
                 arguments_: [
                   python.methodArgument({

@@ -36,7 +36,7 @@ from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_di
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.vellum import EdgeVellumDisplay, EdgeVellumDisplayOverrides
+from vellum_ee.workflows.display.vellum import EdgeVellumDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ class BaseWorkflowDisplay(
     output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = {}
 
     # Used to explicitly specify display data for a workflow's edges.
-    edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeVellumDisplayOverrides] = {}
+    edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = {}
 
     # Used to explicitly specify display data for a workflow's ports.
     port_displays: Dict[Port, PortDisplayOverrides] = {}
@@ -449,7 +449,7 @@ class BaseWorkflowDisplay(
         edge: Edge,
         node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
         port_displays: Dict[Port, PortDisplay],
-        overrides: Optional[EdgeVellumDisplayOverrides] = None,
+        overrides: Optional[EdgeDisplay] = None,
     ) -> EdgeVellumDisplay:
         source_node = get_unadorned_node(edge.from_port.node_class)
         target_node = get_unadorned_node(edge.to_node)

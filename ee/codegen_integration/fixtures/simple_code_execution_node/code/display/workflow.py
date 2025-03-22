@@ -2,7 +2,6 @@ from uuid import UUID
 
 from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowOutputDisplay
 from vellum_ee.workflows.display.vellum import (
-    EdgeVellumDisplayOverrides,
     EntrypointVellumDisplayOverrides,
     NodeDisplayData,
     NodeDisplayPosition,
@@ -40,9 +39,7 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         )
     }
     edge_displays = {
-        (CodeExecutionNode.Ports.default, FinalOutput): EdgeVellumDisplayOverrides(
-            id=UUID("3936972b-ad88-4cc0-85a1-61b931ca3431")
-        )
+        (CodeExecutionNode.Ports.default, FinalOutput): EdgeDisplay(id=UUID("3936972b-ad88-4cc0-85a1-61b931ca3431"))
     }
     output_displays = {
         Workflow.Outputs.final_output: WorkflowOutputDisplay(
