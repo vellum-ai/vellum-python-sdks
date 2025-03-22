@@ -237,6 +237,7 @@ from .node_input_compiled_function_call_value import NodeInputCompiledFunctionCa
 from .node_input_compiled_json_value import NodeInputCompiledJsonValue
 from .node_input_compiled_number_value import NodeInputCompiledNumberValue
 from .node_input_compiled_search_results_value import NodeInputCompiledSearchResultsValue
+from .node_input_compiled_secret_value import NodeInputCompiledSecretValue
 from .node_input_compiled_string_value import NodeInputCompiledStringValue
 from .node_input_variable_compiled_value import NodeInputVariableCompiledValue
 from .node_output_compiled_array_value import NodeOutputCompiledArrayValue
@@ -759,6 +760,7 @@ __all__ = [
     "NodeInputCompiledJsonValue",
     "NodeInputCompiledNumberValue",
     "NodeInputCompiledSearchResultsValue",
+    "NodeInputCompiledSecretValue",
     "NodeInputCompiledStringValue",
     "NodeInputVariableCompiledValue",
     "NodeOutputCompiledArrayValue",
