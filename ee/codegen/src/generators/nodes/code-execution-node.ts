@@ -182,20 +182,6 @@ export class CodeExecutionNode extends BaseSingleFileNode<
 
     statements.push(
       python.field({
-        name: "code_input_id",
-        initializer: python.TypeInstantiation.uuid(nodeData.codeInputId),
-      })
-    );
-
-    statements.push(
-      python.field({
-        name: "runtime_input_id",
-        initializer: python.TypeInstantiation.uuid(nodeData.runtimeInputId),
-      })
-    );
-
-    statements.push(
-      python.field({
         name: "output_id",
         initializer: python.TypeInstantiation.uuid(nodeData.outputId),
       })

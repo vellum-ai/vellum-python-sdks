@@ -15,9 +15,6 @@ _CodeExecutionNodeType = TypeVar("_CodeExecutionNodeType", bound=CodeExecutionNo
 
 
 class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType], Generic[_CodeExecutionNodeType]):
-    code_input_id: ClassVar[Optional[UUID]] = None
-    runtime_input_id: ClassVar[Optional[UUID]] = None
-
     output_id: ClassVar[Optional[UUID]] = None
     log_output_id: ClassVar[Optional[UUID]] = None
 
@@ -52,19 +49,22 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
             for variable_name, variable_value in code_inputs.items()
         ]
 
+        code_input_id = self.node_input_ids_by_name.get(CodeExecutionNode.code.name)
         code_node_input = create_node_input(
             node_id=node_id,
             input_name="code",
             value=code_value,
             display_context=display_context,
-            input_id=self.code_input_id,
+            input_id=code_input_id,
         )
+
+        runtime_input_id = self.node_input_ids_by_name.get(CodeExecutionNode.runtime.name)
         runtime_node_input = create_node_input(
             node_id=node_id,
             input_name="runtime",
             value=node.runtime,
             display_context=display_context,
-            input_id=self.runtime_input_id,
+            input_id=runtime_input_id,
         )
         inputs.extend([code_node_input, runtime_node_input])
 
@@ -84,8 +84,8 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
                 "error_output_id": str(error_output_id) if error_output_id else None,
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
-                "code_input_id": str(self.code_input_id) if self.code_input_id else code_node_input.id,
-                "runtime_input_id": str(self.runtime_input_id) if self.runtime_input_id else runtime_node_input.id,
+                "code_input_id": code_node_input.id,
+                "runtime_input_id": runtime_node_input.id,
                 "output_type": output_type,
                 "packages": [package.dict() for package in packages] if packages is not None else [],
                 "output_id": str(self.output_id) if self.output_id else str(output_display.id),
