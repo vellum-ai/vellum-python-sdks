@@ -367,11 +367,14 @@ describe("TextSearchNode", () => {
 
     it("getNodeFile handles 404 error", async () => {
       node.getNodeFile().write(writer);
-      await writer.toStringFormatted();
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
 
-      expect(workflowContext.getErrors()[0]?.message).toEqual(
+      const error = workflowContext.getErrors()[0];
+      expect(error).toBeDefined();
+      expect(error?.message).toEqual(
         'Document Index "d5beca61-aacb-4b22-a70c-776a1e025aa4" not found.'
       );
+      expect(error?.severity).toEqual("WARNING");
     });
   });
 

@@ -52,7 +52,8 @@ export class TextSearchNodeContext extends BaseNodeContext<SearchNode> {
           if (e instanceof VellumError && e.statusCode === 404) {
             this.workflowContext.addError(
               new EntityNotFoundError(
-                `Document Index "${rule.data.value?.toString()}" not found.`
+                `Document Index "${rule.data.value?.toString()}" not found.`,
+                "WARNING"
               )
             );
           } else {
