@@ -9,6 +9,7 @@ from .node_input_compiled_search_results_value import NodeInputCompiledSearchRes
 from .node_input_compiled_error_value import NodeInputCompiledErrorValue
 from .node_input_compiled_array_value import NodeInputCompiledArrayValue
 from .node_input_compiled_function_call_value import NodeInputCompiledFunctionCallValue
+from .node_input_compiled_secret_value import NodeInputCompiledSecretValue
 
 NodeInputVariableCompiledValue = typing.Union[
     NodeInputCompiledStringValue,
@@ -19,4 +20,5 @@ NodeInputVariableCompiledValue = typing.Union[
     NodeInputCompiledErrorValue,
     NodeInputCompiledArrayValue,
     NodeInputCompiledFunctionCallValue,
+    NodeInputCompiledSecretValue,
 ]
