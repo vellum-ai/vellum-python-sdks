@@ -8,7 +8,7 @@ export function isDefined<TValue>(value: TValue | undefined): value is TValue {
 }
 
 export function assertUnreachable(_: never): never {
-  throw new ValueGenerationError("Didn't expect to get here");
+  throw new ValueGenerationError("Didn't expect to get here", "WARNING");
 }
 
 export function isNilOrEmpty<T>(
