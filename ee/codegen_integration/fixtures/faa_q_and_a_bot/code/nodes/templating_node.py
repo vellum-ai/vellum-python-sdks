@@ -5,5 +5,7 @@ from .prompt_node import PromptNode
 
 
 class TemplatingNode(BaseTemplatingNode[BaseState, str]):
-    template = '{{ json.loads(example_var_1)["classification"] }}'
-    inputs = {"example_var_1": PromptNode.Outputs.text}
+    template = """{{ json.loads(example_var_1)[\"classification\"] }}"""
+    inputs = {
+        "example_var_1": PromptNode.Outputs.text,
+    }

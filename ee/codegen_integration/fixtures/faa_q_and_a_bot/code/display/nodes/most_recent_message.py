@@ -11,10 +11,9 @@ class MostRecentMessageDisplay(BaseTemplatingNodeDisplay[MostRecentMessage]):
     label = "Most Recent Message"
     node_id = UUID("e1aa5d7e-8e6e-471b-ad21-93fdb350d04c")
     target_handle_id = UUID("157d01bd-441e-49fa-abce-7b991c9291da")
-    template_input_id = UUID("b6f8e86f-93ba-4200-9097-421723348d3d")
     node_input_ids_by_name = {
-        "chat_history": UUID("fec02d64-f82c-4970-bd57-31c84aaf7214"),
         "template": UUID("b6f8e86f-93ba-4200-9097-421723348d3d"),
+        "inputs.chat_history": UUID("fec02d64-f82c-4970-bd57-31c84aaf7214"),
     }
     output_display = {
         MostRecentMessage.Outputs.result: NodeOutputDisplay(

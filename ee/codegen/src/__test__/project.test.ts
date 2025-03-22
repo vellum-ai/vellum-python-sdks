@@ -6,6 +6,7 @@ import { difference } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
+import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { expect, vi } from "vitest";
 
 import {
@@ -77,6 +78,17 @@ describe("WorkflowProjectGenerator", () => {
       simple_guard_rail_node: SpyMocks.createMetricDefinitionMock(),
       faa_q_and_a_bot: SpyMocks.createWorkflowDeploymentsMock(),
     };
+    vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
+      async (idOrName: string) => {
+        return {
+          id: idOrName,
+          name: "TEST_SECRET",
+          modified: new Date(),
+          label: idOrName,
+          secretType: "USER_DEFINED",
+        };
+      }
+    );
 
     it.each(
       getFixturesForProjectTest({
@@ -94,6 +106,7 @@ describe("WorkflowProjectGenerator", () => {
           "simple_api_node",
           "simple_node_with_try_wrap",
           "simple_workflow_node_with_output_values",
+          "faa_q_and_a_bot",
         ],
         fixtureMocks: fixtureMocks,
       })
@@ -112,6 +125,7 @@ describe("WorkflowProjectGenerator", () => {
           options: {
             codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
           },
+          strict: true,
         });
 
         await project.generateCode();

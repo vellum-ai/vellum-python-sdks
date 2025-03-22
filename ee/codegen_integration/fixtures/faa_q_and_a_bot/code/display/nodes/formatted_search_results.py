@@ -11,10 +11,9 @@ class FormattedSearchResultsDisplay(BaseTemplatingNodeDisplay[FormattedSearchRes
     label = "Formatted Search Results"
     node_id = UUID("5e23510e-ef40-4ee1-99ed-0e03f1796cfa")
     target_handle_id = UUID("815664ad-b42f-40ea-9607-b23643a224a8")
-    template_input_id = UUID("757a3546-7757-45c9-b0e8-2cc813254285")
     node_input_ids_by_name = {
-        "results": UUID("7bce9418-f01e-4873-bd4c-d1d5b4340afb"),
         "template": UUID("757a3546-7757-45c9-b0e8-2cc813254285"),
+        "inputs.results": UUID("7bce9418-f01e-4873-bd4c-d1d5b4340afb"),
     }
     output_display = {
         FormattedSearchResults.Outputs.result: NodeOutputDisplay(

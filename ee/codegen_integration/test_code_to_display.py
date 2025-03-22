@@ -23,7 +23,7 @@ def test_code_to_display_data(code_to_display_fixture_paths, workspace_secret_cl
     with open(expected_display_data_file_path) as file:
         expected_serialized_workflow = json.load(file, object_hook=_custom_obj_hook)  # noqa: F841
 
-    assert not DeepDiff(
+    diff = DeepDiff(
         expected_serialized_workflow,
         actual_serialized_workflow,
         significant_digits=6,
@@ -35,6 +35,7 @@ def test_code_to_display_data(code_to_display_fixture_paths, workspace_secret_cl
             r"root\['workflow_raw_data'\]\['nodes'\]\[\d+\]\['data'\]\['workflow_raw_data'\]\['output_values'\]",
         ],
     )
+    assert not diff
 
 
 def _process_position_hook(key, value) -> None:

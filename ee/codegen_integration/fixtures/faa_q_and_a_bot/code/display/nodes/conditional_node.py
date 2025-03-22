@@ -66,8 +66,8 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ConditionId(id="8a38731c-a4e8-4f1d-a4a3-8419119294f6", rule_group_id=None),
     ]
     node_input_ids_by_name = {
-        "e23d8319-e907-41e2-ad95-2be4e6aafbb3.field": UUID("e50c08a5-35db-4415-9fa2-40d0d36a16b2"),
-        "e23d8319-e907-41e2-ad95-2be4e6aafbb3.value": UUID("bf5d2644-7159-4fd7-b0f0-703075645e44"),
+        "2690b2e3-0384-457d-864c-7d22fbd3def5.field": UUID("e50c08a5-35db-4415-9fa2-40d0d36a16b2"),
+        "2690b2e3-0384-457d-864c-7d22fbd3def5.value": UUID("bf5d2644-7159-4fd7-b0f0-703075645e44"),
         "60b216e7-9999-4e1d-bce9-0050f29538e1.field": UUID("c3175b80-ba17-4adf-9f51-3d45daff1464"),
         "60b216e7-9999-4e1d-bce9-0050f29538e1.value": UUID("2403091a-f4c6-42e4-9a97-0a05c184653f"),
         "d8e94b2f-e9b5-484c-bd0c-a388747153b9.field": UUID("e4aa9f5b-9934-4f58-9611-0c1c767bae9b"),
