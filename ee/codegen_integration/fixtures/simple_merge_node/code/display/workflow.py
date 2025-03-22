@@ -2,7 +2,6 @@ from uuid import UUID
 
 from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowOutputDisplay
 from vellum_ee.workflows.display.vellum import (
-    EdgeVellumDisplayOverrides,
     EntrypointVellumDisplayOverrides,
     NodeDisplayData,
     NodeDisplayPosition,
@@ -41,18 +40,10 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     }
     edge_displays = {
-        (TemplatingNode2.Ports.default, MergeNode): EdgeVellumDisplayOverrides(
-            id=UUID("114b1eab-ad2a-4612-b590-35f6ebdd87bc")
-        ),
-        (MergeNode.Ports.default, TemplatingNode3): EdgeVellumDisplayOverrides(
-            id=UUID("fba82107-15bc-4033-9b38-6a8b0094aa7f")
-        ),
-        (TemplatingNode3.Ports.default, FinalOutput): EdgeVellumDisplayOverrides(
-            id=UUID("0c6ddc01-1db6-4b0f-ac7c-8b43ca4cf3c2")
-        ),
-        (TemplatingNode1.Ports.default, MergeNode): EdgeVellumDisplayOverrides(
-            id=UUID("20c8d251-bcf1-497e-8d37-668e661ccabc")
-        ),
+        (TemplatingNode2.Ports.default, MergeNode): EdgeDisplay(id=UUID("114b1eab-ad2a-4612-b590-35f6ebdd87bc")),
+        (MergeNode.Ports.default, TemplatingNode3): EdgeDisplay(id=UUID("fba82107-15bc-4033-9b38-6a8b0094aa7f")),
+        (TemplatingNode3.Ports.default, FinalOutput): EdgeDisplay(id=UUID("0c6ddc01-1db6-4b0f-ac7c-8b43ca4cf3c2")),
+        (TemplatingNode1.Ports.default, MergeNode): EdgeDisplay(id=UUID("20c8d251-bcf1-497e-8d37-668e661ccabc")),
     }
     output_displays = {
         Workflow.Outputs.final_output: WorkflowOutputDisplay(

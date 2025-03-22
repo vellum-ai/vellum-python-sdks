@@ -46,12 +46,16 @@ StateValueDisplayOverridesType = TypeVar("StateValueDisplayOverridesType", bound
 
 
 @dataclass
-class EdgeDisplayOverrides:
+class EdgeDisplay:
     id: UUID
 
 
 @dataclass
-class EdgeDisplay(EdgeDisplayOverrides):
+class EdgeDisplayOverrides(EdgeDisplay):
+    """
+    DEPRECATED: Use EdgeDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 
