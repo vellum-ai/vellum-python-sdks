@@ -15,6 +15,10 @@ import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base"
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
+const CODE_INPUT_KEY = "code";
+const RUNTIME_INPUT_KEY = "runtime";
+const INPUTS_PREFIX = "code_inputs";
+
 export class CodeExecutionNode extends BaseSingleFileNode<
   CodeExecutionNodeType,
   CodeExecutionContext
@@ -31,6 +35,17 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     this.codeRepresentationOverride =
       workflowContext.codeExecutionNodeCodeRepresentationOverride;
     this.scriptFileContents = this.generateScriptFileContents();
+  }
+
+  protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    if (nodeInputKey === CODE_INPUT_KEY) {
+      return nodeInputKey;
+    }
+    if (nodeInputKey === RUNTIME_INPUT_KEY) {
+      return nodeInputKey;
+    }
+
+    return `${INPUTS_PREFIX}.${nodeInputKey}`;
   }
 
   // Override
@@ -78,7 +93,7 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     } else {
       statements.push(
         python.field({
-          name: "code",
+          name: CODE_INPUT_KEY,
           initializer: python.TypeInstantiation.str(this.scriptFileContents, {
             multiline: true,
             startOnNewLine: true,
@@ -95,7 +110,7 @@ export class CodeExecutionNode extends BaseSingleFileNode<
 
     statements.push(
       python.field({
-        name: "code_inputs",
+        name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           codeInputs.map((codeInput) => ({
             key: python.TypeInstantiation.str(codeInput.nodeInputData.key),
@@ -113,7 +128,7 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     if (runtime) {
       statements.push(
         python.field({
-          name: "runtime",
+          name: RUNTIME_INPUT_KEY,
           initializer: python.TypeInstantiation.str(runtime),
         })
       );

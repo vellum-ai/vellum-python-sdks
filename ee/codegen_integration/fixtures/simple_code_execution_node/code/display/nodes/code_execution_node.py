@@ -14,7 +14,7 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
     output_id = UUID("9d1dae27-6e6a-40bf-a401-611c974d4143")
     log_output_id = UUID("b57399ac-93ce-4225-8543-10bac4fe82f4")
     node_input_ids_by_name = {
-        "arg": UUID("78da07ee-cc77-445e-af85-f60ab4f7a59f"),
+        "code_inputs.arg": UUID("78da07ee-cc77-445e-af85-f60ab4f7a59f"),
         "code": UUID("19b05769-cee3-4659-80d1-66fcae4e27c3"),
         "runtime": UUID("ebcd1dc6-b0cc-4e67-af67-a42993cf038b"),
     }
