@@ -121,6 +121,7 @@ known_vellum = ["vellum", "vellum_cli", "vellum_ee"]
 default_section = "THIRDPARTY"
 sections = ["FUTURE", "TESTING", "STDLIB", "TYPING", "THIRDPARTY", "VELLUM", "FIRSTPARTY", "LOCALFOLDER"]
 no_lines_before = ["STDLIB", "TYPING"]
+sort_order = "native"
 
 [tool.black]
 line-length = 120

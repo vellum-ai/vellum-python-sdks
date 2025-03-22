@@ -2,522 +2,30 @@
   "workflow_raw_data": {
     "nodes": [
       {
-        "id": "235b2e34-c6a3-48aa-b2cc-090571b41ea8",
-        "type": "PROMPT",
-        "data": {
-          "variant": "INLINE",
-          "label": "Prompt Node 19",
-          "output_id": "7b1ca9d1-d829-4329-b9f3-a864c3ce4230",
-          "array_output_id": "17c0ef53-62bf-459f-8df8-2ff3f6b8852a",
-          "error_output_id": null,
-          "source_handle_id": "7b6c38d1-907d-4074-935e-b84a2a02786b",
-          "target_handle_id": "35b77bfb-91d3-4e5b-8032-9786b9cc05c3",
-          "exec_config": {
-            "parameters": {
-              "stop": null,
-              "temperature": 0.0,
-              "max_tokens": 1000,
-              "top_p": 1.0,
-              "top_k": null,
-              "frequency_penalty": 0.0,
-              "presence_penalty": 0.0,
-              "logit_bias": {},
-              "custom_parameters": null
-            },
-            "input_variables": [],
-            "prompt_template_block_data": {
-              "blocks": [
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": "Respond with \"Sorry I don't know\"",
-                            "id": "81f99d51-fe62-4540-af38-6f26502d33f4",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          }
-                        ],
-                        "id": "a3a3d7a1-f23f-4698-afe4-62485e1944ea",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "SYSTEM",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "c24bdb78-149e-415d-b848-d5681c3740ac",
-                  "state": "ENABLED",
-                  "cache_config": null
-                }
-              ],
-              "version": 1
-            },
-            "settings": null
-          },
-          "ml_model_name": "gpt-4o-2024-05-13"
-        },
+        "id": "81ec43d2-49ec-47ce-b953-faaec3a22c63",
+        "type": "ENTRYPOINT",
         "inputs": [],
-        "display_data": {
-          "position": {
-            "x": 3165.684879595973,
-            "y": 768.6879108547903
-          },
-          "comment": null,
-          "width": 480.0,
-          "height": 170.0
-        },
-        "definition": null
-      },
-      {
-        "id": "9722b9da-0164-40fb-9270-a0fc9b87b1f9",
-        "type": "PROMPT",
         "data": {
-          "variant": "INLINE",
-          "label": "Prompt Node 18",
-          "output_id": "df6d8990-e05b-45e1-9294-ccf58252757b",
-          "array_output_id": "7bba9fdb-bb9e-457d-9755-a8f7ae0af959",
-          "error_output_id": null,
-          "source_handle_id": "e80fd429-37ff-4054-9bd3-bd56568716e5",
-          "target_handle_id": "371cc948-bf59-4eba-9356-b21649f76b5e",
-          "exec_config": {
-            "parameters": {
-              "stop": null,
-              "temperature": 0.0,
-              "max_tokens": 1000,
-              "top_p": 1.0,
-              "top_k": null,
-              "frequency_penalty": null,
-              "presence_penalty": null,
-              "logit_bias": null,
-              "custom_parameters": null
-            },
-            "input_variables": [
-              {
-                "id": "fbd03331-bbef-45f3-98fd-2106fd3cdb8a",
-                "key": "text",
-                "type": "STRING",
-                "required": null,
-                "default": null,
-                "extensions": null
-              }
-            ],
-            "prompt_template_block_data": {
-              "blocks": [
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": "Based on the below JSON response from an airline flight status tracker API, which flights are on the ground? And which airports are they going from and to? Where are they right now?\n\n",
-                            "id": "002302fc-1a1f-43cf-9d34-d5255edd8004",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          },
-                          {
-                            "block_type": "VARIABLE",
-                            "id": "09676442-82b3-4abb-a8d5-7787a889222d",
-                            "state": "ENABLED",
-                            "cache_config": null,
-                            "input_variable_id": "fbd03331-bbef-45f3-98fd-2106fd3cdb8a"
-                          }
-                        ],
-                        "id": "61dceb18-32c3-4554-9894-facc8843407a",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "USER",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "166672fa-c14f-4639-936d-bf478cee3298",
-                  "state": "ENABLED",
-                  "cache_config": null
-                },
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": " Respond in the following format\n\nThe flights that are on the ground are:\n\n1. **Flight Number:** WN597\n   - **Departure Airport:** LAS (Las Vegas McCarran International Airport)\n   - **Arrival Airport:** SJC (San Jose International Airport)\n   - **Current Location:** Latitude 37.3664, Longitude -121.929 (San Jose International Airport)\n",
-                            "id": "a47cc54b-6662-4837-b387-dc0cc19b45c6",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          }
-                        ],
-                        "id": "ce53401e-ba92-4b7c-bc1b-9e1771c6aad8",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "USER",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "0070e33d-8a1a-4b40-9af4-297fdfa61280",
-                  "state": "ENABLED",
-                  "cache_config": null
-                },
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": " Just use plain text and no special characters",
-                            "id": "4f4bd55d-e158-4e34-9d25-203ce6cc3d26",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          }
-                        ],
-                        "id": "bb11880e-08f4-49e4-8987-03919246f8e4",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "USER",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "9856a3b7-2251-4824-aa2d-8402acc5585b",
-                  "state": "ENABLED",
-                  "cache_config": null
-                }
-              ],
-              "version": 1
-            },
-            "settings": null
-          },
-          "ml_model_name": "claude-3-5-sonnet-20241022"
+          "label": "Entrypoint Node",
+          "source_handle_id": "6888c8eb-9dba-42b4-94d4-52900edcfeea"
         },
-        "inputs": [
-          {
-            "id": "fbd03331-bbef-45f3-98fd-2106fd3cdb8a",
-            "key": "text",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "81246ab6-153a-4c87-9f28-b6c28c915cf1",
-                    "output_id": "c3c38fac-f413-4dad-863d-3d388231ba22"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
         "display_data": {
           "position": {
-            "x": 4524.0,
-            "y": 946.5
+            "x": 0.0,
+            "y": 388.75
           },
-          "comment": null,
-          "width": 480.0,
-          "height": 168.0
+          "width": 124,
+          "height": 48
         },
+        "base": null,
         "definition": null
       },
       {
-        "id": "81246ab6-153a-4c87-9f28-b6c28c915cf1",
-        "type": "API",
-        "data": {
-          "label": "API Node",
-          "method_input_id": "96d6ea69-24b7-4e5a-94ed-4c4eb3fcfe69",
-          "url_input_id": "20932275-1a55-455f-b481-5895f9e28123",
-          "body_input_id": "379f9c64-cad2-4b7d-ba30-32599ec1fe64",
-          "authorization_type_input_id": "e29070d6-bd22-46c8-ae18-b6f056ca15ad",
-          "bearer_token_value_input_id": "a596f1fc-01a8-467e-9007-19073a98660d",
-          "api_key_header_key_input_id": "bcf3aac0-536e-42d5-b666-22cfe40eae98",
-          "api_key_header_value_input_id": "bc73ee61-ca29-48fe-b3f2-fea5d8f638f6",
-          "additional_headers": [],
-          "text_output_id": "0c945315-0607-4ef6-8051-f4b6498e9526",
-          "json_output_id": "c3c38fac-f413-4dad-863d-3d388231ba22",
-          "status_code_output_id": "4d3e2c1d-ac9f-43a4-81fc-b652239986a0",
-          "error_output_id": null,
-          "target_handle_id": "8f6f1b95-dd80-46dd-b1f6-167196baf697",
-          "source_handle_id": "5fd01b0b-f0fb-488b-a9c7-4ba1dd7df80e"
-        },
-        "inputs": [
-          {
-            "id": "96d6ea69-24b7-4e5a-94ed-4c4eb3fcfe69",
-            "key": "method",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "GET"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "20932275-1a55-455f-b481-5895f9e28123",
-            "key": "url",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "ed96d879-cb62-40c8-9f8c-b14016740a2f",
-                    "output_id": "845ae624-f957-404e-a9e5-5a8ece09a1c9"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "379f9c64-cad2-4b7d-ba30-32599ec1fe64",
-            "key": "body",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "JSON",
-                    "value": null
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "e29070d6-bd22-46c8-ae18-b6f056ca15ad",
-            "key": "authorization_type",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "API_KEY"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "a596f1fc-01a8-467e-9007-19073a98660d",
-            "key": "bearer_token_value",
-            "value": {
-              "rules": [
-                {
-                  "type": "WORKSPACE_SECRET",
-                  "data": {
-                    "type": "STRING",
-                    "workspace_secret_id": null
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "bcf3aac0-536e-42d5-b666-22cfe40eae98",
-            "key": "api_key_header_key",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "ab2f59-1004d1"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "bc73ee61-ca29-48fe-b3f2-fea5d8f638f6",
-            "key": "api_key_header_value",
-            "value": {
-              "rules": [
-                {
-                  "type": "WORKSPACE_SECRET",
-                  "data": {
-                    "type": "STRING",
-                    "workspace_secret_id": "cfafa394-efd8-4dbe-bada-3fb5f998bb97"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 3916.027261439447,
-            "y": 917.3816601522587
-          },
-          "comment": null,
-          "width": 455.0,
-          "height": 230.0
-        },
-        "definition": null
-      },
-      {
-        "id": "4e377068-94d3-4215-8366-261b7541ef37",
-        "type": "PROMPT",
-        "data": {
-          "variant": "INLINE",
-          "label": "Prompt Node 16",
-          "output_id": "4d31e604-6711-4a12-b618-476bfc304f09",
-          "array_output_id": "4dba2219-6714-4ca7-9076-5bb01ee0b340",
-          "error_output_id": null,
-          "source_handle_id": "aa013fc4-618d-4cf4-88ce-639c56588aa3",
-          "target_handle_id": "ba029d72-7fc2-4e82-a5ad-6f364c84d72f",
-          "exec_config": {
-            "parameters": {
-              "stop": null,
-              "temperature": 0.0,
-              "max_tokens": 1000,
-              "top_p": 1.0,
-              "top_k": null,
-              "frequency_penalty": 0.0,
-              "presence_penalty": 0.0,
-              "logit_bias": {},
-              "custom_parameters": null
-            },
-            "input_variables": [
-              {
-                "id": "0f0f394c-dc7d-46a1-9217-24c1e59b273a",
-                "key": "most_recent_message",
-                "type": "STRING",
-                "required": null,
-                "default": null,
-                "extensions": null
-              }
-            ],
-            "prompt_template_block_data": {
-              "blocks": [
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": "Respond with the IATA airport name this incoming message is about. For example, respond only with \"SJC\", \"SFO\", \"EWR\" or \"JFK\"\n\n",
-                            "id": "41378b0d-7b93-47fe-a39c-143e4d883b07",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          },
-                          {
-                            "block_type": "VARIABLE",
-                            "id": "a478e61f-31b8-4b5a-b126-cd8748566e86",
-                            "state": "ENABLED",
-                            "cache_config": null,
-                            "input_variable_id": "0f0f394c-dc7d-46a1-9217-24c1e59b273a"
-                          }
-                        ],
-                        "id": "12474aa4-b00f-4f5f-9fdf-ebab631bd889",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "SYSTEM",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "eeda5f8c-288d-446f-bf75-478ff046020f",
-                  "state": "ENABLED",
-                  "cache_config": null
-                }
-              ],
-              "version": 1
-            },
-            "settings": null
-          },
-          "ml_model_name": "gpt-4o"
-        },
-        "inputs": [
-          {
-            "id": "0f0f394c-dc7d-46a1-9217-24c1e59b273a",
-            "key": "most_recent_message",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
-                    "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 2694.0,
-            "y": 1100.0
-          },
-          "comment": null,
-          "width": 480.0,
-          "height": 168.0
-        },
-        "definition": null
-      },
-      {
-        "id": "ed96d879-cb62-40c8-9f8c-b14016740a2f",
+        "id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
         "type": "TEMPLATING",
-        "data": {
-          "label": "Templating Node 15",
-          "output_id": "845ae624-f957-404e-a9e5-5a8ece09a1c9",
-          "error_output_id": null,
-          "source_handle_id": "8eaafb2e-a666-4dc9-96c3-52839df75632",
-          "target_handle_id": "ed213a6c-2573-431c-8736-b8f062869db7",
-          "template_node_input_id": "9fa804b1-1b86-4cc9-af3c-1c1a6718dc02",
-          "output_type": "STRING"
-        },
         "inputs": [
           {
-            "id": "8b10a7d8-9d35-4808-ad93-4e1774ca80dc",
-            "key": "API_KEY",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "ab2f59-1004d1"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "9fa804b1-1b86-4cc9-af3c-1c1a6718dc02",
+            "id": "b6f8e86f-93ba-4200-9097-421723348d3d",
             "key": "template",
             "value": {
               "rules": [
@@ -525,7 +33,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "https://aviation-edge.com/v2/public/flights?key={{ API_KEY }}&arrIATA={{ arrival_airport }}&airlineIATA={{ airline_name }}"
+                    "value": "{{ chat_history[-1][\"text\"] }}"
                   }
                 }
               ],
@@ -533,170 +41,7 @@
             }
           },
           {
-            "id": "4540ee13-ed34-4c88-86ba-6bc4f908a49b",
-            "key": "airline_name",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "WN"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "b2aef5a8-526a-4b48-8f35-6984077c48df",
-            "key": "arrival_airport",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "4e377068-94d3-4215-8366-261b7541ef37",
-                    "output_id": "4d31e604-6711-4a12-b618-476bfc304f09"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 3304.0,
-            "y": 1043.0
-          },
-          "comment": null,
-          "width": 461.0,
-          "height": 327.0
-        },
-        "definition": null
-      },
-      {
-        "id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
-        "type": "PROMPT",
-        "data": {
-          "variant": "INLINE",
-          "label": "Prompt Node 14",
-          "output_id": "8e2d57c3-85a3-4acb-b4d3-998c6906e389",
-          "array_output_id": "43cd2bcf-4c99-4f7a-ace7-e27d986dd041",
-          "error_output_id": null,
-          "source_handle_id": "23556dd8-b9f8-4cf7-9c24-291f9d0a223a",
-          "target_handle_id": "3485b3fb-e4ee-47c9-b567-c5eab60c01f9",
-          "exec_config": {
-            "parameters": {
-              "stop": null,
-              "temperature": 0.0,
-              "max_tokens": 1000,
-              "top_p": 1.0,
-              "top_k": 0,
-              "frequency_penalty": 0.0,
-              "presence_penalty": 0.0,
-              "logit_bias": {},
-              "custom_parameters": null
-            },
-            "input_variables": [
-              {
-                "id": "b6524b5f-7697-4923-8b87-f85baadb505a",
-                "key": "chat_history",
-                "type": "CHAT_HISTORY",
-                "required": null,
-                "default": null,
-                "extensions": null
-              }
-            ],
-            "prompt_template_block_data": {
-              "blocks": [
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": "Summarize the weather. Just use plain text, no special characters, no commas, no mathematical signs like + -",
-                            "id": "30b2eda7-142c-4b26-97e0-767ccae6f74e",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          }
-                        ],
-                        "id": "cddde223-5d61-4a4e-848c-992d0a6d0436",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "SYSTEM",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "625b700c-0beb-4f3d-8f18-83bcd44db3b4",
-                  "state": "ENABLED",
-                  "cache_config": null
-                },
-                {
-                  "block_type": "VARIABLE",
-                  "id": "bbe97aa2-324f-4fc6-a632-c800320d6080",
-                  "state": "ENABLED",
-                  "cache_config": null,
-                  "input_variable_id": "b6524b5f-7697-4923-8b87-f85baadb505a"
-                }
-              ],
-              "version": 1
-            },
-            "settings": null
-          },
-          "ml_model_name": "gpt-4o-mini"
-        },
-        "inputs": [
-          {
-            "id": "b6524b5f-7697-4923-8b87-f85baadb505a",
-            "key": "chat_history",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
-                    "output_id": "53970e88-0bf6-4364-86b3-840d78a2afe5"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 4524.0,
-            "y": 631.0
-          },
-          "comment": null,
-          "width": 480.0,
-          "height": 168.0
-        },
-        "definition": null
-      },
-      {
-        "id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
-        "type": "SUBWORKFLOW",
-        "data": {
-          "label": "Subworkflow Node",
-          "source_handle_id": "de5b0a72-e46f-4534-89a9-b78725694dd2",
-          "target_handle_id": "d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2",
-          "error_output_id": null,
-          "variant": "DEPLOYMENT",
-          "workflow_deployment_id": "bed47f01-c77d-412d-b4d3-cee89c19bae1",
-          "release_tag": "LATEST"
-        },
-        "inputs": [
-          {
-            "id": "76519b3c-285d-425d-ba7a-ce7300e4ed9c",
+            "id": "fec02d64-f82c-4970-bd57-31c84aaf7214",
             "key": "chat_history",
             "value": {
               "rules": [
@@ -711,46 +56,230 @@
             }
           }
         ],
-        "display_data": {
-          "position": {
-            "x": 3914.0,
-            "y": 631.0
-          },
-          "comment": null,
-          "width": null,
-          "height": null
-        },
-        "definition": null
-      },
-      {
-        "id": "557f9b98-2229-437e-844b-cac7868a0534",
-        "type": "TEMPLATING",
         "data": {
-          "label": "Templating Node",
-          "output_id": "adf0256c-cdcd-4e62-92a3-a9c1b8e70e0f",
+          "label": "Most Recent Message",
+          "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd",
           "error_output_id": null,
-          "source_handle_id": "0f8cbd50-1919-4c2e-8b1b-1ad741b5da35",
-          "target_handle_id": "73d41849-2a2d-4994-b220-b636c51fab42",
-          "template_node_input_id": "ed2cf7f8-2620-4a8e-bea2-51ba8f48d9ac",
+          "source_handle_id": "ab8e97b4-4ee4-42bc-8f43-e2c9c457ad21",
+          "target_handle_id": "157d01bd-441e-49fa-abce-7b991c9291da",
+          "template_node_input_id": "b6f8e86f-93ba-4200-9097-421723348d3d",
           "output_type": "STRING"
         },
+        "display_data": {
+          "position": {
+            "x": 254.0,
+            "y": 237.3190436953056
+          },
+          "width": 480,
+          "height": 221
+        },
+        "base": {
+          "name": "TemplatingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "templating_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "MostRecentMessage",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "most_recent_message"
+          ]
+        }
+      },
+      {
+        "id": "393c798a-111a-4f73-bfee-5efb93228dcb",
+        "type": "PROMPT",
         "inputs": [
           {
-            "id": "60888a25-050a-4593-8d82-ba7d40eda1ac",
-            "key": "example_var_1",
+            "id": "183b03e5-b903-4d39-abe4-9267c78285f6",
+            "key": "var_1",
             "value": {
               "rules": [
                 {
                   "type": "NODE_OUTPUT",
                   "data": {
-                    "node_id": "393c798a-111a-4f73-bfee-5efb93228dcb",
-                    "output_id": "f7e45a43-f55c-4c19-8fe6-c3ce1308a076"
+                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
+                    "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
                   }
                 }
               ],
               "combinator": "OR"
             }
+          }
+        ],
+        "data": {
+          "label": "Prompt Node",
+          "output_id": "f7e45a43-f55c-4c19-8fe6-c3ce1308a076",
+          "error_output_id": null,
+          "array_output_id": "63213d3c-547c-43df-905f-082aeb7dac61",
+          "source_handle_id": "f743c0c0-8ced-445d-bf1c-bef1f2b26895",
+          "target_handle_id": "b14f0322-965d-43c9-96d4-7bce9fd87067",
+          "variant": "INLINE",
+          "exec_config": {
+            "parameters": {
+              "stop": [],
+              "temperature": 0.0,
+              "max_tokens": 1000,
+              "top_p": 1.0,
+              "frequency_penalty": 0.0,
+              "presence_penalty": 0.0,
+              "logit_bias": {},
+              "custom_parameters": {
+                "json_mode": true,
+                "json_schema": {
+                  "name": "Classification",
+                  "schema": {
+                    "type": "object",
+                    "required": [
+                      "classification"
+                    ],
+                    "properties": {
+                      "classification": {
+                        "type": "string",
+                        "description": ""
+                      }
+                    }
+                  }
+                }
+              },
+              "top_k": null
+            },
+            "input_variables": [
+              {
+                "id": "183b03e5-b903-4d39-abe4-9267c78285f6",
+                "key": "var_1",
+                "type": "STRING"
+              }
+            ],
+            "prompt_template_block_data": {
+              "version": 1,
+              "blocks": [
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": "You are an expert classifier. You will analyze the chat and output one of the following in JSON format: \n\n1. \"weather\" if it is a question about the weather\n2. \"flight status\" if it is about which flights are currently in transit at a certain airport\n3. \"faa\" if the question is about any FAA related aviation policies\n4. \"other\" if the question is about anything else",
+                            "id": "a52a0e71-55ee-4d52-9cd0-09e027a0e69b",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "107dc61f-8708-4f1d-be9e-2aa28f4fab15",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "12fe944a-d55c-409f-8aab-a111ea1920f2",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                },
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "VARIABLE",
+                            "input_variable_id": "183b03e5-b903-4d39-abe4-9267c78285f6",
+                            "id": "e9fb7c34-ab5a-4143-9ccc-96ac017c4236",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "903e8dda-c807-48c3-8f85-2eec75b93c6a",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "1f919fe9-3178-44e7-a114-a10b93d89393",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                }
+              ]
+            }
           },
+          "ml_model_name": "gpt-4o"
+        },
+        "display_data": {
+          "position": {
+            "x": 866.1444593268898,
+            "y": 545.562737655267
+          },
+          "width": 480,
+          "height": 168
+        },
+        "base": {
+          "name": "InlinePromptNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "inline_prompt_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "PromptNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "prompt_node"
+          ]
+        },
+        "outputs": [
+          {
+            "id": "981a3c2e-f173-40d0-9ef0-663d7f1038a1",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "f7e45a43-f55c-4c19-8fe6-c3ce1308a076",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "63213d3c-547c-43df-905f-082aeb7dac61",
+            "name": "results",
+            "type": "ARRAY",
+            "value": null
+          }
+        ]
+      },
+      {
+        "id": "557f9b98-2229-437e-844b-cac7868a0534",
+        "type": "TEMPLATING",
+        "inputs": [
           {
             "id": "ed2cf7f8-2620-4a8e-bea2-51ba8f48d9ac",
             "key": "template",
@@ -766,111 +295,71 @@
               ],
               "combinator": "OR"
             }
+          },
+          {
+            "id": "60888a25-050a-4593-8d82-ba7d40eda1ac",
+            "key": "example_var_1",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "393c798a-111a-4f73-bfee-5efb93228dcb",
+                    "output_id": "f7e45a43-f55c-4c19-8fe6-c3ce1308a076"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
           }
         ],
+        "data": {
+          "label": "Templating Node",
+          "output_id": "adf0256c-cdcd-4e62-92a3-a9c1b8e70e0f",
+          "error_output_id": null,
+          "source_handle_id": "0f8cbd50-1919-4c2e-8b1b-1ad741b5da35",
+          "target_handle_id": "73d41849-2a2d-4994-b220-b636c51fab42",
+          "template_node_input_id": "ed2cf7f8-2620-4a8e-bea2-51ba8f48d9ac",
+          "output_type": "STRING"
+        },
         "display_data": {
           "position": {
             "x": 1474.0,
             "y": 540.5
           },
-          "comment": null,
-          "width": 480.0,
-          "height": 221.0
+          "width": 480,
+          "height": 221
         },
-        "definition": null
+        "base": {
+          "name": "TemplatingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "templating_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "TemplatingNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "templating_node"
+          ]
+        }
       },
       {
         "id": "903aa4b9-70b6-4d32-a12e-488926403836",
         "type": "CONDITIONAL",
-        "data": {
-          "label": "Conditional Node",
-          "target_handle_id": "91f3cff9-32b8-4cda-aae3-a2c69b9bf650",
-          "conditions": [
-            {
-              "id": "4188bda5-5c07-490e-9e17-7e1df1e4fb3a",
-              "type": "IF",
-              "source_handle_id": "d4f0db7d-b04a-4c4d-b9d3-aa3eb61fa3a2",
-              "data": {
-                "id": "c18a30e5-038a-450d-a2c9-5e385aecb2e5",
-                "rules": [
-                  {
-                    "id": "2690b2e3-0384-457d-864c-7d22fbd3def5",
-                    "rules": null,
-                    "combinator": null,
-                    "negated": null,
-                    "field_node_input_id": "e50c08a5-35db-4415-9fa2-40d0d36a16b2",
-                    "operator": "=",
-                    "value_node_input_id": "bf5d2644-7159-4fd7-b0f0-703075645e44"
-                  }
-                ],
-                "combinator": "AND",
-                "negated": null,
-                "field_node_input_id": null,
-                "operator": null,
-                "value_node_input_id": null
-              }
-            },
-            {
-              "id": "e2815ae8-9b09-47e3-bd3f-5f17c9d96a31",
-              "type": "ELIF",
-              "source_handle_id": "d3489082-f03f-4121-ae60-877fd361c5fe",
-              "data": {
-                "id": "b20bfb89-cb0b-4a17-9135-c0bd3206173b",
-                "rules": [
-                  {
-                    "id": "60b216e7-9999-4e1d-bce9-0050f29538e1",
-                    "rules": null,
-                    "combinator": null,
-                    "negated": null,
-                    "field_node_input_id": "c3175b80-ba17-4adf-9f51-3d45daff1464",
-                    "operator": "=",
-                    "value_node_input_id": "2403091a-f4c6-42e4-9a97-0a05c184653f"
-                  }
-                ],
-                "combinator": "AND",
-                "negated": null,
-                "field_node_input_id": null,
-                "operator": null,
-                "value_node_input_id": null
-              }
-            },
-            {
-              "id": "9be476a3-5757-4faa-b3a6-8383924946f0",
-              "type": "ELIF",
-              "source_handle_id": "a913cb88-261b-4fa8-9915-d215e19749ee",
-              "data": {
-                "id": "c321e3d0-e6ee-437b-8860-fc1af277d01b",
-                "rules": [
-                  {
-                    "id": "d8e94b2f-e9b5-484c-bd0c-a388747153b9",
-                    "rules": null,
-                    "combinator": null,
-                    "negated": null,
-                    "field_node_input_id": "e4aa9f5b-9934-4f58-9611-0c1c767bae9b",
-                    "operator": "=",
-                    "value_node_input_id": "2398764a-060b-4ee9-9531-60e06b2c95b9"
-                  }
-                ],
-                "combinator": "AND",
-                "negated": null,
-                "field_node_input_id": null,
-                "operator": null,
-                "value_node_input_id": null
-              }
-            },
-            {
-              "id": "8a38731c-a4e8-4f1d-a4a3-8419119294f6",
-              "type": "ELSE",
-              "source_handle_id": "fec240f8-8baf-40f9-87e7-f268bff4ed94",
-              "data": null
-            }
-          ],
-          "version": "2"
-        },
         "inputs": [
           {
             "id": "e50c08a5-35db-4415-9fa2-40d0d36a16b2",
-            "key": "e23d8319-e907-41e2-ad95-2be4e6aafbb3.field",
+            "key": "2690b2e3-0384-457d-864c-7d22fbd3def5.field",
             "value": {
               "rules": [
                 {
@@ -886,7 +375,7 @@
           },
           {
             "id": "bf5d2644-7159-4fd7-b0f0-703075645e44",
-            "key": "e23d8319-e907-41e2-ad95-2be4e6aafbb3.value",
+            "key": "2690b2e3-0384-457d-864c-7d22fbd3def5.value",
             "value": {
               "rules": [
                 {
@@ -965,339 +454,125 @@
             }
           }
         ],
+        "data": {
+          "label": "Conditional Node",
+          "target_handle_id": "91f3cff9-32b8-4cda-aae3-a2c69b9bf650",
+          "conditions": [
+            {
+              "id": "4188bda5-5c07-490e-9e17-7e1df1e4fb3a",
+              "type": "IF",
+              "source_handle_id": "d4f0db7d-b04a-4c4d-b9d3-aa3eb61fa3a2",
+              "data": {
+                "id": "c18a30e5-038a-450d-a2c9-5e385aecb2e5",
+                "rules": [
+                  {
+                    "id": "2690b2e3-0384-457d-864c-7d22fbd3def5",
+                    "rules": null,
+                    "combinator": null,
+                    "negated": false,
+                    "field_node_input_id": "e50c08a5-35db-4415-9fa2-40d0d36a16b2",
+                    "operator": "=",
+                    "value_node_input_id": "bf5d2644-7159-4fd7-b0f0-703075645e44"
+                  }
+                ],
+                "combinator": "AND",
+                "negated": false,
+                "field_node_input_id": null,
+                "operator": null,
+                "value_node_input_id": null
+              }
+            },
+            {
+              "id": "e2815ae8-9b09-47e3-bd3f-5f17c9d96a31",
+              "type": "ELIF",
+              "source_handle_id": "d3489082-f03f-4121-ae60-877fd361c5fe",
+              "data": {
+                "id": "b20bfb89-cb0b-4a17-9135-c0bd3206173b",
+                "rules": [
+                  {
+                    "id": "60b216e7-9999-4e1d-bce9-0050f29538e1",
+                    "rules": null,
+                    "combinator": null,
+                    "negated": false,
+                    "field_node_input_id": "c3175b80-ba17-4adf-9f51-3d45daff1464",
+                    "operator": "=",
+                    "value_node_input_id": "2403091a-f4c6-42e4-9a97-0a05c184653f"
+                  }
+                ],
+                "combinator": "AND",
+                "negated": false,
+                "field_node_input_id": null,
+                "operator": null,
+                "value_node_input_id": null
+              }
+            },
+            {
+              "id": "9be476a3-5757-4faa-b3a6-8383924946f0",
+              "type": "ELIF",
+              "source_handle_id": "a913cb88-261b-4fa8-9915-d215e19749ee",
+              "data": {
+                "id": "c321e3d0-e6ee-437b-8860-fc1af277d01b",
+                "rules": [
+                  {
+                    "id": "d8e94b2f-e9b5-484c-bd0c-a388747153b9",
+                    "rules": null,
+                    "combinator": null,
+                    "negated": false,
+                    "field_node_input_id": "e4aa9f5b-9934-4f58-9611-0c1c767bae9b",
+                    "operator": "=",
+                    "value_node_input_id": "2398764a-060b-4ee9-9531-60e06b2c95b9"
+                  }
+                ],
+                "combinator": "AND",
+                "negated": false,
+                "field_node_input_id": null,
+                "operator": null,
+                "value_node_input_id": null
+              }
+            },
+            {
+              "id": "8a38731c-a4e8-4f1d-a4a3-8419119294f6",
+              "type": "ELSE",
+              "source_handle_id": "fec240f8-8baf-40f9-87e7-f268bff4ed94",
+              "data": null
+            }
+          ],
+          "version": "2"
+        },
         "display_data": {
           "position": {
             "x": 2084.4413934539916,
             "y": 503.21512629358983
           },
-          "comment": null,
-          "width": 480.0,
-          "height": 283.0
+          "width": 480,
+          "height": 283
         },
-        "definition": null
-      },
-      {
-        "id": "393c798a-111a-4f73-bfee-5efb93228dcb",
-        "type": "PROMPT",
-        "data": {
-          "variant": "INLINE",
-          "label": "Prompt Node",
-          "output_id": "f7e45a43-f55c-4c19-8fe6-c3ce1308a076",
-          "array_output_id": "63213d3c-547c-43df-905f-082aeb7dac61",
-          "error_output_id": null,
-          "source_handle_id": "f743c0c0-8ced-445d-bf1c-bef1f2b26895",
-          "target_handle_id": "b14f0322-965d-43c9-96d4-7bce9fd87067",
-          "exec_config": {
-            "parameters": {
-              "stop": null,
-              "temperature": 0.0,
-              "max_tokens": 1000,
-              "top_p": 1.0,
-              "top_k": null,
-              "frequency_penalty": 0.0,
-              "presence_penalty": 0.0,
-              "logit_bias": {},
-              "custom_parameters": {
-                "json_mode": true,
-                "json_schema": {
-                  "name": "Classification",
-                  "schema": {
-                    "type": "object",
-                    "required": [
-                      "classification"
-                    ],
-                    "properties": {
-                      "classification": {
-                        "type": "string",
-                        "description": ""
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "input_variables": [
-              {
-                "id": "183b03e5-b903-4d39-abe4-9267c78285f6",
-                "key": "var_1",
-                "type": "STRING",
-                "required": null,
-                "default": null,
-                "extensions": null
-              }
-            ],
-            "prompt_template_block_data": {
-              "blocks": [
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": "You are an expert classifier. You will analyze the chat and output one of the following in JSON format: \n\n1. \"weather\" if it is a question about the weather\n2. \"flight status\" if it is about which flights are currently in transit at a certain airport\n3. \"faa\" if the question is about any FAA related aviation policies\n4. \"other\" if the question is about anything else",
-                            "id": "5ec0da8b-cfc9-4cf4-acb6-1946434e9930",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          }
-                        ],
-                        "id": "bd9b3e5e-3cd7-45f7-bfac-d808ec8676b8",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "SYSTEM",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "c8a22dbb-c44d-41b2-a6ae-2643e371a679",
-                  "state": "ENABLED",
-                  "cache_config": null
-                },
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "VARIABLE",
-                            "id": "f97b149d-7ddf-4aee-9a54-7ef71a101e84",
-                            "state": "ENABLED",
-                            "cache_config": null,
-                            "input_variable_id": "183b03e5-b903-4d39-abe4-9267c78285f6"
-                          }
-                        ],
-                        "id": "57f26bf1-286f-41fe-90c6-d29b369afd4f",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "USER",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "6e046564-1fda-4bd4-9d2a-5509013e8749",
-                  "state": "ENABLED",
-                  "cache_config": null
-                }
-              ],
-              "version": 1
-            },
-            "settings": null
-          },
-          "ml_model_name": "gpt-4o"
+        "base": {
+          "name": "ConditionalNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "conditional_node",
+            "node"
+          ]
         },
-        "inputs": [
-          {
-            "id": "183b03e5-b903-4d39-abe4-9267c78285f6",
-            "key": "var_1",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
-                    "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 866.1444593268898,
-            "y": 545.562737655267
-          },
-          "comment": null,
-          "width": 480.0,
-          "height": 168.0
-        },
-        "definition": null
-      },
-      {
-        "id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
-        "type": "PROMPT",
-        "data": {
-          "variant": "INLINE",
-          "label": "Prompt Node 9",
-          "output_id": "e9c9ddb8-4057-4755-bbbd-6ca0291aac9a",
-          "array_output_id": "3e174b5c-2e40-4bda-ba0c-eae3e617c988",
-          "error_output_id": null,
-          "source_handle_id": "ce8e3d37-4c41-4dce-aede-a343d2e1108a",
-          "target_handle_id": "785dc582-83b3-46d1-87ec-9e8a10f4b00f",
-          "exec_config": {
-            "parameters": {
-              "stop": null,
-              "temperature": 0.0,
-              "max_tokens": 1000,
-              "top_p": 1.0,
-              "top_k": 0,
-              "frequency_penalty": 0.0,
-              "presence_penalty": 0.0,
-              "logit_bias": {},
-              "custom_parameters": null
-            },
-            "input_variables": [
-              {
-                "id": "c583f59e-2a5e-47c0-b244-2894b90d3d21",
-                "key": "question",
-                "type": "STRING",
-                "required": null,
-                "default": null,
-                "extensions": null
-              },
-              {
-                "id": "ded72461-3d6a-4633-a45e-e7cc9189941b",
-                "key": "context",
-                "type": "STRING",
-                "required": null,
-                "default": null,
-                "extensions": null
-              }
-            ],
-            "prompt_template_block_data": {
-              "blocks": [
-                {
-                  "block_type": "CHAT_MESSAGE",
-                  "properties": {
-                    "blocks": [
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": " Question:\n---------------\n",
-                            "id": "15ac7d44-6d14-48f2-ba63-418b8b9213ca",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          },
-                          {
-                            "block_type": "VARIABLE",
-                            "id": "2ac523aa-dfb7-4759-8e3a-f2f6f4b74018",
-                            "state": "ENABLED",
-                            "cache_config": null,
-                            "input_variable_id": "c583f59e-2a5e-47c0-b244-2894b90d3d21"
-                          },
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": "\n\nPolicy Quotes:\n-----------------------\n",
-                            "id": "072db945-0750-453a-8697-f1061e229cf6",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          },
-                          {
-                            "block_type": "VARIABLE",
-                            "id": "2f9a3273-5e82-4862-b6ec-6de509310813",
-                            "state": "ENABLED",
-                            "cache_config": null,
-                            "input_variable_id": "ded72461-3d6a-4633-a45e-e7cc9189941b"
-                          }
-                        ],
-                        "id": "87c11cef-1745-49c2-abcb-993caf7b8089",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      },
-                      {
-                        "block_type": "RICH_TEXT",
-                        "blocks": [
-                          {
-                            "block_type": "PLAIN_TEXT",
-                            "text": "You are an expert on FAA rules, guidelines, and safety. Answer the above question given the context. Provide citation of the policy you got it from at the end of the response. If you don't know the answer, say \"Sorry, I don't know\"\n\nLimit your response to 250 words. Just use plain text, no special characters, no commas, no mathematical signs like + -",
-                            "id": "bd3db65e-1a48-4778-bfcc-010acf6bb70f",
-                            "state": "ENABLED",
-                            "cache_config": null
-                          }
-                        ],
-                        "id": "c838186d-d87f-4b47-9f06-460b8cb30cdc",
-                        "state": "ENABLED",
-                        "cache_config": null
-                      }
-                    ],
-                    "chat_role": "SYSTEM",
-                    "chat_source": null,
-                    "chat_message_unterminated": false
-                  },
-                  "id": "fa3f7ee0-c2dc-47e6-9c1c-dea0d5133c43",
-                  "state": "ENABLED",
-                  "cache_config": null
-                }
-              ],
-              "version": 1
-            },
-            "settings": null
-          },
-          "ml_model_name": "gpt-4o-mini"
-        },
-        "inputs": [
-          {
-            "id": "c583f59e-2a5e-47c0-b244-2894b90d3d21",
-            "key": "question",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
-                    "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "ded72461-3d6a-4633-a45e-e7cc9189941b",
-            "key": "context",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
-                    "output_id": "8b8543d8-7b70-4345-9802-76fcedb7b651"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 4528.058075069296,
-            "y": -39.95100525832629
-          },
-          "comment": null,
-          "width": 480.0,
-          "height": 221.0
-        },
-        "definition": null
+        "definition": {
+          "name": "ConditionalNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "conditional_node"
+          ]
+        }
       },
       {
         "id": "fbe1571c-e904-40f6-a414-55adf3b72817",
         "type": "SEARCH",
-        "data": {
-          "label": "FAA Document Store",
-          "results_output_id": "564d7f2a-aa8c-4e9a-b93f-24d8f6418aaf",
-          "text_output_id": "2f4b7f20-9161-4dea-bfb3-f6154c675640",
-          "error_output_id": null,
-          "source_handle_id": "0b203edd-ed4c-4593-9e17-deaeb2780e14",
-          "target_handle_id": "32346adc-40f3-49b5-aea8-5c64b88643ef",
-          "query_node_input_id": "d25dcbce-5d7b-40a4-a5b4-2033bd0d350a",
-          "document_index_node_input_id": "43c7c857-8b25-4dd9-ba16-aa2e5e6ecd0a",
-          "weights_node_input_id": "0ad55ab6-dd3f-4490-b2a8-9d3e4bc27c7b",
-          "limit_node_input_id": "165a6791-79d3-45a3-8e47-74b2de3bdc44",
-          "separator_node_input_id": "52c86f14-c9f6-4473-afaf-2d0dd0d8f738",
-          "result_merging_enabled_node_input_id": "b30cd523-f7cd-4fec-ac37-44eda92c2d16",
-          "external_id_filters_node_input_id": "53cbc583-415f-4c1d-920d-76a3875e193d",
-          "metadata_filters_node_input_id": "a7abbcf8-6c16-411d-b2da-da09ec357ca3"
-        },
         "inputs": [
           {
             "id": "d25dcbce-5d7b-40a4-a5b4-2033bd0d350a",
@@ -1324,7 +599,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "9f13b9d8-5410-48ba-b691-593a4cc681d8"
+                    "value": "my-sweet-document"
                   }
                 }
               ],
@@ -1341,8 +616,8 @@
                   "data": {
                     "type": "JSON",
                     "value": {
-                      "keywords": 0.2,
-                      "semantic_similarity": 0.8
+                      "semantic_similarity": 0.8,
+                      "keywords": 0.2
                     }
                   }
                 }
@@ -1431,16 +706,1249 @@
             }
           }
         ],
+        "data": {
+          "label": "FAA Document Store",
+          "results_output_id": "564d7f2a-aa8c-4e9a-b93f-24d8f6418aaf",
+          "text_output_id": "2f4b7f20-9161-4dea-bfb3-f6154c675640",
+          "error_output_id": null,
+          "source_handle_id": "0b203edd-ed4c-4593-9e17-deaeb2780e14",
+          "target_handle_id": "32346adc-40f3-49b5-aea8-5c64b88643ef",
+          "query_node_input_id": "d25dcbce-5d7b-40a4-a5b4-2033bd0d350a",
+          "document_index_node_input_id": "43c7c857-8b25-4dd9-ba16-aa2e5e6ecd0a",
+          "weights_node_input_id": "0ad55ab6-dd3f-4490-b2a8-9d3e4bc27c7b",
+          "limit_node_input_id": "165a6791-79d3-45a3-8e47-74b2de3bdc44",
+          "separator_node_input_id": "52c86f14-c9f6-4473-afaf-2d0dd0d8f738",
+          "result_merging_enabled_node_input_id": "b30cd523-f7cd-4fec-ac37-44eda92c2d16",
+          "external_id_filters_node_input_id": "53cbc583-415f-4c1d-920d-76a3875e193d",
+          "metadata_filters_node_input_id": "a7abbcf8-6c16-411d-b2da-da09ec357ca3"
+        },
         "display_data": {
           "position": {
             "x": 3318.0,
             "y": 271.25
           },
-          "comment": null,
-          "width": 452.0,
-          "height": 177.0
+          "width": 452,
+          "height": 177
         },
-        "definition": null
+        "base": {
+          "name": "SearchNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "search_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "FAADocumentStore",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "faa_document_store"
+          ]
+        }
+      },
+      {
+        "id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
+        "type": "TEMPLATING",
+        "inputs": [
+          {
+            "id": "757a3546-7757-45c9-b0e8-2cc813254285",
+            "key": "template",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "{% for result in results -%}\nPolicy {{ result.document.label }}:\n------\n{{ result.text }}\n{% if not loop.last %}\n\n#####\n\n{% endif %}\n{% endfor %}"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "7bce9418-f01e-4873-bd4c-d1d5b4340afb",
+            "key": "results",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "fbe1571c-e904-40f6-a414-55adf3b72817",
+                    "output_id": "564d7f2a-aa8c-4e9a-b93f-24d8f6418aaf"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Formatted Search Results",
+          "output_id": "8b8543d8-7b70-4345-9802-76fcedb7b651",
+          "error_output_id": null,
+          "source_handle_id": "886d79d2-2a97-4c15-8172-e9a157c9090d",
+          "target_handle_id": "815664ad-b42f-40ea-9607-b23643a224a8",
+          "template_node_input_id": "757a3546-7757-45c9-b0e8-2cc813254285",
+          "output_type": "STRING"
+        },
+        "display_data": {
+          "position": {
+            "x": 3923.3878883718644,
+            "y": -458.89620665696896
+          },
+          "width": 454,
+          "height": 221
+        },
+        "base": {
+          "name": "TemplatingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "templating_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "FormattedSearchResults",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "formatted_search_results"
+          ]
+        }
+      },
+      {
+        "id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
+        "type": "PROMPT",
+        "inputs": [
+          {
+            "id": "c583f59e-2a5e-47c0-b244-2894b90d3d21",
+            "key": "question",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
+                    "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "ded72461-3d6a-4633-a45e-e7cc9189941b",
+            "key": "context",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
+                    "output_id": "8b8543d8-7b70-4345-9802-76fcedb7b651"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Prompt Node 9",
+          "output_id": "e9c9ddb8-4057-4755-bbbd-6ca0291aac9a",
+          "error_output_id": null,
+          "array_output_id": "3e174b5c-2e40-4bda-ba0c-eae3e617c988",
+          "source_handle_id": "ce8e3d37-4c41-4dce-aede-a343d2e1108a",
+          "target_handle_id": "785dc582-83b3-46d1-87ec-9e8a10f4b00f",
+          "variant": "INLINE",
+          "exec_config": {
+            "parameters": {
+              "stop": [],
+              "temperature": 0.0,
+              "max_tokens": 1000,
+              "top_p": 1.0,
+              "top_k": 0,
+              "frequency_penalty": 0.0,
+              "presence_penalty": 0.0,
+              "logit_bias": {},
+              "custom_parameters": null
+            },
+            "input_variables": [
+              {
+                "id": "c583f59e-2a5e-47c0-b244-2894b90d3d21",
+                "key": "question",
+                "type": "STRING"
+              },
+              {
+                "id": "ded72461-3d6a-4633-a45e-e7cc9189941b",
+                "key": "context",
+                "type": "STRING"
+              }
+            ],
+            "prompt_template_block_data": {
+              "version": 1,
+              "blocks": [
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": " Question:\n---------------\n",
+                            "id": "26e388e1-40dc-4ca5-9e8e-857ef5900746",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "input_variable_id": "c583f59e-2a5e-47c0-b244-2894b90d3d21",
+                            "id": "4b57b657-f228-4183-8cbc-9b97c8436a62",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          },
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": "\n\nPolicy Quotes:\n-----------------------\n",
+                            "id": "8e19ff1c-f214-40c9-aefd-2be64f4ecd7d",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "input_variable_id": "ded72461-3d6a-4633-a45e-e7cc9189941b",
+                            "id": "b6cc8f13-fe58-4e25-9127-584bb5c0fddb",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "1d3ac316-9863-4a9d-b2cf-59c15fe83be6",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      },
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": "You are an expert on FAA rules, guidelines, and safety. Answer the above question given the context. Provide citation of the policy you got it from at the end of the response. If you don't know the answer, say \"Sorry, I don't know\"\n\nLimit your response to 250 words. Just use plain text, no special characters, no commas, no mathematical signs like + -",
+                            "id": "06b8c4cc-6238-4a5c-a208-b48545c1c457",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "67070f33-22fd-4c34-8a2f-34ecb9499056",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "a05d763e-5f71-4cfe-80e5-035d93205781",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                }
+              ]
+            }
+          },
+          "ml_model_name": "gpt-4o-mini"
+        },
+        "display_data": {
+          "position": {
+            "x": 4528.058075069296,
+            "y": -39.95100525832629
+          },
+          "width": 480,
+          "height": 221
+        },
+        "base": {
+          "name": "InlinePromptNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "inline_prompt_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "PromptNode9",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "prompt_node_9"
+          ]
+        },
+        "outputs": [
+          {
+            "id": "91e77930-cd8e-48b2-983a-6ca7b41885a9",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "e9c9ddb8-4057-4755-bbbd-6ca0291aac9a",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "3e174b5c-2e40-4bda-ba0c-eae3e617c988",
+            "name": "results",
+            "type": "ARRAY",
+            "value": null
+          }
+        ]
+      },
+      {
+        "id": "4e377068-94d3-4215-8366-261b7541ef37",
+        "type": "PROMPT",
+        "inputs": [
+          {
+            "id": "0f0f394c-dc7d-46a1-9217-24c1e59b273a",
+            "key": "most_recent_message",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
+                    "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Prompt Node 16",
+          "output_id": "4d31e604-6711-4a12-b618-476bfc304f09",
+          "error_output_id": null,
+          "array_output_id": "4dba2219-6714-4ca7-9076-5bb01ee0b340",
+          "source_handle_id": "aa013fc4-618d-4cf4-88ce-639c56588aa3",
+          "target_handle_id": "ba029d72-7fc2-4e82-a5ad-6f364c84d72f",
+          "variant": "INLINE",
+          "exec_config": {
+            "parameters": {
+              "stop": [],
+              "temperature": 0.0,
+              "max_tokens": 1000,
+              "top_p": 1.0,
+              "frequency_penalty": 0.0,
+              "presence_penalty": 0.0,
+              "logit_bias": {},
+              "top_k": null,
+              "custom_parameters": null
+            },
+            "input_variables": [
+              {
+                "id": "0f0f394c-dc7d-46a1-9217-24c1e59b273a",
+                "key": "most_recent_message",
+                "type": "STRING"
+              }
+            ],
+            "prompt_template_block_data": {
+              "version": 1,
+              "blocks": [
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": "Respond with the IATA airport name this incoming message is about. For example, respond only with \"SJC\", \"SFO\", \"EWR\" or \"JFK\"\n\n",
+                            "id": "36844948-9556-4f06-b6bf-39bb8d7404db",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "input_variable_id": "0f0f394c-dc7d-46a1-9217-24c1e59b273a",
+                            "id": "0db27370-9a80-458e-8e2b-37eb3e30e41c",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "91b30571-176f-432e-bb96-1bfe124b1dce",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "f2058739-6e2a-4460-a64c-5565e1adbbba",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                }
+              ]
+            }
+          },
+          "ml_model_name": "gpt-4o"
+        },
+        "display_data": {
+          "position": {
+            "x": 2694.0,
+            "y": 1100.0
+          },
+          "width": 480,
+          "height": 168
+        },
+        "base": {
+          "name": "InlinePromptNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "inline_prompt_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "PromptNode16",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "prompt_node_16"
+          ]
+        },
+        "outputs": [
+          {
+            "id": "7ef91456-d48e-4c5e-8ba6-a608f36584c5",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "4d31e604-6711-4a12-b618-476bfc304f09",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "4dba2219-6714-4ca7-9076-5bb01ee0b340",
+            "name": "results",
+            "type": "ARRAY",
+            "value": null
+          }
+        ]
+      },
+      {
+        "id": "ed96d879-cb62-40c8-9f8c-b14016740a2f",
+        "type": "TEMPLATING",
+        "inputs": [
+          {
+            "id": "9fa804b1-1b86-4cc9-af3c-1c1a6718dc02",
+            "key": "template",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "https://aviation-edge.com/v2/public/flights?key={{ API_KEY }}&arrIATA={{ arrival_airport }}&airlineIATA={{ airline_name }}"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "8b10a7d8-9d35-4808-ad93-4e1774ca80dc",
+            "key": "API_KEY",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "ab2f59-1004d1"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "4540ee13-ed34-4c88-86ba-6bc4f908a49b",
+            "key": "airline_name",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "WN"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "b2aef5a8-526a-4b48-8f35-6984077c48df",
+            "key": "arrival_airport",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "4e377068-94d3-4215-8366-261b7541ef37",
+                    "output_id": "4d31e604-6711-4a12-b618-476bfc304f09"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Templating Node 15",
+          "output_id": "845ae624-f957-404e-a9e5-5a8ece09a1c9",
+          "error_output_id": null,
+          "source_handle_id": "8eaafb2e-a666-4dc9-96c3-52839df75632",
+          "target_handle_id": "ed213a6c-2573-431c-8736-b8f062869db7",
+          "template_node_input_id": "9fa804b1-1b86-4cc9-af3c-1c1a6718dc02",
+          "output_type": "STRING"
+        },
+        "display_data": {
+          "position": {
+            "x": 3304.0,
+            "y": 1043.0
+          },
+          "width": 461,
+          "height": 327
+        },
+        "base": {
+          "name": "TemplatingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "templating_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "TemplatingNode15",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "templating_node_15"
+          ]
+        }
+      },
+      {
+        "id": "81246ab6-153a-4c87-9f28-b6c28c915cf1",
+        "type": "API",
+        "inputs": [
+          {
+            "id": "20932275-1a55-455f-b481-5895f9e28123",
+            "key": "url",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "ed96d879-cb62-40c8-9f8c-b14016740a2f",
+                    "output_id": "845ae624-f957-404e-a9e5-5a8ece09a1c9"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "96d6ea69-24b7-4e5a-94ed-4c4eb3fcfe69",
+            "key": "method",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "GET"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "379f9c64-cad2-4b7d-ba30-32599ec1fe64",
+            "key": "body",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "JSON",
+                    "value": null
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "e29070d6-bd22-46c8-ae18-b6f056ca15ad",
+            "key": "authorization_type",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "API_KEY"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "a596f1fc-01a8-467e-9007-19073a98660d",
+            "key": "bearer_token_value",
+            "value": {
+              "rules": [
+                {
+                  "type": "WORKSPACE_SECRET",
+                  "data": {
+                    "type": "STRING",
+                    "workspace_secret_id": null
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "bcf3aac0-536e-42d5-b666-22cfe40eae98",
+            "key": "api_key_header_key",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "ab2f59-1004d1"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "bc73ee61-ca29-48fe-b3f2-fea5d8f638f6",
+            "key": "api_key_header_value",
+            "value": {
+              "rules": [
+                {
+                  "type": "WORKSPACE_SECRET",
+                  "data": {
+                    "type": "STRING",
+                    "workspace_secret_id": "cecd16a2-4de5-444d-acff-37a5c400600c"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "API Node",
+          "error_output_id": null,
+          "source_handle_id": "5fd01b0b-f0fb-488b-a9c7-4ba1dd7df80e",
+          "target_handle_id": "8f6f1b95-dd80-46dd-b1f6-167196baf697",
+          "url_input_id": "20932275-1a55-455f-b481-5895f9e28123",
+          "method_input_id": "96d6ea69-24b7-4e5a-94ed-4c4eb3fcfe69",
+          "body_input_id": "379f9c64-cad2-4b7d-ba30-32599ec1fe64",
+          "authorization_type_input_id": "e29070d6-bd22-46c8-ae18-b6f056ca15ad",
+          "bearer_token_value_input_id": "a596f1fc-01a8-467e-9007-19073a98660d",
+          "api_key_header_key_input_id": "bcf3aac0-536e-42d5-b666-22cfe40eae98",
+          "api_key_header_value_input_id": "bc73ee61-ca29-48fe-b3f2-fea5d8f638f6",
+          "additional_headers": [],
+          "text_output_id": "0c945315-0607-4ef6-8051-f4b6498e9526",
+          "json_output_id": "c3c38fac-f413-4dad-863d-3d388231ba22",
+          "status_code_output_id": "4d3e2c1d-ac9f-43a4-81fc-b652239986a0"
+        },
+        "display_data": {
+          "position": {
+            "x": 3916.027261439447,
+            "y": 917.3816601522587
+          },
+          "width": 455,
+          "height": 230
+        },
+        "base": {
+          "name": "APINode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "api_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "APINode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "api_node"
+          ]
+        }
+      },
+      {
+        "id": "9722b9da-0164-40fb-9270-a0fc9b87b1f9",
+        "type": "PROMPT",
+        "inputs": [
+          {
+            "id": "fbd03331-bbef-45f3-98fd-2106fd3cdb8a",
+            "key": "text",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "81246ab6-153a-4c87-9f28-b6c28c915cf1",
+                    "output_id": "c3c38fac-f413-4dad-863d-3d388231ba22"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Prompt Node 18",
+          "output_id": "df6d8990-e05b-45e1-9294-ccf58252757b",
+          "error_output_id": null,
+          "array_output_id": "7bba9fdb-bb9e-457d-9755-a8f7ae0af959",
+          "source_handle_id": "e80fd429-37ff-4054-9bd3-bd56568716e5",
+          "target_handle_id": "371cc948-bf59-4eba-9356-b21649f76b5e",
+          "variant": "INLINE",
+          "exec_config": {
+            "parameters": {
+              "stop": [],
+              "temperature": 0.0,
+              "max_tokens": 1000,
+              "top_p": 1.0,
+              "top_k": null,
+              "frequency_penalty": null,
+              "presence_penalty": null,
+              "logit_bias": null,
+              "custom_parameters": null
+            },
+            "input_variables": [
+              {
+                "id": "fbd03331-bbef-45f3-98fd-2106fd3cdb8a",
+                "key": "text",
+                "type": "JSON"
+              }
+            ],
+            "prompt_template_block_data": {
+              "version": 1,
+              "blocks": [
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": "Based on the below JSON response from an airline flight status tracker API, which flights are on the ground? And which airports are they going from and to? Where are they right now?\n\n",
+                            "id": "7bc70b1f-38ef-4d4d-9c7f-232b6ce0deb2",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "input_variable_id": "fbd03331-bbef-45f3-98fd-2106fd3cdb8a",
+                            "id": "e0eab5c1-c305-4c75-b8eb-c09d8be2a992",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "e36c6875-f7f3-4605-8c57-6f41a642876e",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "535d1cea-8a68-42d8-8b56-1750a456002d",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                },
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": " Respond in the following format\n\nThe flights that are on the ground are:\n\n1. **Flight Number:** WN597\n   - **Departure Airport:** LAS (Las Vegas McCarran International Airport)\n   - **Arrival Airport:** SJC (San Jose International Airport)\n   - **Current Location:** Latitude 37.3664, Longitude -121.929 (San Jose International Airport)\n",
+                            "id": "ef6d2198-c077-4bc1-8734-f16bd8ea0872",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "eb151e13-68a5-4bbb-9f14-edf10587090a",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "e7c45e9a-5260-47a0-b557-f24a37949409",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                },
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": " Just use plain text and no special characters",
+                            "id": "7f913312-0f1d-461d-8060-443e9fc6264d",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "46e6658f-91d4-4750-994b-af0d44038e70",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "5acb332a-67f5-4491-9a35-5212b29951b5",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                }
+              ]
+            }
+          },
+          "ml_model_name": "claude-3-5-sonnet-20241022"
+        },
+        "display_data": {
+          "position": {
+            "x": 4524.0,
+            "y": 946.5
+          },
+          "width": 480,
+          "height": 168
+        },
+        "base": {
+          "name": "InlinePromptNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "inline_prompt_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "PromptNode18",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "prompt_node_18"
+          ]
+        },
+        "outputs": [
+          {
+            "id": "23d497ef-7195-491d-8fc4-66858ee1cd37",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "df6d8990-e05b-45e1-9294-ccf58252757b",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "7bba9fdb-bb9e-457d-9755-a8f7ae0af959",
+            "name": "results",
+            "type": "ARRAY",
+            "value": null
+          }
+        ]
+      },
+      {
+        "id": "235b2e34-c6a3-48aa-b2cc-090571b41ea8",
+        "type": "PROMPT",
+        "inputs": [],
+        "data": {
+          "label": "Prompt Node 19",
+          "output_id": "7b1ca9d1-d829-4329-b9f3-a864c3ce4230",
+          "error_output_id": null,
+          "array_output_id": "17c0ef53-62bf-459f-8df8-2ff3f6b8852a",
+          "source_handle_id": "7b6c38d1-907d-4074-935e-b84a2a02786b",
+          "target_handle_id": "35b77bfb-91d3-4e5b-8032-9786b9cc05c3",
+          "variant": "INLINE",
+          "exec_config": {
+            "parameters": {
+              "stop": [],
+              "temperature": 0.0,
+              "max_tokens": 1000,
+              "top_p": 1.0,
+              "frequency_penalty": 0.0,
+              "presence_penalty": 0.0,
+              "logit_bias": {},
+              "top_k": null,
+              "custom_parameters": null
+            },
+            "input_variables": [],
+            "prompt_template_block_data": {
+              "version": 1,
+              "blocks": [
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": "Respond with \"Sorry I don't know\"",
+                            "id": "e98b4a0e-f811-454b-9d6d-20a1ed094672",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "3d9356b8-e70a-41b1-b8f0-c2a0b554752a",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "e1d51fae-7913-430a-82bd-fec6db0aa834",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                }
+              ]
+            }
+          },
+          "ml_model_name": "gpt-4o-2024-05-13"
+        },
+        "display_data": {
+          "position": {
+            "x": 3165.684879595973,
+            "y": 768.6879108547903
+          },
+          "width": 480,
+          "height": 170
+        },
+        "base": {
+          "name": "InlinePromptNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "inline_prompt_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "PromptNode19",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "prompt_node_19"
+          ]
+        },
+        "outputs": [
+          {
+            "id": "57c13b8c-e07f-4608-afa1-9fe14e6a6359",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "7b1ca9d1-d829-4329-b9f3-a864c3ce4230",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "17c0ef53-62bf-459f-8df8-2ff3f6b8852a",
+            "name": "results",
+            "type": "ARRAY",
+            "value": null
+          }
+        ]
+      },
+      {
+        "id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
+        "type": "SUBWORKFLOW",
+        "inputs": [
+          {
+            "id": "76519b3c-285d-425d-ba7a-ce7300e4ed9c",
+            "key": "chat_history",
+            "value": {
+              "rules": [
+                {
+                  "type": "INPUT_VARIABLE",
+                  "data": {
+                    "input_variable_id": "d4663e15-8871-42d8-8ef7-59baff2cd436"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Subworkflow Node",
+          "error_output_id": null,
+          "source_handle_id": "de5b0a72-e46f-4534-89a9-b78725694dd2",
+          "target_handle_id": "d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2",
+          "variant": "DEPLOYMENT",
+          "workflow_deployment_id": "e68d6033-f3e6-4681-a7b9-6bfd2828a237",
+          "release_tag": "LATEST"
+        },
+        "display_data": {
+          "position": {
+            "x": 3914.0,
+            "y": 631.0
+          },
+          "width": null,
+          "height": null
+        },
+        "base": {
+          "name": "SubworkflowDeploymentNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "subworkflow_deployment_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "SubworkflowNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "subworkflow_node"
+          ]
+        }
+      },
+      {
+        "id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
+        "type": "PROMPT",
+        "inputs": [
+          {
+            "id": "b6524b5f-7697-4923-8b87-f85baadb505a",
+            "key": "chat_history",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
+                    "output_id": "53970e88-0bf6-4364-86b3-840d78a2afe5"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Prompt Node 14",
+          "output_id": "8e2d57c3-85a3-4acb-b4d3-998c6906e389",
+          "error_output_id": null,
+          "array_output_id": "43cd2bcf-4c99-4f7a-ace7-e27d986dd041",
+          "source_handle_id": "23556dd8-b9f8-4cf7-9c24-291f9d0a223a",
+          "target_handle_id": "3485b3fb-e4ee-47c9-b567-c5eab60c01f9",
+          "variant": "INLINE",
+          "exec_config": {
+            "parameters": {
+              "stop": [],
+              "temperature": 0.0,
+              "max_tokens": 1000,
+              "top_p": 1.0,
+              "top_k": 0,
+              "frequency_penalty": 0.0,
+              "presence_penalty": 0.0,
+              "logit_bias": {},
+              "custom_parameters": null
+            },
+            "input_variables": [
+              {
+                "id": "b6524b5f-7697-4923-8b87-f85baadb505a",
+                "key": "chat_history",
+                "type": "STRING"
+              }
+            ],
+            "prompt_template_block_data": {
+              "version": 1,
+              "blocks": [
+                {
+                  "block_type": "CHAT_MESSAGE",
+                  "properties": {
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": false,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "text": "Summarize the weather. Just use plain text, no special characters, no commas, no mathematical signs like + -",
+                            "id": "27ce0776-2b58-4141-b5eb-66f3a4c19a74",
+                            "cache_config": null,
+                            "state": "ENABLED"
+                          }
+                        ],
+                        "id": "db8c6a68-3a1d-4255-9647-fd010e7933f3",
+                        "cache_config": null,
+                        "state": "ENABLED"
+                      }
+                    ]
+                  },
+                  "id": "d522f940-9f5e-4395-bd6b-17548aaf51cc",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                },
+                {
+                  "block_type": "VARIABLE",
+                  "input_variable_id": "b6524b5f-7697-4923-8b87-f85baadb505a",
+                  "id": "f16f28da-3f94-4c49-94f8-b1265c62c3b7",
+                  "cache_config": null,
+                  "state": "ENABLED"
+                }
+              ]
+            }
+          },
+          "ml_model_name": "gpt-4o-mini"
+        },
+        "display_data": {
+          "position": {
+            "x": 4524.0,
+            "y": 631.0
+          },
+          "width": 480,
+          "height": 168
+        },
+        "base": {
+          "name": "InlinePromptNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "inline_prompt_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "PromptNode14",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "prompt_node_14"
+          ]
+        },
+        "outputs": [
+          {
+            "id": "3c742327-c345-4b45-b829-778fd84de9c4",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "8e2d57c3-85a3-4acb-b4d3-998c6906e389",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "43cd2bcf-4c99-4f7a-ace7-e27d986dd041",
+            "name": "results",
+            "type": "ARRAY",
+            "value": null
+          }
+        ]
       },
       {
         "id": "f9c5254c-b86d-420d-811a-a1674df273cd",
@@ -1497,184 +2005,40 @@
             "x": 5134.0,
             "y": 443.0
           },
-          "comment": null,
-          "width": 480.0,
-          "height": 271.0
+          "width": 480,
+          "height": 271
         },
-        "definition": null
-      },
-      {
-        "id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
-        "type": "TEMPLATING",
-        "data": {
-          "label": "Most Recent Message",
-          "output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd",
-          "error_output_id": null,
-          "source_handle_id": "ab8e97b4-4ee4-42bc-8f43-e2c9c457ad21",
-          "target_handle_id": "157d01bd-441e-49fa-abce-7b991c9291da",
-          "template_node_input_id": "b6f8e86f-93ba-4200-9097-421723348d3d",
-          "output_type": "STRING"
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
         },
-        "inputs": [
-          {
-            "id": "fec02d64-f82c-4970-bd57-31c84aaf7214",
-            "key": "chat_history",
-            "value": {
-              "rules": [
-                {
-                  "type": "INPUT_VARIABLE",
-                  "data": {
-                    "input_variable_id": "d4663e15-8871-42d8-8ef7-59baff2cd436"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "b6f8e86f-93ba-4200-9097-421723348d3d",
-            "key": "template",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "{{ chat_history[-1][\"text\"] }}"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 254.0,
-            "y": 237.3190436953056
-          },
-          "comment": null,
-          "width": 480.0,
-          "height": 221.0
-        },
-        "definition": null
-      },
-      {
-        "id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
-        "type": "TEMPLATING",
-        "data": {
-          "label": "Formatted Search Results",
-          "output_id": "8b8543d8-7b70-4345-9802-76fcedb7b651",
-          "error_output_id": null,
-          "source_handle_id": "886d79d2-2a97-4c15-8172-e9a157c9090d",
-          "target_handle_id": "815664ad-b42f-40ea-9607-b23643a224a8",
-          "template_node_input_id": "757a3546-7757-45c9-b0e8-2cc813254285",
-          "output_type": "STRING"
-        },
-        "inputs": [
-          {
-            "id": "7bce9418-f01e-4873-bd4c-d1d5b4340afb",
-            "key": "results",
-            "value": {
-              "rules": [
-                {
-                  "type": "NODE_OUTPUT",
-                  "data": {
-                    "node_id": "fbe1571c-e904-40f6-a414-55adf3b72817",
-                    "output_id": "564d7f2a-aa8c-4e9a-b93f-24d8f6418aaf"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          },
-          {
-            "id": "757a3546-7757-45c9-b0e8-2cc813254285",
-            "key": "template",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "{% for result in results -%}\nPolicy {{ result.document.label }}:\n------\n{{ result.text }}\n{% if not loop.last %}\n\n#####\n\n{% endif %}\n{% endfor %}"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 3923.3878883718644,
-            "y": -458.89620665696896
-          },
-          "comment": null,
-          "width": 454.0,
-          "height": 221.0
-        },
-        "definition": null
-      },
-      {
-        "id": "81ec43d2-49ec-47ce-b953-faaec3a22c63",
-        "type": "ENTRYPOINT",
-        "data": {
-          "label": "Entrypoint Node",
-          "source_handle_id": "6888c8eb-9dba-42b4-94d4-52900edcfeea"
-        },
-        "inputs": [],
-        "display_data": {
-          "position": {
-            "x": 0.0,
-            "y": 388.75
-          },
-          "comment": null,
-          "width": 124.0,
-          "height": 48.0
-        },
-        "definition": null
+        "definition": {
+          "name": "FinalOutput2",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "faa_q_and_a_bot",
+            "code",
+            "nodes",
+            "final_output_2"
+          ]
+        }
       }
     ],
     "edges": [
-      {
-        "id": "db414336-06f3-41c5-b807-3fb6b9745538",
-        "source_node_id": "27db7bd1-0409-4457-8965-e5bf53e621be",
-        "source_handle_id": "f209d3ce-c64b-4512-bba5-ea6bb505bcbe",
-        "target_node_id": "f36e7059-9197-4639-991d-685f27ce221f",
-        "target_handle_id": "cd12a3a1-c2b3-4933-8045-84aa61709829",
-        "type": "DEFAULT"
-      },
       {
         "id": "2ea073be-8a97-431d-8878-27309f0ac8c0",
         "source_node_id": "81ec43d2-49ec-47ce-b953-faaec3a22c63",
         "source_handle_id": "6888c8eb-9dba-42b4-94d4-52900edcfeea",
         "target_node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
         "target_handle_id": "157d01bd-441e-49fa-abce-7b991c9291da",
-        "type": "DEFAULT"
-      },
-      {
-        "id": "9713f09b-7515-459c-9681-2e72cc59cc81",
-        "source_node_id": "fbe1571c-e904-40f6-a414-55adf3b72817",
-        "source_handle_id": "0b203edd-ed4c-4593-9e17-deaeb2780e14",
-        "target_node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
-        "target_handle_id": "815664ad-b42f-40ea-9607-b23643a224a8",
-        "type": "DEFAULT"
-      },
-      {
-        "id": "bde304f6-a485-4e87-836a-6dcb897ed38a",
-        "source_node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
-        "source_handle_id": "886d79d2-2a97-4c15-8172-e9a157c9090d",
-        "target_node_id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
-        "target_handle_id": "785dc582-83b3-46d1-87ec-9e8a10f4b00f",
-        "type": "DEFAULT"
-      },
-      {
-        "id": "9e19ee9e-24a6-47e7-8b10-44781a53018f",
-        "source_node_id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
-        "source_handle_id": "ce8e3d37-4c41-4dce-aede-a343d2e1108a",
-        "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
-        "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
         "type": "DEFAULT"
       },
       {
@@ -1702,27 +2066,27 @@
         "type": "DEFAULT"
       },
       {
-        "id": "7e517fcd-b174-435f-b429-39a5230571b8",
+        "id": "2091a647-7342-4657-a713-55b34148862d",
         "source_node_id": "903aa4b9-70b6-4d32-a12e-488926403836",
-        "source_handle_id": "d4f0db7d-b04a-4c4d-b9d3-aa3eb61fa3a2",
-        "target_node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
-        "target_handle_id": "d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2",
+        "source_handle_id": "a913cb88-261b-4fa8-9915-d215e19749ee",
+        "target_node_id": "fbe1571c-e904-40f6-a414-55adf3b72817",
+        "target_handle_id": "32346adc-40f3-49b5-aea8-5c64b88643ef",
         "type": "DEFAULT"
       },
       {
-        "id": "84229185-fb0e-4f7f-bd11-1de423396872",
-        "source_node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
-        "source_handle_id": "de5b0a72-e46f-4534-89a9-b78725694dd2",
-        "target_node_id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
-        "target_handle_id": "3485b3fb-e4ee-47c9-b567-c5eab60c01f9",
+        "id": "9713f09b-7515-459c-9681-2e72cc59cc81",
+        "source_node_id": "fbe1571c-e904-40f6-a414-55adf3b72817",
+        "source_handle_id": "0b203edd-ed4c-4593-9e17-deaeb2780e14",
+        "target_node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
+        "target_handle_id": "815664ad-b42f-40ea-9607-b23643a224a8",
         "type": "DEFAULT"
       },
       {
-        "id": "417f05e4-f73a-4d93-98ab-ada609062d38",
-        "source_node_id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
-        "source_handle_id": "23556dd8-b9f8-4cf7-9c24-291f9d0a223a",
-        "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
-        "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
+        "id": "bde304f6-a485-4e87-836a-6dcb897ed38a",
+        "source_node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
+        "source_handle_id": "886d79d2-2a97-4c15-8172-e9a157c9090d",
+        "target_node_id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
+        "target_handle_id": "785dc582-83b3-46d1-87ec-9e8a10f4b00f",
         "type": "DEFAULT"
       },
       {
@@ -1758,22 +2122,6 @@
         "type": "DEFAULT"
       },
       {
-        "id": "87051c37-8d28-4849-9c09-e6d243b744b6",
-        "source_node_id": "9722b9da-0164-40fb-9270-a0fc9b87b1f9",
-        "source_handle_id": "e80fd429-37ff-4054-9bd3-bd56568716e5",
-        "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
-        "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
-        "type": "DEFAULT"
-      },
-      {
-        "id": "2091a647-7342-4657-a713-55b34148862d",
-        "source_node_id": "903aa4b9-70b6-4d32-a12e-488926403836",
-        "source_handle_id": "a913cb88-261b-4fa8-9915-d215e19749ee",
-        "target_node_id": "fbe1571c-e904-40f6-a414-55adf3b72817",
-        "target_handle_id": "32346adc-40f3-49b5-aea8-5c64b88643ef",
-        "type": "DEFAULT"
-      },
-      {
         "id": "a5d7013a-4ecb-4f35-8230-ef8fbfecda27",
         "source_node_id": "903aa4b9-70b6-4d32-a12e-488926403836",
         "source_handle_id": "fec240f8-8baf-40f9-87e7-f268bff4ed94",
@@ -1782,9 +2130,49 @@
         "type": "DEFAULT"
       },
       {
+        "id": "7e517fcd-b174-435f-b429-39a5230571b8",
+        "source_node_id": "903aa4b9-70b6-4d32-a12e-488926403836",
+        "source_handle_id": "d4f0db7d-b04a-4c4d-b9d3-aa3eb61fa3a2",
+        "target_node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
+        "target_handle_id": "d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "84229185-fb0e-4f7f-bd11-1de423396872",
+        "source_node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
+        "source_handle_id": "de5b0a72-e46f-4534-89a9-b78725694dd2",
+        "target_node_id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
+        "target_handle_id": "3485b3fb-e4ee-47c9-b567-c5eab60c01f9",
+        "type": "DEFAULT"
+      },
+      {
         "id": "f88c3cad-c845-41af-abe6-118e0606ac16",
         "source_node_id": "235b2e34-c6a3-48aa-b2cc-090571b41ea8",
         "source_handle_id": "7b6c38d1-907d-4074-935e-b84a2a02786b",
+        "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
+        "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "87051c37-8d28-4849-9c09-e6d243b744b6",
+        "source_node_id": "9722b9da-0164-40fb-9270-a0fc9b87b1f9",
+        "source_handle_id": "e80fd429-37ff-4054-9bd3-bd56568716e5",
+        "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
+        "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "9e19ee9e-24a6-47e7-8b10-44781a53018f",
+        "source_node_id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
+        "source_handle_id": "ce8e3d37-4c41-4dce-aede-a343d2e1108a",
+        "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
+        "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "417f05e4-f73a-4d93-98ab-ada609062d38",
+        "source_node_id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
+        "source_handle_id": "23556dd8-b9f8-4cf7-9c24-291f9d0a223a",
         "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
         "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
         "type": "DEFAULT"
@@ -1797,19 +2185,30 @@
         "zoom": 0.9343894537129058
       }
     },
-    "definition": null
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "faa_q_and_a_bot",
+        "code",
+        "workflow"
+      ]
+    }
   },
-  "runner_config": null,
   "input_variables": [
     {
       "id": "d4663e15-8871-42d8-8ef7-59baff2cd436",
       "key": "chat_history",
       "type": "CHAT_HISTORY",
-      "required": null,
       "default": null,
-      "extensions": null
+      "required": false,
+      "extensions": {
+        "color": null
+      }
     }
   ],
+  "state_variables": [],
   "output_variables": [
     {
       "id": "8c6e5464-8916-4039-b911-cf707855d372",

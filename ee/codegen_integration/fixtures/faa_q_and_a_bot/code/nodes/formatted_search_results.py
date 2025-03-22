@@ -5,5 +5,18 @@ from .faa_document_store import FAADocumentStore
 
 
 class FormattedSearchResults(TemplatingNode[BaseState, str]):
-    template = "{% for result in results -%}\nPolicy {{ result.document.label }}:\n------\n{{ result.text }}\n{% if not loop.last %}\n\n#####\n\n{% endif %}\n{% endfor %}"
-    inputs = {"results": FAADocumentStore.Outputs.results}
+    template = """\
+{% for result in results -%}
+Policy {{ result.document.label }}:
+------
+{{ result.text }}
+{% if not loop.last %}
+
+#####
+
+{% endif %}
+{% endfor %}\
+"""
+    inputs = {
+        "results": FAADocumentStore.Outputs.results,
+    }

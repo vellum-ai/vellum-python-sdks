@@ -34,7 +34,6 @@ _fixture_paths = _get_fixtures(
     # TODO: Remove exclusions on all of these fixtures
     # https://app.shortcut.com/vellum/story/4649/remove-fixture-exclusions-for-serialization
     exclude_fixtures={
-        "faa_q_and_a_bot",
         "simple_search_node",
         # TODO: Remove once serialization support is in
         "simple_workflow_node_with_output_values",

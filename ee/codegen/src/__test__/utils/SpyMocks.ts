@@ -38,7 +38,13 @@ export class SpyMocks {
         label: "mocked-workflow-deployment-history-item-label",
         name: "mocked-workflow-deployment-history-item-name",
         inputVariables: [],
-        outputVariables: [],
+        outputVariables: [
+          {
+            id: "53970e88-0bf6-4364-86b3-840d78a2afe5",
+            key: "chat_history",
+            type: "STRING",
+          },
+        ],
       });
   }
 }
