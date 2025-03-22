@@ -265,7 +265,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
         workflow_display.serialize()
 
     # THEN we should raise a user facing error
-    assert str(exc_info) == "Failed to serialize attribute 'attr': Nested references are not supported."
+    assert str(exc_info.value) == "Failed to serialize attribute 'attr': Nested references are not supported."
 
 
 def test_serialize_node__node_output(serialize_node):

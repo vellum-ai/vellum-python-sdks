@@ -129,13 +129,16 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 continue
 
             id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
-            attributes.append(
-                {
-                    "id": id,
-                    "name": attribute.name,
-                    "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
-                }
-            )
+            try:
+                attributes.append(
+                    {
+                        "id": id,
+                        "name": attribute.name,
+                        "value": self.serialize_value(display_context, attribute.instance),
+                    }
+                )
+            except ValueError as e:
+                raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
         adornments = kwargs.get("adornments", None)
         wrapped_node = get_wrapped_node(node)
@@ -369,7 +372,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 "rhs": rhs,
             }
 
-    def serialize_value(self, display_context: "WorkflowDisplayContext", value: BaseDescriptor) -> JsonObject:
+    def serialize_value(self, display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
         if isinstance(value, ConstantValueReference):
             return self.serialize_value(display_context, value._value)
 
@@ -414,6 +417,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 "type": "EXECUTION_COUNTER",
                 "node_id": str(node_class_display.node_id),
             }
+
+        if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
+            raise ValueError("Nested references are not supported.")
 
         if not isinstance(value, BaseDescriptor):
             vellum_value = primitive_to_vellum_value(value)
