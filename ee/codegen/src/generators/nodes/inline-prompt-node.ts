@@ -140,15 +140,6 @@ export class InlinePromptNode extends BaseSingleFileNode<
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
         ),
-      }),
-      python.field({
-        name: "prompt_input_ids_by_name",
-        initializer: python.TypeInstantiation.dict(
-          this.nodeData.inputs.map((input) => ({
-            key: python.TypeInstantiation.str(input.key),
-            value: python.TypeInstantiation.uuid(input.id),
-          }))
-        ),
       })
     );
 

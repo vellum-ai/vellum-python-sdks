@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Generic, Optional, TypeVar, cast
+from typing import Generic, Optional, TypeVar, cast
 
 from vellum.workflows.nodes.displayable.prompt_deployment_node import PromptDeploymentNode
 from vellum.workflows.references import OutputReference
@@ -16,10 +16,6 @@ _PromptDeploymentNodeType = TypeVar("_PromptDeploymentNodeType", bound=PromptDep
 class BasePromptDeploymentNodeDisplay(
     BaseNodeVellumDisplay[_PromptDeploymentNodeType], Generic[_PromptDeploymentNodeType]
 ):
-    output_id: ClassVar[Optional[UUID]] = None
-    array_output_id: ClassVar[Optional[UUID]] = None
-    prompt_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
-
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
@@ -34,7 +30,7 @@ class BasePromptDeploymentNodeDisplay(
                     input_name=variable_name,
                     value=variable_value,
                     display_context=display_context,
-                    input_id=self.prompt_input_ids_by_name.get(variable_name),
+                    input_id=self.node_input_ids_by_name.get(variable_name),
                 )
                 for variable_name, variable_value in prompt_inputs.items()
             ]
