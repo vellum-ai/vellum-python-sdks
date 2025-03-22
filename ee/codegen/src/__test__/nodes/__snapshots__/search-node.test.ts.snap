@@ -1,5 +1,43 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`TextSearchNode > 404 error handling > getNodeFile handles 404 error 1`] = `
+"from vellum import SearchResultMergingRequest, SearchWeightsRequest
+from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
+from vellum.workflows.nodes.displayable.bases.types import (
+    MetadataLogicalCondition,
+    MetadataLogicalConditionGroup,
+    SearchFilters,
+)
+
+
+class SearchNode(BaseSearchNode):
+    query = None
+    document_index = "d5beca61-aacb-4b22-a70c-776a1e025aa4"
+    limit = 8
+    weights = SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2)
+    result_merging = SearchResultMergingRequest(enabled=True)
+    filters = SearchFilters(
+        external_ids=None,
+        metadata=MetadataLogicalConditionGroup(
+            combinator="AND",
+            negated=False,
+            conditions=[
+                MetadataLogicalConditionGroup(
+                    combinator="AND",
+                    negated=False,
+                    conditions=[
+                        MetadataLogicalCondition(
+                            lhs_variable=None, operator="=", rhs_variable=None
+                        )
+                    ],
+                )
+            ],
+        ),
+    )
+    chunk_separator = "\\n\\n#####\\n\\n"
+"
+`;
+
 exports[`TextSearchNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
