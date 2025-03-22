@@ -7,12 +7,12 @@ from vellum.workflows.types.generics import NodeType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 
 if TYPE_CHECKING:
-    from vellum_ee.workflows.display.types import NodeDisplayType
+    from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 
 
 def get_node_display_class(
-    base_class: Type["NodeDisplayType"], node_class: Type[NodeType], root_node_class: Optional[Type[NodeType]] = None
-) -> Type["NodeDisplayType"]:
+    base_class: Type["BaseNodeDisplay"], node_class: Type[NodeType], root_node_class: Optional[Type[NodeType]] = None
+) -> Type["BaseNodeDisplay"]:
     node_display_class = base_class.get_from_node_display_registry(node_class)
     if node_display_class:
         if not issubclass(node_display_class, base_class):

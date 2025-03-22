@@ -3,12 +3,10 @@ from uuid import UUID
 from typing import Dict, List, Optional, Type, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.edges import Edge
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
-from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port
-from vellum.workflows.ports import Port
+from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.references import WorkflowInputReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -16,12 +14,10 @@ from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import (
     EdgeVellumDisplay,
-    EdgeVellumDisplayOverrides,
     EntrypointVellumDisplay,
     EntrypointVellumDisplayOverrides,
     NodeDisplayData,
@@ -46,11 +42,8 @@ class VellumWorkflowDisplay(
         WorkflowInputsVellumDisplayOverrides,
         StateValueVellumDisplay,
         StateValueVellumDisplayOverrides,
-        BaseNodeDisplay,
         EntrypointVellumDisplay,
         EntrypointVellumDisplayOverrides,
-        EdgeVellumDisplay,
-        EdgeVellumDisplayOverrides,
     ]
 ):
     node_display_base_class = BaseNodeDisplay
@@ -367,51 +360,3 @@ class VellumWorkflowDisplay(
         )
 
         return EntrypointVellumDisplay(id=entrypoint_id, edge_display=edge_display)
-
-    def _generate_edge_display(
-        self,
-        edge: Edge,
-        node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
-        port_displays: Dict[Port, PortDisplay],
-        overrides: Optional[EdgeVellumDisplayOverrides] = None,
-    ) -> EdgeVellumDisplay:
-        source_node = get_unadorned_node(edge.from_port.node_class)
-        target_node = get_unadorned_node(edge.to_node)
-
-        source_node_id = node_displays[source_node].node_id
-        from_port = get_unadorned_port(edge.from_port)
-        source_handle_id = port_displays[from_port].id
-
-        target_node_display = node_displays[target_node]
-        target_node_id = target_node_display.node_id
-
-        if isinstance(target_node_display, BaseNodeVellumDisplay):
-            target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(source_node_id)
-        else:
-            target_handle_id = target_node_display.get_trigger_id()
-
-        return self._generate_edge_display_from_source(
-            source_node_id, source_handle_id, target_node_id, target_handle_id, overrides
-        )
-
-    def _generate_edge_display_from_source(
-        self,
-        source_node_id: UUID,
-        source_handle_id: UUID,
-        target_node_id: UUID,
-        target_handle_id: UUID,
-        overrides: Optional[EdgeVellumDisplayOverrides] = None,
-    ) -> EdgeVellumDisplay:
-        edge_id: UUID
-        if overrides:
-            edge_id = overrides.id
-        else:
-            edge_id = uuid4_from_hash(f"{self.workflow_id}|id|{source_node_id}|{target_node_id}")
-
-        return EdgeVellumDisplay(
-            id=edge_id,
-            source_node_id=source_node_id,
-            target_node_id=target_node_id,
-            source_handle_id=source_handle_id,
-            target_handle_id=target_handle_id,
-        )
