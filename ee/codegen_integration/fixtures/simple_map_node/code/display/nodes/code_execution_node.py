@@ -11,8 +11,6 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
     label = "Code Execution Node"
     node_id = UUID("cdec50ed-5cfc-418e-ad1f-45ef7a0abe4b")
     target_handle_id = UUID("3a82ede9-4b1b-42fc-84a0-10e91de602dc")
-    code_input_id = UUID("e5a9379e-871d-4a8f-88cd-b3ea832577dc")
-    runtime_input_id = UUID("611d4cd9-dca8-4821-8d3b-899439c556bb")
     output_id = UUID("98ef146c-6603-4930-85c2-8a637a58476c")
     log_output_id = UUID("ce51ac26-1e30-4434-9915-429b55ed9f06")
     node_input_ids_by_name = {
