@@ -78,7 +78,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
     filepath: ClassVar[Optional[str]] = None
     code: ClassVar[Optional[str]] = None
 
-    code_inputs: ClassVar[EntityInputsInterface]
+    code_inputs: ClassVar[EntityInputsInterface] = {}
     runtime: CodeExecutionRuntime = "PYTHON_3_11_6"
     packages: Optional[Sequence[CodeExecutionPackage]] = None
 

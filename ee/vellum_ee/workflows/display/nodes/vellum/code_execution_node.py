@@ -24,17 +24,20 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
         node = self._node
         node_id = self.node_id
         raw_code = raise_if_descriptor(node.code)
+        filepath = raise_if_descriptor(node.filepath)
 
         code_value: Optional[str]
         if raw_code:
             code_value = raw_code
-        else:
+        elif filepath:
             node_file_path = inspect.getfile(node)
             file_code = read_file_from_path(
                 node_filepath=node_file_path,
-                script_filepath=(raise_if_descriptor(node.filepath)),  # type: ignore
+                script_filepath=filepath,
             )
             code_value = file_code
+        else:
+            code_value = ""
 
         code_inputs = raise_if_descriptor(node.code_inputs)
 
@@ -44,7 +47,8 @@ class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType]
                 input_name=variable_name,
                 value=variable_value,
                 display_context=display_context,
-                input_id=self.node_input_ids_by_name.get(variable_name),
+                input_id=self.node_input_ids_by_name.get(f"{CodeExecutionNode.code_inputs.name}.{variable_name}")
+                or self.node_input_ids_by_name.get(variable_name),
             )
             for variable_name, variable_value in code_inputs.items()
         ]
