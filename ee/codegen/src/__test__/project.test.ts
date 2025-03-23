@@ -105,6 +105,7 @@ describe("WorkflowProjectGenerator", () => {
           "simple_merge_node",
           "simple_api_node",
           "simple_node_with_try_wrap",
+          "simple_subworkflow_deployment_node",
           "simple_workflow_node_with_output_values",
           "faa_q_and_a_bot",
         ],

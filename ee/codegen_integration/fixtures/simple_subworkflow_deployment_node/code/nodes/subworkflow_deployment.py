@@ -4,11 +4,11 @@ from ..inputs import Inputs
 
 
 class SubworkflowDeployment(SubworkflowDeploymentNode):
-    deployment = "deployment-test"
+    deployment = "mocked-workflow-deployment-history-item-name"
     release_tag = "LATEST"
     subworkflow_inputs = {
         "test": Inputs.test,
     }
 
     class Outputs(SubworkflowDeploymentNode.Outputs):
-        final_output: str
+        chat_history: str

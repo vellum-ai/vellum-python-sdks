@@ -13,8 +13,8 @@ class SubworkflowDeploymentDisplay(BaseSubworkflowDeploymentNodeDisplay[Subworkf
     target_handle_id = UUID("30771282-5c0a-4a98-a3a8-4c7eeda30d23")
     node_input_ids_by_name = {"test": UUID("97b63d71-5413-417f-9cf5-49e1b4fd56e4")}
     output_display = {
-        SubworkflowDeployment.Outputs.final_output: NodeOutputDisplay(
-            id=UUID("61759cf7-da3d-45a3-9f73-68d3907207ae"), name="final-output"
+        SubworkflowDeployment.Outputs.chat_history: NodeOutputDisplay(
+            id=UUID("53970e88-0bf6-4364-86b3-840d78a2afe5"), name="chat_history"
         )
     }
     port_displays = {

@@ -1,7 +1,7 @@
 from uuid import UUID
 
+from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowOutputDisplay
 from vellum_ee.workflows.display.vellum import (
-    EdgeVellumDisplayOverrides,
     EntrypointVellumDisplayOverrides,
     NodeDisplayData,
     NodeDisplayPosition,
@@ -9,7 +9,6 @@ from vellum_ee.workflows.display.vellum import (
     WorkflowDisplayDataViewport,
     WorkflowInputsVellumDisplayOverrides,
     WorkflowMetaVellumDisplayOverrides,
-    WorkflowOutputVellumDisplayOverrides,
 )
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
@@ -36,17 +35,14 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
     entrypoint_displays = {
         SubworkflowDeployment: EntrypointVellumDisplayOverrides(
             id=UUID("39a5155a-d137-4a56-be36-d525802df463"),
-            edge_display=EdgeVellumDisplayOverrides(id=UUID("fbf75594-70e8-4e03-ae3d-a64f573df51f")),
+            edge_display=EdgeDisplay(id=UUID("fbf75594-70e8-4e03-ae3d-a64f573df51f")),
         )
     }
     edge_displays = {
-        (SubworkflowDeployment.Ports.default, FinalOutput): EdgeVellumDisplayOverrides(
-            id=UUID("85970a9b-4ce7-46a5-b539-66aaeef080df")
-        )
+        (SubworkflowDeployment.Ports.default, FinalOutput): EdgeDisplay(id=UUID("85970a9b-4ce7-46a5-b539-66aaeef080df"))
     }
     output_displays = {
-        Workflow.Outputs.final_output: WorkflowOutputVellumDisplayOverrides(
-            id=UUID("4dc6e13e-92ba-436e-aa35-87e258f2f585"),
-            name="final-output",
+        Workflow.Outputs.final_output: WorkflowOutputDisplay(
+            id=UUID("4dc6e13e-92ba-436e-aa35-87e258f2f585"), name="final-output"
         )
     }
