@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Callable, ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.nodes import InlinePromptNode
@@ -17,10 +17,6 @@ _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 
 class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
-    output_id: ClassVar[Optional[UUID]] = None
-    array_output_id: ClassVar[Optional[UUID]] = None
-    prompt_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
-
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
@@ -98,7 +94,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
                 input_name=variable_name,
                 value=variable_value,
                 display_context=display_context,
-                input_id=self.prompt_input_ids_by_name.get(variable_name),
+                input_id=self.node_input_ids_by_name.get(variable_name),
             )
             vellum_variable_type = infer_vellum_variable_type(variable_value)
             node_inputs.append(node_input)
