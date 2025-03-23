@@ -13,10 +13,6 @@ class PromptNode9Display(BaseInlinePromptNodeDisplay[PromptNode9]):
     output_id = UUID("e9c9ddb8-4057-4755-bbbd-6ca0291aac9a")
     array_output_id = UUID("3e174b5c-2e40-4bda-ba0c-eae3e617c988")
     target_handle_id = UUID("785dc582-83b3-46d1-87ec-9e8a10f4b00f")
-    prompt_input_ids_by_name = {
-        "question": UUID("c583f59e-2a5e-47c0-b244-2894b90d3d21"),
-        "context": UUID("ded72461-3d6a-4633-a45e-e7cc9189941b"),
-    }
     node_input_ids_by_name = {
         "question": UUID("c583f59e-2a5e-47c0-b244-2894b90d3d21"),
         "context": UUID("ded72461-3d6a-4633-a45e-e7cc9189941b"),

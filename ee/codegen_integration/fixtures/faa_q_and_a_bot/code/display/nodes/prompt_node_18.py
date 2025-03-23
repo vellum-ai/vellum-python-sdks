@@ -13,7 +13,6 @@ class PromptNode18Display(BaseInlinePromptNodeDisplay[PromptNode18]):
     output_id = UUID("df6d8990-e05b-45e1-9294-ccf58252757b")
     array_output_id = UUID("7bba9fdb-bb9e-457d-9755-a8f7ae0af959")
     target_handle_id = UUID("371cc948-bf59-4eba-9356-b21649f76b5e")
-    prompt_input_ids_by_name = {"text": UUID("fbd03331-bbef-45f3-98fd-2106fd3cdb8a")}
     node_input_ids_by_name = {"text": UUID("fbd03331-bbef-45f3-98fd-2106fd3cdb8a")}
     output_display = {
         PromptNode18.Outputs.text: NodeOutputDisplay(id=UUID("df6d8990-e05b-45e1-9294-ccf58252757b"), name="text"),
