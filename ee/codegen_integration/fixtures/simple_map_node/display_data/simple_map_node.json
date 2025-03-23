@@ -482,7 +482,7 @@
                 },
                 "outputs": [
                   {
-                    "id": "c013440d-930d-4953-b386-1ddd7750e831",
+                    "id": "bffc4749-00b8-44db-90ee-db655cbc7e62",
                     "name": "node_input",
                     "type": "STRING",
                     "value": {
@@ -697,9 +697,9 @@
         },
         "outputs": [
           {
-            "id": "c013440d-930d-4953-b386-1ddd7750e831",
+            "id": "d9269719-a7a2-4388-9b85-73e329a78d16",
             "name": "node_input",
-            "type": "STRING",
+            "type": "JSON",
             "value": {
               "type": "NODE_OUTPUT",
               "node_id": "72cb9f1e-aedd-47af-861e-4f38d27053b6",

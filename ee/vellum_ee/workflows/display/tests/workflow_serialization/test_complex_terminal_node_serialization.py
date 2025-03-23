@@ -123,6 +123,9 @@ def test_serialize_workflow__missing_final_output_node():
                     "name": "FirstFinalOutputNode",
                     "module": ["tests", "workflows", "complex_final_output_node", "missing_final_output_node"],
                 },
+                "outputs": [
+                    {"id": "5517e50d-7f40-4f7c-acb2-e329d79a25bf", "name": "node_input", "type": "STRING", "value": {}}
+                ],
             },
             {
                 "id": "bb88768d-472e-4997-b7ea-de09163d1b4c",
@@ -156,14 +159,7 @@ def test_serialize_workflow__missing_final_output_node():
                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
                 "base": {
                     "name": "FinalOutputNode",
-                    "module": [
-                        "vellum",
-                        "workflows",
-                        "nodes",
-                        "displayable",
-                        "final_output_node",
-                        "node",
-                    ],
+                    "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
                 },
                 "definition": None,
             },

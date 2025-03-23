@@ -77,6 +77,8 @@ describe("WorkflowProjectGenerator", () => {
     const fixtureMocks = {
       simple_guard_rail_node: SpyMocks.createMetricDefinitionMock(),
       faa_q_and_a_bot: SpyMocks.createWorkflowDeploymentsMock(),
+      simple_subworkflow_deployment_node:
+        SpyMocks.createWorkflowDeploymentsMock(),
     };
     vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
       async (idOrName: string) => {

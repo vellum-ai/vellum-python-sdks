@@ -47,6 +47,14 @@ class BaseFinalOutputNodeDisplay(BaseNodeVellumDisplay[_FinalOutputNodeType], Ge
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
+            "outputs": [
+                {
+                    "id": str(self._get_output_id()),
+                    "name": "node_input",
+                    "type": inferred_type,
+                    "value": self._create_workflow_value_descriptor(),
+                }
+            ],
         }
 
     def _get_output_id(self) -> UUID:
@@ -60,3 +68,9 @@ class BaseFinalOutputNodeDisplay(BaseNodeVellumDisplay[_FinalOutputNodeType], Ge
     def _get_node_input_id(self) -> UUID:
         explicit_value = self._get_explicit_node_display_attr("node_input_id", UUID)
         return explicit_value if explicit_value else uuid4_from_hash(f"{self.node_id}|node_input_id")
+
+    def _create_workflow_value_descriptor(self) -> dict:
+        descriptor = self.node_input_display if self.node_input_display.name == "node_input" else None
+        if descriptor and descriptor.value:
+            return descriptor.value.dict()
+        return {}

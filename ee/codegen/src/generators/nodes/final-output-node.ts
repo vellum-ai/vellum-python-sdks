@@ -6,6 +6,7 @@ import { FinalOutputNodeContext } from "src/context/node-context/final-output-no
 import { BaseState } from "src/generators/base-state";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
+import { WorkflowValueDescriptorReferenceObject } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference-object";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
@@ -112,7 +113,57 @@ export class FinalOutputNode extends BaseSingleFileNode<
       })
     );
 
+    const nodeInputDisplay = this.getNodeInputDisplay();
+
+    if (nodeInputDisplay) {
+      statements.push(nodeInputDisplay);
+    }
+
     return statements;
+  }
+
+  private getNodeInputDisplay(): python.Field | undefined {
+    // We are going to only get the first value
+    const descriptor = this.nodeData.outputs?.map((output) => output.value)[0];
+
+    if (descriptor) {
+      return python.field({
+        name: "node_input_display",
+        initializer: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeInputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
+          }),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str("node_input"),
+            }),
+            python.methodArgument({
+              name: "type",
+              value: python.TypeInstantiation.str(
+                this.nodeData.data.outputType
+              ),
+            }),
+            python.methodArgument({
+              name: "value",
+              value: new WorkflowValueDescriptorReferenceObject({
+                workflowContext: this.workflowContext,
+                workflowValueDescriptor: descriptor,
+              }),
+            }),
+          ],
+        }),
+      });
+    } else {
+      return undefined;
+    }
   }
 
   protected getOutputDisplay(): python.Field {

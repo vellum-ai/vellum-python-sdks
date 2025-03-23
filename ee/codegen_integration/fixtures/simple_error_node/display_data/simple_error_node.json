@@ -76,18 +76,7 @@
             "nodes",
             "error_node"
           ]
-        },
-        "outputs": [
-          {
-            "id": "c013440d-930d-4953-b386-1ddd7750e831",
-            "name": "node_input",
-            "type": "STRING",
-            "value": {
-              "type": "WORKFLOW_INPUT",
-              "input_variable_id": "a6ef8809-346e-469c-beed-2e5c4e9844c5"
-            }
-          }
-        ]
+        }
       }
     ],
     "edges": [

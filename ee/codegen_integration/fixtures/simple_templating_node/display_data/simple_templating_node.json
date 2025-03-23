@@ -141,9 +141,9 @@
         },
         "outputs": [
           {
-            "id": "c013440d-930d-4953-b386-1ddd7750e831",
+            "id": "b0961a8d-f702-4922-b410-2aecf7d34b68",
             "name": "node_input",
-            "type": "STRING",
+            "type": "NUMBER",
             "value": {
               "type": "EXECUTION_COUNTER",
               "node_id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871"

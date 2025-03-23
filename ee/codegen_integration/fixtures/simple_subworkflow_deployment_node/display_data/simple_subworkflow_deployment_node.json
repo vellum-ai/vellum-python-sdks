@@ -137,7 +137,18 @@
             "final_output"
           ],
           "name": "FinalOutput"
-        }
+        },
+        "outputs": [
+          {
+            "id": "4dc6e13e-92ba-436e-aa35-87e258f2f585",
+            "name": "node_input",
+            "type": "STRING",
+            "value": {
+              "type": "WORKFLOW_INPUT",
+              "input_variable_id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5"
+            }
+          }
+        ]
       }
     ],
     "edges": [

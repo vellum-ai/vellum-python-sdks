@@ -4,8 +4,12 @@ exports[`FinalOutputNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes.types import NodeInputDisplay, NodeOutputDisplay
+from vellum_ee.workflows.display.vellum import (
+    NodeDisplayData,
+    NodeDisplayPosition,
+    WorkflowStateVariableWorkflowReference,
+)
 
 from ...nodes.final_output_node import FinalOutputNode
 
@@ -17,6 +21,12 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
     output_id = UUID("<output-id>")
     output_name = "final-output"
     node_input_id = UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
+    node_input_display = NodeInputDisplay(
+        id=UUID("<output-id>"),
+        name="node_input",
+        type="STRING",
+        value=WorkflowStateVariableWorkflowReference(value="<my-output>"),
+    )
     node_input_ids_by_name = {
         "node_input": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
     }
@@ -41,47 +51,5 @@ from vellum.workflows.state import BaseState
 class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
         value = "<my-output>"
-"
-`;
-
-exports[`FinalOutputNode > should codegen successfully without node input > getNodeDisplayFile 1`] = `
-"from uuid import UUID
-
-from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
-
-from ...nodes.final_output_node import FinalOutputNode
-
-
-class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
-    label = "Final Output Node"
-    node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
-    target_handle_id = UUID("<target-handle-id>")
-    output_id = UUID("<output-id>")
-    output_name = "final-output"
-    node_input_id = UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
-    node_input_ids_by_name = {}
-    output_display = {
-        FinalOutputNode.Outputs.value: NodeOutputDisplay(
-            id=UUID("<output-id>"), name="value"
-        )
-    }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        width=462,
-        height=288,
-    )
-"
-`;
-
-exports[`FinalOutputNode > should codegen successfully without node input > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
-from vellum.workflows.state import BaseState
-
-
-class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
-    class Outputs(BaseFinalOutputNode.Outputs):
-        pass
 "
 `;

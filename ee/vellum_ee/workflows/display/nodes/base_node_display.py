@@ -46,7 +46,12 @@ from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import (
+    NodeInputDisplay,
+    NodeOutputDisplay,
+    PortDisplay,
+    PortDisplayOverrides,
+)
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator, primitive_to_vellum_value
 from vellum_ee.workflows.display.vellum import CodeResourceDefinition, NodeDisplayData
@@ -68,6 +73,13 @@ class BaseNodeDisplayMeta(type):
                 for ref in node_class.Outputs
                 if ref.name in node_class.__output_ids__
             }
+
+        if not dct.get("node_input_display"):
+            node_class = cls.infer_node_class()
+            cls.node_input_display = NodeInputDisplay(
+                id=uuid4_from_hash(f"{node_class.__qualname__}|input"),
+                name=f"{node_class.__name__} Input",
+            )
 
         return cls.__annotate_node__()
 
@@ -114,6 +126,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     output_display: Dict[OutputReference, NodeOutputDisplay]
     port_displays: Dict[Port, PortDisplayOverrides] = {}
     node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
+    node_input_display: NodeInputDisplay
 
     # Used to explicitly set the target handle id for a node
     # Once all nodes are Generic Nodes, we may replace this with a trigger_id or trigger attribute

@@ -99,4 +99,7 @@ def test_serialize_workflow():
             "name": "BasicFinalOutputNode",
             "module": ["tests", "workflows", "basic_final_output_node", "workflow"],
         },
+        "outputs": [
+            {"id": "97349956-d228-4b51-a64b-1331f788373f", "name": "node_input", "type": "STRING", "value": {}}
+        ],
     }
