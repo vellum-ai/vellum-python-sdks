@@ -66,7 +66,7 @@ def test_workflow__cancel_stream():
 
 def test_workflow__cancel_signal_not_set__run():
     """
-    Test that we can cancel a run of a long running workflow with cancel signal passed in but not set.
+    Test that a workflow runs to completion when a cancel signal is passed in but not set.
     """
 
     # GIVEN a workflow that is long running
@@ -78,6 +78,6 @@ def test_workflow__cancel_signal_not_set__run():
     # WHEN we run the workflow
     terminal_event = workflow.run(cancel_signal=cancel_signal)
 
-    # THEN we should get the expected rejection
+    # THEN the workflow should run to completion
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert terminal_event.outputs.final_value == "hello world"
