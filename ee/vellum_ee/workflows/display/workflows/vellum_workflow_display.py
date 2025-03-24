@@ -6,7 +6,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
-from vellum.workflows.nodes.utils import get_unadorned_node
+from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port
 from vellum.workflows.references import WorkflowInputReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -253,15 +253,23 @@ class VellumWorkflowDisplay(
                 }
             )
 
-        for edge_display in self.display_context.edge_displays.values():
+        for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
+            unadorned_source_node_port = get_unadorned_port(source_node_port)
+            unadorned_target_node = get_unadorned_node(target_node)
+
+            source_node_port_display = self.display_context.port_displays[unadorned_source_node_port]
+            target_node_display = self.display_context.node_displays[unadorned_target_node]
+
             edges.append(
                 {
                     "id": str(edge_display.id),
-                    "source_node_id": str(edge_display.source_node_id),
-                    "source_handle_id": str(edge_display.source_handle_id),
-                    "target_node_id": str(edge_display.target_node_id),
-                    "target_handle_id": str(edge_display.target_handle_id),
-                    "type": edge_display.type,
+                    "source_node_id": str(source_node_port_display.node_id),
+                    "source_handle_id": str(source_node_port_display.id),
+                    "target_node_id": str(target_node_display.node_id),
+                    "target_handle_id": str(
+                        target_node_display.get_target_handle_id_by_source_node_id(source_node_port_display.node_id)
+                    ),
+                    "type": "DEFAULT",
                 }
             )
 
