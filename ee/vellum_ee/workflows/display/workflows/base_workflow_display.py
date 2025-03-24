@@ -12,7 +12,7 @@ from vellum.workflows.edges import Edge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
+from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
@@ -36,7 +36,6 @@ from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_di
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.vellum import EdgeVellumDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
@@ -267,14 +266,14 @@ class BaseWorkflowDisplay(
                 entrypoint, workflow_display, node_displays, overrides=entrypoint_display_overrides
             )
 
-        edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeVellumDisplay] = {}
+        edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = {}
         for edge in self._workflow.get_edges():
             if edge in edge_displays:
                 continue
 
             edge_display_overrides = self.edge_displays.get((edge.from_port, edge.to_node))
             edge_displays[(edge.from_port, edge.to_node)] = self._generate_edge_display(
-                edge, node_displays, port_displays, overrides=edge_display_overrides
+                edge, node_displays, overrides=edge_display_overrides
             )
 
         for edge in self._workflow.get_unused_edges():
@@ -283,7 +282,7 @@ class BaseWorkflowDisplay(
 
             edge_display_overrides = self.edge_displays.get((edge.from_port, edge.to_node))
             edge_displays[(edge.from_port, edge.to_node)] = self._generate_edge_display(
-                edge, node_displays, port_displays, overrides=edge_display_overrides
+                edge, node_displays, overrides=edge_display_overrides
             )
 
         workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = {}
@@ -448,42 +447,26 @@ class BaseWorkflowDisplay(
         self,
         edge: Edge,
         node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
-        port_displays: Dict[Port, PortDisplay],
         overrides: Optional[EdgeDisplay] = None,
-    ) -> EdgeVellumDisplay:
+    ) -> EdgeDisplay:
         source_node = get_unadorned_node(edge.from_port.node_class)
         target_node = get_unadorned_node(edge.to_node)
 
         source_node_id = node_displays[source_node].node_id
-        from_port = get_unadorned_port(edge.from_port)
-        source_handle_id = port_displays[from_port].id
+        target_node_id = node_displays[target_node].node_id
 
-        target_node_display = node_displays[target_node]
-        target_node_id = target_node_display.node_id
-        target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(source_node_id)
-
-        return self._generate_edge_display_from_source(
-            source_node_id, source_handle_id, target_node_id, target_handle_id, overrides
-        )
+        return self._generate_edge_display_from_source(source_node_id, target_node_id, overrides)
 
     def _generate_edge_display_from_source(
         self,
         source_node_id: UUID,
-        source_handle_id: UUID,
         target_node_id: UUID,
-        target_handle_id: UUID,
         overrides: Optional[EdgeDisplay] = None,
-    ) -> EdgeVellumDisplay:
+    ) -> EdgeDisplay:
         edge_id: UUID
         if overrides:
             edge_id = overrides.id
         else:
             edge_id = uuid4_from_hash(f"{self.workflow_id}|id|{source_node_id}|{target_node_id}")
 
-        return EdgeVellumDisplay(
-            id=edge_id,
-            source_node_id=source_node_id,
-            target_node_id=target_node_id,
-            source_handle_id=source_handle_id,
-            target_handle_id=target_handle_id,
-        )
+        return EdgeDisplay(id=edge_id)

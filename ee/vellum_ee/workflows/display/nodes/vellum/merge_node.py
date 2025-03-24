@@ -6,7 +6,6 @@ from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.vellum import EdgeVellumDisplay
 
 _MergeNodeType = TypeVar("_MergeNodeType", bound=MergeNode)
 
@@ -22,16 +21,20 @@ class BaseMergeNodeDisplay(BaseNodeVellumDisplay[_MergeNodeType], Generic[_Merge
         node = self._node
         node_id = self.node_id
 
-        all_edges: List[EdgeVellumDisplay] = [edge_display for _, edge_display in display_context.edge_displays.items()]
-        merged_edges = [edge for edge in all_edges if edge.target_node_id == self.node_id]
+        merged_source_ports = [
+            source_node_port
+            for (source_node_port, target_node), _ in display_context.edge_displays.items()
+            if target_node.__id__ == self.node_id
+        ]
 
         target_handle_ids = self.get_target_handle_ids()
 
         if target_handle_ids is None:
             target_handle_ids = [
-                uuid4_from_hash(f"{node_id}|target_handle|{edge.source_node_id}") for edge in merged_edges
+                uuid4_from_hash(f"{node_id}|target_handle|{source_node_port.node_class.__id__}")
+                for source_node_port in merged_source_ports
             ]
-        elif len(target_handle_ids) != len(merged_edges):
+        elif len(target_handle_ids) != len(merged_source_ports):
             raise ValueError("If you explicitly specify target_handle_ids, you must specify one for each incoming edge")
 
         return {
