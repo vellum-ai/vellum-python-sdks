@@ -777,3 +777,44 @@ def main():
 
     # AND the result should be the correct output
     assert outputs == {"result": "hello", "log": "<class 'int'>\n"}
+
+
+def test_run_node__execute_code__invalid_key_access():
+    # GIVEN a node that will access an invalid key
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+def main(arg1: list) -> str:
+    return arg1["invalid"]
+"""
+        code_inputs = {
+            "arg1": {"foo": "bar"},
+        }
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    with pytest.raises(NodeException) as exc_info:
+        node = ExampleCodeExecutionNode()
+        node.run()
+
+    # AND the result should be the correct output
+    assert exc_info.value.message == "dict has no key: 'invalid'"
+
+
+def test_run_node__execute_code__value_key_access():
+    # GIVEN a node that will access the value key before the nested key
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+def main(arg1: list) -> str:
+    return arg1["value"]["foo"]
+"""
+        code_inputs = {
+            "arg1": {"foo": "bar"},
+        }
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # AND the result should be the correct output
+    assert outputs == {"result": "bar", "log": ""}
