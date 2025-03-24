@@ -124,7 +124,7 @@ def test_serialize_workflow(vellum_client):
                 "source_node_id": "f1e4678f-c470-400b-a40e-c8922cc99a86",
                 "source_handle_id": "40201804-8beb-43ad-8873-a027759512f1",
                 "target_node_id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
-                "target_handle_id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8",
+                "target_handle_id": "b7bfb298-959a-4d2b-8b85-bbd0d2522703",
                 "type": "DEFAULT",
             },
             {

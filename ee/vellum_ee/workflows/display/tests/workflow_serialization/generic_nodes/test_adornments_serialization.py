@@ -64,7 +64,7 @@ def test_serialize_node__retry(serialize_node):
                     "test_adornments_serialization",
                 ],
             },
-            "trigger": {"id": "d38a83bf-23d1-4f9d-a875-a08dc27cf397", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "75fbe874-c00b-4fc2-9ade-52f4fe9209fa", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "078650c9-f775-4cd0-a08c-23af9983a361", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
@@ -175,7 +175,7 @@ def test_serialize_node__try(serialize_node):
                     "test_adornments_serialization",
                 ],
             },
-            "trigger": {"id": "16bc1522-c408-47ad-9a22-0ef136384abf", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "bbb343ff-2b7a-4793-a8cf-fb05132ca46a", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [{"id": "8d25f244-4b12-4f8b-b202-8948698679a0", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
@@ -283,7 +283,7 @@ def test_serialize_node__stacked():
                                 "test_adornments_serialization",
                             ],
                         },
-                        "trigger": {"id": "f206358d-04a5-41c9-beee-0871a074fa48", "merge_behavior": "AWAIT_ATTRIBUTES"},
+                        "trigger": {"id": "6e4af17f-bbee-4777-b10d-af042cd6e16a", "merge_behavior": "AWAIT_ATTRIBUTES"},
                         "ports": [{"id": "408cd5fb-3a3e-4eb2-9889-61111bd6a129", "name": "default", "type": "DEFAULT"}],
                         "adornments": [
                             {
@@ -342,7 +342,7 @@ def test_serialize_node__stacked():
                         "source_node_id": "c14c1c9b-a7a4-4d2c-84fb-c940cfb09525",
                         "source_handle_id": "51a5eb25-af14-4bee-9ced-d2aa534ea8e9",
                         "target_node_id": "074833b0-e142-4bbc-8dec-209a35e178a3",
-                        "target_handle_id": "f206358d-04a5-41c9-beee-0871a074fa48",
+                        "target_handle_id": "6e4af17f-bbee-4777-b10d-af042cd6e16a",
                         "type": "DEFAULT",
                     }
                 ],

@@ -33,7 +33,7 @@ def test_serialize_node__basic(serialize_node):
                     "test_trigger_serialization",
                 ],
             },
-            "trigger": {"id": "be19c63b-3492-46b1-be9d-16f8d2e6410b", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "b95cca96-b570-42ac-ace8-51ca0f627881", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "8bec8d0c-113f-4110-afcb-4a6e566e7236",
@@ -75,7 +75,7 @@ def test_serialize_node__await_any(serialize_node):
                     "test_trigger_serialization",
                 ],
             },
-            "trigger": {"id": "5bb6bb4c-4374-44c8-a7b5-7bb6c1060a5b", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "c0db17e7-6766-4062-aaee-7404580d76e4", "merge_behavior": "AWAIT_ANY"},
             "ports": [
                 {
                     "id": "d9a84db7-8bd6-4a15-9e3c-c2e898c26d16",
@@ -117,7 +117,7 @@ def test_serialize_node__await_all(serialize_node):
                     "test_trigger_serialization",
                 ],
             },
-            "trigger": {"id": "124ba9cf-a30e-41ef-81bf-143708f8b1c3", "merge_behavior": "AWAIT_ALL"},
+            "trigger": {"id": "1b22935e-0e79-485a-b274-a2f316c0983c", "merge_behavior": "AWAIT_ALL"},
             "ports": [
                 {
                     "id": "fa73da35-0bf9-4f02-bf5b-0b0d1a6f1494",
