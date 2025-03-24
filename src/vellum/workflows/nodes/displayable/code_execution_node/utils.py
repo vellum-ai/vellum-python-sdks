@@ -41,7 +41,12 @@ class DictWrapper(dict):
 
     def __getattr__(self, attr):
         if attr not in self:
-            raise AttributeError(f"Vellum object has no attribute '{attr}'")
+            if attr == "value":
+                # In order to be backwards compatible with legacy Workflows, which wrapped
+                # several values as VellumValue objects, we use the "value" key to return itself
+                return self
+
+            raise AttributeError(f"dict has no key: '{attr}'")
 
         item = super().__getitem__(attr)
         if not isinstance(item, DictWrapper) and not isinstance(item, ListWrapper):
