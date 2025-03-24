@@ -1,5 +1,6 @@
 import ast
 import inspect
+import logging
 from typing import TYPE_CHECKING, Callable, Generic, TypeVar, Union, get_args
 
 from vellum.workflows.constants import undefined
@@ -9,6 +10,8 @@ if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
 
 _T = TypeVar("_T")
+
+logger = logging.getLogger(__name__)
 
 
 class LazyReference(BaseDescriptor[_T], Generic[_T]):
@@ -50,7 +53,12 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         if isinstance(self._get, str):
             return self._get
 
-        source = inspect.getsource(self._get).strip()
+        try:
+            source = inspect.getsource(self._get).strip()
+        except Exception:
+            logger.exception("Error getting source for lazy reference")
+            return self._get.__name__
+
         try:
             parsed = ast.parse(source)
             assignment = parsed.body[0]
