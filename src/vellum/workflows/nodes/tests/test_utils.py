@@ -1,11 +1,14 @@
 import pytest
-from typing import List, Union
+from typing import Any, List, Union
 
 from pydantic import BaseModel
 
+from vellum.client.types.chat_message import ChatMessage
+from vellum.client.types.function_call import FunctionCall as FunctionCallType
+from vellum.client.types.vellum_value import VellumValue
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.nodes.utils import parse_type_from_str
+from vellum.workflows.nodes.utils import cast_to_output_type, parse_type_from_str
 from vellum.workflows.types.core import Json
 
 
@@ -131,3 +134,13 @@ def test_parse_type_from_str_error_cases(input_str, output_type, expected_except
         assert excinfo.value.code == expected_code
 
     assert expected_message in str(excinfo.value)
+
+
+def test_cast_to_output_type_none_value():
+    assert cast_to_output_type(None, str) == ""  # String
+    assert cast_to_output_type(None, int) == 0  # Number
+    assert cast_to_output_type(None, float) == 0.0  # Number
+    assert cast_to_output_type(None, Any) is None  # Json
+    assert cast_to_output_type(None, FunctionCallType) == {}  # FunctionCall
+    assert cast_to_output_type(None, List[ChatMessage]) == []  # Chat History
+    assert cast_to_output_type(None, List[VellumValue]) == []  # Array
