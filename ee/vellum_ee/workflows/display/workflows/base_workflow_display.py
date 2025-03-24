@@ -460,11 +460,7 @@ class BaseWorkflowDisplay(
 
         target_node_display = node_displays[target_node]
         target_node_id = target_node_display.node_id
-
-        if isinstance(target_node_display, BaseNodeVellumDisplay):
-            target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(source_node_id)
-        else:
-            target_handle_id = target_node_display.get_trigger_id()
+        target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(source_node_id)
 
         return self._generate_edge_display_from_source(
             source_node_id, source_handle_id, target_node_id, target_handle_id, overrides

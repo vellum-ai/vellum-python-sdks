@@ -196,7 +196,7 @@ def test_serialize_workflow():
                 "source_node_id": "32684932-7c7c-4b1c-aed2-553de29bf3f7",
                 "source_handle_id": "e4136ee4-a51a-4ca3-9a3a-aa96f5de2347",
                 "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                "target_handle_id": "a95a34f2-e894-4fb6-a2c9-15d12c1e3135",
+                "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
                 "type": "DEFAULT",
             },
             {

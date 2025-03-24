@@ -40,7 +40,7 @@ def test_serialize_node__basic(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "be19c63b-3492-46b1-be9d-16f8d2e6410b", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "b95cca96-b570-42ac-ace8-51ca0f627881", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "8bec8d0c-113f-4110-afcb-4a6e566e7236",
@@ -86,7 +86,7 @@ def test_serialize_node__if(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "abe5abf8-9678-4606-be71-3104efc25c74", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "46e21bcc-47e1-457f-8134-ead575253b74", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "9889fe69-62f8-4bb3-aac6-425b75700bea",
@@ -148,7 +148,7 @@ def test_serialize_node__if_else(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "b5ef0133-0605-495f-a229-169d7490cd07", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "664c941c-275c-474c-9a5c-8501b934e86d", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "6fd9edea-9c1f-4463-aeb9-bfdde3231ee0",
@@ -217,7 +217,7 @@ def test_serialize_node__if_elif_else(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "d41d03f1-36f3-4cfe-ac9f-0f79a918a810", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "bba33909-beeb-4ebd-ad77-46b617ab07b0", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "19a1cc62-1f18-49b0-8026-7c82709e34db",
@@ -316,7 +316,7 @@ def test_serialize_node__node_output_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "e949426f-9f3c-425e-a4de-8c0c5f6a8945", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "c8804b97-9f84-41b6-ade8-aa74544d6846", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "500075dc-fc65-428a-b3c0-a410f8c7f8cf",
@@ -379,7 +379,7 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "d762741b-c137-4df4-ade6-65f31ea5a624", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "93cc612b-c020-420b-94ef-62d9687c212c", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "3b6b4048-8622-446d-9772-2766357d7b18",
@@ -445,7 +445,7 @@ def test_serialize_node__execution_count_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "d6aa7eec-6f01-41c5-9f5c-d50c53259527", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "ccc61dda-a947-47ac-b484-78f971ae1148", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "79d0cfa3-c8f9-4434-a2f8-5e416d66437a",
@@ -506,7 +506,7 @@ def test_serialize_node__null(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "f4dcf8a3-692c-4b7c-8625-1a54eaa16ff2", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "ad543514-516f-47ac-a363-1bbfccb0dfa9", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "7f1fb75d-0c8b-4ebc-8c59-4ae68f1a68e1",
@@ -564,7 +564,7 @@ def test_serialize_node__between(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "12f79444-890b-4e5e-93b6-6c0efaee40db", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "36799ad9-5c1a-4bb6-be13-aee5487c021b", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "b745c089-1023-46dc-b2b6-ba75ac37563a",
@@ -633,7 +633,7 @@ def test_serialize_node__or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "fb39e80b-4032-4538-83e4-59480b1ef7ff", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "f2837ac2-2132-4af2-b8bb-30de9b0a2815", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "0bd64819-b866-4333-82e0-8ac672c09b79",
@@ -716,7 +716,7 @@ def test_serialize_node__and_then_or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "b2b040de-9fba-4204-a6a5-e17f6ab321b1", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "aa7747fe-4b59-4994-a5c4-0ccc8065f93d", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "8bb89da2-a752-4541-8f90-1276c44910a8",
@@ -818,7 +818,7 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "bfd1504d-f642-431d-a900-28b0709bd65c", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "71601746-3722-423c-8fc0-d15a6bb6ddd4", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "30478083-924d-469e-ad55-df28bc282cdb",
@@ -920,7 +920,7 @@ def test_serialize_node__or_then_and(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "9c59699a-edf9-4618-b6bc-1074f3bfae78", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "9c875b19-fce1-4eef-80ea-19651dec1a76", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "7f442cce-0b99-482c-aec8-8eed6ccadde2",
@@ -1021,7 +1021,7 @@ def test_serialize_node__parse_json(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "1d3287e2-cc05-49d2-be99-150320264f24", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "ecff8eef-b928-48e7-ac26-841322ff2752", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
                     "id": "5a88bac8-89b3-4d81-b539-2f977a36a9c0",

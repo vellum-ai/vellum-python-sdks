@@ -1,6 +1,6 @@
 import logging
 from uuid import UUID
-from typing import Dict, List, Optional, Type, cast
+from typing import Dict, Optional, Type, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases import BaseNode
@@ -17,7 +17,6 @@ from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeV
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import (
-    EdgeVellumDisplay,
     EntrypointVellumDisplay,
     EntrypointVellumDisplayOverrides,
     NodeDisplayData,
@@ -92,14 +91,16 @@ class VellumWorkflowDisplay(
         edges: JsonArray = []
 
         # Add a single synthetic node for the workflow entrypoint
+        entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
+        entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
         nodes.append(
             {
-                "id": str(self.display_context.workflow_display.entrypoint_node_id),
+                "id": str(entrypoint_node_id),
                 "type": "ENTRYPOINT",
                 "inputs": [],
                 "data": {
                     "label": "Entrypoint Node",
-                    "source_handle_id": str(self.display_context.workflow_display.entrypoint_node_source_handle_id),
+                    "source_handle_id": str(entrypoint_node_source_handle_id),
                 },
                 "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
                 "base": None,
@@ -238,17 +239,21 @@ class VellumWorkflowDisplay(
             )
 
         # Add an edge for each edge in the workflow
-        all_edge_displays: List[EdgeVellumDisplay] = [
-            # Create a synthetic edge from the synthetic entrypoint node to each actual entrypoint
-            *[
-                entrypoint_display.edge_display
-                for entrypoint_display in self.display_context.entrypoint_displays.values()
-            ],
-            # Include the concrete edges in the workflow
-            *self.display_context.edge_displays.values(),
-        ]
+        for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+            unadorned_target_node = get_unadorned_node(target_node)
+            target_node_display = self.display_context.node_displays[unadorned_target_node]
+            edges.append(
+                {
+                    "id": str(entrypoint_display.edge_display.id),
+                    "source_node_id": str(entrypoint_node_id),
+                    "source_handle_id": str(entrypoint_node_source_handle_id),
+                    "target_node_id": str(target_node_display.node_id),
+                    "target_handle_id": str(target_node_display.get_trigger_id()),
+                    "type": "DEFAULT",
+                }
+            )
 
-        for edge_display in all_edge_displays:
+        for edge_display in self.display_context.edge_displays.values():
             edges.append(
                 {
                     "id": str(edge_display.id),
@@ -350,10 +355,7 @@ class VellumWorkflowDisplay(
         entrypoint_target = get_unadorned_node(entrypoint)
         target_node_display = node_displays[entrypoint_target]
         target_node_id = target_node_display.node_id
-        if isinstance(target_node_display, BaseNodeVellumDisplay):
-            target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(entrypoint_node_id)
-        else:
-            target_handle_id = target_node_display.get_trigger_id()
+        target_handle_id = target_node_display.get_target_handle_id_by_source_node_id(entrypoint_node_id)
 
         edge_display = self._generate_edge_display_from_source(
             entrypoint_node_id, source_handle_id, target_node_id, target_handle_id, overrides=edge_display_overrides

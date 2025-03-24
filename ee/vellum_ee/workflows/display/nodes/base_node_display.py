@@ -115,6 +115,10 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     port_displays: Dict[Port, PortDisplayOverrides] = {}
     node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
+    # Used to explicitly set the target handle id for a node
+    # Once all nodes are Generic Nodes, we may replace this with a trigger_id or trigger attribute
+    target_handle_id: ClassVar[Optional[UUID]] = None
+
     # Used to store the mapping between node types and their display classes
     _node_display_registry: Dict[Type[NodeType], Type["BaseNodeDisplay"]] = {}
 
@@ -205,7 +209,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
             "trigger": {
-                "id": str(self.get_trigger_id()),
+                "id": str(self.get_target_handle_id()),
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
             "ports": ports,
@@ -255,7 +259,24 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         return PortDisplay(id=port_id, node_id=self.node_id)
 
     def get_trigger_id(self) -> UUID:
-        return uuid4_from_hash(f"{self.node_id}|trigger")
+        return self.get_target_handle_id()
+
+    def get_target_handle_id(self) -> UUID:
+        """
+        Is the same as `get_trigger_id()` but kept for legacy workflows. Once all workflows have been updated to
+        become Generic Nodes, we should be able to drive off of only `get_trigger_id()` going forward
+        """
+
+        return self._get_node_display_uuid("target_handle_id")
+
+    def get_target_handle_id_by_source_node_id(self, source_node_id: UUID) -> UUID:
+        """
+        In the vast majority of cases, nodes will only have a single target handle and can be retrieved independently
+        of the source node. However, in rare cases (such as legacy Merge nodes), this method can be overridden to
+        account for the case of retrieving one amongst multiple target handles on a node.
+        """
+
+        return self.get_target_handle_id()
 
     @classmethod
     def get_from_node_display_registry(cls, node_class: Type[NodeType]) -> Optional[Type["BaseNodeDisplay"]]:
@@ -314,6 +335,10 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             return node_display_attribute
 
         raise ValueError(f"Node {cls.__name__} must define an explicit {attribute} of type {attribute_type.__name__}.")
+
+    def _get_node_display_uuid(self, attribute: str) -> UUID:
+        explicit_value = self._get_explicit_node_display_attr(attribute, UUID)
+        return explicit_value if explicit_value else uuid4_from_hash(f"{self.node_id}|{attribute}")
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)

@@ -131,7 +131,7 @@ def test_serialize_workflow():
                                 "module": ["tests", "workflows", "basic_map_node", "workflow"],
                             },
                             "trigger": {
-                                "id": "01324747-9bc0-4ecd-a8ab-40dca5a94e2e",
+                                "id": "551d5528-f4e1-42ea-bde0-9de4b4968253",
                                 "merge_behavior": "AWAIT_ATTRIBUTES",
                             },
                             "ports": [
@@ -215,7 +215,7 @@ def test_serialize_workflow():
                             "source_node_id": "ff9bfe6e-839d-4d40-b8fc-313b3bbd0ab0",
                             "source_handle_id": "520d3616-8369-4e79-9da5-3febae299c2a",
                             "target_node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
-                            "target_handle_id": "01324747-9bc0-4ecd-a8ab-40dca5a94e2e",
+                            "target_handle_id": "551d5528-f4e1-42ea-bde0-9de4b4968253",
                             "type": "DEFAULT",
                         },
                         {
