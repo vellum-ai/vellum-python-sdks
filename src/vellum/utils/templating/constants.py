@@ -10,7 +10,7 @@ import pydash
 import pytz
 import yaml
 
-from vellum.utils.templating.custom_filters import is_valid_json_string, replace
+from vellum.utils.templating.custom_filters import is_valid_json_string, replace, safe_tojson
 
 DEFAULT_JINJA_GLOBALS: Dict[str, Any] = {
     "datetime": datetime,
@@ -29,4 +29,5 @@ FilterFunc = Union[Callable[[Union[str, bytes]], bool], Callable[[Any, Any, Any]
 DEFAULT_JINJA_CUSTOM_FILTERS: Dict[str, FilterFunc] = {
     "is_valid_json_string": is_valid_json_string,
     "replace": replace,
+    "tojson": safe_tojson,
 }
