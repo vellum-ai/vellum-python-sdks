@@ -1,11 +1,14 @@
 import pytest
-from typing import List, Union
+from typing import Any, List, Union
 
 from pydantic import BaseModel
 
+from vellum.client.types.chat_message import ChatMessage
+from vellum.client.types.function_call import FunctionCall as FunctionCallType
+from vellum.client.types.vellum_value import VellumValue
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.nodes.utils import parse_type_from_str
+from vellum.workflows.nodes.utils import cast_to_output_type, parse_type_from_str
 from vellum.workflows.types.core import Json
 
 
@@ -131,3 +134,32 @@ def test_parse_type_from_str_error_cases(input_str, output_type, expected_except
         assert excinfo.value.code == expected_code
 
     assert expected_message in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    "output_type,expected_result",
+    [
+        (str, ""),  # String
+        (int, 0),  # Number
+        (float, 0.0),  # Number
+        (Any, None),  # Json
+        (FunctionCallType, {}),  # FunctionCall
+        (List[ChatMessage], []),  # Chat History
+        (List[VellumValue], []),  # Array
+        (Union[float, int], 0.0),  # Union
+    ],
+    ids=[
+        "string",
+        "integer",
+        "float",
+        "json",
+        "function_call",
+        "chat_history",
+        "array",
+        "union",
+    ],
+)
+def test_cast_to_output_type_none_value(output_type, expected_result):
+    """Test that cast_to_output_type returns appropriate default values when None is provided."""
+    result = cast_to_output_type(None, output_type)
+    assert result == expected_result
