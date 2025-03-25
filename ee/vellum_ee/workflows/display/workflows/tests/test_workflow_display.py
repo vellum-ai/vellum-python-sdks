@@ -235,3 +235,43 @@ def test_get_event_display_context__templating_node_input_display():
     node_event_display = display_context.node_displays[MyNode.__id__]
 
     assert node_event_display.input_display.keys() == {"inputs.foo"}
+
+
+def test_get_event_display_context__node_display_for_mutiple_adornments():
+    # GIVEN a simple workflow with multiple adornments
+    @TryNode.wrap()
+    @RetryNode.wrap()
+    class MyNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = MyNode
+
+    # AND a display class for the node
+    node_id = uuid4()
+    inner_node_id = uuid4()
+    innermost_node_id = uuid4()
+
+    @BaseTryNodeDisplay.wrap(node_id=node_id)
+    @BaseRetryNodeDisplay.wrap(node_id=inner_node_id)
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        node_id = innermost_node_id
+
+    # WHEN we gather the event display context
+    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+
+    # THEN the subworkflow display should be included
+    assert node_id in display_context.node_displays
+    node_event_display = display_context.node_displays[node_id]
+    assert node_event_display.subworkflow_display
+
+    # AND the inner node should be included
+    assert inner_node_id in node_event_display.subworkflow_display.node_displays
+    inner_node_event_display = node_event_display.subworkflow_display.node_displays[inner_node_id]
+    assert inner_node_event_display.subworkflow_display
+
+    # AND the innermost node should be included
+    assert innermost_node_id in inner_node_event_display.subworkflow_display.node_displays
+    innermost_node_event_display = inner_node_event_display.subworkflow_display.node_displays[innermost_node_id]
+    assert not innermost_node_event_display.subworkflow_display
