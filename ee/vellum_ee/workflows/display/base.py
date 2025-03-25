@@ -59,10 +59,6 @@ class EdgeDisplayOverrides(EdgeDisplay):
     pass
 
 
-EdgeDisplayType = TypeVar("EdgeDisplayType", bound=EdgeDisplay)
-EdgeDisplayOverridesType = TypeVar("EdgeDisplayOverridesType", bound=EdgeDisplayOverrides)
-
-
 @dataclass
 class EntrypointDisplayOverrides:
     id: UUID
