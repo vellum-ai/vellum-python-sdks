@@ -110,9 +110,10 @@ class _BaseWorkflowMeta(type):
                         nodes.update(node for node in item.nodes)
                     elif inspect.isclass(item) and issubclass(item, BaseNode):
                         nodes.add(item)
-            elif issubclass(graph_item, BaseNode):
+            elif inspect.isclass(graph_item) and issubclass(graph_item, BaseNode):
                 nodes.add(graph_item)
             else:
+                # We should never get here, but just in case
                 raise ValueError(f"Unexpected graph type: {graph_item.__class__}")
             return nodes
 
