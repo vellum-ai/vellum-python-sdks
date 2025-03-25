@@ -363,8 +363,8 @@ class VellumWorkflowDisplay(
         target_node_display = node_displays[entrypoint_target]
         target_node_id = target_node_display.node_id
 
-        edge_display = self._generate_edge_display_from_source(
-            entrypoint_node_id, target_node_id, overrides=edge_display_overrides
+        edge_display = edge_display_overrides or self._generate_edge_display_from_source(
+            entrypoint_node_id, target_node_id
         )
 
         return EntrypointVellumDisplay(id=entrypoint_id, edge_display=edge_display)
