@@ -3,6 +3,7 @@ import types
 from uuid import UUID
 from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, cast
 
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -17,7 +18,62 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 _BaseAdornmentNodeType = TypeVar("_BaseAdornmentNodeType", bound=BaseAdornmentNode)
 
 
+def _recursively_replace_wrapped_node(node_class: Type[BaseNode], wrapped_node_display_class: Type["BaseNodeDisplay"]):
+    if not issubclass(node_class, BaseAdornmentNode):
+        return
+
+    # We must edit the node display class to use __wrapped_node__ everywhere it
+    # references the adorned node class, which is three places:
+    wrapped_node_class = node_class.__wrapped_node__
+    if not wrapped_node_class:
+        raise ValueError(f"Node {node_class.__name__} must be used as an adornment with the `wrap` method.")
+
+    # 1. The node display class' parameterized type
+    original_base_node_display = get_original_base(wrapped_node_display_class)
+    original_base_node_display.__args__ = (wrapped_node_class,)
+    wrapped_node_display_class._node_display_registry[wrapped_node_class] = wrapped_node_display_class
+    wrapped_node_display_class.__annotate_node__()
+
+    # 2. The node display class' output displays
+    for old_output in node_class.Outputs:
+        new_output = getattr(wrapped_node_class.Outputs, old_output.name, None)
+        if new_output is None:
+            # If the adornment is adding a new output, such as TryNode adding an "error" output,
+            # we skip it, since it should not be included in the adorned node's output displays
+            wrapped_node_display_class.output_display.pop(old_output, None)
+            continue
+
+        if old_output not in wrapped_node_display_class.output_display:
+            # If the adorned node doesn't have an output display defined for this output, we define one
+            wrapped_node_display_class.output_display[new_output] = NodeOutputDisplay(
+                id=wrapped_node_class.__output_ids__[old_output.name],
+                name=old_output.name,
+            )
+        else:
+            wrapped_node_display_class.output_display[new_output] = wrapped_node_display_class.output_display.pop(
+                old_output
+            )
+
+    # 3. The node display class' port displays
+    old_ports = list(wrapped_node_display_class.port_displays.keys())
+    for old_port in old_ports:
+        new_port = getattr(wrapped_node_class.Ports, old_port.name)
+        wrapped_node_display_class.port_displays[new_port] = wrapped_node_display_class.port_displays.pop(old_port)
+
+    # Now we keep drilling down recursively
+    if (
+        issubclass(wrapped_node_display_class, BaseAdornmentNodeDisplay)
+        and wrapped_node_display_class.__wrapped_node_display__
+    ):
+        _recursively_replace_wrapped_node(
+            wrapped_node_class,
+            wrapped_node_display_class.__wrapped_node_display__,
+        )
+
+
 class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Generic[_BaseAdornmentNodeType]):
+    __wrapped_node_display__: Optional[Type[BaseNodeDisplay]] = None
+
     def serialize(
         self,
         display_context: "WorkflowDisplayContext",
@@ -52,10 +108,6 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
             if not issubclass(node_class, BaseAdornmentNode):
                 raise ValueError(f"Node {node_class.__name__} must be wrapped with a {BaseAdornmentNode.__name__}")
 
-            wrapped_node_class = node_class.__wrapped_node__
-            if not wrapped_node_class:
-                raise ValueError(f"Node {node_class.__name__} must be used as an adornment with the `wrap` method.")
-
             # `mypy` is wrong here, `cls` is indexable bc it's Generic
             BaseAdornmentDisplay = cls[node_class]  # type: ignore[index]
 
@@ -64,6 +116,7 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
                     ns[key] = kwarg
 
                 ns["node_id"] = node_id or uuid4_from_hash(node_class.__qualname__)
+                ns["__wrapped_node_display__"] = wrapped_node_display_class
 
             AdornmentDisplay = types.new_class(
                 re.sub(r"^Base", "", cls.__name__), bases=(BaseAdornmentDisplay,), exec_body=exec_body
@@ -71,43 +124,11 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
 
             setattr(wrapped_node_display_class, "__adorned_by__", AdornmentDisplay)
 
-            # We must edit the node display class to use __wrapped_node__ everywhere it
-            # references the adorned node class, which is three places:
+            _recursively_replace_wrapped_node(
+                node_class,
+                wrapped_node_display_class,
+            )
 
-            # 1. The node display class' parameterized type
-            original_base_node_display = get_original_base(wrapped_node_display_class)
-            original_base_node_display.__args__ = (wrapped_node_class,)
-            wrapped_node_display_class._node_display_registry[wrapped_node_class] = wrapped_node_display_class
-            wrapped_node_display_class.__annotate_node__()
-
-            # 2. The node display class' output displays
-            for old_output in node_class.Outputs:
-                new_output = getattr(wrapped_node_class.Outputs, old_output.name, None)
-                if new_output is None:
-                    # If the adornment is adding a new output, such as TryNode adding an "error" output,
-                    # we skip it, since it should not be included in the adorned node's output displays
-                    wrapped_node_display_class.output_display.pop(old_output, None)
-                    continue
-
-                if old_output not in wrapped_node_display_class.output_display:
-                    # If the adorned node doesn't have an output display defined for this output, we define one
-                    wrapped_node_display_class.output_display[new_output] = NodeOutputDisplay(
-                        id=wrapped_node_class.__output_ids__[old_output.name],
-                        name=old_output.name,
-                    )
-                else:
-                    wrapped_node_display_class.output_display[new_output] = (
-                        wrapped_node_display_class.output_display.pop(old_output)
-                    )
-
-            # 3. The node display class' port displays
-            old_ports = list(wrapped_node_display_class.port_displays.keys())
-            for old_port in old_ports:
-                new_port = getattr(wrapped_node_class.Ports, old_port.name)
-                wrapped_node_display_class.port_displays[new_port] = wrapped_node_display_class.port_displays.pop(
-                    old_port
-                )
-
-            return wrapped_node_display_class
+            return AdornmentDisplay
 
         return decorator
