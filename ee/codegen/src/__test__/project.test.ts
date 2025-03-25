@@ -1202,6 +1202,138 @@ baz = foo + bar
         "__init__.py",
       ]);
     });
+    it("should not generate unused_graphs if final output is not used", async () => {
+      // GIVEN a workflow where final output is not used
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "edge_1",
+              type: "DEFAULT",
+              source_node_id: "entrypoint",
+              target_node_id: "generic-node",
+              source_handle_id: "entrypoint_source",
+              target_handle_id: "generic-node-trigger",
+            },
+          ],
+          nodes: [
+            {
+              id: "generic-node",
+              type: "GENERIC",
+              label: "Generic Node",
+              attributes: [
+                {
+                  id: uuidv4(),
+                  name: "forward",
+                  value: {
+                    type: "NODE_OUTPUT",
+                    node_id: "generic-node",
+                    node_output_id: "output",
+                  },
+                },
+              ],
+              trigger: {
+                id: "generic-node-trigger",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: "generic-node-default-port",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              base: {
+                name: "BaseNode",
+                module: ["vellum", "workflows", "nodes", "bases", "base"],
+              },
+              outputs: [],
+            },
+            {
+              id: "entrypoint",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "e345568c-6f75-4aab-ab46-a189a069870f",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+              definition: null,
+              display_data: {
+                width: 124.0,
+                height: 48.0,
+                comment: null,
+                position: { x: 1545.0, y: 330.0 },
+              },
+            },
+            {
+              id: "terminal",
+              base: null,
+              data: {
+                name: "final-output",
+                label: "Final Output",
+                output_id: "terminal_output",
+                output_type: "STRING",
+                node_input_id: "terminal_input",
+                target_handle_id: "terminal_target",
+              },
+              type: "TERMINAL",
+              inputs: [
+                {
+                  id: "terminal_input",
+                  key: "node_input",
+                  value: { rules: [], combinator: "OR" },
+                },
+              ],
+              trigger: {
+                id: "terminal_target",
+                merge_behavior: "AWAIT_ANY",
+              },
+              definition: null,
+              display_data: {
+                width: 454.0,
+                height: 239.0,
+                comment: null,
+                position: { x: 2750.0, y: 210.0 },
+              },
+            },
+          ],
+          definition: null,
+          display_data: {
+            viewport: {
+              x: -1120.031727765905,
+              y: 146.58014137760972,
+              zoom: 0.7660693736643104,
+            },
+          },
+          output_values: [
+            {
+              value: {
+                type: "NODE_OUTPUT",
+                node_id: "generic-node",
+                node_output_id: "output",
+              },
+              output_variable_id: "not-used-output-variable-id",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+      expectProjectFileToMatchSnapshot(project, ["workflow.py"]);
+    });
   });
 
   describe("initialization case", () => {

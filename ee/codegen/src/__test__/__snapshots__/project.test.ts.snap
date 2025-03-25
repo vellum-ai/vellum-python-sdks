@@ -1,5 +1,19 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should not generate unused_graphs if final output is not used 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.generic_node import GenericNode
+
+
+class Workflow(BaseWorkflow):
+    graph = GenericNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = None
+"
+`;
+
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 1`] = `
 "from vellum.workflows import BaseWorkflow
 

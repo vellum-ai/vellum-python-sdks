@@ -636,12 +636,14 @@ export class Workflow {
 
     this.addRemainingUnusedNodes(remainingUnusedNodes, unusedGraphs);
 
-    const unusedGraphsField = python.field({
-      name: "unused_graphs",
-      initializer: python.TypeInstantiation.set(unusedGraphs),
-    });
+    if (unusedGraphs.length > 0) {
+      const unusedGraphsField = python.field({
+        name: "unused_graphs",
+        initializer: python.TypeInstantiation.set(unusedGraphs),
+      });
 
-    workflowClass.add(unusedGraphsField);
+      workflowClass.add(unusedGraphsField);
+    }
   }
 
   public getWorkflowFile(): WorkflowFile {
