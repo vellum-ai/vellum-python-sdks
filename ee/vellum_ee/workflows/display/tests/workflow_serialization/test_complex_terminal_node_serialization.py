@@ -124,7 +124,15 @@ def test_serialize_workflow__missing_final_output_node():
                     "module": ["tests", "workflows", "complex_final_output_node", "missing_final_output_node"],
                 },
                 "outputs": [
-                    {"id": "5517e50d-7f40-4f7c-acb2-e329d79a25bf", "name": "node_input", "type": "STRING", "value": {}}
+                    {
+                        "id": "5517e50d-7f40-4f7c-acb2-e329d79a25bf",
+                        "name": "node_input",
+                        "type": "STRING",
+                        "value": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": "da086239-d743-4246-b666-5c91e22fb88c",
+                        },
+                    }
                 ],
             },
             {

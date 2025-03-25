@@ -1,8 +1,8 @@
 from uuid import UUID
 
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
-from vellum_ee.workflows.display.nodes.types import NodeInputDisplay, NodeOutputDisplay
-from vellum_ee.workflows.display.vellum import ExecutionCounterWorkflowReference, NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.final_output import FinalOutput
 
@@ -14,12 +14,6 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
     output_id = UUID("b0961a8d-f702-4922-b410-2aecf7d34b68")
     output_name = "final-output"
     node_input_id = UUID("bb465fa1-defb-493c-8284-7156cd680fb3")
-    node_input_display = NodeInputDisplay(
-        id=UUID("b0961a8d-f702-4922-b410-2aecf7d34b68"),
-        name="node_input",
-        type="NUMBER",
-        value=ExecutionCounterWorkflowReference(node_id="7dffcbb1-0a5c-4149-a6e9-f83095b0a871"),
-    )
     node_input_ids_by_name = {"node_input": UUID("bb465fa1-defb-493c-8284-7156cd680fb3")}
     output_display = {
         FinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("b0961a8d-f702-4922-b410-2aecf7d34b68"), name="value")

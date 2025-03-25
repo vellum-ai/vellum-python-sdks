@@ -4,12 +4,8 @@ exports[`FinalOutputNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
-from vellum_ee.workflows.display.nodes.types import NodeInputDisplay, NodeOutputDisplay
-from vellum_ee.workflows.display.vellum import (
-    NodeDisplayData,
-    NodeDisplayPosition,
-    WorkflowStateVariableWorkflowReference,
-)
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.final_output_node import FinalOutputNode
 
@@ -21,12 +17,6 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
     output_id = UUID("<output-id>")
     output_name = "final-output"
     node_input_id = UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
-    node_input_display = NodeInputDisplay(
-        id=UUID("<output-id>"),
-        name="node_input",
-        type="STRING",
-        value=WorkflowStateVariableWorkflowReference(value="<my-output>"),
-    )
     node_input_ids_by_name = {
         "node_input": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
     }
