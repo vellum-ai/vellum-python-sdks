@@ -299,3 +299,21 @@ def test_templating_node__empty_string_to_list():
 
     # THEN the output should be an empty list, not raise an exception
     assert outputs.result == []
+
+
+def test_api_error_templating_node():
+    class UndefinedTemplatingNode(TemplatingNode[BaseState, str]):
+        template = """{{ foo | tojson }}"""
+        inputs = {
+            "bar": "bar",
+            # foo is not define
+        }
+
+    # GIVEN a templating node with an undefined value
+    node = UndefinedTemplatingNode()
+
+    # WHEN the node is run
+    outputs = node.run()
+
+    # THEN the output should be empty string
+    assert outputs.result == ""

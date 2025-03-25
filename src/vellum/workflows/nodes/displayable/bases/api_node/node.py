@@ -57,7 +57,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             if isinstance(headers[header], VellumSecret):
                 vellum_instance = True
         if vellum_instance or bearer_token:
-            return self._vellum_execute_api(bearer_token, data, headers, method, url)
+            return self._vellum_execute_api(bearer_token, json, headers, method, url)
         else:
             return self._local_execute_api(data, headers, json, method, url)
 

@@ -1,6 +1,9 @@
 import json
 from typing import Any, Union
 
+from jinja2 import Undefined
+from jinja2.utils import htmlsafe_json_dumps
+
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
 
@@ -31,3 +34,9 @@ def replace(s: Any, old: Any, new: Any) -> str:
     old_str = encode_to_str(old)
     new_str = encode_to_str(new)
     return s_str.replace(old_str, new_str)
+
+
+def safe_tojson(value: Any) -> str:
+    if isinstance(value, Undefined):
+        return ""
+    return htmlsafe_json_dumps(value, cls=DefaultStateEncoder)
