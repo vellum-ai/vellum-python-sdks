@@ -28,7 +28,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
-    url: str
+    url: str = ""
     method: Optional[APIRequestMethod] = APIRequestMethod.GET
     data: Optional[str] = None
     json: Optional[Json] = None

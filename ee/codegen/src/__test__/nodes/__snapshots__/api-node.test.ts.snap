@@ -17,13 +17,6 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     label = "API Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
-    url_input_id = UUID("480a4c12-22d6-4223-a38a-85db5eda118c")
-    method_input_id = UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
-    body_input_id = UUID("74865eb7-cdaf-4d40-a499-0a6505e72680")
-    authorization_type_input_id = UUID("de330dac-05b1-4e78-bee7-7452203af3d5")
-    bearer_token_value_input_id = UUID("931502c1-23a5-4e2a-a75e-80736c42f3c9")
-    api_key_header_key_input_id = UUID("96c8343d-cc94-4df0-9001-eb2905a00be7")
-    api_key_header_value_input_id = UUID("bfc2e790-66fd-42fd-acf7-3b2c785c1a0a")
     additional_header_key_input_ids = {
         "foo": UUID("8ad006f3-d19e-4af1-931f-3e955152cd91"),
         "bar": UUID("3075be8c-248b-421d-9266-7779297be883"),
@@ -37,7 +30,7 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     node_input_ids_by_name = {
         "method": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc"),
         "url": UUID("480a4c12-22d6-4223-a38a-85db5eda118c"),
-        "body": UUID("74865eb7-cdaf-4d40-a499-0a6505e72680"),
+        "json": UUID("74865eb7-cdaf-4d40-a499-0a6505e72680"),
         "authorization_type": UUID("de330dac-05b1-4e78-bee7-7452203af3d5"),
         "bearer_token_value": UUID("931502c1-23a5-4e2a-a75e-80736c42f3c9"),
         "api_key_header_key": UUID("96c8343d-cc94-4df0-9001-eb2905a00be7"),
@@ -213,13 +206,6 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     label = "API Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
-    url_input_id = UUID("480a4c12-22d6-4223-a38a-85db5eda118c")
-    method_input_id = UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
-    body_input_id = UUID("74865eb7-cdaf-4d40-a499-0a6505e72680")
-    authorization_type_input_id = UUID("de330dac-05b1-4e78-bee7-7452203af3d5")
-    bearer_token_value_input_id = UUID("931502c1-23a5-4e2a-a75e-80736c42f3c9")
-    api_key_header_key_input_id = UUID("96c8343d-cc94-4df0-9001-eb2905a00be7")
-    api_key_header_value_input_id = UUID("bfc2e790-66fd-42fd-acf7-3b2c785c1a0a")
     additional_header_key_input_ids = {
         "foo": UUID("8ad006f3-d19e-4af1-931f-3e955152cd91"),
         "bar": UUID("3075be8c-248b-421d-9266-7779297be883"),
@@ -233,7 +219,7 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     node_input_ids_by_name = {
         "method": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc"),
         "url": UUID("480a4c12-22d6-4223-a38a-85db5eda118c"),
-        "body": UUID("74865eb7-cdaf-4d40-a499-0a6505e72680"),
+        "json": UUID("74865eb7-cdaf-4d40-a499-0a6505e72680"),
         "authorization_type": UUID("de330dac-05b1-4e78-bee7-7452203af3d5"),
         "bearer_token_value": UUID("931502c1-23a5-4e2a-a75e-80736c42f3c9"),
         "api_key_header_key": UUID("96c8343d-cc94-4df0-9001-eb2905a00be7"),
