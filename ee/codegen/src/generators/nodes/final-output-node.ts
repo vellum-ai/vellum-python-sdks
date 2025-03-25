@@ -43,7 +43,7 @@ export class FinalOutputNode extends BaseSingleFileNode<
       ],
     });
 
-    // We are going to only get the first value
+    // There is only one value in the outputs list so we grab the first one
     const descriptor = this.nodeData.outputs?.map((output) => output.value)[0];
 
     if (descriptor) {
