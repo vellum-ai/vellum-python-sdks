@@ -48,8 +48,8 @@
 
 ## Get Started
 
-Most functionality within the SDK requires a Vellum account and API key. To sign up, [talk to us](https://www.vellum.ai/landing-pages/request-demo)
-or visit our [pricing page](https://www.vellum.ai/pricing).
+Most functionality within the Vellum SDK requires a Vellum account and API key. You can sign up for free [here]
+(https://app.vellum.ai/signup?f=wsdk&utm_source=github&utm_medium=repo_readme&utm_campaign=sdk) or visit our [pricing page](https://www.vellum.ai/pricing) for paid options.
 
 Even without a Vellum account, you can use the Workflows SDK to define the control flow of your AI systems. [Learn
 more below](#workflows-sdk).
