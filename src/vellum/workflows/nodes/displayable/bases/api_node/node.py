@@ -63,7 +63,12 @@ class BaseAPINode(BaseNode, Generic[StateType]):
 
     def _local_execute_api(self, data, headers, json, method, url):
         try:
-            prepped = Request(method=method.value, url=url, data=data, json=json, headers=headers).prepare()
+            if data is not None:
+                prepped = Request(method=method.value, url=url, data=data, headers=headers).prepare()
+            elif json is not None:
+                prepped = Request(method=method.value, url=url, json=json, headers=headers).prepare()
+            else:
+                prepped = Request(method=method.value, url=url, headers=headers).prepare()
         except Exception as e:
             raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
         try:

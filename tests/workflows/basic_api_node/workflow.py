@@ -6,7 +6,7 @@ from vellum.workflows.nodes import APINode
 class SimpleBaseAPINode(APINode):
     method = APIRequestMethod.POST
     url = "https://api.vellum.ai"
-    body = {
+    json = {
         "key": "value",
     }
     headers = {

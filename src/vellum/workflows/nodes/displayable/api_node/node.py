@@ -50,7 +50,7 @@ class APINode(BaseAPINode):
         return self._run(
             method=self.method,
             url=self.url,
-            data=self.data or self.json,
+            data=self.data,
             json=self.json,
             headers={**headers, **header_overrides},
             bearer_token=bearer_token,
