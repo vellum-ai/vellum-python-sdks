@@ -77,7 +77,8 @@ code to UI and vice versa.
     ```bash
     python my_workflow.py
 
-Note: To use most out-of-box Nodes, and to push/pull to/from the Velłum UI, you'll need a Vellum account and API key. [Talk to us](https://www.vellum.ai/landing-pages/request-demo) or visit our [pricing page](https://www.vellum.ai/pricing) for more information.
+Note: To use most out-of-box Nodes, and to push/pull to/from the Vellum UI, you'll need a Vellum account and API key.
+You can [sign up for free here](https://app.vellum.ai/signup?f=wsdk&utm_source=github&utm_medium=repo_quickstart&utm_campaign=sdk).
 
 
 ## Documentation
@@ -86,5 +87,5 @@ Complete documentation for the Vellum Workflows SDK can be found at https://docs
 
 ## Stability
 
-This SDK is currently in <Availability type="beta" /> and is subject to change. If you'd like to pariticpate in
+This SDK is currently in <Availability type="beta" /> and is subject to change. If you'd like to participate in
 our beta program, please [contact us](https://docs.vellum.ai/home/getting-started/support).
