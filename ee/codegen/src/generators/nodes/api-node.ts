@@ -9,7 +9,19 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";
 
+const BODY_INPUT_KEY = "body";
+const JSON_ATTRIBUTE_NAME = "json";
+
 export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
+  protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    if (nodeInputKey === BODY_INPUT_KEY) {
+      // This field was renamed in the SDK for consistency with `requests` pip package
+      return JSON_ATTRIBUTE_NAME;
+    }
+
+    return nodeInputKey;
+  }
+
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
@@ -188,83 +200,6 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
         ),
       })
     );
-
-    if (!isNil(this.nodeData.data.urlInputId)) {
-      statements.push(
-        python.field({
-          name: "url_input_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.urlInputId
-          ),
-        })
-      );
-    }
-
-    if (!isNil(this.nodeData.data.methodInputId)) {
-      statements.push(
-        python.field({
-          name: "method_input_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.methodInputId
-          ),
-        })
-      );
-    }
-
-    if (!isNil(this.nodeData.data.bodyInputId)) {
-      statements.push(
-        python.field({
-          name: "body_input_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.bodyInputId
-          ),
-        })
-      );
-    }
-
-    if (!isNil(this.nodeData.data.authorizationTypeInputId)) {
-      statements.push(
-        python.field({
-          name: "authorization_type_input_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.authorizationTypeInputId
-          ),
-        })
-      );
-    }
-
-    if (!isNil(this.nodeData.data.bearerTokenValueInputId)) {
-      statements.push(
-        python.field({
-          name: "bearer_token_value_input_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.bearerTokenValueInputId
-          ),
-        })
-      );
-    }
-
-    if (!isNil(this.nodeData.data.apiKeyHeaderKeyInputId)) {
-      statements.push(
-        python.field({
-          name: "api_key_header_key_input_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.apiKeyHeaderKeyInputId
-          ),
-        })
-      );
-    }
-
-    if (!isNil(this.nodeData.data.apiKeyHeaderValueInputId)) {
-      statements.push(
-        python.field({
-          name: "api_key_header_value_input_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.apiKeyHeaderValueInputId
-          ),
-        })
-      );
-    }
 
     if (!isNil(this.nodeData.data.additionalHeaders)) {
       statements.push(

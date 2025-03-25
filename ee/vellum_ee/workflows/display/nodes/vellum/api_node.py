@@ -14,15 +14,6 @@ _APINodeType = TypeVar("_APINodeType", bound=APINode)
 
 
 class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeType]):
-    url_input_id: ClassVar[Optional[UUID]] = None
-    method_input_id: ClassVar[Optional[UUID]] = None
-    body_input_id: ClassVar[Optional[UUID]] = None
-
-    authorization_type_input_id: ClassVar[Optional[UUID]] = None
-    bearer_token_value_input_id: ClassVar[Optional[UUID]] = None
-    api_key_header_key_input_id: ClassVar[Optional[UUID]] = None
-    api_key_header_value_input_id: ClassVar[Optional[UUID]] = None
-
     # A mapping between node input keys and their ids for inputs representing additional header keys
     additional_header_key_input_ids: ClassVar[Optional[Dict[str, UUID]]] = None
 
@@ -41,7 +32,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             input_name="url",
             value=node_url,
             display_context=display_context,
-            input_id=self.url_input_id,
+            input_id=self.node_input_ids_by_name.get(APINode.url.name),
         )
 
         node_method = raise_if_descriptor(node.method)
@@ -50,7 +41,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             input_name="method",
             value=node_method,
             display_context=display_context,
-            input_id=self.method_input_id,
+            input_id=self.node_input_ids_by_name.get(APINode.method.name),
         )
 
         node_data = raise_if_descriptor(node.data)
@@ -60,7 +51,9 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             input_name="body",
             value=node_data if node_data else node_json,
             display_context=display_context,
-            input_id=self.body_input_id,
+            input_id=self.node_input_ids_by_name.get(APINode.json.name)
+            # Kept for backwards compatibility with a bug in previous versions of SDK serialization
+            or self.node_input_ids_by_name.get("body"),
         )
 
         headers = raise_if_descriptor(node.headers)
@@ -75,7 +68,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
                 input_name="authorization_type",
                 value=authorization_type,
                 display_context=display_context,
-                input_id=self.authorization_type_input_id,
+                input_id=self.node_input_ids_by_name.get(APINode.authorization_type.name),
             )
             if authorization_type
             else None
@@ -85,7 +78,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             input_name="bearer_token_value",
             value=bearer_token_value,
             display_context=display_context,
-            input_id=self.bearer_token_value_input_id,
+            input_id=self.node_input_ids_by_name.get(APINode.bearer_token_value.name),
             pointer_type=WorkspaceSecretPointer,
         )
         api_key_header_key_node_input = (
@@ -94,7 +87,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
                 input_name="api_key_header_key",
                 value=api_key_header_key,
                 display_context=display_context,
-                input_id=self.api_key_header_key_input_id,
+                input_id=self.node_input_ids_by_name.get(APINode.api_key_header_key.name),
             )
             if api_key_header_key
             else None
@@ -104,7 +97,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             input_name="api_key_header_value",
             value=api_key_header_value,
             display_context=display_context,
-            input_id=self.api_key_header_value_input_id,
+            input_id=self.node_input_ids_by_name.get(APINode.api_key_header_value.name),
             pointer_type=WorkspaceSecretPointer,
         )
 
