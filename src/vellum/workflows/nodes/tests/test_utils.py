@@ -136,11 +136,30 @@ def test_parse_type_from_str_error_cases(input_str, output_type, expected_except
     assert expected_message in str(excinfo.value)
 
 
-def test_cast_to_output_type_none_value():
-    assert cast_to_output_type(None, str) == ""  # String
-    assert cast_to_output_type(None, int) == 0  # Number
-    assert cast_to_output_type(None, float) == 0.0  # Number
-    assert cast_to_output_type(None, Any) is None  # Json
-    assert cast_to_output_type(None, FunctionCallType) == {}  # FunctionCall
-    assert cast_to_output_type(None, List[ChatMessage]) == []  # Chat History
-    assert cast_to_output_type(None, List[VellumValue]) == []  # Array
+@pytest.mark.parametrize(
+    "output_type,expected_result",
+    [
+        (str, ""),  # String
+        (int, 0),  # Number
+        (float, 0.0),  # Number
+        (Any, None),  # Json
+        (FunctionCallType, {}),  # FunctionCall
+        (List[ChatMessage], []),  # Chat History
+        (List[VellumValue], []),  # Array
+        (Union[float, int], 0.0),  # Union
+    ],
+    ids=[
+        "string",
+        "integer",
+        "float",
+        "json",
+        "function_call",
+        "chat_history",
+        "array",
+        "union",
+    ],
+)
+def test_cast_to_output_type_none_value(output_type, expected_result):
+    """Test that cast_to_output_type returns appropriate default values when None is provided."""
+    result = cast_to_output_type(None, output_type)
+    assert result == expected_result

@@ -209,11 +209,9 @@ def _get_default_value(output_type: Any) -> Any:
     elif output_type is FunctionCall:
         return {}
     elif origin is Union:
-        # Recursively find first type with a non-None default
-        for inner_type in args:
-            default = _get_default_value(inner_type)
-            if default is not None:
-                return default
+        # Always use the first argument type's default value
+        if args:
+            return _get_default_value(args[0])
         return None
     else:
         # We defined Json as Any now which is why it returns None
