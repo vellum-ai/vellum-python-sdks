@@ -20,7 +20,7 @@ def test_run_workflow__secrets(vellum_client):
         method = APIRequestMethod.POST
         authorization_type = AuthorizationType.BEARER_TOKEN
         url = "https://api.vellum.ai"
-        body = {
+        json = {
             "key": "value",
         }
         headers = {
@@ -32,6 +32,7 @@ def test_run_workflow__secrets(vellum_client):
     terminal = node.run()
 
     assert vellum_client.execute_api.call_count == 1
+    assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
     bearer_token = vellum_client.execute_api.call_args.kwargs["bearer_token"]
     assert bearer_token == ClientVellumSecret(name="secret")
     assert terminal.headers == {"X-Response-Header": "bar"}
@@ -45,7 +46,7 @@ def test_api_node_raises_error_when_api_call_fails(vellum_client):
         method = APIRequestMethod.GET
         authorization_type = AuthorizationType.BEARER_TOKEN
         url = "https://api.vellum.ai"
-        body = {
+        json = {
             "key": "value",
         }
         headers = {
@@ -64,6 +65,7 @@ def test_api_node_raises_error_when_api_call_fails(vellum_client):
 
     # AND the API call should have been made
     assert vellum_client.execute_api.call_count == 1
+    assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
 
 
 def test_api_node_defaults_to_get_method(vellum_client):
