@@ -10,6 +10,8 @@ from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecuteP
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.json_input_request import JsonInputRequest
 from vellum.client.types.string_vellum_value import StringVellumValue
+from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.prompt_deployment_node.node import PromptDeploymentNode
 
 
@@ -94,3 +96,22 @@ def test_run_node__any_array_input(vellum_client):
     assert call_kwargs["inputs"] == [
         JsonInputRequest(name="fruits", value=["apple", "banana", "cherry"]),
     ]
+
+
+def test_prompt_deployment_node_missing_input_variable():
+    """Test that PromptDeploymentNode correctly raises error for missing input variables."""
+
+    # GIVEN a Prompt Deployment Node that is missing an input variable
+    class TestPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "test-deployment"
+        prompt_inputs = {"fruits": None}
+
+    # WHEN the node is run with missing inputs
+    node = TestPromptDeploymentNode()
+
+    # THEN it should raise a NodeException with the correct error message and code
+    with pytest.raises(NodeException) as exc_info:
+        list(node.run())
+
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "Missing required input variables by VariablePromptBlock: 'fruits'" == str(exc_info.value)

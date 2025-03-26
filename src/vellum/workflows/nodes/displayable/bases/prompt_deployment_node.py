@@ -54,6 +54,21 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
+    def _validate(self) -> None:
+        if not self.prompt_inputs:
+            return
+
+        required_variables = set(self.prompt_inputs.keys())
+        provided_variables = {key for key in required_variables if self.prompt_inputs[key] is not None}
+
+        missing_variables = required_variables - provided_variables
+        if missing_variables:
+            missing_vars_str = ", ".join(f"'{var}'" for var in missing_variables)
+            raise NodeException(
+                message=f"Missing required input variables by VariablePromptBlock: {missing_vars_str}",
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
+
     def _get_prompt_event_stream(self) -> Iterator[ExecutePromptEvent]:
         current_context = get_execution_context()
         trace_id = current_context.trace_id
