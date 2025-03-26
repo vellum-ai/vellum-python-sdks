@@ -240,7 +240,7 @@
         "outputs": [
           {
             "id": "d8381526-1225-4843-8c22-eec7747445e4",
-            "name": "node_input",
+            "name": "value",
             "type": "STRING",
             "value": {
               "type": "WORKFLOW_INPUT",

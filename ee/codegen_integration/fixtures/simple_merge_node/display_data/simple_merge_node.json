@@ -284,7 +284,7 @@
         "outputs": [
           {
             "id": "8988fa40-5083-4635-a647-bcbbf42c1652",
-            "name": "node_input",
+            "name": "value",
             "type": "STRING",
             "value": {
               "type": "NODE_OUTPUT",

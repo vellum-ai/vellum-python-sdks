@@ -43,23 +43,35 @@ export class FinalOutputNode extends BaseSingleFileNode<
       ],
     });
 
-    // There is only one value in the outputs list so we grab the first one
-    const descriptor = this.nodeData.outputs?.map((output) => output.value)[0];
+    const descriptors = this.nodeData.outputs?.map((output) => output.value);
 
-    if (descriptor) {
-      const workflowValueDescriptor = new WorkflowValueDescriptor({
-        nodeContext: this.nodeContext,
-        workflowValueDescriptor: descriptor,
-        workflowContext: this.workflowContext,
-      });
+    if (descriptors && descriptors.length > 0) {
+      descriptors.forEach((descriptor) => {
+        if (descriptor) {
+          const workflowValueDescriptor = new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowValueDescriptor: descriptor,
+            workflowContext: this.workflowContext,
+          });
 
-      const outputField = python.field({
-        name: "value",
-        initializer: workflowValueDescriptor,
+          const outputField = python.field({
+            name: "value",
+            initializer: workflowValueDescriptor,
+          });
+          outputsClass.add(outputField);
+        }
       });
-      outputsClass.add(outputField);
+    } else {
+      const nodeInput = this.getNodeInputByName("node_input");
+
+      if (nodeInput) {
+        const outputField = python.field({
+          name: "value",
+          initializer: nodeInput,
+        });
+        outputsClass.add(outputField);
+      }
     }
-
     return outputsClass;
   }
 

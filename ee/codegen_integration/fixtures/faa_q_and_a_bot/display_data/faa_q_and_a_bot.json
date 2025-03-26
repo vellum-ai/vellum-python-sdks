@@ -2033,7 +2033,7 @@
         "outputs": [
           {
             "id": "8c6e5464-8916-4039-b911-cf707855d372",
-            "name": "node_input",
+            "name": "value",
             "type": "STRING",
             "value": {
               "type": "BINARY_EXPRESSION",

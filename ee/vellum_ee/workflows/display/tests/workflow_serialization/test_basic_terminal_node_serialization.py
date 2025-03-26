@@ -102,7 +102,7 @@ def test_serialize_workflow():
         "outputs": [
             {
                 "id": "97349956-d228-4b51-a64b-1331f788373f",
-                "name": "node_input",
+                "name": "value",
                 "type": "STRING",
                 "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e39a7b63-de15-490a-ae9b-8112c767aea0"},
             }

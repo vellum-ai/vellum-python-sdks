@@ -1,7 +1,6 @@
 from uuid import UUID
-from typing import Any, ClassVar, Generic, Optional, TypeVar, cast
+from typing import Any, ClassVar, Generic, Optional, TypeVar
 
-from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -51,9 +50,9 @@ class BaseFinalOutputNodeDisplay(BaseNodeVellumDisplay[_FinalOutputNodeType], Ge
             "outputs": [
                 {
                     "id": str(self._get_output_id()),
-                    "name": "node_input",
+                    "name": node.Outputs.value.name,
                     "type": inferred_type,
-                    "value": self.serialize_value(display_context, cast(BaseDescriptor, node.Outputs.value.instance)),
+                    "value": self.serialize_value(display_context, node.Outputs.value.instance),
                 }
             ],
         }

@@ -126,7 +126,7 @@ def test_serialize_workflow__missing_final_output_node():
                 "outputs": [
                     {
                         "id": "5517e50d-7f40-4f7c-acb2-e329d79a25bf",
-                        "name": "node_input",
+                        "name": "value",
                         "type": "STRING",
                         "value": {
                             "type": "WORKFLOW_INPUT",
