@@ -9,13 +9,14 @@ import { Expression } from "src/generators/expression";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
   IterableConfig,
-  OperatorMapping,
   WorkflowDataNode,
-  WorkflowExpression as WorkflowExpressionType,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
-  WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
 } from "src/types/vellum";
 import { assertUnreachable } from "src/utils/typing";
+import {
+  convertOperatorType,
+  isReference,
+} from "src/utils/workflow-value-descriptor";
 
 export namespace WorkflowValueDescriptor {
   export interface Args {
@@ -61,7 +62,7 @@ export class WorkflowValueDescriptor extends AstNode {
     }
 
     // Base case
-    if (this.isReference(workflowValueDescriptor)) {
+    if (isReference(workflowValueDescriptor)) {
       const reference = new WorkflowValueDescriptorReference({
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
@@ -79,7 +80,7 @@ export class WorkflowValueDescriptor extends AstNode {
     switch (workflowValueDescriptor.type) {
       case "UNARY_EXPRESSION": {
         const lhs = this.buildExpression(workflowValueDescriptor.lhs);
-        const operator = this.convertOperatorType(workflowValueDescriptor);
+        const operator = convertOperatorType(workflowValueDescriptor);
         return new Expression({
           lhs,
           operator: operator,
@@ -88,7 +89,7 @@ export class WorkflowValueDescriptor extends AstNode {
       case "BINARY_EXPRESSION": {
         const lhs = this.buildExpression(workflowValueDescriptor.lhs);
         const rhs = this.buildExpression(workflowValueDescriptor.rhs);
-        const operator = this.convertOperatorType(workflowValueDescriptor);
+        const operator = convertOperatorType(workflowValueDescriptor);
         return new Expression({
           lhs,
           operator: operator,
@@ -99,7 +100,7 @@ export class WorkflowValueDescriptor extends AstNode {
         const base = this.buildExpression(workflowValueDescriptor.base);
         const lhs = this.buildExpression(workflowValueDescriptor.lhs);
         const rhs = this.buildExpression(workflowValueDescriptor.rhs);
-        const operator = this.convertOperatorType(workflowValueDescriptor);
+        const operator = convertOperatorType(workflowValueDescriptor);
         return new Expression({
           lhs: lhs,
           operator: operator,
@@ -110,66 +111,6 @@ export class WorkflowValueDescriptor extends AstNode {
       default:
         assertUnreachable(workflowValueDescriptor);
     }
-  }
-
-  private convertOperatorType(
-    workflowValueDescriptor: WorkflowValueDescriptorType
-  ): OperatorMapping {
-    if (!this.isExpression(workflowValueDescriptor)) {
-      return "equals"; // default operator if not an expression
-    }
-
-    const operator = workflowValueDescriptor.operator;
-    if (!operator) {
-      return "equals"; // default operator if operator is null
-    }
-
-    const operatorMappings: Record<string, OperatorMapping> = {
-      "=": "equals",
-      "!=": "does_not_equal",
-      "<": "less_than",
-      ">": "greater_than",
-      "<=": "less_than_or_equal_to",
-      ">=": "greater_than_or_equal_to",
-      contains: "contains",
-      beginsWith: "begins_with",
-      endsWith: "ends_with",
-      doesNotContain: "does_not_contain",
-      doesNotBeginWith: "does_not_begin_with",
-      doesNotEndWith: "does_not_end_with",
-      null: "is_null",
-      notNull: "is_not_null",
-      in: "in",
-      notIn: "not_in",
-      between: "between",
-      notBetween: "not_between",
-      parseJson: "parse_json",
-    };
-
-    return operatorMappings[operator] || "equals"; // return default operator if not found
-  }
-
-  private isExpression(
-    workflowValueDescriptor: WorkflowValueDescriptorType
-  ): workflowValueDescriptor is WorkflowExpressionType {
-    return (
-      workflowValueDescriptor.type === "UNARY_EXPRESSION" ||
-      workflowValueDescriptor.type === "BINARY_EXPRESSION" ||
-      workflowValueDescriptor.type === "TERNARY_EXPRESSION"
-    );
-  }
-
-  private isReference(
-    workflowValueDescriptor: WorkflowValueDescriptorType
-  ): workflowValueDescriptor is WorkflowValueDescriptorReferenceType {
-    return (
-      workflowValueDescriptor.type === "NODE_OUTPUT" ||
-      workflowValueDescriptor.type === "WORKFLOW_INPUT" ||
-      workflowValueDescriptor.type === "WORKFLOW_STATE" ||
-      workflowValueDescriptor.type === "CONSTANT_VALUE" ||
-      workflowValueDescriptor.type === "VELLUM_SECRET" ||
-      workflowValueDescriptor.type === "EXECUTION_COUNTER"
-    );
   }
 
   write(writer: Writer): void {

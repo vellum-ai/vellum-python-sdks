@@ -152,7 +152,19 @@
             "final_output"
           ],
           "name": "FinalOutput"
-        }
+        },
+        "outputs": [
+          {
+            "id": "493cfa4b-5235-4b71-99ef-270955f35fcb",
+            "name": "value",
+            "type": "NUMBER",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "c207b440-6aac-4047-a37c-e25fcb5b9cfb",
+              "node_output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"
+            }
+          }
+        ]
       }
     ],
     "edges": [

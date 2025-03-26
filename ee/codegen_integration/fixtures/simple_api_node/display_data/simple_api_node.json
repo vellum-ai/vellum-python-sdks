@@ -320,7 +320,19 @@
             "nodes",
             "final_output"
           ]
-        }
+        },
+        "outputs": [
+          {
+            "id": "e53bdfb1-f74d-43f0-a3fc-24c7a5162a62",
+            "name": "value",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "743aec59-2aa9-402c-963a-d9b86a80a1c2",
+              "node_output_id": "6a3c1704-7020-411d-a440-84b2a481691e"
+            }
+          }
+        ]
       }
     ],
     "edges": [

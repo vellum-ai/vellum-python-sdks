@@ -289,7 +289,19 @@
                     "nodes",
                     "final_output"
                   ]
-                }
+                },
+                "outputs": [
+                  {
+                    "id": "6ab3665f-881d-488b-9124-a6da40136c68",
+                    "name": "value",
+                    "type": "STRING",
+                    "value": {
+                      "type": "NODE_OUTPUT",
+                      "node_id": "e413adc6-40f8-4772-8b28-769954d68d26",
+                      "node_output_id": "240f117b-f47f-4cdf-8c1d-b5fba7f71310"
+                    }
+                  }
+                ]
               }
             ],
             "edges": [
@@ -444,7 +456,19 @@
             "nodes",
             "final_output"
           ]
-        }
+        },
+        "outputs": [
+          {
+            "id": "b38e08c7-904d-4f49-b8fb-56e1eff254d6",
+            "name": "value",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "8c6d5fe5-e955-4598-9c35-0cd6f5eca47e",
+              "node_output_id": "6ab3665f-881d-488b-9124-a6da40136c68"
+            }
+          }
+        ]
       }
     ],
     "edges": [

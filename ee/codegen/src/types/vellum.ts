@@ -842,7 +842,8 @@ export type OperatorMapping =
   | "not_in"
   | "between"
   | "not_between"
-  | "parse_json";
+  | "parse_json"
+  | "coalesce";
 
 export interface IterableConfig {
   endWithComma?: boolean;

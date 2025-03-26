@@ -1639,6 +1639,7 @@ export const FinalOutputNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  outputs: listSchema(NodeOutputSerializer).optional(),
 });
 
 export declare namespace FinalOutputNodeSerializer {

@@ -47,6 +47,14 @@ class BaseFinalOutputNodeDisplay(BaseNodeVellumDisplay[_FinalOutputNodeType], Ge
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
+            "outputs": [
+                {
+                    "id": str(self._get_output_id()),
+                    "name": node.Outputs.value.name,
+                    "type": inferred_type,
+                    "value": self.serialize_value(display_context, node.Outputs.value.instance),
+                }
+            ],
         }
 
     def _get_output_id(self) -> UUID:

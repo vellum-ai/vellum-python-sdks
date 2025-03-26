@@ -143,7 +143,36 @@
           ],
           "name": "TryNode"
         },
-        "adornments": [{"id": "42823c15-2ba6-4c85-a0d7-74a4e0541a42", "label": "TryNode", "base": {"name": "TryNode", "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"]}, "attributes": [{"id": "55821c68-5207-4a5b-8345-e89dee65f71a", "name": "on_error_code", "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": null}}}]}],
+        "adornments": [
+          {
+            "id": "42823c15-2ba6-4c85-a0d7-74a4e0541a42",
+            "label": "TryNode",
+            "base": {
+              "name": "TryNode",
+              "module": [
+                "vellum",
+                "workflows",
+                "nodes",
+                "core",
+                "try_node",
+                "node"
+              ]
+            },
+            "attributes": [
+              {
+                "id": "55821c68-5207-4a5b-8345-e89dee65f71a",
+                "name": "on_error_code",
+                "value": {
+                  "type": "CONSTANT_VALUE",
+                  "value": {
+                    "type": "JSON",
+                    "value": null
+                  }
+                }
+              }
+            ]
+          }
+        ],
         "outputs": [
           {
             "id": "6f89f74a-32d8-43a5-8414-fdd7ae9265b4",
@@ -223,7 +252,19 @@
             "final_output"
           ],
           "name": "FinalOutput"
-        }
+        },
+        "outputs": [
+          {
+            "id": "f1eca494-a7dc-41c0-9c74-9658a64955e6",
+            "name": "value",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "1645c7e7-1b5f-4ca3-9610-0c5ac30a77ff",
+              "node_output_id": "13e677d3-14e7-4b0c-ab36-834bb99c930c"
+            }
+          }
+        ]
       }
     ],
     "edges": [
