@@ -10,6 +10,8 @@ from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
 from ...types.workflow_deployment_read import WorkflowDeploymentRead
 from ...core.jsonable_encoder import jsonable_encoder
+from ...types.workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
+from ...types.workflow_event_execution_read import WorkflowEventExecutionRead
 from ...types.workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from .types.list_workflow_release_tags_request_source import ListWorkflowReleaseTagsRequestSource
 from ...types.paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
@@ -133,6 +135,122 @@ class WorkflowDeploymentsClient:
                     WorkflowDeploymentRead,
                     parse_obj_as(
                         type_=WorkflowDeploymentRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_workflow_deployment_event_executions(
+        self,
+        id: str,
+        *,
+        filters: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkflowDeploymentEventExecutionsResponse:
+        """
+        Parameters
+        ----------
+        id : str
+
+        filters : typing.Optional[str]
+
+        limit : typing.Optional[int]
+            Number of executions to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the executions.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowDeploymentEventExecutionsResponse
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_key="YOUR_API_KEY",
+        )
+        client.workflow_deployments.list_workflow_deployment_event_executions(
+            id="id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "filters": filters,
+                "limit": limit,
+                "offset": offset,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    WorkflowDeploymentEventExecutionsResponse,
+                    parse_obj_as(
+                        type_=WorkflowDeploymentEventExecutionsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def workflow_deployment_event_execution(
+        self, execution_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkflowEventExecutionRead:
+        """
+        Parameters
+        ----------
+        execution_id : str
+
+        id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowEventExecutionRead
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_key="YOUR_API_KEY",
+        )
+        client.workflow_deployments.workflow_deployment_event_execution(
+            execution_id="execution_id",
+            id="id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events/{jsonable_encoder(execution_id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    WorkflowEventExecutionRead,
+                    parse_obj_as(
+                        type_=WorkflowEventExecutionRead,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -521,6 +639,138 @@ class AsyncWorkflowDeploymentsClient:
                     WorkflowDeploymentRead,
                     parse_obj_as(
                         type_=WorkflowDeploymentRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_workflow_deployment_event_executions(
+        self,
+        id: str,
+        *,
+        filters: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkflowDeploymentEventExecutionsResponse:
+        """
+        Parameters
+        ----------
+        id : str
+
+        filters : typing.Optional[str]
+
+        limit : typing.Optional[int]
+            Number of executions to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the executions.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowDeploymentEventExecutionsResponse
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflow_deployments.list_workflow_deployment_event_executions(
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "filters": filters,
+                "limit": limit,
+                "offset": offset,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    WorkflowDeploymentEventExecutionsResponse,
+                    parse_obj_as(
+                        type_=WorkflowDeploymentEventExecutionsResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def workflow_deployment_event_execution(
+        self, execution_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkflowEventExecutionRead:
+        """
+        Parameters
+        ----------
+        execution_id : str
+
+        id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowEventExecutionRead
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflow_deployments.workflow_deployment_event_execution(
+                execution_id="execution_id",
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events/{jsonable_encoder(execution_id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    WorkflowEventExecutionRead,
+                    parse_obj_as(
+                        type_=WorkflowEventExecutionRead,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

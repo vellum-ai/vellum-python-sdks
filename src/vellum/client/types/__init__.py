@@ -9,6 +9,8 @@ from .ad_hoc_streaming_prompt_execution_meta import AdHocStreamingPromptExecutio
 from .add_openai_api_key_enum import AddOpenaiApiKeyEnum
 from .api_node_result import ApiNodeResult
 from .api_node_result_data import ApiNodeResultData
+from .api_request_parent_context import ApiRequestParentContext
+from .api_version_enum import ApiVersionEnum
 from .array_chat_message_content import ArrayChatMessageContent
 from .array_chat_message_content_item import ArrayChatMessageContentItem
 from .array_chat_message_content_item_request import ArrayChatMessageContentItemRequest
@@ -21,6 +23,7 @@ from .audio_chat_message_content_request import AudioChatMessageContentRequest
 from .audio_prompt_block import AudioPromptBlock
 from .audio_vellum_value import AudioVellumValue
 from .audio_vellum_value_request import AudioVellumValueRequest
+from .base_output import BaseOutput
 from .basic_vectorizer_intfloat_multilingual_e_5_large import BasicVectorizerIntfloatMultilingualE5Large
 from .basic_vectorizer_intfloat_multilingual_e_5_large_request import BasicVectorizerIntfloatMultilingualE5LargeRequest
 from .basic_vectorizer_sentence_transformers_multi_qa_mpnet_base_cos_v_1 import (
@@ -61,6 +64,7 @@ from .code_execution_runtime import CodeExecutionRuntime
 from .code_executor_input import CodeExecutorInput
 from .code_executor_response import CodeExecutorResponse
 from .code_executor_secret_input import CodeExecutorSecretInput
+from .code_resource_definition import CodeResourceDefinition
 from .compile_prompt_deployment_expand_meta_request import CompilePromptDeploymentExpandMetaRequest
 from .compile_prompt_meta import CompilePromptMeta
 from .components_schemas_pdf_search_result_meta_source import ComponentsSchemasPdfSearchResultMetaSource
@@ -118,6 +122,7 @@ from .execution_number_vellum_value import ExecutionNumberVellumValue
 from .execution_search_results_vellum_value import ExecutionSearchResultsVellumValue
 from .execution_string_vellum_value import ExecutionStringVellumValue
 from .execution_vellum_value import ExecutionVellumValue
+from .external_input_descriptor import ExternalInputDescriptor
 from .external_test_case_execution import ExternalTestCaseExecution
 from .external_test_case_execution_request import ExternalTestCaseExecutionRequest
 from .finish_reason_enum import FinishReasonEnum
@@ -184,6 +189,7 @@ from .initiated_prompt_execution_meta import InitiatedPromptExecutionMeta
 from .initiated_workflow_node_result_event import InitiatedWorkflowNodeResultEvent
 from .instructor_vectorizer_config import InstructorVectorizerConfig
 from .instructor_vectorizer_config_request import InstructorVectorizerConfigRequest
+from .invoked_port import InvokedPort
 from .iteration_state_enum import IterationStateEnum
 from .jinja_prompt_block import JinjaPromptBlock
 from .json_input import JsonInput
@@ -207,6 +213,7 @@ from .metric_definition_input import MetricDefinitionInput
 from .metric_node_result import MetricNodeResult
 from .ml_model_read import MlModelRead
 from .ml_model_usage import MlModelUsage
+from .ml_model_usage_wrapper import MlModelUsageWrapper
 from .named_scenario_input_chat_history_variable_value_request import NamedScenarioInputChatHistoryVariableValueRequest
 from .named_scenario_input_json_variable_value_request import NamedScenarioInputJsonVariableValueRequest
 from .named_scenario_input_request import NamedScenarioInputRequest
@@ -230,6 +237,21 @@ from .named_test_case_string_variable_value_request import NamedTestCaseStringVa
 from .named_test_case_variable_value import NamedTestCaseVariableValue
 from .named_test_case_variable_value_request import NamedTestCaseVariableValueRequest
 from .new_member_join_behavior_enum import NewMemberJoinBehaviorEnum
+from .node_event_display_context import NodeEventDisplayContext
+from .node_execution_fulfilled_body import NodeExecutionFulfilledBody
+from .node_execution_fulfilled_event import NodeExecutionFulfilledEvent
+from .node_execution_initiated_body import NodeExecutionInitiatedBody
+from .node_execution_initiated_event import NodeExecutionInitiatedEvent
+from .node_execution_paused_body import NodeExecutionPausedBody
+from .node_execution_paused_event import NodeExecutionPausedEvent
+from .node_execution_rejected_body import NodeExecutionRejectedBody
+from .node_execution_rejected_event import NodeExecutionRejectedEvent
+from .node_execution_resumed_body import NodeExecutionResumedBody
+from .node_execution_resumed_event import NodeExecutionResumedEvent
+from .node_execution_span import NodeExecutionSpan
+from .node_execution_span_attributes import NodeExecutionSpanAttributes
+from .node_execution_streaming_body import NodeExecutionStreamingBody
+from .node_execution_streaming_event import NodeExecutionStreamingEvent
 from .node_input_compiled_array_value import NodeInputCompiledArrayValue
 from .node_input_compiled_chat_history_value import NodeInputCompiledChatHistoryValue
 from .node_input_compiled_error_value import NodeInputCompiledErrorValue
@@ -249,6 +271,7 @@ from .node_output_compiled_number_value import NodeOutputCompiledNumberValue
 from .node_output_compiled_search_results_value import NodeOutputCompiledSearchResultsValue
 from .node_output_compiled_string_value import NodeOutputCompiledStringValue
 from .node_output_compiled_value import NodeOutputCompiledValue
+from .node_parent_context import NodeParentContext
 from .normalized_log_probs import NormalizedLogProbs
 from .normalized_token_log_probs import NormalizedTokenLogProbs
 from .number_input import NumberInput
@@ -274,6 +297,7 @@ from .paginated_test_suite_run_execution_list import PaginatedTestSuiteRunExecut
 from .paginated_test_suite_test_case_list import PaginatedTestSuiteTestCaseList
 from .paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
 from .paginated_workflow_sandbox_example_list import PaginatedWorkflowSandboxExampleList
+from .parent_context import ParentContext
 from .pdf_search_result_meta_source import PdfSearchResultMetaSource
 from .pdf_search_result_meta_source_request import PdfSearchResultMetaSourceRequest
 from .plain_text_prompt_block import PlainTextPromptBlock
@@ -283,6 +307,7 @@ from .prompt_block import PromptBlock
 from .prompt_block_state import PromptBlockState
 from .prompt_deployment_expand_meta_request import PromptDeploymentExpandMetaRequest
 from .prompt_deployment_input_request import PromptDeploymentInputRequest
+from .prompt_deployment_parent_context import PromptDeploymentParentContext
 from .prompt_execution_meta import PromptExecutionMeta
 from .prompt_node_execution_meta import PromptNodeExecutionMeta
 from .prompt_node_result import PromptNodeResult
@@ -340,6 +365,9 @@ from .slim_deployment_read import SlimDeploymentRead
 from .slim_document import SlimDocument
 from .slim_document_document_to_document_index import SlimDocumentDocumentToDocumentIndex
 from .slim_workflow_deployment import SlimWorkflowDeployment
+from .slim_workflow_execution_read import SlimWorkflowExecutionRead
+from .span_link import SpanLink
+from .span_link_type_enum import SpanLinkTypeEnum
 from .streaming_ad_hoc_execute_prompt_event import StreamingAdHocExecutePromptEvent
 from .streaming_execute_prompt_event import StreamingExecutePromptEvent
 from .streaming_prompt_execution_meta import StreamingPromptExecutionMeta
@@ -469,6 +497,7 @@ from .upsert_test_suite_test_case_request import UpsertTestSuiteTestCaseRequest
 from .variable_prompt_block import VariablePromptBlock
 from .vellum_audio import VellumAudio
 from .vellum_audio_request import VellumAudioRequest
+from .vellum_code_resource_definition import VellumCodeResourceDefinition
 from .vellum_document import VellumDocument
 from .vellum_document_request import VellumDocumentRequest
 from .vellum_error import VellumError
@@ -476,7 +505,11 @@ from .vellum_error_code_enum import VellumErrorCodeEnum
 from .vellum_error_request import VellumErrorRequest
 from .vellum_image import VellumImage
 from .vellum_image_request import VellumImageRequest
+from .vellum_node_execution_event import VellumNodeExecutionEvent
+from .vellum_sdk_error import VellumSdkError
+from .vellum_sdk_error_code_enum import VellumSdkErrorCodeEnum
 from .vellum_secret import VellumSecret
+from .vellum_span import VellumSpan
 from .vellum_value import VellumValue
 from .vellum_value_logical_condition_group_request import VellumValueLogicalConditionGroupRequest
 from .vellum_value_logical_condition_request import VellumValueLogicalConditionRequest
@@ -485,17 +518,43 @@ from .vellum_value_request import VellumValueRequest
 from .vellum_variable import VellumVariable
 from .vellum_variable_extensions import VellumVariableExtensions
 from .vellum_variable_type import VellumVariableType
+from .vellum_workflow_execution_event import VellumWorkflowExecutionEvent
+from .workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from .workflow_deployment_history_item import WorkflowDeploymentHistoryItem
+from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
 from .workflow_deployment_read import WorkflowDeploymentRead
+from .workflow_error import WorkflowError
+from .workflow_event_display_context import WorkflowEventDisplayContext
 from .workflow_event_error import WorkflowEventError
+from .workflow_event_execution_read import WorkflowEventExecutionRead
+from .workflow_execution_actual import WorkflowExecutionActual
 from .workflow_execution_actual_chat_history_request import WorkflowExecutionActualChatHistoryRequest
 from .workflow_execution_actual_json_request import WorkflowExecutionActualJsonRequest
 from .workflow_execution_actual_string_request import WorkflowExecutionActualStringRequest
 from .workflow_execution_event_error_code import WorkflowExecutionEventErrorCode
 from .workflow_execution_event_type import WorkflowExecutionEventType
+from .workflow_execution_fulfilled_body import WorkflowExecutionFulfilledBody
+from .workflow_execution_fulfilled_event import WorkflowExecutionFulfilledEvent
+from .workflow_execution_initiated_body import WorkflowExecutionInitiatedBody
+from .workflow_execution_initiated_event import WorkflowExecutionInitiatedEvent
 from .workflow_execution_node_result_event import WorkflowExecutionNodeResultEvent
+from .workflow_execution_paused_body import WorkflowExecutionPausedBody
+from .workflow_execution_paused_event import WorkflowExecutionPausedEvent
+from .workflow_execution_rejected_body import WorkflowExecutionRejectedBody
+from .workflow_execution_rejected_event import WorkflowExecutionRejectedEvent
+from .workflow_execution_resumed_body import WorkflowExecutionResumedBody
+from .workflow_execution_resumed_event import WorkflowExecutionResumedEvent
+from .workflow_execution_snapshotted_body import WorkflowExecutionSnapshottedBody
+from .workflow_execution_snapshotted_event import WorkflowExecutionSnapshottedEvent
+from .workflow_execution_span import WorkflowExecutionSpan
+from .workflow_execution_span_attributes import WorkflowExecutionSpanAttributes
+from .workflow_execution_streaming_body import WorkflowExecutionStreamingBody
+from .workflow_execution_streaming_event import WorkflowExecutionStreamingEvent
+from .workflow_execution_usage_calculation_fulfilled_body import WorkflowExecutionUsageCalculationFulfilledBody
+from .workflow_execution_view_online_eval_metric_result import WorkflowExecutionViewOnlineEvalMetricResult
 from .workflow_execution_workflow_result_event import WorkflowExecutionWorkflowResultEvent
 from .workflow_expand_meta_request import WorkflowExpandMetaRequest
+from .workflow_initialization_error import WorkflowInitializationError
 from .workflow_node_result_data import WorkflowNodeResultData
 from .workflow_node_result_event import WorkflowNodeResultEvent
 from .workflow_node_result_event_state import WorkflowNodeResultEventState
@@ -509,6 +568,7 @@ from .workflow_output_json import WorkflowOutputJson
 from .workflow_output_number import WorkflowOutputNumber
 from .workflow_output_search_results import WorkflowOutputSearchResults
 from .workflow_output_string import WorkflowOutputString
+from .workflow_parent_context import WorkflowParentContext
 from .workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from .workflow_push_exec_config import WorkflowPushExecConfig
 from .workflow_push_response import WorkflowPushResponse
@@ -530,6 +590,7 @@ from .workflow_result_event_output_data_number import WorkflowResultEventOutputD
 from .workflow_result_event_output_data_search_results import WorkflowResultEventOutputDataSearchResults
 from .workflow_result_event_output_data_string import WorkflowResultEventOutputDataString
 from .workflow_sandbox_example import WorkflowSandboxExample
+from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
 from .workflow_stream_event import WorkflowStreamEvent
 from .workspace_read import WorkspaceRead
 from .workspace_secret_read import WorkspaceSecretRead
@@ -544,6 +605,8 @@ __all__ = [
     "AddOpenaiApiKeyEnum",
     "ApiNodeResult",
     "ApiNodeResultData",
+    "ApiRequestParentContext",
+    "ApiVersionEnum",
     "ArrayChatMessageContent",
     "ArrayChatMessageContentItem",
     "ArrayChatMessageContentItemRequest",
@@ -556,6 +619,7 @@ __all__ = [
     "AudioPromptBlock",
     "AudioVellumValue",
     "AudioVellumValueRequest",
+    "BaseOutput",
     "BasicVectorizerIntfloatMultilingualE5Large",
     "BasicVectorizerIntfloatMultilingualE5LargeRequest",
     "BasicVectorizerSentenceTransformersMultiQaMpnetBaseCosV1",
@@ -588,6 +652,7 @@ __all__ = [
     "CodeExecutorInput",
     "CodeExecutorResponse",
     "CodeExecutorSecretInput",
+    "CodeResourceDefinition",
     "CompilePromptDeploymentExpandMetaRequest",
     "CompilePromptMeta",
     "ComponentsSchemasPdfSearchResultMetaSource",
@@ -645,6 +710,7 @@ __all__ = [
     "ExecutionSearchResultsVellumValue",
     "ExecutionStringVellumValue",
     "ExecutionVellumValue",
+    "ExternalInputDescriptor",
     "ExternalTestCaseExecution",
     "ExternalTestCaseExecutionRequest",
     "FinishReasonEnum",
@@ -707,6 +773,7 @@ __all__ = [
     "InitiatedWorkflowNodeResultEvent",
     "InstructorVectorizerConfig",
     "InstructorVectorizerConfigRequest",
+    "InvokedPort",
     "IterationStateEnum",
     "JinjaPromptBlock",
     "JsonInput",
@@ -730,6 +797,7 @@ __all__ = [
     "MetricNodeResult",
     "MlModelRead",
     "MlModelUsage",
+    "MlModelUsageWrapper",
     "NamedScenarioInputChatHistoryVariableValueRequest",
     "NamedScenarioInputJsonVariableValueRequest",
     "NamedScenarioInputRequest",
@@ -753,6 +821,21 @@ __all__ = [
     "NamedTestCaseVariableValue",
     "NamedTestCaseVariableValueRequest",
     "NewMemberJoinBehaviorEnum",
+    "NodeEventDisplayContext",
+    "NodeExecutionFulfilledBody",
+    "NodeExecutionFulfilledEvent",
+    "NodeExecutionInitiatedBody",
+    "NodeExecutionInitiatedEvent",
+    "NodeExecutionPausedBody",
+    "NodeExecutionPausedEvent",
+    "NodeExecutionRejectedBody",
+    "NodeExecutionRejectedEvent",
+    "NodeExecutionResumedBody",
+    "NodeExecutionResumedEvent",
+    "NodeExecutionSpan",
+    "NodeExecutionSpanAttributes",
+    "NodeExecutionStreamingBody",
+    "NodeExecutionStreamingEvent",
     "NodeInputCompiledArrayValue",
     "NodeInputCompiledChatHistoryValue",
     "NodeInputCompiledErrorValue",
@@ -772,6 +855,7 @@ __all__ = [
     "NodeOutputCompiledSearchResultsValue",
     "NodeOutputCompiledStringValue",
     "NodeOutputCompiledValue",
+    "NodeParentContext",
     "NormalizedLogProbs",
     "NormalizedTokenLogProbs",
     "NumberInput",
@@ -797,6 +881,7 @@ __all__ = [
     "PaginatedTestSuiteTestCaseList",
     "PaginatedWorkflowReleaseTagReadList",
     "PaginatedWorkflowSandboxExampleList",
+    "ParentContext",
     "PdfSearchResultMetaSource",
     "PdfSearchResultMetaSourceRequest",
     "PlainTextPromptBlock",
@@ -806,6 +891,7 @@ __all__ = [
     "PromptBlockState",
     "PromptDeploymentExpandMetaRequest",
     "PromptDeploymentInputRequest",
+    "PromptDeploymentParentContext",
     "PromptExecutionMeta",
     "PromptNodeExecutionMeta",
     "PromptNodeResult",
@@ -863,6 +949,9 @@ __all__ = [
     "SlimDocument",
     "SlimDocumentDocumentToDocumentIndex",
     "SlimWorkflowDeployment",
+    "SlimWorkflowExecutionRead",
+    "SpanLink",
+    "SpanLinkTypeEnum",
     "StreamingAdHocExecutePromptEvent",
     "StreamingExecutePromptEvent",
     "StreamingPromptExecutionMeta",
@@ -976,6 +1065,7 @@ __all__ = [
     "VariablePromptBlock",
     "VellumAudio",
     "VellumAudioRequest",
+    "VellumCodeResourceDefinition",
     "VellumDocument",
     "VellumDocumentRequest",
     "VellumError",
@@ -983,7 +1073,11 @@ __all__ = [
     "VellumErrorRequest",
     "VellumImage",
     "VellumImageRequest",
+    "VellumNodeExecutionEvent",
+    "VellumSdkError",
+    "VellumSdkErrorCodeEnum",
     "VellumSecret",
+    "VellumSpan",
     "VellumValue",
     "VellumValueLogicalConditionGroupRequest",
     "VellumValueLogicalConditionRequest",
@@ -992,17 +1086,43 @@ __all__ = [
     "VellumVariable",
     "VellumVariableExtensions",
     "VellumVariableType",
+    "VellumWorkflowExecutionEvent",
+    "WorkflowDeploymentEventExecutionsResponse",
     "WorkflowDeploymentHistoryItem",
+    "WorkflowDeploymentParentContext",
     "WorkflowDeploymentRead",
+    "WorkflowError",
+    "WorkflowEventDisplayContext",
     "WorkflowEventError",
+    "WorkflowEventExecutionRead",
+    "WorkflowExecutionActual",
     "WorkflowExecutionActualChatHistoryRequest",
     "WorkflowExecutionActualJsonRequest",
     "WorkflowExecutionActualStringRequest",
     "WorkflowExecutionEventErrorCode",
     "WorkflowExecutionEventType",
+    "WorkflowExecutionFulfilledBody",
+    "WorkflowExecutionFulfilledEvent",
+    "WorkflowExecutionInitiatedBody",
+    "WorkflowExecutionInitiatedEvent",
     "WorkflowExecutionNodeResultEvent",
+    "WorkflowExecutionPausedBody",
+    "WorkflowExecutionPausedEvent",
+    "WorkflowExecutionRejectedBody",
+    "WorkflowExecutionRejectedEvent",
+    "WorkflowExecutionResumedBody",
+    "WorkflowExecutionResumedEvent",
+    "WorkflowExecutionSnapshottedBody",
+    "WorkflowExecutionSnapshottedEvent",
+    "WorkflowExecutionSpan",
+    "WorkflowExecutionSpanAttributes",
+    "WorkflowExecutionStreamingBody",
+    "WorkflowExecutionStreamingEvent",
+    "WorkflowExecutionUsageCalculationFulfilledBody",
+    "WorkflowExecutionViewOnlineEvalMetricResult",
     "WorkflowExecutionWorkflowResultEvent",
     "WorkflowExpandMetaRequest",
+    "WorkflowInitializationError",
     "WorkflowNodeResultData",
     "WorkflowNodeResultEvent",
     "WorkflowNodeResultEventState",
@@ -1016,6 +1136,7 @@ __all__ = [
     "WorkflowOutputNumber",
     "WorkflowOutputSearchResults",
     "WorkflowOutputString",
+    "WorkflowParentContext",
     "WorkflowPushDeploymentConfigRequest",
     "WorkflowPushExecConfig",
     "WorkflowPushResponse",
@@ -1037,6 +1158,7 @@ __all__ = [
     "WorkflowResultEventOutputDataSearchResults",
     "WorkflowResultEventOutputDataString",
     "WorkflowSandboxExample",
+    "WorkflowSandboxParentContext",
     "WorkflowStreamEvent",
     "WorkspaceRead",
     "WorkspaceSecretRead",
