@@ -13,6 +13,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import InputsType, StateType
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
@@ -140,3 +141,8 @@ class InlineSubworkflowNode(
         # Subclasses of InlineSubworkflowNode can override this method to provider their own
         # approach to annotating the outputs class based on the `subworkflow.Outputs`
         setattr(outputs_class, reference.name, reference)
+
+        if not hasattr(cls, "__output_ids__"):
+            cls.__output_ids__ = {}
+
+        cls.__output_ids__[reference.name] = uuid4_from_hash(f"{cls.__id__}|{reference.name}")
