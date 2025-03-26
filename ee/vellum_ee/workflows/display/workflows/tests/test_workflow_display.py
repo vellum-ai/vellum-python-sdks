@@ -275,3 +275,17 @@ def test_get_event_display_context__node_display_for_mutiple_adornments():
     assert innermost_node_id in inner_node_event_display.subworkflow_display.node_displays
     innermost_node_event_display = inner_node_event_display.subworkflow_display.node_displays[innermost_node_id]
     assert not innermost_node_event_display.subworkflow_display
+
+
+def test_get_event_display_context__workflow_output_display_with_none():
+    # GIVEN a workflow with a workflow output that is None
+    class MyWorkflow(BaseWorkflow):
+        class Outputs(BaseWorkflow.Outputs):
+            foo = None
+            bar = "baz"
+
+    # WHEN we gather the event display context
+    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+
+    # THEN the workflow output display should be included
+    assert display_context.workflow_outputs.keys() == {"foo", "bar"}

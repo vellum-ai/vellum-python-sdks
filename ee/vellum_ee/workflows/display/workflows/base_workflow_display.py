@@ -10,7 +10,6 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
-from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
@@ -290,11 +289,6 @@ class BaseWorkflowDisplay(
 
             if not isinstance(workflow_output, OutputReference):
                 raise ValueError(f"{workflow_output} must be an {OutputReference.__name__}")
-
-            if not workflow_output.instance or not isinstance(
-                workflow_output.instance, (OutputReference, CoalesceExpression)
-            ):
-                raise ValueError("Expected to find a descriptor instance on the workflow output")
 
             workflow_output_display = self.output_displays.get(workflow_output)
             workflow_output_displays[workflow_output] = (
