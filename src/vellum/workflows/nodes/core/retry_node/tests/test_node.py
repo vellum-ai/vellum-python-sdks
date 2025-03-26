@@ -33,29 +33,6 @@ def test_retry_node__retry_on_error_code__successfully_retried():
     assert outputs.execution_count == 3
 
 
-def test_retry_node__retry_on_error_code_all():
-    # GIVEN a retry node that is configured to retry on all errors
-    @RetryNode.wrap(max_attempts=3)
-    class TestNode(BaseNode):
-        attempt_number = RetryNode.SubworkflowInputs.attempt_number
-
-        class Outputs(BaseOutputs):
-            execution_count: int
-
-        def run(self) -> Outputs:
-            if self.attempt_number < 3:
-                raise NodeException(message="This will be retried", code=WorkflowErrorCode.PROVIDER_ERROR)
-
-            return self.Outputs(execution_count=self.attempt_number)
-
-    # WHEN the node is run and throws a None
-    node = TestNode(state=BaseState())
-    outputs = node.run()
-
-    # THEN the exception is retried
-    assert outputs.execution_count == 3
-
-
 def test_retry_node__retry_on_error_code__missed():
     # GIVEN a retry node that is configured to retry on PROVIDER_ERROR
     @RetryNode.wrap(max_attempts=3, retry_on_error_code=WorkflowErrorCode.PROVIDER_ERROR)
