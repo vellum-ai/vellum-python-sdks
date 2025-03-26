@@ -304,3 +304,13 @@ def test_workflow__node_in_both_graph_and_unused():
 
     # THEN it should raise an error
     assert "Node(s) NodeA cannot appear in both graph and unused_graphs" in str(exc_info.value)
+
+
+def test_workflow__unsupported_graph_item():
+    with pytest.raises(TypeError) as exc_info:
+        # GIVEN a workflow with an unsupported graph item
+        class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+            graph = 1  # type: ignore
+
+    # THEN it should raise an error
+    assert "Unexpected graph type: <class 'int'>" in str(exc_info.value)
