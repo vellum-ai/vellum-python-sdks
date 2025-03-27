@@ -8,10 +8,9 @@ from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
-from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
+from vellum_ee.workflows.display.nodes.vellum.utils import NodeInput, create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
-from vellum_ee.workflows.display.vellum import NodeInput
 
 _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 

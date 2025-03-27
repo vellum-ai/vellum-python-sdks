@@ -1347,10 +1347,10 @@
             "value": {
               "rules": [
                 {
-                  "type": "WORKSPACE_SECRET",
+                  "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "workspace_secret_id": null
+                    "value": ""
                   }
                 }
               ],

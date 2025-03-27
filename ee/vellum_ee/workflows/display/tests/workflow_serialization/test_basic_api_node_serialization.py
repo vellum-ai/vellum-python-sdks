@@ -115,9 +115,7 @@ def test_serialize_workflow(vellum_client):
                     "id": "fee5e3c9-442a-4922-ba80-5ee07361cea7",
                     "key": "bearer_token_value",
                     "value": {
-                        "rules": [
-                            {"type": "WORKSPACE_SECRET", "data": {"type": "STRING", "workspace_secret_id": None}}
-                        ],
+                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": ""}}],
                         "combinator": "OR",
                     },
                 },

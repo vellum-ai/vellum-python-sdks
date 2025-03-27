@@ -13,10 +13,8 @@ from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
-from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
+from vellum_ee.workflows.display.nodes.vellum.utils import NodeInput, create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.vellum import InputVariablePointer
-from vellum_ee.workflows.display.vellum import NodeInput
 
 _SearchNodeType = TypeVar("_SearchNodeType", bound=SearchNode)
 
@@ -185,7 +183,6 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
                         str(lhs_query_input_id),
                         display_context,
                         input_id=UUID(lhs_variable_id),
-                        pointer_type=InputVariablePointer,
                     ),
                     create_node_input(
                         self.node_id,
@@ -193,7 +190,6 @@ class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_Sea
                         str(rhs_query_input_id),
                         display_context,
                         input_id=UUID(rhs_variable_id),
-                        pointer_type=InputVariablePointer,
                     ),
                 ],
             )

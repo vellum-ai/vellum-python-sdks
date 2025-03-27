@@ -15,7 +15,12 @@ def test_serialize_workflow():
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the workflow
-    assert serialized_workflow.keys() == {"workflow_raw_data", "input_variables", "state_variables", "output_variables"}
+    assert serialized_workflow.keys() == {
+        "workflow_raw_data",
+        "input_variables",
+        "state_variables",
+        "output_variables",
+    }
 
     # AND its input variables should be what we expect
     input_variables = serialized_workflow["input_variables"]
@@ -165,8 +170,8 @@ def test_serialize_workflow():
                 "value": {
                     "rules": [
                         {
-                            "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "8ffffeb2-79b3-4105-acc7-78b0267da955"},
+                            "type": "CONSTANT_VALUE",
+                            "data": {"type": "STRING", "value": "8ffffeb2-79b3-4105-acc7-78b0267da955"},
                         }
                     ],
                     "combinator": "OR",
@@ -178,8 +183,8 @@ def test_serialize_workflow():
                 "value": {
                     "rules": [
                         {
-                            "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "8ffffeb2-79b3-4105-acc7-78b0267da955"},
+                            "type": "CONSTANT_VALUE",
+                            "data": {"type": "STRING", "value": "8ffffeb2-79b3-4105-acc7-78b0267da955"},
                         }
                     ],
                     "combinator": "OR",
@@ -191,8 +196,8 @@ def test_serialize_workflow():
                 "value": {
                     "rules": [
                         {
-                            "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "f5eee974-b0c3-4775-bc8a-679a9e99d7ba"},
+                            "type": "CONSTANT_VALUE",
+                            "data": {"type": "STRING", "value": "f5eee974-b0c3-4775-bc8a-679a9e99d7ba"},
                         }
                     ],
                     "combinator": "OR",
@@ -204,8 +209,8 @@ def test_serialize_workflow():
                 "value": {
                     "rules": [
                         {
-                            "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "f5eee974-b0c3-4775-bc8a-679a9e99d7ba"},
+                            "type": "CONSTANT_VALUE",
+                            "data": {"type": "STRING", "value": "f5eee974-b0c3-4775-bc8a-679a9e99d7ba"},
                         }
                     ],
                     "combinator": "OR",

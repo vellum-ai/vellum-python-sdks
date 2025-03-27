@@ -14,5 +14,5 @@ class ApiNode(APINode):
     }
     api_key_header_key = "nice-key"
     authorization_type = AuthorizationType.API_KEY
-    api_key_header_value = None
-    bearer_token_value = None
+    api_key_header_value = ""
+    bearer_token_value = ""

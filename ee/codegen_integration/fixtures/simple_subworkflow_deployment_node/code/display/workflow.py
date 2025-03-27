@@ -36,7 +36,9 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         )
     }
     edge_displays = {
-        (SubworkflowDeployment.Ports.default, FinalOutput): EdgeDisplay(id=UUID("85970a9b-4ce7-46a5-b539-66aaeef080df"))
+        (SubworkflowDeployment.Ports.default, FinalOutput): EdgeDisplay(
+            id=UUID("85970a9b-4ce7-46a5-b539-66aaeef080df")
+        )
     }
     output_displays = {
         Workflow.Outputs.final_output: WorkflowOutputDisplay(

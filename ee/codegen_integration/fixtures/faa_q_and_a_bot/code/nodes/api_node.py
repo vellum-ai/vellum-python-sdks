@@ -10,4 +10,4 @@ class APINode(BaseAPINode):
     api_key_header_key = "ab2f59-1004d1"
     authorization_type = AuthorizationType.API_KEY
     api_key_header_value = VellumSecretReference("TEST_SECRET")
-    bearer_token_value = None
+    bearer_token_value = ""

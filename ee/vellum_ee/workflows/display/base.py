@@ -85,6 +85,10 @@ class EntrypointDisplay:
 
 @dataclass
 class EntrypointDisplayOverrides(EntrypointDisplay):
+    """
+    DEPRECATED: Use EntrypointDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 

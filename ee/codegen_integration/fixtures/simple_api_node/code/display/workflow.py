@@ -35,7 +35,9 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
             edge_display=EdgeDisplay(id=UUID("8fbc728e-7408-4456-a932-001423ae8efa")),
         )
     }
-    edge_displays = {(ApiNode.Ports.default, FinalOutput): EdgeDisplay(id=UUID("dc149e06-f71f-48ba-be58-0c3f6be13719"))}
+    edge_displays = {
+        (ApiNode.Ports.default, FinalOutput): EdgeDisplay(id=UUID("dc149e06-f71f-48ba-be58-0c3f6be13719"))
+    }
     output_displays = {
         Workflow.Outputs.final_output: WorkflowOutputDisplay(
             id=UUID("e53bdfb1-f74d-43f0-a3fc-24c7a5162a62"), name="final-output"

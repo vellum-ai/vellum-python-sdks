@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Tuple, Type, Union
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.array_vellum_value import ArrayVellumValue
 from vellum.client.types.logical_operator import LogicalOperator
+from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_variable_type import VellumVariableType
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -123,7 +124,7 @@ def infer_vellum_variable_type(value: Any) -> VellumVariableType:
 
 
 def create_node_input_value_pointer_rule(
-    value: Any, display_context: "WorkflowDisplayContext"
+    value: Any, display_context: "WorkflowDisplayContext", expected_types: Optional[Tuple[Type, ...]] = None
 ) -> NodeInputValuePointerRule:
     if isinstance(value, OutputReference):
         if value not in display_context.global_node_output_displays:
@@ -159,6 +160,9 @@ def create_node_input_value_pointer_rule(
         return ExecutionCounterPointer(
             data=ExecutionCounterData(node_id=str(node_class_display.node_id)),
         )
+
+    if value is None and expected_types and any(issubclass(t, str) for t in expected_types):
+        return ConstantValuePointer(type="CONSTANT_VALUE", data=StringVellumValue(value=""))
 
     if not isinstance(value, BaseDescriptor):
         vellum_value = primitive_to_vellum_value(value)

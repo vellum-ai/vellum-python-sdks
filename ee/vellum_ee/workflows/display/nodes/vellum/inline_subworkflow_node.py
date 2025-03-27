@@ -7,10 +7,9 @@ from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
-from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
+from vellum_ee.workflows.display.nodes.vellum.utils import NodeInput, create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
-from vellum_ee.workflows.display.vellum import NodeInput
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 _InlineSubworkflowNodeType = TypeVar("_InlineSubworkflowNodeType", bound=InlineSubworkflowNode)

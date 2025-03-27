@@ -8,7 +8,6 @@ from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeV
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.vellum import WorkspaceSecretPointer
 
 _APINodeType = TypeVar("_APINodeType", bound=APINode)
 
@@ -79,7 +78,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             value=bearer_token_value,
             display_context=display_context,
             input_id=self.node_input_ids_by_name.get(APINode.bearer_token_value.name),
-            pointer_type=WorkspaceSecretPointer,
+            expected_types=APINode.bearer_token_value.types,
         )
         api_key_header_key_node_input = (
             create_node_input(
@@ -98,7 +97,7 @@ class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeTy
             value=api_key_header_value,
             display_context=display_context,
             input_id=self.node_input_ids_by_name.get(APINode.api_key_header_value.name),
-            pointer_type=WorkspaceSecretPointer,
+            expected_types=APINode.api_key_header_key.types,
         )
 
         additional_header_inputs = []

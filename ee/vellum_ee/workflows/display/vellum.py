@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from uuid import UUID
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
-from vellum.core import UniversalBaseModel
+from vellum.client.types.code_resource_definition import CodeResourceDefinition  # noqa: F401 - Remove in 0.15.0
 from vellum_ee.workflows.display.base import (
     EdgeDisplayOverrides,
     EntrypointDisplayOverrides,
@@ -18,12 +18,6 @@ from vellum_ee.workflows.display.base import WorkflowDisplayDataViewport  # noqa
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment  # noqa: F401 - Remove in 0.15.0
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.editor.types import NodeDisplayPosition  # noqa: F401 - Remove in 0.15.0
-from vellum_ee.workflows.display.utils.vellum import NodeInputValuePointerRule
-
-
-class CodeResourceDefinition(UniversalBaseModel):
-    name: str
-    module: List[str]
 
 
 @dataclass
@@ -127,14 +121,3 @@ class WorkflowOutputVellumDisplay(WorkflowOutputVellumDisplayOverrides):
     """
 
     pass
-
-
-class NodeInputValuePointer(UniversalBaseModel):
-    rules: List[NodeInputValuePointerRule]
-    combinator: Literal["OR"] = "OR"
-
-
-class NodeInput(UniversalBaseModel):
-    id: str
-    key: str
-    value: NodeInputValuePointer
