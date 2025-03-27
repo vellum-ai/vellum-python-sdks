@@ -34,6 +34,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
 
     class Outputs(BaseOutputs):
         score: float
+        log: Optional[str]
 
     def run(self) -> Outputs:
         metric_execution = self._context.vellum_client.metric_definitions.execute_metric_definition(
@@ -52,8 +53,19 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
             )
 
+        log = metric_outputs.get("log")
+
+        if log is not None and not isinstance(log, str):
+            raise NodeException(
+                message="Metric execution log output must be of type 'str'",
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+            )
+        if log:
+            metric_outputs.pop("log")
+
         metric_outputs.pop("score")
-        return self.Outputs(score=score, **metric_outputs)
+
+        return self.Outputs(score=score, log=log, **metric_outputs)
 
     def _compile_metric_inputs(self) -> List[MetricDefinitionInput]:
         # TODO: We may want to consolidate with prompt deployment input compilation
