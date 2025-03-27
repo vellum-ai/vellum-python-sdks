@@ -46,6 +46,8 @@ class OnValidatePython(ValidatePythonHandlerProtocol):
         context: Optional[Dict[str, Any]] = None,
         self_instance: Optional[Any] = None,
         allow_partial: Union[bool, Literal["off", "on", "trailing-strings"]] = False,
+        by_alias: Optional[bool] = None,
+        by_name: Optional[bool] = None,
     ) -> None:
         if not isinstance(input, dict):
             return
