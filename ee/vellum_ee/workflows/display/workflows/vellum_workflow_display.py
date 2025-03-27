@@ -12,6 +12,7 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum_ee.workflows.display.base import WorkflowMetaDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -25,7 +26,6 @@ from vellum_ee.workflows.display.vellum import (
     WorkflowInputsVellumDisplay,
     WorkflowInputsVellumDisplayOverrides,
     WorkflowMetaVellumDisplay,
-    WorkflowMetaVellumDisplayOverrides,
 )
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
@@ -35,8 +35,6 @@ logger = logging.getLogger(__name__)
 class VellumWorkflowDisplay(
     BaseWorkflowDisplay[
         WorkflowType,
-        WorkflowMetaVellumDisplay,
-        WorkflowMetaVellumDisplayOverrides,
         WorkflowInputsVellumDisplay,
         WorkflowInputsVellumDisplayOverrides,
         StateValueVellumDisplay,
@@ -346,7 +344,7 @@ class VellumWorkflowDisplay(
     def _generate_entrypoint_display(
         self,
         entrypoint: Type[BaseNode],
-        workflow_display: WorkflowMetaVellumDisplay,
+        workflow_display: WorkflowMetaDisplay,
         node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
         overrides: Optional[EntrypointVellumDisplayOverrides] = None,
     ) -> EntrypointVellumDisplay:

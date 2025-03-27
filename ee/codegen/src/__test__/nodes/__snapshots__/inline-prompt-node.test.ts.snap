@@ -3,12 +3,12 @@
 exports[`InlinePromptNode > CHAT_MESSAGE block type > basic > getNodeDisplayFile for CHAT_MESSAGE block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -95,12 +95,12 @@ Summarize the following text:
 exports[`InlinePromptNode > CHAT_MESSAGE block type > legacy prompt variant > getNodeDisplayFile for CHAT_MESSAGE block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -187,6 +187,7 @@ Summarize the following text:
 exports[`InlinePromptNode > CHAT_MESSAGE block type > reject on error enabled > getNodeDisplayFile for CHAT_MESSAGE block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseTryNodeDisplay,
@@ -195,7 +196,6 @@ from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -288,12 +288,12 @@ Summarize the following text:
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > basic > getNodeDisplayFile for FUNCTION_DEFINITION block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -357,12 +357,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > legacy prompt variant > getNodeDisplayFile for FUNCTION_DEFINITION block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -426,6 +426,7 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > reject on error enabled > getNodeDisplayFile for FUNCTION_DEFINITION block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseTryNodeDisplay,
@@ -434,7 +435,6 @@ from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -504,12 +504,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > JINJA block type > basic > getNodeDisplayFile for JINJA block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -572,12 +572,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > JINJA block type > legacy prompt variant > getNodeDisplayFile for JINJA block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -640,6 +640,7 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > JINJA block type > reject on error enabled > getNodeDisplayFile for JINJA block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseTryNodeDisplay,
@@ -648,7 +649,6 @@ from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -717,12 +717,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > RICH_TEXT block type > basic > getNodeDisplayFile for RICH_TEXT block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -791,12 +791,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > RICH_TEXT block type > legacy prompt variant > getNodeDisplayFile for RICH_TEXT block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -865,6 +865,7 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > RICH_TEXT block type > reject on error enabled > getNodeDisplayFile for RICH_TEXT block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseTryNodeDisplay,
@@ -873,7 +874,6 @@ from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -948,12 +948,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > VARIABLE block type > basic > getNodeDisplayFile for VARIABLE block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -1016,12 +1016,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > VARIABLE block type > legacy prompt variant > getNodeDisplayFile for VARIABLE block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -1084,6 +1084,7 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > VARIABLE block type > reject on error enabled > getNodeDisplayFile for VARIABLE block type 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseTryNodeDisplay,
@@ -1092,7 +1093,6 @@ from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 
@@ -1227,12 +1227,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > with json output id defined > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.prompt_node import PromptNode
 

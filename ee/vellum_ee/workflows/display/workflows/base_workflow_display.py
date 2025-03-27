@@ -25,8 +25,7 @@ from vellum_ee.workflows.display.base import (
     StateValueDisplayType,
     WorkflowInputsDisplayOverridesType,
     WorkflowInputsDisplayType,
-    WorkflowMetaDisplayOverridesType,
-    WorkflowMetaDisplayType,
+    WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -50,8 +49,6 @@ logger = logging.getLogger(__name__)
 class BaseWorkflowDisplay(
     Generic[
         WorkflowType,
-        WorkflowMetaDisplayType,
-        WorkflowMetaDisplayOverridesType,
         WorkflowInputsDisplayType,
         WorkflowInputsDisplayOverridesType,
         StateValueDisplayType,
@@ -61,7 +58,7 @@ class BaseWorkflowDisplay(
     ]
 ):
     # Used to specify the display data for a workflow.
-    workflow_display: Optional[WorkflowMetaDisplayOverridesType] = None
+    workflow_display: Optional[WorkflowMetaDisplay] = None
 
     # Used to explicitly specify display data for a workflow's inputs.
     inputs_display: Dict[WorkflowInputReference, WorkflowInputsDisplayOverridesType] = {}
@@ -94,7 +91,6 @@ class BaseWorkflowDisplay(
         *,
         parent_display_context: Optional[
             WorkflowDisplayContext[
-                WorkflowMetaDisplayType,
                 WorkflowInputsDisplayType,
                 StateValueDisplayType,
                 EntrypointDisplayType,
@@ -190,7 +186,6 @@ class BaseWorkflowDisplay(
     def display_context(
         self,
     ) -> WorkflowDisplayContext[
-        WorkflowMetaDisplayType,
         WorkflowInputsDisplayType,
         StateValueDisplayType,
         EntrypointDisplayType,
@@ -311,7 +306,7 @@ class BaseWorkflowDisplay(
         )
 
     @abstractmethod
-    def _generate_workflow_meta_display(self) -> WorkflowMetaDisplayType:
+    def _generate_workflow_meta_display(self) -> WorkflowMetaDisplay:
         pass
 
     @abstractmethod
@@ -330,7 +325,7 @@ class BaseWorkflowDisplay(
     def _generate_entrypoint_display(
         self,
         entrypoint: Type[BaseNode],
-        workflow_display: WorkflowMetaDisplayType,
+        workflow_display: WorkflowMetaDisplay,
         node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
         overrides: Optional[EntrypointDisplayOverridesType] = None,
     ) -> EntrypointDisplayType:

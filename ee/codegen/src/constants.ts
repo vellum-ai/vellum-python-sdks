@@ -30,6 +30,12 @@ export const VELLUM_WORKFLOWS_DISPLAY_BASE_PATH = [
   "display",
   "base",
 ] as const;
+export const VELLUM_WORKFLOW_EDITOR_TYPES_PATH = [
+  "vellum_ee",
+  "workflows",
+  "display",
+  "editor",
+] as const;
 /* Class names */
 export const OUTPUTS_CLASS_NAME = "Outputs";
 export const PORTS_CLASS_NAME = "Ports";

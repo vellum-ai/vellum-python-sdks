@@ -169,9 +169,8 @@ export class Workflow {
         name: "workflow_display",
         initializer: python.instantiateClass({
           classReference: python.reference({
-            name: "WorkflowMetaVellumDisplayOverrides",
-            modulePath:
-              this.workflowContext.sdkModulePathNames.VELLUM_TYPES_MODULE_PATH,
+            name: "WorkflowMetaDisplay",
+            modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
           }),
           arguments_: [
             python.methodArgument({

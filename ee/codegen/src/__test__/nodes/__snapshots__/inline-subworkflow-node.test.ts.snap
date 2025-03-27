@@ -18,9 +18,9 @@ exports[`InlineSubworkflowNode > adornments > should generate adornments 2`] = `
 
 from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay, BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ....nodes.my_node import MyNode
 from .nodes import *
@@ -49,9 +49,9 @@ exports[`InlineSubworkflowNode > basic > inline subworkflow node display file 1`
 
 from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ....nodes.inline_subworkflow_node import InlineSubworkflowNode
 from .nodes import *
@@ -103,9 +103,9 @@ exports[`InlineSubworkflowNode > name collision > should handle subworkflow with
 
 from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ....nodes.my_node import MyNode
 from .nodes import *
@@ -142,9 +142,9 @@ class MyNode1(TemplatingNode[BaseState, str]):
 exports[`InlineSubworkflowNode > name collision > should handle subworkflow with same name as internal node 4`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from .....nodes.my_node.nodes.my_node import MyNode1
 

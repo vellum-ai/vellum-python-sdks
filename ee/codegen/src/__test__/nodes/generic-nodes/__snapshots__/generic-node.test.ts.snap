@@ -1,8 +1,8 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`GenericNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+"from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 
 from ...nodes.my_custom_node import MyCustomNode
 
@@ -36,13 +36,13 @@ class MyCustomNode(BaseNode):
 exports[`GenericNode > basic with adornments > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseMapNodeDisplay,
     BaseNodeDisplay,
     BaseRetryNodeDisplay,
     BaseTryNodeDisplay,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.my_custom_node import MyCustomNode
 
@@ -115,8 +115,8 @@ class MyCustomNode(BaseNode):
 `;
 
 exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+"from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 
 from ...nodes.my_custom_node import MyCustomNode
 
