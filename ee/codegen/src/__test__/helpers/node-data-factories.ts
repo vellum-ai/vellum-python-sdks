@@ -1315,11 +1315,13 @@ export function codeExecutionNodeFactory({
   codeOutputValueType,
   runtimeInput,
   generateLogOutputId = true,
+  code,
 }: {
   codeInputValueRule?: NodeInputValuePointerRule;
   codeOutputValueType?: VellumVariableType;
   runtimeInput?: NodeInput;
   generateLogOutputId?: boolean;
+  code?: string;
 } = {}): CodeExecutionNode {
   const runtime =
     runtimeInput ??
@@ -1367,7 +1369,7 @@ export function codeExecutionNodeFactory({
                   type: "CONSTANT_VALUE",
                   data: {
                     type: "STRING",
-                    value: "print('Hello, World!')",
+                    value: code ?? "print('Hello, World!')",
                   },
                 },
               ],

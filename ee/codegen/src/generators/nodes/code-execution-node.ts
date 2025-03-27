@@ -35,6 +35,12 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     this.codeRepresentationOverride =
       workflowContext.codeExecutionNodeCodeRepresentationOverride;
     this.scriptFileContents = this.generateScriptFileContents();
+
+    // When using a single line string for INLINE representation which is used by vembda, fern
+    // will error when using toStringFormatted.
+    if (this.codeRepresentationOverride === "INLINE") {
+      this.skipFormatting = true;
+    }
   }
 
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
@@ -95,7 +101,10 @@ export class CodeExecutionNode extends BaseSingleFileNode<
         python.field({
           name: CODE_INPUT_KEY,
           initializer: python.TypeInstantiation.str(this.scriptFileContents, {
-            multiline: true,
+            // Fern will garble the escaping when using python multiline for inline so we disable it.
+            // Inline code generation is currently only used by vembda and likely to remain that way
+            // so skipping over pretty formatting is acceptable.
+            multiline: false,
             startOnNewLine: true,
             endWithNewLine: true,
           }),
