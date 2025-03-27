@@ -32,9 +32,16 @@ from vellum_ee.workflows.display.base import (
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
-from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.types import (
+    EdgeDisplays,
+    NodeDisplays,
+    NodeOutputDisplays,
+    PortDisplays,
+    WorkflowDisplayContext,
+    WorkflowOutputDisplays,
+)
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
@@ -66,13 +73,13 @@ class BaseWorkflowDisplay(
     entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayOverridesType] = {}
 
     # Used to explicitly specify display data for a workflow's outputs.
-    output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = {}
+    output_displays: WorkflowOutputDisplays = {}
 
     # Used to explicitly specify display data for a workflow's edges.
-    edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = {}
+    edge_displays: EdgeDisplays = {}
 
     # Used to explicitly specify display data for a workflow's ports.
-    port_displays: Dict[Port, PortDisplayOverrides] = {}
+    port_displays: PortDisplays = {}
 
     # Used to store the mapping between workflows and their display classes
     _workflow_display_registry: Dict[Type[WorkflowType], Type["BaseWorkflowDisplay"]] = {}
@@ -190,43 +197,35 @@ class BaseWorkflowDisplay(
     ]:
         workflow_display = self._generate_workflow_meta_display()
 
-        global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = (
+        global_node_output_displays: NodeOutputDisplays = (
             copy(self._parent_display_context.global_node_output_displays) if self._parent_display_context else {}
         )
 
-        node_displays: Dict[Type[BaseNode], BaseNodeDisplay] = {}
+        node_displays: NodeDisplays = {}
 
-        global_node_displays: Dict[Type[BaseNode], BaseNodeDisplay] = (
+        global_node_displays: NodeDisplays = (
             copy(self._parent_display_context.global_node_displays) if self._parent_display_context else {}
         )
 
-        port_displays: Dict[Port, PortDisplay] = {}
+        port_displays: PortDisplays = {}
 
         for node in self._workflow.get_nodes():
-            extracted_node_displays = self._extract_node_displays(node)
-
-            for extracted_node, extracted_node_display in extracted_node_displays.items():
-                if extracted_node not in node_displays:
-                    node_displays[extracted_node] = extracted_node_display
-
-                if extracted_node not in global_node_displays:
-                    global_node_displays[extracted_node] = extracted_node_display
-
-            self._enrich_global_node_output_displays(node, extracted_node_displays[node], global_node_output_displays)
-            self._enrich_node_port_displays(node, extracted_node_displays[node], port_displays)
+            self._enrich_node_displays(
+                node=node,
+                node_displays=node_displays,
+                global_node_displays=global_node_displays,
+                global_node_output_displays=global_node_output_displays,
+                port_displays=port_displays,
+            )
 
         for node in self._workflow.get_unused_nodes():
-            extracted_node_displays = self._extract_node_displays(node)
-
-            for extracted_node, extracted_node_display in extracted_node_displays.items():
-                if extracted_node not in node_displays:
-                    node_displays[extracted_node] = extracted_node_display
-
-                if extracted_node not in global_node_displays:
-                    global_node_displays[extracted_node] = extracted_node_display
-
-            self._enrich_global_node_output_displays(node, extracted_node_displays[node], global_node_output_displays)
-            self._enrich_node_port_displays(node, extracted_node_displays[node], port_displays)
+            self._enrich_node_displays(
+                node=node,
+                node_displays=node_displays,
+                global_node_displays=global_node_displays,
+                global_node_output_displays=global_node_output_displays,
+                port_displays=port_displays,
+            )
 
         workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {}
         # If we're dealing with a nested workflow, then it should have access to the inputs of its parents.
@@ -417,6 +416,26 @@ class BaseWorkflowDisplay(
             node_displays=node_event_displays,
         )
         return display_meta
+
+    def _enrich_node_displays(
+        self,
+        node: Type[BaseNode],
+        node_displays: NodeDisplays,
+        global_node_displays: NodeDisplays,
+        global_node_output_displays: NodeOutputDisplays,
+        port_displays: PortDisplays,
+    ) -> None:
+        extracted_node_displays = self._extract_node_displays(node)
+
+        for extracted_node, extracted_node_display in extracted_node_displays.items():
+            if extracted_node not in node_displays:
+                node_displays[extracted_node] = extracted_node_display
+
+            if extracted_node not in global_node_displays:
+                global_node_displays[extracted_node] = extracted_node_display
+
+        self._enrich_global_node_output_displays(node, extracted_node_displays[node], global_node_output_displays)
+        self._enrich_node_port_displays(node, extracted_node_displays[node], port_displays)
 
     def _extract_node_displays(self, node: Type[BaseNode]) -> Dict[Type[BaseNode], BaseNodeDisplay]:
         node_display = self._get_node_display(node)
