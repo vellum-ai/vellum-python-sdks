@@ -22,6 +22,12 @@ if TYPE_CHECKING:
 
 WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
 
+NodeDisplays = Dict[Type[BaseNode], BaseNodeDisplay]
+NodeOutputDisplays = Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]]
+WorkflowOutputDisplays = Dict[BaseDescriptor, WorkflowOutputDisplay]
+EdgeDisplays = Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay]
+PortDisplays = Dict[Port, PortDisplay]
+
 
 @dataclass
 class WorkflowDisplayContext(
@@ -40,12 +46,10 @@ class WorkflowDisplayContext(
     )
     state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
     global_state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
-    node_displays: Dict[Type[BaseNode], BaseNodeDisplay] = field(default_factory=dict)
-    global_node_displays: Dict[Type[BaseNode], BaseNodeDisplay] = field(default_factory=dict)
-    global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = field(
-        default_factory=dict
-    )
+    node_displays: NodeDisplays = field(default_factory=dict)
+    global_node_displays: NodeDisplays = field(default_factory=dict)
+    global_node_output_displays: NodeOutputDisplays = field(default_factory=dict)
     entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = field(default_factory=dict)
-    workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = field(default_factory=dict)
-    edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = field(default_factory=dict)
-    port_displays: Dict[Port, PortDisplay] = field(default_factory=dict)
+    workflow_output_displays: WorkflowOutputDisplays = field(default_factory=dict)
+    edge_displays: EdgeDisplays = field(default_factory=dict)
+    port_displays: PortDisplays = field(default_factory=dict)
