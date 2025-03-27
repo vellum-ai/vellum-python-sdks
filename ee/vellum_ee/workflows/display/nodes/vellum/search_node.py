@@ -15,7 +15,8 @@ from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeV
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.vellum import InputVariablePointer, NodeInput
+from vellum_ee.workflows.display.utils.vellum import InputVariablePointer
+from vellum_ee.workflows.display.vellum import NodeInput
 
 _SearchNodeType = TypeVar("_SearchNodeType", bound=SearchNode)
 

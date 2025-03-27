@@ -9,19 +9,18 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
-from vellum_ee.workflows.display.utils.vellum import create_node_input_value_pointer_rule
-from vellum_ee.workflows.display.vellum import (
+from vellum_ee.workflows.display.utils.vellum import (
     ConstantValuePointer,
     ExecutionCounterData,
     ExecutionCounterPointer,
     InputVariableData,
     InputVariablePointer,
-    NodeInput,
-    NodeInputValuePointer,
     NodeInputValuePointerRule,
     WorkspaceSecretData,
     WorkspaceSecretPointer,
+    create_node_input_value_pointer_rule,
 )
+from vellum_ee.workflows.display.vellum import NodeInput, NodeInputValuePointer
 
 
 def create_node_input(

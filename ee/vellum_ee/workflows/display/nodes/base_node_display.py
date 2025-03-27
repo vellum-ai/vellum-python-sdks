@@ -17,6 +17,7 @@ from typing import (
     get_origin,
 )
 
+from vellum.client.types.code_resource_definition import CodeResourceDefinition
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -45,11 +46,11 @@ from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
+from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator, primitive_to_vellum_value
-from vellum_ee.workflows.display.vellum import CodeResourceDefinition, NodeDisplayData
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext

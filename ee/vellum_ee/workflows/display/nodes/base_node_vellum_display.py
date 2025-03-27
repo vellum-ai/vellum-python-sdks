@@ -4,9 +4,9 @@ from typing import ClassVar, Dict, Optional
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.ports import Port
 from vellum.workflows.types.generics import NodeType
+from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayComment, NodeDisplayData
 
 
 class BaseNodeVellumDisplay(BaseNodeDisplay[NodeType]):
