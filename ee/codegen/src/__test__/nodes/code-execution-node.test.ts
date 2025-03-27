@@ -84,7 +84,7 @@ describe("CodeExecutionNode", () => {
 
         const nodeData = codeExecutionNodeFactory({
           // This code triggers some things with the way fern does escapes that we need to test is escaping correctly
-          // as it sometimes does not for inline mode which is used by vembda.
+          // as it sometimes does not escape correctly for inline mode which is used by vembda.
           code:
             "async function main(inputs: {\n  question: string\n}) {\n  inputs = {\n    " +
             '"question": "{\\"text_explanation\\":\\"First, \\\\\\\\(\\\\\\\\frac{1}{40}\\\\\\\\).\\\\"\n  }\n  ' +
