@@ -5,6 +5,7 @@ from typing import TypeVar
 from pydantic import Field
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum_ee.workflows.display.editor.types import NodeDisplayData
 
 
 class WorkflowDisplayDataViewport(UniversalBaseModel):
@@ -21,6 +22,7 @@ class WorkflowDisplayData(UniversalBaseModel):
 class WorkflowMetaDisplay:
     entrypoint_node_id: UUID
     entrypoint_node_source_handle_id: UUID
+    entrypoint_node_display: NodeDisplayData = Field(default_factory=NodeDisplayData)
     display_data: WorkflowDisplayData = field(default_factory=WorkflowDisplayData)
 
 

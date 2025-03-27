@@ -7,10 +7,10 @@ from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 

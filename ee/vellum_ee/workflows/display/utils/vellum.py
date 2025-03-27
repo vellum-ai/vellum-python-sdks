@@ -1,6 +1,9 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.types.array_vellum_value import ArrayVellumValue
 from vellum.client.types.logical_operator import LogicalOperator
+from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_variable_type import VellumVariableType
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.and_ import AndExpression
@@ -39,21 +42,64 @@ from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
-from vellum_ee.workflows.display.vellum import (
-    ConstantValuePointer,
-    ExecutionCounterData,
-    ExecutionCounterPointer,
-    InputVariableData,
-    InputVariablePointer,
-    NodeInputValuePointerRule,
-    NodeOutputData,
-    NodeOutputPointer,
-    WorkspaceSecretData,
-    WorkspaceSecretPointer,
-)
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
+
+
+class ConstantValuePointer(UniversalBaseModel):
+    type: Literal["CONSTANT_VALUE"] = "CONSTANT_VALUE"
+    data: VellumValue
+
+
+ArrayVellumValue.model_rebuild()
+
+
+class NodeOutputData(UniversalBaseModel):
+    node_id: str
+    output_id: str
+
+
+class NodeOutputPointer(UniversalBaseModel):
+    type: Literal["NODE_OUTPUT"] = "NODE_OUTPUT"
+    data: NodeOutputData
+
+
+class InputVariableData(UniversalBaseModel):
+    input_variable_id: str
+
+
+class InputVariablePointer(UniversalBaseModel):
+    type: Literal["INPUT_VARIABLE"] = "INPUT_VARIABLE"
+    data: InputVariableData
+
+
+class WorkspaceSecretData(UniversalBaseModel):
+    type: VellumVariableType
+    workspace_secret_id: Optional[str] = None
+
+
+class WorkspaceSecretPointer(UniversalBaseModel):
+    type: Literal["WORKSPACE_SECRET"] = "WORKSPACE_SECRET"
+    data: WorkspaceSecretData
+
+
+class ExecutionCounterData(UniversalBaseModel):
+    node_id: str
+
+
+class ExecutionCounterPointer(UniversalBaseModel):
+    type: Literal["EXECUTION_COUNTER"] = "EXECUTION_COUNTER"
+    data: ExecutionCounterData
+
+
+NodeInputValuePointerRule = Union[
+    NodeOutputPointer,
+    InputVariablePointer,
+    ConstantValuePointer,
+    WorkspaceSecretPointer,
+    ExecutionCounterPointer,
+]
 
 
 def infer_vellum_variable_type(value: Any) -> VellumVariableType:

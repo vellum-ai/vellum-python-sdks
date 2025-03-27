@@ -8,21 +8,20 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.references import LazyReference
+from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input_value_pointer_rules
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.vellum import (
+from vellum_ee.workflows.display.utils.vellum import (
     ConstantValuePointer,
     InputVariableData,
     InputVariablePointer,
-    NodeDisplayData,
     NodeInputValuePointerRule,
     NodeOutputData,
     NodeOutputPointer,
-    WorkflowInputsVellumDisplayOverrides,
-    WorkflowMetaVellumDisplay,
 )
+from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplayOverrides, WorkflowMetaVellumDisplay
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
@@ -68,41 +67,36 @@ class MyNodeB(BaseNode):
             MyNodeB.fallback_example,
             [
                 NodeOutputPointer(
-                    type="NODE_OUTPUT",
                     data=NodeOutputData(
                         node_id="b48fa5e0-d7d3-4fe3-ae48-615415011cc5",
                         output_id="4b16a629-11a1-4b3f-a965-a57b872d13b8",
                     ),
                 ),
                 InputVariablePointer(
-                    type="INPUT_VARIABLE",
                     data=InputVariableData(input_variable_id="a154c29d-fac0-4cd0-ba88-bc52034f5470"),
                 ),
-                ConstantValuePointer(type="CONSTANT_VALUE", data=StringVellumValue(value="fallback")),
+                ConstantValuePointer(data=StringVellumValue(value="fallback")),
             ],
         ),
         (
             MyNodeB.constant_coalesce,
             [
                 InputVariablePointer(
-                    type="INPUT_VARIABLE",
                     data=InputVariableData(input_variable_id="a154c29d-fac0-4cd0-ba88-bc52034f5470"),
                 ),
-                ConstantValuePointer(type="CONSTANT_VALUE", data=StringVellumValue(value="default_value")),
+                ConstantValuePointer(data=StringVellumValue(value="default_value")),
             ],
         ),
         (
             MyNodeB.lazy_coalesce,
             [
                 NodeOutputPointer(
-                    type="NODE_OUTPUT",
                     data=NodeOutputData(
                         node_id="b48fa5e0-d7d3-4fe3-ae48-615415011cc5",
                         output_id="4b16a629-11a1-4b3f-a965-a57b872d13b8",
                     ),
                 ),
                 InputVariablePointer(
-                    type="INPUT_VARIABLE",
                     data=InputVariableData(input_variable_id="a154c29d-fac0-4cd0-ba88-bc52034f5470"),
                 ),
             ],
