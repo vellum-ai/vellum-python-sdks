@@ -140,6 +140,6 @@ def test_inline_subworkflow_node__with_adornment():
 
     # AND when we run the node
     node = TestNode()
-    events = list(node.run())
+    outputs = list(node.run())
 
-    assert any(e.name == "final_output" and e.value == "hello" for e in events)
+    assert outputs[-1].name == "final_output" and outputs[-1].value == "hello"

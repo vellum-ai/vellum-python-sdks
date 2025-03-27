@@ -142,7 +142,7 @@ class InlineSubworkflowNode(
         # approach to annotating the outputs class based on the `subworkflow.Outputs`
         setattr(outputs_class, reference.name, reference)
 
-        if not hasattr(cls, "__output_ids__"):
+        if cls.__output_ids__ is None:
             cls.__output_ids__ = {}
 
         cls.__output_ids__[reference.name] = uuid4_from_hash(f"{cls.__id__}|{reference.name}")
