@@ -1,9 +1,9 @@
 from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import ConditionId, RuleIdMap
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.conditional_node import ConditionalNode
 

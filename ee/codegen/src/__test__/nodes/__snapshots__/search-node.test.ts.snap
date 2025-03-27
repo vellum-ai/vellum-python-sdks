@@ -41,12 +41,12 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.search_node import SearchNode
 
@@ -185,12 +185,12 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > metadata filters > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.search_node import SearchNode
 
@@ -295,12 +295,12 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay, BaseTryNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.search_node import SearchNode
 
@@ -403,12 +403,12 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > should codegen successfully without document index id input > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.search_node import SearchNode
 

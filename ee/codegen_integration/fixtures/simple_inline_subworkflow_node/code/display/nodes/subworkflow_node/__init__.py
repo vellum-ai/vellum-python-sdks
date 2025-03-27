@@ -2,9 +2,9 @@
 
 from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ....nodes.subworkflow_node import SubworkflowNode
 from .nodes import *

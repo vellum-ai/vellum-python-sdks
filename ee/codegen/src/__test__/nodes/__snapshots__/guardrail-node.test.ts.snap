@@ -3,12 +3,12 @@
 exports[`GuardrailNode > basic > getNodeDisplayFile - multiple output variables 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.guardrail_node import GuardrailNode
 
@@ -47,12 +47,12 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
 exports[`GuardrailNode > basic > getNodeDisplayFile - single output variable 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.guardrail_node import GuardrailNode
 
@@ -120,6 +120,7 @@ class GuardrailNode(BaseGuardrailNode):
 exports[`GuardrailNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseGuardrailNodeDisplay,
     BaseTryNodeDisplay,
@@ -128,7 +129,6 @@ from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
     PortDisplayOverrides,
 )
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.guardrail_node import GuardrailNode
 

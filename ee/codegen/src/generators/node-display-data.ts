@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { NodeDisplayData as NodeDisplayDataType } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -37,8 +38,7 @@ export class NodeDisplayData extends AstNode {
         value: python.instantiateClass({
           classReference: python.reference({
             name: "NodeDisplayPosition",
-            modulePath:
-              this.workflowContext.sdkModulePathNames.VELLUM_TYPES_MODULE_PATH,
+            modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
           }),
           arguments_: [
             python.methodArgument({
@@ -78,8 +78,7 @@ export class NodeDisplayData extends AstNode {
     const clazz = python.instantiateClass({
       classReference: python.reference({
         name: "NodeDisplayData",
-        modulePath:
-          this.workflowContext.sdkModulePathNames.VELLUM_TYPES_MODULE_PATH,
+        modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
       }),
       arguments_: args,
     });
@@ -122,8 +121,7 @@ export class NodeDisplayData extends AstNode {
       value: python.instantiateClass({
         classReference: python.reference({
           name: "NodeDisplayComment",
-          modulePath:
-            this.workflowContext.sdkModulePathNames.VELLUM_TYPES_MODULE_PATH,
+          modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
         }),
         arguments_: commentArgs,
       }),

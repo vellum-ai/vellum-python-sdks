@@ -1,14 +1,12 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowOutputDisplay
+from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.vellum import (
     EntrypointVellumDisplayOverrides,
-    NodeDisplayData,
-    NodeDisplayPosition,
     WorkflowDisplayData,
     WorkflowDisplayDataViewport,
     WorkflowInputsVellumDisplayOverrides,
-    WorkflowMetaVellumDisplayOverrides,
 )
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
@@ -19,7 +17,7 @@ from ..workflow import Workflow
 
 
 class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
-    workflow_display = WorkflowMetaVellumDisplayOverrides(
+    workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("48134634-f654-4a45-9f00-4e9378ab1f32"),
         entrypoint_node_source_handle_id=UUID("c1eca197-d299-4feb-906b-a9f4647e759c"),
         entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=1545, y=330), width=124, height=48),

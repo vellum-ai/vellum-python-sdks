@@ -38,8 +38,8 @@ class SecondNode(BaseNode):
 `;
 
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node 3`] = `
-"from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
+"from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 
 from ...nodes.second_node import SecondNode
 

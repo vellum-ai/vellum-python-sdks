@@ -3,9 +3,9 @@
 exports[`FinalOutputNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.final_output_node import FinalOutputNode
 
@@ -47,9 +47,9 @@ class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
 exports[`FinalOutputNode > should codegen successfully without node input > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.vellum import NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.final_output_node import FinalOutputNode
 

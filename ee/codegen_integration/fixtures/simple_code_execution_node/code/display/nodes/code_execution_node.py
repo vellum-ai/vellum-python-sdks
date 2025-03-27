@@ -1,8 +1,8 @@
 from uuid import UUID
 
+from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseCodeExecutionNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.vellum import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 
 from ...nodes.code_execution_node import CodeExecutionNode
 

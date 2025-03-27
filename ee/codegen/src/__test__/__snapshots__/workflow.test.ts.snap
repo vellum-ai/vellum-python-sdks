@@ -75,13 +75,12 @@ class TestWorkflow(BaseWorkflow):
 exports[`Workflow > write > should generate correct display code when there are input variables with escape characters 1`] = `
 "from uuid import UUID
 
+from vellum_ee.workflows.display.base import WorkflowMetaDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.vellum import (
-    NodeDisplayData,
-    NodeDisplayPosition,
     WorkflowDisplayData,
     WorkflowDisplayDataViewport,
     WorkflowInputsVellumDisplayOverrides,
-    WorkflowMetaVellumDisplayOverrides,
 )
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import (
     VellumWorkflowDisplay,
@@ -92,7 +91,7 @@ from ..workflow import TestWorkflow
 
 
 class TestWorkflowDisplay(VellumWorkflowDisplay[TestWorkflow]):
-    workflow_display = WorkflowMetaVellumDisplayOverrides(
+    workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("entrypoint"),
         entrypoint_node_source_handle_id=UUID("<source_handle_id>"),
         entrypoint_node_display=NodeDisplayData(
