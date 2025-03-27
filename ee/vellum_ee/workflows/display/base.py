@@ -1,15 +1,35 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from uuid import UUID
 from typing import TypeVar
 
+from pydantic import Field
+
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
+
+
+class WorkflowDisplayDataViewport(UniversalBaseModel):
+    x: float = 0.0
+    y: float = 0.0
+    zoom: float = 1.0
+
+
+class WorkflowDisplayData(UniversalBaseModel):
+    viewport: WorkflowDisplayDataViewport = Field(default_factory=WorkflowDisplayDataViewport)
+
 
 @dataclass
-class WorkflowMetaDisplayOverrides:
-    pass
+class WorkflowMetaDisplay:
+    entrypoint_node_id: UUID
+    entrypoint_node_source_handle_id: UUID
+    display_data: WorkflowDisplayData = field(default_factory=WorkflowDisplayData)
 
 
 @dataclass
-class WorkflowMetaDisplay(WorkflowMetaDisplayOverrides):
+class WorkflowMetaDisplayOverrides(WorkflowMetaDisplay):
+    """
+    DEPRECATED: Use WorkflowMetaDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 

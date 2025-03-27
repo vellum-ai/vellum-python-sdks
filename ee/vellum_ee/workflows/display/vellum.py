@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from uuid import UUID
 from typing import List, Literal, Optional, Union
 
@@ -17,10 +17,11 @@ from vellum_ee.workflows.display.base import (
     StateValueDisplayOverrides,
     WorkflowInputsDisplay,
     WorkflowInputsDisplayOverrides,
-    WorkflowMetaDisplay,
     WorkflowMetaDisplayOverrides,
     WorkflowOutputDisplayOverrides,
 )
+from vellum_ee.workflows.display.base import WorkflowDisplayData  # noqa: F401 - Remove in 0.15.0
+from vellum_ee.workflows.display.base import WorkflowDisplayDataViewport  # noqa: F401 - Remove in 0.15.0
 
 
 class NodeDisplayPosition(UniversalBaseModel):
@@ -45,26 +46,17 @@ class CodeResourceDefinition(UniversalBaseModel):
     module: List[str]
 
 
-class WorkflowDisplayDataViewport(UniversalBaseModel):
-    x: float = 0.0
-    y: float = 0.0
-    zoom: float = 1.0
-
-
-class WorkflowDisplayData(UniversalBaseModel):
-    viewport: WorkflowDisplayDataViewport = Field(default_factory=WorkflowDisplayDataViewport)
-
-
 @dataclass
-class WorkflowMetaVellumDisplayOverrides(WorkflowMetaDisplay, WorkflowMetaDisplayOverrides):
-    entrypoint_node_id: UUID
-    entrypoint_node_source_handle_id: UUID
-    entrypoint_node_display: NodeDisplayData
-    display_data: WorkflowDisplayData = field(default_factory=WorkflowDisplayData)
+class WorkflowMetaVellumDisplayOverrides(WorkflowMetaDisplayOverrides):
+    entrypoint_node_display: NodeDisplayData = Field(default_factory=NodeDisplayData)
 
 
 @dataclass
 class WorkflowMetaVellumDisplay(WorkflowMetaVellumDisplayOverrides):
+    """
+    DEPRECATED: Use WorkflowMetaDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 
