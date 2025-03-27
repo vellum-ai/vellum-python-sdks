@@ -94,11 +94,11 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
-exports[`CodeExecutionNode > code representation override > should generate the correct node class when the override is INLINE 1`] = `
+exports[`CodeExecutionNode > code representation override: Base case > should generate the correct node class when the override is INLINE 1`] = `
 "from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
 from vellum.workflows.state import BaseState
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
-    code = "async function main(inputs: {\\n  question: string\\n}) {\\n  inputs = {\\n    \\"question\\": \\"{\\\\"text_explanation\\\\":\\\\"First, \\\\\\\\\\(\\\\\\\\\\frac{1}{40}\\\\\\\\\\).\\\\\\"\\n  }\\n  const test = \\"\\\\frac\\".replace(/\\\\\\frac/g, \\'\\\\\\dfrac\\');\\n  return {};\\n} \\n"
+    code = "print(\\'Hello, World!\\')"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
     packages = None
@@ -106,7 +106,7 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
-exports[`CodeExecutionNode > code representation override > should generate the correct node class when the override is STANDALONE 1`] = `
+exports[`CodeExecutionNode > code representation override: Base case > should generate the correct node class when the override is STANDALONE 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
@@ -121,7 +121,49 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
-exports[`CodeExecutionNode > code representation override > should generate the correct node class when the override is undefined 1`] = `
+exports[`CodeExecutionNode > code representation override: Base case > should generate the correct node class when the override is undefined 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > code representation override: Escaped case > should generate the correct node class when the override is INLINE 1`] = `
+"from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
+from vellum.workflows.state import BaseState
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    code = "async function main(inputs: {\\n  question: string\\n}) {\\n  inputs = {\\n    \\"question\\": \\"{\\\\"text_explanation\\\\":\\\\"First, \\\\\\\\\\(\\\\\\\\\\frac{1}{40}\\\\\\\\\\).\\\\\\"\\n  }\\n  const test = \\"\\\\frac\\".replace(/\\\\\\frac/g, \\'\\\\\\dfrac\\');\\n  return {};\\n} \\n"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+
+"
+`;
+
+exports[`CodeExecutionNode > code representation override: Escaped case > should generate the correct node class when the override is STANDALONE 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > code representation override: Escaped case > should generate the correct node class when the override is undefined 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )

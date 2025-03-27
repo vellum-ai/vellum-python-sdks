@@ -1,3 +1,6 @@
+import { mkdir, readFile } from "fs/promises";
+import { join } from "path";
+
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuid } from "uuid";
 import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
@@ -9,6 +12,7 @@ import {
   codeExecutionNodeFactory,
   nodeInputFactory,
 } from "src/__test__/helpers/node-data-factories";
+import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
@@ -16,13 +20,16 @@ import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
 import { NodeInput, NodeInputValuePointerRule } from "src/types/vellum";
 
 describe("CodeExecutionNode", () => {
+  let tempDir: string;
   let workflowContext: WorkflowContext;
   let writer: Writer;
   let node: CodeExecutionNode;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     workflowContext = workflowContextFactory();
     writer = new Writer();
+    tempDir = makeTempDir("code-node-test");
+    await mkdir(tempDir, { recursive: true });
   });
 
   describe("basic", () => {
@@ -70,7 +77,15 @@ describe("CodeExecutionNode", () => {
     });
   });
 
-  describe("code representation override", () => {
+  describe.each([
+    ["Base case", "print('Hello, World!')"],
+    [
+      "Escaped case",
+      "async function main(inputs: {\n  question: string\n}) {\n  inputs = {\n" +
+        '"question": "{\\"text_explanation\\":\\"First, \\\\\\\\(\\\\\\\\frac{1}{40}\\\\\\\\).\\\\"\n  }\n' +
+        "const test = \"\\frac\".replace(/\\\\frac/g, '\\\\dfrac');\n  return {};\n} \n",
+    ],
+  ])("code representation override: %s", (_, code) => {
     it.each<"INLINE" | "STANDALONE" | undefined>([
       undefined,
       "STANDALONE",
@@ -80,15 +95,14 @@ describe("CodeExecutionNode", () => {
       async (override) => {
         workflowContext = workflowContextFactory({
           codeExecutionNodeCodeRepresentationOverride: override,
+          absolutePathToOutputDirectory: tempDir,
+          moduleName: "code",
         });
 
         const nodeData = codeExecutionNodeFactory({
           // This code triggers some things with the way fern does escapes that we need to test is escaping correctly
           // as it sometimes does not escape correctly for inline mode which is used by vembda.
-          code:
-            "async function main(inputs: {\n  question: string\n}) {\n  inputs = {\n    " +
-            '"question": "{\\"text_explanation\\":\\"First, \\\\\\\\(\\\\\\\\frac{1}{40}\\\\\\\\).\\\\"\n  }\n  ' +
-            "const test = \"\\frac\".replace(/\\\\frac/g, '\\\\dfrac');\n  return {};\n} \n",
+          code,
         });
 
         const nodeContext = (await createNodeContext({
@@ -101,14 +115,20 @@ describe("CodeExecutionNode", () => {
           nodeContext,
         });
 
-        node.getNodeFile().write(writer);
-        const output = await (override === "INLINE"
-          ? // Fern will error out when using toStringFormatted with our approach to inline code nodes
-            // with a bizarre syntax error, there's a try catch in our persisted file code and we also
-            // pass in a skipFormatting flag to it for this case
-            writer.toString()
-          : writer.toStringFormatted());
-        expect(output).toMatchSnapshot();
+        if (override === "INLINE") {
+          // Do full persist here to check write logic
+          await node.persist();
+
+          expect(
+            await readFile(
+              join(tempDir, "code", "nodes", "code_execution_node.py"),
+              "utf-8"
+            )
+          ).toMatchSnapshot();
+        } else {
+          node.getNodeFile().write(writer);
+          expect(await writer.toStringFormatted()).toMatchSnapshot();
+        }
       }
     );
   });
