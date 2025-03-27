@@ -28,6 +28,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
+from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
@@ -190,7 +191,7 @@ class BaseWorkflowDisplay(
         StateValueDisplayType,
         EntrypointDisplayType,
     ]:
-        workflow_display = self._generate_workflow_meta_display()
+        workflow_meta_display = self._generate_workflow_meta_display()
 
         global_node_output_displays: NodeOutputDisplays = (
             copy(self._parent_display_context.global_node_output_displays) if self._parent_display_context else {}
@@ -254,7 +255,7 @@ class BaseWorkflowDisplay(
 
             entrypoint_display_overrides = self.entrypoint_displays.get(entrypoint)
             entrypoint_displays[entrypoint] = self._generate_entrypoint_display(
-                entrypoint, workflow_display, node_displays, overrides=entrypoint_display_overrides
+                entrypoint, workflow_meta_display, node_displays, overrides=entrypoint_display_overrides
             )
 
         edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = {}
@@ -290,7 +291,7 @@ class BaseWorkflowDisplay(
             )
 
         return WorkflowDisplayContext(
-            workflow_display=workflow_display,
+            workflow_display=workflow_meta_display,
             workflow_input_displays=workflow_input_displays,
             global_workflow_input_displays=global_workflow_input_displays,
             state_value_displays=state_value_displays,
@@ -305,9 +306,24 @@ class BaseWorkflowDisplay(
             workflow_display_class=self.__class__,
         )
 
-    @abstractmethod
     def _generate_workflow_meta_display(self) -> WorkflowMetaDisplay:
-        pass
+        overrides = self.workflow_display
+        if overrides:
+            return WorkflowMetaDisplay(
+                entrypoint_node_id=overrides.entrypoint_node_id,
+                entrypoint_node_source_handle_id=overrides.entrypoint_node_source_handle_id,
+                entrypoint_node_display=overrides.entrypoint_node_display,
+                display_data=overrides.display_data,
+            )
+
+        entrypoint_node_id = uuid4_from_hash(f"{self.workflow_id}|entrypoint_node_id")
+        entrypoint_node_source_handle_id = uuid4_from_hash(f"{self.workflow_id}|entrypoint_node_source_handle_id")
+
+        return WorkflowMetaDisplay(
+            entrypoint_node_id=entrypoint_node_id,
+            entrypoint_node_source_handle_id=entrypoint_node_source_handle_id,
+            entrypoint_node_display=NodeDisplayData(),
+        )
 
     @abstractmethod
     def _generate_workflow_input_display(

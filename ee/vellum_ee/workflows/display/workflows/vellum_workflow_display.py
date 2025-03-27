@@ -25,7 +25,6 @@ from vellum_ee.workflows.display.vellum import (
     StateValueVellumDisplayOverrides,
     WorkflowInputsVellumDisplay,
     WorkflowInputsVellumDisplayOverrides,
-    WorkflowMetaVellumDisplay,
 )
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
@@ -287,25 +286,6 @@ class VellumWorkflowDisplay(
             "state_variables": state_variables,
             "output_variables": output_variables,
         }
-
-    def _generate_workflow_meta_display(self) -> WorkflowMetaVellumDisplay:
-        overrides = self.workflow_display
-        if overrides:
-            return WorkflowMetaVellumDisplay(
-                entrypoint_node_id=overrides.entrypoint_node_id,
-                entrypoint_node_source_handle_id=overrides.entrypoint_node_source_handle_id,
-                entrypoint_node_display=overrides.entrypoint_node_display,
-                display_data=overrides.display_data,
-            )
-
-        entrypoint_node_id = uuid4_from_hash(f"{self.workflow_id}|entrypoint_node_id")
-        entrypoint_node_source_handle_id = uuid4_from_hash(f"{self.workflow_id}|entrypoint_node_source_handle_id")
-
-        return WorkflowMetaVellumDisplay(
-            entrypoint_node_id=entrypoint_node_id,
-            entrypoint_node_source_handle_id=entrypoint_node_source_handle_id,
-            entrypoint_node_display=NodeDisplayData(),
-        )
 
     def _generate_workflow_input_display(
         self, workflow_input: WorkflowInputReference, overrides: Optional[WorkflowInputsVellumDisplayOverrides] = None
