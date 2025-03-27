@@ -35,10 +35,6 @@ class WorkflowMetaDisplayOverrides(WorkflowMetaDisplay):
     pass
 
 
-WorkflowMetaDisplayType = TypeVar("WorkflowMetaDisplayType", bound=WorkflowMetaDisplay)
-WorkflowMetaDisplayOverridesType = TypeVar("WorkflowMetaDisplayOverridesType", bound=WorkflowMetaDisplayOverrides)
-
-
 @dataclass
 class WorkflowInputsDisplayOverrides:
     id: UUID
