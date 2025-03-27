@@ -78,12 +78,13 @@ class EdgeDisplayOverrides(EdgeDisplay):
 
 
 @dataclass
-class EntrypointDisplayOverrides:
+class EntrypointDisplay:
     id: UUID
+    edge_display: EdgeDisplay
 
 
 @dataclass
-class EntrypointDisplay(EntrypointDisplayOverrides):
+class EntrypointDisplayOverrides(EntrypointDisplay):
     pass
 
 

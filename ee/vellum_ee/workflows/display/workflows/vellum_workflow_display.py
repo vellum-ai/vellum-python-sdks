@@ -1,9 +1,8 @@
 import logging
 from uuid import UUID
-from typing import Dict, Optional, Type, cast
+from typing import Optional, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port
@@ -12,7 +11,6 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.base import WorkflowMetaDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -320,29 +318,3 @@ class VellumWorkflowDisplay(
             state_value_id = uuid4_from_hash(f"{self.workflow_id}|state_values|id|{state_value.name}")
 
         return StateValueVellumDisplay(id=state_value_id, name=name, required=required, color=color)
-
-    def _generate_entrypoint_display(
-        self,
-        entrypoint: Type[BaseNode],
-        workflow_display: WorkflowMetaDisplay,
-        node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
-        overrides: Optional[EntrypointVellumDisplayOverrides] = None,
-    ) -> EntrypointVellumDisplay:
-        entrypoint_node_id = workflow_display.entrypoint_node_id
-
-        edge_display_overrides = overrides.edge_display if overrides else None
-        entrypoint_id = (
-            edge_display_overrides.id
-            if edge_display_overrides
-            else uuid4_from_hash(f"{self.workflow_id}|id|{entrypoint_node_id}")
-        )
-
-        entrypoint_target = get_unadorned_node(entrypoint)
-        target_node_display = node_displays[entrypoint_target]
-        target_node_id = target_node_display.node_id
-
-        edge_display = edge_display_overrides or self._generate_edge_display_from_source(
-            entrypoint_node_id, target_node_id
-        )
-
-        return EntrypointVellumDisplay(id=entrypoint_id, edge_display=edge_display)

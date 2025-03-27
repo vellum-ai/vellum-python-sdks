@@ -4,9 +4,7 @@ from typing import List, Literal, Optional
 
 from vellum.core import UniversalBaseModel
 from vellum_ee.workflows.display.base import (
-    EdgeDisplay,
     EdgeDisplayOverrides,
-    EntrypointDisplay,
     EntrypointDisplayOverrides,
     StateValueDisplay,
     StateValueDisplayOverrides,
@@ -93,13 +91,21 @@ class EdgeVellumDisplay(EdgeVellumDisplayOverrides):
 
 
 @dataclass
-class EntrypointVellumDisplayOverrides(EntrypointDisplay, EntrypointDisplayOverrides):
-    edge_display: EdgeDisplay
+class EntrypointVellumDisplayOverrides(EntrypointDisplayOverrides):
+    """
+    DEPRECATED: Use EntrypointDisplay instead. Will be removed in 0.15.0
+    """
+
+    pass
 
 
 @dataclass
 class EntrypointVellumDisplay(EntrypointVellumDisplayOverrides):
-    edge_display: EdgeDisplay
+    """
+    DEPRECATED: Use EntrypointDisplay instead. Will be removed in 0.15.0
+    """
+
+    pass
 
 
 @dataclass

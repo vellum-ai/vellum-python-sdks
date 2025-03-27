@@ -8,6 +8,7 @@ from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
+    EntrypointDisplay,
     EntrypointDisplayType,
     StateValueDisplayType,
     WorkflowInputsDisplayType,
@@ -24,6 +25,7 @@ WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay"
 
 NodeDisplays = Dict[Type[BaseNode], BaseNodeDisplay]
 NodeOutputDisplays = Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]]
+EntrypointDisplays = Dict[Type[BaseNode], EntrypointDisplay]
 WorkflowOutputDisplays = Dict[BaseDescriptor, WorkflowOutputDisplay]
 EdgeDisplays = Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay]
 PortDisplays = Dict[Port, PortDisplay]
@@ -48,7 +50,7 @@ class WorkflowDisplayContext(
     node_displays: NodeDisplays = field(default_factory=dict)
     global_node_displays: NodeDisplays = field(default_factory=dict)
     global_node_output_displays: NodeOutputDisplays = field(default_factory=dict)
-    entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = field(default_factory=dict)
+    entrypoint_displays: EntrypointDisplays = field(default_factory=dict)
     workflow_output_displays: WorkflowOutputDisplays = field(default_factory=dict)
     edge_displays: EdgeDisplays = field(default_factory=dict)
     port_displays: PortDisplays = field(default_factory=dict)
