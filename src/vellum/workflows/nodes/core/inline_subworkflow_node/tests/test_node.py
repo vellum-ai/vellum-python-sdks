@@ -116,3 +116,30 @@ def test_inline_subworkflow_node__base_inputs_validation():
     # AND the error message should indicate the missing required input
     assert e.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "Required input variables required_input should have defined value" == str(e.value)
+
+
+def test_inline_subworkflow_node__with_adornment():
+    # GIVEN a simple inline subworkflow with an output
+    class InnerNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            final_output = "hello"
+
+    class TestSubworkflow(BaseWorkflow):
+        graph = InnerNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = InnerNode.Outputs.final_output
+
+    # AND it's wrapped in a TryNode
+    @TryNode.wrap()
+    class TestNode(InlineSubworkflowNode):
+        subworkflow = TestSubworkflow
+
+    # THEN the wrapped node should have the correct output IDs
+    assert "final_output" in TestNode.__output_ids__
+
+    # AND when we run the node
+    node = TestNode()
+    outputs = list(node.run())
+
+    assert outputs[-1].name == "final_output" and outputs[-1].value == "hello"
