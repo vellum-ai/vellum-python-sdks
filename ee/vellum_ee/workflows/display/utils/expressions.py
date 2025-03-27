@@ -1,9 +1,13 @@
+from typing import TYPE_CHECKING
+
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.references.lazy import LazyReference
-from vellum_ee.workflows.display.types import WorkflowDisplayContext
+
+if TYPE_CHECKING:
+    from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 
-def get_child_descriptor(value: LazyReference, display_context: WorkflowDisplayContext) -> BaseDescriptor:
+def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplayContext") -> BaseDescriptor:
     if isinstance(value._get, str):
         reference_parts = value._get.split(".")
         if len(reference_parts) < 3:
