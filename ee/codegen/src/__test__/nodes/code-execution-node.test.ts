@@ -50,6 +50,7 @@ describe("CodeExecutionNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
   describe("basic representation", () => {
     it("should accept int and float", async () => {
       const nodeData = codeExecutionNodeFactory({
@@ -68,6 +69,7 @@ describe("CodeExecutionNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
   describe("code representation override", () => {
     it.each<"INLINE" | "STANDALONE" | undefined>([
       undefined,
@@ -80,7 +82,14 @@ describe("CodeExecutionNode", () => {
           codeExecutionNodeCodeRepresentationOverride: override,
         });
 
-        const nodeData = codeExecutionNodeFactory();
+        const nodeData = codeExecutionNodeFactory({
+          // This code triggers some things with the way fern does escapes that we need to test is escaping correctly
+          // as it sometimes does not for inline mode which is used by vembda.
+          code:
+            "async function main(inputs: {\n  question: string\n}) {\n  inputs = {\n    " +
+            '"question": "{\\"text_explanation\\":\\"First, \\\\\\\\(\\\\\\\\frac{1}{40}\\\\\\\\).\\\\"\n  }\n  ' +
+            "const test = \"\\frac\".replace(/\\\\frac/g, '\\\\dfrac');\n  return {};\n} \n",
+        });
 
         const nodeContext = (await createNodeContext({
           workflowContext,
@@ -93,7 +102,13 @@ describe("CodeExecutionNode", () => {
         });
 
         node.getNodeFile().write(writer);
-        expect(await writer.toStringFormatted()).toMatchSnapshot();
+        const output = await (override === "INLINE"
+          ? // Fern will error out when using toStringFormatted with our approach to inline code nodes
+            // with a bizarre syntax error, there's a try catch in our persisted file code and we also
+            // pass in a skipFormatting flag to it for this case
+            writer.toString()
+          : writer.toStringFormatted());
+        expect(output).toMatchSnapshot();
       }
     );
   });
@@ -169,6 +184,7 @@ describe("CodeExecutionNode", () => {
       }
     );
   });
+
   describe("with runtime set", () => {
     it.each<"PYTHON_3_11_6" | "TYPESCRIPT_5_3_3">([
       "PYTHON_3_11_6",
@@ -280,6 +296,7 @@ describe("CodeExecutionNode", () => {
       }
     );
   });
+
   describe("log output id", () => {
     it("should not generate log output id if not given", async () => {
       const nodeData = codeExecutionNodeFactory({
