@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Dict, Generic, Tuple, Type, TypeVar
+from typing import Dict, Generic, Tuple, Type, TypeVar
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa: F401
@@ -14,11 +14,9 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplayType,
     WorkflowOutputDisplay,
 )
-
-if TYPE_CHECKING:
-    from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
-    from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
-    from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
 
@@ -40,12 +38,12 @@ class WorkflowDisplayContext(
     )
     state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
     global_state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
-    node_displays: Dict[Type[BaseNode], "BaseNodeDisplay"] = field(default_factory=dict)
-    global_node_displays: Dict[Type[BaseNode], "BaseNodeDisplay"] = field(default_factory=dict)
-    global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], "NodeOutputDisplay"]] = field(
+    node_displays: Dict[Type[BaseNode], BaseNodeDisplay] = field(default_factory=dict)
+    global_node_displays: Dict[Type[BaseNode], BaseNodeDisplay] = field(default_factory=dict)
+    global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = field(
         default_factory=dict
     )
     entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = field(default_factory=dict)
     workflow_output_displays: Dict[BaseDescriptor, WorkflowOutputDisplay] = field(default_factory=dict)
     edge_displays: Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay] = field(default_factory=dict)
-    port_displays: Dict[Port, "PortDisplay"] = field(default_factory=dict)
+    port_displays: Dict[Port, PortDisplay] = field(default_factory=dict)
