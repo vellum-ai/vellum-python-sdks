@@ -147,53 +147,55 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     return statements;
   }
 
-  protected getOutputDisplay(): python.Field {
+  protected getOutputDisplay(): python.Field | undefined {
     if (!this.nodeContext.workflowDeploymentHistoryItem) {
-      throw new NodeDefinitionGenerationError(
-        `Failed to generate \`output_display\` for ${this.nodeData.data.label}`
+      this.workflowContext.addError(
+        new NodeDefinitionGenerationError(
+          `Failed to generate \`output_display\` for ${this.nodeData.data.label}`,
+          "WARNING"
+        )
       );
     }
+
+    const outputVariables =
+      this.nodeContext.workflowDeploymentHistoryItem?.outputVariables ?? [];
 
     return python.field({
       name: "output_display",
       initializer: python.TypeInstantiation.dict(
-        this.nodeContext.workflowDeploymentHistoryItem.outputVariables.map(
-          (output) => {
-            const outputName = this.nodeContext.getNodeOutputNameById(
-              output.id
+        outputVariables.map((output) => {
+          const outputName = this.nodeContext.getNodeOutputNameById(output.id);
+          if (!outputName) {
+            throw new NodeAttributeGenerationError(
+              `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
             );
-            if (!outputName) {
-              throw new NodeAttributeGenerationError(
-                `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
-              );
-            }
-            return {
-              key: python.reference({
-                name: this.nodeContext.nodeClassName,
-                modulePath: this.nodeContext.nodeModulePath,
-                attribute: [OUTPUTS_CLASS_NAME, outputName],
-              }),
-              value: python.instantiateClass({
-                classReference: python.reference({
-                  name: "NodeOutputDisplay",
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .NODE_DISPLAY_TYPES_MODULE_PATH,
-                }),
-                arguments_: [
-                  python.methodArgument({
-                    name: "id",
-                    value: python.TypeInstantiation.uuid(output.id),
-                  }),
-                  python.methodArgument({
-                    name: "name",
-                    value: python.TypeInstantiation.str(output.key),
-                  }),
-                ],
-              }),
-            };
           }
-        )
+          return {
+            key: python.reference({
+              name: this.nodeContext.nodeClassName,
+              modulePath: this.nodeContext.nodeModulePath,
+              attribute: [OUTPUTS_CLASS_NAME, outputName],
+            }),
+            value: python.instantiateClass({
+              classReference: python.reference({
+                name: "NodeOutputDisplay",
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_TYPES_MODULE_PATH,
+              }),
+              arguments_: [
+                python.methodArgument({
+                  name: "id",
+                  value: python.TypeInstantiation.uuid(output.id),
+                }),
+                python.methodArgument({
+                  name: "name",
+                  value: python.TypeInstantiation.str(output.key),
+                }),
+              ],
+            }),
+          };
+        })
       ),
     });
   }
