@@ -54,7 +54,7 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
       );
     } catch (error) {
       if (isVellumErrorWithDetail(error)) {
-        throw new NodeDefinitionGenerationError(error.body.detail);
+        throw new NodeDefinitionGenerationError(error.body.detail, "WARNING");
       }
 
       throw error;

@@ -145,6 +145,17 @@ describe("SubworkflowDeploymentNode", () => {
 
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(2);
+
+      expect(errors[0]?.message).toContain("No Workflow Deployment found.");
+      expect(errors[0]?.severity).toBe("WARNING");
+
+      expect(errors[1]?.message).toContain(
+        "Failed to generate `output_display` for Subworkflow Node"
+      );
+      expect(errors[1]?.severity).toBe("WARNING");
     });
   });
 });
