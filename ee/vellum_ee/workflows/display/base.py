@@ -88,10 +88,6 @@ class EntrypointDisplayOverrides(EntrypointDisplay):
     pass
 
 
-EntrypointDisplayType = TypeVar("EntrypointDisplayType", bound=EntrypointDisplay)
-EntrypointDisplayOverridesType = TypeVar("EntrypointDisplayOverridesType", bound=EntrypointDisplayOverrides)
-
-
 @dataclass
 class WorkflowOutputDisplay:
     id: UUID

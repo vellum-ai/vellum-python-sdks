@@ -9,7 +9,6 @@ from vellum.workflows.references import OutputReference, StateValueReference, Wo
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
-    EntrypointDisplayType,
     StateValueDisplayType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplay,
@@ -36,7 +35,6 @@ class WorkflowDisplayContext(
     Generic[
         WorkflowInputsDisplayType,
         StateValueDisplayType,
-        EntrypointDisplayType,
     ]
 ):
     workflow_display_class: Type["BaseWorkflowDisplay"]

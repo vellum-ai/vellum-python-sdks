@@ -20,8 +20,6 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
-    EntrypointDisplayOverridesType,
-    EntrypointDisplayType,
     StateValueDisplayOverridesType,
     StateValueDisplayType,
     WorkflowInputsDisplayOverridesType,
@@ -56,8 +54,6 @@ class BaseWorkflowDisplay(
         WorkflowInputsDisplayOverridesType,
         StateValueDisplayType,
         StateValueDisplayOverridesType,
-        EntrypointDisplayType,
-        EntrypointDisplayOverridesType,
     ]
 ):
     # Used to specify the display data for a workflow.
@@ -96,7 +92,6 @@ class BaseWorkflowDisplay(
             WorkflowDisplayContext[
                 WorkflowInputsDisplayType,
                 StateValueDisplayType,
-                EntrypointDisplayType,
             ]
         ] = None,
         dry_run: bool = False,
@@ -191,7 +186,6 @@ class BaseWorkflowDisplay(
     ) -> WorkflowDisplayContext[
         WorkflowInputsDisplayType,
         StateValueDisplayType,
-        EntrypointDisplayType,
     ]:
         workflow_meta_display = self._generate_workflow_meta_display()
 
