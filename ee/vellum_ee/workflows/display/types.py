@@ -9,6 +9,7 @@ from vellum.workflows.references import OutputReference, StateValueReference, Wo
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
+    StateValueDisplay,
     StateValueDisplayType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplay,
@@ -22,6 +23,7 @@ if TYPE_CHECKING:
 
 WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
 
+StateValueDisplays = Dict[StateValueReference, StateValueDisplay]
 NodeDisplays = Dict[Type[BaseNode], BaseNodeDisplay]
 NodeOutputDisplays = Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]]
 EntrypointDisplays = Dict[Type[BaseNode], EntrypointDisplay]
@@ -43,8 +45,8 @@ class WorkflowDisplayContext(
     global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(
         default_factory=dict
     )
-    state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
-    global_state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
+    state_value_displays: StateValueDisplays = field(default_factory=dict)
+    global_state_value_displays: StateValueDisplays = field(default_factory=dict)
     node_displays: NodeDisplays = field(default_factory=dict)
     global_node_displays: NodeDisplays = field(default_factory=dict)
     global_node_output_displays: NodeOutputDisplays = field(default_factory=dict)

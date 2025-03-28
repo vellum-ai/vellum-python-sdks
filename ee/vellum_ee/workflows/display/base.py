@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID
-from typing import TypeVar
+from typing import Optional, TypeVar
 
 from pydantic import Field
 
@@ -50,12 +50,18 @@ WorkflowInputsDisplayOverridesType = TypeVar("WorkflowInputsDisplayOverridesType
 
 
 @dataclass
-class StateValueDisplayOverrides:
+class StateValueDisplay:
     id: UUID
+    name: Optional[str] = None
+    color: Optional[str] = None
 
 
 @dataclass
-class StateValueDisplay(StateValueDisplayOverrides):
+class StateValueDisplayOverrides(StateValueDisplay):
+    """
+    DEPRECATED: Use StateValueDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 
@@ -85,6 +91,10 @@ class EntrypointDisplay:
 
 @dataclass
 class EntrypointDisplayOverrides(EntrypointDisplay):
+    """
+    DEPRECATED: Use EntrypointDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 
