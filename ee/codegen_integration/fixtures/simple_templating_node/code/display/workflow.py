@@ -1,12 +1,8 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
+from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    EntrypointVellumDisplayOverrides,
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-)
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 from ..nodes.final_output import FinalOutput
@@ -25,7 +21,7 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
     )
     inputs_display = {}
     entrypoint_displays = {
-        TemplatingNode: EntrypointVellumDisplayOverrides(
+        TemplatingNode: EntrypointDisplay(
             id=UUID("6b52893a-e649-434d-aedd-e8ad73d78dce"),
             edge_display=EdgeDisplay(id=UUID("662141c0-23b1-4513-9b8a-e382e56c4021")),
         )

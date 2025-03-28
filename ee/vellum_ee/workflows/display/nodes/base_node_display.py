@@ -31,6 +31,7 @@ from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
@@ -50,7 +51,7 @@ from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
-from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator, primitive_to_vellum_value
+from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext

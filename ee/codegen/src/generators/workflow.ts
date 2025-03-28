@@ -335,10 +335,8 @@ export class Workflow {
                 }),
                 value: python.instantiateClass({
                   classReference: python.reference({
-                    name: "EntrypointVellumDisplayOverrides",
-                    modulePath:
-                      this.workflowContext.sdkModulePathNames
-                        .VELLUM_TYPES_MODULE_PATH,
+                    name: "EntrypointDisplay",
+                    modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                   }),
                   arguments_: [
                     python.methodArgument({
