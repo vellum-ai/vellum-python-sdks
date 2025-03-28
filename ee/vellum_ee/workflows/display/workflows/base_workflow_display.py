@@ -19,6 +19,7 @@ from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
+    EntrypointDisplay,
     EntrypointDisplayOverridesType,
     EntrypointDisplayType,
     StateValueDisplayOverridesType,
@@ -36,6 +37,7 @@ from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDispl
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.types import (
     EdgeDisplays,
+    EntrypointDisplays,
     NodeDisplays,
     NodeOutputDisplays,
     PortDisplays,
@@ -68,7 +70,7 @@ class BaseWorkflowDisplay(
     state_value_displays: Dict[StateValueReference, StateValueDisplayOverridesType] = {}
 
     # Used to explicitly specify display data for a workflow's entrypoints.
-    entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayOverridesType] = {}
+    entrypoint_displays: EntrypointDisplays = {}
 
     # Used to explicitly specify display data for a workflow's outputs.
     output_displays: WorkflowOutputDisplays = {}
@@ -248,7 +250,7 @@ class BaseWorkflowDisplay(
             state_value_displays[state_value] = state_value_display
             global_state_value_displays[state_value] = state_value_display
 
-        entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = {}
+        entrypoint_displays: EntrypointDisplays = {}
         for entrypoint in self._workflow.get_entrypoints():
             if entrypoint in entrypoint_displays:
                 continue
@@ -337,15 +339,31 @@ class BaseWorkflowDisplay(
     ) -> StateValueDisplayType:
         pass
 
-    @abstractmethod
     def _generate_entrypoint_display(
         self,
         entrypoint: Type[BaseNode],
         workflow_display: WorkflowMetaDisplay,
         node_displays: Dict[Type[BaseNode], BaseNodeDisplay],
-        overrides: Optional[EntrypointDisplayOverridesType] = None,
-    ) -> EntrypointDisplayType:
-        pass
+        overrides: Optional[EntrypointDisplay] = None,
+    ) -> EntrypointDisplay:
+        entrypoint_node_id = workflow_display.entrypoint_node_id
+
+        edge_display_overrides = overrides.edge_display if overrides else None
+        entrypoint_id = (
+            edge_display_overrides.id
+            if edge_display_overrides
+            else uuid4_from_hash(f"{self.workflow_id}|id|{entrypoint_node_id}")
+        )
+
+        entrypoint_target = get_unadorned_node(entrypoint)
+        target_node_display = node_displays[entrypoint_target]
+        target_node_id = target_node_display.node_id
+
+        edge_display = edge_display_overrides or self._generate_edge_display_from_source(
+            entrypoint_node_id, target_node_id
+        )
+
+        return EntrypointDisplay(id=entrypoint_id, edge_display=edge_display)
 
     def _generate_workflow_output_display(self, output: BaseDescriptor) -> WorkflowOutputDisplay:
         output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
