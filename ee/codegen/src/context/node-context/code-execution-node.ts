@@ -116,6 +116,7 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
     try {
       const tokenItem = await new WorkspaceSecretsClient({
         apiKey: this.workflowContext.vellumApiKey,
+        environment: this.workflowContext.vellumApiEnvironment,
       }).retrieve(inputRule.data.workspaceSecretId);
       inputRule.data.workspaceSecretId = tokenItem.name;
     } catch (e) {

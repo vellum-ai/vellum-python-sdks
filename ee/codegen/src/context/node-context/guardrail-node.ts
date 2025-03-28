@@ -46,6 +46,7 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
     try {
       metricDefinitionsHistoryItem = await new MetricDefinitionsClient({
         apiKey: this.workflowContext.vellumApiKey,
+        environment: this.workflowContext.vellumApiEnvironment,
       }).metricDefinitionHistoryItemRetrieve(
         this.nodeData.data.releaseTag,
         this.nodeData.data.metricDefinitionId

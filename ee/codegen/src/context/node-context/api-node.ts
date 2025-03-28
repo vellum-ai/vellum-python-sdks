@@ -45,6 +45,7 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
     try {
       const tokenItem = await new WorkspaceSecretsClient({
         apiKey: this.workflowContext.vellumApiKey,
+        environment: this.workflowContext.vellumApiEnvironment,
       }).retrieve(inputRule.data.workspaceSecretId);
       inputRule.data.workspaceSecretId = tokenItem.name;
     } catch (e) {
