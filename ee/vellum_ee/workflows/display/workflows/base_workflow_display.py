@@ -20,6 +20,7 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
+    StateValueDisplay,
     StateValueDisplayOverridesType,
     StateValueDisplayType,
     WorkflowInputsDisplayOverridesType,
@@ -39,6 +40,7 @@ from vellum_ee.workflows.display.types import (
     NodeDisplays,
     NodeOutputDisplays,
     PortDisplays,
+    StateValueDisplays,
     WorkflowDisplayContext,
     WorkflowOutputDisplays,
 )
@@ -232,7 +234,7 @@ class BaseWorkflowDisplay(
             workflow_input_displays[workflow_input] = input_display
             global_workflow_input_displays[workflow_input] = input_display
 
-        state_value_displays: Dict[StateValueReference, StateValueDisplayType] = {}
+        state_value_displays: StateValueDisplays = {}
         global_state_value_displays = (
             copy(self._parent_display_context.global_state_value_displays) if self._parent_display_context else {}
         )
@@ -327,11 +329,20 @@ class BaseWorkflowDisplay(
     ) -> WorkflowInputsDisplayType:
         pass
 
-    @abstractmethod
     def _generate_state_value_display(
-        self, state_value: StateValueReference, overrides: Optional[StateValueDisplayOverridesType] = None
-    ) -> StateValueDisplayType:
-        pass
+        self, state_value: BaseDescriptor, overrides: Optional[StateValueDisplay] = None
+    ) -> StateValueDisplay:
+        state_value_id: UUID
+        name = None
+        color = None
+        if overrides:
+            state_value_id = overrides.id
+            name = overrides.name
+            color = overrides.color
+        else:
+            state_value_id = uuid4_from_hash(f"{self.workflow_id}|state_values|id|{state_value.name}")
+
+        return StateValueDisplay(id=state_value_id, name=name, color=color)
 
     def _generate_entrypoint_display(
         self,
