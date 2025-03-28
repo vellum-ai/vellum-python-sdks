@@ -35,6 +35,9 @@ class WorkflowInputReference(BaseDescriptor[_InputType], Generic[_InputType]):
         if state.meta.parent:
             return self.resolve(state.meta.parent)
 
+        if type(None) in self.types:
+            return cast(_InputType, None)
+
         raise NodeException(f"Missing required Workflow input: {self._name}", code=WorkflowErrorCode.INVALID_INPUTS)
 
     def __repr__(self) -> str:
