@@ -11,14 +11,12 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import (
-    EntrypointVellumDisplay,
-    EntrypointVellumDisplayOverrides,
-    NodeDisplayData,
     StateValueVellumDisplay,
     StateValueVellumDisplayOverrides,
     WorkflowInputsVellumDisplay,
@@ -36,8 +34,6 @@ class VellumWorkflowDisplay(
         WorkflowInputsVellumDisplayOverrides,
         StateValueVellumDisplay,
         StateValueVellumDisplayOverrides,
-        EntrypointVellumDisplay,
-        EntrypointVellumDisplayOverrides,
     ]
 ):
     node_display_base_class = BaseNodeDisplay
