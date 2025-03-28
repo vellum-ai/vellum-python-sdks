@@ -41,6 +41,7 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
     try {
       this.deploymentHistoryItem = await new DeploymentsClient({
         apiKey: this.workflowContext.vellumApiKey,
+        environment: this.workflowContext.vellumApiEnvironment,
       }).deploymentHistoryItemRetrieve(
         this.nodeData.data.releaseTag,
         this.nodeData.data.promptDeploymentId

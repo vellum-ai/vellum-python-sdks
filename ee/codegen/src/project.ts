@@ -5,6 +5,7 @@ import { python } from "@fern-api/python-ast";
 import { Comment } from "@fern-api/python-ast/Comment";
 import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { VellumEnvironment } from "vellum-ai";
 
 import * as codegen from "./codegen";
 import {
@@ -111,6 +112,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
+    vellumApiEnvironment?: VellumEnvironment;
     sandboxInputs?: WorkflowSandboxInputs[];
     options?: WorkflowProjectGeneratorOptions;
   }
@@ -127,7 +129,6 @@ export class WorkflowProjectGenerator {
   public readonly workflowVersionExecConfig: WorkflowVersionExecConfig;
   public readonly workflowContext: WorkflowContext;
   private readonly sandboxInputs?: WorkflowSandboxInputs[];
-  private readonly options?: WorkflowProjectGeneratorOptions;
 
   constructor({ moduleName, ...rest }: WorkflowProjectGenerator.Args) {
     if ("workflowContext" in rest) {
@@ -179,6 +180,7 @@ ${errors.slice(0, 3).map((err) => {
         moduleName,
         workflowClassName,
         vellumApiKey,
+        vellumApiEnvironment: rest.vellumApiEnvironment,
         workflowRawData: this.workflowVersionExecConfig.workflowRawData,
         strict: rest.strict ?? false,
         codeExecutionNodeCodeRepresentationOverride:
@@ -187,7 +189,6 @@ ${errors.slice(0, 3).map((err) => {
         disableFormatting: rest.options?.disableFormatting ?? false,
       });
       this.sandboxInputs = rest.sandboxInputs;
-      this.options = rest.options;
     }
   }
 

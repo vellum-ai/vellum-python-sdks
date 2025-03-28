@@ -1,3 +1,4 @@
+import { VellumEnvironment } from "vellum-ai";
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
 
 import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";
@@ -49,6 +50,7 @@ export declare namespace WorkflowContext {
     workflowsSdkModulePath?: readonly string[];
     portContextByName?: PortContextById;
     vellumApiKey: string;
+    vellumApiEnvironment?: VellumEnvironment;
     workflowRawData: WorkflowRawData;
     strict: boolean;
     codeExecutionNodeCodeRepresentationOverride: "STANDALONE" | "INLINE";
@@ -111,6 +113,7 @@ export class WorkflowContext {
 
   // Used by the vellum api client
   public readonly vellumApiKey: string;
+  public readonly vellumApiEnvironment?: VellumEnvironment;
   private readonly mlModelNamesById: Record<string, string> = {};
   private readonly errors: BaseCodegenError[] = [];
 
@@ -139,6 +142,7 @@ export class WorkflowContext {
     workflowsSdkModulePath = ["vellum", "workflows"] as const,
     portContextByName,
     vellumApiKey,
+    vellumApiEnvironment,
     workflowRawData,
     strict,
     codeExecutionNodeCodeRepresentationOverride,
@@ -155,6 +159,7 @@ export class WorkflowContext {
       : [this.moduleName, GENERATED_WORKFLOW_MODULE_NAME];
     this.workflowClassName = workflowClassName;
     this.vellumApiKey = vellumApiKey;
+    this.vellumApiEnvironment = vellumApiEnvironment;
 
     this.inputVariableContextsById = new Map();
     this.globalInputVariableContextsById =
@@ -207,6 +212,7 @@ export class WorkflowContext {
       parentNode,
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,
+      vellumApiEnvironment: this.vellumApiEnvironment,
       workflowRawData,
       codeExecutionNodeCodeRepresentationOverride:
         this.codeExecutionNodeCodeRepresentationOverride,
@@ -424,9 +430,10 @@ export class WorkflowContext {
       return mlModelName;
     }
 
-    const mlModel = await new MlModels({ apiKey: this.vellumApiKey }).retrieve(
-      mlModelId
-    );
+    const mlModel = await new MlModels({
+      apiKey: this.vellumApiKey,
+      environment: this.vellumApiEnvironment,
+    }).retrieve(mlModelId);
 
     this.mlModelNamesById[mlModelId] = mlModel.name;
     return mlModel.name;

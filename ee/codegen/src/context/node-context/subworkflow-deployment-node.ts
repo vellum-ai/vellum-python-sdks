@@ -47,6 +47,7 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
     try {
       this.workflowDeploymentHistoryItem = await new WorkflowDeploymentsClient({
         apiKey: this.workflowContext.vellumApiKey,
+        environment: this.workflowContext.vellumApiEnvironment,
       }).workflowDeploymentHistoryItemRetrieve(
         this.nodeData.data.releaseTag,
         this.nodeData.data.workflowDeploymentId
