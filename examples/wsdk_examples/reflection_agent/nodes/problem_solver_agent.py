@@ -9,7 +9,7 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 
 
 class ProblemSolverAgent(InlinePromptNode):
-    """Here we use any context we have from an Evaluator Agent to answer a math problem for a user. If we haven't run the answer through the Evaluator Agent yet, then we initialize an empty Chat History as a "fallback value\""""
+    """Here we use any context we have from an Evaluator Agent to answer a math problem for a user. If we haven't run the answer through the Evaluator Agent yet, then we initialize an empty Chat History as a "fallback value\" """
 
     ml_model = "gpt-4o-mini"
     blocks = [
