@@ -10,7 +10,6 @@ from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
     StateValueDisplay,
-    StateValueDisplayType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
@@ -33,12 +32,7 @@ PortDisplays = Dict[Port, PortDisplay]
 
 
 @dataclass
-class WorkflowDisplayContext(
-    Generic[
-        WorkflowInputsDisplayType,
-        StateValueDisplayType,
-    ]
-):
+class WorkflowDisplayContext(Generic[WorkflowInputsDisplayType,]):
     workflow_display_class: Type["BaseWorkflowDisplay"]
     workflow_display: WorkflowMetaDisplay
     workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(default_factory=dict)

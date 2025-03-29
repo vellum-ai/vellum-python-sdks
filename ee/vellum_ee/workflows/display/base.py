@@ -65,10 +65,6 @@ class StateValueDisplayOverrides(StateValueDisplay):
     pass
 
 
-StateValueDisplayType = TypeVar("StateValueDisplayType", bound=StateValueDisplay)
-StateValueDisplayOverridesType = TypeVar("StateValueDisplayOverridesType", bound=StateValueDisplayOverrides)
-
-
 @dataclass
 class EdgeDisplay:
     id: UUID

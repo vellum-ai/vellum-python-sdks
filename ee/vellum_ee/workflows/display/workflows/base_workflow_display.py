@@ -13,7 +13,7 @@ from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEv
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
-from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -21,8 +21,6 @@ from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
     StateValueDisplay,
-    StateValueDisplayOverridesType,
-    StateValueDisplayType,
     WorkflowInputsDisplayOverridesType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplay,
@@ -54,8 +52,6 @@ class BaseWorkflowDisplay(
         WorkflowType,
         WorkflowInputsDisplayType,
         WorkflowInputsDisplayOverridesType,
-        StateValueDisplayType,
-        StateValueDisplayOverridesType,
     ]
 ):
     # Used to specify the display data for a workflow.
@@ -65,7 +61,7 @@ class BaseWorkflowDisplay(
     inputs_display: Dict[WorkflowInputReference, WorkflowInputsDisplayOverridesType] = {}
 
     # Used to explicitly specify display data for a workflow's state values.
-    state_value_displays: Dict[StateValueReference, StateValueDisplayOverridesType] = {}
+    state_value_displays: StateValueDisplays = {}
 
     # Used to explicitly specify display data for a workflow's entrypoints.
     entrypoint_displays: EntrypointDisplays = {}
@@ -90,12 +86,7 @@ class BaseWorkflowDisplay(
         self,
         workflow: Type[WorkflowType],
         *,
-        parent_display_context: Optional[
-            WorkflowDisplayContext[
-                WorkflowInputsDisplayType,
-                StateValueDisplayType,
-            ]
-        ] = None,
+        parent_display_context: Optional[WorkflowDisplayContext[WorkflowInputsDisplayType,]] = None,
         dry_run: bool = False,
     ):
         self._workflow = workflow
@@ -185,10 +176,7 @@ class BaseWorkflowDisplay(
     @cached_property
     def display_context(
         self,
-    ) -> WorkflowDisplayContext[
-        WorkflowInputsDisplayType,
-        StateValueDisplayType,
-    ]:
+    ) -> WorkflowDisplayContext[WorkflowInputsDisplayType]:
         workflow_meta_display = self._generate_workflow_meta_display()
 
         global_node_output_displays: NodeOutputDisplays = (
