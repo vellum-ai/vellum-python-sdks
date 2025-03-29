@@ -15,12 +15,7 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
-from vellum_ee.workflows.display.vellum import (
-    StateValueVellumDisplay,
-    StateValueVellumDisplayOverrides,
-    WorkflowInputsVellumDisplay,
-    WorkflowInputsVellumDisplayOverrides,
-)
+from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplay, WorkflowInputsVellumDisplayOverrides
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 logger = logging.getLogger(__name__)
@@ -31,8 +26,6 @@ class VellumWorkflowDisplay(
         WorkflowType,
         WorkflowInputsVellumDisplay,
         WorkflowInputsVellumDisplayOverrides,
-        StateValueVellumDisplay,
-        StateValueVellumDisplayOverrides,
     ]
 ):
     node_display_base_class = BaseNodeDisplay
