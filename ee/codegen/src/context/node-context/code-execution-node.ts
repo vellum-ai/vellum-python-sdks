@@ -1,5 +1,4 @@
 import { CodeExecutionRuntime } from "vellum-ai/api";
-import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "./base";
@@ -114,15 +113,16 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
       return;
     }
     try {
-      const tokenItem = await new WorkspaceSecretsClient({
-        apiKey: this.workflowContext.vellumApiKey,
-        environment: this.workflowContext.vellumApiEnvironment,
-      }).retrieve(inputRule.data.workspaceSecretId);
-      inputRule.data.workspaceSecretId = tokenItem.name;
+      await this.workflowContext.loadWorkspaceSecret(
+        inputRule.data.workspaceSecretId
+      );
     } catch (e) {
       if (e instanceof VellumError && e.statusCode === 404) {
         this.workflowContext.addError(
-          new EntityNotFoundError(`Workspace Secret "${input.key}" not found.`)
+          new EntityNotFoundError(
+            `Workspace Secret mapped to input "${input.key}" not found.`,
+            "WARNING"
+          )
         );
       } else {
         throw e;
