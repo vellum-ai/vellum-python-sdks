@@ -525,11 +525,7 @@ export class WorkflowContext {
     this.loadedWorkspaceSecretsById[workspaceSecretId] = workspaceSecret;
   }
 
-  public getWorkspaceSecretName(workspaceSecretId?: string): string {
-    if (!workspaceSecretId) {
-      return "";
-    }
-
+  public getWorkspaceSecretName(workspaceSecretId: string): string {
     return (
       this.loadedWorkspaceSecretsById[workspaceSecretId]?.name ??
       workspaceSecretId
