@@ -1,5 +1,7 @@
 import { VellumEnvironment } from "vellum-ai";
+import { WorkspaceSecretRead } from "vellum-ai/api";
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
+import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 
 import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";
 import { InputVariableContext } from "src/context/input-variable-context";
@@ -130,6 +132,12 @@ export class WorkflowContext {
 
   // Track what class names are used within this workflow so that we can ensure name uniqueness
   public readonly classNames: Set<string>;
+
+  // Track Vellum entities that have been loaded
+  private readonly loadedWorkspaceSecretsById: Record<
+    string,
+    WorkspaceSecretRead
+  > = {};
 
   constructor({
     absolutePathToOutputDirectory,
@@ -503,5 +511,28 @@ export class WorkflowContext {
    */
   public getPythonCodeMergeableNodeFiles(): Set<string> {
     return this.pythonCodeMergeableNodeFiles;
+  }
+
+  public async loadWorkspaceSecret(workspaceSecretId: string): Promise<void> {
+    if (this.loadedWorkspaceSecretsById[workspaceSecretId]) {
+      return;
+    }
+
+    const workspaceSecret = await new WorkspaceSecretsClient({
+      apiKey: this.vellumApiKey,
+      environment: this.vellumApiEnvironment,
+    }).retrieve(workspaceSecretId);
+    this.loadedWorkspaceSecretsById[workspaceSecretId] = workspaceSecret;
+  }
+
+  public getWorkspaceSecretName(workspaceSecretId?: string): string {
+    if (!workspaceSecretId) {
+      return "";
+    }
+
+    return (
+      this.loadedWorkspaceSecretsById[workspaceSecretId]?.name ??
+      workspaceSecretId
+    );
   }
 }

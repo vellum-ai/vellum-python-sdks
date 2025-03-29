@@ -9,7 +9,9 @@ export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<Wo
   getAstNode(): python.AstNode {
     const workspaceSecretPointerData = this.nodeInputValuePointerRule.data;
 
-    const workspaceSecretName = workspaceSecretPointerData.workspaceSecretId;
+    const workspaceSecretName = this.workflowContext.getWorkspaceSecretName(
+      workspaceSecretPointerData.workspaceSecretId
+    );
 
     if (isNil(workspaceSecretName)) {
       return python.TypeInstantiation.none();
