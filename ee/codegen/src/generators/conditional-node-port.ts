@@ -163,8 +163,11 @@ export class ConditionalNodePort extends AstNode {
       ? this.convertOperatorToMethod(conditionData.operator, lhs)
       : undefined;
     if (isNil(operator)) {
-      throw new NodePortGenerationError(
-        `Node ${this.nodeLabel} is missing required operator for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`
+      this.portContext.workflowContext.addError(
+        new NodePortGenerationError(
+          `Node ${this.nodeLabel} is missing required operator for rule: ${ruleIdx} in condition: ${this.conditionalNodeDataIndex}`,
+          "WARNING"
+        )
       );
     }
 
@@ -187,7 +190,8 @@ export class ConditionalNodePort extends AstNode {
       const castedValue = Number(nodeValue.data.value);
       if (isNaN(castedValue)) {
         const error = new ValueGenerationError(
-          `Failed to cast constant value ${nodeValue.data.value} to NUMBER for attribute ${this.nodeLabel}.${rhsKey}`
+          `Failed to cast constant value ${nodeValue.data.value} to NUMBER for attribute ${this.nodeLabel}.${rhsKey}`,
+          "WARNING"
         );
         this.portContext.workflowContext.addError(error);
       } else {
