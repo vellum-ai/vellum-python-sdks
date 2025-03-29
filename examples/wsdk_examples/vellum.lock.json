@@ -20,6 +20,15 @@
       "workspace": "default"
     },
     {
+      "module": "extract_from_image_of_receipt",
+      "workflow_sandbox_id": "e10e2eb8-b243-4e3f-a0ed-a92a0681e543",
+      "ignore": "sandbox.py",
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default"
+    },
+    {
       "module": "image_processing",
       "workflow_sandbox_id": "965383d3-5da5-45b2-a1fe-9e1fd9ae8c0e",
       "ignore": "sandbox.py",
@@ -51,22 +60,13 @@
       "workflow_sandbox_id": "d173ba01-2066-46e9-b481-5057d7d65266",
       "ignore": "sandbox.py",
       "deployments": [],
-      "container_image_name": "python-workflow-runtime",
+      "container_image_name": null,
       "container_image_tag": "latest",
       "workspace": "default"
     },
     {
       "module": "trust_center_q_a",
       "workflow_sandbox_id": "f0662f3a-af4f-44a8-85c4-eefe0a1c1c3a",
-      "ignore": "sandbox.py",
-      "deployments": [],
-      "container_image_name": null,
-      "container_image_tag": null,
-      "workspace": "default"
-    },
-    {
-      "module": "extract_from_image_of_receipt",
-      "workflow_sandbox_id": "e10e2eb8-b243-4e3f-a0ed-a92a0681e543",
       "ignore": "sandbox.py",
       "deployments": [],
       "container_image_name": null,
