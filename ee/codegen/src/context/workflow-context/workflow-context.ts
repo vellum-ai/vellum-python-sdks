@@ -1,4 +1,4 @@
-import { VellumEnvironment } from "vellum-ai";
+import { VellumEnvironmentUrls } from "vellum-ai";
 import { WorkspaceSecretRead } from "vellum-ai/api";
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
 import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
@@ -52,7 +52,7 @@ export declare namespace WorkflowContext {
     workflowsSdkModulePath?: readonly string[];
     portContextByName?: PortContextById;
     vellumApiKey: string;
-    vellumApiEnvironment?: VellumEnvironment;
+    vellumApiEnvironment?: VellumEnvironmentUrls;
     workflowRawData: WorkflowRawData;
     strict: boolean;
     codeExecutionNodeCodeRepresentationOverride: "STANDALONE" | "INLINE";
@@ -115,7 +115,7 @@ export class WorkflowContext {
 
   // Used by the vellum api client
   public readonly vellumApiKey: string;
-  public readonly vellumApiEnvironment?: VellumEnvironment;
+  public readonly vellumApiEnvironment?: VellumEnvironmentUrls;
   private readonly mlModelNamesById: Record<string, string> = {};
   private readonly errors: BaseCodegenError[] = [];
 
