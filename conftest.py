@@ -70,6 +70,11 @@ def vellum_adhoc_prompt_client(vellum_client: Any) -> Any:
 
 
 @pytest.fixture
+def mock_httpx_transport(mocker: MockerFixture) -> Any:
+    return mocker.patch("httpx._client.HTTPTransport").return_value
+
+
+@pytest.fixture
 def mock_requests() -> Any:
     with requests_mock.Mocker() as m:
         yield m
