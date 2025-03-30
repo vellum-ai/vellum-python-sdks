@@ -28,13 +28,16 @@ def serialize_type_encoder(obj: type) -> Dict[str, Any]:
     }
 
 
-def serialize_type_encoder_with_id(obj: type) -> Dict[str, Any]:
-    if not hasattr(obj, "__id__"):
-        raise AttributeError(f"The object of type '{type(obj).__name__}' must have an '__id__' attribute.")
-    return {
-        "id": getattr(obj, "__id__"),
-        **serialize_type_encoder(obj),
-    }
+def serialize_type_encoder_with_id(obj: Union[type, "CodeResourceDefinition"]) -> Dict[str, Any]:
+    if hasattr(obj, "__id__") and isinstance(obj, type):
+        return {
+            "id": getattr(obj, "__id__"),
+            **serialize_type_encoder(obj),
+        }
+    elif isinstance(obj, CodeResourceDefinition):
+        return obj.model_dump(mode="json")
+
+    raise AttributeError(f"The object of type '{type(obj).__name__}' must have an '__id__' attribute.")
 
 
 def default_serializer(obj: Any) -> Any:
