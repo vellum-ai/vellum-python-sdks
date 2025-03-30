@@ -94,6 +94,24 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`CodeExecutionNode > basic secret node > should be resilient to invalid secret ids 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.references import VellumSecretReference
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {
+        "secret_arg": VellumSecretReference("5678"),
+    }
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
 exports[`CodeExecutionNode > code representation override: Base case > should generate the correct node class when the override is INLINE 1`] = `
 "from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
 from vellum.workflows.state import BaseState
