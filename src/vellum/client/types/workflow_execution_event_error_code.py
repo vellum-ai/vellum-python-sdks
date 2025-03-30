@@ -11,6 +11,7 @@ WorkflowExecutionEventErrorCode = typing.Union[
         "NODE_EXECUTION",
         "LLM_PROVIDER",
         "INVALID_TEMPLATE",
+        "INVALID_INPUTS",
         "USER_DEFINED_ERROR",
     ],
     typing.Any,

@@ -5,6 +5,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuid } from "uuid";
 import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
+import { VellumError } from "vellum-ai/errors";
 import { beforeEach, describe } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -26,7 +27,9 @@ describe("CodeExecutionNode", () => {
   let node: CodeExecutionNode;
 
   beforeEach(async () => {
-    workflowContext = workflowContextFactory();
+    workflowContext = workflowContextFactory({
+      strict: false,
+    });
     writer = new Writer();
     tempDir = makeTempDir("code-node-test");
     await mkdir(tempDir, { recursive: true });
@@ -315,6 +318,51 @@ describe("CodeExecutionNode", () => {
         expect(await writer.toStringFormatted()).toMatchSnapshot();
       }
     );
+
+    it("should be resilient to invalid secret ids", async () => {
+      vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(() =>
+        Promise.reject(
+          new VellumError({ message: "not found", statusCode: 404 })
+        )
+      );
+
+      const nodeData = codeExecutionNodeFactory();
+      const bearer_input = uuid();
+      nodeData.inputs.push({
+        id: bearer_input,
+        key: "secret_arg",
+        value: {
+          rules: [
+            {
+              type: "WORKSPACE_SECRET",
+              data: {
+                type: "STRING",
+                workspaceSecretId: "5678",
+              },
+            },
+          ],
+          combinator: "OR",
+        },
+      });
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      const node = new CodeExecutionNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toContain(
+        'Workspace Secret mapped to input "secret_arg" not found'
+      );
+      expect(errors[0]?.severity).toBe("WARNING");
+    });
   });
 
   describe("log output id", () => {

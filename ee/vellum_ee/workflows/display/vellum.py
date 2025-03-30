@@ -6,7 +6,6 @@ from vellum.core import UniversalBaseModel
 from vellum_ee.workflows.display.base import (
     EdgeDisplayOverrides,
     EntrypointDisplayOverrides,
-    StateValueDisplay,
     StateValueDisplayOverrides,
     WorkflowInputsDisplay,
     WorkflowInputsDisplayOverrides,
@@ -57,14 +56,20 @@ class WorkflowInputsVellumDisplay(WorkflowInputsVellumDisplayOverrides):
 
 
 @dataclass
-class StateValueVellumDisplayOverrides(StateValueDisplay, StateValueDisplayOverrides):
-    name: Optional[str] = None
+class StateValueVellumDisplayOverrides(StateValueDisplayOverrides):
+    """
+    DEPRECATED: Use StateValueDisplay instead. Will be removed in 0.15.0
+    """
+
     required: Optional[bool] = None
-    color: Optional[str] = None
 
 
 @dataclass
 class StateValueVellumDisplay(StateValueVellumDisplayOverrides):
+    """
+    DEPRECATED: Use StateValueDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
 
 

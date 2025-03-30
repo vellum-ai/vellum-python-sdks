@@ -2,7 +2,6 @@ import logging
 from uuid import UUID
 from typing import Optional, cast
 
-from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port
@@ -11,19 +10,12 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
-from vellum_ee.workflows.display.vellum import (
-    EntrypointVellumDisplay,
-    EntrypointVellumDisplayOverrides,
-    NodeDisplayData,
-    StateValueVellumDisplay,
-    StateValueVellumDisplayOverrides,
-    WorkflowInputsVellumDisplay,
-    WorkflowInputsVellumDisplayOverrides,
-)
+from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplay, WorkflowInputsVellumDisplayOverrides
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 logger = logging.getLogger(__name__)
@@ -34,10 +26,6 @@ class VellumWorkflowDisplay(
         WorkflowType,
         WorkflowInputsVellumDisplay,
         WorkflowInputsVellumDisplayOverrides,
-        StateValueVellumDisplay,
-        StateValueVellumDisplayOverrides,
-        EntrypointVellumDisplay,
-        EntrypointVellumDisplayOverrides,
     ]
 ):
     node_display_base_class = BaseNodeDisplay
@@ -64,20 +52,17 @@ class VellumWorkflowDisplay(
             )
 
         state_variables: JsonArray = []
-        for state_value, state_value_display in self.display_context.state_value_displays.items():
-            default = primitive_to_vellum_value(state_value.instance) if state_value.instance else None
-            required = (
-                state_value_display.required
-                if state_value_display.required is not None
-                else type(None) not in state_value.types
+        for state_value_reference, state_value_display in self.display_context.state_value_displays.items():
+            default = (
+                primitive_to_vellum_value(state_value_reference.instance) if state_value_reference.instance else None
             )
             state_variables.append(
                 {
                     "id": str(state_value_display.id),
-                    "key": state_value_display.name or state_value.name,
-                    "type": infer_vellum_variable_type(state_value),
+                    "key": state_value_display.name or state_value_reference.name,
+                    "type": infer_vellum_variable_type(state_value_reference),
                     "default": default.dict() if default else None,
-                    "required": required,
+                    "required": state_value_reference.instance is None,
                     "extensions": {"color": state_value_display.color},
                 }
             )
@@ -301,20 +286,3 @@ class VellumWorkflowDisplay(
             workflow_input_id = uuid4_from_hash(f"{self.workflow_id}|inputs|id|{workflow_input.name}")
 
         return WorkflowInputsVellumDisplay(id=workflow_input_id, name=name, required=required, color=color)
-
-    def _generate_state_value_display(
-        self, state_value: BaseDescriptor, overrides: Optional[StateValueVellumDisplayOverrides] = None
-    ) -> StateValueVellumDisplay:
-        state_value_id: UUID
-        name = None
-        required = None
-        color = None
-        if overrides:
-            state_value_id = overrides.id
-            name = overrides.name
-            required = overrides.required
-            color = overrides.color
-        else:
-            state_value_id = uuid4_from_hash(f"{self.workflow_id}|state_values|id|{state_value.name}")
-
-        return StateValueVellumDisplay(id=state_value_id, name=name, required=required, color=color)

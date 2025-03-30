@@ -13,17 +13,14 @@ from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEv
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
-from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
-    EntrypointDisplayOverridesType,
-    EntrypointDisplayType,
-    StateValueDisplayOverridesType,
-    StateValueDisplayType,
+    StateValueDisplay,
     WorkflowInputsDisplayOverridesType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplay,
@@ -41,6 +38,7 @@ from vellum_ee.workflows.display.types import (
     NodeDisplays,
     NodeOutputDisplays,
     PortDisplays,
+    StateValueDisplays,
     WorkflowDisplayContext,
     WorkflowOutputDisplays,
 )
@@ -54,10 +52,6 @@ class BaseWorkflowDisplay(
         WorkflowType,
         WorkflowInputsDisplayType,
         WorkflowInputsDisplayOverridesType,
-        StateValueDisplayType,
-        StateValueDisplayOverridesType,
-        EntrypointDisplayType,
-        EntrypointDisplayOverridesType,
     ]
 ):
     # Used to specify the display data for a workflow.
@@ -67,7 +61,7 @@ class BaseWorkflowDisplay(
     inputs_display: Dict[WorkflowInputReference, WorkflowInputsDisplayOverridesType] = {}
 
     # Used to explicitly specify display data for a workflow's state values.
-    state_value_displays: Dict[StateValueReference, StateValueDisplayOverridesType] = {}
+    state_value_displays: StateValueDisplays = {}
 
     # Used to explicitly specify display data for a workflow's entrypoints.
     entrypoint_displays: EntrypointDisplays = {}
@@ -92,13 +86,7 @@ class BaseWorkflowDisplay(
         self,
         workflow: Type[WorkflowType],
         *,
-        parent_display_context: Optional[
-            WorkflowDisplayContext[
-                WorkflowInputsDisplayType,
-                StateValueDisplayType,
-                EntrypointDisplayType,
-            ]
-        ] = None,
+        parent_display_context: Optional[WorkflowDisplayContext[WorkflowInputsDisplayType,]] = None,
         dry_run: bool = False,
     ):
         self._workflow = workflow
@@ -188,11 +176,7 @@ class BaseWorkflowDisplay(
     @cached_property
     def display_context(
         self,
-    ) -> WorkflowDisplayContext[
-        WorkflowInputsDisplayType,
-        StateValueDisplayType,
-        EntrypointDisplayType,
-    ]:
+    ) -> WorkflowDisplayContext[WorkflowInputsDisplayType]:
         workflow_meta_display = self._generate_workflow_meta_display()
 
         global_node_output_displays: NodeOutputDisplays = (
@@ -238,7 +222,7 @@ class BaseWorkflowDisplay(
             workflow_input_displays[workflow_input] = input_display
             global_workflow_input_displays[workflow_input] = input_display
 
-        state_value_displays: Dict[StateValueReference, StateValueDisplayType] = {}
+        state_value_displays: StateValueDisplays = {}
         global_state_value_displays = (
             copy(self._parent_display_context.global_state_value_displays) if self._parent_display_context else {}
         )
@@ -333,11 +317,20 @@ class BaseWorkflowDisplay(
     ) -> WorkflowInputsDisplayType:
         pass
 
-    @abstractmethod
     def _generate_state_value_display(
-        self, state_value: StateValueReference, overrides: Optional[StateValueDisplayOverridesType] = None
-    ) -> StateValueDisplayType:
-        pass
+        self, state_value: BaseDescriptor, overrides: Optional[StateValueDisplay] = None
+    ) -> StateValueDisplay:
+        state_value_id: UUID
+        name = None
+        color = None
+        if overrides:
+            state_value_id = overrides.id
+            name = overrides.name
+            color = overrides.color
+        else:
+            state_value_id = uuid4_from_hash(f"{self.workflow_id}|state_values|id|{state_value.name}")
+
+        return StateValueDisplay(id=state_value_id, name=name, color=color)
 
     def _generate_entrypoint_display(
         self,

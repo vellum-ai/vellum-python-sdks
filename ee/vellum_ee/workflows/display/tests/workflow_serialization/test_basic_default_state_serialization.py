@@ -50,7 +50,7 @@ def test_serialize_workflow():
                 "key": "example",
                 "type": "NUMBER",
                 "default": {"type": "NUMBER", "value": 5.0},
-                "required": True,
+                "required": False,
                 "extensions": {"color": None},
             },
         ],
