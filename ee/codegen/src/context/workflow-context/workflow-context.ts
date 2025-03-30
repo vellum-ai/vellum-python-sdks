@@ -1,4 +1,4 @@
-import { VellumEnvironment } from "vellum-ai";
+import { VellumEnvironment, VellumEnvironmentUrls } from 'vellum-ai';
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
 
 import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";
@@ -50,7 +50,7 @@ export declare namespace WorkflowContext {
     workflowsSdkModulePath?: readonly string[];
     portContextByName?: PortContextById;
     vellumApiKey: string;
-    vellumApiEnvironment?: VellumEnvironment;
+    vellumApiEnvironment?: VellumEnvironmentUrls;
     workflowRawData: WorkflowRawData;
     strict: boolean;
     codeExecutionNodeCodeRepresentationOverride: "STANDALONE" | "INLINE";
@@ -113,7 +113,7 @@ export class WorkflowContext {
 
   // Used by the vellum api client
   public readonly vellumApiKey: string;
-  public readonly vellumApiEnvironment?: VellumEnvironment;
+  public readonly vellumApiEnvironment?: VellumEnvironmentUrls;
   private readonly mlModelNamesById: Record<string, string> = {};
   private readonly errors: BaseCodegenError[] = [];
 
