@@ -1,4 +1,4 @@
-import { VellumEnvironment, VellumEnvironmentUrls } from 'vellum-ai';
+import { VellumEnvironmentUrls } from "vellum-ai";
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
 
 import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";

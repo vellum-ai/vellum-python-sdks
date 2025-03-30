@@ -5,7 +5,7 @@ import { python } from "@fern-api/python-ast";
 import { Comment } from "@fern-api/python-ast/Comment";
 import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { VellumEnvironment, VellumEnvironmentUrls } from 'vellum-ai';
+import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
 import {
