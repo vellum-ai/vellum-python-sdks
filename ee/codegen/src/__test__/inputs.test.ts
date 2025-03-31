@@ -148,6 +148,9 @@ describe("Inputs", () => {
       const inputVariables: VellumVariable[] = [
         { id: "1", key: "My Input", type: "STRING", required: true },
         { id: "2", key: "$My*Input", type: "NUMBER", required: true },
+        { id: "4", key: "123", type: "STRING", required: true },
+        { id: "3", key: "_a", type: "STRING", required: true },
+        { id: "5", key: "_123", type: "STRING", required: true },
       ];
       inputVariables.forEach((inputVariableData) => {
         workflowContext.addInputVariableContext(

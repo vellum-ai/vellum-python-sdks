@@ -9,6 +9,9 @@ from vellum.workflows.inputs import BaseInputs
 class Inputs(BaseInputs):
     my_input: str
     my_input_1: Union[float, int]
+    input_123: str
+    input_a: str
+    input_123_1: str
 "
 `;
 

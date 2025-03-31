@@ -71,8 +71,8 @@ export function toPythonSafeSnakeCase(
   // Strip special characters from start of string
   const cleanedStr = str.replace(/^[^a-zA-Z0-9_]+/, "");
 
-  // Check if cleaned string starts with a number
-  const startsWithUnsafe = /^\d/.test(cleanedStr);
+  // Check if cleaned string starts with a number or an underscore
+  const startsWithUnsafe = /^[\d_]/.test(cleanedStr);
 
   const snakeCase = cleanedStr
     .replace(/([a-z])([A-Z])/g, "$1_$2") // Insert underscore between lower and upper case
