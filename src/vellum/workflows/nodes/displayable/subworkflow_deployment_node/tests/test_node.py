@@ -1,7 +1,10 @@
 import pytest
 from datetime import datetime
+import json
 from uuid import uuid4
 from typing import Any, Iterator, List
+
+from httpx import Response
 
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.chat_message import ChatMessage
@@ -13,6 +16,7 @@ from vellum.client.types.workflow_request_json_input_request import WorkflowRequ
 from vellum.client.types.workflow_request_number_input_request import WorkflowRequestNumberInputRequest
 from vellum.client.types.workflow_result_event import WorkflowResultEvent
 from vellum.client.types.workflow_stream_event import WorkflowStreamEvent
+from vellum.workflows.context import execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
@@ -405,3 +409,62 @@ def test_subworkflow_deployment_node__immediate_api_error__node_exception(vellum
     # THEN the node raises the correct NodeException
     assert e.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert e.value.message == "Not found"
+
+
+@pytest.mark.timeout(5)
+def test_prompt_deployment_node__parent_context_serialization(mock_httpx_transport, mock_complex_parent_context):
+    # GIVEN a prompt deployment node
+    class MyNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {}
+
+    # AND a known response from the httpx client
+    execution_id = str(uuid4())
+    events: List[WorkflowStreamEvent] = [
+        WorkflowExecutionWorkflowResultEvent(
+            execution_id=execution_id,
+            data=WorkflowResultEvent(
+                id=str(uuid4()),
+                state="INITIATED",
+                ts=datetime.now(),
+            ),
+        ),
+        WorkflowExecutionWorkflowResultEvent(
+            execution_id=execution_id,
+            data=WorkflowResultEvent(
+                id=str(uuid4()),
+                state="FULFILLED",
+                ts=datetime.now(),
+                outputs=[
+                    WorkflowOutputString(
+                        id=str(uuid4()),
+                        name="final-output_copy",  # Note the hyphen here
+                        value="Test",
+                    )
+                ],
+            ),
+        ),
+    ]
+    text = "\n".join(e.model_dump_json() for e in events)
+
+    mock_httpx_transport.handle_request.return_value = Response(
+        status_code=200,
+        text=text,
+    )
+
+    # WHEN the node is run with a complex parent context
+    trace_id = uuid4()
+    with execution_context(
+        parent_context=mock_complex_parent_context,
+        trace_id=trace_id,
+    ):
+        outputs = list(MyNode().run())
+
+    # THEN the last output is as expected
+    assert outputs[-1].value == "Test"
+
+    # AND the prompt is executed with the correct execution context
+    call_request_args = mock_httpx_transport.handle_request.call_args_list[0][0][0]
+    request_execution_context = json.loads(call_request_args.read().decode("utf-8"))["execution_context"]
+    assert request_execution_context["trace_id"] == str(trace_id)
+    assert request_execution_context["parent_context"]
