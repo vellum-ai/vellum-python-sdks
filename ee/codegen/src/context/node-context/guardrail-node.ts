@@ -55,7 +55,8 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
       if (e instanceof VellumError && e.statusCode === 404) {
         this.workflowContext.addError(
           new EntityNotFoundError(
-            `Metric Definition "${this.nodeData.data.metricDefinitionId} ${this.nodeData.data.releaseTag}" not found.`
+            `Metric Definition "${this.nodeData.data.metricDefinitionId} ${this.nodeData.data.releaseTag}" not found.`,
+            "WARNING"
           )
         );
       } else {

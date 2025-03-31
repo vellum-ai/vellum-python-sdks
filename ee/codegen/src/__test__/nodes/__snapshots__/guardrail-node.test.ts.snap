@@ -117,6 +117,17 @@ class GuardrailNode(BaseGuardrailNode):
 "
 `;
 
+exports[`GuardrailNode > no metric definition found > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import GuardrailNode as BaseGuardrailNode
+
+
+class GuardrailNode(BaseGuardrailNode):
+    metric_definition = "589df5bd-8c0d-4797-9a84-9598ecd043de"
+    metric_inputs = {}
+    release_tag = "LATEST"
+"
+`;
+
 exports[`GuardrailNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
