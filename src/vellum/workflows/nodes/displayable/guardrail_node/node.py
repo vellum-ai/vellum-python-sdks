@@ -52,18 +52,17 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
                 message="Metric execution must have one output named 'score' with type 'float'",
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
             )
-
-        log = metric_outputs.get("log")
-
-        if log is not None and not isinstance(log, str):
-            raise NodeException(
-                message="Metric execution log output must be of type 'str'",
-                code=WorkflowErrorCode.INVALID_OUTPUTS,
-            )
-        if log:
-            metric_outputs.pop("log")
-
         metric_outputs.pop("score")
+
+        if "log" in metric_outputs:
+            log = metric_outputs.pop("log") or ""
+            if not isinstance(log, str):
+                raise NodeException(
+                    message="Metric execution log output must be of type 'str'",
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                )
+        else:
+            log = None
 
         return self.Outputs(score=score, log=log, **metric_outputs)
 
