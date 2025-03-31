@@ -4,7 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 from .release_tag_source import ReleaseTagSource
 from .workflow_release_tag_workflow_deployment_history_item import WorkflowReleaseTagWorkflowDeploymentHistoryItem
-from .release import Release
+from .release_tag_release import ReleaseTagRelease
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
@@ -28,7 +28,7 @@ class WorkflowReleaseTagRead(UniversalBaseModel):
     Deprecated. Reference the `release` field instead.
     """
 
-    release: Release = pydantic.Field()
+    release: ReleaseTagRelease = pydantic.Field()
     """
     The Release that this Release Tag points to.
     """

@@ -7,7 +7,7 @@ import typing
 import pydantic
 
 
-class Release(UniversalBaseModel):
+class ReleaseTagRelease(UniversalBaseModel):
     id: str
     timestamp: dt.datetime
 

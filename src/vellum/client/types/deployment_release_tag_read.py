@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 from .release_tag_source import ReleaseTagSource
 from .deployment_release_tag_deployment_history_item import DeploymentReleaseTagDeploymentHistoryItem
+from .release_tag_release import ReleaseTagRelease
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
@@ -24,7 +25,12 @@ class DeploymentReleaseTagRead(UniversalBaseModel):
 
     history_item: DeploymentReleaseTagDeploymentHistoryItem = pydantic.Field()
     """
-    The Deployment History Item that this Release Tag is associated with
+    Deprecated. Reference the `release` field instead.
+    """
+
+    release: ReleaseTagRelease = pydantic.Field()
+    """
+    The Release that this Release Tag points to.
     """
 
     if IS_PYDANTIC_V2:

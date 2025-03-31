@@ -2,7 +2,6 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
-from .types.workflows_pull_request_format import WorkflowsPullRequestFormat
 from ...core.request_options import RequestOptions
 from ...core.jsonable_encoder import jsonable_encoder
 from ...errors.bad_request_error import BadRequestError
@@ -28,7 +27,6 @@ class WorkflowsClient:
         id: str,
         *,
         exclude_code: typing.Optional[bool] = None,
-        format: typing.Optional[WorkflowsPullRequestFormat] = None,
         include_json: typing.Optional[bool] = None,
         include_sandbox: typing.Optional[bool] = None,
         strict: typing.Optional[bool] = None,
@@ -41,8 +39,6 @@ class WorkflowsClient:
             The ID of the Workflow to pull from
 
         exclude_code : typing.Optional[bool]
-
-        format : typing.Optional[WorkflowsPullRequestFormat]
 
         include_json : typing.Optional[bool]
 
@@ -64,7 +60,6 @@ class WorkflowsClient:
             method="GET",
             params={
                 "exclude_code": exclude_code,
-                "format": format,
                 "include_json": include_json,
                 "include_sandbox": include_sandbox,
                 "strict": strict,
@@ -180,7 +175,6 @@ class AsyncWorkflowsClient:
         id: str,
         *,
         exclude_code: typing.Optional[bool] = None,
-        format: typing.Optional[WorkflowsPullRequestFormat] = None,
         include_json: typing.Optional[bool] = None,
         include_sandbox: typing.Optional[bool] = None,
         strict: typing.Optional[bool] = None,
@@ -193,8 +187,6 @@ class AsyncWorkflowsClient:
             The ID of the Workflow to pull from
 
         exclude_code : typing.Optional[bool]
-
-        format : typing.Optional[WorkflowsPullRequestFormat]
 
         include_json : typing.Optional[bool]
 
@@ -216,7 +208,6 @@ class AsyncWorkflowsClient:
             method="GET",
             params={
                 "exclude_code": exclude_code,
-                "format": format,
                 "include_json": include_json,
                 "include_sandbox": include_sandbox,
                 "strict": strict,
