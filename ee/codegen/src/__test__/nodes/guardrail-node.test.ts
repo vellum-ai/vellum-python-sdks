@@ -1,6 +1,7 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { MetricDefinitionHistoryItem } from "vellum-ai/api";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
+import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -77,7 +78,41 @@ describe("GuardrailNode", () => {
         outputVariables
       ) as unknown as MetricDefinitionHistoryItem
     );
-    const nodeData = guardrailNodeDataFactory({ errorOutputId });
+    const nodeData = guardrailNodeDataFactory({
+      errorOutputId,
+      inputs: [
+        {
+          id: "3f917af8-03a4-4ca4-8d40-fa662417fe9c",
+          key: "expected",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "a6ef8809-346e-469c-beed-2e5c4e9844c5",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "bed55ada-923e-46ef-8340-1a5b0b563dc1",
+          key: "actual",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "1472503c-1662-4da9-beb9-73026be90c68",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+    });
 
     const nodeContext = (await createNodeContext({
       workflowContext,
@@ -155,6 +190,50 @@ describe("GuardrailNode", () => {
 
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("no metric definition found", () => {
+    let node: GuardrailNode;
+    beforeEach(async () => {
+      vi.spyOn(
+        MetricDefinitionsClient.prototype,
+        "metricDefinitionHistoryItemRetrieve"
+      ).mockRejectedValue(
+        new VellumError({
+          message: "Metric Definition not found",
+          body: {
+            detail: "Could not find Metric Definition",
+          },
+          statusCode: 404,
+        })
+      );
+      writer = new Writer();
+      workflowContext = workflowContextFactory({ strict: false });
+      const nodeData = guardrailNodeDataFactory();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GuardrailNodeContext;
+
+      node = new GuardrailNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+      const errors = workflowContext.getErrors();
+      // console.log(errors);
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toContain(
+        'Metric Definition "589df5bd-8c0d-4797-9a84-9598ecd043de LATEST" not found.'
+      );
+      expect(errors[0]?.severity).toBe("WARNING");
     });
   });
 });

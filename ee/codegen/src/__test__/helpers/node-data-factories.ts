@@ -360,8 +360,10 @@ export function noteNodeDataFactory(): NoteNode {
 
 export function guardrailNodeDataFactory({
   errorOutputId,
+  inputs,
 }: {
   errorOutputId?: string;
+  inputs?: NodeInput[];
 } = {}): GuardrailNode {
   const nodeData: GuardrailNode = {
     id: "metric",
@@ -374,38 +376,7 @@ export function guardrailNodeDataFactory({
       metricDefinitionId: "589df5bd-8c0d-4797-9a84-9598ecd043de",
       releaseTag: "LATEST",
     },
-    inputs: [
-      {
-        id: "3f917af8-03a4-4ca4-8d40-fa662417fe9c",
-        key: "expected",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "a6ef8809-346e-469c-beed-2e5c4e9844c5",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-      {
-        id: "bed55ada-923e-46ef-8340-1a5b0b563dc1",
-        key: "actual",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "1472503c-1662-4da9-beb9-73026be90c68",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-    ],
+    inputs: inputs ?? [],
   };
   return nodeData;
 }
