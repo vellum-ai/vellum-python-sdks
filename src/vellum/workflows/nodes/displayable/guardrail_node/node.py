@@ -3,7 +3,7 @@ from typing import Any, ClassVar, Dict, Generic, List, Optional, Union, cast
 
 from vellum import ChatHistoryInput, ChatMessage, JsonInput, MetricDefinitionInput, NumberInput, StringInput
 from vellum.core import RequestOptions
-from vellum.workflows.constants import LATEST_RELEASE_TAG, undefined
+from vellum.workflows.constants import LATEST_RELEASE_TAG
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
@@ -62,7 +62,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
                     code=WorkflowErrorCode.INVALID_OUTPUTS,
                 )
         else:
-            log = undefined
+            log = None
 
         return self.Outputs(score=score, log=log, **metric_outputs)
 
