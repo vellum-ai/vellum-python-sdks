@@ -88,10 +88,9 @@ def test_run_workflow__happy_path(vellum_client):
     )
     trace_id = call_kwargs["request_options"]["additional_body_parameters"]["execution_context"]["trace_id"]
     assert trace_id is not None
-    assert (
-        parent_context["node_definition"]
-        == VellumCodeResourceDefinition.encode(ExamplePromptDeploymentNode).model_dump()
-    )
+    assert parent_context["node_definition"] == VellumCodeResourceDefinition.encode(
+        ExamplePromptDeploymentNode
+    ).model_dump(mode="json")
 
 
 def test_run_workflow_return_only_function_call__happy_path(vellum_client):
@@ -154,10 +153,9 @@ def test_run_workflow_return_only_function_call__happy_path(vellum_client):
         "parent_context"
     )
     assert call_kwargs["request_options"]["additional_body_parameters"]["execution_context"]["trace_id"] is not None
-    assert (
-        parent_context["node_definition"]
-        == VellumCodeResourceDefinition.encode(ExamplePromptDeploymentNode).model_dump()
-    )
+    assert parent_context["node_definition"] == VellumCodeResourceDefinition.encode(
+        ExamplePromptDeploymentNode
+    ).model_dump(mode="json")
 
 
 def test_stream_workflow__happy_path(vellum_client):

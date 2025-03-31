@@ -87,15 +87,11 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
     def _get_prompt_event_stream(self) -> Iterator[AdHocExecutePromptEvent]:
         input_variables, input_values = self._compile_prompt_inputs()
-        current_context = get_execution_context()
-        parent_context = (
-            current_context.parent_context.model_dump(mode="json") if current_context.parent_context else None
-        )
-        trace_id = current_context.trace_id
+        execution_context = get_execution_context()
         request_options = self.request_options or RequestOptions()
 
         request_options["additional_body_parameters"] = {
-            "execution_context": {"parent_context": parent_context, "trace_id": trace_id},
+            "execution_context": execution_context.model_dump(mode="json"),
             **request_options.get("additional_body_parameters", {}),
         }
         normalized_functions = (

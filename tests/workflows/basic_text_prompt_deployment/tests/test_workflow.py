@@ -83,10 +83,9 @@ def test_run_workflow__happy_path(vellum_client):
     parent_context = call_kwargs["request_options"]["additional_body_parameters"]["execution_context"].get(
         "parent_context"
     )
-    assert (
-        parent_context["node_definition"]
-        == VellumCodeResourceDefinition.encode(ExamplePromptDeploymentNode).model_dump()
-    )
+    assert parent_context["node_definition"] == VellumCodeResourceDefinition.encode(
+        ExamplePromptDeploymentNode
+    ).model_dump(mode="json")
 
 
 def test_stream_workflow__happy_path(vellum_client):
