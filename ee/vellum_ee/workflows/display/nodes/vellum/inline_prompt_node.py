@@ -94,7 +94,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeVellumDisplay[_InlinePromptNodeType], 
                 input_name=variable_name,
                 value=variable_value,
                 display_context=display_context,
-                input_id=self.node_input_ids_by_name.get(variable_name),
+                input_id=self.node_input_ids_by_name.get(f"{InlinePromptNode.prompt_inputs.name}.{variable_name}"),
             )
             vellum_variable_type = infer_vellum_variable_type(variable_value)
             node_inputs.append(node_input)

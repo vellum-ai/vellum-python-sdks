@@ -34,7 +34,7 @@ def test_serialize_node__lazy_reference_in_prompt_inputs():
 
     assert lazy_reference_node["inputs"] == [
         {
-            "id": "fba6a4d5-835a-4e99-afb7-f6a4aed15110",
+            "id": "aa81c1bc-d5d8-4ae8-8946-e9f4d0c1ab5f",
             "key": "attr",
             "value": {
                 "combinator": "OR",

@@ -15,10 +15,16 @@ import {
   InlinePromptNodeData,
 } from "src/types/vellum";
 
+const INPUTS_PREFIX = "prompt_inputs";
+
 export class InlinePromptNode extends BaseSingleFileNode<
   InlinePromptNodeType,
   InlinePromptNodeContext
 > {
+  protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    return `${INPUTS_PREFIX}.${nodeInputKey}`;
+  }
+
   protected getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
@@ -71,7 +77,7 @@ export class InlinePromptNode extends BaseSingleFileNode<
 
     statements.push(
       python.field({
-        name: "prompt_inputs",
+        name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
             key: python.TypeInstantiation.str(key),
