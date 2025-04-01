@@ -1,3 +1,4 @@
+import pytest
 import sys
 from uuid import uuid4
 from typing import Type, cast
@@ -69,3 +70,56 @@ class StartNode(BaseNode):
     # AND the lazy reference has the correct name
     assert start_node.foo.instance
     assert start_node.foo.instance.name == "StartNode.Outputs.bar"
+
+
+@pytest.mark.skip(reason="Code execution inspect and get read file from path needs to be fixed")
+def test_load_from_module__ts_code_in_file_loader():
+    # GIVEN a workflow module with only a code execution node
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.code_execution_node import CodeExecutionNode
+
+class Workflow(BaseWorkflow):
+    graph = CodeExecutionNode
+""",
+        "nodes/__init__.py": """\
+from .code_execution_node import CodeExecutionNode
+
+__all__ = ["CodeExecutionNode"]
+""",
+        "nodes/code_execution_node.py": """\
+from typing import Any
+
+from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
+from vellum.workflows.state import BaseState
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, Any]):
+    filepath = "./script.ts"
+    code_inputs = {}
+    runtime = "TYPESCRIPT_5_3_3"
+    packages = []
+""",
+        "nodes/code_execution_node/script.ts": """async function main(inputs: {
+  text: string,
+}): any {
+  const matches = inputs.text.match(/\\((.+?)\\)/gs);
+  return matches;
+}""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    # WHEN the workflow is loaded
+    Workflow = BaseWorkflow.load_from_module(namespace)
+    workflow = Workflow()
+
+    # THEN the workflow is successfully initialized
+    assert workflow
+
+    event = workflow.run()
+    assert event.name == "workflow.execution.fulfilled"
