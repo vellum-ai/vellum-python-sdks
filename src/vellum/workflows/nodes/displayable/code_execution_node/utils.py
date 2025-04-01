@@ -14,10 +14,11 @@ def read_file_from_path(node_filepath: str, script_filepath: str) -> Union[str, 
     node_filepath_dir = os.path.dirname(node_filepath)
     full_filepath = os.path.join(node_filepath_dir, script_filepath)
 
-    if os.path.isfile(full_filepath):
+    try:
         with open(full_filepath) as file:
             return file.read()
-    return None
+    except (FileNotFoundError, IsADirectoryError):
+        return None
 
 
 class ListWrapper(list):
