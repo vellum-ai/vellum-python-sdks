@@ -3,7 +3,7 @@ import json
 from uuid import UUID, uuid4
 from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BeforeValidator, Field
+from pydantic import BeforeValidator, Field, field_validator
 
 from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.state.encoder import DefaultStateEncoder
@@ -70,6 +70,26 @@ class BaseParentContext(UniversalBaseModel):
     parent: Optional["ParentContext"] = None
     type: str
 
+    @field_validator("parent")
+    @classmethod
+    def validate_parent(cls, value: Optional[Dict[str, Any]]) -> Optional["ParentContext"]:
+        if not value:
+            return None
+
+        parent_type = value.get("type")
+        if parent_type not in [
+            "WORKFLOW_RELEASE_TAG",
+            "PROMPT_RELEASE_TAG",
+            "WORKFLOW_NODE",
+            "WORKFLOW",
+            "WORKFLOW_SANDBOX",
+            "API_REQUEST",
+            "UNKNOWN",
+        ]:
+            value["type"] = "UNKNOWN"
+
+        return BaseParentContext.model_validate(value)
+
 
 class BaseDeploymentParentContext(BaseParentContext):
     deployment_id: UUID
@@ -112,6 +132,10 @@ class APIRequestParentContext(BaseParentContext):
     type: Literal["API_REQUEST"] = "API_REQUEST"
 
 
+class UnknownParentContext(BaseParentContext):
+    type: Literal["UNKNOWN"] = "UNKNOWN"
+
+
 # Define the discriminated union
 ParentContext = Annotated[
     Union[
@@ -121,6 +145,7 @@ ParentContext = Annotated[
         PromptDeploymentParentContext,
         WorkflowSandboxParentContext,
         APIRequestParentContext,
+        UnknownParentContext,
     ],
     Field(discriminator="type"),
 ]
