@@ -9,6 +9,7 @@ from httpx import Response
 from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.chat_message import ChatMessage
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
@@ -241,7 +242,7 @@ def test_inline_prompt_node__parent_context(mock_httpx_transport, mock_complex_p
     # GIVEN a prompt node
     class MyNode(InlinePromptNode):
         ml_model = "gpt-4o"
-        blocks = []
+        blocks = [ChatMessagePromptBlock(chat_role="USER", blocks=[])]
         prompt_inputs = {}
 
     # AND a known response from the httpx client
@@ -276,6 +277,16 @@ def test_inline_prompt_node__parent_context(mock_httpx_transport, mock_complex_p
 
     # AND the prompt is executed with the correct execution context
     call_request_args = mock_httpx_transport.handle_request.call_args_list[0][0][0]
-    request_execution_context = json.loads(call_request_args.read().decode("utf-8"))["execution_context"]
+    call_request = json.loads(call_request_args.read().decode("utf-8"))
+    request_execution_context = call_request["execution_context"]
     assert request_execution_context["trace_id"] == str(trace_id)
     assert request_execution_context["parent_context"]
+
+    # AND the blocks are serialized as expected
+    assert call_request["blocks"] == [
+        {
+            "block_type": "CHAT_MESSAGE",
+            "chat_role": "USER",
+            "blocks": [],
+        }
+    ]
