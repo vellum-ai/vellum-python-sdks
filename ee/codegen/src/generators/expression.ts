@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/order
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
@@ -6,9 +5,6 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
-// eslint-disable-next-line import/order
-import { NodeInput } from "src/generators/node-inputs";
-import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace Expression {
   interface Args {
@@ -17,6 +13,25 @@ export declare namespace Expression {
     rhs?: AstNode | undefined;
     base?: AstNode | undefined;
   }
+}
+
+type NodeInput = AstNode & {
+  nodeInputValuePointer: {
+    nodeInputValuePointerData?: {
+      rules?: Array<{ type: string }>;
+    };
+  };
+};
+
+// This is to replace the usage of instanceof when checking for NodeInput
+// due to a circular dependency
+function isNodeInput(node: AstNode): node is NodeInput {
+  return (
+    node != null &&
+    "nodeInputValuePointer" in node &&
+    node.nodeInputValuePointer != null &&
+    typeof node.nodeInputValuePointer === "object"
+  );
 }
 
 export class Expression extends AstNode {
@@ -114,11 +129,13 @@ export class Expression extends AstNode {
   }
 
   private isConstantValuePointer(lhs: AstNode): boolean {
+    if (!isNodeInput(lhs)) {
+      return false;
+    }
+
     return (
-      lhs instanceof NodeInput &&
-      !isNilOrEmpty(
-        lhs.nodeInputValuePointer.nodeInputValuePointerData.rules
-      ) &&
+      lhs.nodeInputValuePointer.nodeInputValuePointerData?.rules != null &&
+      lhs.nodeInputValuePointer.nodeInputValuePointerData.rules.length > 0 &&
       lhs.nodeInputValuePointer.nodeInputValuePointerData.rules[0]?.type ===
         "CONSTANT_VALUE"
     );
