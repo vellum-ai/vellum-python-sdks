@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/order
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
@@ -5,6 +6,9 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
+// eslint-disable-next-line import/order
+import { NodeInput } from "src/generators/node-inputs";
+import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace Expression {
   interface Args {
@@ -57,7 +61,10 @@ export class Expression extends AstNode {
         "rhs must be defined if base is defined"
       );
     }
-    if (this.isConstantValueReference(base)) {
+    if (
+      this.isConstantValueReference(base) ||
+      this.isConstantValuePointer(base)
+    ) {
       rawLhs = this.generateLhsAsConstantReference(base);
     }
     this.inheritReferences(rawLhs);
@@ -70,10 +77,15 @@ export class Expression extends AstNode {
     rhs: AstNode | undefined
   ): string {
     let rawLhs = lhs;
-    if (this.isConstantValueReference(lhs)) {
+    if (
+      this.isConstantValueReference(lhs) ||
+      this.isConstantValuePointer(lhs)
+    ) {
       rawLhs = this.generateLhsAsConstantReference(lhs);
     }
+
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
+    this.inheritReferences(rawLhs);
     return `${rawLhs.toString()}.${operator}${rhsExpression}`;
   }
 
@@ -98,6 +110,17 @@ export class Expression extends AstNode {
     return (
       lhs instanceof WorkflowValueDescriptorReference &&
       lhs.workflowValueReferencePointer === "CONSTANT_VALUE"
+    );
+  }
+
+  private isConstantValuePointer(lhs: AstNode): boolean {
+    return (
+      lhs instanceof NodeInput &&
+      !isNilOrEmpty(
+        lhs.nodeInputValuePointer.nodeInputValuePointerData.rules
+      ) &&
+      lhs.nodeInputValuePointer.nodeInputValuePointerData.rules[0]?.type ===
+        "CONSTANT_VALUE"
     );
   }
 

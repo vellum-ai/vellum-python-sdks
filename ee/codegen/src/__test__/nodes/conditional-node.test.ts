@@ -581,3 +581,197 @@ describe("ConditionalNode with empty rules array", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
+
+describe("Conditional Node with constant value string lhs", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const nodeData: ConditionalNodeType = {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+            type: "IF",
+            sourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+            data: {
+              id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+              rules: [
+                {
+                  id: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c",
+                  fieldNodeInputId: "f804da22-b3d2-43d0-8c6f-321434c28ead",
+                  operator: "=",
+                  valueNodeInputId: "c2e0ebfc-e079-4b7e-a926-f7ba671995dc",
+                },
+              ],
+              combinator: "AND",
+            },
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "f804da22-b3d2-43d0-8c6f-321434c28ead",
+          key: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "hello",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "c2e0ebfc-e079-4b7e-a926-f7ba671995dc",
+          key: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "world",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+    };
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
+describe("Conditional Node with constant value string base", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const nodeData: ConditionalNodeType = {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "d93fecd6-0f6c-4c13-b572-2254404650cd",
+            type: "IF",
+            sourceHandleId: "b9a8c7af-68bf-42e0-9643-a62d73734c74",
+            data: {
+              id: "55f430c7-a98e-4c40-a2b3-455f7152556a",
+              rules: [
+                {
+                  id: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c",
+                  fieldNodeInputId: "f804da22-b3d2-43d0-8c6f-321434c28ead",
+                  operator: "between",
+                  valueNodeInputId: "c2e0ebfc-e079-4b7e-a926-f7ba671995dc",
+                },
+              ],
+              combinator: "AND",
+            },
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "f804da22-b3d2-43d0-8c6f-321434c28ead",
+          key: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "hello",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "c2e0ebfc-e079-4b7e-a926-f7ba671995dc",
+          key: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "world,hello",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+    };
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
