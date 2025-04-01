@@ -321,6 +321,7 @@ class WorkflowRunner(Generic[StateType]):
                 )
             )
         except NodeException as e:
+            logger.info(e)
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
                     trace_id=node.state.meta.trace_id,
@@ -333,6 +334,7 @@ class WorkflowRunner(Generic[StateType]):
                 )
             )
         except WorkflowInitializationException as e:
+            logger.info(e)
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
                     trace_id=node.state.meta.trace_id,
