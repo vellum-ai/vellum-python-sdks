@@ -308,6 +308,7 @@ from .prompt_block_state import PromptBlockState
 from .prompt_deployment_expand_meta_request import PromptDeploymentExpandMetaRequest
 from .prompt_deployment_input_request import PromptDeploymentInputRequest
 from .prompt_deployment_parent_context import PromptDeploymentParentContext
+from .prompt_exec_config import PromptExecConfig
 from .prompt_execution_meta import PromptExecutionMeta
 from .prompt_node_execution_meta import PromptNodeExecutionMeta
 from .prompt_node_result import PromptNodeResult
@@ -892,6 +893,7 @@ __all__ = [
     "PromptDeploymentExpandMetaRequest",
     "PromptDeploymentInputRequest",
     "PromptDeploymentParentContext",
+    "PromptExecConfig",
     "PromptExecutionMeta",
     "PromptNodeExecutionMeta",
     "PromptNodeResult",
