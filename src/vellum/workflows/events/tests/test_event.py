@@ -4,6 +4,7 @@ from uuid import UUID
 
 from deepdiff import DeepDiff
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events.node import (
@@ -14,7 +15,7 @@ from vellum.workflows.events.node import (
     NodeExecutionStreamingBody,
     NodeExecutionStreamingEvent,
 )
-from vellum.workflows.events.types import NodeParentContext, WorkflowParentContext
+from vellum.workflows.events.types import NodeParentContext, ParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionFulfilledEvent,
@@ -419,3 +420,30 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
 )
 def test_event_serialization(event, expected_json):
     assert not DeepDiff(event.model_dump(mode="json"), expected_json)
+
+
+def test_parent_context__deserialize_from_json__invalid_parent_context():
+    # GIVEN an event with a parent context that Vellum is introducing in the future
+    data = {
+        "foo": "bar",
+        "parent": {
+            "type": "SOME_FUTURE_ENTITY",
+            "span_id": "123e4567-e89b-12d3-a456-426614174000",
+            "some_randome_field": "some_random_value",
+            "parent": None,
+        },
+    }
+
+    # AND a dataclass that references the parent context
+    class MyData(UniversalBaseModel):
+        foo: str
+        parent: ParentContext
+
+    # WHEN the data is deserialized
+    event = MyData.model_validate(data)
+
+    # THEN the event is deserialized correctly
+    assert event.parent
+    assert event.parent.type == "UNKNOWN"
+    assert event.parent.span_id == UUID("123e4567-e89b-12d3-a456-426614174000")
+    assert event.parent.parent is None
