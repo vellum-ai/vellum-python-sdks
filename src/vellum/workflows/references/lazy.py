@@ -30,17 +30,17 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         from vellum.workflows.descriptors.utils import resolve_value
 
         if isinstance(self._get, str):
-            # The full solution will involve creating a nodes registry on `WorkflowContext`. I want to update
-            # how WorkflowContext works so that we could just access it directly instead of it needing to be
-            # passed in, similar to get_workflow_context(). Because we don't want this to slow down p1 issues
-            # that we are debugging with existing workflows, using the following workaround for now.
+            # We are comparing Output string references - when if we want to be exact,
+            # should be comparing the Output class themselves
             for output_reference, value in state.meta.node_outputs.items():
                 if str(output_reference) == self._get:
                     return value
 
+            child_reference = self.resolve(state.meta.parent) if state.meta.parent else None
+
             # Fix typing surrounding the return value of node outputs/output descriptors
             # https://app.shortcut.com/vellum/story/4783
-            return undefined  # type: ignore[return-value]
+            return child_reference or undefined  # type: ignore[return-value]
 
         return resolve_value(self._get(), state)
 
