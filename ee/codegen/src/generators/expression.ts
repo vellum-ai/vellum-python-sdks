@@ -15,9 +15,17 @@ export declare namespace Expression {
   }
 }
 
+type NodeInput = AstNode & {
+  nodeInputValuePointer: {
+    nodeInputValuePointerData?: {
+      rules?: Array<{ type: string }>;
+    };
+  };
+};
+
 // This is to replace the usage of instanceof when checking for NodeInput
 // due to a circular dependency
-function isNodeInput(node: AstNode): boolean {
+function isNodeInput(node: AstNode): node is NodeInput {
   return (
     node != null &&
     "nodeInputValuePointer" in node &&
@@ -125,21 +133,11 @@ export class Expression extends AstNode {
       return false;
     }
 
-    const nodeInput = lhs as unknown as {
-      nodeInputValuePointer: {
-        nodeInputValuePointerData?: {
-          rules?: Array<{ type: string }>;
-        };
-      };
-    };
-
     return (
-      nodeInput.nodeInputValuePointer.nodeInputValuePointerData?.rules !=
-        null &&
-      nodeInput.nodeInputValuePointer.nodeInputValuePointerData.rules.length >
-        0 &&
-      nodeInput.nodeInputValuePointer.nodeInputValuePointerData.rules[0]
-        ?.type === "CONSTANT_VALUE"
+      lhs.nodeInputValuePointer.nodeInputValuePointerData?.rules != null &&
+      lhs.nodeInputValuePointer.nodeInputValuePointerData.rules.length > 0 &&
+      lhs.nodeInputValuePointer.nodeInputValuePointerData.rules[0]?.type ===
+        "CONSTANT_VALUE"
     );
   }
 
