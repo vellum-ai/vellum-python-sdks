@@ -45,7 +45,7 @@ def jsonable_encoder(obj: Any, custom_encoder: Optional[Dict[Any, Callable[[Any]
             encoder = getattr(obj.__config__, "json_encoders", {})  # type: ignore # Pydantic v1
         if custom_encoder:
             encoder.update(custom_encoder)
-        obj_dict = obj.dict()
+        obj_dict = obj.dict(by_alias=True)
         if "__root__" in obj_dict:
             obj_dict = obj_dict["__root__"]
         if "root" in obj_dict:
