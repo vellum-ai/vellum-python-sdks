@@ -1,9 +1,10 @@
 from datetime import datetime
 import json
 from uuid import UUID, uuid4
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union, get_args
 
-from pydantic import BeforeValidator, Field, field_validator
+from pydantic import BeforeValidator, Field, GetCoreSchemaHandler, Tag, ValidationInfo
+from pydantic_core import CoreSchema, core_schema
 
 from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.state.encoder import DefaultStateEncoder
@@ -70,26 +71,6 @@ class BaseParentContext(UniversalBaseModel):
     parent: Optional["ParentContext"] = None
     type: str
 
-    @field_validator("parent")
-    @classmethod
-    def validate_parent(cls, value: Optional[Dict[str, Any]]) -> Optional["ParentContext"]:
-        if not value:
-            return None
-
-        parent_type = value.get("type")
-        if parent_type not in [
-            "WORKFLOW_RELEASE_TAG",
-            "PROMPT_RELEASE_TAG",
-            "WORKFLOW_NODE",
-            "WORKFLOW",
-            "WORKFLOW_SANDBOX",
-            "API_REQUEST",
-            "UNKNOWN",
-        ]:
-            value["type"] = "UNKNOWN"
-
-        return BaseParentContext.model_validate(value)
-
 
 class BaseDeploymentParentContext(BaseParentContext):
     deployment_id: UUID
@@ -136,6 +117,55 @@ class UnknownParentContext(BaseParentContext):
     type: Literal["UNKNOWN"] = "UNKNOWN"
 
 
+def _cast_parent_context_discriminator(v: Any) -> Any:
+    if v in PARENT_CONTEXT_TYPES:
+        return v
+
+    return "UNKNOWN"
+
+
+def _get_parent_context_discriminator(v: Any) -> Any:
+    if isinstance(v, dict) and "type" in v:
+        return _cast_parent_context_discriminator(v["type"])
+
+    if isinstance(v, PARENT_CONTEXT_CHOICES):
+        return v.type
+
+    return _cast_parent_context_discriminator(v)
+
+
+def _tag_parent_context_discriminator(v: Any) -> Any:
+    return Tag(_get_parent_context_discriminator(v))
+
+
+def _validate_parent_context_discriminator(v: Any, info: ValidationInfo) -> Any:
+    if isinstance(v, str):
+        return _get_parent_context_discriminator(v)
+
+    if isinstance(v, dict) and "type" in v:
+        v["type"] = _get_parent_context_discriminator(v["type"])
+
+    return v
+
+
+class ParentContextDiscriminator:
+    def __get_pydantic_core_schema__(self, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
+        original_schema = handler(source_type)
+        tagged_union_choices = {}
+        for index, choice in enumerate(original_schema["choices"]):
+            tagged_union_choices[Tag(PARENT_CONTEXT_TYPES[index])] = choice
+
+        tagged_union_schema = core_schema.tagged_union_schema(
+            tagged_union_choices,
+            _tag_parent_context_discriminator,
+        )
+        return core_schema.with_info_before_validator_function(
+            function=_validate_parent_context_discriminator,
+            schema=tagged_union_schema,
+            field_name="type",
+        )
+
+
 # Define the discriminated union
 ParentContext = Annotated[
     Union[
@@ -147,7 +177,11 @@ ParentContext = Annotated[
         APIRequestParentContext,
         UnknownParentContext,
     ],
-    Field(discriminator="type"),
+    ParentContextDiscriminator(),
+]
+PARENT_CONTEXT_CHOICES = get_args(get_args(ParentContext)[0])
+PARENT_CONTEXT_TYPES = [
+    pc.model_fields["type"].default for pc in PARENT_CONTEXT_CHOICES if issubclass(pc, UniversalBaseModel)
 ]
 
 # Update the forward references
