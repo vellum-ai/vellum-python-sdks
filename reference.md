@@ -3902,6 +3902,85 @@ client.organizations.organization_identity()
 </dl>
 </details>
 
+## Prompts
+<details><summary><code>client.prompts.<a href="src/vellum/resources/prompts/client.py">pull_prompt</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Used to pull the definition of a Prompt from Vellum.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.pull_prompt(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — The ID of the Prompt to pull from. Prompt Sandbox IDs are currently supported.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_variant_id:** `typing.Optional[str]` — The ID of the Prompt Variant within a Prompt Sandbox to pull. Must be included if providing the ID of a Prompt Sandbox.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Sandboxes
 <details><summary><code>client.sandboxes.<a href="src/vellum/resources/sandboxes/client.py">deploy_prompt</a>(...)</code></summary>
 <dl>
