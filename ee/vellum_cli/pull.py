@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from pydash import snake_case
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import VellumCliConfig, WorkflowConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
