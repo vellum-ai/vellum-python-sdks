@@ -3,7 +3,7 @@ from queue import Queue
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 from vellum import Vellum
-from vellum.workflows.context import ExecutionContext, get_execution_context
+from vellum.workflows.context import ExecutionContext, get_execution_context, set_execution_context
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
@@ -24,10 +24,12 @@ class WorkflowContext:
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
-        self._execution_context = get_execution_context()
-        if not self._execution_context.parent_context and execution_context:
-            self._execution_context = execution_context
         self._generated_files = generated_files
+        if execution_context:
+            set_execution_context(execution_context)
+            self._execution_context = execution_context
+        else:
+            self._execution_context = get_execution_context() or ExecutionContext()
 
     @cached_property
     def vellum_client(self) -> Vellum:

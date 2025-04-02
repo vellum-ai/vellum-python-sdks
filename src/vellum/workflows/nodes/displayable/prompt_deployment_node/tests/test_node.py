@@ -114,7 +114,9 @@ def test_run_node__any_array_input(vellum_client, input_value):
 
 
 @pytest.mark.timeout(5)
-def test_prompt_deployment_node__parent_context_serialization(mock_httpx_transport, mock_complex_parent_context):
+def test_prompt_deployment_node__parent_context_serialization(
+    mock_httpx_transport, mock_complex_parent_context, mock_uuid4_generator
+):
     # GIVEN a prompt deployment node
     class MyNode(PromptDeploymentNode):
         deployment = "example_prompt_deployment"
@@ -140,11 +142,8 @@ def test_prompt_deployment_node__parent_context_serialization(mock_httpx_transpo
     )
 
     # WHEN the node is run with a complex parent context
-    trace_id = uuid4()
-    with execution_context(
-        parent_context=mock_complex_parent_context,
-        trace_id=trace_id,
-    ):
+    trace_id = mock_uuid4_generator("vellum.workflows.context.uuid4")()
+    with execution_context(parent_context=mock_complex_parent_context):
         outputs = list(MyNode().run())
 
     # THEN the last output is as expected

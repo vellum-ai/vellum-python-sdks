@@ -61,7 +61,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     assert events[0].timestamp == frozen_datetime
     assert events[0].initial_state is None
 
-    assert events[1].name == "node.execution.initiated"
+    assert events[1].name == "node.execution.initiated", events[1].model_dump_json()
     assert events[1].node_definition == StartNode
     assert events[1].trace_id == trace_id
     assert events[1].span_id == start_node_span_id

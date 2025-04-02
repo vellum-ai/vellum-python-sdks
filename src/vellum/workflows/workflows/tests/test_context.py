@@ -25,8 +25,10 @@ class MockWorkflow(BaseWorkflow[MockInputs, BaseState]):
     graph = MockNode
 
 
-def test_context_trace_and_parent():
-    trace_id = uuid4()
+def test_context_trace_and_parent(mock_uuid4_generator):
+    trace_id_generator = mock_uuid4_generator("vellum.workflows.context.uuid4")
+    trace_id = trace_id_generator()
+    second_trace_id = trace_id_generator()
     parent_context = NodeParentContext(
         node_definition=MockNode,
         span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
@@ -39,22 +41,27 @@ def test_context_trace_and_parent():
         workflow_definition=MockWorkflow, span_id=uuid4(), parent=parent_context
     )
     # When using execution context , if we set trace id within
-    with execution_context(parent_context=parent_context, trace_id=trace_id):
+    with execution_context(parent_context=parent_context):
         test = get_execution_context()
+        assert test
         assert test.trace_id == trace_id
         assert test.parent_context == parent_context
         with execution_context(parent_context=second_parent_context):
             test1 = get_execution_context()
+            assert test1
             assert test1.trace_id == trace_id
             assert test1.parent_context == second_parent_context
             # then we can assume trace id will not change
-            with execution_context(trace_id=uuid4()):
+            with execution_context():
                 test3 = get_execution_context()
+                assert test3
                 assert test3.trace_id == trace_id
-            with execution_context(parent_context=parent_context, trace_id=uuid4()):
+            with execution_context(parent_context=parent_context):
                 test3 = get_execution_context()
+                assert test3
                 assert test3.trace_id == trace_id
     # and if we have a new context, the trace will differ
-    with execution_context(parent_context=parent_context, trace_id=uuid4()):
+    with execution_context(parent_context=parent_context):
         test = get_execution_context()
-        assert test.trace_id != trace_id
+        assert test
+        assert test.trace_id == second_trace_id, trace_id
