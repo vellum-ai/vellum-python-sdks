@@ -6,8 +6,6 @@ from vellum import (
     ChatMessagePromptBlock,
     ExecutePromptEvent,
     FulfilledExecutePromptEvent,
-    FunctionCall,
-    FunctionCallVellumValue,
     InitiatedExecutePromptEvent,
     JinjaPromptBlock,
     PromptOutput,
@@ -33,7 +31,6 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
     # AND we know what the Prompt will respond with
     expected_outputs: List[PromptOutput] = [
         StringVellumValue(value="Your favorite animal is a fox."),
-        FunctionCallVellumValue(value=FunctionCall(name="favorite_noun", arguments={})),
     ]
 
     def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
