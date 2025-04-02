@@ -7,8 +7,4 @@ class StartNode(BaseNode):
     noun = WorkflowInputs.noun
 
     class Outputs(BaseNode.Outputs):
-        final_noun: str
-
-    def run(self) -> Outputs:
-        final_value = "animal"
-        return self.Outputs(final_noun=final_value)
+        final_noun = "animal"

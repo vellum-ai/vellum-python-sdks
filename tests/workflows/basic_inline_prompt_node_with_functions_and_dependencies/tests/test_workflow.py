@@ -8,7 +8,6 @@ from vellum import (
     FulfilledExecutePromptEvent,
     FunctionCall,
     FunctionCallVellumValue,
-    FunctionDefinition,
     InitiatedExecutePromptEvent,
     JinjaPromptBlock,
     PromptOutput,
@@ -93,13 +92,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                 ],
             ),
         ],
-        functions=[
-            FunctionDefinition(
-                name="favorite_noun",
-                description="Returns the favorite noun of the user",
-                parameters={},
-            ),
-        ],
+        functions=None,
         expand_meta=OMIT,
         request_options=mock.ANY,
         settings=None,
