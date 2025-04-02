@@ -488,7 +488,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     workflow_inputs=workflow_inputs or self.get_default_inputs(),
                     trace_id=execution_context.trace_id,
                 )
-                if execution_context and execution_context.trace_id
+                if execution_context and int(execution_context.trace_id)
                 else StateMeta(
                     parent=self._parent_state,
                     workflow_inputs=workflow_inputs or self.get_default_inputs(),
