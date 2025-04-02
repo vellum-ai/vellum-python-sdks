@@ -3315,13 +3315,6 @@ The current status of the document
 Upload a document to be indexed and used for search.
 
 **Note:** Uses a base url of `https://documents.vellum.ai`.
-
-This is a multipart/form-data request. The `contents` field should be a file upload. It also expects a JSON body with the following fields:
-- `add_to_index_names: list[str]` - Optionally include the names of all indexes that you'd like this document to be included in
-- `external_id: str | None` - Optionally include an external ID for this document. This is useful if you want to re-upload the same document later when its contents change and would like it to be re-indexed.
-- `label: str` - A human-friendly name for this document. Typically the filename.
-- `keywords: list[str] | None` - Optionally include a list of keywords that'll be associated with this document. Used when performing keyword searches.
-- `metadata: dict[str, Any]` - A stringified JSON object containing any metadata associated with the document that you'd like to filter upon later.
 </dd>
 </dl>
 </dd>
@@ -3886,6 +3879,85 @@ client.organizations.organization_identity()
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Prompts
+<details><summary><code>client.prompts.<a href="src/vellum/resources/prompts/client.py">pull</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Used to pull the definition of a Prompt from Vellum.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.pull(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — The ID of the Prompt to pull from. Prompt Sandbox IDs are currently supported.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_variant_id:** `typing.Optional[str]` — The ID of the Prompt Variant within a Prompt Sandbox to pull. Must be included if providing the ID of a Prompt Sandbox.
+    
+</dd>
+</dl>
 
 <dl>
 <dd>

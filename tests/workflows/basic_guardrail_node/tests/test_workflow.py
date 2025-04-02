@@ -1,14 +1,8 @@
-from typing import List
-
-from vellum import StringInput, TestSuiteRunMetricNumberOutput, TestSuiteRunMetricOutput
-from vellum.core import UniversalBaseModel
+from vellum import StringInput, TestSuiteRunMetricNumberOutput
+from vellum.client.types.metric_definition_execution import MetricDefinitionExecution
 from vellum.workflows.constants import LATEST_RELEASE_TAG
 
 from tests.workflows.basic_guardrail_node.workflow import BasicGuardrailNodeWorkflow, Inputs
-
-
-class MetricExecution(UniversalBaseModel):
-    outputs: List[TestSuiteRunMetricOutput]
 
 
 def test_run_workflow__happy_path(vellum_client):
@@ -18,9 +12,7 @@ def test_run_workflow__happy_path(vellum_client):
     workflow = BasicGuardrailNodeWorkflow()
 
     # AND we know what the Guardrail Node will respond with
-    # TODO: We need to expose executing metrics in Vellum's API
-    # https://app.shortcut.com/vellum/story/4607
-    mock_metric_execution = MetricExecution(
+    mock_metric_execution = MetricDefinitionExecution(
         outputs=[
             TestSuiteRunMetricNumberOutput(
                 name="score",

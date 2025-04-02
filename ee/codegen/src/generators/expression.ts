@@ -15,6 +15,25 @@ export declare namespace Expression {
   }
 }
 
+type NodeInput = AstNode & {
+  nodeInputValuePointer: {
+    nodeInputValuePointerData?: {
+      rules?: Array<{ type: string }>;
+    };
+  };
+};
+
+// This is to replace the usage of instanceof when checking for NodeInput
+// due to a circular dependency
+function isNodeInput(node: AstNode): node is NodeInput {
+  return (
+    node != null &&
+    "nodeInputValuePointer" in node &&
+    node.nodeInputValuePointer != null &&
+    typeof node.nodeInputValuePointer === "object"
+  );
+}
+
 export class Expression extends AstNode {
   private readonly astNode: AstNode;
 
@@ -57,7 +76,10 @@ export class Expression extends AstNode {
         "rhs must be defined if base is defined"
       );
     }
-    if (this.isConstantValueReference(base)) {
+    if (
+      this.isConstantValueReference(base) ||
+      this.isConstantValuePointer(base)
+    ) {
       rawLhs = this.generateLhsAsConstantReference(base);
     }
     this.inheritReferences(rawLhs);
@@ -70,10 +92,15 @@ export class Expression extends AstNode {
     rhs: AstNode | undefined
   ): string {
     let rawLhs = lhs;
-    if (this.isConstantValueReference(lhs)) {
+    if (
+      this.isConstantValueReference(lhs) ||
+      this.isConstantValuePointer(lhs)
+    ) {
       rawLhs = this.generateLhsAsConstantReference(lhs);
     }
+
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
+    this.inheritReferences(rawLhs);
     return `${rawLhs.toString()}.${operator}${rhsExpression}`;
   }
 
@@ -98,6 +125,19 @@ export class Expression extends AstNode {
     return (
       lhs instanceof WorkflowValueDescriptorReference &&
       lhs.workflowValueReferencePointer === "CONSTANT_VALUE"
+    );
+  }
+
+  private isConstantValuePointer(lhs: AstNode): boolean {
+    if (!isNodeInput(lhs)) {
+      return false;
+    }
+
+    return (
+      lhs.nodeInputValuePointer.nodeInputValuePointerData?.rules != null &&
+      lhs.nodeInputValuePointer.nodeInputValuePointerData.rules.length > 0 &&
+      lhs.nodeInputValuePointer.nodeInputValuePointerData.rules[0]?.type ===
+        "CONSTANT_VALUE"
     );
   }
 

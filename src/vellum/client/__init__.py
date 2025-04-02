@@ -13,6 +13,7 @@ from .resources.folder_entities.client import FolderEntitiesClient
 from .resources.metric_definitions.client import MetricDefinitionsClient
 from .resources.ml_models.client import MlModelsClient
 from .resources.organizations.client import OrganizationsClient
+from .resources.prompts.client import PromptsClient
 from .resources.sandboxes.client import SandboxesClient
 from .resources.test_suite_runs.client import TestSuiteRunsClient
 from .resources.test_suites.client import TestSuitesClient
@@ -69,6 +70,7 @@ from .resources.folder_entities.client import AsyncFolderEntitiesClient
 from .resources.metric_definitions.client import AsyncMetricDefinitionsClient
 from .resources.ml_models.client import AsyncMlModelsClient
 from .resources.organizations.client import AsyncOrganizationsClient
+from .resources.prompts.client import AsyncPromptsClient
 from .resources.sandboxes.client import AsyncSandboxesClient
 from .resources.test_suite_runs.client import AsyncTestSuiteRunsClient
 from .resources.test_suites.client import AsyncTestSuitesClient
@@ -145,6 +147,7 @@ class Vellum:
         self.metric_definitions = MetricDefinitionsClient(client_wrapper=self._client_wrapper)
         self.ml_models = MlModelsClient(client_wrapper=self._client_wrapper)
         self.organizations = OrganizationsClient(client_wrapper=self._client_wrapper)
+        self.prompts = PromptsClient(client_wrapper=self._client_wrapper)
         self.sandboxes = SandboxesClient(client_wrapper=self._client_wrapper)
         self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = TestSuitesClient(client_wrapper=self._client_wrapper)
@@ -1486,6 +1489,7 @@ class AsyncVellum:
         self.metric_definitions = AsyncMetricDefinitionsClient(client_wrapper=self._client_wrapper)
         self.ml_models = AsyncMlModelsClient(client_wrapper=self._client_wrapper)
         self.organizations = AsyncOrganizationsClient(client_wrapper=self._client_wrapper)
+        self.prompts = AsyncPromptsClient(client_wrapper=self._client_wrapper)
         self.sandboxes = AsyncSandboxesClient(client_wrapper=self._client_wrapper)
         self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = AsyncTestSuitesClient(client_wrapper=self._client_wrapper)
