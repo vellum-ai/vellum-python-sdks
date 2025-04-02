@@ -866,6 +866,7 @@ export declare namespace BaseDisplayableWorkflowNodeSerializer {
     inputs: NodeInputSerializer.Raw[];
     adornments?: AdornmentNodeSerializer.Raw[] | null;
     outputs?: NodeOutputSerializer.Raw[] | null;
+    attributes?: NodeAttributeSerializer.Raw[] | null;
   }
 }
 
@@ -1164,6 +1165,7 @@ export const PromptNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   outputs: listSchema(NodeOutputSerializer).optional(),
+  attributes: listSchema(NodeAttributeSerializer).optional(),
 });
 
 export declare namespace PromptNodeSerializer {

@@ -11,6 +11,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
 import {
+  NodeAttribute as NodeAttributeType,
   NodeOutput as NodeOutputType,
   PromptTemplateBlock,
 } from "src/types/vellum";
@@ -229,6 +230,44 @@ describe("InlinePromptNode", () => {
 
     it(`getNodeDisplayFile`, async () => {
       node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("with ml model node attribute defined", async () => {
+    let node: InlinePromptNode;
+    beforeEach(async () => {
+      const randomMlModelAttrId = "some-ml-mlmodel-attr-id";
+      const nodeAttributes: NodeAttributeType[] = [
+        {
+          id: randomMlModelAttrId,
+          name: "ml_model",
+          value: {
+            type: "CONSTANT_VALUE",
+            value: {
+              type: "STRING",
+              value: "gpt-4",
+            },
+          },
+        },
+      ];
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        attributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile`, async () => {
+      node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
