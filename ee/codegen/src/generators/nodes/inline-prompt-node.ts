@@ -9,6 +9,7 @@ import { FunctionDefinition } from "src/generators/function-definition";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { PromptBlock } from "src/generators/prompt-block";
 import { PromptParameters } from "src/generators/prompt-parameters-request";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   InlinePromptNode as InlinePromptNodeType,
   FunctionDefinitionPromptTemplateBlock,
@@ -47,12 +48,32 @@ export class InlinePromptNode extends BaseSingleFileNode<
           block.blockType === "FUNCTION_DEFINITION"
       );
 
-    statements.push(
-      python.field({
-        name: "ml_model",
-        initializer: python.TypeInstantiation.str(nodeData.mlModelName),
-      })
+    const mlModelAttr = this.nodeData.attributes?.find(
+      (attr) => attr.name === "ml_model"
     );
+
+    // If we have the node attribute for ml model use it. Otherwise default to legacy way
+    // of using ml model name
+    if (mlModelAttr) {
+      statements.push(
+        python.field({
+          name: "ml_model",
+          initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+            workflowValueDescriptor: mlModelAttr.value,
+          }),
+        })
+      );
+    } else {
+      statements.push(
+        python.field({
+          name: "ml_model",
+          initializer: python.TypeInstantiation.str(nodeData.mlModelName),
+        })
+      );
+    }
+
     statements.push(
       python.field({
         name: "blocks",
