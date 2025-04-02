@@ -837,6 +837,7 @@ export function conditionalNodeFactory({
   elseSourceHandleId,
   inputReferenceId,
   inputReferenceNodeId,
+  inputs,
   includeElif = false,
   conditions = null,
 }: {
@@ -849,6 +850,7 @@ export function conditionalNodeFactory({
   inputReferenceNodeId?: string;
   includeElif?: boolean;
   conditions?: ConditionalNodeConditionData[] | null;
+  inputs?: NodeInput[];
 } = {}): ConditionalNode {
   // Some test may want to pass in conditions directly
   if (!conditions) {
@@ -909,75 +911,76 @@ export function conditionalNodeFactory({
       conditions: conditions,
       version: "2",
     },
-    inputs:
-      inputReferenceId && inputReferenceNodeId
-        ? [
-            {
-              id: "2cb6582e-c329-4952-8598-097830b766c7",
-              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
-              value: {
-                rules: [
-                  {
-                    type: "NODE_OUTPUT",
-                    data: {
-                      nodeId: inputReferenceNodeId,
-                      outputId: inputReferenceId,
-                    },
+    inputs: inputs
+      ? inputs
+      : inputReferenceId && inputReferenceNodeId
+      ? [
+          {
+            id: "2cb6582e-c329-4952-8598-097830b766c7",
+            key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+            value: {
+              rules: [
+                {
+                  type: "NODE_OUTPUT",
+                  data: {
+                    nodeId: inputReferenceNodeId,
+                    outputId: inputReferenceId,
                   },
-                ],
-                combinator: "OR",
-              },
+                },
+              ],
+              combinator: "OR",
             },
-            {
-              id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
-              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
-              value: {
-                rules: [
-                  {
-                    type: "CONSTANT_VALUE",
-                    data: {
-                      type: "STRING",
-                      value: "testtest",
-                    },
+          },
+          {
+            id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+            key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+            value: {
+              rules: [
+                {
+                  type: "CONSTANT_VALUE",
+                  data: {
+                    type: "STRING",
+                    value: "testtest",
                   },
-                ],
-                combinator: "OR",
-              },
+                },
+              ],
+              combinator: "OR",
             },
-          ]
-        : [
-            {
-              id: "2cb6582e-c329-4952-8598-097830b766c7",
-              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
-              value: {
-                rules: [
-                  {
-                    type: "INPUT_VARIABLE",
-                    data: {
-                      inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
-                    },
+          },
+        ]
+      : [
+          {
+            id: "2cb6582e-c329-4952-8598-097830b766c7",
+            key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+            value: {
+              rules: [
+                {
+                  type: "INPUT_VARIABLE",
+                  data: {
+                    inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
                   },
-                ],
-                combinator: "OR",
-              },
+                },
+              ],
+              combinator: "OR",
             },
-            {
-              id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
-              key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
-              value: {
-                rules: [
-                  {
-                    type: "CONSTANT_VALUE",
-                    data: {
-                      type: "STRING",
-                      value: "testtest",
-                    },
+          },
+          {
+            id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+            key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+            value: {
+              rules: [
+                {
+                  type: "CONSTANT_VALUE",
+                  data: {
+                    type: "STRING",
+                    value: "testtest",
                   },
-                ],
-                combinator: "OR",
-              },
+                },
+              ],
+              combinator: "OR",
             },
-          ],
+          },
+        ],
     displayData: {
       width: 480,
       height: 180,

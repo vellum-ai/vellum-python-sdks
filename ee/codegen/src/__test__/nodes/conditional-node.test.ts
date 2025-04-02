@@ -7,6 +7,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   conditionalNodeFactory,
   conditionalNodeWithNullOperatorFactory,
+  nodeInputFactory,
   templatingNodeFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
@@ -454,6 +455,86 @@ describe("Conditional Node with numeric operator casts rhs to NUMBER", () => {
   });
 
   it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
+describe("Conditional Node with equals operator to numeric lhs should cast rhs to NUMBER", () => {
+  // TODO: Solve as part of https://linear.app/vellum/issue/APO-313/update-conditional-expression-codegen-to-support-equality-of-numbers
+  it.skip("getNodeFile", async () => {
+    const workflowContext = workflowContextFactory();
+    const writer = new Writer();
+
+    const numericInputId = uuid4();
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: numericInputId,
+          key: "lhs",
+          type: "NUMBER",
+        },
+        workflowContext,
+      })
+    );
+
+    const lhsInputId = uuid4();
+    const rhsInputId = uuid4();
+    const nodeData = conditionalNodeFactory({
+      conditions: [
+        {
+          id: uuid4(),
+          type: "IF",
+          sourceHandleId: uuid4(),
+          data: {
+            id: uuid4(),
+            rules: [
+              {
+                id: uuid4(),
+                rules: [],
+                fieldNodeInputId: lhsInputId,
+                operator: "=",
+                valueNodeInputId: rhsInputId,
+              },
+            ],
+            combinator: "AND",
+          },
+        },
+      ],
+      inputs: [
+        nodeInputFactory({
+          id: lhsInputId,
+          key: "lhs",
+          value: {
+            type: "INPUT_VARIABLE",
+            data: {
+              inputVariableId: numericInputId,
+            },
+          },
+        }),
+        nodeInputFactory({
+          id: rhsInputId,
+          key: "rhs",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "200",
+            },
+          },
+        }),
+      ],
+    });
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    const node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+
     node.getNodeFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });

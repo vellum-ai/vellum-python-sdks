@@ -48,6 +48,20 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`Conditional Node with equals operator to numeric lhs should cast rhs to NUMBER > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+
+from ..inputs import Inputs
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        branch_1 = Port.on_if(Inputs.lhs.equals(200))
+        branch_2 = Port.on_else()
+"
+`;
+
 exports[`Conditional Node with numeric operator casts rhs to NUMBER > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
