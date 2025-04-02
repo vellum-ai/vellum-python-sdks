@@ -2,6 +2,7 @@ import pytest
 
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
+from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.state.base import BaseState
@@ -162,3 +163,34 @@ class DummyNode(BaseNode[FixtureState]):
 def test_resolve_value__happy_path(descriptor, expected_value):
     actual_value = resolve_value(descriptor, FixtureState())
     assert actual_value == expected_value
+
+
+def test_resolve_value__for_falsy_values():
+    """Test that falsy values in FinalOutputNode are handled correctly."""
+
+    class EmptyStringOutput(FinalOutputNode[FixtureState, str]):
+        class Outputs(FinalOutputNode.Outputs):
+            value = ""
+
+    # GIVEN a node with a falsy string
+    empty_string_node = EmptyStringOutput(state=FixtureState())
+
+    # WHEN we run the node
+    empty_string_output = empty_string_node.run()
+
+    # Assert that the output has the correct value
+    assert empty_string_output.value == ""
+
+    # Define a FinalOutputNode subclass with a zero value
+    class ZeroOutput(FinalOutputNode[FixtureState, int]):
+        class Outputs(FinalOutputNode.Outputs):
+            value = 0
+
+    # GIVEN a node with a falsy int
+    zero_node = ZeroOutput(state=FixtureState())
+
+    # WHEN we run the node
+    zero_output = zero_node.run()
+
+    # Assert that the output has the correct value
+    assert zero_output.value == 0
