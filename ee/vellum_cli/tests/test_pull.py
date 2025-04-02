@@ -338,16 +338,7 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
     workflow_deployment = "my-deployment"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {
-                    "workflow.py": "print('hello')",
-                    "metadata.json": json.dumps({"deployment_name": workflow_deployment}),
-                }
-            )
-        ]
-    )
+    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND we are currently in a new directory
     current_dir = os.getcwd()

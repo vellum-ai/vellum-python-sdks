@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from pydash import snake_case
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import VellumCliConfig, WorkflowConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
@@ -78,8 +79,13 @@ def _resolve_workflow_config(
             pk=workflow_config.workflow_sandbox_id,
         )
     elif workflow_deployment:
+        module = (
+            f"workflow_{workflow_deployment.split('-')[0]}"
+            if is_valid_uuid(workflow_deployment)
+            else snake_case(workflow_deployment)
+        )
         workflow_config = WorkflowConfig(
-            module="",
+            module=module,
         )
         config.workflows.append(workflow_config)
         return WorkflowConfigResolutionResult(
@@ -156,7 +162,7 @@ def pull_command(
             metadata_json: Optional[dict] = None
             with zip_file.open(METADATA_FILE_NAME) as source:
                 metadata_json = json.load(source)
-
+            print("metadata_json: ", metadata_json)
             pull_contents_metadata = PullContentsMetadata.model_validate(metadata_json)
 
             if pull_contents_metadata.runner_config:
@@ -164,9 +170,9 @@ def pull_command(
                 workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
                 if workflow_config.container_image_name and not workflow_config.container_image_tag:
                     workflow_config.container_image_tag = "latest"
-            if not workflow_config.module and pull_contents_metadata.deployment_name:
+            if workflow_deployment and pull_contents_metadata.deployment_name:
                 workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
-            elif not workflow_config.module and pull_contents_metadata.label:
+            if not workflow_config.module and pull_contents_metadata.label:
                 workflow_config.module = snake_case(pull_contents_metadata.label)
 
         if not workflow_config.module:
