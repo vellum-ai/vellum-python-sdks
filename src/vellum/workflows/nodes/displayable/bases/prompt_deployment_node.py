@@ -91,8 +91,10 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                         value=input_value,
                     )
                 )
-            elif isinstance(input_value, list) and all(
-                isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
+            elif (
+                input_value
+                and isinstance(input_value, list)
+                and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
             ):
                 chat_history = [
                     (

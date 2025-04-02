@@ -140,8 +140,10 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                         value=input_value,
                     )
                 )
-            elif isinstance(input_value, list) and all(
-                isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value
+            elif (
+                input_value
+                and isinstance(input_value, list)
+                and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
             ):
                 chat_history = [
                     message if isinstance(message, ChatMessage) else ChatMessage.model_validate(message.model_dump())
