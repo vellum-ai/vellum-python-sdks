@@ -15,7 +15,7 @@ from vellum.workflows.state import BaseState
 from vellum.workflows.state.base import StateMeta
 
 
-def test_text_prompt_deployment_node__basic(vellum_client):
+def test_text_prompt_deployment_node__basic(vellum_client, mock_uuid4_generator):
     """Confirm that TextPromptDeploymentNodes output the expected text and results when run."""
 
     # GIVEN a node that subclasses TextPromptDeploymentNode
@@ -74,7 +74,5 @@ def test_text_prompt_deployment_node__basic(vellum_client):
         prompt_deployment_name="my-deployment",
         raw_overrides=OMIT,
         release_tag="LATEST",
-        request_options={
-            "additional_body_parameters": {"execution_context": {"parent_context": None, "trace_id": None}}
-        },
+        request_options={"additional_body_parameters": {"execution_context": None}},
     )

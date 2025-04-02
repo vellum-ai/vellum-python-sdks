@@ -58,7 +58,7 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
         execution_context = get_execution_context()
         request_options = self.request_options or RequestOptions()
         request_options["additional_body_parameters"] = {
-            "execution_context": execution_context.model_dump(mode="json"),
+            "execution_context": execution_context.model_dump(mode="json") if execution_context else None,
             **request_options.get("additional_body_parameters", {}),
         }
         return self._context.vellum_client.execute_prompt_stream(
