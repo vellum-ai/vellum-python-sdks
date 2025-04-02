@@ -26,3 +26,11 @@ class Store:
     @property
     def state_snapshots(self) -> Iterator[BaseState]:
         return iter(self._state_snapshots)
+
+
+class PassThroughStore(Store):
+    def append_event(self, event: WorkflowEvent) -> None:
+        pass
+
+    def append_state_snapshot(self, state: BaseState) -> None:
+        pass
