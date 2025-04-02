@@ -162,7 +162,7 @@ def pull_command(
             metadata_json: Optional[dict] = None
             with zip_file.open(METADATA_FILE_NAME) as source:
                 metadata_json = json.load(source)
-            print("metadata_json: ", metadata_json)
+
             pull_contents_metadata = PullContentsMetadata.model_validate(metadata_json)
 
             if pull_contents_metadata.runner_config:
