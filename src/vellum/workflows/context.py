@@ -1,6 +1,7 @@
 from contextlib import contextmanager
+from dataclasses import field
 import threading
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import Iterator, Optional, cast
 
 from vellum.client.core import UniversalBaseModel
@@ -8,8 +9,8 @@ from vellum.workflows.events.types import ParentContext
 
 
 class ExecutionContext(UniversalBaseModel):
+    trace_id: UUID = field(default_factory=uuid4)
     parent_context: Optional[ParentContext] = None
-    trace_id: Optional[UUID] = None
 
 
 _CONTEXT_KEY = "_execution_context"
