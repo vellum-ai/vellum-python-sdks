@@ -61,14 +61,22 @@ def test_run_node__chat_history_input(vellum_client, ChatMessageClass):
     ]
 
 
-def test_run_node__any_array_input(vellum_client):
+@pytest.mark.parametrize(
+    "input_value",
+    [
+        ["apple", "banana", "cherry"],
+        [],
+    ],
+    ids=["non_empty_array", "empty_array"],
+)
+def test_run_node__any_array_input(vellum_client, input_value):
     """Confirm that we can successfully invoke a Prompt Deployment Node that uses any array input"""
 
     # GIVEN a Prompt Deployment Node
     class ExamplePromptDeploymentNode(PromptDeploymentNode):
         deployment = "example_prompt_deployment"
         prompt_inputs = {
-            "fruits": ["apple", "banana", "cherry"],
+            "fruits": input_value,
         }
 
     # AND we know what the Prompt Deployment will respond with
@@ -97,7 +105,7 @@ def test_run_node__any_array_input(vellum_client):
     # AND we should have invoked the Prompt Deployment with the expected inputs
     call_kwargs = vellum_client.execute_prompt_stream.call_args.kwargs
     assert call_kwargs["inputs"] == [
-        JsonInputRequest(name="fruits", value=["apple", "banana", "cherry"]),
+        JsonInputRequest(name="fruits", value=input_value),
     ]
 
 

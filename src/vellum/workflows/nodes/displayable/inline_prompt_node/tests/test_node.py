@@ -44,6 +44,7 @@ def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
             "a_list": [1, 2, 3],
             "a_dataclass": MyDataClass(hello="world"),
             "a_pydantic": MyPydantic(example="example"),
+            "an_empty_list": [],
         }
 
     # AND a known response from invoking an inline prompt
@@ -75,8 +76,9 @@ def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
         PromptRequestJsonInput(key="a_list", type="JSON", value=[1, 2, 3]),
         PromptRequestJsonInput(key="a_dataclass", type="JSON", value={"hello": "world"}),
         PromptRequestJsonInput(key="a_pydantic", type="JSON", value={"example": "example"}),
+        PromptRequestJsonInput(key="an_empty_list", type="JSON", value=[]),
     ]
-    assert len(mock_api.call_args.kwargs["input_variables"]) == 4
+    assert len(mock_api.call_args.kwargs["input_variables"]) == 5
 
 
 def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
