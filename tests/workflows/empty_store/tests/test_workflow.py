@@ -1,12 +1,12 @@
-from vellum.workflows.state.store import PassThroughStore
+from vellum.workflows.state.store import EmptyStore
 
-from tests.workflows.pass_through_store.workflow import WorkflowWithPassThroughStore
+from tests.workflows.empty_store.workflow import WorkflowWithEmptyStore
 
 
 def test_run_workflow__happy_path():
     # GIVEN a trivial workflow with access to a pass through store
-    workflow = WorkflowWithPassThroughStore(
-        store=PassThroughStore(),
+    workflow = WorkflowWithEmptyStore(
+        store=EmptyStore(),
     )
 
     # WHEN the workflow is run

@@ -28,7 +28,12 @@ class Store:
         return iter(self._state_snapshots)
 
 
-class PassThroughStore(Store):
+class EmptyStore(Store):
+    """
+    A store that does not record any events or state snapshots, for workflows
+    that want to opt out of the memory footprint of the traditional store entirely.
+    """
+
     def append_event(self, event: WorkflowEvent) -> None:
         pass
 

@@ -6,5 +6,5 @@ class StartNode(BaseNode):
     pass
 
 
-class WorkflowWithPassThroughStore(BaseWorkflow):
+class WorkflowWithEmptyStore(BaseWorkflow):
     graph = StartNode
