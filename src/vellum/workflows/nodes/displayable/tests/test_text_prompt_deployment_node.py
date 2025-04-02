@@ -1,3 +1,4 @@
+from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -75,6 +76,6 @@ def test_text_prompt_deployment_node__basic(vellum_client):
         raw_overrides=OMIT,
         release_tag="LATEST",
         request_options={
-            "additional_body_parameters": {"execution_context": {"parent_context": None, "trace_id": None}}
+            "additional_body_parameters": {"execution_context": {"parent_context": None, "trace_id": mock.ANY}}
         },
     )
