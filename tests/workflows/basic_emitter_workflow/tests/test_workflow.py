@@ -20,8 +20,9 @@ def mock_datetime_now(mocker):
 def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     # GIVEN a uuid for our state
     state_id_generator = mock_uuid4_generator("vellum.workflows.state.base.uuid4")
+    trace_id_generator = mock_uuid4_generator("vellum.workflows.context.uuid4")
     state_id = state_id_generator()
-    trace_id = state_id_generator()
+    trace_id = trace_id_generator()
     workflow_span_id = state_id_generator()
     start_node_span_id = state_id_generator()
     next_node_span_id = state_id_generator()
@@ -47,7 +48,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     assert events[0].span_id == workflow_span_id
     assert events[0].timestamp == frozen_datetime
 
-    assert events[1].name == "node.execution.initiated"
+    assert events[1].name == "node.execution.initiated", events[1].model_dump_json()
     assert events[1].node_definition == StartNode
 
     assert events[2].name == "workflow.execution.snapshotted"
