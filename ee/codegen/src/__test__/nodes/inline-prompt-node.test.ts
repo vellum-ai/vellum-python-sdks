@@ -1,4 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -237,7 +238,7 @@ describe("InlinePromptNode", () => {
   describe("with ml model node attribute defined", async () => {
     let node: InlinePromptNode;
     beforeEach(async () => {
-      const randomMlModelAttrId = "some-ml-mlmodel-attr-id";
+      const randomMlModelAttrId = uuidv4();
       const nodeAttributes: NodeAttributeType[] = [
         {
           id: randomMlModelAttrId,
