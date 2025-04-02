@@ -165,12 +165,13 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         parent_state: Optional[BaseState] = None,
         emitters: Optional[List[BaseWorkflowEmitter]] = None,
         resolvers: Optional[List[BaseWorkflowResolver]] = None,
+        store: Optional[Store] = None,
     ):
         self._parent_state = parent_state
         self.emitters = emitters or (self.emitters if hasattr(self, "emitters") else [])
         self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._context = context or WorkflowContext()
-        self._store = Store()
+        self._store = store or Store()
         self._execution_context = self._context.execution_context
 
         self.validate()

@@ -26,3 +26,16 @@ class Store:
     @property
     def state_snapshots(self) -> Iterator[BaseState]:
         return iter(self._state_snapshots)
+
+
+class EmptyStore(Store):
+    """
+    A store that does not record any events or state snapshots, for workflows
+    that want to opt out of the memory footprint of the traditional store entirely.
+    """
+
+    def append_event(self, event: WorkflowEvent) -> None:
+        pass
+
+    def append_state_snapshot(self, state: BaseState) -> None:
+        pass
