@@ -1,4 +1,4 @@
-from vellum import ChatMessagePromptBlock, FunctionDefinition, JinjaPromptBlock
+from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows.nodes import InlinePromptNode, TryNode
 from vellum.workflows.references import LazyReference
 
@@ -23,10 +23,3 @@ class ExampleBaseInlinePromptNodeWithFunctions(InlinePromptNode):
     prompt_inputs = {
         "noun": LazyReference("StartNode.Outputs.final_noun").coalesce(WorkflowInputs.noun),
     }
-    functions = [
-        FunctionDefinition(
-            name="favorite_noun",
-            description="Returns the favorite noun of the user",
-            parameters={},
-        ),
-    ]

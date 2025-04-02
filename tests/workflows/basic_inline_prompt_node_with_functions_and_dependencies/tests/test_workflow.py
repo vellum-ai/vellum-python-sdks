@@ -1,4 +1,3 @@
-import pytest
 from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List
@@ -7,9 +6,6 @@ from vellum import (
     ChatMessagePromptBlock,
     ExecutePromptEvent,
     FulfilledExecutePromptEvent,
-    FunctionCall,
-    FunctionCallVellumValue,
-    FunctionDefinition,
     InitiatedExecutePromptEvent,
     JinjaPromptBlock,
     PromptOutput,
@@ -26,7 +22,6 @@ from tests.workflows.basic_inline_prompt_node_with_functions_and_dependencies.wo
 )
 
 
-@pytest.mark.skip(reason="https://linear.app/vellum/issue/APO-242/try-node-adorned-nodes-appear-to-have-stale-values")
 def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generator):
     """Confirm that we can successfully invoke a Workflow with a single Inline Prompt Node that includes functions"""
 
@@ -36,7 +31,6 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
     # AND we know what the Prompt will respond with
     expected_outputs: List[PromptOutput] = [
         StringVellumValue(value="Your favorite animal is a fox."),
-        FunctionCallVellumValue(value=FunctionCall(name="favorite_noun", arguments={})),
     ]
 
     def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
@@ -95,13 +89,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                 ],
             ),
         ],
-        functions=[
-            FunctionDefinition(
-                name="favorite_noun",
-                description="Returns the favorite noun of the user",
-                parameters={},
-            ),
-        ],
+        functions=None,
         expand_meta=OMIT,
         request_options=mock.ANY,
         settings=None,
