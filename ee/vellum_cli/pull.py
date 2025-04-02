@@ -31,6 +31,7 @@ class RunnerConfig(UniversalBaseModel):
 class PullContentsMetadata(UniversalBaseModel):
     label: Optional[str] = None
     runner_config: Optional[RunnerConfig] = None
+    deployment_name: Optional[str] = None
 
 
 def _resolve_workflow_config(
@@ -78,13 +79,8 @@ def _resolve_workflow_config(
             pk=workflow_config.workflow_sandbox_id,
         )
     elif workflow_deployment:
-        module = (
-            f"workflow_{workflow_deployment.split('-')[0]}"
-            if is_valid_uuid(workflow_deployment)
-            else snake_case(workflow_deployment)
-        )
         workflow_config = WorkflowConfig(
-            module=module,
+            module="",
         )
         config.workflows.append(workflow_config)
         return WorkflowConfigResolutionResult(
@@ -169,8 +165,9 @@ def pull_command(
                 workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
                 if workflow_config.container_image_name and not workflow_config.container_image_tag:
                     workflow_config.container_image_tag = "latest"
-
-            if not workflow_config.module and pull_contents_metadata.label:
+            if not workflow_config.module and pull_contents_metadata.deployment_name:
+                workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
+            elif not workflow_config.module and pull_contents_metadata.label:
                 workflow_config.module = snake_case(pull_contents_metadata.label)
 
         if not workflow_config.module:
