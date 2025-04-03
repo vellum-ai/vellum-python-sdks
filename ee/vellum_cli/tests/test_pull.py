@@ -338,7 +338,16 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
     workflow_deployment = "my-deployment"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                    "metadata.json": json.dumps({"deployment_name": workflow_deployment, "label": "Some Label"}),
+                }
+            )
+        ]
+    )
 
     # AND we are currently in a new directory
     current_dir = os.getcwd()
@@ -822,3 +831,47 @@ def test_pull__multiple_instances_of_same_module__keep_when_pulling_another_modu
     with open(lock_json) as f:
         lock_data = json.load(f)
         assert len(lock_data["workflows"]) == 3
+
+
+def test_pull__module_name_from_deployment_name(vellum_client):
+    # GIVEN a workflow deployment
+    workflow_deployment = "test-workflow-deployment-id"
+
+    # AND the workflow pull API call returns a zip file with metadata containing a deployment_name
+    deployment_name = "Test Deployment"
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                    "metadata.json": json.dumps({"deployment_name": deployment_name, "label": "Some Label"}),
+                }
+            )
+        ]
+    )
+
+    # AND we are currently in a new directory
+    current_dir = os.getcwd()
+    temp_dir = tempfile.mkdtemp()
+    os.chdir(temp_dir)
+
+    # WHEN the user runs the pull command with the workflow deployment
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+    os.chdir(current_dir)
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the module name is derived from the deployment_name in metadata.json (snake_cased)
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+    with open(vellum_lock_json) as f:
+        lock_data = json.loads(f.read())
+        assert lock_data["workflows"][0]["module"] == "test_deployment"
+
+    # AND the workflow.py file is written to the module directory with the correct name
+    workflow_py = os.path.join(temp_dir, "test_deployment", "workflow.py")
+    assert os.path.exists(workflow_py)
+    with open(workflow_py) as f:
+        assert f.read() == "print('hello')"
