@@ -19,10 +19,24 @@ exports[`ChatMessageContent > ARRAY > should write an array of content correctly
 
 exports[`ChatMessageContent > AUDIO > should write an audio content correctly 1`] = `
 "AudioChatMessageContent(
-    src="https://example.com/audio.mp3",
-    metadata={
-        "key": "value",
-    },
+    value=VellumAudio(
+        src="https://example.com/audio.mp3",
+        metadata={
+            "key": "value",
+        },
+    )
+)
+"
+`;
+
+exports[`ChatMessageContent > DOCUMENT > should write a document content correctly 1`] = `
+"DocumentChatMessageContent(
+    value=VellumDocument(
+        src="https://example.com/document.pdf",
+        metadata={
+            "key": "value",
+        },
+    )
 )
 "
 `;
