@@ -45,3 +45,23 @@ Workspace:
 \x1b[0m
 """
     )
+
+
+def test_ping__error_path(vellum_client):
+    # GIVEN a cli
+    runner = CliRunner()
+
+    # Mock the workspace_identity method to raise ApiError directly
+    from vellum.client.core.api_error import ApiError
+
+    vellum_client.workspaces.workspace_identity.side_effect = ApiError(status_code=400, body="Invalid JSON")
+
+    # WHEN the user runs the ping command
+    result = runner.invoke(cli_main, ["ping"])
+
+    # THEN the command returns an error
+    assert result.exit_code == 1
+    assert (
+        str(result.exception)
+        == "The API we tried to ping returned an invalid response. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+    )
