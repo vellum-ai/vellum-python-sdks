@@ -2,6 +2,7 @@ from datetime import datetime
 
 from click.testing import CliRunner
 
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.organization_read import OrganizationRead
 from vellum.client.types.workspace_read import WorkspaceRead
 from vellum_cli import main as cli_main
@@ -51,9 +52,6 @@ def test_ping__error_path(vellum_client):
     # GIVEN a cli
     runner = CliRunner()
 
-    # Mock the workspace_identity method to raise ApiError directly
-    from vellum.client.core.api_error import ApiError
-
     vellum_client.workspaces.workspace_identity.side_effect = ApiError(status_code=400, body="Invalid JSON")
 
     # WHEN the user runs the ping command
@@ -65,3 +63,22 @@ def test_ping__error_path(vellum_client):
         str(result.exception)
         == "The API we tried to ping returned an invalid response. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
     )
+
+
+def test_ping__403_error_path(vellum_client):
+    # GIVEN a cli
+    runner = CliRunner()
+
+    # GIVEN a 403 error with the error message from the API
+    vellum_client.workspaces.workspace_identity.side_effect = ApiError(
+        status_code=403, body={"detail": "Authentication credentials were not provided."}
+    )
+
+    # WHEN the user runs the ping command
+    result = runner.invoke(cli_main, ["ping"])
+
+    # THEN the command returns an error
+    assert result.exit_code == 1
+    assert isinstance(result.exception, ApiError)
+    assert result.exception.status_code == 403
+    assert result.exception.body == {"detail": "Authentication credentials were not provided."}
