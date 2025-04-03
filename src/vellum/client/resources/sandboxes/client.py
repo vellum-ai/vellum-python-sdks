@@ -30,6 +30,7 @@ class SandboxesClient:
         prompt_deployment_name: typing.Optional[str] = OMIT,
         label: typing.Optional[str] = OMIT,
         release_tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        release_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DeploymentRead:
         """
@@ -52,6 +53,9 @@ class SandboxesClient:
 
         release_tags : typing.Optional[typing.Sequence[str]]
             Optionally provide the release tags that you'd like to be associated with the latest release of the created/updated Prompt Deployment.
+
+        release_description : typing.Optional[str]
+            Optionally provide a description that details what's new in this Release.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -82,6 +86,7 @@ class SandboxesClient:
                 "prompt_deployment_name": prompt_deployment_name,
                 "label": label,
                 "release_tags": release_tags,
+                "release_description": release_description,
             },
             request_options=request_options,
             omit=OMIT,
@@ -250,6 +255,7 @@ class AsyncSandboxesClient:
         prompt_deployment_name: typing.Optional[str] = OMIT,
         label: typing.Optional[str] = OMIT,
         release_tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        release_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DeploymentRead:
         """
@@ -272,6 +278,9 @@ class AsyncSandboxesClient:
 
         release_tags : typing.Optional[typing.Sequence[str]]
             Optionally provide the release tags that you'd like to be associated with the latest release of the created/updated Prompt Deployment.
+
+        release_description : typing.Optional[str]
+            Optionally provide a description that details what's new in this Release.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -310,6 +319,7 @@ class AsyncSandboxesClient:
                 "prompt_deployment_name": prompt_deployment_name,
                 "label": label,
                 "release_tags": release_tags,
+                "release_description": release_description,
             },
             request_options=request_options,
             omit=OMIT,
