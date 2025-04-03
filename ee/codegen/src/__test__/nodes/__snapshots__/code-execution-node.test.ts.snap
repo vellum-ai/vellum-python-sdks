@@ -196,6 +196,32 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`CodeExecutionNode > code representation: Base case > should generate the correct node class 1`] = `
+"from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
+exports[`CodeExecutionNode > code representation: Escaped case > should generate the correct node class 1`] = `
+"from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
 exports[`CodeExecutionNode > failure cases > fallback to python 3.11.6 if runtime input is not valid 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,

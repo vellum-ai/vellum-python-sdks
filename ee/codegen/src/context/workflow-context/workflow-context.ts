@@ -55,7 +55,6 @@ export declare namespace WorkflowContext {
     vellumApiEnvironment?: VellumEnvironmentUrls;
     workflowRawData: WorkflowRawData;
     strict: boolean;
-    codeExecutionNodeCodeRepresentationOverride: "STANDALONE" | "INLINE";
     disableFormatting: boolean;
     classNames?: Set<string>;
   };
@@ -124,10 +123,6 @@ export class WorkflowContext {
 
   public readonly workflowRawData: WorkflowRawData;
 
-  public readonly codeExecutionNodeCodeRepresentationOverride:
-    | "STANDALONE"
-    | "INLINE";
-
   public readonly disableFormatting: boolean;
 
   // Track what class names are used within this workflow so that we can ensure name uniqueness
@@ -153,7 +148,6 @@ export class WorkflowContext {
     vellumApiEnvironment,
     workflowRawData,
     strict,
-    codeExecutionNodeCodeRepresentationOverride,
     disableFormatting,
     classNames,
   }: WorkflowContext.Args) {
@@ -185,9 +179,6 @@ export class WorkflowContext {
 
     this.strict = strict;
     this.errors = [];
-
-    this.codeExecutionNodeCodeRepresentationOverride =
-      codeExecutionNodeCodeRepresentationOverride;
 
     this.disableFormatting = disableFormatting;
 
@@ -222,8 +213,6 @@ export class WorkflowContext {
       vellumApiKey: this.vellumApiKey,
       vellumApiEnvironment: this.vellumApiEnvironment,
       workflowRawData,
-      codeExecutionNodeCodeRepresentationOverride:
-        this.codeExecutionNodeCodeRepresentationOverride,
       strict: this.strict,
       disableFormatting: this.disableFormatting,
       classNames,

@@ -7,7 +7,6 @@ export function workflowContextFactory({
   moduleName,
   workflowClassName,
   workflowRawData,
-  codeExecutionNodeCodeRepresentationOverride = "STANDALONE",
   strict = true,
   disableFormatting = true,
 }: Partial<WorkflowContext.Args> = {}): WorkflowContext {
@@ -22,7 +21,6 @@ export function workflowContextFactory({
       edges: [],
     },
     strict,
-    codeExecutionNodeCodeRepresentationOverride,
     disableFormatting,
   });
 }
