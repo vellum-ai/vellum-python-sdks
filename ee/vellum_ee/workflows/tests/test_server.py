@@ -1,4 +1,3 @@
-import pytest
 import sys
 from uuid import uuid4
 from typing import Type, cast
@@ -8,12 +7,8 @@ from vellum.client.types.code_executor_response import CodeExecutorResponse
 from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.state.context import WorkflowContext
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
-
-
-@pytest.fixture
-def mock_open(mocker):
-    return mocker.patch("vellum.workflows.nodes.displayable.code_execution_node.utils.open")
 
 
 def test_load_workflow_event_display_context():
@@ -80,7 +75,6 @@ class StartNode(BaseNode):
 
 
 def test_load_from_module__ts_code_in_file_loader(
-    mock_open,
     vellum_client,
 ):
     # GIVEN typescript code
@@ -91,19 +85,27 @@ def test_load_from_module__ts_code_in_file_loader(
     # AND a workflow module with only a code execution node
     files = {
         "__init__.py": "",
-        "workflow.py": """\
+        "workflow.py": """
 from vellum.workflows import BaseWorkflow
 from .nodes.code_execution_node import CodeExecutionNode
 
 class Workflow(BaseWorkflow):
     graph = CodeExecutionNode
+
+    class Outputs(BaseWorkflow.Outputs):
+       final_output = CodeExecutionNode.Outputs.result
 """,
-        "nodes/__init__.py": """\
+        "nodes/__init__.py": """
 from .code_execution_node import CodeExecutionNode
 
 __all__ = ["CodeExecutionNode"]
 """,
-        "nodes/code_execution_node.py": """\
+        "nodes/code_execution_node/__init__.py": """
+from .code_execution_node import CodeExecutionNode
+
+__all__ = ["CodeExecutionNode"]
+""",
+        "nodes/code_execution_node/code_execution_node.py": """
 from typing import Any
 
 from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
@@ -120,11 +122,10 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, int]):
 
     namespace = str(uuid4())
 
-    # AND the virtual file loader is registered
-    sys.meta_path.append(VirtualFileFinder(files, namespace))
+    finder = VirtualFileFinder(files, namespace)
 
-    # AND the open function returns our file content
-    mock_open.return_value.__enter__.return_value.read.return_value = ts_code
+    # AND the virtual file loader is registered
+    sys.meta_path.append(finder)
 
     # AND we know what the Code Execution Node will respond with
     mock_code_execution = CodeExecutorResponse(
@@ -135,16 +136,13 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, int]):
 
     # WHEN the workflow is loaded
     Workflow = BaseWorkflow.load_from_module(namespace)
-    workflow = Workflow()
+    workflow = Workflow(context=WorkflowContext(dynamic_file_loader=finder.loader))
 
     # THEN the workflow is successfully initialized
     assert workflow
 
     event = workflow.run()
-    assert event.name == "workflow.execution.fulfilled", event.model_dump_json()
+    assert event.name == "workflow.execution.fulfilled"
 
-    # AND we pass in the correct file path to the open function
-    assert mock_open.call_args[0][0] == f"{namespace}/nodes/./script.ts"
-
-    # AND we invoke the Code Execution Node with the correct code
-    assert vellum_client.execute_code.call_args.kwargs["code"] == ts_code
+    # AND we get the code execution result
+    assert event.body.outputs.final_output == 5.0  # type: ignore

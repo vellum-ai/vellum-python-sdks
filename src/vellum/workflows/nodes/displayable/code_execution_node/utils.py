@@ -1,19 +1,31 @@
 import io
 import os
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 from pydantic import BaseModel
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.utils import cast_to_output_type
+from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
 
 
-def read_file_from_path(node_filepath: str, script_filepath: str) -> Union[str, None]:
+def read_file_from_path(
+    node_filepath: str, script_filepath: str, context: Optional[WorkflowContext] = None
+) -> Union[str, None]:
     node_filepath_dir = os.path.dirname(node_filepath)
     full_filepath = os.path.join(node_filepath_dir, script_filepath)
 
+    # If dynamic file loader is present, try and read the code from there
+    if context and context.dynamic_file_loader:
+        normalized_path = os.path.normpath(full_filepath)
+
+        code = context.dynamic_file_loader._get_code(normalized_path)
+        if code is not None:
+            return code
+
+    # Default logic for reading from filesystem
     try:
         with open(full_filepath) as file:
             return file.read()

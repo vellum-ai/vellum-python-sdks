@@ -8,6 +8,7 @@ from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.vellum_client import create_vellum_client
+from vellum_ee.workflows.server.virtual_file_loader import VirtualFileLoader
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
@@ -19,6 +20,7 @@ class WorkflowContext:
         *,
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
+        dynamic_file_loader: Optional[VirtualFileLoader] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
@@ -26,6 +28,7 @@ class WorkflowContext:
         self._execution_context = get_execution_context()
         if not self._execution_context.parent_context and execution_context:
             self._execution_context = execution_context
+        self._dynamic_file_loader = dynamic_file_loader
 
     @cached_property
     def vellum_client(self) -> Vellum:
@@ -37,6 +40,10 @@ class WorkflowContext:
     @cached_property
     def execution_context(self) -> ExecutionContext:
         return self._execution_context
+
+    @cached_property
+    def dynamic_file_loader(self) -> Optional[VirtualFileLoader]:
+        return self._dynamic_file_loader
 
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
