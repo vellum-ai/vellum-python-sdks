@@ -15,7 +15,7 @@ describe("ChatMessageContent", () => {
         chatMessageContent: { type: "STRING", value: "Hello, AI!" },
       });
       chatMessageContent.write(writer);
-      expect(await writer.toString()).toMatchSnapshot();
+      expect(writer.toString()).toMatchSnapshot();
       expect(chatMessageContent.getReferences()).toHaveLength(1);
     });
 
@@ -28,7 +28,7 @@ describe("ChatMessageContent", () => {
         },
       });
       chatMessageContent.write(writer);
-      expect(await writer.toString()).toMatchSnapshot();
+      expect(writer.toString()).toMatchSnapshot();
       expect(chatMessageContent.getReferences()).toHaveLength(1);
     });
   });
