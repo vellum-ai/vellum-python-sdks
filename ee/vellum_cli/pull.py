@@ -8,6 +8,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from pydash import snake_case
 
+from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import VellumCliConfig, WorkflowConfig, load_vellum_cli_config
@@ -146,11 +147,15 @@ def pull_command(
         request_options={"additional_query_parameters": query_parameters},
     )
 
-    zip_bytes = b"".join(response)
+    try:
+        zip_bytes = b"".join(response)
+    except ApiError:
+        raise Exception(
+            "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        )
+
     zip_buffer = io.BytesIO(zip_bytes)
-
     error_content = ""
-
     try:
         with zipfile.ZipFile(zip_buffer) as zip_file:
             if METADATA_FILE_NAME in zip_file.namelist():
