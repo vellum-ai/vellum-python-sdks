@@ -461,8 +461,7 @@ describe("Conditional Node with numeric operator casts rhs to NUMBER", () => {
 });
 
 describe("Conditional Node with equals operator to numeric lhs should cast rhs to NUMBER", () => {
-  // TODO: Solve as part of https://linear.app/vellum/issue/APO-313/update-conditional-expression-codegen-to-support-equality-of-numbers
-  it.skip("getNodeFile", async () => {
+  it("getNodeFile", async () => {
     const workflowContext = workflowContextFactory();
     const writer = new Writer();
 
