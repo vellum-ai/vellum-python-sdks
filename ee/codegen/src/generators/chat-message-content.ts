@@ -203,7 +203,7 @@ class ImageChatMessageContent extends AstNode {
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
 
-    const arguments_ = [
+    const imageArgs = [
       python.methodArgument({
         name: "src",
         value: python.TypeInstantiation.str(value.src),
@@ -212,13 +212,26 @@ class ImageChatMessageContent extends AstNode {
 
     if (!isNil(value.metadata)) {
       const metadataJson = new Json(value.metadata);
-      arguments_.push(
+      imageArgs.push(
         python.methodArgument({
           name: "metadata",
           value: metadataJson,
         })
       );
     }
+
+    const arguments_ = [
+      python.methodArgument({
+        name: "value",
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "VellumImage" + (isRequestType ? "Request" : ""),
+            modulePath: VELLUM_CLIENT_MODULE_PATH,
+          }),
+          arguments_: imageArgs,
+        }),
+      }),
+    ];
 
     const astNode = python.instantiateClass({
       classReference: imageChatMessageContentRequestRef,

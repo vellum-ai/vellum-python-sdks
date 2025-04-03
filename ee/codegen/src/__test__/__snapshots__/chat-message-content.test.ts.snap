@@ -69,10 +69,12 @@ exports[`ChatMessageContent > FUNCTION_CALL > should write a function call conte
 
 exports[`ChatMessageContent > IMAGE > should write an image content correctly 1`] = `
 "ImageChatMessageContent(
-    src="https://example.com/image.png",
-    metadata={
-        "key": "value",
-    },
+    value=VellumImage(
+        src="https://example.com/image.png",
+        metadata={
+            "key": "value",
+        },
+    )
 )
 "
 `;
