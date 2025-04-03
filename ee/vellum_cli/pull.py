@@ -149,9 +149,14 @@ def pull_command(
 
     try:
         zip_bytes = b"".join(response)
-        zip_buffer = io.BytesIO(zip_bytes)
+    except ApiError:
+        raise Exception(
+            "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        )
 
-        error_content = ""
+    zip_buffer = io.BytesIO(zip_bytes)
+    error_content = ""
+    try:
         with zipfile.ZipFile(zip_buffer) as zip_file:
             if METADATA_FILE_NAME in zip_file.namelist():
                 metadata_json: Optional[dict] = None
@@ -217,10 +222,6 @@ def pull_command(
     except zipfile.BadZipFile:
         raise Exception(
             "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
-        )
-    except ApiError:
-        raise Exception(
-            "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
         )
 
     if include_json:
