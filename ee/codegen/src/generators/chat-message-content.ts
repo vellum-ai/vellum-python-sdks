@@ -266,7 +266,7 @@ class AudioChatMessageContent extends AstNode {
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
 
-    const arguments_ = [
+    const audioArgs = [
       python.methodArgument({
         name: "src",
         value: python.TypeInstantiation.str(value.src),
@@ -275,13 +275,26 @@ class AudioChatMessageContent extends AstNode {
 
     if (!isNil(value.metadata)) {
       const metadataJson = new Json(value.metadata);
-      arguments_.push(
+      audioArgs.push(
         python.methodArgument({
           name: "metadata",
           value: metadataJson,
         })
       );
     }
+
+    const arguments_ = [
+      python.methodArgument({
+        name: "value",
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "VellumAudio" + (isRequestType ? "Request" : ""),
+            modulePath: VELLUM_CLIENT_MODULE_PATH,
+          }),
+          arguments_: audioArgs,
+        }),
+      }),
+    ];
 
     const astNode = python.instantiateClass({
       classReference: audioChatMessageContentRequestRef,
@@ -316,7 +329,7 @@ class DocumentChatMessageContent extends AstNode {
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
 
-    const arguments_ = [
+    const documentArgs = [
       python.methodArgument({
         name: "src",
         value: python.TypeInstantiation.str(value.src),
@@ -325,13 +338,26 @@ class DocumentChatMessageContent extends AstNode {
 
     if (!isNil(value.metadata)) {
       const metadataJson = new Json(value.metadata);
-      arguments_.push(
+      documentArgs.push(
         python.methodArgument({
           name: "metadata",
           value: metadataJson,
         })
       );
     }
+
+    const arguments_ = [
+      python.methodArgument({
+        name: "value",
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "VellumDocument" + (isRequestType ? "Request" : ""),
+            modulePath: VELLUM_CLIENT_MODULE_PATH,
+          }),
+          arguments_: documentArgs,
+        }),
+      }),
+    ];
 
     const astNode = python.instantiateClass({
       classReference: documentChatMessageContentRequestRef,

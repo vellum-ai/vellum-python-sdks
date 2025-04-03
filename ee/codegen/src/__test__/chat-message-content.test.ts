@@ -131,7 +131,7 @@ describe("ChatMessageContent", () => {
       });
       chatMessageContent.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
-      expect(chatMessageContent.getReferences()).toHaveLength(1);
+      expect(chatMessageContent.getReferences()).toHaveLength(2);
     });
   });
 
@@ -142,6 +142,23 @@ describe("ChatMessageContent", () => {
           type: "IMAGE",
           value: {
             src: "https://example.com/image.png",
+            metadata: { key: "value" },
+          },
+        },
+      });
+      chatMessageContent.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(chatMessageContent.getReferences()).toHaveLength(2);
+    });
+  });
+
+  describe("DOCUMENT", () => {
+    it("should write a document content correctly", async () => {
+      const chatMessageContent = new ChatMessageContent({
+        chatMessageContent: {
+          type: "DOCUMENT",
+          value: {
+            src: "https://example.com/document.pdf",
             metadata: { key: "value" },
           },
         },
