@@ -1,3 +1,4 @@
+import { VellumVariableType } from "vellum-ai/api";
 import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -20,6 +21,17 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
       [this.nodeData.data.textOutputId]: "text",
       ...(this.nodeData.data.errorOutputId
         ? { [this.nodeData.data.errorOutputId]: "error" }
+        : {}),
+    };
+  }
+
+  getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    return {
+      [this.nodeData.data.jsonOutputId]: "JSON",
+      [this.nodeData.data.statusCodeOutputId]: "NUMBER",
+      [this.nodeData.data.textOutputId]: "STRING",
+      ...(this.nodeData.data.errorOutputId
+        ? { [this.nodeData.data.errorOutputId]: "ERROR" }
         : {}),
     };
   }

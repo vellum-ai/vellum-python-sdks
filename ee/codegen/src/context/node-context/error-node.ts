@@ -1,3 +1,5 @@
+import { VellumVariableType } from "vellum-ai/api";
+
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
@@ -11,6 +13,12 @@ export class ErrorNodeContext extends BaseNodeContext<ErrorNode> {
   getNodeOutputNamesById(): Record<string, string> {
     return {
       [this.nodeData.data.errorOutputId]: "error",
+    };
+  }
+
+  getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    return {
+      [this.nodeData.data.errorOutputId]: "ERROR",
     };
   }
 

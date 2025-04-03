@@ -1,3 +1,5 @@
+import { VellumVariableType } from "vellum-ai/api";
+
 import { VELLUM_WORKFLOW_NODES_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
@@ -90,6 +92,10 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
   }
 
   protected abstract getNodeOutputNamesById(): Record<string, string>;
+  protected abstract getNodeOutputTypesById(): Record<
+    string,
+    VellumVariableType
+  >;
   protected abstract createPortContexts(): PortContext[];
 
   public getNodeLabel(): string {
@@ -125,6 +131,14 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     }
 
     return toPythonSafeSnakeCase(nodeOutputName, "output");
+  }
+
+  public getNodeOutputTypeById(
+    outputId: string
+  ): VellumVariableType | undefined {
+    const nodeOutputTypesById = this.getNodeOutputTypesById();
+
+    return nodeOutputTypesById[outputId];
   }
 
   public isPortNameUsed(portName: string): boolean {

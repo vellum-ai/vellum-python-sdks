@@ -1,4 +1,7 @@
-import { WorkflowDeploymentHistoryItem } from "vellum-ai/api";
+import {
+  VellumVariableType,
+  WorkflowDeploymentHistoryItem,
+} from "vellum-ai/api";
 import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 
 import { BaseNodeContext } from "./base";
@@ -27,6 +30,19 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
       acc[output.id] = toPythonSafeSnakeCase(output.key, "output");
       return acc;
     }, {});
+  }
+
+  getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    if (!this.workflowDeploymentHistoryItem) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      this.workflowDeploymentHistoryItem.outputVariables.map((variable) => [
+        variable.id,
+        variable.type,
+      ])
+    );
   }
 
   createPortContexts(): PortContext[] {

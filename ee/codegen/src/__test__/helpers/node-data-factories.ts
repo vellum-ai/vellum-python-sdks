@@ -1002,9 +1002,13 @@ export interface ApiNodeFactoryProps {
   url?: string | null;
   method?: string;
   body?: Record<string, unknown> | null;
+  statusCodeOutputId?: string;
+  id?: string;
 }
 
 export function apiNodeFactory({
+  id,
+  statusCodeOutputId,
   errorOutputId,
   bearerToken,
   apiKeyHeaderValue,
@@ -1249,7 +1253,7 @@ export function apiNodeFactory({
   ];
 
   const nodeData: ApiNode = {
-    id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
+    id: id ?? "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
     type: "API",
     data: {
       label: "API Node",
@@ -1269,7 +1273,8 @@ export function apiNodeFactory({
       })),
       textOutputId: "81b270c0-4deb-4db3-aae5-138f79531b2b",
       jsonOutputId: "af576eaa-d39d-4c19-8992-1f01a65a709a",
-      statusCodeOutputId: "69250713-617d-42a4-9326-456c70d0ef20",
+      statusCodeOutputId:
+        statusCodeOutputId ?? "69250713-617d-42a4-9326-456c70d0ef20",
       errorOutputId,
       targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",

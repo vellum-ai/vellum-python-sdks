@@ -1,3 +1,5 @@
+import { VellumVariableType } from "vellum-ai/api";
+
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
@@ -21,6 +23,22 @@ export class MapNodeContext extends BaseNodeContext<MapNodeType> {
       acc[variable.id] = variable.key;
       return acc;
     }, {} as Record<string, string>);
+  }
+
+  getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    const subworkflowNodeData = this.nodeData.data;
+    if (subworkflowNodeData.variant !== "INLINE") {
+      throw new NodeDefinitionGenerationError(
+        `MapNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
+      );
+    }
+
+    return Object.fromEntries(
+      subworkflowNodeData.outputVariables.map((variable) => [
+        variable.id,
+        "ARRAY",
+      ])
+    );
   }
 
   createPortContexts(): PortContext[] {

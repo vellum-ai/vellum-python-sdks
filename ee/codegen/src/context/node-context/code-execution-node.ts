@@ -1,4 +1,4 @@
-import { CodeExecutionRuntime } from "vellum-ai/api";
+import { CodeExecutionRuntime, VellumVariableType } from "vellum-ai/api";
 import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "./base";
@@ -31,6 +31,15 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
       [this.nodeData.data.outputId]: "result",
       ...(this.nodeData.data.logOutputId
         ? { [this.nodeData.data.logOutputId]: "logs" }
+        : {}),
+    };
+  }
+
+  getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    return {
+      [this.nodeData.data.outputId]: this.nodeData.data.outputType,
+      ...(this.nodeData.data.logOutputId
+        ? { [this.nodeData.data.logOutputId]: "STRING" }
         : {}),
     };
   }

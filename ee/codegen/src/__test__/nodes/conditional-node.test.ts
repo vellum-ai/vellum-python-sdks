@@ -5,6 +5,7 @@ import { beforeEach, describe, it, expect } from "vitest";
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import {
+  apiNodeFactory,
   conditionalNodeFactory,
   conditionalNodeWithNullOperatorFactory,
   nodeInputFactory,
@@ -16,6 +17,7 @@ import { TemplatingNodeContext } from "src/context/node-context/templating-node"
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import {
   ConditionalNode as ConditionalNodeType,
+  NodeInputValuePointerRule,
   WorkflowNodeType,
 } from "src/types/vellum";
 
@@ -461,10 +463,9 @@ describe("Conditional Node with numeric operator casts rhs to NUMBER", () => {
 });
 
 describe("Conditional Node with equals operator to numeric lhs should cast rhs to NUMBER", () => {
-  it("getNodeFile", async () => {
-    const workflowContext = workflowContextFactory();
-    const writer = new Writer();
-
+  const inputVariableCase = async (
+    workflowContext: WorkflowContext
+  ): Promise<NodeInputValuePointerRule> => {
     const numericInputId = uuid4();
     workflowContext.addInputVariableContext(
       inputVariableContextFactory({
@@ -476,67 +477,97 @@ describe("Conditional Node with equals operator to numeric lhs should cast rhs t
         workflowContext,
       })
     );
+    return {
+      type: "INPUT_VARIABLE",
+      data: {
+        inputVariableId: numericInputId,
+      },
+    };
+  };
 
-    const lhsInputId = uuid4();
-    const rhsInputId = uuid4();
-    const nodeData = conditionalNodeFactory({
-      conditions: [
-        {
-          id: uuid4(),
-          type: "IF",
-          sourceHandleId: uuid4(),
-          data: {
+  const apiNodeStatusCodeCase = async (
+    workflowContext: WorkflowContext
+  ): Promise<NodeInputValuePointerRule> => {
+    const apiNodeId = uuid4();
+    const statusCodeOutputId = uuid4();
+    await createNodeContext({
+      workflowContext,
+      nodeData: apiNodeFactory({ id: apiNodeId, statusCodeOutputId }),
+    });
+
+    return {
+      type: "NODE_OUTPUT",
+      data: {
+        nodeId: apiNodeId,
+        outputId: statusCodeOutputId,
+      },
+    };
+  };
+
+  it.each([inputVariableCase, apiNodeStatusCodeCase])(
+    "getNodeFile",
+    async (testCaseFn) => {
+      const workflowContext = workflowContextFactory();
+      const writer = new Writer();
+
+      const lhsNodeInputValue = await testCaseFn(workflowContext);
+
+      const lhsInputId = uuid4();
+      const rhsInputId = uuid4();
+      const nodeData = conditionalNodeFactory({
+        conditions: [
+          {
             id: uuid4(),
-            rules: [
-              {
-                id: uuid4(),
-                rules: [],
-                fieldNodeInputId: lhsInputId,
-                operator: "=",
-                valueNodeInputId: rhsInputId,
+            type: "IF",
+            sourceHandleId: uuid4(),
+            data: {
+              id: uuid4(),
+              rules: [
+                {
+                  id: uuid4(),
+                  rules: [],
+                  fieldNodeInputId: lhsInputId,
+                  operator: "=",
+                  valueNodeInputId: rhsInputId,
+                },
+              ],
+              combinator: "AND",
+            },
+          },
+        ],
+        inputs: [
+          nodeInputFactory({
+            id: lhsInputId,
+            key: "lhs",
+            value: lhsNodeInputValue,
+          }),
+          nodeInputFactory({
+            id: rhsInputId,
+            key: "rhs",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "200",
               },
-            ],
-            combinator: "AND",
-          },
-        },
-      ],
-      inputs: [
-        nodeInputFactory({
-          id: lhsInputId,
-          key: "lhs",
-          value: {
-            type: "INPUT_VARIABLE",
-            data: {
-              inputVariableId: numericInputId,
             },
-          },
-        }),
-        nodeInputFactory({
-          id: rhsInputId,
-          key: "rhs",
-          value: {
-            type: "CONSTANT_VALUE",
-            data: {
-              type: "STRING",
-              value: "200",
-            },
-          },
-        }),
-      ],
-    });
-    const nodeContext = (await createNodeContext({
-      workflowContext,
-      nodeData,
-    })) as ConditionalNodeContext;
+          }),
+        ],
+      });
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ConditionalNodeContext;
 
-    const node = new ConditionalNode({
-      workflowContext,
-      nodeContext,
-    });
+      const node = new ConditionalNode({
+        workflowContext,
+        nodeContext,
+      });
 
-    node.getNodeFile().write(writer);
-    expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    }
+  );
 });
 
 describe("Conditional Node warning cases", () => {

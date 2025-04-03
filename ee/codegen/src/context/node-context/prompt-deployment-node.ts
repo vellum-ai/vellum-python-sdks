@@ -1,4 +1,4 @@
-import { DeploymentHistoryItem } from "vellum-ai/api";
+import { DeploymentHistoryItem, VellumVariableType } from "vellum-ai/api";
 import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
 
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -20,6 +20,16 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
         ? { [this.nodeData.data.errorOutputId]: "error" }
         : {}),
       [this.nodeData.data.arrayOutputId]: "results",
+    };
+  }
+
+  protected getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    return {
+      [this.nodeData.data.outputId]: "STRING",
+      ...(this.nodeData.data.errorOutputId
+        ? { [this.nodeData.data.errorOutputId]: "ERROR" }
+        : {}),
+      [this.nodeData.data.arrayOutputId]: "ARRAY",
     };
   }
 

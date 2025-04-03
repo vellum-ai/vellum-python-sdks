@@ -1,3 +1,5 @@
+import { VellumVariableType } from "vellum-ai/api";
+
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
@@ -23,6 +25,21 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
         : {}),
       [this.nodeData.data.arrayOutputId]: "results",
       ...(jsonOutput ? { [jsonOutput.id]: "json" } : {}),
+    };
+  }
+
+  protected getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    const jsonOutput = this.nodeData.outputs?.find(
+      (output) => output.type === "JSON"
+    );
+
+    return {
+      [this.nodeData.data.outputId]: "STRING",
+      ...(this.nodeData.data.errorOutputId
+        ? { [this.nodeData.data.errorOutputId]: "ERROR" }
+        : {}),
+      [this.nodeData.data.arrayOutputId]: "ARRAY",
+      ...(jsonOutput ? { [jsonOutput.id]: "JSON" } : {}),
     };
   }
 
