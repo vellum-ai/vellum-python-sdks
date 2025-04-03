@@ -51,7 +51,7 @@ describe("VellumValue", () => {
         },
       });
       chatHistoryValue.write(writer);
-      expect(await writer.toString()).toMatchSnapshot();
+      expect(writer.toString()).toMatchSnapshot();
       expect(chatHistoryValue.getReferences()).toHaveLength(1);
     });
 
@@ -68,7 +68,7 @@ describe("VellumValue", () => {
         },
       });
       chatHistoryValue.write(writer);
-      expect(await writer.toString()).toMatchSnapshot();
+      expect(writer.toString()).toMatchSnapshot();
       expect(chatHistoryValue.getReferences()).toHaveLength(2);
     });
 
@@ -79,7 +79,7 @@ describe("VellumValue", () => {
         },
       });
       chatHistoryValue.write(writer);
-      expect(await writer.toString()).toMatchSnapshot();
+      expect(writer.toString()).toMatchSnapshot();
       expect(chatHistoryValue.getReferences()).toHaveLength(0);
     });
 
@@ -91,7 +91,7 @@ describe("VellumValue", () => {
         },
       });
       chatHistoryValue.write(writer);
-      expect(await writer.toString()).toMatchSnapshot();
+      expect(writer.toString()).toMatchSnapshot();
       expect(chatHistoryValue.getReferences()).toHaveLength(0);
     });
   });
