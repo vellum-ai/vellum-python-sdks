@@ -893,3 +893,29 @@ def test_pull__invalid_zip_file(vellum_client):
         str(result.exception)
         == "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
     )
+
+
+def test_pull__json_decode_error(vellum_client):
+    workflow_deployment = "test-workflow-deployment-id"
+
+    # GIVEN a workflow pull API call that returns a generator which raises an error when consumed
+    def mock_error_generator():
+        # This generator yields nothing but raises when consumed
+        if False:  # This ensures the generator is created but yields nothing
+            yield b""
+        from vellum.client.core.api_error import ApiError
+
+        raise ApiError(status_code=400, body="Invalid JSON")
+
+    vellum_client.workflows.pull.return_value = mock_error_generator()
+
+    # WHEN the user runs the pull command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+
+    # THEN the command returns an error
+    assert result.exit_code == 1
+    assert (
+        str(result.exception)
+        == "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+    )
