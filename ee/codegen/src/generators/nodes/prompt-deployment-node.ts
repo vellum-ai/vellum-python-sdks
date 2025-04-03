@@ -44,7 +44,7 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
       statements.push(
         python.field({
           name: "deployment",
-          initializer: python.TypeInstantiation.str(
+          initializer: python.TypeInstantiation.uuid(
             this.nodeData.data.promptDeploymentId
           ),
         })
