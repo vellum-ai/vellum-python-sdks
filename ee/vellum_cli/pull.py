@@ -214,8 +214,10 @@ def pull_command(
                     with open(target_file, "w") as target:
                         logger.info(f"Writing to {target_file}...")
                         target.write(content)
-    except Exception:
-        raise Exception("Please check if API URL is set correctly.")
+    except zipfile.BadZipFile:
+        raise Exception(
+            "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        )
 
     if include_json:
         logger.warning(

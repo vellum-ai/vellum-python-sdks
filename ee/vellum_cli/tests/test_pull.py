@@ -889,4 +889,7 @@ def test_pull__invalid_zip_file(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert str(result.exception) == "Please check if API URL is set correctly."
+    assert (
+        str(result.exception)
+        == "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+    )
