@@ -105,6 +105,7 @@ def pull_command(
     include_sandbox: Optional[bool] = None,
     target_directory: Optional[str] = None,
 ) -> None:
+    print("pull_command", module, workflow_sandbox_id, workflow_deployment, include_json, exclude_code, strict, include_sandbox, target_directory)
     load_dotenv()
     logger = load_cli_logger()
     config = load_vellum_cli_config()
@@ -164,12 +165,16 @@ def pull_command(
                 workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
                 if workflow_config.container_image_name and not workflow_config.container_image_tag:
                     workflow_config.container_image_tag = "latest"
+            print("pull_contents_metadata", pull_contents_metadata)
             if not workflow_config.module and workflow_deployment and pull_contents_metadata.deployment_name:
                 workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
             if not workflow_config.module and pull_contents_metadata.label:
                 workflow_config.module = snake_case(pull_contents_metadata.label)
 
         if not workflow_config.module:
+            print("================================================")
+            print("workflow_config", workflow_config)
+            print("================================================")
             raise ValueError(f"Failed to resolve a module name for Workflow {pk}")
 
         # Use target_directory if provided, otherwise use current working directory

@@ -341,7 +341,7 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
     vellum_client.workflows.pull.return_value = iter(
         [
             _zip_file_map(
-                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"deployment_name": workflow_deployment})}
+                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"deployment_name": workflow_deployment, "label": "Some Label"})}
             )
         ]
     )
@@ -355,6 +355,8 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
     runner = CliRunner()
     result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
     os.chdir(current_dir)
+    
+    print("result", result)
 
     # THEN the command returns successfully
     assert result.exit_code == 0
@@ -841,8 +843,7 @@ def test_pull__module_name_from_deployment_name(vellum_client):
             _zip_file_map(
                 {
                     "workflow.py": "print('hello')",
-                    "metadata.json": json.dumps({"deployment_name": deployment_name}),
-                    "label": "Some Label",
+                    "metadata.json": json.dumps({"deployment_name": deployment_name, "label": "Some Label"}),
                 }
             )
         ]
