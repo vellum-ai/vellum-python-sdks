@@ -359,8 +359,6 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
     result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
     os.chdir(current_dir)
 
-    print("result", result)
-
     # THEN the command returns successfully
     assert result.exit_code == 0
 
