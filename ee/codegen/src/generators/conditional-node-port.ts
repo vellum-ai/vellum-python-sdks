@@ -4,6 +4,7 @@ import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
+import { VellumVariableType } from "vellum-ai/api";
 
 import { NodePortGenerationError, ValueGenerationError } from "./errors";
 
@@ -28,6 +29,14 @@ export declare namespace ConditionalNodePort {
     nodeLabel: string;
   }
 }
+
+const NUMERIC_OPERATORS = new Set([
+  "less_than",
+  "greater_than",
+  "less_than_or_equal_to",
+  "greater_than_or_equal_to",
+]);
+const EQUALITY_OPERATORS = new Set(["equals", "does_not_equal"]);
 
 export class ConditionalNodePort extends AstNode {
   private portContext: PortContext;
@@ -182,35 +191,21 @@ export class ConditionalNodePort extends AstNode {
       this.isNumericOperator(operator) &&
       this.isConstantStringPointer(rhs)
     ) {
-      const nodeValue = rhs.nodeInputData.value
-        .rules[0] as ConstantValuePointer;
-      const castedValue = Number(nodeValue.data.value);
-      if (isNaN(castedValue)) {
-        const error = new ValueGenerationError(
-          `Failed to cast constant value ${nodeValue.data.value} to NUMBER for attribute ${this.nodeLabel}.${rhsKey}`
-        );
-        this.portContext.workflowContext.addError(error);
-      } else {
-        const castedRhs = {
-          id: rhs.nodeInputData.id,
-          key: rhs.nodeInputData.key,
-          value: {
-            rules: [
-              {
-                type: "CONSTANT_VALUE" as const,
-                data: {
-                  type: "NUMBER",
-                  value: castedValue,
-                },
-              } as ConstantValuePointer,
-            ],
-            combinator: "OR" as const,
-          },
-        };
-        rhs = codegen.nodeInput({
-          nodeContext: this.portContext.nodeContext,
-          nodeInputData: castedRhs,
-        });
+      const castedRhs = this.castStringConstantToNumber(rhs);
+      if (castedRhs) {
+        rhs = castedRhs;
+      }
+    }
+
+    // The following is to account for another case where old workflows auto casted strings to numbers
+    // when it detected numeric equality operators. This is a workaround to support that cutover.
+    if (
+      this.isEqualityOperator(operator) &&
+      this.inferNodeInputType(lhs) === "NUMBER"
+    ) {
+      const castedRhs = this.castStringConstantToNumber(rhs);
+      if (castedRhs) {
+        rhs = castedRhs;
       }
     }
 
@@ -256,12 +251,11 @@ export class ConditionalNodePort extends AstNode {
   }
 
   private isNumericOperator(operator: string): boolean {
-    return new Set([
-      "less_than",
-      "greater_than",
-      "less_than_or_equal_to",
-      "greater_than_or_equal_to",
-    ]).has(operator);
+    return NUMERIC_OPERATORS.has(operator);
+  }
+
+  private isEqualityOperator(operator: string): boolean {
+    return EQUALITY_OPERATORS.has(operator);
   }
 
   private isConstantStringPointer(input: NodeInput): boolean {
@@ -270,6 +264,92 @@ export class ConditionalNodePort extends AstNode {
       input.nodeInputData.value.rules[0]?.type === "CONSTANT_VALUE" &&
       input.nodeInputData.value.rules[0]?.data.type === "STRING"
     );
+  }
+
+  private inferNodeInputType(input: NodeInput): VellumVariableType {
+    const rule = input.nodeInputData.value.rules[0];
+    if (!rule) {
+      return "JSON";
+    }
+
+    if (rule.type === "CONSTANT_VALUE") {
+      return rule.data.type;
+    }
+
+    if (rule.type === "NODE_OUTPUT") {
+      const nodeContext = this.portContext.workflowContext.findNodeContext(
+        rule.data.nodeId
+      );
+      if (nodeContext) {
+        const outputName = nodeContext.getNodeOutputNameById(
+          rule.data.outputId
+        );
+        if (outputName) {
+          // TODO: We need to flesh out the node output types
+          return "JSON";
+        }
+      }
+    }
+
+    if (rule.type === "EXECUTION_COUNTER") {
+      return "NUMBER";
+    }
+
+    if (rule.type === "INPUT_VARIABLE") {
+      const inputVariableContext =
+        this.portContext.workflowContext.findInputVariableContextById(
+          rule.data.inputVariableId
+        );
+      if (inputVariableContext) {
+        return inputVariableContext.getInputVariableData().type;
+      }
+    }
+
+    if (rule.type === "WORKSPACE_SECRET") {
+      return "STRING";
+    }
+
+    return "JSON";
+  }
+
+  private castStringConstantToNumber(
+    nodeInput: NodeInput | undefined
+  ): NodeInput | undefined {
+    if (isNil(nodeInput)) {
+      return undefined;
+    }
+
+    const nodeValue = nodeInput.nodeInputData.value
+      .rules[0] as ConstantValuePointer;
+    const castedValue = Number(nodeValue.data.value);
+    if (isNaN(castedValue)) {
+      const error = new ValueGenerationError(
+        `Failed to cast constant value ${nodeValue.data.value} to NUMBER for attribute ${this.nodeLabel}.${nodeInput.nodeInputData.key}`
+      );
+      this.portContext.workflowContext.addError(error);
+      return;
+    } else {
+      const castedRhs = {
+        id: nodeInput.nodeInputData.id,
+        key: nodeInput.nodeInputData.key,
+        value: {
+          rules: [
+            {
+              type: "CONSTANT_VALUE" as const,
+              data: {
+                type: "NUMBER",
+                value: castedValue,
+              },
+            } as ConstantValuePointer,
+          ],
+          combinator: "OR" as const,
+        },
+      };
+      return codegen.nodeInput({
+        nodeContext: this.portContext.nodeContext,
+        nodeInputData: castedRhs,
+      });
+    }
   }
 
   public write(writer: Writer): void {
