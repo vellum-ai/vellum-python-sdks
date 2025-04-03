@@ -4060,6 +4060,14 @@ client.sandboxes.deploy_prompt(
 <dl>
 <dd>
 
+**release_description:** `typing.Optional[str]` — Optionally provide a description that details what's new in this Release.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -5667,6 +5675,14 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **release_tags:** `typing.Optional[typing.Sequence[str]]` — Optionally provide the release tags that you'd like to be associated with the latest release of the created/updated Prompt Deployment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_description:** `typing.Optional[str]` — Optionally provide a description that details what's new in this Release.
     
 </dd>
 </dl>
