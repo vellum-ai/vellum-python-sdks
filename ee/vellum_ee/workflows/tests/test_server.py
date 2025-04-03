@@ -101,11 +101,6 @@ from .code_execution_node import CodeExecutionNode
 __all__ = ["CodeExecutionNode"]
 """,
         "nodes/code_execution_node/__init__.py": """
-from .code_execution_node import CodeExecutionNode
-
-__all__ = ["CodeExecutionNode"]
-""",
-        "nodes/code_execution_node/code_execution_node.py": """
 from typing import Any
 
 from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
@@ -122,9 +117,8 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, int]):
 
     namespace = str(uuid4())
 
-    finder = VirtualFileFinder(files, namespace)
-
     # AND the virtual file loader is registered
+    finder = VirtualFileFinder(files, namespace)
     sys.meta_path.append(finder)
 
     # AND we know what the Code Execution Node will respond with
@@ -136,7 +130,7 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, int]):
 
     # WHEN the workflow is loaded
     Workflow = BaseWorkflow.load_from_module(namespace)
-    workflow = Workflow(context=WorkflowContext(dynamic_file_loader=finder.loader))
+    workflow = Workflow(context=WorkflowContext(dynamic_files=files))
 
     # THEN the workflow is successfully initialized
     assert workflow
@@ -145,4 +139,4 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, int]):
     assert event.name == "workflow.execution.fulfilled"
 
     # AND we get the code execution result
-    assert event.body.outputs.final_output == 5.0  # type: ignore
+    assert event.body.outputs == {"final_output": 5.0}

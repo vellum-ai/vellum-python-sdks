@@ -14,17 +14,20 @@ from vellum.workflows.types.core import EntityInputsInterface
 def read_file_from_path(
     node_filepath: str, script_filepath: str, context: Optional[WorkflowContext] = None
 ) -> Union[str, None]:
-    node_filepath_dir = os.path.dirname(node_filepath)
-    full_filepath = os.path.join(node_filepath_dir, script_filepath)
-
     # If dynamic file loader is present, try and read the code from there
-    if context and context.dynamic_file_loader:
+    if context and context.dynamic_files:
+        # Strip out namespace
+        stripped_node_filepath = "/".join(node_filepath.split("/")[1:])
+        node_filepath_dir = os.path.dirname(stripped_node_filepath)
+        full_filepath = os.path.join(node_filepath_dir, script_filepath)
         normalized_path = os.path.normpath(full_filepath)
 
-        code = context.dynamic_file_loader._get_code(normalized_path)
+        code = context.dynamic_files.get(normalized_path, None)
         if code is not None:
             return code
 
+    node_filepath_dir = os.path.dirname(node_filepath)
+    full_filepath = os.path.join(node_filepath_dir, script_filepath)
     # Default logic for reading from filesystem
     try:
         with open(full_filepath) as file:
