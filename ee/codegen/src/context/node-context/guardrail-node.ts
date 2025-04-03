@@ -1,4 +1,4 @@
-import { MetricDefinitionHistoryItem } from "vellum-ai/api";
+import { MetricDefinitionHistoryItem, VellumVariableType } from "vellum-ai/api";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
 import { VellumError } from "vellum-ai/errors";
 
@@ -26,6 +26,19 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
         return acc;
       },
       {} as Record<string, string>
+    );
+  }
+
+  getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    if (!this.metricDefinitionsHistoryItem) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      this.metricDefinitionsHistoryItem.outputVariables.map((variable) => [
+        variable.id,
+        variable.type,
+      ])
     );
   }
 

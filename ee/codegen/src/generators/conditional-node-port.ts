@@ -281,12 +281,11 @@ export class ConditionalNodePort extends AstNode {
         rule.data.nodeId
       );
       if (nodeContext) {
-        const outputName = nodeContext.getNodeOutputNameById(
+        const outputType = nodeContext.getNodeOutputTypeById(
           rule.data.outputId
         );
-        if (outputName) {
-          // TODO: We need to flesh out the node output types
-          return "JSON";
+        if (outputType) {
+          return outputType;
         }
       }
     }

@@ -1,4 +1,4 @@
-import { DocumentIndexRead } from "vellum-ai/api";
+import { DocumentIndexRead, VellumVariableType } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { VellumError } from "vellum-ai/errors";
 
@@ -19,6 +19,16 @@ export class TextSearchNodeContext extends BaseNodeContext<SearchNode> {
       [this.nodeData.data.textOutputId]: "text",
       ...(this.nodeData.data.errorOutputId
         ? { [this.nodeData.data.errorOutputId]: "error" }
+        : {}),
+    };
+  }
+
+  getNodeOutputTypesById(): Record<string, VellumVariableType> {
+    return {
+      [this.nodeData.data.resultsOutputId]: "ARRAY",
+      [this.nodeData.data.textOutputId]: "STRING",
+      ...(this.nodeData.data.errorOutputId
+        ? { [this.nodeData.data.errorOutputId]: "ERROR" }
         : {}),
     };
   }
