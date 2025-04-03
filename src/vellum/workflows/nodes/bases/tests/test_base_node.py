@@ -1,9 +1,12 @@
+import pytest
 from uuid import UUID
 from typing import Optional
 
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.workflows.descriptors.tests.test_utils import FixtureState
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
@@ -232,3 +235,27 @@ def test_outputs_preserves_non_object_bases():
     # THEN the output values should be correct
     assert outputs.foo == "bar"
     assert outputs.bar == "baz"
+
+
+@pytest.mark.parametrize(
+    "falsy_value,expected_type",
+    [
+        ("", str),
+        (0, int),
+    ],
+)
+def test_resolve_value__for_falsy_values(falsy_value, expected_type):
+    """Test that falsy values in FinalOutputNode are handled correctly."""
+
+    class FalsyOutput(FinalOutputNode[FixtureState, expected_type]):  # type: ignore
+        class Outputs(FinalOutputNode.Outputs):
+            value = falsy_value
+
+    # GIVEN a node with a falsy value
+    falsy_node = FalsyOutput(state=FixtureState())
+
+    # WHEN we run the node
+    falsy_output = falsy_node.run()
+
+    # THEN the output has the correct value
+    assert falsy_output.value == falsy_value
