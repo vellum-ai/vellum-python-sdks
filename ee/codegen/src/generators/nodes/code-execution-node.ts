@@ -25,22 +25,13 @@ export class CodeExecutionNode extends BaseSingleFileNode<
 > {
   public declare readonly nodeContext: CodeExecutionContext;
   private readonly scriptFileContents: string;
-  private readonly codeRepresentationOverride: "STANDALONE" | "INLINE";
 
   constructor({
     workflowContext,
     nodeContext,
   }: BaseNode.Args<CodeExecutionNodeType, CodeExecutionContext>) {
     super({ workflowContext, nodeContext });
-    this.codeRepresentationOverride =
-      workflowContext.codeExecutionNodeCodeRepresentationOverride;
     this.scriptFileContents = this.generateScriptFileContents();
-
-    // When using a single line string for INLINE representation which is used by vembda, fern
-    // will error when using toStringFormatted.
-    if (this.codeRepresentationOverride === "INLINE") {
-      this.skipFormatting = true;
-    }
   }
 
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
@@ -56,10 +47,6 @@ export class CodeExecutionNode extends BaseSingleFileNode<
 
   // Override
   public async persist(): Promise<void> {
-    if (!this.shouldGenerateStandaloneCodeFile()) {
-      return super.persist();
-    }
-
     const nodeInitFile = new InitFile({
       workflowContext: this.workflowContext,
       modulePath: this.nodeContext.nodeModulePath,
@@ -89,28 +76,12 @@ export class CodeExecutionNode extends BaseSingleFileNode<
     const nodeData = this.nodeData.data;
     const statements: AstNode[] = [];
 
-    if (this.shouldGenerateStandaloneCodeFile()) {
-      statements.push(
-        python.field({
-          name: "filepath",
-          initializer: python.TypeInstantiation.str(this.nodeContext.filepath),
-        })
-      );
-    } else {
-      statements.push(
-        python.field({
-          name: CODE_INPUT_KEY,
-          initializer: python.TypeInstantiation.str(this.scriptFileContents, {
-            // Fern will garble the escaping when using python multiline for inline so we disable it.
-            // Inline code generation is currently only used by vembda and likely to remain that way
-            // so skipping over pretty formatting is acceptable.
-            multiline: false,
-            startOnNewLine: true,
-            endWithNewLine: true,
-          }),
-        })
-      );
-    }
+    statements.push(
+      python.field({
+        name: "filepath",
+        initializer: python.TypeInstantiation.str(this.nodeContext.filepath),
+      })
+    );
 
     const systemInputs = [nodeData.codeInputId, nodeData.runtimeInputId];
     const codeInputs = Array.from(this.nodeInputsByKey.values()).filter(
@@ -355,18 +326,5 @@ export class CodeExecutionNode extends BaseSingleFileNode<
       name: "output_display",
       initializer: python.TypeInstantiation.dict(outputDisplayEntries),
     });
-  }
-
-  private shouldGenerateStandaloneCodeFile(): boolean {
-    if (this.codeRepresentationOverride === "STANDALONE") {
-      return true;
-    }
-    if (this.codeRepresentationOverride === "INLINE") {
-      return false;
-    }
-
-    // By default, we generate standalone code files unless there's an override saying otherwise.
-    // If no filepath is specified, we'll create a `script.py` file in the node directory.
-    return true;
   }
 }

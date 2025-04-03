@@ -83,57 +83,42 @@ describe("CodeExecutionNode", () => {
   describe.each([
     ["Base case", "print('Hello, World!')"],
     [
-      // This code triggers some things with the way fern does escapes that we need to test is escaping correctly
-      // as it sometimes does not escape correctly for inline mode which is used by vembda.
       "Escaped case",
       "async function main(inputs: {\n  question: string\n}) {\n  inputs = {\n" +
         '"question": "{\\"text_explanation\\":\\"First, \\\\\\\\(\\\\\\\\frac{1}{40}\\\\\\\\).\\\\"\n  }\n' +
         "const test = \"\\frac\".replace(/\\\\frac/g, '\\\\dfrac');\n  return {};\n} \n",
     ],
-  ])("code representation override: %s", (_, code) => {
-    it.each<"INLINE" | "STANDALONE" | undefined>([
-      undefined,
-      "STANDALONE",
-      "INLINE",
-    ])(
-      "should generate the correct node class when the override is %s",
-      async (override) => {
-        workflowContext = workflowContextFactory({
-          codeExecutionNodeCodeRepresentationOverride: override,
-          absolutePathToOutputDirectory: tempDir,
-          moduleName: "code",
-        });
+  ])("code representation: %s", (_, code) => {
+    it("should generate the correct node class", async () => {
+      workflowContext = workflowContextFactory({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+      });
 
-        const nodeData = codeExecutionNodeFactory({
-          code,
-        });
+      const nodeData = codeExecutionNodeFactory({
+        code,
+      });
 
-        const nodeContext = (await createNodeContext({
-          workflowContext,
-          nodeData,
-        })) as CodeExecutionContext;
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
 
-        node = new CodeExecutionNode({
-          workflowContext: workflowContext,
-          nodeContext,
-        });
+      node = new CodeExecutionNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
 
-        if (override === "INLINE") {
-          // Do full persist here to check write logic
-          await node.persist();
+      // Always do full persist to check write logic
+      await node.persist();
 
-          expect(
-            await readFile(
-              join(tempDir, "code", "nodes", "code_execution_node.py"),
-              "utf-8"
-            )
-          ).toMatchSnapshot();
-        } else {
-          node.getNodeFile().write(writer);
-          expect(await writer.toStringFormatted()).toMatchSnapshot();
-        }
-      }
-    );
+      expect(
+        await readFile(
+          join(tempDir, "code", "nodes", "code_execution_node", "__init__.py"),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+    });
   });
 
   describe("failure cases", () => {
@@ -213,9 +198,7 @@ describe("CodeExecutionNode", () => {
       "PYTHON_3_11_6",
       "TYPESCRIPT_5_3_3",
     ])("should generate the correct standalone file %s", async (override) => {
-      workflowContext = workflowContextFactory({
-        codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
-      });
+      workflowContext = workflowContextFactory();
 
       const overrideInputValue: NodeInputValuePointerRule = {
         type: "CONSTANT_VALUE",

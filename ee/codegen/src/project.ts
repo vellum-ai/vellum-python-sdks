@@ -183,9 +183,6 @@ ${errors.slice(0, 3).map((err) => {
         vellumApiEnvironment: rest.vellumApiEnvironment,
         workflowRawData: this.workflowVersionExecConfig.workflowRawData,
         strict: rest.strict ?? false,
-        codeExecutionNodeCodeRepresentationOverride:
-          rest.options?.codeExecutionNodeCodeRepresentationOverride ??
-          "STANDALONE",
         disableFormatting: rest.options?.disableFormatting ?? false,
       });
       this.sandboxInputs = rest.sandboxInputs;
