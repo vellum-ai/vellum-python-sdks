@@ -149,7 +149,9 @@ def pull_command(
 
     try:
         zip_bytes = b"".join(response)
-    except ApiError:
+    except ApiError as e:
+        if e.status_code == 403:
+            raise e
         raise Exception(
             "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
         )
