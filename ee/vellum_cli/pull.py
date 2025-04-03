@@ -151,68 +151,73 @@ def pull_command(
 
     error_content = ""
 
-    with zipfile.ZipFile(zip_buffer) as zip_file:
-        if METADATA_FILE_NAME in zip_file.namelist():
-            metadata_json: Optional[dict] = None
-            with zip_file.open(METADATA_FILE_NAME) as source:
-                metadata_json = json.load(source)
+    try:
+        with zipfile.ZipFile(zip_buffer) as zip_file:
+            if METADATA_FILE_NAME in zip_file.namelist():
+                metadata_json: Optional[dict] = None
+                with zip_file.open(METADATA_FILE_NAME) as source:
+                    metadata_json = json.load(source)
 
-            pull_contents_metadata = PullContentsMetadata.model_validate(metadata_json)
+                pull_contents_metadata = PullContentsMetadata.model_validate(metadata_json)
 
-            if pull_contents_metadata.runner_config:
-                workflow_config.container_image_name = pull_contents_metadata.runner_config.container_image_name
-                workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
-                if workflow_config.container_image_name and not workflow_config.container_image_tag:
-                    workflow_config.container_image_tag = "latest"
-            if not workflow_config.module and workflow_deployment and pull_contents_metadata.deployment_name:
-                workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
-            if not workflow_config.module and pull_contents_metadata.label:
-                workflow_config.module = snake_case(pull_contents_metadata.label)
+                if pull_contents_metadata.runner_config:
+                    workflow_config.container_image_name = pull_contents_metadata.runner_config.container_image_name
+                    workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
+                    if workflow_config.container_image_name and not workflow_config.container_image_tag:
+                        workflow_config.container_image_tag = "latest"
+                if not workflow_config.module and workflow_deployment and pull_contents_metadata.deployment_name:
+                    workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
+                if not workflow_config.module and pull_contents_metadata.label:
+                    workflow_config.module = snake_case(pull_contents_metadata.label)
 
-        if not workflow_config.module:
-            raise ValueError(f"Failed to resolve a module name for Workflow {pk}")
+            if not workflow_config.module:
+                raise ValueError(f"Failed to resolve a module name for Workflow {pk}")
 
-        # Use target_directory if provided, otherwise use current working directory
-        base_dir = os.path.join(os.getcwd(), target_directory) if target_directory else os.getcwd()
-        target_dir = os.path.join(base_dir, *workflow_config.module.split("."))
-        workflow_config.target_directory = target_dir if target_directory else None
+            # Use target_directory if provided, otherwise use current working directory
+            base_dir = os.path.join(os.getcwd(), target_directory) if target_directory else os.getcwd()
+            target_dir = os.path.join(base_dir, *workflow_config.module.split("."))
+            workflow_config.target_directory = target_dir if target_directory else None
 
-        # Delete files in target_dir that aren't in the zip file
-        if os.path.exists(target_dir):
-            ignore_patterns = (
-                workflow_config.ignore
-                if isinstance(workflow_config.ignore, list)
-                else [workflow_config.ignore] if isinstance(workflow_config.ignore, str) else []
-            )
-            existing_files = []
-            for root, _, files in os.walk(target_dir):
-                for file in files:
-                    rel_path = os.path.relpath(os.path.join(root, file), target_dir)
-                    existing_files.append(rel_path)
+            # Delete files in target_dir that aren't in the zip file
+            if os.path.exists(target_dir):
+                ignore_patterns = (
+                    workflow_config.ignore
+                    if isinstance(workflow_config.ignore, list)
+                    else [workflow_config.ignore] if isinstance(workflow_config.ignore, str) else []
+                )
+                existing_files = []
+                for root, _, files in os.walk(target_dir):
+                    for file in files:
+                        rel_path = os.path.relpath(os.path.join(root, file), target_dir)
+                        existing_files.append(rel_path)
 
-            for file in existing_files:
-                if any(Path(file).match(ignore_pattern) for ignore_pattern in ignore_patterns):
-                    continue
+                for file in existing_files:
+                    if any(Path(file).match(ignore_pattern) for ignore_pattern in ignore_patterns):
+                        continue
 
-                if file not in zip_file.namelist():
-                    file_path = os.path.join(target_dir, file)
-                    logger.info(f"Deleting {file_path}...")
-                    os.remove(file_path)
+                    if file not in zip_file.namelist():
+                        file_path = os.path.join(target_dir, file)
+                        logger.info(f"Deleting {file_path}...")
+                        os.remove(file_path)
 
-        for file_name in zip_file.namelist():
-            with zip_file.open(file_name) as source:
-                content = source.read().decode("utf-8")
-                if file_name == ERROR_LOG_FILE_NAME:
-                    error_content = content
-                    continue
-                if file_name == METADATA_FILE_NAME:
-                    continue
+            for file_name in zip_file.namelist():
+                with zip_file.open(file_name) as source:
+                    content = source.read().decode("utf-8")
+                    if file_name == ERROR_LOG_FILE_NAME:
+                        error_content = content
+                        continue
+                    if file_name == METADATA_FILE_NAME:
+                        continue
 
-                target_file = os.path.join(target_dir, file_name)
-                os.makedirs(os.path.dirname(target_file), exist_ok=True)
-                with open(target_file, "w") as target:
-                    logger.info(f"Writing to {target_file}...")
-                    target.write(content)
+                    target_file = os.path.join(target_dir, file_name)
+                    os.makedirs(os.path.dirname(target_file), exist_ok=True)
+                    with open(target_file, "w") as target:
+                        logger.info(f"Writing to {target_file}...")
+                        target.write(content)
+    except zipfile.BadZipFile:
+        raise Exception(
+            "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        )
 
     if include_json:
         logger.warning(

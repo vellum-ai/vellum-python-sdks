@@ -875,3 +875,21 @@ def test_pull__module_name_from_deployment_name(vellum_client):
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
+
+
+def test_pull__invalid_zip_file(vellum_client):
+    workflow_deployment = "test-workflow-deployment-id"
+
+    # GIVEN a workflow pull API call returns an invalid zip file
+    vellum_client.workflows.pull.return_value = iter([b"invalid"])  # Return bytes instead of string
+
+    # WHEN the user runs the pull command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+
+    # THEN the command returns an error
+    assert result.exit_code == 1
+    assert (
+        str(result.exception)
+        == "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+    )
