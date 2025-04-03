@@ -227,7 +227,8 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
             )
 
         root = inspect.getfile(self.__class__)
-        code = read_file_from_path(node_filepath=root, script_filepath=self.filepath)
+
+        code = read_file_from_path(node_filepath=root, script_filepath=self.filepath, context=self._context)
         if not code:
             raise NodeException(
                 message=f"Filepath '{self.filepath}' does not exist",
