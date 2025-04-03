@@ -145,7 +145,7 @@ class _BaseOutputsMeta(type):
             # we iterate through its inheritance hierarchy to find the first base class that has this attribute
             # and use its mapping.
             instance = vars(cls).get(name, undefined)
-            if not instance:
+            if instance is undefined:
                 for base in cls.__mro__[1:]:
                     if hasattr(base, name):
                         instance = getattr(base, name)
