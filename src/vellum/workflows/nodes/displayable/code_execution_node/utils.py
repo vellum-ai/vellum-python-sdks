@@ -15,14 +15,14 @@ def read_file_from_path(
     node_filepath: str, script_filepath: str, context: Optional[WorkflowContext] = None
 ) -> Union[str, None]:
     # If dynamic file loader is present, try and read the code from there
-    if context and context.dynamic_files:
+    if context and context.generated_files:
         # Strip out namespace
         stripped_node_filepath = "/".join(node_filepath.split("/")[1:])
         node_filepath_dir = os.path.dirname(stripped_node_filepath)
         full_filepath = os.path.join(node_filepath_dir, script_filepath)
         normalized_path = os.path.normpath(full_filepath)
 
-        code = context.dynamic_files.get(normalized_path, None)
+        code = context.generated_files.get(normalized_path, None)
         if code is not None:
             return code
 

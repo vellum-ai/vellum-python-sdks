@@ -130,7 +130,7 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, int]):
 
     # WHEN the workflow is loaded
     Workflow = BaseWorkflow.load_from_module(namespace)
-    workflow = Workflow(context=WorkflowContext(dynamic_files=files))
+    workflow = Workflow(context=WorkflowContext(generated_files=files))
 
     # THEN the workflow is successfully initialized
     assert workflow

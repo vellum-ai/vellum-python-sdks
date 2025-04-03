@@ -19,7 +19,7 @@ class WorkflowContext:
         *,
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
-        dynamic_files: Optional[dict[str, str]] = None,
+        generated_files: Optional[dict[str, str]] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
@@ -27,7 +27,7 @@ class WorkflowContext:
         self._execution_context = get_execution_context()
         if not self._execution_context.parent_context and execution_context:
             self._execution_context = execution_context
-        self._dynamic_files = dynamic_files
+        self._generated_files = generated_files
 
     @cached_property
     def vellum_client(self) -> Vellum:
@@ -41,8 +41,8 @@ class WorkflowContext:
         return self._execution_context
 
     @cached_property
-    def dynamic_files(self) -> Optional[dict[str, str]]:
-        return self._dynamic_files
+    def generated_files(self) -> Optional[dict[str, str]]:
+        return self._generated_files
 
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
