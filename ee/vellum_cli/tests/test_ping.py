@@ -65,11 +65,11 @@ def test_ping__error_path(vellum_client):
     )
 
 
-def test_ping__403_error_path(vellum_client):
+def test_ping__unauthorized_error_path(vellum_client):
     # GIVEN a cli
     runner = CliRunner()
 
-    # GIVEN a 403 error with the error message from the API
+    # GIVEN an unauthorized error with the error message from the API
     vellum_client.workspaces.workspace_identity.side_effect = ApiError(
         status_code=403, body={"detail": "Authentication credentials were not provided."}
     )
@@ -79,6 +79,4 @@ def test_ping__403_error_path(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert isinstance(result.exception, ApiError)
-    assert result.exception.status_code == 403
-    assert result.exception.body == {"detail": "Authentication credentials were not provided."}
+    assert str(result.exception) == "Please make sure your `VELLUM_API_KEY` environment variable is set correctly."
