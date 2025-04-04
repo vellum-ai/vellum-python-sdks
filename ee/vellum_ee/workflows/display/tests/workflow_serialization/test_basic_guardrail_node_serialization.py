@@ -73,7 +73,7 @@ def test_serialize_workflow():
         "type": "METRIC",
         "inputs": [
             {
-                "id": "3ec00ee3-c068-4d41-9488-87b7778a649e",
+                "id": "e5e9757e-27db-4200-a650-2f7bb2cd61f5",
                 "key": "expected",
                 "value": {
                     "rules": [
@@ -86,7 +86,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "a43ce7ba-1685-4977-a34d-65580c42853f",
+                "id": "f5cd9336-e8e9-429e-b7bc-785402e31bfb",
                 "key": "actual",
                 "value": {
                     "rules": [

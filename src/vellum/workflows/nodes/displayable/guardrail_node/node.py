@@ -24,7 +24,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
 
     metric_definition: ClassVar[Union[UUID, str]]
 
-    metric_inputs: ClassVar[EntityInputsInterface]
+    metric_inputs: ClassVar[EntityInputsInterface] = {}
     release_tag: str = LATEST_RELEASE_TAG
 
     request_options: Optional[RequestOptions] = None

@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import GuardrailNode
 from vellum.workflows.types.core import JsonObject
@@ -12,8 +12,6 @@ _GuardrailNodeType = TypeVar("_GuardrailNodeType", bound=GuardrailNode)
 
 
 class BaseGuardrailNodeDisplay(BaseNodeVellumDisplay[_GuardrailNodeType], Generic[_GuardrailNodeType]):
-    metric_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
-
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
@@ -27,7 +25,8 @@ class BaseGuardrailNodeDisplay(BaseNodeVellumDisplay[_GuardrailNodeType], Generi
                 input_name=variable_name,
                 value=variable_value,
                 display_context=display_context,
-                input_id=self.metric_input_ids_by_name.get(variable_name),
+                input_id=self.node_input_ids_by_name.get(f"{GuardrailNode.metric_inputs.name}.{variable_name}")
+                or self.node_input_ids_by_name.get(variable_name),
             )
             for variable_name, variable_value in metric_inputs.items()
         ]
