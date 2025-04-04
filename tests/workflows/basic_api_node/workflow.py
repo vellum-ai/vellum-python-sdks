@@ -10,7 +10,7 @@ class SimpleAPINode(APINode):
     authorization_type = AuthorizationType.API_KEY
     api_key_header_key = "CUSTOM_API_KEY"
     api_key_header_value = VellumSecretReference("MY_SECRET")
-    body = {
+    json = {
         "key": "value",
     }
     headers = {
