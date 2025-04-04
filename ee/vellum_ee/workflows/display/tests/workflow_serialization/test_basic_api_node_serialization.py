@@ -97,9 +97,9 @@ def test_serialize_workflow(vellum_client):
                 },
                 {
                     "id": "c3a17ceb-e201-4025-b18a-9162aac7705e",
-                    "key": "json",
+                    "key": "body",
                     "value": {
-                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": None}}],
+                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": {"key": "value"}}}],
                         "combinator": "OR",
                     },
                 },
