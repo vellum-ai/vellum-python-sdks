@@ -1,5 +1,8 @@
-import requests_mock
+from unittest import mock
+
 import requests_mock.mocker
+
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 
 from tests.workflows.basic_api_node.workflow import SimpleAPIWorkflow
 
@@ -17,7 +20,9 @@ def test_run_workflow__happy_path(requests_mock: requests_mock.mocker.Mocker):
     workflow = SimpleAPIWorkflow()
 
     # WHEN we run the workflow
-    terminal_event = workflow.run()
+    with mock.patch.object(VellumSecretReference, "resolve") as mocked_resolve:
+        mocked_resolve.return_value = "SECRET_VALUE"
+        terminal_event = workflow.run()
 
     # THEN we should see the expected outputs
     assert terminal_event.name == "workflow.execution.fulfilled"

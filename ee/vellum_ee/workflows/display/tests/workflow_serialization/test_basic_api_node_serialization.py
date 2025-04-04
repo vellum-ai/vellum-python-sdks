@@ -7,7 +7,7 @@ from vellum import WorkspaceSecretRead
 from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-from tests.workflows.basic_vellum_api_node.workflow import SimpleAPIWorkflow
+from tests.workflows.basic_api_node.workflow import SimpleAPIWorkflow
 
 
 def test_serialize_workflow(vellum_client):
@@ -99,7 +99,7 @@ def test_serialize_workflow(vellum_client):
                     "id": "c3a17ceb-e201-4025-b18a-9162aac7705e",
                     "key": "body",
                     "value": {
-                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": None}}],
+                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": {"key": "value"}}}],
                         "combinator": "OR",
                     },
                 },
@@ -193,7 +193,7 @@ def test_serialize_workflow(vellum_client):
             },
             "definition": {
                 "name": "SimpleAPINode",
-                "module": ["tests", "workflows", "basic_vellum_api_node", "workflow"],
+                "module": ["tests", "workflows", "basic_api_node", "workflow"],
             },
         },
         api_node,
@@ -373,7 +373,7 @@ def test_serialize_workflow(vellum_client):
         "module": [
             "tests",
             "workflows",
-            "basic_vellum_api_node",
+            "basic_api_node",
             "workflow",
         ],
     }
