@@ -1,6 +1,8 @@
 import time
+from typing import Any, Optional, Union
 
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes import CodeExecutionNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.map_node.node import MapNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
@@ -116,3 +118,44 @@ def test_map_node__inner_try():
     # THEN the workflow should succeed
     assert outputs[-1].name == "final_output"
     assert len(outputs[-1].value) == 2
+
+
+def test_map_node__with_code_execution_node(vellum_client, mock_script_file):
+    # GIVEN a CodeExecutionNode setup
+    class MapNodeInputs(BaseInputs):
+        items: Optional[Any]
+        item: Optional[Any]
+        index: Optional[Union[float, int]]
+
+    class State(BaseState):
+        pass
+
+    # AND a CodeExecutionNode that will be used in the workflow
+    class MyCodeExecutionNode(CodeExecutionNode[State, int]):
+        filepath = mock_script_file
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "word": MapNodeInputs.item,
+        }
+
+    # AND a workflow using that node
+    class MapNodeWorkflow(BaseWorkflow[MapNodeInputs, State]):
+        graph = MyCodeExecutionNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = MyCodeExecutionNode.Outputs.result
+
+    # AND a MapNode that uses this workflow
+    class TestMapNode(MapNode):
+        items = ["hi", "hey", "hello"]
+        subworkflow = MapNodeWorkflow
+        max_concurrency = 4
+
+    # WHEN we run the node
+    node = TestMapNode()
+    outputs = list(node.run())
+
+    # THEN the output should contain the expected values
+    assert len(outputs) > 0
+    assert outputs[-1].name == "final_output"
+    assert outputs[-1].value == [2, 3, 5]

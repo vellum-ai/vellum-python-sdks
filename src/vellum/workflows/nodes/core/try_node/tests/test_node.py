@@ -4,6 +4,7 @@ from vellum.client import Vellum
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes import CodeExecutionNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs import BaseOutputs
@@ -158,3 +159,39 @@ def test_try_node__nested_try():
     # THEN we only have the outer node's outputs
     valid_events = [e for e in events if e.name == "bar"]
     assert len(valid_events) == len(events)
+
+
+def test_try_node__with_code_execution_node(vellum_client, mock_script_file):
+    """Test that TryNode works correctly with CodeExecutionNode"""
+
+    # GIVEN a CodeExecutionNode that will fail
+    class Inputs(BaseInputs):
+        word: str
+
+    class State(BaseState):
+        pass
+
+    # AND a TryNode that wraps the CodeExecutionNode to catch errors
+    @TryNode.wrap()
+    class MyTryCodeExecutionNode(CodeExecutionNode[BaseState, int]):
+        filepath = mock_script_file
+        code_inputs = {
+            "word": Inputs.word,
+        }
+        runtime = "PYTHON_3_11_6"
+        packages = []
+
+    # WHEN the node is run
+    node = MyTryCodeExecutionNode(
+        state=State(
+            meta=StateMeta(workflow_inputs=Inputs(word="hello")),
+        )
+    )
+    outputs = [o for o in node.run()]
+
+    # THEN the exception is caught and returned
+    assert len(outputs) == 2
+    assert set(outputs) == {
+        BaseOutput(name="result", value=5),
+        BaseOutput(name="log", value="hello\n"),
+    }

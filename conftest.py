@@ -4,6 +4,7 @@ import sys
 import threading
 import time
 import traceback
+from unittest.mock import MagicMock
 from uuid import UUID, uuid4
 from typing import Any, Callable, Generator, List
 
@@ -112,3 +113,19 @@ def debug_threads() -> Callable[[int], None]:
                     logger.info(f"    {frame.line}")
 
     return _debug_threads
+
+
+@pytest.fixture
+def mock_script_file(mocker: MockerFixture):
+    """Fixture to mock reading from script.py"""
+    script_path = "./script.py"
+    script_content = "def main(word: str) -> int:\n    print(word)  # noqa: T201\n    return len(word)"
+
+    # Create a mock file object
+    mock_file = MagicMock()
+    mock_file.__enter__.return_value.read.return_value = script_content
+
+    # Mock open to always return our mock file
+    mocker.patch("builtins.open", return_value=mock_file)
+
+    return script_path

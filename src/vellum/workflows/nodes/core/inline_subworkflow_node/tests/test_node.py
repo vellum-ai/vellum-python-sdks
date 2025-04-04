@@ -3,6 +3,7 @@ import pytest
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes import CodeExecutionNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
@@ -143,3 +144,40 @@ def test_inline_subworkflow_node__with_adornment():
     outputs = list(node.run())
 
     assert outputs[-1].name == "final_output" and outputs[-1].value == "hello"
+
+
+def test_inline_subworkflow_node__with_code_execution_node(vellum_client, mock_script_file):
+    # GIVEN a CodeExecutionNode
+    class Inputs(BaseInputs):
+        word: str
+
+    class State(BaseState):
+        pass
+
+    class MyCodeExecutionNode(CodeExecutionNode[State, int]):
+        filepath = mock_script_file
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "word": Inputs.word,
+        }
+
+    # AND a subworkflow that uses the CodeExecutionNode
+    class CodeSubworkflow(BaseWorkflow[Inputs, State]):
+        graph = MyCodeExecutionNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = MyCodeExecutionNode.Outputs.result
+
+    # AND an InlineSubworkflowNode that uses this subworkflow
+    class TestNode(InlineSubworkflowNode):
+        subworkflow = CodeSubworkflow
+        subworkflow_inputs = {"word": "hello"}
+
+    # WHEN we run the node
+    node = TestNode()
+    outputs = list(node.run())
+
+    # THEN the output should contain the expected value
+    assert len(outputs) == 1
+    assert outputs[0].name == "final_output"
+    assert outputs[0].value == 5

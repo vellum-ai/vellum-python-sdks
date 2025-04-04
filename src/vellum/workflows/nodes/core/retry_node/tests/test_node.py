@@ -3,6 +3,7 @@ import pytest
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes import CodeExecutionNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.outputs import BaseOutputs
@@ -131,3 +132,34 @@ Message: This is failure attempt 3"""
 
     # AND the state was updated each time
     assert node.state.count == 3
+
+
+def test_retry_node__with_code_execution_node(vellum_client, mock_script_file):
+    # GIVEN a CodeExecutionNode that will fail on first attempts
+    class Inputs(BaseInputs):
+        word: str
+
+    class State(BaseState):
+        pass
+
+    # AND a RetryNode that wraps the CodeExecutionNode
+    @RetryNode.wrap(max_attempts=3)
+    class MyRetryCodeExecutionNode(CodeExecutionNode[BaseState, int]):
+        filepath = mock_script_file
+        code_inputs = {
+            "word": Inputs.word,
+        }
+        runtime = "PYTHON_3_11_6"
+        packages = []
+
+    # WHEN the node is run
+    node = MyRetryCodeExecutionNode(
+        state=State(
+            meta=StateMeta(workflow_inputs=Inputs(word="hello")),
+        )
+    )
+    outputs = node.run()
+
+    # THEN the node should have been retried and eventually succeeded
+    assert outputs["result"] == 5
+    assert outputs["log"] == "hello\n"
