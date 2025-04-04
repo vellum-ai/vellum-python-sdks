@@ -1,23 +1,27 @@
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.constants import APIRequestMethod
-from vellum.workflows.nodes import APINode
+from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 
 
-class SimpleBaseAPINode(APINode):
+class SimpleAPINode(APINode):
     method = APIRequestMethod.POST
     url = "https://api.vellum.ai"
-    json = {
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_key = "CUSTOM_API_KEY"
+    api_key_header_value = VellumSecretReference("MY_SECRET")
+    body = {
         "key": "value",
     }
     headers = {
-        "X-Test-Header": "foo",
+        "additional_header": "additional header value",
     }
 
 
 class SimpleAPIWorkflow(BaseWorkflow):
-    graph = SimpleBaseAPINode
+    graph = SimpleAPINode
 
     class Outputs(BaseWorkflow.Outputs):
-        json = SimpleBaseAPINode.Outputs.json
-        headers = SimpleBaseAPINode.Outputs.headers
-        status_code = SimpleBaseAPINode.Outputs.status_code
+        json = SimpleAPINode.Outputs.json
+        headers = SimpleAPINode.Outputs.headers
+        status_code = SimpleAPINode.Outputs.status_code
