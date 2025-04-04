@@ -14,7 +14,12 @@ def ping_command():
     try:
         workspace = client.workspaces.workspace_identity()
         organization = client.organizations.organization_identity()
-    except ApiError:
+    except ApiError as e:
+        # If user did not provide an API key, we will get a 403 error
+        if e.status_code == 401 or e.status_code == 403:
+            raise Exception(
+                "Please make sure your `VELLUM_API_KEY` environment variable is set correctly."  # noqa: E501
+            ) from e
         raise Exception(
             "The API we tried to ping returned an invalid response. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
         )
