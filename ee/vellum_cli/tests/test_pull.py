@@ -8,6 +8,7 @@ import zipfile
 
 from click.testing import CliRunner
 
+from vellum.client.core.api_error import ApiError
 from vellum_cli import main as cli_main
 
 
@@ -903,8 +904,6 @@ def test_pull__json_decode_error(vellum_client):
         # This generator yields nothing but raises when consumed
         if False:  # This ensures the generator is created but yields nothing
             yield b""
-        from vellum.client.core.api_error import ApiError
-
         raise ApiError(status_code=400, body="Invalid JSON")
 
     vellum_client.workflows.pull.return_value = mock_error_generator()
@@ -919,3 +918,22 @@ def test_pull__json_decode_error(vellum_client):
         str(result.exception)
         == "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
     )
+
+
+def test_pull__unauthorized_error_path(vellum_client):
+    workflow_deployment = "test-workflow-deployment-id"
+
+    # GIVEN an unauthorized error with the error message from the API
+    def mock_error_generator():
+        yield b""
+        raise ApiError(status_code=403, body={"detail": "Authentication credentials were not provided."})
+
+    vellum_client.workflows.pull.return_value = mock_error_generator()
+
+    # WHEN the user runs the pull command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+
+    # THEN the command returns an error
+    assert result.exit_code == 1
+    assert str(result.exception) == "Please make sure your `VELLUM_API_KEY` environment variable is set correctly."
