@@ -920,10 +920,10 @@ def test_pull__json_decode_error(vellum_client):
     )
 
 
-def test_pull__403_error_path(vellum_client):
+def test_pull__unauthorized_error_path(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
-    # GIVEN a 403 error with the error message from the API
+    # GIVEN an unauthorized error with the error message from the API
     def mock_error_generator():
         yield b""
         raise ApiError(status_code=403, body={"detail": "Authentication credentials were not provided."})
@@ -936,6 +936,4 @@ def test_pull__403_error_path(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert isinstance(result.exception, ApiError)
-    assert result.exception.status_code == 403
-    assert result.exception.body == {"detail": "Authentication credentials were not provided."}
+    assert str(result.exception) == "Please make sure your `VELLUM_API_KEY` environment variable is set correctly."
