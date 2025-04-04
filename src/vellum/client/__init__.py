@@ -18,6 +18,7 @@ from .resources.sandboxes.client import SandboxesClient
 from .resources.test_suite_runs.client import TestSuiteRunsClient
 from .resources.test_suites.client import TestSuitesClient
 from .resources.workflow_deployments.client import WorkflowDeploymentsClient
+from .resources.release_reviews.client import ReleaseReviewsClient
 from .resources.workflow_sandboxes.client import WorkflowSandboxesClient
 from .resources.workflows.client import WorkflowsClient
 from .resources.workspace_secrets.client import WorkspaceSecretsClient
@@ -75,6 +76,7 @@ from .resources.sandboxes.client import AsyncSandboxesClient
 from .resources.test_suite_runs.client import AsyncTestSuiteRunsClient
 from .resources.test_suites.client import AsyncTestSuitesClient
 from .resources.workflow_deployments.client import AsyncWorkflowDeploymentsClient
+from .resources.release_reviews.client import AsyncReleaseReviewsClient
 from .resources.workflow_sandboxes.client import AsyncWorkflowSandboxesClient
 from .resources.workflows.client import AsyncWorkflowsClient
 from .resources.workspace_secrets.client import AsyncWorkspaceSecretsClient
@@ -152,6 +154,7 @@ class Vellum:
         self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = TestSuitesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = WorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
+        self.release_reviews = ReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = WorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = WorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = WorkspaceSecretsClient(client_wrapper=self._client_wrapper)
@@ -1494,6 +1497,7 @@ class AsyncVellum:
         self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = AsyncTestSuitesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = AsyncWorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
+        self.release_reviews = AsyncReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = AsyncWorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = AsyncWorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = AsyncWorkspaceSecretsClient(client_wrapper=self._client_wrapper)

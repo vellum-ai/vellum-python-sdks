@@ -331,6 +331,11 @@ from .rejected_execute_prompt_response import RejectedExecutePromptResponse
 from .rejected_execute_workflow_workflow_result_event import RejectedExecuteWorkflowWorkflowResultEvent
 from .rejected_prompt_execution_meta import RejectedPromptExecutionMeta
 from .rejected_workflow_node_result_event import RejectedWorkflowNodeResultEvent
+from .release_created_by import ReleaseCreatedBy
+from .release_environment import ReleaseEnvironment
+from .release_release_tag import ReleaseReleaseTag
+from .release_review_reviewer import ReleaseReviewReviewer
+from .release_review_state import ReleaseReviewState
 from .release_tag_release import ReleaseTagRelease
 from .release_tag_source import ReleaseTagSource
 from .replace_test_suite_test_case_request import ReplaceTestSuiteTestCaseRequest
@@ -365,6 +370,7 @@ from .sentence_chunking_request import SentenceChunkingRequest
 from .slim_deployment_read import SlimDeploymentRead
 from .slim_document import SlimDocument
 from .slim_document_document_to_document_index import SlimDocumentDocumentToDocumentIndex
+from .slim_release_review import SlimReleaseReview
 from .slim_workflow_deployment import SlimWorkflowDeployment
 from .slim_workflow_execution_read import SlimWorkflowExecutionRead
 from .span_link import SpanLink
@@ -524,6 +530,8 @@ from .workflow_deployment_event_executions_response import WorkflowDeploymentEve
 from .workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
 from .workflow_deployment_read import WorkflowDeploymentRead
+from .workflow_deployment_release import WorkflowDeploymentRelease
+from .workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
 from .workflow_error import WorkflowError
 from .workflow_event_display_context import WorkflowEventDisplayContext
 from .workflow_event_error import WorkflowEventError
@@ -916,6 +924,11 @@ __all__ = [
     "RejectedExecuteWorkflowWorkflowResultEvent",
     "RejectedPromptExecutionMeta",
     "RejectedWorkflowNodeResultEvent",
+    "ReleaseCreatedBy",
+    "ReleaseEnvironment",
+    "ReleaseReleaseTag",
+    "ReleaseReviewReviewer",
+    "ReleaseReviewState",
     "ReleaseTagRelease",
     "ReleaseTagSource",
     "ReplaceTestSuiteTestCaseRequest",
@@ -950,6 +963,7 @@ __all__ = [
     "SlimDeploymentRead",
     "SlimDocument",
     "SlimDocumentDocumentToDocumentIndex",
+    "SlimReleaseReview",
     "SlimWorkflowDeployment",
     "SlimWorkflowExecutionRead",
     "SpanLink",
@@ -1093,6 +1107,8 @@ __all__ = [
     "WorkflowDeploymentHistoryItem",
     "WorkflowDeploymentParentContext",
     "WorkflowDeploymentRead",
+    "WorkflowDeploymentRelease",
+    "WorkflowDeploymentReleaseWorkflowVersion",
     "WorkflowError",
     "WorkflowEventDisplayContext",
     "WorkflowEventError",
