@@ -11,13 +11,9 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
     label = "Guardrail Node"
     node_id = UUID("c207b440-6aac-4047-a37c-e25fcb5b9cfb")
     target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
-    metric_input_ids_by_name = {
-        "expected": UUID("3f917af8-03a4-4ca4-8d40-fa662417fe9c"),
-        "actual": UUID("bed55ada-923e-46ef-8340-1a5b0b563dc1"),
-    }
     node_input_ids_by_name = {
-        "expected": UUID("3f917af8-03a4-4ca4-8d40-fa662417fe9c"),
-        "actual": UUID("bed55ada-923e-46ef-8340-1a5b0b563dc1"),
+        "metric_inputs.expected": UUID("3f917af8-03a4-4ca4-8d40-fa662417fe9c"),
+        "metric_inputs.actual": UUID("bed55ada-923e-46ef-8340-1a5b0b563dc1"),
     }
     output_display = {
         GuardrailNode.Outputs.score: NodeOutputDisplay(id=UUID("0e455862-ccc4-47a4-a9a5-061fadc94fd6"), name="score")

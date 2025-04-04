@@ -7,10 +7,16 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
+const INPUTS_PREFIX = "metric_inputs";
+
 export class GuardrailNode extends BaseSingleFileNode<
   GuardrailNodeType,
   GuardrailNodeContext
 > {
+  protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    return `${INPUTS_PREFIX}.${nodeInputKey}`;
+  }
+
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
@@ -31,7 +37,7 @@ export class GuardrailNode extends BaseSingleFileNode<
 
     statements.push(
       python.field({
-        name: "metric_inputs",
+        name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
             key: python.TypeInstantiation.str(key),
@@ -82,18 +88,6 @@ export class GuardrailNode extends BaseSingleFileNode<
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
-        ),
-      })
-    );
-
-    statements.push(
-      python.field({
-        name: "metric_input_ids_by_name",
-        initializer: python.TypeInstantiation.dict(
-          this.nodeData.inputs.map((input) => ({
-            key: python.TypeInstantiation.str(input.key),
-            value: python.TypeInstantiation.uuid(input.id),
-          }))
         ),
       })
     );
