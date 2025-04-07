@@ -32,9 +32,7 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
         with execution_context(parent_context=parent_context):
             subworkflow = self.subworkflow(
                 parent_state=self.state,
-                context=WorkflowContext(
-                    vellum_client=self._context.vellum_client, generated_files=self._context.generated_files
-                ),
+                context=WorkflowContext.from_(self._context),
             )
             subworkflow_stream = subworkflow.stream(
                 event_filter=all_workflow_event_filter,
