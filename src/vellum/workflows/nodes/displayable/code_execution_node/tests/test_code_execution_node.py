@@ -1,5 +1,6 @@
 import pytest
 import os
+import re
 from typing import Any, List, Union
 
 from pydantic import BaseModel
@@ -653,7 +654,9 @@ def main():
         node.run()
 
     # AND the error should contain the execution error details
-    assert exc_info.value.message == "Expected an output of type 'int | float', but received 'str'"
+    assert re.match(
+        r"Expected an output of type '(int \| float|float \| int)', but received 'str'", exc_info.value.message
+    )
 
 
 def test_run_node__chat_history_output_type():
