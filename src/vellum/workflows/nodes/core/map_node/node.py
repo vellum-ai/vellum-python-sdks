@@ -171,7 +171,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             self._run_subworkflow(item=item, index=index)
 
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
-        context = WorkflowContext.from_(self._context)
+        context = WorkflowContext.create_from(self._context)
         subworkflow = self.subworkflow(
             parent_state=self.state,
             context=context,

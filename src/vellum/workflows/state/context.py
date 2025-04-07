@@ -76,5 +76,5 @@ class WorkflowContext:
         return [mock for mocks in self._node_output_mocks_map.values() for mock in mocks]
 
     @classmethod
-    def from_(cls, context):
+    def create_from(cls, context):
         return cls(vellum_client=context.vellum_client, generated_files=context.generated_files)

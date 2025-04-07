@@ -75,7 +75,7 @@ class InlineSubworkflowNode(
         with execution_context(parent_context=get_parent_context()):
             subworkflow = self.subworkflow(
                 parent_state=self.state,
-                context=WorkflowContext.from_(self._context),
+                context=WorkflowContext.create_from(self._context),
             )
             subworkflow_stream = subworkflow.stream(
                 inputs=self._compile_subworkflow_inputs(),
