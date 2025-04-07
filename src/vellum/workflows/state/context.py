@@ -74,3 +74,7 @@ class WorkflowContext:
 
     def _get_all_node_output_mocks(self) -> List[MockNodeExecution]:
         return [mock for mocks in self._node_output_mocks_map.values() for mock in mocks]
+
+    @classmethod
+    def create_from(cls, context):
+        return cls(vellum_client=context.vellum_client, generated_files=context.generated_files)

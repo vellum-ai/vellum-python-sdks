@@ -75,9 +75,7 @@ class InlineSubworkflowNode(
         with execution_context(parent_context=get_parent_context()):
             subworkflow = self.subworkflow(
                 parent_state=self.state,
-                context=WorkflowContext(
-                    vellum_client=self._context.vellum_client, generated_files=self._context.generated_files
-                ),
+                context=WorkflowContext.create_from(self._context),
             )
             subworkflow_stream = subworkflow.stream(
                 inputs=self._compile_subworkflow_inputs(),
