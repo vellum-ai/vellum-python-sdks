@@ -63,8 +63,6 @@ import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   FinalOutputNode as FinalOutputNodeType,
   WorkflowDataNode,
-  WorkflowEdge,
-  WorkflowNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
@@ -80,26 +78,6 @@ export interface WorkflowProjectGeneratorOptions {
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
   disableFormatting?: boolean;
 }
-
-const getPortIds = (node: WorkflowNode): string[] => {
-  if (node.type === "GENERIC") {
-    return node.ports.map((port) => port.id);
-  }
-
-  if (node.type === "CONDITIONAL") {
-    return node.data.conditions.map((condition) => condition.sourceHandleId);
-  }
-
-  if (
-    node.type === "TERMINAL" ||
-    node.type === "NOTE" ||
-    node.type == "ERROR"
-  ) {
-    return [];
-  }
-
-  return [node.data.sourceHandleId];
-};
 
 export declare namespace WorkflowProjectGenerator {
   interface BaseArgs {
@@ -426,79 +404,84 @@ ${errors.slice(0, 3).map((err) => {
    */
   private getOrderedNodes(): WorkflowDataNode[] {
     const rawData = this.workflowVersionExecConfig.workflowRawData;
+    const nodes = rawData.nodes.filter(
+      (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
+    );
 
     // Edge case: Workflow init only has two nodes of ENTRYPOINT and TERMINAL with no edge between them
     if (rawData.edges.length === 0) {
-      return rawData.nodes.filter(
-        (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
-      );
+      return nodes;
     }
 
-    const nodesById = Object.fromEntries(
-      rawData.nodes.map((node) => [node.id, node])
-    );
+    const nodesById = Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
-    const edgesByPortId = this.workflowContext.getEdgesByPortId();
-    const processedEdges = new Set<WorkflowEdge>();
-    const processedNodeIds = new Set<string>();
+    // Create an adjacency list representation of the graph
+    const graph: Map<string, string[]> = new Map();
+    // Track in-degree (number of incoming edges) for each node
+    const inDegree: Map<string, number> = new Map();
+
+    // Initialize graph with all nodes
+    nodes.forEach((node) => {
+      graph.set(node.id, []);
+      inDegree.set(node.id, 0);
+    });
+
+    // Add edges to graph and count in-degrees
+    rawData.edges.forEach((edge) => {
+      const sourceId = edge.sourceNodeId;
+      const targetId = edge.targetNodeId;
+
+      if (!graph.has(sourceId)) {
+        return;
+      }
+
+      if (graph.has(targetId)) {
+        graph.get(sourceId)?.push(targetId);
+        inDegree.set(targetId, (inDegree.get(targetId) || 0) + 1);
+      }
+    });
+
+    // Find all nodes with no incoming edges
+    const sources: string[] = [];
+    inDegree.forEach((degree, nodeId) => {
+      if (degree === 0) {
+        sources.push(nodeId);
+      }
+    });
 
     const orderedNodes: WorkflowDataNode[] = [];
+    const processedNodeIds = new Set<string>();
 
-    while (edgesQueue.length > 0) {
-      const edge = edgesQueue.shift();
-      if (!edge) {
-        continue;
+    // Process nodes in topological order
+    while (sources.length > 0) {
+      const nodeId = sources.shift();
+      if (!nodeId) {
+        break;
+      }
+      const node = nodesById[nodeId];
+
+      if (node && !processedNodeIds.has(nodeId)) {
+        orderedNodes.push(node);
+        processedNodeIds.add(nodeId);
       }
 
-      const sourceNode = nodesById[edge.sourceNodeId];
-      if (!sourceNode) {
-        continue;
-      }
+      // For each neighbor, reduce in-degree and check if it becomes a source
+      const neighbors = graph.get(nodeId) || [];
+      for (const neighborId of neighbors) {
+        const currentDegree = inDegree.get(neighborId) || 0;
+        inDegree.set(neighborId, currentDegree - 1);
 
-      const targetNode = nodesById[edge.targetNodeId];
-      if (!targetNode) {
-        continue;
+        if (currentDegree - 1 === 0) {
+          sources.push(neighborId);
+        }
       }
-
-      if (
-        !processedNodeIds.has(sourceNode.id) &&
-        sourceNode.type !== "ENTRYPOINT"
-      ) {
-        orderedNodes.push(sourceNode);
-        processedNodeIds.add(sourceNode.id);
-      }
-
-      if (
-        !processedNodeIds.has(targetNode.id) &&
-        targetNode.type !== "ENTRYPOINT"
-      ) {
-        orderedNodes.push(targetNode);
-        processedNodeIds.add(targetNode.id);
-      }
-      processedEdges.add(edge);
-
-      const portIds = getPortIds(targetNode);
-      portIds.forEach((portId) => {
-        const edges = edgesByPortId.get(portId);
-        edges?.forEach((edge) => {
-          if (processedEdges.has(edge)) {
-            return;
-          }
-          edgesQueue.push(edge);
-        });
-      });
     }
 
     // Include at the end nodes that are included in the workflow, but not referenced in the graph
     // For example, Note Nodes.
     const unprocessedNodes: WorkflowDataNode[] = rawData.nodes.filter(
       (node): node is WorkflowDataNode => {
-        return (
-          !processedNodeIds.has(node.id) &&
-          node.type !== "ENTRYPOINT" &&
-          node.type !== "TERMINAL"
-        );
+        return !processedNodeIds.has(node.id) && node.type !== "ENTRYPOINT";
       }
     );
 

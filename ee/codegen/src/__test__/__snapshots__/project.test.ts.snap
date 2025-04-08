@@ -3,15 +3,16 @@
 exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference 1`] = `
 "from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
-from vellum.workflows.references import LazyReference, VellumSecretReference
+from vellum.workflows.references import VellumSecretReference
 
 from .parallel_node_2 import ParallelNode2
+from .request_body_node import RequestBodyNode
 
 
 class APINode(BaseAPINode):
     url = ParallelNode2.Outputs.result
     method = APIRequestMethod.POST
-    json = LazyReference("RequestBodyNode.Outputs.result")
+    json = RequestBodyNode.Outputs.result
     api_key_header_key = None
     authorization_type = AuthorizationType.BEARER_TOKEN
     api_key_header_value = None
@@ -19,17 +20,19 @@ class APINode(BaseAPINode):
 "
 `;
 
-exports[`WorkflowProjectGenerator > Nodes present but not in graph > should not generate unused_graphs if final output is not used 1`] = `
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should generate unused_graphs if final output is not used 1`] = `
 "from vellum.workflows import BaseWorkflow
 
+from .nodes.final_output import FinalOutput
 from .nodes.generic_node import GenericNode
 
 
 class Workflow(BaseWorkflow):
     graph = GenericNode
+    unused_graphs = {FinalOutput}
 
     class Outputs(BaseWorkflow.Outputs):
-        final_output = None
+        final_output = FinalOutput.Outputs.value
 "
 `;
 

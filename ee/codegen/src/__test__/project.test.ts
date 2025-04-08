@@ -1216,7 +1216,7 @@ baz = foo + bar
         "__init__.py",
       ]);
     });
-    it("should not generate unused_graphs if final output is not used", async () => {
+    it("should generate unused_graphs if final output is not used", async () => {
       // GIVEN a workflow where final output is not used
       const displayData = {
         workflow_raw_data: {
