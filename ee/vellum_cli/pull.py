@@ -204,8 +204,6 @@ def pull_command(
                     if existing_deployment:
                         if pull_contents_metadata.label:
                             existing_deployment.label = pull_contents_metadata.label
-                        if pull_contents_metadata.deployment_name:
-                            existing_deployment.name = pull_contents_metadata.deployment_name
                     else:
                         deployment_config = WorkflowDeploymentConfig(
                             id=workflow_deployment_id,
