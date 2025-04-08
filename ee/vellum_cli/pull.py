@@ -2,6 +2,7 @@ import io
 import json
 import os
 from pathlib import Path
+from uuid import UUID
 import zipfile
 from typing import Optional
 
@@ -10,8 +11,9 @@ from pydash import snake_case
 
 from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.vellum_client import create_vellum_client
-from vellum_cli.config import VellumCliConfig, WorkflowConfig, load_vellum_cli_config
+from vellum_cli.config import VellumCliConfig, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
 
 ERROR_LOG_FILE_NAME = "error.log"
@@ -31,6 +33,7 @@ class RunnerConfig(UniversalBaseModel):
 class PullContentsMetadata(UniversalBaseModel):
     label: Optional[str] = None
     runner_config: Optional[RunnerConfig] = None
+    deployment_id: Optional[UUID] = None
     deployment_name: Optional[str] = None
 
 
@@ -79,6 +82,29 @@ def _resolve_workflow_config(
             pk=workflow_config.workflow_sandbox_id,
         )
     elif workflow_deployment:
+        if is_valid_uuid(workflow_deployment):
+            # name may also be a valid UUID
+            workflow_config = next(
+                (
+                    w
+                    for w in config.workflows
+                    if w.deployments
+                    and (
+                        str(w.deployments[0].id) == workflow_deployment or w.deployments[0].name == workflow_deployment
+                    )
+                ),
+                None,
+            )
+        else:
+            workflow_config = next(
+                (w for w in config.workflows if w.deployments and w.deployments[0].name == workflow_deployment), None
+            )
+        if workflow_config:
+            return WorkflowConfigResolutionResult(
+                workflow_config=workflow_config,
+                pk=workflow_deployment,
+            )
+
         workflow_config = WorkflowConfig(
             module="",
         )
@@ -176,6 +202,24 @@ def pull_command(
                     workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
                 if not workflow_config.module and pull_contents_metadata.label:
                     workflow_config.module = snake_case(pull_contents_metadata.label)
+
+                # Save or update the deployment info when pulling with --workflow-deployment
+                if workflow_deployment:
+                    workflow_deployment_id = pull_contents_metadata.deployment_id
+                    existing_deployment = next(
+                        (d for d in workflow_config.deployments if d.id == workflow_deployment_id), None
+                    )
+
+                    if existing_deployment:
+                        if pull_contents_metadata.label:
+                            existing_deployment.label = pull_contents_metadata.label
+                    else:
+                        deployment_config = WorkflowDeploymentConfig(
+                            id=workflow_deployment_id,
+                            label=pull_contents_metadata.label,
+                            name=pull_contents_metadata.deployment_name,
+                        )
+                        workflow_config.deployments.append(deployment_config)
 
             if not workflow_config.module:
                 raise ValueError(f"Failed to resolve a module name for Workflow {pk}")
