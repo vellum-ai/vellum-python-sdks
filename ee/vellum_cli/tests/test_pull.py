@@ -1008,6 +1008,86 @@ def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, work
     os.chdir(current_dir)
 
 
+def test_pull__workflow_deployment_name_is_uuid(vellum_client):
+    # GIVEN a workflow deployment name that is a valid UUID
+    deployment_id = str(uuid4())
+    deployment_name = str(uuid4())
+
+    # AND an existing configuration with this deployment
+    current_dir = os.getcwd()
+    temp_dir = tempfile.mkdtemp()
+    os.chdir(temp_dir)
+
+    # Create initial config with a deployment
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    with open(vellum_lock_json, "w") as f:
+        json.dump(
+            {
+                "version": "1.0",
+                "workflows": [
+                    {
+                        "module": "test_workflow",
+                        "workflow_sandbox_id": None,
+                        "ignore": None,
+                        "deployments": [
+                            {
+                                "id": deployment_id,
+                                "label": "Test Label",
+                                "name": deployment_name,
+                                "description": None,
+                                "release_tags": None,
+                            }
+                        ],
+                        "container_image_name": None,
+                        "container_image_tag": None,
+                        "workspace": "default",
+                        "target_directory": None,
+                    }
+                ],
+                "workspaces": [],
+            },
+            f,
+        )
+
+    # AND the workflow pull API call returns a zip file with updated metadata
+    updated_label = "Updated Label"
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                    "metadata.json": json.dumps(
+                        {
+                            "deployment_id": deployment_id,
+                            "deployment_name": deployment_name,
+                            "label": updated_label,
+                        }
+                    ),
+                }
+            )
+        ]
+    )
+
+    # WHEN the user runs the pull command with the workflow deployment
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", deployment_name])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the deployment info is updated in the config
+    with open(vellum_lock_json) as f:
+        lock_data = json.loads(f.read())
+        assert len(lock_data["workflows"]) == 1
+        assert len(lock_data["workflows"][0]["deployments"]) == 1
+        deployment = lock_data["workflows"][0]["deployments"][0]
+        assert str(deployment["id"]) == deployment_id
+        assert deployment["name"] == deployment_name
+        assert deployment["label"] == updated_label
+
+    os.chdir(current_dir)
+
+
 @pytest.mark.parametrize("get_identifier", [(lambda d: d), (lambda d: "Test Name")])
 def test_pull__workflow_deployment_updates_existing_deployment(vellum_client, get_identifier):
     """

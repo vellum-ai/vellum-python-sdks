@@ -83,8 +83,17 @@ def _resolve_workflow_config(
         )
     elif workflow_deployment:
         if is_valid_uuid(workflow_deployment):
+            # name may also be a valid UUID
             workflow_config = next(
-                (w for w in config.workflows if w.deployments and str(w.deployments[0].id) == workflow_deployment), None
+                (
+                    w
+                    for w in config.workflows
+                    if w.deployments
+                    and (
+                        str(w.deployments[0].id) == workflow_deployment or w.deployments[0].name == workflow_deployment
+                    )
+                ),
+                None,
             )
         else:
             workflow_config = next(
