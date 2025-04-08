@@ -1095,3 +1095,86 @@ def test_pull__workflow_deployment_updates_existing_deployment(vellum_client, ge
         assert deployment["label"] == updated_label
 
     os.chdir(current_dir)
+
+
+def test_pull__workflow_deployment_with_name_and_id(vellum_client):
+    """
+    This test is to ensure that pulling with id and name will not add a new deployment to the config
+    """
+    # GIVEN a workflow deployment ID
+    deployment_id = str(uuid4())  # config will always use the deployment_id return from the API
+    deployment_name = "Test Deployment"
+    deployment_label = "Test Label"
+
+    # AND the workflow pull API call returns a zip file with metadata
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                    "metadata.json": json.dumps(
+                        {
+                            "deployment_id": deployment_id,
+                            "deployment_name": deployment_name,
+                            "label": deployment_label,
+                        }
+                    ),
+                }
+            )
+        ]
+    )
+
+    # AND we are currently in a new directory
+    current_dir = os.getcwd()
+    temp_dir = tempfile.mkdtemp()
+    os.chdir(temp_dir)
+
+    # WHEN the user runs the pull command with the workflow deployment
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", deployment_id])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the deployment is saved in the config
+    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    assert os.path.exists(vellum_lock_json)
+    with open(vellum_lock_json) as f:
+        lock_data = json.loads(f.read())
+        assert len(lock_data["workflows"]) == 1
+        assert len(lock_data["workflows"][0]["deployments"]) == 1
+        deployment = lock_data["workflows"][0]["deployments"][0]
+        assert str(deployment["id"]) == deployment_id
+        assert deployment["name"] == deployment_name
+        assert deployment["label"] == deployment_label
+
+    os.chdir(current_dir)
+
+    # AND pull with name will not add a new deployment to the config
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            _zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                    "metadata.json": json.dumps(
+                        {
+                            "deployment_id": deployment_id,
+                            "deployment_name": deployment_name,
+                            "label": deployment_label,
+                        }
+                    ),
+                }
+            )
+        ]
+    )
+    os.chdir(current_dir)
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", deployment_name])
+    assert result.exit_code == 0
+    with open(vellum_lock_json) as f:
+        lock_data = json.loads(f.read())
+        assert len(lock_data["workflows"][0]["deployments"]) == 1
+        assert lock_data["workflows"][0]["deployments"][0]["id"] == deployment_id
+        assert lock_data["workflows"][0]["deployments"][0]["name"] == deployment_name
+        assert lock_data["workflows"][0]["deployments"][0]["label"] == deployment_label
+
+    os.chdir(current_dir)
