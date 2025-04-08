@@ -1008,15 +1008,20 @@ def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, work
     os.chdir(current_dir)
 
 
-@pytest.mark.parametrize(
-    "get_identifier", [(lambda d: d), (lambda d: "Test Name")]  # Use ID to pull  # Use name to pull
-)
+@pytest.mark.parametrize("get_identifier", [(lambda d: d), (lambda d: "Test Name")])
 def test_pull__workflow_deployment_updates_existing_deployment(vellum_client, get_identifier):
+    """
+    This test is to ensure that the deployment info is updated in the config
+    when the user runs the pull command with the workflow deployment
+
+    get_identifier is a function that returns the identifier to use for the deployment
+    it can be the deployment_id or the deployment_name
+    """
     # GIVEN a workflow deployment id and name
     deployment_id = str(uuid4())
     deployment_name = "Test Name"
 
-    # AND an existing configuration with this deployment but missing metadata
+    # AND an existing configuration with this deployment
     current_dir = os.getcwd()
     temp_dir = tempfile.mkdtemp()
     os.chdir(temp_dir)
