@@ -1,5 +1,24 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+from vellum.workflows.references import LazyReference, VellumSecretReference
+
+from .parallel_node_2 import ParallelNode2
+
+
+class APINode(BaseAPINode):
+    url = ParallelNode2.Outputs.result
+    method = APIRequestMethod.POST
+    json = LazyReference("RequestBodyNode.Outputs.result")
+    api_key_header_key = None
+    authorization_type = AuthorizationType.BEARER_TOKEN
+    api_key_header_value = None
+    bearer_token_value = VellumSecretReference("TEST_SECRET")
+"
+`;
+
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should not generate unused_graphs if final output is not used 1`] = `
 "from vellum.workflows import BaseWorkflow
 

@@ -2119,7 +2119,7 @@ baz = foo + bar
     });
   });
   describe("LazyReference", () => {
-    it.skip("should not generate LazyReference", async () => {
+    it("should not generate LazyReference", async () => {
       //   graph = (
       //     {
       //         parallel-node-1
