@@ -7,6 +7,7 @@ import { isNil } from "lodash";
 import { VellumVariableType } from "vellum-ai/api";
 
 import { NodePortGenerationError, ValueGenerationError } from "./errors";
+import { PipeExpression } from "./extensions";
 
 import * as codegen from "src/codegen";
 import { PortContext } from "src/context/port-context";
@@ -118,11 +119,7 @@ export class ConditionalNodePort extends AstNode {
             });
           }
         : (lhs: AstNode, rhs: AstNode): AstNode => {
-            return python.operator({
-              operator: OperatorType.Or,
-              lhs: lhs,
-              rhs: rhs,
-            });
+            return new PipeExpression(lhs, rhs);
           };
 
     return otherConditions.length > 0

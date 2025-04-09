@@ -307,3 +307,24 @@ export class PythonFile extends AstNode {
     );
   }
 }
+
+export class PipeExpression extends AstNode {
+  private lhs: AstNode;
+  private rhs: AstNode;
+
+  constructor(lhs: AstNode, rhs: AstNode) {
+    super();
+    this.lhs = lhs;
+    this.rhs = rhs;
+    this.inheritReferences(lhs);
+    this.inheritReferences(rhs);
+  }
+
+  write(writer: Writer): void {
+    writer.write("(");
+    this.lhs.write(writer);
+    writer.write(" | ");
+    this.rhs.write(writer);
+    writer.write(")");
+  }
+}

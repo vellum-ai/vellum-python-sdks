@@ -886,3 +886,139 @@ describe("Conditional Node with constant value string base", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
+
+describe("Conditional Node with OR combinator generates pipe operator", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const nodeData: ConditionalNodeType = {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+            type: "IF",
+            sourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+            data: {
+              id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+              rules: [
+                {
+                  id: "rule1",
+                  fieldNodeInputId: "field1",
+                  operator: "=",
+                  valueNodeInputId: "value1",
+                },
+                {
+                  id: "rule2",
+                  fieldNodeInputId: "field2",
+                  operator: "=",
+                  valueNodeInputId: "value2",
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "field1",
+          key: "rule1.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "text",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value1",
+          key: "rule1.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "val-1",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "field2",
+          key: "rule2.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "text",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value2",
+          key: "rule2.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "val-2",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+    };
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("should generate code with pipe operator for OR conditions", async () => {
+    node.getNodeFile().write(writer);
+    const generatedCode = await writer.toStringFormatted();
+    expect(generatedCode).toMatchSnapshot();
+  });
+});
