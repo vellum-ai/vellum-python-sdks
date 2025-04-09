@@ -429,11 +429,10 @@ ${errors.slice(0, 3).map((err) => {
       const sourceNodeId = edge.sourceNodeId;
       const targetNodeId = edge.targetNodeId;
 
-      if (
-        dependencyGraph.has(targetNodeId) &&
-        dependencyGraph.has(sourceNodeId)
-      ) {
-        dependencyGraph.get(targetNodeId)?.add(sourceNodeId);
+      const targetDependencies = dependencyGraph.get(targetNodeId);
+      const sourceDependencies = dependencyGraph.get(sourceNodeId);
+      if (targetDependencies && sourceDependencies) {
+        targetDependencies.add(sourceNodeId);
       }
     });
 
