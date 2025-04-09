@@ -34,6 +34,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
 
     class Outputs(BaseOutputs):
         score: float
+        normalized_score: Optional[float]
         log: Optional[str]
 
     def run(self) -> Outputs:
@@ -46,16 +47,30 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
 
         metric_outputs = {output.name: output.value for output in metric_execution.outputs}
 
-        score = metric_outputs.get("score")
+        SCORE_KEY = "score"
+        NORMALIZED_SCORE_KEY = "normalized_score"
+        LOG_KEY = "log"
+
+        score = metric_outputs.get(SCORE_KEY)
         if not isinstance(score, float):
             raise NodeException(
-                message="Metric execution must have one output named 'score' with type 'float'",
+                message=f"Metric execution must have one output named '{SCORE_KEY}' with type 'float'",
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
             )
-        metric_outputs.pop("score")
+        metric_outputs.pop(SCORE_KEY)
 
-        if "log" in metric_outputs:
-            log = metric_outputs.pop("log") or ""
+        if NORMALIZED_SCORE_KEY in metric_outputs:
+            normalized_score = metric_outputs.pop(NORMALIZED_SCORE_KEY)
+            if not isinstance(normalized_score, float):
+                raise NodeException(
+                    message=f"Metric execution must have one output named '{NORMALIZED_SCORE_KEY}' with type 'float'",
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                )
+        else:
+            normalized_score = None
+
+        if LOG_KEY in metric_outputs:
+            log = metric_outputs.pop(LOG_KEY) or ""
             if not isinstance(log, str):
                 raise NodeException(
                     message="Metric execution log output must be of type 'str'",
@@ -64,7 +79,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
         else:
             log = None
 
-        return self.Outputs(score=score, log=log, **metric_outputs)
+        return self.Outputs(score=score, normalized_score=normalized_score, log=log, **metric_outputs)
 
     def _compile_metric_inputs(self) -> List[MetricDefinitionInput]:
         # TODO: We may want to consolidate with prompt deployment input compilation
