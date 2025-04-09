@@ -24,7 +24,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
       );
     }
 
-    if (!this.nodeContext.workflowDeploymentHistoryItem) {
+    if (!this.nodeContext.workflowDeploymentRelease) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
           `Failed to generate attribute: ${this.nodeData.data.label}.deployment`
@@ -35,7 +35,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
         python.field({
           name: "deployment",
           initializer: python.TypeInstantiation.str(
-            this.nodeContext.workflowDeploymentHistoryItem.name
+            this.nodeContext.workflowDeploymentRelease.deployment.name
           ),
         })
       );
@@ -74,7 +74,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
   }
 
   private generateOutputsClass(): python.Class | null {
-    if (!this.nodeContext.workflowDeploymentHistoryItem) {
+    if (!this.nodeContext.workflowDeploymentRelease) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
           `Failed to generate ${this.nodeData.data.label}.Outputs class`
@@ -96,7 +96,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
       ],
     });
 
-    this.nodeContext.workflowDeploymentHistoryItem.outputVariables.forEach(
+    this.nodeContext.workflowDeploymentRelease.workflowVersion.outputVariables.forEach(
       (output) => {
         const outputName = this.nodeContext.getNodeOutputNameById(output.id);
         if (outputName) {
@@ -148,7 +148,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
   }
 
   protected getOutputDisplay(): python.Field | undefined {
-    if (!this.nodeContext.workflowDeploymentHistoryItem) {
+    if (!this.nodeContext.workflowDeploymentRelease) {
       this.workflowContext.addError(
         new NodeDefinitionGenerationError(
           `Failed to generate \`output_display\` for ${this.nodeData.data.label}`,
@@ -158,7 +158,8 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
     }
 
     const outputVariables =
-      this.nodeContext.workflowDeploymentHistoryItem?.outputVariables ?? [];
+      this.nodeContext.workflowDeploymentRelease?.workflowVersion
+        .outputVariables ?? [];
 
     return python.field({
       name: "output_display",

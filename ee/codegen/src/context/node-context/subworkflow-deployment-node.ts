@@ -1,8 +1,5 @@
-import {
-  VellumVariableType,
-  WorkflowDeploymentHistoryItem,
-} from "vellum-ai/api";
-import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
+import { VellumVariableType, WorkflowDeploymentRelease } from "vellum-ai/api";
+import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 
 import { BaseNodeContext } from "./base";
 
@@ -16,15 +13,14 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
   baseNodeClassName = "SubworkflowDeploymentNode";
   baseNodeDisplayClassName = "BaseSubworkflowDeploymentNodeDisplay";
 
-  public workflowDeploymentHistoryItem: WorkflowDeploymentHistoryItem | null =
-    null;
+  public workflowDeploymentRelease: WorkflowDeploymentRelease | null = null;
 
   getNodeOutputNamesById(): Record<string, string> {
-    if (!this.workflowDeploymentHistoryItem) {
+    if (!this.workflowDeploymentRelease) {
       return {};
     }
 
-    return this.workflowDeploymentHistoryItem.outputVariables.reduce<
+    return this.workflowDeploymentRelease.workflowVersion.outputVariables.reduce<
       Record<string, string>
     >((acc, output) => {
       acc[output.id] = toPythonSafeSnakeCase(output.key, "output");
@@ -33,15 +29,14 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
   }
 
   getNodeOutputTypesById(): Record<string, VellumVariableType> {
-    if (!this.workflowDeploymentHistoryItem) {
+    if (!this.workflowDeploymentRelease) {
       return {};
     }
 
     return Object.fromEntries(
-      this.workflowDeploymentHistoryItem.outputVariables.map((variable) => [
-        variable.id,
-        variable.type,
-      ])
+      this.workflowDeploymentRelease.workflowVersion.outputVariables.map(
+        (variable) => [variable.id, variable.type]
+      )
     );
   }
 
@@ -61,12 +56,12 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
     }
 
     try {
-      this.workflowDeploymentHistoryItem = await new WorkflowDeploymentsClient({
+      this.workflowDeploymentRelease = await new WorkflowReleaseClient({
         apiKey: this.workflowContext.vellumApiKey,
         environment: this.workflowContext.vellumApiEnvironment,
-      }).workflowDeploymentHistoryItemRetrieve(
-        this.nodeData.data.releaseTag,
-        this.nodeData.data.workflowDeploymentId
+      }).retrieveWorkflowDeploymentRelease(
+        this.nodeData.data.workflowDeploymentId,
+        this.nodeData.data.releaseTag
       );
     } catch (error) {
       if (isVellumErrorWithDetail(error)) {
