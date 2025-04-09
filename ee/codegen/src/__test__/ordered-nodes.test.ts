@@ -186,7 +186,7 @@ describe("getOrderedNodes", () => {
       nodeIds.indexOf("api-node")
     );
 
-    // merge, api, finalOutput must come after requestBodyNode, parallelNode2
+    // merge, api, finalOutput must come after requestBodyNode
     expect(nodeIds.indexOf("merge-node-1")).toBeGreaterThan(
       nodeIds.indexOf("request-body-node")
     );
@@ -197,6 +197,7 @@ describe("getOrderedNodes", () => {
       nodeIds.indexOf("request-body-node")
     );
 
+    // merge, api, finalOutput must come after parallelNode2
     expect(nodeIds.indexOf("merge-node-1")).toBeGreaterThan(
       nodeIds.indexOf("parallel-node-2")
     );
