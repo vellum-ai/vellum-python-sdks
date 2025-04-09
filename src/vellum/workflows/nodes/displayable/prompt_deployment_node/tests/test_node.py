@@ -151,3 +151,54 @@ def test_prompt_deployment_node__parent_context_serialization(mock_httpx_transpo
     request_execution_context = json.loads(call_request_args.read().decode("utf-8"))["execution_context"]
     assert request_execution_context["trace_id"] == str(trace_id)
     assert request_execution_context["parent_context"]
+
+
+def test_prompt_deployment_node__json_output(vellum_client):
+    # GIVEN a PromptDeploymentNode
+    class MyPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "example_prompt_deployment"
+        prompt_inputs = {
+            "chat_history": [ChatMessageRequest(role="USER", text="Generate JSON.")],
+        }
+
+    # AND a known JSON response from invoking a prompt deployment
+    expected_json = {"result": "Hello, world!"}
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value=json.dumps(expected_json)),
+    ]
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_client.execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the node is run
+    node = MyPromptDeploymentNode()
+    outputs = [o for o in node.run()]
+
+    # THEN the node should have produced the outputs we expect
+    results_output = outputs[0]
+    assert results_output.name == "results"
+    assert results_output.value == expected_outputs
+
+    text_output = outputs[1]
+    assert text_output.name == "text"
+    assert text_output.value == '{"result": "Hello, world!"}'
+
+    json_output = outputs[2]
+    assert json_output.name == "json"
+    assert json_output.value == expected_json
+
+    # AND we should have invoked the Prompt Deployment with the expected inputs
+    call_kwargs = vellum_client.execute_prompt_stream.call_args.kwargs
+    assert call_kwargs["inputs"] == [
+        ChatHistoryInputRequest(name="chat_history", value=[ChatMessageRequest(role="USER", text="Generate JSON.")]),
+    ]
