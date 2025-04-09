@@ -531,6 +531,7 @@ from .workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
 from .workflow_deployment_read import WorkflowDeploymentRead
 from .workflow_deployment_release import WorkflowDeploymentRelease
+from .workflow_deployment_release_workflow_deployment import WorkflowDeploymentReleaseWorkflowDeployment
 from .workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
 from .workflow_error import WorkflowError
 from .workflow_event_display_context import WorkflowEventDisplayContext
@@ -1108,6 +1109,7 @@ __all__ = [
     "WorkflowDeploymentParentContext",
     "WorkflowDeploymentRead",
     "WorkflowDeploymentRelease",
+    "WorkflowDeploymentReleaseWorkflowDeployment",
     "WorkflowDeploymentReleaseWorkflowVersion",
     "WorkflowError",
     "WorkflowEventDisplayContext",

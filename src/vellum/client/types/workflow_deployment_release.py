@@ -8,6 +8,7 @@ from .release_environment import ReleaseEnvironment
 import typing
 from .release_created_by import ReleaseCreatedBy
 from .workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
+from .workflow_deployment_release_workflow_deployment import WorkflowDeploymentReleaseWorkflowDeployment
 from .release_release_tag import ReleaseReleaseTag
 from .slim_release_review import SlimReleaseReview
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -21,6 +22,7 @@ class WorkflowDeploymentRelease(UniversalBaseModel):
     environment: ReleaseEnvironment
     created_by: typing.Optional[ReleaseCreatedBy] = None
     workflow_version: WorkflowDeploymentReleaseWorkflowVersion
+    deployment: WorkflowDeploymentReleaseWorkflowDeployment
     description: typing.Optional[str] = None
     release_tags: typing.List[ReleaseReleaseTag]
     reviews: typing.List[SlimReleaseReview]
