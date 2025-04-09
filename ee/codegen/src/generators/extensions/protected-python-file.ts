@@ -321,10 +321,8 @@ export class PipeExpression extends AstNode {
   }
 
   write(writer: Writer): void {
-    writer.write("(");
     this.lhs.write(writer);
     writer.write(" | ");
     this.rhs.write(writer);
-    writer.write(")");
   }
 }
