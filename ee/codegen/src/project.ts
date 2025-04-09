@@ -425,15 +425,9 @@ ${errors.slice(0, 3).map((err) => {
     });
 
     // Build dependency relationships based on edges
+    // Process source node before target node
     rawData.edges.forEach((edge) => {
-      const sourceNodeId = edge.sourceNodeId;
-      const targetNodeId = edge.targetNodeId;
-
-      const targetDependencies = dependencyGraph.get(targetNodeId);
-      const sourceDependencies = dependencyGraph.get(sourceNodeId);
-      if (targetDependencies && sourceDependencies) {
-        targetDependencies.add(sourceNodeId);
-      }
+      dependencyGraph.get(edge.targetNodeId)?.add(edge.sourceNodeId);
     });
 
     const orderedNodes: WorkflowDataNode[] = [];
