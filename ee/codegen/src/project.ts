@@ -63,8 +63,6 @@ import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   FinalOutputNode as FinalOutputNodeType,
   WorkflowDataNode,
-  WorkflowEdge,
-  WorkflowNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
@@ -80,26 +78,6 @@ export interface WorkflowProjectGeneratorOptions {
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
   disableFormatting?: boolean;
 }
-
-const getPortIds = (node: WorkflowNode): string[] => {
-  if (node.type === "GENERIC") {
-    return node.ports.map((port) => port.id);
-  }
-
-  if (node.type === "CONDITIONAL") {
-    return node.data.conditions.map((condition) => condition.sourceHandleId);
-  }
-
-  if (
-    node.type === "TERMINAL" ||
-    node.type === "NOTE" ||
-    node.type == "ERROR"
-  ) {
-    return [];
-  }
-
-  return [node.data.sourceHandleId];
-};
 
 export declare namespace WorkflowProjectGenerator {
   interface BaseArgs {
@@ -421,88 +399,79 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   /**
-   * This method is used to order the nodes based on a declared import order, determined by a
-   * breadth first search over edges in the graph.
+   * This method is used to order the nodes based on dependencies between them.
+   * It ensures that nodes appear in the result after all the nodes they depend on.
    */
   private getOrderedNodes(): WorkflowDataNode[] {
     const rawData = this.workflowVersionExecConfig.workflowRawData;
+    const nodes = rawData.nodes.filter(
+      (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
+    );
 
     // Edge case: Workflow init only has two nodes of ENTRYPOINT and TERMINAL with no edge between them
     if (rawData.edges.length === 0) {
-      return rawData.nodes.filter(
-        (node): node is WorkflowDataNode => node.type !== "ENTRYPOINT"
-      );
+      return nodes;
     }
 
-    const nodesById = Object.fromEntries(
-      rawData.nodes.map((node) => [node.id, node])
-    );
+    const nodesById = Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
-    const edgesByPortId = this.workflowContext.getEdgesByPortId();
-    const processedEdges = new Set<WorkflowEdge>();
-    const processedNodeIds = new Set<string>();
+    // Create a dependency graph that represents the "depends on" relationships between nodes
+    // If A depends on B, then B must come before A in the result
+    const dependencyGraph: Map<string, Set<string>> = new Map();
+
+    // Initialize dependency graph with all nodes
+    nodes.forEach((node) => {
+      dependencyGraph.set(node.id, new Set());
+    });
+
+    // Build dependency relationships based on edges
+    // Process source node before target node
+    rawData.edges.forEach((edge) => {
+      dependencyGraph.get(edge.targetNodeId)?.add(edge.sourceNodeId);
+    });
 
     const orderedNodes: WorkflowDataNode[] = [];
+    const visited = new Set<string>();
+    const tempVisited = new Set<string>(); // Used to detect cycles
 
-    while (edgesQueue.length > 0) {
-      const edge = edgesQueue.shift();
-      if (!edge) {
-        continue;
+    // DFS function that ensures dependencies are processed first
+    const visit = (nodeId: string) => {
+      // Skip if already processed
+      if (visited.has(nodeId)) {
+        return;
       }
 
-      const sourceNode = nodesById[edge.sourceNodeId];
-      if (!sourceNode) {
-        continue;
+      // Return early if we've already visited this node in the current path (cycle)
+      if (tempVisited.has(nodeId)) {
+        return;
       }
 
-      const targetNode = nodesById[edge.targetNodeId];
-      if (!targetNode) {
-        continue;
+      // Mark as temporarily visited (part of current path)
+      tempVisited.add(nodeId);
+
+      // Process all dependencies first
+      const dependencies = dependencyGraph.get(nodeId) || new Set();
+      for (const depId of dependencies) {
+        visit(depId);
       }
 
-      if (
-        !processedNodeIds.has(sourceNode.id) &&
-        sourceNode.type !== "ENTRYPOINT"
-      ) {
-        orderedNodes.push(sourceNode);
-        processedNodeIds.add(sourceNode.id);
+      // All dependencies processed, now safe to add this node
+      const node = nodesById[nodeId];
+      if (node) {
+        orderedNodes.push(node);
       }
 
-      if (
-        !processedNodeIds.has(targetNode.id) &&
-        targetNode.type !== "ENTRYPOINT"
-      ) {
-        orderedNodes.push(targetNode);
-        processedNodeIds.add(targetNode.id);
+      // Mark as fully processed
+      visited.add(nodeId);
+      tempVisited.delete(nodeId);
+    };
+
+    // Visit each node to ensure all are processed
+    nodes.forEach((node) => {
+      if (!visited.has(node.id)) {
+        visit(node.id);
       }
-      processedEdges.add(edge);
-
-      const portIds = getPortIds(targetNode);
-      portIds.forEach((portId) => {
-        const edges = edgesByPortId.get(portId);
-        edges?.forEach((edge) => {
-          if (processedEdges.has(edge)) {
-            return;
-          }
-          edgesQueue.push(edge);
-        });
-      });
-    }
-
-    // Include at the end nodes that are included in the workflow, but not referenced in the graph
-    // For example, Note Nodes.
-    const unprocessedNodes: WorkflowDataNode[] = rawData.nodes.filter(
-      (node): node is WorkflowDataNode => {
-        return (
-          !processedNodeIds.has(node.id) &&
-          node.type !== "ENTRYPOINT" &&
-          node.type !== "TERMINAL"
-        );
-      }
-    );
-
-    orderedNodes.push(...unprocessedNodes);
+    });
 
     return orderedNodes;
   }
