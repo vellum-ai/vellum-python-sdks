@@ -4,7 +4,7 @@ from ..inputs import Inputs
 
 
 class SubworkflowDeployment(SubworkflowDeploymentNode):
-    deployment = "mocked-workflow-deployment-history-item-name"
+    deployment = "mocked-workflow-deployment-release-name"
     release_tag = "LATEST"
     subworkflow_inputs = {
         "test": Inputs.test,

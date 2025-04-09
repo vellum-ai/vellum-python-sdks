@@ -2,10 +2,10 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import {
   DeploymentHistoryItem,
-  WorkflowDeploymentHistoryItem,
+  WorkflowDeploymentRelease,
 } from "vellum-ai/api";
 import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
-import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
+import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 import { beforeEach, expect, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -254,12 +254,45 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
     workflowContext = workflowContextFactory({ strict: false });
     writer = new Writer();
     vi.spyOn(
-      WorkflowDeploymentsClient.prototype,
-      "workflowDeploymentHistoryItemRetrieve"
+      WorkflowReleaseClient.prototype,
+      "retrieveWorkflowDeploymentRelease"
     ).mockResolvedValue({
-      name: "test-deployment",
-      outputVariables: [{ id: "1", key: "output-1", type: "STRING" }],
-    } as unknown as WorkflowDeploymentHistoryItem);
+      id: "mocked-workflow-deployment-history-item-id",
+      created: new Date(),
+      environment: {
+        id: "mocked-environment-id",
+        name: "mocked-environment-name",
+        label: "mocked-environment-label",
+      },
+      createdBy: {
+        id: "mocked-created-by-id",
+        email: "mocked-created-by-email",
+      },
+      workflowVersion: {
+        id: "mocked-workflow-release-id",
+        inputVariables: [],
+        outputVariables: [{ id: "1", key: "output-1", type: "STRING" }],
+      },
+      deployment: {
+        name: "test-deployment",
+      },
+      releaseTags: [
+        {
+          name: "mocked-release-tag-name",
+          source: "USER",
+        },
+      ],
+      reviews: [
+        {
+          id: "mocked-release-review-id",
+          created: new Date(),
+          reviewer: {
+            id: "mocked-reviewer-id",
+          },
+          state: "APPROVED",
+        },
+      ],
+    } as unknown as WorkflowDeploymentRelease);
 
     const subworkflowNodeData = subworkflowDeploymentNodeDataFactory();
 

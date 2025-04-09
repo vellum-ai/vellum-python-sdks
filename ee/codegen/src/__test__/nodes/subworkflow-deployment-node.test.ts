@@ -1,6 +1,6 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { WorkflowDeploymentHistoryItem } from "vellum-ai/api";
-import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
+import { WorkflowDeploymentRelease } from "vellum-ai/api";
+import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
 
@@ -24,15 +24,48 @@ describe("SubworkflowDeploymentNode", () => {
   describe("basic", () => {
     beforeEach(async () => {
       vi.spyOn(
-        WorkflowDeploymentsClient.prototype,
-        "workflowDeploymentHistoryItemRetrieve"
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
       ).mockResolvedValue({
-        name: "test-deployment",
-        outputVariables: [
-          { id: "1", key: "output-1", type: "STRING" },
-          { id: "2", key: "output-2", type: "NUMBER" },
+        id: "mocked-workflow-deployment-history-item-id",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [],
+          outputVariables: [
+            { id: "1", key: "output-1", type: "STRING" },
+            { id: "2", key: "output-2", type: "NUMBER" },
+          ],
+        },
+        deployment: {
+          name: "test-deployment",
+        },
+        releaseTags: [
+          {
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
         ],
-      } as unknown as WorkflowDeploymentHistoryItem);
+        reviews: [
+          {
+            id: "mocked-release-review-id",
+            created: new Date(),
+            reviewer: {
+              id: "mocked-reviewer-id",
+            },
+            state: "APPROVED",
+          },
+        ],
+      } as unknown as WorkflowDeploymentRelease);
 
       const nodeData = subworkflowDeploymentNodeDataFactory();
 
@@ -61,8 +94,8 @@ describe("SubworkflowDeploymentNode", () => {
   describe("failure", () => {
     it(`should throw an error we can handle if the workflow deployment history item is not found`, async () => {
       vi.spyOn(
-        WorkflowDeploymentsClient.prototype,
-        "workflowDeploymentHistoryItemRetrieve"
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
       ).mockRejectedValue(
         new VellumError({
           body: {
@@ -89,8 +122,8 @@ describe("SubworkflowDeploymentNode", () => {
       });
 
       vi.spyOn(
-        WorkflowDeploymentsClient.prototype,
-        "workflowDeploymentHistoryItemRetrieve"
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
       ).mockRejectedValue(
         new VellumError({
           body: {
@@ -121,8 +154,8 @@ describe("SubworkflowDeploymentNode", () => {
       });
 
       vi.spyOn(
-        WorkflowDeploymentsClient.prototype,
-        "workflowDeploymentHistoryItemRetrieve"
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
       ).mockRejectedValue(
         new VellumError({
           body: {

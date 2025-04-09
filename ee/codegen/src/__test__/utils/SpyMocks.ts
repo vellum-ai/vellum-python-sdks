@@ -1,6 +1,6 @@
 import { MetricDefinitionHistoryItem } from "vellum-ai/api";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
-import { WorkflowDeployments as WorkflowDeploymentsClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
+import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 import { MockInstance, vi } from "vitest";
 
 export class SpyMocks {
@@ -28,21 +28,49 @@ export class SpyMocks {
   static createWorkflowDeploymentsMock(): MockInstance {
     return vi
       .spyOn(
-        WorkflowDeploymentsClient.prototype,
-        "workflowDeploymentHistoryItemRetrieve"
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
       )
       .mockResolvedValue({
         id: "mocked-workflow-deployment-history-item-id",
-        workflowDeploymentId: "mocked-workflow-deployment-id",
-        timestamp: new Date(),
-        label: "mocked-workflow-deployment-history-item-label",
-        name: "mocked-workflow-deployment-history-item-name",
-        inputVariables: [],
-        outputVariables: [
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [],
+          outputVariables: [
+            {
+              id: "53970e88-0bf6-4364-86b3-840d78a2afe5",
+              key: "chat_history",
+              type: "STRING",
+            },
+          ],
+        },
+        deployment: {
+          name: "mocked-workflow-deployment-release-name",
+        },
+        releaseTags: [
           {
-            id: "53970e88-0bf6-4364-86b3-840d78a2afe5",
-            key: "chat_history",
-            type: "STRING",
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
+        ],
+        reviews: [
+          {
+            id: "mocked-release-review-id",
+            created: new Date(),
+            reviewer: {
+              id: "mocked-reviewer-id",
+            },
+            state: "APPROVED",
           },
         ],
       });
