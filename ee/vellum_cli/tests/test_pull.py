@@ -1248,6 +1248,7 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
         ]
     )
 
+    os.chdir(temp_dir)
     result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", deployment_name])
     assert result.exit_code == 0
     with open(vellum_lock_json) as f:
