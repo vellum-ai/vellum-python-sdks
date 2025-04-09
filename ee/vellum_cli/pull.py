@@ -199,7 +199,7 @@ def pull_command(
                     workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
                     if workflow_config.container_image_name and not workflow_config.container_image_tag:
                         workflow_config.container_image_tag = "latest"
-                workflow_config.workflow_sandbox_id = (
+                workflow_config.workflow_sandbox_id = str(
                     workflow_config.workflow_sandbox_id or pull_contents_metadata.workflow_sandbox_id
                 )
                 if not workflow_config.module and workflow_deployment and pull_contents_metadata.deployment_name:
