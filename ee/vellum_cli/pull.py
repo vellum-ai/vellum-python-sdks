@@ -35,6 +35,7 @@ class PullContentsMetadata(UniversalBaseModel):
     runner_config: Optional[RunnerConfig] = None
     deployment_id: Optional[UUID] = None
     deployment_name: Optional[str] = None
+    workflow_sandbox_id: Optional[UUID] = None
 
 
 def _resolve_workflow_config(
@@ -198,6 +199,9 @@ def pull_command(
                     workflow_config.container_image_tag = pull_contents_metadata.runner_config.container_image_tag
                     if workflow_config.container_image_name and not workflow_config.container_image_tag:
                         workflow_config.container_image_tag = "latest"
+                workflow_config.workflow_sandbox_id = (
+                    workflow_config.workflow_sandbox_id or pull_contents_metadata.workflow_sandbox_id
+                )
                 if not workflow_config.module and workflow_deployment and pull_contents_metadata.deployment_name:
                     workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
                 if not workflow_config.module and pull_contents_metadata.label:
