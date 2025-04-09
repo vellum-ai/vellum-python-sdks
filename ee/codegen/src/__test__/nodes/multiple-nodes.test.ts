@@ -466,3 +466,80 @@ describe("InlinePromptNode json output referenced by TemplatingNode", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
+
+describe("PromptDeploymentNode json output referenced by TemplatingNode", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: TemplatingNode;
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    vi.spyOn(
+      DeploymentsClient.prototype,
+      "deploymentHistoryItemRetrieve"
+    ).mockResolvedValue({
+      id: "some-id",
+      deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
+      name: "some-unique-deployment-name",
+    } as unknown as DeploymentHistoryItem);
+
+    const nodeOutputs: NodeOutputType[] = [
+      {
+        id: uuidv4(),
+        name: "json",
+        type: "JSON",
+      },
+    ];
+    const promptDeploymentNode = promptDeploymentNodeDataFactory({
+      outputs: nodeOutputs,
+    });
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: promptDeploymentNode,
+    });
+
+    const templatingNode = templatingNodeFactory({
+      inputs: [
+        nodeInputFactory({
+          id: "9feb7b5e-5947-496d-b56f-1e2627730796",
+          key: "var_1",
+          value: {
+            type: "NODE_OUTPUT",
+            data: {
+              nodeId: promptDeploymentNode.id,
+              outputId: nodeOutputs[0]?.id ?? uuidv4(),
+            },
+          },
+        }),
+        nodeInputFactory({
+          id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
+          key: "template",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "{{ var_1.type }}",
+            },
+          },
+        }),
+      ],
+    });
+
+    const templatingNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: templatingNode,
+    })) as TemplatingNodeContext;
+
+    node = new TemplatingNode({
+      workflowContext,
+      nodeContext: templatingNodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});

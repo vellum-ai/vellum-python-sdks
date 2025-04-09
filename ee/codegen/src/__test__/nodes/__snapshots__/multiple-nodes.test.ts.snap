@@ -414,3 +414,18 @@ class ConditionalNode(BaseConditionalNode):
         branch_2 = Port.on_else()
 "
 `;
+
+exports[`PromptDeploymentNode json output referenced by TemplatingNode > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+from .prompt_deployment_node import PromptDeploymentNode
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """{{ var_1.type }}"""
+    inputs = {
+        "var_1": PromptDeploymentNode.Outputs.json,
+    }
+"
+`;
