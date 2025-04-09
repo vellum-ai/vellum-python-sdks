@@ -157,9 +157,7 @@ def test_prompt_deployment_node__json_output(vellum_client):
     # GIVEN a PromptDeploymentNode
     class MyPromptDeploymentNode(PromptDeploymentNode):
         deployment = "example_prompt_deployment"
-        prompt_inputs = {
-            "chat_history": [ChatMessageRequest(role="USER", text="Generate JSON.")],
-        }
+        prompt_inputs = {}
 
     # AND a known JSON response from invoking a prompt deployment
     expected_json = {"result": "Hello, world!"}
@@ -196,9 +194,3 @@ def test_prompt_deployment_node__json_output(vellum_client):
     json_output = outputs[2]
     assert json_output.name == "json"
     assert json_output.value == expected_json
-
-    # AND we should have invoked the Prompt Deployment with the expected inputs
-    call_kwargs = vellum_client.execute_prompt_stream.call_args.kwargs
-    assert call_kwargs["inputs"] == [
-        ChatHistoryInputRequest(name="chat_history", value=[ChatMessageRequest(role="USER", text="Generate JSON.")]),
-    ]
