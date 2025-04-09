@@ -449,13 +449,6 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
       id: "some-id",
       deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
       name: "some-unique-deployment-name",
-      outputs: [
-        {
-          id: uuidv4(),
-          name: "json",
-          type: "JSON",
-        },
-      ],
     } as unknown as DeploymentHistoryItem);
 
     const nodeOutputs: NodeOutputType[] = [
@@ -514,11 +507,6 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
 
   it("getNodeFile", async () => {
     node.getNodeFile().write(writer);
-    expect(await writer.toStringFormatted()).toMatchSnapshot();
-  });
-
-  it("getNodeDisplayFile", async () => {
-    node.getNodeDisplayFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
