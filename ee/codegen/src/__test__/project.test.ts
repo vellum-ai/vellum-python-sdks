@@ -2118,4 +2118,407 @@ baz = foo + bar
       expect(pythonCodeMergeableNodeFiles).toEqual(new Set());
     });
   });
+  describe("LazyReference", () => {
+    it.skip("should not generate LazyReference", async () => {
+      //   graph = (
+      //     {
+      //         parallel-node-1
+      //         >> seq-node-1
+      //         >> seq-node-2
+      //         >> request-body-node,
+      //         parallel-node-2
+      //     }
+      //     >> MergeNode
+      //     >> APINode
+      //     >> FinalOutput
+      // )
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "edge-1",
+              type: "DEFAULT",
+              source_node_id: "entrypoint-node",
+              target_node_id: "parallel-node-1",
+              source_handle_id: "2667ea0e-9ef6-4731-8478-43f2d2afa4de",
+              target_handle_id: "15913e7a-5f25-40b8-84a3-f15fe490da55",
+            },
+            {
+              id: "edge-2",
+              type: "DEFAULT",
+              source_node_id: "seq-node-1",
+              target_node_id: "seq-node-2",
+              source_handle_id: "436591c9-ae12-405f-9b56-81c71f4d6065",
+              target_handle_id: "34d16931-3161-4c47-b9ad-9055a05ee511",
+            },
+            {
+              id: "edge-3",
+              type: "DEFAULT",
+              source_node_id: "parallel-node-1",
+              target_node_id: "seq-node-1",
+              source_handle_id: "0baeef65-7205-4db3-a111-dfb11b5e0184",
+              target_handle_id: "0ab49640-f504-4f7c-99be-66a8c0597ccf",
+            },
+            {
+              id: "edge-4",
+              type: "DEFAULT",
+              source_node_id: "seq-node-2",
+              target_node_id: "request-body-node",
+              source_handle_id: "7a1bca72-7c7e-4523-ad65-8bd19d4b12ed",
+              target_handle_id: "e55a5921-0cd9-4c8e-b8ec-cbd42f91e935",
+            },
+            {
+              id: "edge-5",
+              type: "DEFAULT",
+              source_node_id: "request-body-node",
+              target_node_id: "merge-node",
+              source_handle_id: "2bb42ef4-3ef7-4b07-8790-ca74c1a3ac4d",
+              target_handle_id: "b8e75fdf-30d2-4051-9531-ee1b2116ecb1",
+            },
+            {
+              id: "edge-6",
+              type: "DEFAULT",
+              source_node_id: "parallel-node-2",
+              target_node_id: "merge-node",
+              source_handle_id: "dab065ab-349a-4a6b-b34d-7d10e1475349",
+              target_handle_id: "429e7230-cbfc-47b9-b43e-bd22c50d565c",
+            },
+            {
+              id: "edge-7",
+              type: "DEFAULT",
+              source_node_id: "merge-node",
+              target_node_id: "api-node",
+              source_handle_id: "f65dc3ac-cad7-4b24-a0f9-112f6e13a7b7",
+              target_handle_id: "d480a94a-678b-41c6-86d2-5178b49ca1b4",
+            },
+            {
+              id: "edge-8",
+              type: "DEFAULT",
+              source_node_id: "api-node",
+              target_node_id: "final-output-node",
+              source_handle_id: "468fcd8c-1bc5-4519-99a5-f2a29b19fa1a",
+              target_handle_id: "8cc17648-7940-4821-b603-99f5e61366dc",
+            },
+            {
+              id: "54fb5a58-ebf2-4347-92d6-947bfe21fe58",
+              type: "DEFAULT",
+              source_node_id: "entrypoint-node",
+              target_node_id: "parallel-node-2",
+              source_handle_id: "2667ea0e-9ef6-4731-8478-43f2d2afa4de",
+              target_handle_id: "85ad292c-569f-4451-9747-9e8b7300c518",
+            },
+          ],
+          nodes: [
+            {
+              id: "merge-node",
+              base: null,
+              data: {
+                label: "Merge Node",
+                merge_strategy: "AWAIT_ALL",
+                target_handles: [
+                  { id: "b8e75fdf-30d2-4051-9531-ee1b2116ecb1" },
+                  { id: "429e7230-cbfc-47b9-b43e-bd22c50d565c" },
+                ],
+                source_handle_id: "f65dc3ac-cad7-4b24-a0f9-112f6e13a7b7",
+              },
+              type: "MERGE",
+              ports: [],
+              inputs: [],
+              definition: null,
+            },
+            {
+              id: "parallel-node-2",
+              base: null,
+              data: {
+                label: "Parallel Node 2",
+                output_id: "1f084b44-bbab-4495-bed0-11e13313c676",
+                output_type: "STRING",
+                error_output_id: null,
+                source_handle_id: "dab065ab-349a-4a6b-b34d-7d10e1475349",
+                target_handle_id: "85ad292c-569f-4451-9747-9e8b7300c518",
+                template_node_input_id: "63795ac6-e197-4ada-998b-ac18ca875696",
+              },
+              type: "TEMPLATING",
+              ports: [],
+              inputs: [],
+              outputs: null,
+              trigger: {},
+              adornments: null,
+              definition: null,
+            },
+            {
+              id: "api-node",
+              base: null,
+              data: {
+                label: "API Node",
+                url_input_id: "866d0466-9eb9-4a14-963c-db9d2253c2ab",
+                body_input_id: "38219078-d3cc-4059-906a-6091428baeb8",
+                json_output_id: "de6c95b6-b325-42b4-8232-46221604013f",
+                text_output_id: "20b7f27a-7144-45a1-9ab8-e34889826f8d",
+                error_output_id: null,
+                method_input_id: "d0547072-c7cd-45f2-9668-6afeba5c1735",
+                source_handle_id: "468fcd8c-1bc5-4519-99a5-f2a29b19fa1a",
+                target_handle_id: "d480a94a-678b-41c6-86d2-5178b49ca1b4",
+                additional_headers: [],
+                status_code_output_id: "a7e4bceb-f187-489b-b554-72ce8c92bcbf",
+                api_key_header_key_input_id:
+                  "d65868b0-4d4d-4573-a66a-fca8b82496bb",
+                authorization_type_input_id:
+                  "592656b1-b527-4d32-821d-488f0ce1bfbe",
+                bearer_token_value_input_id:
+                  "13894fb1-b8b0-41a2-ba52-cde0ffd41386",
+                api_key_header_value_input_id:
+                  "9de2d5a2-89ad-4d1b-bdb7-04dc1b9c115a",
+              },
+              type: "API",
+              ports: [],
+              inputs: [
+                {
+                  id: "d0547072-c7cd-45f2-9668-6afeba5c1735",
+                  key: "method",
+                  value: {
+                    rules: [
+                      {
+                        data: { type: "STRING", value: "POST" },
+                        type: "CONSTANT_VALUE",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+                {
+                  id: "866d0466-9eb9-4a14-963c-db9d2253c2ab",
+                  key: "url",
+                  value: {
+                    rules: [
+                      {
+                        data: {
+                          node_id: "parallel-node-2",
+                          output_id: "1f084b44-bbab-4495-bed0-11e13313c676",
+                        },
+                        type: "NODE_OUTPUT",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+                {
+                  id: "38219078-d3cc-4059-906a-6091428baeb8",
+                  key: "body",
+                  value: {
+                    rules: [
+                      {
+                        data: {
+                          node_id: "request-body-node",
+                          output_id: "393b0c22-47b2-48de-b018-82fbe67ee965",
+                        },
+                        type: "NODE_OUTPUT",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+                {
+                  id: "592656b1-b527-4d32-821d-488f0ce1bfbe",
+                  key: "authorization_type",
+                  value: {
+                    rules: [
+                      {
+                        data: { type: "STRING", value: "BEARER_TOKEN" },
+                        type: "CONSTANT_VALUE",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+                {
+                  id: "13894fb1-b8b0-41a2-ba52-cde0ffd41386",
+                  key: "bearer_token_value",
+                  value: {
+                    rules: [
+                      {
+                        data: {
+                          type: "STRING",
+                          workspace_secret_id:
+                            "f295ac8f-2e82-481c-ba19-98ba97252696",
+                        },
+                        type: "WORKSPACE_SECRET",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+                {
+                  id: "d65868b0-4d4d-4573-a66a-fca8b82496bb",
+                  key: "api_key_header_key",
+                  value: {
+                    rules: [
+                      {
+                        data: { type: "STRING", value: null },
+                        type: "CONSTANT_VALUE",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+                {
+                  id: "9de2d5a2-89ad-4d1b-bdb7-04dc1b9c115a",
+                  key: "api_key_header_value",
+                  value: {
+                    rules: [
+                      {
+                        data: { type: "STRING", workspace_secret_id: null },
+                        type: "WORKSPACE_SECRET",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              outputs: null,
+              trigger: {},
+              adornments: null,
+              definition: null,
+            },
+            {
+              id: "request-body-node",
+              base: null,
+              data: {
+                label: "Request Body Node",
+                output_id: "393b0c22-47b2-48de-b018-82fbe67ee965",
+                output_type: "JSON",
+                error_output_id: null,
+                source_handle_id: "2bb42ef4-3ef7-4b07-8790-ca74c1a3ac4d",
+                target_handle_id: "749a2f14-cec0-4d34-a4fa-fb8fd269fed8",
+                template_node_input_id: "f19b1132-ca0c-4b1d-afe5-bd0833fe6b89",
+              },
+              type: "TEMPLATING",
+              ports: [],
+              inputs: [],
+              outputs: null,
+              trigger: {},
+              adornments: null,
+              definition: null,
+            },
+            {
+              id: "parallel-node-1",
+              base: null,
+              data: {
+                label: "Parallel Node 1",
+                output_id: "fe4be5d9-4c5a-4e8d-857a-d73a809ce17d",
+                output_type: "STRING",
+                error_output_id: null,
+                source_handle_id: "0baeef65-7205-4db3-a111-dfb11b5e0184",
+                target_handle_id: "15913e7a-5f25-40b8-84a3-f15fe490da55",
+                template_node_input_id: "10a8f721-9980-4b9a-9384-254ec1866b02",
+              },
+              type: "TEMPLATING",
+              ports: [],
+              inputs: [],
+              outputs: null,
+              trigger: {},
+              adornments: null,
+              definition: null,
+            },
+            {
+              id: "seq-node-2",
+              base: null,
+              data: {
+                label: "Seq Node 2",
+                variant: "DEPLOYMENT",
+                output_id: "5c3864a5-0aa6-402d-8f84-5c113219f408",
+                release_tag: "LATEST",
+                array_output_id: "f2741add-1d83-449c-ade8-7ffb9aa3c1fa",
+                error_output_id: null,
+                source_handle_id: "7a1bca72-7c7e-4523-ad65-8bd19d4b12ed",
+                target_handle_id: "34d16931-3161-4c47-b9ad-9055a05ee511",
+                ml_model_fallbacks: [],
+                prompt_deployment_id: "ef1eea88-8dfa-431e-8bde-163ea5e635e2",
+              },
+              type: "PROMPT",
+              ports: [],
+              inputs: [],
+              outputs: [],
+              trigger: {},
+              adornments: null,
+              definition: null,
+            },
+            {
+              id: "seq-node-1",
+              base: null,
+              data: {
+                label: "Seq Node 1",
+                url_input_id: "c8cdf994-ada3-4813-9e79-b11c84e2eaaf",
+                body_input_id: "5752bb47-1346-405e-aa1a-2fdbda8e7b79",
+                json_output_id: "8e32e235-0a8e-4596-987e-927eb66aa6f6",
+                text_output_id: "624b484e-8991-4c4f-9403-75b477d7dc46",
+                error_output_id: null,
+                method_input_id: "e6b4c461-ff82-40d2-8e53-2646198a8d36",
+                source_handle_id: "436591c9-ae12-405f-9b56-81c71f4d6065",
+                target_handle_id: "0ab49640-f504-4f7c-99be-66a8c0597ccf",
+                additional_headers: [],
+                status_code_output_id: "4cce55f8-fa0e-44b8-811b-35e9252d149c",
+                api_key_header_key_input_id:
+                  "3ebf4273-dded-4e9e-a9b6-15096e60c2e5",
+                authorization_type_input_id:
+                  "f1aae5a3-9a6c-4995-aa74-bae54b74a544",
+                bearer_token_value_input_id:
+                  "00672750-b19c-4661-86b0-8d250805be1a",
+                api_key_header_value_input_id:
+                  "bac82cd0-4a34-42ef-a08f-c2567dc71ac8",
+              },
+              type: "API",
+              ports: [],
+              inputs: [],
+              outputs: null,
+              trigger: {},
+              adornments: null,
+              definition: null,
+            },
+            {
+              id: "entrypoint-node",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "2667ea0e-9ef6-4731-8478-43f2d2afa4de",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+              definition: null,
+            },
+            {
+              id: "final-output-node",
+              base: null,
+              data: {
+                name: "final-output",
+                label: "Final Output",
+                output_id: "baeb6244-b88b-4bf8-a6a3-7212d9922ae4",
+                output_type: "STRING",
+                node_input_id: "63a6d2c9-fffa-40cb-96ab-017cdd040b9f",
+                target_handle_id: "8cc17648-7940-4821-b603-99f5e61366dc",
+              },
+              type: "TERMINAL",
+              inputs: [],
+              trigger: {},
+              definition: null,
+            },
+          ],
+          definition: null,
+          output_values: [],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+      expectProjectFileToMatchSnapshot(project, ["nodes", "api_node.py"]);
+    });
+  });
 });
