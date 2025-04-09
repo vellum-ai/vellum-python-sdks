@@ -414,3 +414,55 @@ class ConditionalNode(BaseConditionalNode):
         branch_2 = Port.on_else()
 "
 `;
+
+exports[`PromptDeploymentNode json output referenced by TemplatingNode > getNodeDisplayFile 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
+
+from ...nodes.templating_node import TemplatingNode
+
+
+class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
+    label = "Templating Node"
+    node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
+    node_input_ids_by_name = {
+        "inputs.var_1": UUID("9feb7b5e-5947-496d-b56f-1e2627730796"),
+        "template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616"),
+    }
+    output_display = {
+        TemplatingNode.Outputs.result: NodeOutputDisplay(
+            id=UUID("2d4f1826-de75-499a-8f84-0a690c8136ad"), name="result"
+        )
+    }
+    port_displays = {
+        TemplatingNode.Ports.default: PortDisplayOverrides(
+            id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`PromptDeploymentNode json output referenced by TemplatingNode > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+from .prompt_deployment_node import PromptDeploymentNode
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """{{ var_1.type }}"""
+    inputs = {
+        "var_1": PromptDeploymentNode.Outputs.json,
+    }
+"
+`;

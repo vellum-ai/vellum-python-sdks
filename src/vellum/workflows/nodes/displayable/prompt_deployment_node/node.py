@@ -1,6 +1,7 @@
 import json
-from typing import Iterator
+from typing import Any, Dict, Iterator, Type, Union
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BasePromptDeploymentNode as BasePromptDeploymentNode
@@ -11,7 +12,7 @@ from vellum.workflows.types.generics import StateType
 
 class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
     """
-    Used to execute a Prompt Deployment and surface a string output for convenience.
+    Used to execute a Prompt Deployment and surface a string output and json output if applicable for convenience.
 
     prompt_inputs: EntityInputsInterface - The inputs for the Prompt
     deployment: Union[UUID, str] - Either the Prompt Deployment's UUID or its name.
@@ -33,9 +34,11 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
         The outputs of the PromptDeploymentNode.
 
         text: str - The result of the Prompt Execution
+        json: Optional[Dict[Any, Any]] - The result of the Prompt Execution in JSON format
         """
 
         text: str
+        json: Union[Dict[Any, Any], Type[undefined]] = undefined
 
     def run(self) -> Iterator[BaseOutput]:
         outputs = yield from self._process_prompt_event_stream()
@@ -46,12 +49,18 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
             )
 
         string_outputs = []
+        json_output = None
+
         for output in outputs:
             if output.value is None:
                 continue
 
             if output.type == "STRING":
                 string_outputs.append(output.value)
+                try:
+                    json_output = json.loads(output.value)
+                except (json.JSONDecodeError, TypeError):
+                    pass
             elif output.type == "JSON":
                 string_outputs.append(json.dumps(output.value, indent=4))
             elif output.type == "FUNCTION_CALL":
@@ -61,3 +70,6 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
 
         value = "\n".join(string_outputs)
         yield BaseOutput(name="text", value=value)
+
+        if json_output:
+            yield BaseOutput(name="json", value=json_output)

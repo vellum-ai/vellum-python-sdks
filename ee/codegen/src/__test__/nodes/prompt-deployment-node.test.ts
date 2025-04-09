@@ -9,6 +9,7 @@ import { promptDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-
 import { createNodeContext, WorkflowContext } from "src/context";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
+import { NodeOutput as NodeOutputType } from "src/types/vellum";
 
 describe("PromptDeploymentNode", () => {
   let workflowContext: WorkflowContext;
@@ -116,6 +117,55 @@ describe("PromptDeploymentNode", () => {
 
     it(`getNodeFile`, async () => {
       node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("with json output id defined", async () => {
+    const randomJsonOutputId = "82c3d131-fe28-4f48-93c0-34ecf5a2a703";
+    let node: PromptDeploymentNode;
+    beforeEach(async () => {
+      vi.spyOn(
+        DeploymentsClient.prototype,
+        "deploymentHistoryItemRetrieve"
+      ).mockResolvedValue({
+        id: "some-id",
+        deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
+        name: "some-unique-deployment-name",
+        outputs: [
+          {
+            id: randomJsonOutputId,
+            name: "json",
+            type: "JSON",
+          },
+        ],
+      } as unknown as DeploymentHistoryItem);
+      const nodeOutputs: NodeOutputType[] = [
+        {
+          id: randomJsonOutputId,
+          name: "json",
+          type: "JSON",
+        },
+      ];
+      writer = new Writer();
+      workflowContext = workflowContextFactory();
+      const nodeData = promptDeploymentNodeDataFactory({
+        outputs: nodeOutputs,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as PromptDeploymentNodeContext;
+
+      node = new PromptDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeDisplayFile`, async () => {
+      node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
