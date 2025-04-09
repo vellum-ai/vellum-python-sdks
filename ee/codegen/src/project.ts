@@ -399,8 +399,8 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   /**
-   * This method is used to order the nodes based on a declared import order, determined by a
-   * breadth first search over edges in the graph.
+   * This method is used to order the nodes based on dependencies between them.
+   * It ensures that nodes appear in the result after all the nodes they depend on.
    */
   private getOrderedNodes(): WorkflowDataNode[] {
     const rawData = this.workflowVersionExecConfig.workflowRawData;
@@ -415,77 +415,72 @@ ${errors.slice(0, 3).map((err) => {
 
     const nodesById = Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-    // Create an adjacency list representation of the graph
-    const graph: Map<string, string[]> = new Map();
-    // Track in-degree (number of incoming edges) for each node
-    const inDegree: Map<string, number> = new Map();
+    // Create a dependency graph (directed edges represent "depends on" relationships)
+    // If A depends on B, then B must come before A in the result
+    const dependencyGraph: Map<string, Set<string>> = new Map();
 
-    // Initialize graph with all nodes
+    // Initialize dependency graph with all nodes
     nodes.forEach((node) => {
-      graph.set(node.id, []);
-      inDegree.set(node.id, 0);
+      dependencyGraph.set(node.id, new Set());
     });
 
-    // Add edges to graph and count in-degrees
+    // Build dependency relationships based on edges
+    // If there's an edge from A to B, it means B depends on A's output
     rawData.edges.forEach((edge) => {
       const sourceId = edge.sourceNodeId;
       const targetId = edge.targetNodeId;
 
-      if (!graph.has(sourceId)) {
+      if (dependencyGraph.has(targetId) && dependencyGraph.has(sourceId)) {
+        // Target depends on source, so source must come before target
+        dependencyGraph.get(targetId)?.add(sourceId);
+      }
+    });
+
+    // Topological sort with dependency resolution
+    const orderedNodes: WorkflowDataNode[] = [];
+    const visited = new Set<string>();
+    const tempVisited = new Set<string>(); // Used to detect cycles
+
+    // DFS function that ensures dependencies are processed first
+    const visit = (nodeId: string) => {
+      // Skip if already processed
+      if (visited.has(nodeId)) {
         return;
       }
 
-      if (graph.has(targetId)) {
-        graph.get(sourceId)?.push(targetId);
-        inDegree.set(targetId, (inDegree.get(targetId) || 0) + 1);
+      // Check for cycles - if we're already visiting this node in this DFS path
+      if (tempVisited.has(nodeId)) {
+        // We've detected a cycle, but we'll still try to process the node
+        // console.warn(`Detected cycle involving node ${nodeId}`);
+        return;
       }
-    });
 
-    // Find all nodes with no incoming edges
-    const sources: string[] = [];
-    inDegree.forEach((degree, nodeId) => {
-      if (degree === 0) {
-        sources.push(nodeId);
+      // Mark as temporarily visited (part of current path)
+      tempVisited.add(nodeId);
+
+      // Process all dependencies first (recursively)
+      const dependencies = dependencyGraph.get(nodeId) || new Set();
+      for (const depId of dependencies) {
+        visit(depId);
       }
-    });
 
-    const orderedNodes: WorkflowDataNode[] = [];
-    const processedNodeIds = new Set<string>();
-
-    // Process nodes in topological order
-    while (sources.length > 0) {
-      const nodeId = sources.shift();
-      if (!nodeId) {
-        break;
-      }
+      // All dependencies processed, now safe to add this node
       const node = nodesById[nodeId];
-
-      if (node && !processedNodeIds.has(nodeId)) {
+      if (node) {
         orderedNodes.push(node);
-        processedNodeIds.add(nodeId);
       }
 
-      // For each neighbor, reduce in-degree and check if it becomes a source
-      const neighbors = graph.get(nodeId) || [];
-      for (const neighborId of neighbors) {
-        const currentDegree = inDegree.get(neighborId) || 0;
-        inDegree.set(neighborId, currentDegree - 1);
+      // Mark as fully processed
+      visited.add(nodeId);
+      tempVisited.delete(nodeId);
+    };
 
-        if (currentDegree - 1 === 0) {
-          sources.push(neighborId);
-        }
+    // Visit each node to ensure all are processed
+    nodes.forEach((node) => {
+      if (!visited.has(node.id)) {
+        visit(node.id);
       }
-    }
-
-    // Include at the end nodes that are included in the workflow, but not referenced in the graph
-    // For example, Note Nodes.
-    const unprocessedNodes: WorkflowDataNode[] = rawData.nodes.filter(
-      (node): node is WorkflowDataNode => {
-        return !processedNodeIds.has(node.id) && node.type !== "ENTRYPOINT";
-      }
-    );
-
-    orderedNodes.push(...unprocessedNodes);
+    });
 
     return orderedNodes;
   }
