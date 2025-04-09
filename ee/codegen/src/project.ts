@@ -415,7 +415,7 @@ ${errors.slice(0, 3).map((err) => {
 
     const nodesById = Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-    // Create a dependency graph (directed edges represent "depends on" relationships)
+    // Create a dependency graph that represents the "depends on" relationships between nodes
     // If A depends on B, then B must come before A in the result
     const dependencyGraph: Map<string, Set<string>> = new Map();
 
@@ -425,18 +425,18 @@ ${errors.slice(0, 3).map((err) => {
     });
 
     // Build dependency relationships based on edges
-    // If there's an edge from A to B, it means B depends on A's output
     rawData.edges.forEach((edge) => {
-      const sourceId = edge.sourceNodeId;
-      const targetId = edge.targetNodeId;
+      const sourceNodeId = edge.sourceNodeId;
+      const targetNodeId = edge.targetNodeId;
 
-      if (dependencyGraph.has(targetId) && dependencyGraph.has(sourceId)) {
-        // Target depends on source, so source must come before target
-        dependencyGraph.get(targetId)?.add(sourceId);
+      if (
+        dependencyGraph.has(targetNodeId) &&
+        dependencyGraph.has(sourceNodeId)
+      ) {
+        dependencyGraph.get(targetNodeId)?.add(sourceNodeId);
       }
     });
 
-    // Topological sort with dependency resolution
     const orderedNodes: WorkflowDataNode[] = [];
     const visited = new Set<string>();
     const tempVisited = new Set<string>(); // Used to detect cycles
@@ -448,17 +448,15 @@ ${errors.slice(0, 3).map((err) => {
         return;
       }
 
-      // Check for cycles - if we're already visiting this node in this DFS path
+      // Return early if we've already visited this node in the current path (cycle)
       if (tempVisited.has(nodeId)) {
-        // We've detected a cycle, but we'll still try to process the node
-        // console.warn(`Detected cycle involving node ${nodeId}`);
         return;
       }
 
       // Mark as temporarily visited (part of current path)
       tempVisited.add(nodeId);
 
-      // Process all dependencies first (recursively)
+      // Process all dependencies first
       const dependencies = dependencyGraph.get(nodeId) || new Set();
       for (const depId of dependencies) {
         visit(depId);
