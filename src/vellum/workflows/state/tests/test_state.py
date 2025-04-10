@@ -13,6 +13,16 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 snapshot_count: Dict[int, int] = defaultdict(int)
 
 
+@pytest.fixture()
+def mock_deepcopy(mocker):
+    return mocker.patch("vellum.workflows.state.base.deepcopy")
+
+
+@pytest.fixture
+def mock_logger(mocker):
+    return mocker.patch("vellum.workflows.state.base.logger")
+
+
 class MockState(BaseState):
     foo: str
     nested_dict: Dict[str, int] = {}
@@ -170,3 +180,42 @@ def test_state_json_serialization__with_queue():
 
     # THEN the state is serialized correctly with the queue turned into a list
     assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": ["test1", "test2"]}
+
+
+def test_state_snapshot__deepcopy_fails__logs_error(mock_deepcopy, mock_logger):
+    # GIVEN an initial state instance
+    class MockState(BaseState):
+        foo: str
+
+    state = MockState(foo="bar")
+
+    # AND we have a snapshot callback that we are tracking
+    snapshot_count = 0
+
+    def __snapshot_callback__(state: "BaseState") -> None:
+        nonlocal snapshot_count
+        snapshot_count += 1
+
+    state.__snapshot_callback__ = __snapshot_callback__
+
+    # AND deepcopy fails the first time but succeeds the second time
+    deepcopy_side_effect_count = 0
+
+    def side_effect(*args, **kwargs):
+        nonlocal deepcopy_side_effect_count
+        deepcopy_side_effect_count += 1
+        if deepcopy_side_effect_count == 1:
+            raise Exception("Failed to deepcopy")
+        return deepcopy(args[0])
+
+    mock_deepcopy.side_effect = side_effect
+
+    # WHEN we snapshot the state twice
+    state.__snapshot__()
+    state.__snapshot__()
+
+    # THEN we were able to invoke the callback once
+    assert snapshot_count == 1
+
+    # AND alert sentry once
+    assert mock_logger.exception.call_count == 1
