@@ -652,6 +652,10 @@ ${errors.slice(0, 3).map((err) => {
     return nodes;
   }
 
+  private sortAlphabetically(items: string[]): string[] {
+    return items.sort((a, b) => a.localeCompare(b));
+  }
+
   private generateNodeFiles(
     nodes: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[]
   ): Promise<unknown>[] {
@@ -660,21 +664,31 @@ ${errors.slice(0, 3).map((err) => {
     if (nodes.length) {
       const nodeInitFileAllField = python.field({
         name: "__all__",
-        initializer: python.TypeInstantiation.list([
-          ...nodes.map((node) => {
-            return python.TypeInstantiation.str(node.getNodeClassName());
-          }),
-        ]),
+        initializer: python.TypeInstantiation.list(
+          [
+            ...this.sortAlphabetically(
+              nodes.map((node) => node.getNodeClassName())
+            ).map((name) => python.TypeInstantiation.str(name)),
+          ],
+          {
+            endWithComma: true,
+          }
+        ),
       });
       rootNodesInitFileStatements.push(nodeInitFileAllField);
 
       const nodeDisplayInitFileAllField = python.field({
         name: "__all__",
-        initializer: python.TypeInstantiation.list([
-          ...nodes.map((node) => {
-            return python.TypeInstantiation.str(node.getNodeDisplayClassName());
-          }),
-        ]),
+        initializer: python.TypeInstantiation.list(
+          [
+            ...this.sortAlphabetically(
+              nodes.map((node) => node.getNodeDisplayClassName())
+            ).map((name) => python.TypeInstantiation.str(name)),
+          ],
+          {
+            endWithComma: true,
+          }
+        ),
       });
       rootDisplayNodesInitFileStatements.push(nodeDisplayInitFileAllField);
     }

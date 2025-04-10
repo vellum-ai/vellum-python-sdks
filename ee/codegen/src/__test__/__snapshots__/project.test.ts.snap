@@ -76,7 +76,10 @@ exports[`WorkflowProjectGenerator > Nodes present but not in graph > should stil
 "from .first_node import FirstNode
 from .second_node import SecondNode
 
-__all__ = ["FirstNode", "SecondNode"]
+__all__ = [
+    "FirstNode",
+    "SecondNode",
+]
 "
 `;
 
@@ -84,7 +87,10 @@ exports[`WorkflowProjectGenerator > Nodes present but not in graph > should stil
 "from .first_node import FirstNodeDisplay
 from .second_node import SecondNodeDisplay
 
-__all__ = ["FirstNodeDisplay", "SecondNodeDisplay"]
+__all__ = [
+    "FirstNodeDisplay",
+    "SecondNodeDisplay",
+]
 "
 `;
 
