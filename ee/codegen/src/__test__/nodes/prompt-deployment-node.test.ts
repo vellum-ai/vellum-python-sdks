@@ -55,8 +55,8 @@ describe("PromptDeploymentNode", () => {
   describe("fallback models", () => {
     beforeEach(async () => {
       vi.spyOn(
-        DeploymentsClient.prototype,
-        "deploymentHistoryItemRetrieve"
+          DeploymentsClient.prototype,
+          "deploymentHistoryItemRetrieve"
       ).mockResolvedValue({
         id: "some-id",
         deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
@@ -79,11 +79,9 @@ describe("PromptDeploymentNode", () => {
         nodeContext,
       });
     });
-
-    it(`getNodeFile should fail`, async () => {
-      expect(() => node.getNodeFile().write(writer)).toThrowError(
-        "Fallback models not currently support"
-      );
+    it(`getNodeFile`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 

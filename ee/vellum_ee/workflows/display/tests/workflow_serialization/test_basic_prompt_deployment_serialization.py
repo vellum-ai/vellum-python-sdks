@@ -144,6 +144,7 @@ def test_serialize_workflow(vellum_client):
             "variant": "DEPLOYMENT",
             "prompt_deployment_id": deployment.id,
             "release_tag": "LATEST",
+            "ml_model_fallbacks": ["gpt-4o", "gemini-1.5-pro"],
         },
         "display_data": {
             "position": {

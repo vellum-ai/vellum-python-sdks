@@ -26,8 +26,11 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
       this.nodeData.data.fallbackModels &&
       this.nodeData.data.fallbackModels.length > 0
     ) {
-      throw new NodeDefinitionGenerationError(
-        "Fallback models not currently supported."
+      statements.push(
+        python.field({
+          name: "ml_model_fallback",
+          initializer: python.TypeInstantiation.list(this.nodeData.data.fallbackModels.map(model => python.TypeInstantiation.str(model))),
+        })
       );
     }
 
