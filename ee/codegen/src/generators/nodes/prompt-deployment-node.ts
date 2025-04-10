@@ -37,12 +37,12 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
       );
     }
 
-    if (this.nodeContext.deploymentHistoryItem) {
+    if (this.nodeContext.promptDeploymentRelease) {
       statements.push(
         python.field({
           name: "deployment",
           initializer: python.TypeInstantiation.str(
-            this.nodeContext.deploymentHistoryItem.name
+            this.nodeContext.promptDeploymentRelease.deployment.name
           ),
         })
       );
