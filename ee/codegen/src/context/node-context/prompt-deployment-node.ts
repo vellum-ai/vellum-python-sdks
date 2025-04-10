@@ -1,5 +1,5 @@
-import { DeploymentHistoryItem, VellumVariableType } from "vellum-ai/api";
-import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
+import { PromptDeploymentRelease, VellumVariableType } from "vellum-ai/api";
+import { ReleaseReviews as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
@@ -11,7 +11,7 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
   baseNodeClassName = "PromptDeploymentNode";
   baseNodeDisplayClassName = "BasePromptDeploymentNodeDisplay";
 
-  public deploymentHistoryItem: DeploymentHistoryItem | null = null;
+  public promptDeploymentRelease: PromptDeploymentRelease | null = null;
 
   protected getNodeOutputNamesById(): Record<string, string> {
     const jsonOutput = this.nodeData.outputs?.find(
@@ -53,12 +53,12 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
     }
 
     try {
-      this.deploymentHistoryItem = await new DeploymentsClient({
+      this.promptDeploymentRelease = await new PromptDeploymentReleaseClient({
         apiKey: this.workflowContext.vellumApiKey,
         environment: this.workflowContext.vellumApiEnvironment,
-      }).deploymentHistoryItemRetrieve(
-        this.nodeData.data.releaseTag,
-        this.nodeData.data.promptDeploymentId
+      }).retrievePromptDeploymentRelease(
+        this.nodeData.data.promptDeploymentId,
+        this.nodeData.data.releaseTag
       );
     } catch (error) {
       if (isVellumErrorWithDetail(error)) {
