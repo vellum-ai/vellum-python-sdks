@@ -308,6 +308,9 @@ from .prompt_block_state import PromptBlockState
 from .prompt_deployment_expand_meta_request import PromptDeploymentExpandMetaRequest
 from .prompt_deployment_input_request import PromptDeploymentInputRequest
 from .prompt_deployment_parent_context import PromptDeploymentParentContext
+from .prompt_deployment_release import PromptDeploymentRelease
+from .prompt_deployment_release_prompt_deployment import PromptDeploymentReleasePromptDeployment
+from .prompt_deployment_release_prompt_version import PromptDeploymentReleasePromptVersion
 from .prompt_exec_config import PromptExecConfig
 from .prompt_execution_meta import PromptExecutionMeta
 from .prompt_node_execution_meta import PromptNodeExecutionMeta
@@ -902,6 +905,9 @@ __all__ = [
     "PromptDeploymentExpandMetaRequest",
     "PromptDeploymentInputRequest",
     "PromptDeploymentParentContext",
+    "PromptDeploymentRelease",
+    "PromptDeploymentReleasePromptDeployment",
+    "PromptDeploymentReleasePromptVersion",
     "PromptExecConfig",
     "PromptExecutionMeta",
     "PromptNodeExecutionMeta",

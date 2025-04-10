@@ -7,6 +7,7 @@ from .core.client_wrapper import SyncClientWrapper
 from .resources.ad_hoc.client import AdHocClient
 from .resources.container_images.client import ContainerImagesClient
 from .resources.deployments.client import DeploymentsClient
+from .resources.release_reviews.client import ReleaseReviewsClient
 from .resources.document_indexes.client import DocumentIndexesClient
 from .resources.documents.client import DocumentsClient
 from .resources.folder_entities.client import FolderEntitiesClient
@@ -18,7 +19,6 @@ from .resources.sandboxes.client import SandboxesClient
 from .resources.test_suite_runs.client import TestSuiteRunsClient
 from .resources.test_suites.client import TestSuitesClient
 from .resources.workflow_deployments.client import WorkflowDeploymentsClient
-from .resources.release_reviews.client import ReleaseReviewsClient
 from .resources.workflow_sandboxes.client import WorkflowSandboxesClient
 from .resources.workflows.client import WorkflowsClient
 from .resources.workspace_secrets.client import WorkspaceSecretsClient
@@ -65,6 +65,7 @@ from .core.client_wrapper import AsyncClientWrapper
 from .resources.ad_hoc.client import AsyncAdHocClient
 from .resources.container_images.client import AsyncContainerImagesClient
 from .resources.deployments.client import AsyncDeploymentsClient
+from .resources.release_reviews.client import AsyncReleaseReviewsClient
 from .resources.document_indexes.client import AsyncDocumentIndexesClient
 from .resources.documents.client import AsyncDocumentsClient
 from .resources.folder_entities.client import AsyncFolderEntitiesClient
@@ -76,7 +77,6 @@ from .resources.sandboxes.client import AsyncSandboxesClient
 from .resources.test_suite_runs.client import AsyncTestSuiteRunsClient
 from .resources.test_suites.client import AsyncTestSuitesClient
 from .resources.workflow_deployments.client import AsyncWorkflowDeploymentsClient
-from .resources.release_reviews.client import AsyncReleaseReviewsClient
 from .resources.workflow_sandboxes.client import AsyncWorkflowSandboxesClient
 from .resources.workflows.client import AsyncWorkflowsClient
 from .resources.workspace_secrets.client import AsyncWorkspaceSecretsClient
@@ -143,6 +143,7 @@ class Vellum:
         self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = ContainerImagesClient(client_wrapper=self._client_wrapper)
         self.deployments = DeploymentsClient(client_wrapper=self._client_wrapper)
+        self.release_reviews = ReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.document_indexes = DocumentIndexesClient(client_wrapper=self._client_wrapper)
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
         self.folder_entities = FolderEntitiesClient(client_wrapper=self._client_wrapper)
@@ -154,7 +155,6 @@ class Vellum:
         self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = TestSuitesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = WorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
-        self.release_reviews = ReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = WorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = WorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = WorkspaceSecretsClient(client_wrapper=self._client_wrapper)
@@ -1486,6 +1486,7 @@ class AsyncVellum:
         self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = AsyncContainerImagesClient(client_wrapper=self._client_wrapper)
         self.deployments = AsyncDeploymentsClient(client_wrapper=self._client_wrapper)
+        self.release_reviews = AsyncReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.document_indexes = AsyncDocumentIndexesClient(client_wrapper=self._client_wrapper)
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
         self.folder_entities = AsyncFolderEntitiesClient(client_wrapper=self._client_wrapper)
@@ -1497,7 +1498,6 @@ class AsyncVellum:
         self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = AsyncTestSuitesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = AsyncWorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
-        self.release_reviews = AsyncReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = AsyncWorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = AsyncWorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = AsyncWorkspaceSecretsClient(client_wrapper=self._client_wrapper)
