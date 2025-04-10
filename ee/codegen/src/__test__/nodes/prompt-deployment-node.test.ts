@@ -66,7 +66,7 @@ describe("PromptDeploymentNode", () => {
       workflowContext = workflowContextFactory();
 
       const nodeData = promptDeploymentNodeDataFactory({
-        fallbackModels: ["model1"],
+        mlModelFallbacks: ["model1"],
       });
 
       const nodeContext = (await createNodeContext({

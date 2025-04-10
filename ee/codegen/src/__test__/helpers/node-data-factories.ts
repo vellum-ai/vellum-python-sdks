@@ -609,11 +609,11 @@ export function inlinePromptNodeDataLegacyVariantFactory({
 
 export function promptDeploymentNodeDataFactory({
   errorOutputId = undefined,
-  fallbackModels,
+  mlModelFallbacks,
   outputs,
 }: {
   errorOutputId?: string;
-  fallbackModels?: string[];
+  mlModelFallbacks?: string[];
   outputs?: NodeOutput[];
 } = {}): PromptNode {
   return {
@@ -629,7 +629,7 @@ export function promptDeploymentNodeDataFactory({
       targetHandleId: "e1f8a351-ab12-4167-93ee-d2dd72c8d15c",
       promptDeploymentId: "afd05488-7a25-4ff2-b87b-878e9552474e",
       releaseTag: "LATEST",
-      fallbackModels,
+      mlModelFallbacks,
     },
     inputs: [
       {
