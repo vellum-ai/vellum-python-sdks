@@ -21,13 +21,19 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
     }
 
     const nodeData: DeploymentPromptNodeData = this.nodeData.data;
-
     if (
-      this.nodeData.data.fallbackModels &&
-      this.nodeData.data.fallbackModels.length > 0
+      this.nodeData.data.mlModelFallbacks &&
+      this.nodeData.data.mlModelFallbacks.length > 0
     ) {
-      throw new NodeDefinitionGenerationError(
-        "Fallback models not currently supported."
+      statements.push(
+        python.field({
+          name: "ml_model_fallbacks",
+          initializer: python.TypeInstantiation.list(
+            this.nodeData.data.mlModelFallbacks.map((model) =>
+              python.TypeInstantiation.str(model)
+            )
+          ),
+        })
       );
     }
 

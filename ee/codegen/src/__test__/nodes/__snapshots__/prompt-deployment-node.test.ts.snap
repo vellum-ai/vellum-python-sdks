@@ -54,6 +54,20 @@ class PromptDeploymentNode(BasePromptDeploymentNode):
 "
 `;
 
+exports[`PromptDeploymentNode > fallback models > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    PromptDeploymentNode as BasePromptDeploymentNode,
+)
+
+
+class PromptDeploymentNode(BasePromptDeploymentNode):
+    ml_model_fallbacks = ["model1"]
+    deployment = "some-unique-deployment-name"
+    release_tag = "LATEST"
+    prompt_inputs = {}
+"
+`;
+
 exports[`PromptDeploymentNode > no prompt deployment found > getNodeFile 1`] = `
 "from uuid import UUID
 

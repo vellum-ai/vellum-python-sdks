@@ -38,6 +38,7 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     expand_raw: Optional[Sequence[str]] - Expandable raw fields to include in the response
     metadata: Optional[Dict[str, Optional[Any]]] - The metadata to use for the Prompt Execution
     request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution
+    ml_model_fallback: Optional[Sequence[str]] - ML model fallbacks to use
     """
 
     # Either the Prompt Deployment's UUID or its name.
@@ -50,6 +51,7 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     raw_overrides: Optional[RawPromptExecutionOverridesRequest] = OMIT
     expand_raw: Optional[Sequence[str]] = OMIT
     metadata: Optional[Dict[str, Optional[Any]]] = OMIT
+    ml_model_fallbacks: Optional[Sequence[str]] = OMIT
 
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY

@@ -66,7 +66,7 @@ describe("PromptDeploymentNode", () => {
       workflowContext = workflowContextFactory();
 
       const nodeData = promptDeploymentNodeDataFactory({
-        fallbackModels: ["model1"],
+        mlModelFallbacks: ["model1"],
       });
 
       const nodeContext = (await createNodeContext({
@@ -79,11 +79,9 @@ describe("PromptDeploymentNode", () => {
         nodeContext,
       });
     });
-
-    it(`getNodeFile should fail`, async () => {
-      expect(() => node.getNodeFile().write(writer)).toThrowError(
-        "Fallback models not currently support"
-      );
+    it(`getNodeFile`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 

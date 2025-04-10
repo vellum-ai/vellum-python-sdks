@@ -16,6 +16,7 @@ class ExamplePromptDeploymentNode(PromptDeploymentNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
+    ml_model_fallbacks = ["gpt-4o", "gemini-1.5-pro"]
 
 
 class BasicTextPromptDeployment(BaseWorkflow[Inputs, BaseState]):
