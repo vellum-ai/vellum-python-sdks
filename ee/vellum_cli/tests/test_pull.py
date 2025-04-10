@@ -1185,7 +1185,7 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
     deployment_id = str(uuid4())  # config will always use the deployment_id return from the API
     deployment_name = "Test Deployment"
     deployment_label = "Test Label"
-
+    workflow_sandbox_id = str(uuid4())
     # AND the workflow pull API call returns a zip file with metadata
     vellum_client.workflows.pull.return_value = iter(
         [
@@ -1197,6 +1197,7 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
                             "deployment_id": deployment_id,
                             "deployment_name": deployment_name,
                             "label": deployment_label,
+                            "workflow_sandbox_id": workflow_sandbox_id,
                         }
                     ),
                 }
@@ -1227,6 +1228,7 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
         assert str(deployment["id"]) == deployment_id
         assert deployment["name"] == deployment_name
         assert deployment["label"] == deployment_label
+        assert lock_data["workflows"][0]["workflow_sandbox_id"] == workflow_sandbox_id
 
     os.chdir(current_dir)
 
