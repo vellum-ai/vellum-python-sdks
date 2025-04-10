@@ -47,7 +47,7 @@ class BasePromptDeploymentNodeDisplay(
         deployment = vellum_client.deployments.retrieve(
             id=str(raise_if_descriptor(node.deployment)),
         )
-        ml_model_fallback = raise_if_descriptor(node.ml_model_fallback)
+        ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)
 
         return {
             "id": str(node_id),
@@ -63,7 +63,7 @@ class BasePromptDeploymentNodeDisplay(
                 "variant": "DEPLOYMENT",
                 "prompt_deployment_id": str(deployment.id),
                 "release_tag": raise_if_descriptor(node.release_tag),
-                "ml_model_fallbacks": list(ml_model_fallback) if ml_model_fallback else None,
+                "ml_model_fallbacks": list(ml_model_fallbacks) if ml_model_fallbacks else None,
             },
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),

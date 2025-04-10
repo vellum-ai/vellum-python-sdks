@@ -61,7 +61,7 @@ exports[`PromptDeploymentNode > fallback models > getNodeFile 1`] = `
 
 
 class PromptDeploymentNode(BasePromptDeploymentNode):
-    ml_model_fallback = ["model1"]
+    ml_model_fallbacks = ["model1"]
     deployment = "some-unique-deployment-name"
     release_tag = "LATEST"
     prompt_inputs = {}

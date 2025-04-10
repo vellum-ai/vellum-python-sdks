@@ -51,7 +51,7 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     raw_overrides: Optional[RawPromptExecutionOverridesRequest] = OMIT
     expand_raw: Optional[Sequence[str]] = OMIT
     metadata: Optional[Dict[str, Optional[Any]]] = OMIT
-    ml_model_fallback: Optional[Sequence[str]] = OMIT
+    ml_model_fallbacks: Optional[Sequence[str]] = OMIT
 
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY

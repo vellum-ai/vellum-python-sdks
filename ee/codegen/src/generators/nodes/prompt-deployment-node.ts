@@ -27,7 +27,7 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
     ) {
       statements.push(
         python.field({
-          name: "ml_model_fallback",
+          name: "ml_model_fallbacks",
           initializer: python.TypeInstantiation.list(
             this.nodeData.data.mlModelFallbacks.map((model) =>
               python.TypeInstantiation.str(model)
