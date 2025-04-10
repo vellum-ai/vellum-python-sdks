@@ -55,8 +55,8 @@ describe("PromptDeploymentNode", () => {
   describe("fallback models", () => {
     beforeEach(async () => {
       vi.spyOn(
-          DeploymentsClient.prototype,
-          "deploymentHistoryItemRetrieve"
+        DeploymentsClient.prototype,
+        "deploymentHistoryItemRetrieve"
       ).mockResolvedValue({
         id: "some-id",
         deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
