@@ -664,21 +664,31 @@ ${errors.slice(0, 3).map((err) => {
     if (nodes.length) {
       const nodeInitFileAllField = python.field({
         name: "__all__",
-        initializer: python.TypeInstantiation.list([
-          ...this.sortAlphabetically(
-            nodes.map((node) => node.getNodeClassName())
-          ).map((name) => python.TypeInstantiation.str(name)),
-        ]),
+        initializer: python.TypeInstantiation.list(
+          [
+            ...this.sortAlphabetically(
+              nodes.map((node) => node.getNodeClassName())
+            ).map((name) => python.TypeInstantiation.str(name)),
+          ],
+          {
+            endWithComma: true,
+          }
+        ),
       });
       rootNodesInitFileStatements.push(nodeInitFileAllField);
 
       const nodeDisplayInitFileAllField = python.field({
         name: "__all__",
-        initializer: python.TypeInstantiation.list([
-          ...this.sortAlphabetically(
-            nodes.map((node) => node.getNodeDisplayClassName())
-          ).map((name) => python.TypeInstantiation.str(name)),
-        ]),
+        initializer: python.TypeInstantiation.list(
+          [
+            ...this.sortAlphabetically(
+              nodes.map((node) => node.getNodeDisplayClassName())
+            ).map((name) => python.TypeInstantiation.str(name)),
+          ],
+          {
+            endWithComma: true,
+          }
+        ),
       });
       rootDisplayNodesInitFileStatements.push(nodeDisplayInitFileAllField);
     }
