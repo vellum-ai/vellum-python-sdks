@@ -5,9 +5,9 @@ from .templating_node_2 import TemplatingNode2Display
 from .templating_node_3 import TemplatingNode3Display
 
 __all__ = [
-    "TemplatingNode2Display",
-    "TemplatingNode1Display",
-    "MergeNodeDisplay",
-    "TemplatingNode3Display",
     "FinalOutputDisplay",
+    "MergeNodeDisplay",
+    "TemplatingNode1Display",
+    "TemplatingNode2Display",
+    "TemplatingNode3Display",
 ]

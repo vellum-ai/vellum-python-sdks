@@ -652,6 +652,10 @@ ${errors.slice(0, 3).map((err) => {
     return nodes;
   }
 
+  private sortAlphabetically(items: string[]): string[] {
+    return items.sort((a, b) => a.localeCompare(b));
+  }
+
   private generateNodeFiles(
     nodes: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[]
   ): Promise<unknown>[] {
@@ -661,9 +665,9 @@ ${errors.slice(0, 3).map((err) => {
       const nodeInitFileAllField = python.field({
         name: "__all__",
         initializer: python.TypeInstantiation.list([
-          ...nodes.map((node) => {
-            return python.TypeInstantiation.str(node.getNodeClassName());
-          }),
+          ...this.sortAlphabetically(
+            nodes.map((node) => node.getNodeClassName())
+          ).map((name) => python.TypeInstantiation.str(name)),
         ]),
       });
       rootNodesInitFileStatements.push(nodeInitFileAllField);
@@ -671,9 +675,9 @@ ${errors.slice(0, 3).map((err) => {
       const nodeDisplayInitFileAllField = python.field({
         name: "__all__",
         initializer: python.TypeInstantiation.list([
-          ...nodes.map((node) => {
-            return python.TypeInstantiation.str(node.getNodeDisplayClassName());
-          }),
+          ...this.sortAlphabetically(
+            nodes.map((node) => node.getNodeDisplayClassName())
+          ).map((name) => python.TypeInstantiation.str(name)),
         ]),
       });
       rootDisplayNodesInitFileStatements.push(nodeDisplayInitFileAllField);
