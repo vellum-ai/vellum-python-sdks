@@ -2,6 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import field
 from datetime import datetime
+import logging
 from queue import Queue
 from threading import Lock
 from uuid import UUID, uuid4
@@ -28,6 +29,8 @@ from vellum.workflows.types.utils import (
 
 if TYPE_CHECKING:
     from vellum.workflows.nodes.bases import BaseNode
+
+logger = logging.getLogger(__name__)
 
 
 class _Snapshottable:
@@ -377,7 +380,10 @@ class BaseState(metaclass=_BaseStateMeta):
         Snapshots the current state to the workflow emitter. The invoked callback is overridden by the
         workflow runner.
         """
-        self.__snapshot_callback__(deepcopy(self))
+        try:
+            self.__snapshot_callback__(deepcopy(self))
+        except Exception:
+            logger.exception("Failed to snapshot Workflow state.")
 
     @classmethod
     def __get_pydantic_core_schema__(
