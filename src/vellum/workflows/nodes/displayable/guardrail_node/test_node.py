@@ -1,6 +1,7 @@
 import pytest
 
 from vellum import TestSuiteRunMetricNumberOutput
+from vellum.client import ApiError
 from vellum.client.types.metric_definition_execution import MetricDefinitionExecution
 from vellum.client.types.test_suite_run_metric_string_output import TestSuiteRunMetricStringOutput
 from vellum.workflows.errors import WorkflowErrorCode
@@ -99,3 +100,27 @@ def test_run_guardrail_node__normalized_score_null(vellum_client):
     # THEN we get an exception
     assert exc_info.value.message == "Metric execution must have one output named 'normalized_score' with type 'float'"
     assert exc_info.value.code == WorkflowErrorCode.INVALID_OUTPUTS
+
+
+def test_run_guardrail_node__api_error(vellum_client):
+    # GIVEN a Guardrail Node
+    class MyGuard(GuardrailNode):
+        metric_definition = "example_metric_definition"
+        metric_inputs = {}
+
+    # AND the API client raises an ApiError when called
+    api_error = ApiError(status_code=503)
+    vellum_client.metric_definitions.execute_metric_definition.side_effect = api_error
+
+    # WHEN we run the Guardrail Node
+    with pytest.raises(NodeException) as exc_info:
+        MyGuard().run()
+
+    # THEN we get a NodeException with the appropriate error code
+    assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
+    assert "Failed to execute metric definition" in exc_info.value.message
+
+    # Verify the mock was called with the expected arguments
+    vellum_client.metric_definitions.execute_metric_definition.assert_called_once_with(
+        "example_metric_definition", inputs=[], release_tag="LATEST", request_options=None
+    )
