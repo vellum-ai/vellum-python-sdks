@@ -52,8 +52,14 @@ jobs:
         working-directory: ee/codegen
 
       - name: Test
-        run: npm test
+        run: npm run test:update
         working-directory: ee/codegen
+
+      - name: Fail if snapshot changes were not committed
+        run: |
+          git diff --exit-code -- 'ee/codegen/**/*.snap' || (
+            echo "Snapshot files were modified. Run 'npm run test:update' and commit the changes." && exit 1
+          )
 
   publish:
     permissions:
