@@ -48,7 +48,6 @@ class WorkflowInputsVellumDisplayOverrides(WorkflowInputsDisplay):
     DEPRECATED: Use WorkflowInputsDisplay instead. Will be removed in 0.15.0
     """
 
-    name: Optional[str] = None
     required: Optional[bool] = None
 
 

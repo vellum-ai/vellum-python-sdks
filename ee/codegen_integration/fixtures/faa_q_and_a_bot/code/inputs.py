@@ -5,4 +5,4 @@ from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
-    chat_history: Optional[List[ChatMessage]]
+    chat_history: Optional[List[ChatMessage]] = None

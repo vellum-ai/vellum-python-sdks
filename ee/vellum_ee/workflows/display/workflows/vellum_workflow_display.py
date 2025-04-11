@@ -2,6 +2,7 @@ import logging
 from uuid import UUID
 from typing import Optional, cast
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port
@@ -36,7 +37,7 @@ class VellumWorkflowDisplay(BaseWorkflowDisplay[WorkflowType]):
                     "key": workflow_input_display.name or workflow_input_reference.name,
                     "type": infer_vellum_variable_type(workflow_input_reference),
                     "default": default.dict() if default else None,
-                    "required": workflow_input_reference.instance is None,
+                    "required": workflow_input_reference.instance is undefined,
                     "extensions": {"color": workflow_input_display.color},
                 }
             )
@@ -52,7 +53,7 @@ class VellumWorkflowDisplay(BaseWorkflowDisplay[WorkflowType]):
                     "key": state_value_display.name or state_value_reference.name,
                     "type": infer_vellum_variable_type(state_value_reference),
                     "default": default.dict() if default else None,
-                    "required": state_value_reference.instance is None,
+                    "required": state_value_reference.instance is undefined,
                     "extensions": {"color": state_value_display.color},
                 }
             )

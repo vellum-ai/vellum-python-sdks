@@ -36,7 +36,7 @@ export class VellumVariable extends AstNode {
     super();
 
     const baseType = getVellumVariablePrimitiveType(variable.type);
-    let finalType = baseType;
+    const name = variable.name ?? variable.key;
 
     // NULL type do not need to be optional
     // variable.required === false is used to indicate that the variable is optional
@@ -47,16 +47,23 @@ export class VellumVariable extends AstNode {
       (variable.required === false ||
         (variable.required === undefined && defaultRequired === false))
     ) {
-      finalType = Type.optional(baseType);
+      this.field = python.field({
+        name,
+        type: Type.optional(baseType),
+        initializer: variable.default
+          ? this.generateInitializerIfDefault(variable)
+          : python.TypeInstantiation.none(),
+      });
+    } else {
+      this.field = python.field({
+        name,
+        type: baseType,
+        initializer: variable.default
+          ? this.generateInitializerIfDefault(variable)
+          : undefined,
+      });
     }
 
-    this.field = python.field({
-      name: variable.name ?? variable.key,
-      type: finalType,
-      initializer: variable.default
-        ? this.generateInitializerIfDefault(variable)
-        : undefined,
-    });
     this.inheritReferences(this.field);
   }
 
@@ -67,6 +74,8 @@ export class VellumVariable extends AstNode {
       ? new VellumValue({
           vellumValue: variable.default,
         })
+      : variable.default == null
+      ? python.TypeInstantiation.none()
       : undefined;
   }
 

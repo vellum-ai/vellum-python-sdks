@@ -4,6 +4,7 @@ from typing_extensions import dataclass_transform
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.references import ExternalInputReference, WorkflowInputReference
@@ -15,7 +16,7 @@ from vellum.workflows.types.utils import get_class_attr_names, infer_types
 class _BaseInputsMeta(type):
     def __getattribute__(cls, name: str) -> Any:
         if not name.startswith("_") and name in cls.__annotations__ and issubclass(cls, BaseInputs):
-            instance = vars(cls).get(name)
+            instance = vars(cls).get(name, undefined)
             types = infer_types(cls, name)
 
             if getattr(cls, "__descriptor_class__", None) is ExternalInputReference:
