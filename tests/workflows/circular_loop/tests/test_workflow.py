@@ -3,7 +3,9 @@ import pytest
 from tests.workflows.circular_loop.workflow import CircularLoopWorkflow
 
 
-@pytest.mark.skip(reason="This test will fail because of circular loop")
+@pytest.mark.skip(
+    reason="https://linear.app/vellum/issue/APO-390/workflow-erronously-terminates-in-looping-edge-case-with-prefixed-node"  # noqa: E501
+)
 def test_workflow__happy_path():
     """
     This test is not happy now.
