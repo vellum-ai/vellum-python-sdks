@@ -1,4 +1,3 @@
-import json
 from typing import Any, ClassVar, Dict, Generic, TypeVar, Union
 
 from vellum.workflows.nodes import NoteNode
@@ -23,7 +22,7 @@ class BaseNoteNodeDisplay(BaseNodeVellumDisplay[_NoteNodeType], Generic[_NoteNod
             "data": {
                 "label": self.label,
                 "text": self.text,
-                "style": json.dumps(self.style) if self.style else None,
+                "style": self.style,
             },
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
