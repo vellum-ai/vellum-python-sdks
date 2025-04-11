@@ -46,7 +46,7 @@ exports[`VellumVariableField > NumberVellumVariable snapshot 1`] = `
 `;
 
 exports[`VellumVariableField > OptionalVellumVariable defaultRequired=false snapshot 1`] = `
-"test: Optional[str]
+"test: Optional[str] = None
 "
 `;
 

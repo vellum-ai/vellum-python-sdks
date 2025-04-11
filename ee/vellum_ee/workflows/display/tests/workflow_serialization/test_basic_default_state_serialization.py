@@ -32,7 +32,7 @@ def test_serialize_workflow():
                 "key": "example",
                 "type": "STRING",
                 "default": {"type": "STRING", "value": "hello"},
-                "required": True,
+                "required": False,
                 "extensions": {"color": None},
             },
         ],

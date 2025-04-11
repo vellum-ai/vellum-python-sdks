@@ -50,7 +50,7 @@ class _Snapshottable:
 class _BaseStateMeta(type):
     def __getattribute__(cls, name: str) -> Any:
         if not name.startswith("_"):
-            instance = vars(cls).get(name)
+            instance = vars(cls).get(name, undefined)
             types = infer_types(cls, name)
             return StateValueReference(name=name, types=types, instance=instance)
 

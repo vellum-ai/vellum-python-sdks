@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Dict, Generic, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Dict, Tuple, Type, TypeVar
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa: F401
@@ -10,7 +10,7 @@ from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
     StateValueDisplay,
-    WorkflowInputsDisplayType,
+    WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
 
+WorkflowInputsDisplays = Dict[WorkflowInputReference, WorkflowInputsDisplay]
 StateValueDisplays = Dict[StateValueReference, StateValueDisplay]
 NodeDisplays = Dict[Type[BaseNode], BaseNodeDisplay]
 NodeOutputDisplays = Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]]
@@ -32,13 +33,11 @@ PortDisplays = Dict[Port, PortDisplay]
 
 
 @dataclass
-class WorkflowDisplayContext(Generic[WorkflowInputsDisplayType,]):
+class WorkflowDisplayContext:
     workflow_display_class: Type["BaseWorkflowDisplay"]
     workflow_display: WorkflowMetaDisplay
-    workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(default_factory=dict)
-    global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(
-        default_factory=dict
-    )
+    workflow_input_displays: WorkflowInputsDisplays = field(default_factory=dict)
+    global_workflow_input_displays: WorkflowInputsDisplays = field(default_factory=dict)
     state_value_displays: StateValueDisplays = field(default_factory=dict)
     global_state_value_displays: StateValueDisplays = field(default_factory=dict)
     node_displays: NodeDisplays = field(default_factory=dict)

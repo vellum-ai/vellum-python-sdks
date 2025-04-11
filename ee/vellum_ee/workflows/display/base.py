@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID
-from typing import Optional, TypeVar
+from typing import Optional
 
 from pydantic import Field
 
@@ -36,17 +36,19 @@ class WorkflowMetaDisplayOverrides(WorkflowMetaDisplay):
 
 
 @dataclass
-class WorkflowInputsDisplayOverrides:
+class WorkflowInputsDisplay:
     id: UUID
+    name: Optional[str] = None
+    color: Optional[str] = None
 
 
 @dataclass
-class WorkflowInputsDisplay(WorkflowInputsDisplayOverrides):
+class WorkflowInputsDisplayOverrides(WorkflowInputsDisplay):
+    """
+    DEPRECATED: Use WorkflowInputsDisplay instead. Will be removed in 0.15.0
+    """
+
     pass
-
-
-WorkflowInputsDisplayType = TypeVar("WorkflowInputsDisplayType", bound=WorkflowInputsDisplay)
-WorkflowInputsDisplayOverridesType = TypeVar("WorkflowInputsDisplayOverridesType", bound=WorkflowInputsDisplayOverrides)
 
 
 @dataclass

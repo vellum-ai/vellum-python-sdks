@@ -8,7 +8,6 @@ from vellum_ee.workflows.display.base import (
     EntrypointDisplayOverrides,
     StateValueDisplayOverrides,
     WorkflowInputsDisplay,
-    WorkflowInputsDisplayOverrides,
     WorkflowMetaDisplayOverrides,
     WorkflowOutputDisplayOverrides,
 )
@@ -44,10 +43,12 @@ class WorkflowMetaVellumDisplay(WorkflowMetaVellumDisplayOverrides):
 
 
 @dataclass
-class WorkflowInputsVellumDisplayOverrides(WorkflowInputsDisplay, WorkflowInputsDisplayOverrides):
-    name: Optional[str] = None
+class WorkflowInputsVellumDisplayOverrides(WorkflowInputsDisplay):
+    """
+    DEPRECATED: Use WorkflowInputsDisplay instead. Will be removed in 0.15.0
+    """
+
     required: Optional[bool] = None
-    color: Optional[str] = None
 
 
 @dataclass
