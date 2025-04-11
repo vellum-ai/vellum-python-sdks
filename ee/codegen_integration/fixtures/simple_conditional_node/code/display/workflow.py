@@ -1,12 +1,14 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 from ..inputs import Inputs
@@ -25,12 +27,8 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.foobar: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("5f64210f-ec43-48ce-ae40-40a9ba4c4c11"), name="foobar", required=True
-        ),
-        Inputs.bazbaz: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("b81c5c88-9528-47d0-8106-14a75520ed47"), name="bazbaz", required=True
-        ),
+        Inputs.foobar: WorkflowInputsDisplay(id=UUID("5f64210f-ec43-48ce-ae40-40a9ba4c4c11"), name="foobar"),
+        Inputs.bazbaz: WorkflowInputsDisplay(id=UUID("b81c5c88-9528-47d0-8106-14a75520ed47"), name="bazbaz"),
     }
     entrypoint_displays = {
         ConditionalNode: EntrypointDisplay(

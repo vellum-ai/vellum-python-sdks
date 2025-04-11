@@ -1,12 +1,14 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 from ....nodes.map_node.inputs import Inputs
@@ -26,15 +28,9 @@ class MapNodeWorkflowDisplay(VellumWorkflowDisplay[MapNodeWorkflow]):
         ),
     )
     inputs_display = {
-        Inputs.items: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("b8d66997-444e-4409-b315-5bef0c06192a"), name="items", required=True
-        ),
-        Inputs.item: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("2619e147-870f-40ec-8f21-f3e131fcd65a"), name="item", required=True
-        ),
-        Inputs.index: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("edecf894-c35b-485a-998f-118833a4b045"), name="index", required=True
-        ),
+        Inputs.items: WorkflowInputsDisplay(id=UUID("b8d66997-444e-4409-b315-5bef0c06192a"), name="items"),
+        Inputs.item: WorkflowInputsDisplay(id=UUID("2619e147-870f-40ec-8f21-f3e131fcd65a"), name="item"),
+        Inputs.index: WorkflowInputsDisplay(id=UUID("edecf894-c35b-485a-998f-118833a4b045"), name="index"),
     }
     entrypoint_displays = {
         TemplatingNode: EntrypointDisplay(

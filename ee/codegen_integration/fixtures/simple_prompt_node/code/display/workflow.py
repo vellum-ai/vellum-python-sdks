@@ -1,12 +1,14 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 from ..inputs import Inputs
@@ -24,11 +26,7 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
             viewport=WorkflowDisplayDataViewport(x=-1299.4246406540078, y=142.4751202622371, zoom=0.8897129183403404)
         ),
     )
-    inputs_display = {
-        Inputs.text: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("90c6afd3-06cc-430d-aed1-35937c062531"), name="text", required=True
-        )
-    }
+    inputs_display = {Inputs.text: WorkflowInputsDisplay(id=UUID("90c6afd3-06cc-430d-aed1-35937c062531"), name="text")}
     entrypoint_displays = {
         PromptNode: EntrypointDisplay(
             id=UUID("fedbe8f4-aa63-405b-aefa-0e40e65d547e"),

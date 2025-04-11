@@ -272,16 +272,6 @@ export class Workflow {
                 })
               );
 
-              const required =
-                inputVariableContext.getInputVariableData().required;
-              overrideArgs.push(
-                python.methodArgument({
-                  name: "required",
-                  value: required
-                    ? python.TypeInstantiation.bool(required)
-                    : python.TypeInstantiation.bool(false),
-                })
-              );
               const extensions =
                 inputVariableContext.getInputVariableData().extensions?.color;
               if (!isNil(extensions)) {
@@ -300,10 +290,8 @@ export class Workflow {
                 }),
                 value: python.instantiateClass({
                   classReference: python.reference({
-                    name: "WorkflowInputsVellumDisplayOverrides",
-                    modulePath:
-                      this.workflowContext.sdkModulePathNames
-                        .VELLUM_TYPES_MODULE_PATH,
+                    name: "WorkflowInputsDisplay",
+                    modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                   }),
                   arguments_: overrideArgs,
                 }),
