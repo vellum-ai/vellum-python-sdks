@@ -28,6 +28,7 @@ class ToolCallingNode(BaseNode):
         ml_model: str - The model to use for tool calling (e.g., "gpt-4o-mini")
         blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)
         functions: List[FunctionDefinition] - The functions that can be called
+        function_callables: List[Callable] - The callables that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
     """
 

@@ -1,12 +1,3 @@
-"""
-Basic Tool Calling Node Example
-
-This module demonstrates how to use the new ToolCallingNode in a workflow.
-
-To run the tests with a timeout (to prevent hangs), use:
-    poetry run pytest -xvs tests/workflows/basic_tool_calling_node/tests/test_workflow.py --timeout=30
-"""
-
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
