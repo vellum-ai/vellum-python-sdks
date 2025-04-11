@@ -3,10 +3,13 @@ from collections import defaultdict
 from copy import deepcopy
 import json
 from queue import Queue
-from typing import Dict
+from threading import Thread
+import time
+from typing import Dict, List
 
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
@@ -219,3 +222,42 @@ def test_state_snapshot__deepcopy_fails__logs_error(mock_deepcopy, mock_logger):
 
     # AND alert sentry once
     assert mock_logger.exception.call_count == 1
+
+
+def test_state_copy__resilient_to_concurrent_node_output_writes():
+    # GIVEN an initial state instance
+    state = MockState(foo="bar")
+
+    # AND multiple threads that is concurrently making a bunch of node output writes
+    num_threads = 10
+    writes_per_thread = 50
+
+    def node_output_writer(offset: int):
+        for i in range(writes_per_thread):
+            state.meta.node_outputs[
+                OutputReference(
+                    name=f"test_{i + offset}",
+                    types=(int,),
+                    instance=None,
+                    outputs_class=MockNode.Outputs,
+                )
+            ] = i
+            time.sleep(0.0001)
+
+    threads: List[Thread] = []
+    for i in range(num_threads):
+        thread = Thread(target=node_output_writer, args=(i * writes_per_thread,))
+        threads.append(thread)
+
+    # WHEN we start the threads
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    # THEN the state should have the correct number of node outputs
+    assert len(state.meta.node_outputs) == num_threads * writes_per_thread
+
+    # AND the state should have snapshotted the correct number of times
+    assert snapshot_count[id(state)] == num_threads * writes_per_thread
