@@ -90,12 +90,16 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
         """Override the base prompt node _process_prompt_event_stream()"""
         self._validate()
-        has_fallbacks = self.ml_model_fallbacks is not OMIT and self.ml_model_fallbacks is not None
         try:
             prompt_event_stream = self._get_prompt_event_stream()
             next(prompt_event_stream)
         except ApiError as e:
-            if e.status_code < 500 and has_fallbacks:
+            if (
+                e.status_code
+                and e.status_code < 500
+                and self.ml_model_fallbacks is not OMIT
+                and self.ml_model_fallbacks is not None
+            ):
                 for ml_model_fallback in self.ml_model_fallbacks:
                     try:
                         prompt_event_stream = self._get_prompt_event_stream(ml_model_fallback=ml_model_fallback)
