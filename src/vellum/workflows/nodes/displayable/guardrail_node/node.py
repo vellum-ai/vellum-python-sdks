@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Any, ClassVar, Dict, Generic, List, Optional, Union, cast
 
 from vellum import ChatHistoryInput, ChatMessage, JsonInput, MetricDefinitionInput, NumberInput, StringInput
+from vellum.client import ApiError
 from vellum.core import RequestOptions
 from vellum.workflows.constants import LATEST_RELEASE_TAG
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -38,12 +39,19 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
         log: Optional[str]
 
     def run(self) -> Outputs:
-        metric_execution = self._context.vellum_client.metric_definitions.execute_metric_definition(
-            self.metric_definition if isinstance(self.metric_definition, str) else str(self.metric_definition),
-            inputs=self._compile_metric_inputs(),
-            release_tag=self.release_tag,
-            request_options=self.request_options,
-        )
+        try:
+            metric_execution = self._context.vellum_client.metric_definitions.execute_metric_definition(
+                self.metric_definition if isinstance(self.metric_definition, str) else str(self.metric_definition),
+                inputs=self._compile_metric_inputs(),
+                release_tag=self.release_tag,
+                request_options=self.request_options,
+            )
+
+        except ApiError:
+            raise NodeException(
+                code=WorkflowErrorCode.NODE_EXECUTION,
+                message="Failed to execute metric definition",
+            )
 
         metric_outputs = {output.name: output.value for output in metric_execution.outputs}
 
