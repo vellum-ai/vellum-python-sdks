@@ -314,3 +314,42 @@ def test_workflow__unsupported_graph_item():
 
     # THEN it should raise an error
     assert "Unexpected graph type: <class 'int'>" in str(exc_info.value)
+
+
+def test_base_workflow__deserialize_state():
+
+    # GIVEN a state definition
+    class State(BaseState):
+        bar: str
+
+    # AND an inputs definition
+    class Inputs(BaseInputs):
+        baz: str
+
+    # AND a node
+    class NodeA(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow that uses all three
+    class TestWorkflow(BaseWorkflow[Inputs, State]):
+        graph = NodeA
+
+    # WHEN we deserialize the state
+    state = TestWorkflow.deserialize_state(
+        {
+            "bar": "My state bar",
+            "meta": {
+                "node_outputs": {
+                    "test_base_workflow__deserialize_state.<locals>.NodeA.Outputs.foo": "My node A output foo"
+                }
+            },
+        },
+        workflow_inputs=Inputs(baz="My input baz"),
+    )
+
+    # THEN the state should be correct
+    assert state.bar == "My state bar"
+    assert state.meta.node_outputs == {NodeA.Outputs.foo: "My node A output foo"}
+    assert isinstance(state.meta.workflow_inputs, Inputs)
+    assert state.meta.workflow_inputs.baz == "My input baz"
