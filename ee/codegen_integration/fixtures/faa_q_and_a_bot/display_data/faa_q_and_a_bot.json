@@ -2241,7 +2241,7 @@
       "key": "chat_history",
       "type": "CHAT_HISTORY",
       "default": null,
-      "required": false,
+      "required": true,
       "extensions": {
         "color": null
       }
