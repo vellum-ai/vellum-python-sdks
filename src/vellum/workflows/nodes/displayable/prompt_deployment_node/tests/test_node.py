@@ -5,6 +5,7 @@ from typing import Any, Iterator, List
 
 from httpx import Response
 
+from vellum.client import ApiError
 from vellum.client.types.chat_history_input_request import ChatHistoryInputRequest
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_request import ChatMessageRequest
@@ -15,6 +16,7 @@ from vellum.client.types.json_input_request import JsonInputRequest
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.context import execution_context
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.prompt_deployment_node.node import PromptDeploymentNode
 
 
@@ -194,3 +196,85 @@ def test_prompt_deployment_node__json_output(vellum_client):
     json_output = outputs[2]
     assert json_output.name == "json"
     assert json_output.value == expected_json
+
+
+def test_prompt_deployment_node_all_fallbacks_fail(vellum_client):
+    # GIVEN a Prompt Deployment Node with fallback models
+    class TestPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "test_deployment"
+        prompt_inputs = {"query": "test query"}
+        ml_model_fallbacks = ["fallback_model_1", "fallback_model_2"]
+
+    # AND all models fail with 404 errors
+    primary_error = ApiError(
+        body={"detail": "Failed to find model 'primary_model'"},
+        status_code=404,
+    )
+    fallback1_error = ApiError(
+        body={"detail": "Failed to find model 'fallback_model_1'"},
+        status_code=404,
+    )
+    fallback2_error = ApiError(
+        body={"detail": "Failed to find model 'fallback_model_2'"},
+        status_code=404,
+    )
+
+    vellum_client.execute_prompt_stream.side_effect = [primary_error, fallback1_error, fallback2_error]
+
+    # WHEN we run the node
+    node = TestPromptDeploymentNode()
+
+    # THEN an exception should be raised
+    with pytest.raises(NodeException) as exc_info:
+        list(node.run())
+
+    # AND the client should have been called three times
+    assert vellum_client.execute_prompt_stream.call_count == 3
+    assert (
+        exc_info.value.message
+        == "Failed to execute prompts with these fallbacks: ['fallback_model_1', 'fallback_model_2']"
+    )
+
+
+def test_prompt_deployment_node_fallback_success(vellum_client):
+    # GIVEN a Prompt Deployment Node with fallback models
+    class TestPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "test_deployment"
+        prompt_inputs = {"query": "test query"}
+        ml_model_fallbacks = ["fallback_model_1", "fallback_model_2"]
+
+    # AND the primary model fails with a 404 error
+    primary_error = ApiError(
+        body={"detail": "Failed to find model 'primary_model'"},
+        status_code=404,
+    )
+
+    # AND the first fallback model succeeds
+    def generate_successful_stream():
+        execution_id = str(uuid4())
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id, outputs=[StringVellumValue(value="Fallback response")]
+            ),
+        ]
+        return iter(events)
+
+    # Set up the mock to fail on primary but succeed on first fallback
+    vellum_client.execute_prompt_stream.side_effect = [primary_error, generate_successful_stream()]
+
+    # WHEN we run the node
+    node = TestPromptDeploymentNode()
+    outputs = list(node.run())
+
+    # THEN the node should complete successfully using the fallback model
+    assert len(outputs) > 0
+    assert outputs[-1].value == "Fallback response"
+
+    # AND the client should have been called twice (once for primary, once for fallback)
+    assert vellum_client.execute_prompt_stream.call_count == 2
+
+    # AND the second call should include the fallback model override
+    second_call_kwargs = vellum_client.execute_prompt_stream.call_args_list[1][1]
+    body_params = second_call_kwargs["request_options"]["additional_body_parameters"]
+    assert body_params["overrides"]["ml_model_fallback"] == "fallback_model_1"
