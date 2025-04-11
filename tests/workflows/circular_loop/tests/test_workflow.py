@@ -16,7 +16,7 @@ def test_workflow__happy_path():
 
     # WHEN we run the workflow
     terminal_event = workflow.run()
-    
+
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event.body
 
     assert terminal_event.outputs.counter == 2
