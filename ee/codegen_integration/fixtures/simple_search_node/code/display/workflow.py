@@ -1,12 +1,14 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 from ..inputs import Inputs
@@ -25,11 +27,11 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.query: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("a6ef8809-346e-469c-beed-2e5c4e9844c5"), name="query", required=True, color="someColor"
+        Inputs.query: WorkflowInputsDisplay(
+            id=UUID("a6ef8809-346e-469c-beed-2e5c4e9844c5"), name="query", color="someColor"
         ),
-        Inputs.var1: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("c95cccdc-8881-4528-bc63-97d9df6e1d87"), name="var1", required=True, color="someColor"
+        Inputs.var1: WorkflowInputsDisplay(
+            id=UUID("c95cccdc-8881-4528-bc63-97d9df6e1d87"), name="var1", color="someColor"
         ),
     }
     entrypoint_displays = {
