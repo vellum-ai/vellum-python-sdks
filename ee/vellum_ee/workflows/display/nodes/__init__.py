@@ -1,4 +1,4 @@
-# flake8: noqa
+# flake8: noqa: F403
 
 # Force an import to ensure that all display classes are registered with the BaseNodeDisplay registry
 from .base_node_display import BaseNodeDisplay
