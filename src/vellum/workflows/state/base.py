@@ -9,13 +9,14 @@ from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Type, cast
 from typing_extensions import dataclass_transform
 
-from pydantic import GetCoreSchemaHandler, field_serializer
+from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
 from pydantic_core import core_schema
 
 from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.constants import undefined
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.stack import Stack
@@ -239,6 +240,34 @@ class StateMeta(UniversalBaseModel):
     @field_serializer("node_outputs")
     def serialize_node_outputs(self, node_outputs: Dict[OutputReference, Any], _info: Any) -> Dict[str, Any]:
         return {str(descriptor): value for descriptor, value in node_outputs.items()}
+
+    @field_validator("node_outputs", mode="before")
+    @classmethod
+    def deserialize_node_outputs(cls, node_outputs: Any, info: ValidationInfo):
+        if isinstance(node_outputs, dict) and isinstance(info.context, dict):
+            raw_workflow_nodes = info.context.get("nodes")
+            workflow_node_outputs = {}
+            if isinstance(raw_workflow_nodes, list):
+                for node in raw_workflow_nodes:
+                    Outputs = getattr(node, "Outputs", None)
+                    if not isinstance(Outputs, type) or not issubclass(Outputs, BaseOutputs):
+                        continue
+
+                    for output in Outputs:
+                        workflow_node_outputs[str(output)] = output
+
+            node_output_keys = list(node_outputs.keys())
+            deserialized_node_outputs = {}
+            for node_output_key in node_output_keys:
+                output_reference = workflow_node_outputs.get(node_output_key)
+                if not output_reference:
+                    continue
+
+                deserialized_node_outputs[output_reference] = node_outputs[node_output_key]
+
+            return deserialized_node_outputs
+
+        return node_outputs
 
     @field_serializer("external_inputs")
     def serialize_external_inputs(

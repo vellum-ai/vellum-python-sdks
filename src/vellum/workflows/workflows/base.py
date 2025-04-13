@@ -530,6 +530,23 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
 
         return most_recent_state_snapshot
 
+    @classmethod
+    def deserialize_state(cls, state: dict, workflow_inputs: Optional[InputsType] = None) -> StateType:
+        state_class = cls.get_state_class()
+        if "meta" in state:
+            nodes = list(cls.get_nodes())
+            state["meta"] = StateMeta.model_validate(
+                {
+                    **state["meta"],
+                    "workflow_inputs": workflow_inputs,
+                },
+                context={
+                    "nodes": nodes,
+                },
+            )
+
+        return state_class(**state)
+
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
         workflow_path = f"{module_path}.workflow"
