@@ -5,7 +5,6 @@ import {
   ReleaseReviews as PromptDeploymentReleaseClient,
   ReleaseReviews as WorkflowReleaseClient,
 } from "vellum-ai/api/resources/releaseReviews/client/Client";
-import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { beforeEach, expect, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -106,7 +105,7 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
   beforeEach(async () => {
     vi.spyOn(
       PromptDeploymentReleaseClient.prototype,
-      "retrievePromptDeploymentRelease"
+      "retrieveWorkflowDeploymentRelease"
     ).mockResolvedValue({
       id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
       created: new Date(),
@@ -119,8 +118,10 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
         id: "mocked-created-by-id",
         email: "mocked-created-by-email",
       },
-      promptVersion: {
+      workflowVersion: {
         id: "mocked-prompt-release-id",
+        inputVariables: [],
+        outputVariables: [],
       },
       deployment: {
         name: "some-unique-deployment-name",
@@ -141,7 +142,7 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
           state: "APPROVED",
         },
       ],
-    } as unknown as PromptDeploymentRelease);
+    });
     workflowContext = workflowContextFactory();
     writer = new Writer();
 
@@ -507,7 +508,7 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
 
     vi.spyOn(
       PromptDeploymentReleaseClient.prototype,
-      "retrievePromptDeploymentRelease"
+      "retrieveWorkflowDeploymentRelease"
     ).mockResolvedValue({
       id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
       created: new Date(),
@@ -520,8 +521,10 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
         id: "mocked-created-by-id",
         email: "mocked-created-by-email",
       },
-      promptVersion: {
+      workflowVersion: {
         id: "mocked-prompt-release-id",
+        inputVariables: [],
+        outputVariables: [],
       },
       deployment: {
         name: "some-unique-deployment-name",
@@ -542,7 +545,7 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
           state: "APPROVED",
         },
       ],
-    } as unknown as PromptDeploymentRelease);
+    });
 
     const nodeOutputs: NodeOutputType[] = [
       {

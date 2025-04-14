@@ -1,4 +1,4 @@
-import { PromptDeploymentRelease, VellumVariableType } from "vellum-ai/api";
+import { WorkflowDeploymentRelease, VellumVariableType } from "vellum-ai/api";
 import { ReleaseReviews as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -11,7 +11,7 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
   baseNodeClassName = "PromptDeploymentNode";
   baseNodeDisplayClassName = "BasePromptDeploymentNodeDisplay";
 
-  public promptDeploymentRelease: PromptDeploymentRelease | null = null;
+  public promptDeploymentRelease: WorkflowDeploymentRelease | null = null;
 
   protected getNodeOutputNamesById(): Record<string, string> {
     const jsonOutput = this.nodeData.outputs?.find(
@@ -56,7 +56,7 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
       this.promptDeploymentRelease = await new PromptDeploymentReleaseClient({
         apiKey: this.workflowContext.vellumApiKey,
         environment: this.workflowContext.vellumApiEnvironment,
-      }).retrievePromptDeploymentRelease(
+      }).retrieveWorkflowDeploymentRelease(
         this.nodeData.data.promptDeploymentId,
         this.nodeData.data.releaseTag
       );

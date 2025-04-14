@@ -1,6 +1,5 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { ReleaseReviews as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
-import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
 
@@ -20,7 +19,7 @@ describe("PromptDeploymentNode", () => {
     beforeEach(async () => {
       vi.spyOn(
         PromptDeploymentReleaseClient.prototype,
-        "retrievePromptDeploymentRelease"
+        "retrieveWorkflowDeploymentRelease"
       ).mockResolvedValue({
         id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
         created: new Date(),
@@ -33,8 +32,10 @@ describe("PromptDeploymentNode", () => {
           id: "mocked-created-by-id",
           email: "mocked-created-by-email",
         },
-        promptVersion: {
+        workflowVersion: {
           id: "mocked-prompt-release-id",
+          inputVariables: [],
+          outputVariables: [],
         },
         deployment: {
           name: "some-unique-deployment-name",
@@ -55,7 +56,7 @@ describe("PromptDeploymentNode", () => {
             state: "APPROVED",
           },
         ],
-      } as unknown as PromptDeploymentRelease);
+      });
       writer = new Writer();
       workflowContext = workflowContextFactory();
       const nodeData = promptDeploymentNodeDataFactory();
@@ -86,7 +87,7 @@ describe("PromptDeploymentNode", () => {
     beforeEach(async () => {
       vi.spyOn(
         PromptDeploymentReleaseClient.prototype,
-        "retrievePromptDeploymentRelease"
+        "retrieveWorkflowDeploymentRelease"
       ).mockResolvedValue({
         id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
         created: new Date(),
@@ -99,8 +100,10 @@ describe("PromptDeploymentNode", () => {
           id: "mocked-created-by-id",
           email: "mocked-created-by-email",
         },
-        promptVersion: {
+        workflowVersion: {
           id: "mocked-prompt-release-id",
+          inputVariables: [],
+          outputVariables: [],
         },
         deployment: {
           name: "some-unique-deployment-name",
@@ -121,7 +124,7 @@ describe("PromptDeploymentNode", () => {
             state: "APPROVED",
           },
         ],
-      } as unknown as PromptDeploymentRelease);
+      });
       writer = new Writer();
       workflowContext = workflowContextFactory();
 
@@ -149,7 +152,7 @@ describe("PromptDeploymentNode", () => {
     beforeEach(async () => {
       vi.spyOn(
         PromptDeploymentReleaseClient.prototype,
-        "retrievePromptDeploymentRelease"
+        "retrieveWorkflowDeploymentRelease"
       ).mockRejectedValue(
         new VellumError({
           message: "Deployment not found",
@@ -185,7 +188,7 @@ describe("PromptDeploymentNode", () => {
     beforeEach(async () => {
       vi.spyOn(
         PromptDeploymentReleaseClient.prototype,
-        "retrievePromptDeploymentRelease"
+        "retrieveWorkflowDeploymentRelease"
       ).mockResolvedValue({
         id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
         created: new Date(),
@@ -198,8 +201,10 @@ describe("PromptDeploymentNode", () => {
           id: "mocked-created-by-id",
           email: "mocked-created-by-email",
         },
-        promptVersion: {
+        workflowVersion: {
           id: "mocked-prompt-release-id",
+          inputVariables: [],
+          outputVariables: [],
         },
         deployment: {
           name: "some-unique-deployment-name",
@@ -220,7 +225,7 @@ describe("PromptDeploymentNode", () => {
             state: "APPROVED",
           },
         ],
-      } as unknown as PromptDeploymentRelease);
+      });
       const nodeOutputs: NodeOutputType[] = [
         {
           id: randomJsonOutputId,
