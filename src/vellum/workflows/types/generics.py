@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, TypeVar
+from functools import cache
+from typing import TYPE_CHECKING, Any, Type, TypeVar
+from typing_extensions import TypeGuard
 
 if TYPE_CHECKING:
     from vellum.workflows import BaseWorkflow
@@ -12,3 +14,19 @@ StateType = TypeVar("StateType", bound="BaseState")
 WorkflowType = TypeVar("WorkflowType", bound="BaseWorkflow")
 InputsType = TypeVar("InputsType", bound="BaseInputs")
 OutputsType = TypeVar("OutputsType", bound="BaseOutputs")
+
+
+@cache
+def _import_node_class() -> Type["BaseNode"]:
+    """
+    Helper function to help avoid circular imports.
+    """
+
+    from vellum.workflows.nodes import BaseNode
+
+    return BaseNode
+
+
+def is_node_class(obj: Any) -> TypeGuard[Type["BaseNode"]]:
+    base_node_class = _import_node_class()
+    return isinstance(obj, type) and issubclass(obj, base_node_class)
