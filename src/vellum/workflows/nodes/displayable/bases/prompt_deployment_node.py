@@ -87,52 +87,72 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
             request_options=request_options,
         )
 
-    def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
+    def _process_prompt_event_stream(
+        self, prompt_event_stream: Optional[Iterator[ExecutePromptEvent]] = None
+    ) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
         """Override the base prompt node _process_prompt_event_stream()"""
         self._validate()
-        try:
-            prompt_event_stream = self._get_prompt_event_stream()
-            next(prompt_event_stream)
-        except ApiError as e:
-            if (
-                e.status_code
-                and e.status_code < 500
-                and self.ml_model_fallbacks is not OMIT
-                and self.ml_model_fallbacks is not None
-            ):
-                for ml_model_fallback in self.ml_model_fallbacks:
-                    try:
-                        prompt_event_stream = self._get_prompt_event_stream(ml_model_fallback=ml_model_fallback)
-                        next(prompt_event_stream)
-                        break
-                    except ApiError:
-                        continue
+
+        if prompt_event_stream is None:
+            try:
+                prompt_event_stream = self._get_prompt_event_stream()
+                next(prompt_event_stream)
+            except ApiError as e:
+                if (
+                    e.status_code
+                    and e.status_code < 500
+                    and self.ml_model_fallbacks is not OMIT
+                    and self.ml_model_fallbacks is not None
+                ):
+                    prompt_event_stream = self._retry_prompt_stream_with_fallbacks()
                 else:
-                    self._handle_api_error(
-                        ApiError(
-                            body={
-                                "detail": f"Failed to execute prompts with these fallbacks: {self.ml_model_fallbacks}"
-                            },
-                            status_code=400,
-                        )
-                    )
-            else:
-                self._handle_api_error(e)
+                    self._handle_api_error(e)
 
         outputs: Optional[List[PromptOutput]] = None
-        for event in prompt_event_stream:
-            if event.state == "INITIATED":
-                continue
-            elif event.state == "STREAMING":
-                yield BaseOutput(name="results", delta=event.output.value)
-            elif event.state == "FULFILLED":
-                outputs = event.outputs
-                yield BaseOutput(name="results", value=event.outputs)
-            elif event.state == "REJECTED":
-                workflow_error = vellum_error_to_workflow_error(event.error)
-                raise NodeException.of(workflow_error)
+        if prompt_event_stream is not None:
+            for event in prompt_event_stream:
+                if event.state == "INITIATED":
+                    continue
+                elif event.state == "STREAMING":
+                    yield BaseOutput(name="results", delta=event.output.value)
+                elif event.state == "FULFILLED":
+                    outputs = event.outputs
+                    yield BaseOutput(name="results", value=event.outputs)
+                elif event.state == "REJECTED":
+                    if (
+                        event.error
+                        and event.error.code == WorkflowErrorCode.PROVIDER_ERROR.value
+                        and self.ml_model_fallbacks is not OMIT
+                        and self.ml_model_fallbacks is not None
+                    ):
+                        try:
+                            fallback_stream = self._retry_prompt_stream_with_fallbacks()
+                            fallback_outputs = yield from self._process_prompt_event_stream(fallback_stream)
+                            return fallback_outputs
+                        except ApiError:
+                            pass
+
+                    workflow_error = vellum_error_to_workflow_error(event.error)
+                    raise NodeException.of(workflow_error)
 
         return outputs
+
+    def _retry_prompt_stream_with_fallbacks(self):
+        if self.ml_model_fallbacks is not None:
+            for ml_model_fallback in self.ml_model_fallbacks:
+                try:
+                    prompt_event_stream = self._get_prompt_event_stream(ml_model_fallback=ml_model_fallback)
+                    next(prompt_event_stream)
+                    return prompt_event_stream
+                except ApiError:
+                    continue
+            else:
+                self._handle_api_error(
+                    ApiError(
+                        body={"detail": f"Failed to execute prompts with these fallbacks: {self.ml_model_fallbacks}"},
+                        status_code=400,
+                    )
+                )
 
     def _compile_prompt_inputs(self) -> List[PromptDeploymentInputRequest]:
         # TODO: We may want to consolidate with subworkflow deployment input compilation

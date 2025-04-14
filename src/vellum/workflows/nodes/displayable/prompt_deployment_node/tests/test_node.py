@@ -5,6 +5,7 @@ from typing import Any, Iterator, List
 
 from httpx import Response
 
+from vellum import RejectedExecutePromptEvent
 from vellum.client import ApiError
 from vellum.client.types.chat_history_input_request import ChatHistoryInputRequest
 from vellum.client.types.chat_message import ChatMessage
@@ -278,3 +279,55 @@ def test_prompt_deployment_node_fallback_success(vellum_client):
     second_call_kwargs = vellum_client.execute_prompt_stream.call_args_list[1][1]
     body_params = second_call_kwargs["request_options"]["additional_body_parameters"]
     assert body_params["overrides"]["ml_model_fallback"] == "fallback_model_1"
+
+
+def test_prompt_deployment_node_provider_error_with_fallbacks(vellum_client):
+    # GIVEN a Prompt Deployment Node with fallback models
+    class TestPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "test_deployment"
+        prompt_inputs = {}
+        ml_model_fallbacks = ["gpt-40", "gemini-1.5-flash-latest"]
+
+    # AND the primary model starts but then fails with a provider error
+    def generate_primary_events():
+        execution_id = str(uuid4())
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            RejectedExecutePromptEvent(
+                execution_id=execution_id,
+                error={
+                    "code": "PROVIDER_ERROR",
+                    "message": "The model provider encountered an error",
+                    "details": {"provider": "openai"},
+                },
+            ),
+        ]
+        return iter(events)
+
+    # AND the fallback model succeeds
+    def generate_fallback_events():
+        execution_id = str(uuid4())
+        expected_outputs: List[PromptOutput] = [StringVellumValue(value="Fallback response")]
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(execution_id=execution_id, outputs=expected_outputs),
+        ]
+        return iter(events)
+
+    vellum_client.execute_prompt_stream.side_effect = [generate_primary_events(), generate_fallback_events()]
+
+    # WHEN we run the node
+    node = TestPromptDeploymentNode()
+    outputs = list(node.run())
+
+    # THEN the node should complete successfully using the fallback model
+    assert len(outputs) > 0
+    assert outputs[-1].value == "Fallback response"
+
+    # AND the client should have been called twice
+    assert vellum_client.execute_prompt_stream.call_count == 2
+
+    # AND the second call should include the fallback model override
+    second_call_kwargs = vellum_client.execute_prompt_stream.call_args_list[1][1]
+    body_params = second_call_kwargs["request_options"]["additional_body_parameters"]
+    assert body_params["overrides"]["ml_model_fallback"] == "gpt-40"
