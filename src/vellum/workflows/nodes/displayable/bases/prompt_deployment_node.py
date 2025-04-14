@@ -1,6 +1,6 @@
 import json
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Sequence, Union
+from typing import Any, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Sequence, Union
 
 from vellum import (
     ChatHistoryInputRequest,
@@ -9,17 +9,20 @@ from vellum import (
     JsonInputRequest,
     PromptDeploymentExpandMetaRequest,
     PromptDeploymentInputRequest,
+    PromptOutput,
     RawPromptExecutionOverridesRequest,
     StringInputRequest,
 )
-from vellum.client import RequestOptions
+from vellum.client import ApiError, RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.errors.types import vellum_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
+from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
@@ -56,13 +59,21 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
-    def _get_prompt_event_stream(self) -> Iterator[ExecutePromptEvent]:
+    def _get_prompt_event_stream(self, ml_model_fallback: Optional[str] = None) -> Iterator[ExecutePromptEvent]:
         execution_context = get_execution_context()
         request_options = self.request_options or RequestOptions()
         request_options["additional_body_parameters"] = {
             "execution_context": execution_context.model_dump(mode="json"),
             **request_options.get("additional_body_parameters", {}),
         }
+        if ml_model_fallback:
+            request_options["additional_body_parameters"] = {
+                "overrides": {
+                    "ml_model_fallback": ml_model_fallback,
+                },
+                **request_options.get("additional_body_parameters", {}),
+            }
+
         return self._context.vellum_client.execute_prompt_stream(
             inputs=self._compile_prompt_inputs(),
             prompt_deployment_id=str(self.deployment) if isinstance(self.deployment, UUID) else None,
@@ -75,6 +86,53 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
             metadata=self.metadata,
             request_options=request_options,
         )
+
+    def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
+        """Override the base prompt node _process_prompt_event_stream()"""
+        self._validate()
+        try:
+            prompt_event_stream = self._get_prompt_event_stream()
+            next(prompt_event_stream)
+        except ApiError as e:
+            if (
+                e.status_code
+                and e.status_code < 500
+                and self.ml_model_fallbacks is not OMIT
+                and self.ml_model_fallbacks is not None
+            ):
+                for ml_model_fallback in self.ml_model_fallbacks:
+                    try:
+                        prompt_event_stream = self._get_prompt_event_stream(ml_model_fallback=ml_model_fallback)
+                        next(prompt_event_stream)
+                        break
+                    except ApiError:
+                        continue
+                else:
+                    self._handle_api_error(
+                        ApiError(
+                            body={
+                                "detail": f"Failed to execute prompts with these fallbacks: {self.ml_model_fallbacks}"
+                            },
+                            status_code=400,
+                        )
+                    )
+            else:
+                self._handle_api_error(e)
+
+        outputs: Optional[List[PromptOutput]] = None
+        for event in prompt_event_stream:
+            if event.state == "INITIATED":
+                continue
+            elif event.state == "STREAMING":
+                yield BaseOutput(name="results", delta=event.output.value)
+            elif event.state == "FULFILLED":
+                outputs = event.outputs
+                yield BaseOutput(name="results", value=event.outputs)
+            elif event.state == "REJECTED":
+                workflow_error = vellum_error_to_workflow_error(event.error)
+                raise NodeException.of(workflow_error)
+
+        return outputs
 
     def _compile_prompt_inputs(self) -> List[PromptDeploymentInputRequest]:
         # TODO: We may want to consolidate with subworkflow deployment input compilation
