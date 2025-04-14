@@ -11,6 +11,7 @@ from vellum.client.types.function_call_vellum_value import FunctionCallVellumVal
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
 from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.string_vellum_value import StringVellumValue
@@ -59,7 +60,9 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
 
     uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
     first_call_input_id = uuid4_generator()
+    first_call_input_id_2 = uuid4_generator()
     second_call_input_id = uuid4_generator()
+    second_call_input_id_2 = uuid4_generator()
 
     # GIVEN a get current weather workflow
     workflow = GetCurrentWeatherWorkflow()
@@ -72,20 +75,32 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert terminal_event.outputs.text == "The current temperature in San Francisco is 22°C (71.6°F)."
     assert terminal_event.outputs.chat_history == [
         ChatMessage(
+            text="Hello, how are you?",
+            role="USER",
+            content=None,
+            source=None,
+        ),
+        ChatMessage(
+            text="I'm good, thank you!",
+            role="ASSISTANT",
+            content=None,
+            source=None,
+        ),
+        ChatMessage(
             text='{\n    "arguments": {\n        "location": "Miami",\n        "unit": "metric"\n    },\n    "id": "call_7115tNTmEACTsQRGwKpJipJK",\n    "name": "get_current_weather",\n    "state": "FULFILLED"\n}',  # noqa: E501
-            role="assistant",
+            role="ASSISTANT",
             content=None,
             source=None,
         ),
         ChatMessage(
             text="Result from get_current_weather: The current temperature is 22°C (71.6°F).",
-            role="tool",
+            role="TOOL",
             content=None,
             source=None,
         ),
         ChatMessage(
             text="The current temperature in San Francisco is 22°C (71.6°F).",
-            role="assistant",
+            role="ASSISTANT",
             content=None,
             source=None,
         ),
@@ -95,7 +110,15 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert first_call.kwargs == {
         "ml_model": "gpt-4o-mini",
         "input_values": [
-            PromptRequestStringInput(key="question", type="STRING", value="What's the weather like in San Francisco?")
+            PromptRequestStringInput(key="question", type="STRING", value="What's the weather like in San Francisco?"),
+            PromptRequestChatHistoryInput(
+                key="chat_history",
+                type="CHAT_HISTORY",
+                value=[
+                    ChatMessage(role="USER", text="Hello, how are you?"),
+                    ChatMessage(role="ASSISTANT", text="I'm good, thank you!"),
+                ],
+            ),
         ],
         "input_variables": [
             VellumVariable(
@@ -105,7 +128,15 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 required=None,
                 default=None,
                 extensions=None,
-            )
+            ),
+            VellumVariable(
+                id=str(first_call_input_id_2),
+                key="chat_history",
+                type="CHAT_HISTORY",
+                required=None,
+                default=None,
+                extensions=None,
+            ),
         ],
         "parameters": DEFAULT_PROMPT_PARAMETERS,
         "blocks": [
@@ -177,7 +208,15 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert second_call.kwargs == {
         "ml_model": "gpt-4o-mini",
         "input_values": [
-            PromptRequestStringInput(key="question", type="STRING", value="What's the weather like in San Francisco?")
+            PromptRequestStringInput(key="question", type="STRING", value="What's the weather like in San Francisco?"),
+            PromptRequestChatHistoryInput(
+                key="chat_history",
+                type="CHAT_HISTORY",
+                value=[
+                    ChatMessage(role="USER", text="Hello, how are you?"),
+                    ChatMessage(role="ASSISTANT", text="I'm good, thank you!"),
+                ],
+            ),
         ],
         "input_variables": [
             VellumVariable(
@@ -187,7 +226,15 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 required=None,
                 default=None,
                 extensions=None,
-            )
+            ),
+            VellumVariable(
+                id=str(second_call_input_id_2),
+                key="chat_history",
+                type="CHAT_HISTORY",
+                required=None,
+                default=None,
+                extensions=None,
+            ),
         ],
         "parameters": DEFAULT_PROMPT_PARAMETERS,
         "blocks": [

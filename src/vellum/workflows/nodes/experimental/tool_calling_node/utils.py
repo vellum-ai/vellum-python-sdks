@@ -18,7 +18,7 @@ class FunctionNode(BaseNode):
         # TODO: We should think about how to execute the function
         self.state.chat_history.append(
             ChatMessage(
-                role="tool", text=f"Result from {self.function.name}: The current temperature is 22°C (71.6°F)."
+                role="TOOL", text=f"Result from {self.function.name}: The current temperature is 22°C (71.6°F)."
             )
         )
 
@@ -34,7 +34,7 @@ class ToolRouterNode(InlinePromptNode):
             if output.name == "text":
                 text = output.value
                 if hasattr(self.state, "chat_history"):
-                    self.state.chat_history.append(ChatMessage(role="assistant", text=text))
+                    self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=text))
             yield output
 
 

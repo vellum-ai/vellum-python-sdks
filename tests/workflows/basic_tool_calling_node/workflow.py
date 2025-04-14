@@ -1,3 +1,4 @@
+from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
@@ -73,6 +74,10 @@ class GetCurrentWeatherNode(ToolCallingNode):
     ]
     prompt_inputs = {
         "question": "What's the weather like in San Francisco?",
+        "chat_history": [
+            ChatMessage(role="USER", text="Hello, how are you?"),
+            ChatMessage(role="ASSISTANT", text="I'm good, thank you!"),
+        ],
     }
 
 
