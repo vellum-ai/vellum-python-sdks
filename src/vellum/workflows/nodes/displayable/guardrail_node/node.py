@@ -117,7 +117,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
                         value=cast(Dict[str, Any], input_value),
                     )
                 )
-            elif isinstance(input_value, float):
+            elif isinstance(input_value, (int, float)):
                 compiled_inputs.append(
                     NumberInput(
                         name=input_name,
