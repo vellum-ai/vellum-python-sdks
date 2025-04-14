@@ -29,6 +29,7 @@ LogicalOperator = typing.Union[
         "parseJson",
         "and",
         "or",
+        "isError",
     ],
     typing.Any,
 ]
