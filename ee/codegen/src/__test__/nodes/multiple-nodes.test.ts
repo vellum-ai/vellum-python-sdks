@@ -1,11 +1,11 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
+import { WorkflowDeploymentRelease } from "vellum-ai/api";
 import {
-  DeploymentHistoryItem,
-  WorkflowDeploymentRelease,
-} from "vellum-ai/api";
-import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
-import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
+  ReleaseReviews as PromptDeploymentReleaseClient,
+  ReleaseReviews as WorkflowReleaseClient,
+} from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { beforeEach, expect, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -105,13 +105,43 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
 
   beforeEach(async () => {
     vi.spyOn(
-      DeploymentsClient.prototype,
-      "deploymentHistoryItemRetrieve"
+      PromptDeploymentReleaseClient.prototype,
+      "retrievePromptDeploymentRelease"
     ).mockResolvedValue({
-      id: "some-id",
-      deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
-      name: "some-unique-deployment-name",
-    } as unknown as DeploymentHistoryItem);
+      id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
+      created: new Date(),
+      environment: {
+        id: "mocked-environment-id",
+        name: "mocked-environment-name",
+        label: "mocked-environment-label",
+      },
+      createdBy: {
+        id: "mocked-created-by-id",
+        email: "mocked-created-by-email",
+      },
+      promptVersion: {
+        id: "mocked-prompt-release-id",
+      },
+      deployment: {
+        name: "some-unique-deployment-name",
+      },
+      releaseTags: [
+        {
+          name: "mocked-release-tag-name",
+          source: "USER",
+        },
+      ],
+      reviews: [
+        {
+          id: "mocked-release-review-id",
+          created: new Date(),
+          reviewer: {
+            id: "mocked-reviewer-id",
+          },
+          state: "APPROVED",
+        },
+      ],
+    } as unknown as PromptDeploymentRelease);
     workflowContext = workflowContextFactory();
     writer = new Writer();
 
@@ -476,13 +506,43 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
     writer = new Writer();
 
     vi.spyOn(
-      DeploymentsClient.prototype,
-      "deploymentHistoryItemRetrieve"
+      PromptDeploymentReleaseClient.prototype,
+      "retrievePromptDeploymentRelease"
     ).mockResolvedValue({
-      id: "some-id",
-      deploymentId: "947cc337-9a53-4c12-9a38-4f65c04c6317",
-      name: "some-unique-deployment-name",
-    } as unknown as DeploymentHistoryItem);
+      id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
+      created: new Date(),
+      environment: {
+        id: "mocked-environment-id",
+        name: "mocked-environment-name",
+        label: "mocked-environment-label",
+      },
+      createdBy: {
+        id: "mocked-created-by-id",
+        email: "mocked-created-by-email",
+      },
+      promptVersion: {
+        id: "mocked-prompt-release-id",
+      },
+      deployment: {
+        name: "some-unique-deployment-name",
+      },
+      releaseTags: [
+        {
+          name: "mocked-release-tag-name",
+          source: "USER",
+        },
+      ],
+      reviews: [
+        {
+          id: "mocked-release-review-id",
+          created: new Date(),
+          reviewer: {
+            id: "mocked-reviewer-id",
+          },
+          state: "APPROVED",
+        },
+      ],
+    } as unknown as PromptDeploymentRelease);
 
     const nodeOutputs: NodeOutputType[] = [
       {
