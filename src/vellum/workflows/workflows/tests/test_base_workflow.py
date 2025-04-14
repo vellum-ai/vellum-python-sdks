@@ -1,4 +1,5 @@
 import pytest
+from uuid import uuid4
 
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
@@ -336,13 +337,34 @@ def test_base_workflow__deserialize_state():
         graph = NodeA
 
     # WHEN we deserialize the state
+    last_span_id = str(uuid4())
     state = TestWorkflow.deserialize_state(
         {
             "bar": "My state bar",
             "meta": {
+                "id": "b70a5a4f-8253-4a38-aeaf-0700b4783a78",
+                "trace_id": "9dcfb309-81e9-4b75-9b21-edd31cf9685f",
+                "span_id": "1c2e310c-3624-4f4f-b7ac-1e429de29bbf",
+                "updated_ts": "2025-04-14T19:22:18.504902",
+                "external_inputs": {},
                 "node_outputs": {
                     "test_base_workflow__deserialize_state.<locals>.NodeA.Outputs.foo": "My node A output foo"
-                }
+                },
+                "node_execution_cache": {
+                    "dependencies_invoked": {
+                        last_span_id: ["test_base_workflow__deserialize_state.<locals>.NodeA"],
+                    },
+                    "node_executions_initiated": {
+                        "test_base_workflow__deserialize_state.<locals>.NodeA": [last_span_id],
+                    },
+                    "node_executions_fulfilled": {
+                        "test_base_workflow__deserialize_state.<locals>.NodeA": [last_span_id],
+                    },
+                    "node_executions_queued": {
+                        "test_base_workflow__deserialize_state.<locals>.NodeA": [],
+                    },
+                },
+                "parent": None,
             },
         },
         workflow_inputs=Inputs(baz="My input baz"),
@@ -353,3 +375,6 @@ def test_base_workflow__deserialize_state():
     assert state.meta.node_outputs == {NodeA.Outputs.foo: "My node A output foo"}
     assert isinstance(state.meta.workflow_inputs, Inputs)
     assert state.meta.workflow_inputs.baz == "My input baz"
+
+    # AND the node execution cache should deserialize
+    assert state.meta.node_execution_cache
