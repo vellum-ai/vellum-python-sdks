@@ -8,9 +8,10 @@ from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.node import NodeReference
+from vellum.workflows.types.definition import serialize_type_encoder_with_id
 from vellum.workflows.types.generics import OutputsType
 
-from .types import BaseEvent, default_serializer, serialize_type_encoder_with_id
+from .types import BaseEvent, default_serializer
 
 if TYPE_CHECKING:
     from vellum.workflows.nodes.bases import BaseNode

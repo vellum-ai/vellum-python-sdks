@@ -19,11 +19,6 @@ from vellum_ee.workflows.display.editor.types import NodeDisplayPosition  # noqa
 from vellum_ee.workflows.display.utils.vellum import NodeInputValuePointerRule
 
 
-class CodeResourceDefinition(UniversalBaseModel):
-    name: str
-    module: List[str]
-
-
 @dataclass
 class WorkflowMetaVellumDisplayOverrides(WorkflowMetaDisplayOverrides):
     """

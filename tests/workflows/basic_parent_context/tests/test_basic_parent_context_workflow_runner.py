@@ -1,7 +1,8 @@
 from uuid import uuid4
 
 from vellum.workflows.context import execution_context
-from vellum.workflows.events.types import CodeResourceDefinition, NodeParentContext
+from vellum.workflows.events.types import NodeParentContext
+from vellum.workflows.types.definition import CodeResourceDefinition
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 from tests.workflows.basic_parent_context.basic_workflow import TrivialWorkflow
