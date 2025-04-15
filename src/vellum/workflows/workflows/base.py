@@ -488,11 +488,13 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     parent=self._parent_state,
                     workflow_inputs=workflow_inputs or self.get_default_inputs(),
                     trace_id=execution_context.trace_id,
+                    workflow_definition=self.__class__,
                 )
                 if execution_context and int(execution_context.trace_id)
                 else StateMeta(
                     parent=self._parent_state,
                     workflow_inputs=workflow_inputs or self.get_default_inputs(),
+                    workflow_definition=self.__class__,
                 )
             )
         )
@@ -600,3 +602,5 @@ NodeExecutionRejectedEvent.model_rebuild()
 NodeExecutionPausedEvent.model_rebuild()
 NodeExecutionResumedEvent.model_rebuild()
 NodeExecutionStreamingEvent.model_rebuild()
+
+StateMeta.model_rebuild()

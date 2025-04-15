@@ -414,3 +414,72 @@ def test_base_workflow__deserialize_state_with_optional_inputs():
     assert state.bar == "My state bar"
     assert isinstance(state.meta.workflow_inputs, Inputs)
     assert state.meta.workflow_inputs.baz == "My default baz"
+
+
+def test_base_workflow__deserialize_nested_state():
+    # GIVEN a state definition
+    class State(BaseState):
+        foo: str
+
+    # AND a nested state definition
+    class NestedState(BaseState):
+        bar: str
+
+    # AND an inner node
+    class InnerNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            baz: str
+
+    # AND a subworkflow definition with the nested state and inner node
+    class InnerWorkflow(BaseWorkflow[BaseInputs, NestedState]):
+        graph = InnerNode
+
+    # AND a subworkflow node
+    class OuterNode(InlineSubworkflowNode[State, BaseInputs, NestedState]):
+        subworkflow = InnerWorkflow
+
+        class Outputs(InlineSubworkflowNode.Outputs):
+            qux: str
+
+    # AND a workflow that uses the outer state and subworkflow node
+    class TestWorkflow(BaseWorkflow[BaseInputs, State]):
+        graph = OuterNode
+
+    # WHEN we deserialize the nested state
+    inner_node_output_definition = "test_base_workflow__deserialize_nested_state.<locals>.InnerNode.Outputs.baz"
+    outer_node_output_definition = "test_base_workflow__deserialize_nested_state.<locals>.OuterNode.Outputs.qux"
+    state = InnerWorkflow.deserialize_state(
+        {
+            "bar": "My nested state bar",
+            "meta": {
+                "workflow_definition": {
+                    "id": str(InnerWorkflow.__id__),
+                    "name": "test_base_workflow__deserialize_nested_state.<locals>.InnerWorkflow",
+                    "module": ["vellum", "workflows", "workflows", "tests", "test_base_workflow"],
+                },
+                "node_outputs": {inner_node_output_definition: "My inner node output baz"},
+                "parent": {
+                    "foo": "My outer state foo",
+                    "meta": {
+                        "node_outputs": {outer_node_output_definition: "My outer node output qux"},
+                        "workflow_definition": {
+                            "id": str(TestWorkflow.__id__),
+                            "name": "test_base_workflow__deserialize_nested_state.<locals>.TestWorkflow",
+                            "module": ["vellum", "workflows", "workflows", "tests", "test_base_workflow"],
+                        },
+                    },
+                },
+            },
+        },
+    )
+
+    # THEN the state should be correct
+    assert state.bar == "My nested state bar"
+    assert state.meta.node_outputs == {InnerNode.Outputs.baz: "My inner node output baz"}
+    assert state.meta.workflow_definition == InnerWorkflow
+
+    # AND the parent state should be correct
+    assert isinstance(state.meta.parent, State)
+    assert state.meta.parent.foo == "My outer state foo"
+    assert state.meta.parent.meta.node_outputs == {OuterNode.Outputs.qux: "My outer node output qux"}
+    assert state.meta.parent.meta.workflow_definition == TestWorkflow

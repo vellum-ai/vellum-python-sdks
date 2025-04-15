@@ -67,6 +67,11 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                 "node_executions_queued": {},
                 "dependencies_invoked": {},
             },
+            "workflow_definition": {
+                "name": "BasicEmitterWorkflow",
+                "id": str(BasicEmitterWorkflow.__id__),
+                "module": ["tests", "workflows", "basic_emitter_workflow", "workflow"],
+            },
         },
         "score": 0,
     }
@@ -106,6 +111,11 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                     str(next_node_span_id): [f"{base_module}.workflow.StartNode"],
                 },
             },
+            "workflow_definition": {
+                "name": "BasicEmitterWorkflow",
+                "id": str(BasicEmitterWorkflow.__id__),
+                "module": ["tests", "workflows", "basic_emitter_workflow", "workflow"],
+            },
         },
         "score": 13,
     }
@@ -140,6 +150,11 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                 },
             },
             "parent": None,
+            "workflow_definition": {
+                "name": "BasicEmitterWorkflow",
+                "id": str(BasicEmitterWorkflow.__id__),
+                "module": ["tests", "workflows", "basic_emitter_workflow", "workflow"],
+            },
         },
         "score": 13,
     }
