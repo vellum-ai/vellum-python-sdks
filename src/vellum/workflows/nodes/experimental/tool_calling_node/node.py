@@ -38,6 +38,8 @@ class ToolCallingNode(BaseNode):
     functions: ClassVar[List[FunctionDefinition]] = []
     function_callables: ClassVar[List[Callable]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
+    # TODO: https://linear.app/vellum/issue/APO-342/support-tool-call-max-retries
+    max_tool_calls: ClassVar[int] = 1
 
     class Outputs(BaseOutputs):
         """
