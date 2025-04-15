@@ -22,6 +22,7 @@ from typing import (
     Union,
     cast,
     get_args,
+    overload,
 )
 
 from vellum.workflows.edges import Edge
@@ -532,8 +533,21 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
 
         return most_recent_state_snapshot
 
+    @overload
     @classmethod
-    def deserialize_state(cls, state: dict, workflow_inputs: Optional[InputsType] = None) -> StateType:
+    def deserialize_state(cls, state: dict, workflow_inputs: Optional[InputsType] = None) -> StateType: ...
+
+    @overload
+    @classmethod
+    def deserialize_state(cls, state: None, workflow_inputs: Optional[InputsType] = None) -> None: ...
+
+    @classmethod
+    def deserialize_state(
+        cls, state: Optional[dict], workflow_inputs: Optional[InputsType] = None
+    ) -> Optional[StateType]:
+        if state is None:
+            return None
+
         state_class = cls.get_state_class()
         if "meta" in state:
             state["meta"] = StateMeta.model_validate(
