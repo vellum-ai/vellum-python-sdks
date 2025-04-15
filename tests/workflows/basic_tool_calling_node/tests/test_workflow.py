@@ -11,6 +11,7 @@ from vellum.client.types.function_call_vellum_value import FunctionCallVellumVal
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
 from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
@@ -31,7 +32,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         execution_id = str(uuid4())
 
         call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
-        expected_outputs: List[Union[FunctionCallVellumValue, StringVellumValue]]
+        expected_outputs: List[PromptOutput]
         if call_count == 1:
             expected_outputs = [
                 FunctionCallVellumValue(
