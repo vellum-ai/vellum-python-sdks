@@ -39,9 +39,6 @@ class ToolCallingNode(BaseNode):
     function_callables: ClassVar[List[Callable]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
-
     class Outputs(BaseOutputs):
         """
         The outputs of the ToolCallingNode.
