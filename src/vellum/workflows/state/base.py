@@ -231,7 +231,6 @@ def default_datetime_factory() -> datetime:
 class StateMeta(UniversalBaseModel):
     workflow_definition: Type["BaseWorkflow"] = field(default_factory=import_workflow_class)
     id: UUID = field(default_factory=uuid4_default_factory)
-    trace_id: UUID = field(default_factory=uuid4_default_factory)
     span_id: UUID = field(default_factory=uuid4_default_factory)
     updated_ts: datetime = field(default_factory=default_datetime_factory)
     workflow_inputs: BaseInputs = field(default_factory=BaseInputs)
@@ -242,8 +241,6 @@ class StateMeta(UniversalBaseModel):
     __snapshot_callback__: Optional[Callable[[], None]] = field(init=False, default=None)
 
     def model_post_init(self, context: Any) -> None:
-        if self.parent:
-            self.trace_id = self.parent.meta.trace_id
         self.__snapshot_callback__ = None
 
     def add_snapshot_callback(self, callback: Callable[[], None]) -> None:

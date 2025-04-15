@@ -1,8 +1,11 @@
 import pytest
 from datetime import datetime
 import time
+from uuid import uuid4
 
+from vellum.workflows.context import ExecutionContext
 from vellum.workflows.events.types import default_serializer
+from vellum.workflows.state.context import WorkflowContext
 
 from tests.workflows.basic_emitter_workflow.workflow import BasicEmitterWorkflow, ExampleEmitter, NextNode, StartNode
 
@@ -21,14 +24,19 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     # GIVEN a uuid for our state
     state_id_generator = mock_uuid4_generator("vellum.workflows.state.base.uuid4")
     state_id = state_id_generator()
-    trace_id = state_id_generator()
     workflow_span_id = state_id_generator()
     start_node_span_id = state_id_generator()
     next_node_span_id = state_id_generator()
 
     # AND a workflow that uses a custom event emitter
+    trace_id = uuid4()
     emitter = ExampleEmitter()
-    workflow = BasicEmitterWorkflow(emitters=[emitter])
+    workflow = BasicEmitterWorkflow(
+        emitters=[emitter],
+        context=WorkflowContext(
+            execution_context=ExecutionContext(trace_id=trace_id),
+        ),
+    )
 
     # WHEN the workflow is run
     frozen_datetime = datetime(2024, 1, 1, 12, 0, 0)
@@ -54,7 +62,6 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     assert default_serializer(events[2].state) == {
         "meta": {
             "id": str(state_id),
-            "trace_id": str(trace_id),
             "span_id": str(workflow_span_id),
             "updated_ts": "2024-01-01T12:00:00",
             "workflow_inputs": {},
@@ -87,7 +94,6 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     assert default_serializer(events[5].state) == {
         "meta": {
             "id": str(state_id),
-            "trace_id": str(trace_id),
             "span_id": str(workflow_span_id),
             "updated_ts": "2024-01-01T12:00:00",
             "workflow_inputs": {},
@@ -124,7 +130,6 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     assert default_serializer(events[6].state) == {
         "meta": {
             "id": str(state_id),
-            "trace_id": str(trace_id),
             "span_id": str(workflow_span_id),
             "updated_ts": "2024-01-01T12:00:00",
             "workflow_inputs": {},
