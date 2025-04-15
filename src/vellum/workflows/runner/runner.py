@@ -146,7 +146,6 @@ class WorkflowRunner(Generic[StateType]):
         self._active_nodes_by_execution_id: Dict[UUID, ActiveNode[StateType]] = {}
         self._cancel_signal = cancel_signal
         self._execution_context = init_execution_context or get_execution_context()
-        self._parent_context = self._execution_context.parent_context
 
         setattr(
             self._initial_state,
@@ -159,13 +158,13 @@ class WorkflowRunner(Generic[StateType]):
     def _snapshot_state(self, state: StateType) -> StateType:
         self._workflow_event_inner_queue.put(
             WorkflowExecutionSnapshottedEvent(
-                trace_id=state.meta.trace_id,
+                trace_id=self._execution_context.trace_id,
                 span_id=state.meta.span_id,
                 body=WorkflowExecutionSnapshottedBody(
                     workflow_definition=self.workflow.__class__,
                     state=state,
                 ),
-                parent=self._parent_context,
+                parent=self._execution_context.parent_context,
             )
         )
         self.workflow._store.append_state_snapshot(state)
@@ -178,16 +177,16 @@ class WorkflowRunner(Generic[StateType]):
         return event
 
     def _run_work_item(self, node: BaseNode[StateType], span_id: UUID) -> None:
-        parent_context = get_parent_context()
+        execution = get_execution_context()
         self._workflow_event_inner_queue.put(
             NodeExecutionInitiatedEvent(
-                trace_id=node.state.meta.trace_id,
+                trace_id=execution.trace_id,
                 span_id=span_id,
                 body=NodeExecutionInitiatedBody(
                     node_definition=node.__class__,
                     inputs=node._inputs,
                 ),
-                parent=parent_context,
+                parent=execution.parent_context,
             )
         )
 
@@ -197,7 +196,7 @@ class WorkflowRunner(Generic[StateType]):
             updated_parent_context = NodeParentContext(
                 span_id=span_id,
                 node_definition=node.__class__,
-                parent=parent_context,
+                parent=execution.parent_context,
             )
             node_run_response: NodeRunResponse
             was_mocked: Optional[bool] = None
@@ -209,7 +208,7 @@ class WorkflowRunner(Generic[StateType]):
                     break
 
             if not was_mocked:
-                with execution_context(parent_context=updated_parent_context, trace_id=node.state.meta.trace_id):
+                with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
                     node_run_response = node.run()
 
             ports = node.Ports()
@@ -232,7 +231,7 @@ class WorkflowRunner(Generic[StateType]):
                 outputs = node.Outputs()
 
                 def initiate_node_streaming_output(output: BaseOutput) -> None:
-                    parent_context = get_parent_context()
+                    execution = get_execution_context()
                     streaming_output_queues[output.name] = Queue()
                     output_descriptor = OutputReference(
                         name=output.name,
@@ -245,18 +244,18 @@ class WorkflowRunner(Generic[StateType]):
                     initiated_ports = initiated_output > ports
                     self._workflow_event_inner_queue.put(
                         NodeExecutionStreamingEvent(
-                            trace_id=node.state.meta.trace_id,
+                            trace_id=execution.trace_id,
                             span_id=span_id,
                             body=NodeExecutionStreamingBody(
                                 node_definition=node.__class__,
                                 output=initiated_output,
                                 invoked_ports=initiated_ports,
                             ),
-                            parent=parent_context,
+                            parent=execution.parent_context,
                         ),
                     )
 
-                with execution_context(parent_context=updated_parent_context, trace_id=node.state.meta.trace_id):
+                with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
                     for output in node_run_response:
                         invoked_ports = output > ports
                         if output.is_initiated:
@@ -268,14 +267,14 @@ class WorkflowRunner(Generic[StateType]):
                             streaming_output_queues[output.name].put(output.delta)
                             self._workflow_event_inner_queue.put(
                                 NodeExecutionStreamingEvent(
-                                    trace_id=node.state.meta.trace_id,
+                                    trace_id=execution.trace_id,
                                     span_id=span_id,
                                     body=NodeExecutionStreamingBody(
                                         node_definition=node.__class__,
                                         output=output,
                                         invoked_ports=invoked_ports,
                                     ),
-                                    parent=parent_context,
+                                    parent=execution.parent_context,
                                 ),
                             )
                         elif output.is_fulfilled:
@@ -285,14 +284,14 @@ class WorkflowRunner(Generic[StateType]):
                             setattr(outputs, output.name, output.value)
                             self._workflow_event_inner_queue.put(
                                 NodeExecutionStreamingEvent(
-                                    trace_id=node.state.meta.trace_id,
+                                    trace_id=execution.trace_id,
                                     span_id=span_id,
                                     body=NodeExecutionStreamingBody(
                                         node_definition=node.__class__,
                                         output=output,
                                         invoked_ports=invoked_ports,
                                     ),
-                                    parent=parent_context,
+                                    parent=execution.parent_context,
                                 )
                             )
 
@@ -309,7 +308,7 @@ class WorkflowRunner(Generic[StateType]):
             invoked_ports = ports(outputs, node.state)
             self._workflow_event_inner_queue.put(
                 NodeExecutionFulfilledEvent(
-                    trace_id=node.state.meta.trace_id,
+                    trace_id=execution.trace_id,
                     span_id=span_id,
                     body=NodeExecutionFulfilledBody(
                         node_definition=node.__class__,
@@ -317,33 +316,33 @@ class WorkflowRunner(Generic[StateType]):
                         invoked_ports=invoked_ports,
                         mocked=was_mocked,
                     ),
-                    parent=parent_context,
+                    parent=execution.parent_context,
                 )
             )
         except NodeException as e:
             logger.info(e)
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
-                    trace_id=node.state.meta.trace_id,
+                    trace_id=execution.trace_id,
                     span_id=span_id,
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
                         error=e.error,
                     ),
-                    parent=parent_context,
+                    parent=execution.parent_context,
                 )
             )
         except WorkflowInitializationException as e:
             logger.info(e)
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
-                    trace_id=node.state.meta.trace_id,
+                    trace_id=execution.trace_id,
                     span_id=span_id,
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
                         error=e.error,
                     ),
-                    parent=parent_context,
+                    parent=execution.parent_context,
                 )
             )
         except Exception as e:
@@ -351,7 +350,7 @@ class WorkflowRunner(Generic[StateType]):
 
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
-                    trace_id=node.state.meta.trace_id,
+                    trace_id=execution.trace_id,
                     span_id=span_id,
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
@@ -360,17 +359,18 @@ class WorkflowRunner(Generic[StateType]):
                             code=WorkflowErrorCode.INTERNAL_ERROR,
                         ),
                     ),
-                    parent=parent_context,
+                    parent=execution.parent_context,
                 ),
             )
 
         logger.debug(f"Finished running node: {node.__class__.__name__}")
 
     def _context_run_work_item(self, node: BaseNode[StateType], span_id: UUID, parent_context=None) -> None:
-        if parent_context is None:
-            parent_context = get_parent_context() or self._parent_context
-
-        with execution_context(parent_context=parent_context, trace_id=node.state.meta.trace_id):
+        execution = get_execution_context()
+        with execution_context(
+            parent_context=parent_context or execution.parent_context,
+            trace_id=execution.trace_id,
+        ):
             self._run_work_item(node, span_id)
 
     def _handle_invoked_ports(self, state: StateType, ports: Optional[Iterable[Port]]) -> None:
@@ -495,66 +495,67 @@ class WorkflowRunner(Generic[StateType]):
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
         return WorkflowExecutionInitiatedEvent(
-            trace_id=self._initial_state.meta.trace_id,
+            trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionInitiatedBody(
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
             ),
-            parent=self._parent_context,
+            parent=self._execution_context.parent_context,
         )
 
     def _stream_workflow_event(self, output: BaseOutput) -> WorkflowExecutionStreamingEvent:
         return WorkflowExecutionStreamingEvent(
-            trace_id=self._initial_state.meta.trace_id,
+            trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionStreamingBody(
                 workflow_definition=self.workflow.__class__,
                 output=output,
             ),
-            parent=self._parent_context,
+            parent=self._execution_context.parent_context,
         )
 
     def _fulfill_workflow_event(self, outputs: OutputsType) -> WorkflowExecutionFulfilledEvent:
         return WorkflowExecutionFulfilledEvent(
-            trace_id=self._initial_state.meta.trace_id,
+            trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionFulfilledBody(
                 workflow_definition=self.workflow.__class__,
                 outputs=outputs,
             ),
-            parent=self._parent_context,
+            parent=self._execution_context.parent_context,
         )
 
     def _reject_workflow_event(self, error: WorkflowError) -> WorkflowExecutionRejectedEvent:
         return WorkflowExecutionRejectedEvent(
-            trace_id=self._initial_state.meta.trace_id,
+            trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionRejectedBody(
                 workflow_definition=self.workflow.__class__,
                 error=error,
             ),
-            parent=self._parent_context,
+            parent=self._execution_context.parent_context,
         )
 
     def _resume_workflow_event(self) -> WorkflowExecutionResumedEvent:
         return WorkflowExecutionResumedEvent(
-            trace_id=self._initial_state.meta.trace_id,
+            trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionResumedBody(
                 workflow_definition=self.workflow.__class__,
             ),
+            parent=self._execution_context.parent_context,
         )
 
     def _pause_workflow_event(self, external_inputs: Iterable[ExternalInputReference]) -> WorkflowExecutionPausedEvent:
         return WorkflowExecutionPausedEvent(
-            trace_id=self._initial_state.meta.trace_id,
+            trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionPausedBody(
                 workflow_definition=self.workflow.__class__,
                 external_inputs=external_inputs,
             ),
-            parent=self._parent_context,
+            parent=self._execution_context.parent_context,
         )
 
     def _stream(self) -> None:
@@ -564,13 +565,13 @@ class WorkflowRunner(Generic[StateType]):
         current_parent = WorkflowParentContext(
             span_id=self._initial_state.meta.span_id,
             workflow_definition=self.workflow.__class__,
-            parent=self._parent_context,
+            parent=self._execution_context.parent_context,
             type="WORKFLOW",
         )
         for node_cls in self._entrypoints:
             try:
                 if not self._max_concurrency or len(self._active_nodes_by_execution_id) < self._max_concurrency:
-                    with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
+                    with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
                         self._run_node_if_ready(self._initial_state, node_cls)
                 else:
                     self._concurrency_queue.put((self._initial_state, node_cls, None))
@@ -600,7 +601,7 @@ class WorkflowRunner(Generic[StateType]):
 
             self._workflow_event_outer_queue.put(event)
 
-            with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
+            with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
                 rejection_error = self._handle_work_item_event(event)
 
             if rejection_error:
@@ -611,7 +612,7 @@ class WorkflowRunner(Generic[StateType]):
             while event := self._workflow_event_inner_queue.get_nowait():
                 self._workflow_event_outer_queue.put(event)
 
-                with execution_context(parent_context=current_parent, trace_id=self._initial_state.meta.trace_id):
+                with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
                     rejection_error = self._handle_work_item_event(event)
 
                 if rejection_error:
