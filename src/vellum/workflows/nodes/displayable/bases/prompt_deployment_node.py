@@ -165,12 +165,6 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                     )
                 )
 
-        self._handle_api_error(
-            ApiError(
-                body={"detail": "No fallback models available"},
-                status_code=400,
-            )
-        )
         return None
 
     def _compile_prompt_inputs(self) -> List[PromptDeploymentInputRequest]:

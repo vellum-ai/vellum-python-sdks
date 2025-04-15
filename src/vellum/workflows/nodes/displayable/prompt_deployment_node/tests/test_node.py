@@ -17,6 +17,7 @@ from vellum.client.types.json_input_request import JsonInputRequest
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.context import execution_context
+from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.prompt_deployment_node.node import PromptDeploymentNode
 
@@ -199,7 +200,7 @@ def test_prompt_deployment_node__json_output(vellum_client):
     assert json_output.value == expected_json
 
 
-def test_prompt_deployment_node_all_fallbacks_fail(vellum_client):
+def test_prompt_deployment_node__all_fallbacks_fail(vellum_client):
     # GIVEN a Prompt Deployment Node with fallback models
     class TestPromptDeploymentNode(PromptDeploymentNode):
         deployment = "test_deployment"
@@ -239,7 +240,7 @@ def test_prompt_deployment_node_all_fallbacks_fail(vellum_client):
     )
 
 
-def test_prompt_deployment_node_fallback_success(vellum_client):
+def test_prompt_deployment_node__fallback_success(vellum_client):
     # GIVEN a Prompt Deployment Node with fallback models
     class TestPromptDeploymentNode(PromptDeploymentNode):
         deployment = "test_deployment"
@@ -283,7 +284,7 @@ def test_prompt_deployment_node_fallback_success(vellum_client):
     assert body_params["overrides"]["ml_model_fallback"] == "fallback_model_1"
 
 
-def test_prompt_deployment_node_provider_error_with_fallbacks(vellum_client):
+def test_prompt_deployment_node__provider_error_with_fallbacks(vellum_client):
     # GIVEN a Prompt Deployment Node with fallback models
     class TestPromptDeploymentNode(PromptDeploymentNode):
         deployment = "test_deployment"
@@ -335,7 +336,7 @@ def test_prompt_deployment_node_provider_error_with_fallbacks(vellum_client):
     assert body_params["overrides"]["ml_model_fallback"] == "gpt-4o"
 
 
-def test_prompt_deployment_node_multiple_fallbacks_mixed_errors(vellum_client):
+def test_prompt_deployment_node__multiple_fallbacks_mixed_errors(vellum_client):
     """
     This test case is when the primary model fails with an api error and
     the first fallback fails with a provider error
@@ -406,7 +407,7 @@ def test_prompt_deployment_node_multiple_fallbacks_mixed_errors(vellum_client):
 
 
 def test_prompt_deployment_node_multiple_provider_errors(vellum_client):
-    # GIVEN a Prompt Deployment Node with multiple fallback models
+    # GIVEN a Prompt Deployment Node with a single fallback model
     class TestPromptDeploymentNode(PromptDeploymentNode):
         deployment = "test_deployment"
         prompt_inputs = {}
@@ -422,6 +423,7 @@ def test_prompt_deployment_node_multiple_provider_errors(vellum_client):
                 error={
                     "code": "PROVIDER_ERROR",
                     "message": "The primary provider encountered an error",
+                    "details": {"provider": "openai"},
                 },
             ),
         ]
@@ -437,7 +439,6 @@ def test_prompt_deployment_node_multiple_provider_errors(vellum_client):
                 error={
                     "code": "PROVIDER_ERROR",
                     "message": "The first fallback provider encountered an error",
-                    "details": {"provider": "anthropic"},
                 },
             ),
         ]
@@ -463,3 +464,32 @@ def test_prompt_deployment_node_multiple_provider_errors(vellum_client):
     first_fallback_call = vellum_client.execute_prompt_stream.call_args_list[1][1]
     first_fallback_params = first_fallback_call["request_options"]["additional_body_parameters"]
     assert first_fallback_params["overrides"]["ml_model_fallback"] == "gpt-4o"
+
+
+def test_prompt_deployment_node__no_fallbacks(vellum_client):
+    # GIVEN a Prompt Deployment Node with no fallback models
+    class TestPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "test_deployment"
+        prompt_inputs = {}
+
+    # AND the primary model fails with an API error
+    primary_error = ApiError(
+        body={"detail": "Failed to find model 'primary_model'"},
+        status_code=404,
+    )
+
+    vellum_client.execute_prompt_stream.side_effect = primary_error
+
+    # WHEN we run the node
+    node = TestPromptDeploymentNode()
+
+    # THEN the node should raise an exception
+    with pytest.raises(NodeException) as exc_info:
+        list(node.run())
+
+    # AND the exception should contain the original error message
+    assert exc_info.value.message == "Failed to find model 'primary_model'"
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+
+    # AND the client should have been called only once (for the primary model)
+    assert vellum_client.execute_prompt_stream.call_count == 1
