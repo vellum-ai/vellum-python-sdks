@@ -53,7 +53,7 @@ class OnValidatePython(ValidatePythonHandlerProtocol):
             return
 
         if self_instance:
-            model_fields: Dict[str, FieldInfo] = self_instance.model_fields
+            model_fields: Dict[str, FieldInfo] = self_instance.__class__.model_fields
         else:
             model_fields = {}
 
