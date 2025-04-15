@@ -1,5 +1,5 @@
-from vellum.workflows.events.types import CodeResourceDefinition, VellumCodeResourceDefinition
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
+from vellum.workflows.types.definition import CodeResourceDefinition, VellumCodeResourceDefinition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 

@@ -1,12 +1,8 @@
 import pytest
 from uuid import UUID
 
-from vellum.workflows.events.types import (
-    CodeResourceDefinition,
-    NodeParentContext,
-    WorkflowDeploymentParentContext,
-    WorkflowParentContext,
-)
+from vellum.workflows.events.types import NodeParentContext, WorkflowDeploymentParentContext, WorkflowParentContext
+from vellum.workflows.types.definition import CodeResourceDefinition
 
 
 @pytest.fixture

@@ -1,13 +1,14 @@
 from datetime import datetime
 import json
 from uuid import UUID, uuid4
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union, get_args
+from typing import Annotated, Any, Literal, Optional, Union, get_args
 
-from pydantic import BeforeValidator, Field, GetCoreSchemaHandler, Tag, ValidationInfo
+from pydantic import Field, GetCoreSchemaHandler, Tag, ValidationInfo
 from pydantic_core import CoreSchema, core_schema
 
 from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.types.utils import datetime_now
 
 
@@ -19,28 +20,6 @@ def default_datetime_factory() -> datetime:
     return datetime_now()
 
 
-excluded_modules = {"typing", "builtins"}
-
-
-def serialize_type_encoder(obj: type) -> Dict[str, Any]:
-    return {
-        "name": obj.__name__,
-        "module": obj.__module__.split("."),
-    }
-
-
-def serialize_type_encoder_with_id(obj: Union[type, "CodeResourceDefinition"]) -> Dict[str, Any]:
-    if hasattr(obj, "__id__") and isinstance(obj, type):
-        return {
-            "id": getattr(obj, "__id__"),
-            **serialize_type_encoder(obj),
-        }
-    elif isinstance(obj, CodeResourceDefinition):
-        return obj.model_dump(mode="json")
-
-    raise AttributeError(f"The object of type '{type(obj).__name__}' must have an '__id__' attribute.")
-
-
 def default_serializer(obj: Any) -> Any:
     return json.loads(
         json.dumps(
@@ -48,22 +27,6 @@ def default_serializer(obj: Any) -> Any:
             cls=DefaultStateEncoder,
         )
     )
-
-
-class CodeResourceDefinition(UniversalBaseModel):
-    id: UUID
-    name: str
-    module: List[str]
-
-    @staticmethod
-    def encode(obj: type) -> "CodeResourceDefinition":
-        return CodeResourceDefinition(**serialize_type_encoder_with_id(obj))
-
-
-VellumCodeResourceDefinition = Annotated[
-    CodeResourceDefinition,
-    BeforeValidator(lambda d: (d if type(d) is dict else serialize_type_encoder_with_id(d))),
-]
 
 
 class BaseParentContext(UniversalBaseModel):
