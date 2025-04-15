@@ -8,6 +8,7 @@ from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references import ExternalInputReference
+from vellum.workflows.types.definition import serialize_type_encoder_with_id
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 from .node import (
@@ -18,7 +19,7 @@ from .node import (
     NodeExecutionResumedEvent,
     NodeExecutionStreamingEvent,
 )
-from .types import BaseEvent, default_serializer, serialize_type_encoder_with_id
+from .types import BaseEvent, default_serializer
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
