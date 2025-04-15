@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .finish_reason_enum import FinishReasonEnum
 from .ml_model_usage import MlModelUsage
+from .price import Price
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
@@ -16,6 +17,7 @@ class FulfilledPromptExecutionMeta(UniversalBaseModel):
     latency: typing.Optional[int] = None
     finish_reason: typing.Optional[FinishReasonEnum] = None
     usage: typing.Optional[MlModelUsage] = None
+    cost: typing.Optional[Price] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

@@ -453,6 +453,8 @@ from .test_suite_run_metric_json_output import TestSuiteRunMetricJsonOutput
 from .test_suite_run_metric_number_output import TestSuiteRunMetricNumberOutput
 from .test_suite_run_metric_output import TestSuiteRunMetricOutput
 from .test_suite_run_metric_string_output import TestSuiteRunMetricStringOutput
+from .test_suite_run_prompt_sandbox_exec_config_data_request import TestSuiteRunPromptSandboxExecConfigDataRequest
+from .test_suite_run_prompt_sandbox_exec_config_request import TestSuiteRunPromptSandboxExecConfigRequest
 from .test_suite_run_prompt_sandbox_history_item_exec_config import TestSuiteRunPromptSandboxHistoryItemExecConfig
 from .test_suite_run_prompt_sandbox_history_item_exec_config_data import (
     TestSuiteRunPromptSandboxHistoryItemExecConfigData,
@@ -472,6 +474,8 @@ from .test_suite_run_workflow_release_tag_exec_config_data_request import (
     TestSuiteRunWorkflowReleaseTagExecConfigDataRequest,
 )
 from .test_suite_run_workflow_release_tag_exec_config_request import TestSuiteRunWorkflowReleaseTagExecConfigRequest
+from .test_suite_run_workflow_sandbox_exec_config_data_request import TestSuiteRunWorkflowSandboxExecConfigDataRequest
+from .test_suite_run_workflow_sandbox_exec_config_request import TestSuiteRunWorkflowSandboxExecConfigRequest
 from .test_suite_run_workflow_sandbox_history_item_exec_config import TestSuiteRunWorkflowSandboxHistoryItemExecConfig
 from .test_suite_run_workflow_sandbox_history_item_exec_config_data import (
     TestSuiteRunWorkflowSandboxHistoryItemExecConfigData,
@@ -1048,6 +1052,8 @@ __all__ = [
     "TestSuiteRunMetricNumberOutput",
     "TestSuiteRunMetricOutput",
     "TestSuiteRunMetricStringOutput",
+    "TestSuiteRunPromptSandboxExecConfigDataRequest",
+    "TestSuiteRunPromptSandboxExecConfigRequest",
     "TestSuiteRunPromptSandboxHistoryItemExecConfig",
     "TestSuiteRunPromptSandboxHistoryItemExecConfigData",
     "TestSuiteRunPromptSandboxHistoryItemExecConfigDataRequest",
@@ -1059,6 +1065,8 @@ __all__ = [
     "TestSuiteRunWorkflowReleaseTagExecConfigData",
     "TestSuiteRunWorkflowReleaseTagExecConfigDataRequest",
     "TestSuiteRunWorkflowReleaseTagExecConfigRequest",
+    "TestSuiteRunWorkflowSandboxExecConfigDataRequest",
+    "TestSuiteRunWorkflowSandboxExecConfigRequest",
     "TestSuiteRunWorkflowSandboxHistoryItemExecConfig",
     "TestSuiteRunWorkflowSandboxHistoryItemExecConfigData",
     "TestSuiteRunWorkflowSandboxHistoryItemExecConfigDataRequest",
