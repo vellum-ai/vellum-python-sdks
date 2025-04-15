@@ -286,7 +286,7 @@ def test_prompt_deployment_node_provider_error_with_fallbacks(vellum_client):
     class TestPromptDeploymentNode(PromptDeploymentNode):
         deployment = "test_deployment"
         prompt_inputs = {}
-        ml_model_fallbacks = ["gpt-40", "gemini-1.5-flash-latest"]
+        ml_model_fallbacks = ["gpt-4o", "gemini-1.5-flash-latest"]
 
     # AND the primary model starts but then fails with a provider error
     def generate_primary_events():
@@ -330,4 +330,4 @@ def test_prompt_deployment_node_provider_error_with_fallbacks(vellum_client):
     # AND the second call should include the fallback model override
     second_call_kwargs = vellum_client.execute_prompt_stream.call_args_list[1][1]
     body_params = second_call_kwargs["request_options"]["additional_body_parameters"]
-    assert body_params["overrides"]["ml_model_fallback"] == "gpt-40"
+    assert body_params["overrides"]["ml_model_fallback"] == "gpt-4o"
