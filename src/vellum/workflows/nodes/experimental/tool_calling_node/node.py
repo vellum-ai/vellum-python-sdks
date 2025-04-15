@@ -122,15 +122,16 @@ class ToolCallingNode(BaseNode):
             prompt_inputs=self.prompt_inputs,
         )
 
-        self._function_nodes = {function.name: create_function_node(function) for function in self.functions}
+        self._function_nodes = {
+            function.name: create_function_node(function)
+            for function in self.functions
+            if function.name is not None
+        }
 
         graph_set = set()
 
         # Add connections from ports of router to function nodes and back to router
         for function_name, FunctionNodeClass in self._function_nodes.items():
-            # TODO: We should think about how to handle this
-            if function_name is None:
-                raise ValueError("Function name is required")
             router_port = getattr(self.tool_router_node.Ports, function_name)
             edge_graph = router_port >> FunctionNodeClass >> self.tool_router_node
             graph_set.add(edge_graph)
