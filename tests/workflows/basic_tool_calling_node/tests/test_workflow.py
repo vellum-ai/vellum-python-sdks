@@ -1,6 +1,6 @@
 from unittest import mock
 from uuid import uuid4
-from typing import Iterator, List, Union
+from typing import Iterator, List
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
@@ -45,7 +45,11 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 ),
             ]
         else:
-            expected_outputs = [StringVellumValue(value="The current temperature in San Francisco is 22°C (71.6°F).")]
+            expected_outputs = [
+                StringVellumValue(
+                    value="Based on the function call, the current temperature in Miami is 70 degrees metric."
+                )
+            ]
 
         events: List[ExecutePromptEvent] = [
             InitiatedExecutePromptEvent(execution_id=execution_id),
@@ -73,7 +77,10 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
 
     # THEN the workflow is executed successfully
     assert terminal_event.name == "workflow.execution.fulfilled"
-    assert terminal_event.outputs.text == "The current temperature in San Francisco is 22°C (71.6°F)."
+    assert (
+        terminal_event.outputs.text
+        == "Based on the function call, the current temperature in Miami is 70 degrees metric."
+    )
     assert terminal_event.outputs.chat_history == [
         ChatMessage(
             text="Hello, how are you?",
@@ -94,19 +101,20 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             source=None,
         ),
         ChatMessage(
-            text="Result from get_current_weather: The current temperature is 22°C (71.6°F).",
+            text="The current weather in Miami is sunny with a temperature of 70 degrees metric.",
             role="FUNCTION",
             content=None,
             source=None,
         ),
         ChatMessage(
-            text="The current temperature in San Francisco is 22°C (71.6°F).",
+            text="Based on the function call, the current temperature in Miami is 70 degrees metric.",
             role="ASSISTANT",
             content=None,
             source=None,
         ),
     ]
 
+    # Existing assertions for the API calls
     first_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[0]
     assert first_call.kwargs == {
         "ml_model": "gpt-4o-mini",

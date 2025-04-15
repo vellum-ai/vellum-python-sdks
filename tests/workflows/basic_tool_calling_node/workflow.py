@@ -8,20 +8,11 @@ from vellum.workflows.nodes.experimental.tool_calling_node import ToolCallingNod
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
-# A simple tool definition
-def get_current_weather():
+def get_current_weather(location: str, unit: str) -> str:
     """
     Get the current weather in a given location.
     """
-    return {
-        "name": "get_current_weather",
-        "description": "Get the current weather in a given location",
-        "parameters": {
-            "type": "object",
-            "properties": {"location": {"type": "string", "description": "The city and state, e.g. San Francisco, CA"}},
-            "required": ["location"],
-        },
-    }
+    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
@@ -56,7 +47,7 @@ class GetCurrentWeatherNode(ToolCallingNode):
             ],
         ),
     ]
-    function_callables = [get_current_weather]
+    function_callables = {"get_current_weather": get_current_weather}
     functions = [
         FunctionDefinition(
             name="get_current_weather",

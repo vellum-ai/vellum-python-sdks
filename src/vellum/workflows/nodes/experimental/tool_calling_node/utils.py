@@ -1,3 +1,5 @@
+from collections.abc import Callable
+import json
 from typing import Iterator, List, Optional, Type
 
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
@@ -13,16 +15,6 @@ class FunctionNode(BaseNode):
     """Node that executes a specific function."""
 
     function: FunctionDefinition
-
-    def run(self) -> BaseNode.Outputs:
-        # TODO: We should think about how to execute the function
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION", text=f"Result from {self.function.name}: The current temperature is 22°C (71.6°F)."
-            )
-        )
-
-        return self.Outputs()
 
 
 class ToolRouterNode(InlinePromptNode):
@@ -76,12 +68,33 @@ def create_tool_router_node(
     return node
 
 
-def create_function_node(function: FunctionDefinition) -> Type[FunctionNode]:
+def create_function_node(function: FunctionDefinition, function_callable: Callable) -> Type[FunctionNode]:
+    """
+    Create a FunctionNode class for a given function.
+
+    This ensures the callable is properly registered and can be called with the expected arguments.
+    """
+
+    # Create a class-level wrapper that calls the original function
+    def execute_function(self) -> BaseNode.Outputs:
+        outputs = self.state.meta.node_outputs.get(ToolRouterNode.Outputs.text)
+        # first parse into json
+        outputs = json.loads(outputs)
+        arguments = outputs["arguments"]
+
+        # Call the original function directly with the arguments
+        result = function_callable(**arguments)
+
+        self.state.chat_history.append(ChatMessage(role="FUNCTION", text=result))
+
+        return self.Outputs()
+
     node = type(
         f"FunctionNode_{function.name}",
         (FunctionNode,),
         {
             "function": function,
+            "run": execute_function,
             "__module__": __name__,
         },
     )

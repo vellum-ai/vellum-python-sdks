@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import ClassVar, List, Optional
+from typing import ClassVar, Dict, List, Optional
 
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
 from vellum.client.types.chat_message_request import ChatMessageRequest
@@ -17,7 +17,7 @@ from vellum.workflows.nodes.experimental.tool_calling_node.utils import (
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
+from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -36,7 +36,7 @@ class ToolCallingNode(BaseNode):
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
     functions: ClassVar[List[FunctionDefinition]] = []
-    function_callables: ClassVar[List[Callable]] = []
+    function_callables: ClassVar[Dict[str, Callable]] = {}
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     # TODO: https://linear.app/vellum/issue/APO-342/support-tool-call-max-retries
     max_tool_calls: ClassVar[int] = 1
@@ -122,8 +122,12 @@ class ToolCallingNode(BaseNode):
             prompt_inputs=self.prompt_inputs,
         )
 
+        # TODO: fix mypy error
         self._function_nodes = {
-            function.name: create_function_node(function)
+            function.name: create_function_node(
+                function=function,
+                function_callable=self.function_callables[function.name]  # type: ignore
+            )
             for function in self.functions
             if function.name is not None
         }
