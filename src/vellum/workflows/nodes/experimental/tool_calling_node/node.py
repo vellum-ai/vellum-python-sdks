@@ -23,7 +23,7 @@ from vellum.workflows.workflows.base import BaseWorkflow
 
 class ToolCallingNode(BaseNode):
     """
-    A Node that allows for tool calling while dynamically generating a graph based on provided functions.
+    A Node that dynamically invokes the provided functions to the underlying Prompt
 
     Attributes:
         ml_model: str - The model to use for tool calling (e.g., "gpt-4o-mini")
