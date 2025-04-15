@@ -1,6 +1,6 @@
 from collections.abc import Callable
 import json
-from typing import Iterator, List, Optional, Type
+from typing import Any, Iterator, List, Optional, Type
 
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
 from vellum.workflows.nodes.bases import BaseNode
@@ -68,7 +68,7 @@ def create_tool_router_node(
     return node
 
 
-def create_function_node(function: FunctionDefinition, function_callable: Callable) -> Type[FunctionNode]:
+def create_function_node(function: FunctionDefinition, function_callable: Callable[..., Any]) -> Type[FunctionNode]:
     """
     Create a FunctionNode class for a given function.
 

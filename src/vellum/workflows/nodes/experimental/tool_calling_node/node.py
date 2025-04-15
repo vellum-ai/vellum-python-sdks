@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
 
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
 from vellum.client.types.chat_message_request import ChatMessageRequest
@@ -36,7 +36,7 @@ class ToolCallingNode(BaseNode):
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
     functions: ClassVar[List[FunctionDefinition]] = []
-    function_callables: ClassVar[Dict[str, Callable]] = {}
+    function_callables: ClassVar[Dict[str, Callable[..., Any]]] = {}
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     # TODO: https://linear.app/vellum/issue/APO-342/support-tool-call-max-retries
     max_tool_calls: ClassVar[int] = 1
