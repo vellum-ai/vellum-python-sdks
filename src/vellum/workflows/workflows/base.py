@@ -534,14 +534,13 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     def deserialize_state(cls, state: dict, workflow_inputs: Optional[InputsType] = None) -> StateType:
         state_class = cls.get_state_class()
         if "meta" in state:
-            nodes = list(cls.get_nodes())
             state["meta"] = StateMeta.model_validate(
                 {
                     **state["meta"],
                     "workflow_inputs": workflow_inputs,
                 },
                 context={
-                    "nodes": nodes,
+                    "workflow_definition": cls,
                 },
             )
 
