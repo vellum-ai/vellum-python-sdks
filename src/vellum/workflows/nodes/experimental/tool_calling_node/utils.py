@@ -78,7 +78,7 @@ def create_tool_router_node(
 
 def create_function_node(function: FunctionDefinition) -> Type[FunctionNode]:
     node = type(
-        f"FunctionNode.{function.name}",
+        f"FunctionNode_{function.name}",
         (FunctionNode,),
         {
             "function": function,
