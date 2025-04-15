@@ -17,7 +17,8 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
-from vellum.workflows.types.generics import StateType, is_workflow_class
+from vellum.workflows.types.definition import CodeResourceDefinition, serialize_type_encoder_with_id
+from vellum.workflows.types.generics import StateType, import_workflow_class, is_workflow_class
 from vellum.workflows.types.stack import Stack
 from vellum.workflows.types.utils import datetime_now, deepcopy_with_exclusions, get_class_attr_names, infer_types
 
@@ -228,6 +229,7 @@ def default_datetime_factory() -> datetime:
 
 
 class StateMeta(UniversalBaseModel):
+    workflow_definition: Type["BaseWorkflow"] = field(default_factory=import_workflow_class)
     id: UUID = field(default_factory=uuid4_default_factory)
     trace_id: UUID = field(default_factory=uuid4_default_factory)
     span_id: UUID = field(default_factory=uuid4_default_factory)
@@ -257,6 +259,18 @@ class StateMeta(UniversalBaseModel):
         super().__setattr__(name, value)
         if callable(self.__snapshot_callback__):
             self.__snapshot_callback__()
+
+    @field_serializer("workflow_definition")
+    def serialize_workflow_definition(self, workflow_definition: Type["BaseWorkflow"], _info: Any) -> Dict[str, Any]:
+        return serialize_type_encoder_with_id(workflow_definition)
+
+    @field_validator("workflow_definition", mode="before")
+    @classmethod
+    def deserialize_workflow_definition(cls, workflow_definition: Any, info: ValidationInfo):
+        if isinstance(workflow_definition, dict):
+            return CodeResourceDefinition.model_validate(workflow_definition).decode()
+
+        return workflow_definition
 
     @field_serializer("node_outputs")
     def serialize_node_outputs(self, node_outputs: Dict[OutputReference, Any], _info: Any) -> Dict[str, Any]:
@@ -324,6 +338,28 @@ class StateMeta(UniversalBaseModel):
         self, external_inputs: Dict[ExternalInputReference, Any], _info: Any
     ) -> Dict[str, Any]:
         return {str(descriptor): value for descriptor, value in external_inputs.items()}
+
+    @field_validator("parent", mode="before")
+    @classmethod
+    def deserialize_parent(cls, parent: Any, info: ValidationInfo):
+        if isinstance(parent, dict):
+            workflow_definition = cls._get_workflow(info)
+            if not workflow_definition:
+                return parent
+
+            parent_meta = parent.get("meta")
+            if not isinstance(parent_meta, dict):
+                return parent
+
+            parent_workflow_definition = cls.deserialize_workflow_definition(
+                parent_meta.get("workflow_definition"), info
+            )
+            if not is_workflow_class(parent_workflow_definition):
+                return parent
+
+            return parent_workflow_definition.deserialize_state(parent)
+
+        return parent
 
     def __deepcopy__(self, memo: Optional[Dict[int, Any]] = None) -> "StateMeta":
         if not memo:

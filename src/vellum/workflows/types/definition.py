@@ -1,5 +1,8 @@
+import importlib
+import inspect
+from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Union
+from typing import Annotated, Any, Dict, Optional, Union
 
 from pydantic import BeforeValidator
 
@@ -31,6 +34,31 @@ class CodeResourceDefinition(ClientCodeResourceDefinition):
     @staticmethod
     def encode(obj: type) -> "CodeResourceDefinition":
         return CodeResourceDefinition(**serialize_type_encoder_with_id(obj))
+
+    def decode(self) -> Any:
+        if ".<locals>." in self.name:
+            # We are decoding a local class that should already be loaded in our stack frame. So
+            # we climb up to look for it.
+            frame = inspect.currentframe()
+            return self._resolve_local(frame)
+
+        imported_module = importlib.import_module(".".join(self.module))
+        return getattr(imported_module, self.name)
+
+    def _resolve_local(self, frame: Optional[FrameType]) -> Any:
+        if not frame:
+            return None
+
+        frame_module = frame.f_globals.get("__name__")
+        if not isinstance(frame_module, str) or frame_module.split(".") != self.module:
+            return self._resolve_local(frame.f_back)
+
+        outer, inner = self.name.split(".<locals>.")
+        frame_outer = frame.f_code.co_name
+        if frame_outer != outer:
+            return self._resolve_local(frame.f_back)
+
+        return frame.f_locals.get(inner)
 
 
 VellumCodeResourceDefinition = Annotated[
