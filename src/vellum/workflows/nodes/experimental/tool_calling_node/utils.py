@@ -18,7 +18,7 @@ class FunctionNode(BaseNode):
         # TODO: We should think about how to execute the function
         self.state.chat_history.append(
             ChatMessage(
-                role="TOOL", text=f"Result from {self.function.name}: The current temperature is 22°C (71.6°F)."
+                role="FUNCTION", text=f"Result from {self.function.name}: The current temperature is 22°C (71.6°F)."
             )
         )
 

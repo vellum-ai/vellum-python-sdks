@@ -94,7 +94,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         ),
         ChatMessage(
             text="Result from get_current_weather: The current temperature is 22°C (71.6°F).",
-            role="TOOL",
+            role="FUNCTION",
             content=None,
             source=None,
         ),
