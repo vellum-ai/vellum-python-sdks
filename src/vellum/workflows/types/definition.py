@@ -42,8 +42,12 @@ class CodeResourceDefinition(ClientCodeResourceDefinition):
             frame = inspect.currentframe()
             return self._resolve_local(frame)
 
-        imported_module = importlib.import_module(".".join(self.module))
-        return getattr(imported_module, self.name)
+        try:
+            imported_module = importlib.import_module(".".join(self.module))
+        except ImportError:
+            return None
+
+        return getattr(imported_module, self.name, None)
 
     def _resolve_local(self, frame: Optional[FrameType]) -> Any:
         if not frame:

@@ -268,9 +268,16 @@ class StateMeta(UniversalBaseModel):
     @classmethod
     def deserialize_workflow_definition(cls, workflow_definition: Any, info: ValidationInfo):
         if isinstance(workflow_definition, dict):
-            return CodeResourceDefinition.model_validate(workflow_definition).decode()
+            deserialized_workflow_definition = CodeResourceDefinition.model_validate(workflow_definition).decode()
+            if not is_workflow_class(deserialized_workflow_definition):
+                return import_workflow_class()
 
-        return workflow_definition
+            return deserialized_workflow_definition
+
+        if is_workflow_class(workflow_definition):
+            return workflow_definition
+
+        return import_workflow_class()
 
     @field_serializer("node_outputs")
     def serialize_node_outputs(self, node_outputs: Dict[OutputReference, Any], _info: Any) -> Dict[str, Any]:
