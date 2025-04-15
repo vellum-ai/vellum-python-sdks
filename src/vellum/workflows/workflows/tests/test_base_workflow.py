@@ -10,6 +10,14 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
+class GlobalTestWorkflow(BaseWorkflow):
+    """
+    Used as part of `test_base_workflow__deserialize_state_with_invalid_workflow_definition` below.
+    """
+
+    pass
+
+
 def test_base_workflow__inherit_base_outputs():
     class MyNode(BaseNode):
         class Outputs(BaseNode.Outputs):
@@ -509,3 +517,70 @@ def test_base_workflow__deserialize_state_with_none():
 
     # THEN we should get back None
     assert state is None
+
+
+@pytest.mark.parametrize(
+    "raw_workflow_definition",
+    [
+        {
+            "name": "test_base_workflow__deserialize_state_with_invalid_workflow_definition.<locals>.TestWorkflow",
+            "module": ["invalid", "module", "path"],
+        },
+        {
+            "name": "test_base_workflow__deserialize_state_with_invalid_workflow_definition.<locals>.InvalidWorkflow",
+            "module": ["vellum", "workflows", "workflows", "tests", "test_base_workflow"],
+        },
+        {
+            "name": "invalid_local_function_name.<locals>.TestWorkflow",
+            "module": ["vellum", "workflows", "workflows", "tests", "test_base_workflow"],
+        },
+        {
+            "name": "GlobalTestWorkflow",
+            "module": ["invalid", "module", "path"],
+        },
+        {
+            "name": "InlineSubworkflowNode",
+            "module": ["vellum", "workflows", "workflows", "tests", "test_base_workflow"],
+        },
+        {
+            "name": "InvalidWorkflow",
+            "module": ["vellum", "workflows", "workflows", "tests", "test_base_workflow"],
+        },
+    ],
+    ids=[
+        "invalid_module_path_with_locals",
+        "invalid_local_name",
+        "invalid_local_container",
+        "invalid_global_module",
+        "invalid_global_name",
+        "missing_global_name",
+    ],
+)
+def test_base_workflow__deserialize_state_with_invalid_workflow_definition(raw_workflow_definition):
+
+    # GIVEN a state definition
+    class State(BaseState):
+        bar = "My default bar"
+
+    # AND a workflow
+    class TestWorkflow(BaseWorkflow[BaseInputs, State]):
+        pass
+
+    # WHEN we deserialize a state with an invalid module path
+    state = TestWorkflow.deserialize_state(
+        {
+            "meta": {
+                "workflow_definition": {
+                    "id": str(TestWorkflow.__id__),
+                    **raw_workflow_definition,
+                },
+            },
+        },
+    )
+
+    # THEN we should get back the default state
+    assert isinstance(state, State)
+    assert state.bar == "My default bar"
+
+    # AND the workflow definition should be BaseWorkflow
+    assert state.meta.workflow_definition == BaseWorkflow
