@@ -483,3 +483,29 @@ def test_base_workflow__deserialize_nested_state():
     assert state.meta.parent.foo == "My outer state foo"
     assert state.meta.parent.meta.node_outputs == {OuterNode.Outputs.qux: "My outer node output qux"}
     assert state.meta.parent.meta.workflow_definition == TestWorkflow
+
+
+def test_base_workflow__deserialize_state_with_none():
+
+    # GIVEN a state definition
+    class State(BaseState):
+        bar: str
+
+    # AND an inputs definition
+    class Inputs(BaseInputs):
+        baz: str
+
+    # AND a node
+    class NodeA(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow that uses all three
+    class TestWorkflow(BaseWorkflow[Inputs, State]):
+        graph = NodeA
+
+    # WHEN we deserialize None
+    state = TestWorkflow.deserialize_state(None)
+
+    # THEN we should get back None
+    assert state is None
