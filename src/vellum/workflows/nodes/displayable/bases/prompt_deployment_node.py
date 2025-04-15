@@ -1,6 +1,6 @@
 import json
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Sequence, Union
+from typing import Any, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Sequence, Set, Union
 
 from vellum import (
     ChatHistoryInputRequest,
@@ -88,10 +88,15 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
         )
 
     def _process_prompt_event_stream(
-        self, prompt_event_stream: Optional[Iterator[ExecutePromptEvent]] = None
+        self,
+        prompt_event_stream: Optional[Iterator[ExecutePromptEvent]] = None,
+        tried_fallbacks: Optional[set[str]] = None,
     ) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
         """Override the base prompt node _process_prompt_event_stream()"""
         self._validate()
+
+        if tried_fallbacks is None:
+            tried_fallbacks = set()
 
         if prompt_event_stream is None:
             try:
@@ -104,7 +109,7 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                     and self.ml_model_fallbacks is not OMIT
                     and self.ml_model_fallbacks is not None
                 ):
-                    prompt_event_stream = self._retry_prompt_stream_with_fallbacks()
+                    prompt_event_stream = self._retry_prompt_stream_with_fallbacks(tried_fallbacks)
                 else:
                     self._handle_api_error(e)
 
@@ -126,8 +131,10 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                         and self.ml_model_fallbacks is not None
                     ):
                         try:
-                            fallback_stream = self._retry_prompt_stream_with_fallbacks()
-                            fallback_outputs = yield from self._process_prompt_event_stream(fallback_stream)
+                            fallback_stream = self._retry_prompt_stream_with_fallbacks(tried_fallbacks)
+                            fallback_outputs = yield from self._process_prompt_event_stream(
+                                fallback_stream, tried_fallbacks
+                            )
                             return fallback_outputs
                         except ApiError:
                             pass
@@ -137,10 +144,14 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
 
         return outputs
 
-    def _retry_prompt_stream_with_fallbacks(self):
+    def _retry_prompt_stream_with_fallbacks(self, tried_fallbacks: Set[str]) -> Optional[Iterator[ExecutePromptEvent]]:
         if self.ml_model_fallbacks is not None:
             for ml_model_fallback in self.ml_model_fallbacks:
+                if ml_model_fallback in tried_fallbacks:
+                    continue
+
                 try:
+                    tried_fallbacks.add(ml_model_fallback)
                     prompt_event_stream = self._get_prompt_event_stream(ml_model_fallback=ml_model_fallback)
                     next(prompt_event_stream)
                     return prompt_event_stream
@@ -153,6 +164,14 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                         status_code=400,
                     )
                 )
+
+        self._handle_api_error(
+            ApiError(
+                body={"detail": "No fallback models available"},
+                status_code=400,
+            )
+        )
+        return None
 
     def _compile_prompt_inputs(self) -> List[PromptDeploymentInputRequest]:
         # TODO: We may want to consolidate with subworkflow deployment input compilation
