@@ -378,3 +378,39 @@ def test_base_workflow__deserialize_state():
 
     # AND the node execution cache should deserialize
     assert state.meta.node_execution_cache
+
+
+def test_base_workflow__deserialize_state_with_optional_inputs():
+
+    # GIVEN a state definition
+    class State(BaseState):
+        bar: str
+
+    # AND an inputs definition with an optional field
+    class Inputs(BaseInputs):
+        baz: str = "My default baz"
+
+    # AND a node
+    class NodeA(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow that uses all three
+    class TestWorkflow(BaseWorkflow[Inputs, State]):
+        graph = NodeA
+
+    # WHEN we deserialize the state
+    state = TestWorkflow.deserialize_state(
+        {
+            "bar": "My state bar",
+            "meta": {
+                "node_outputs": {},
+                "parent": None,
+            },
+        },
+    )
+
+    # THEN the state should be correct
+    assert state.bar == "My state bar"
+    assert isinstance(state.meta.workflow_inputs, Inputs)
+    assert state.meta.workflow_inputs.baz == "My default baz"

@@ -17,11 +17,12 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
-from vellum.workflows.types.generics import StateType, is_node_class
+from vellum.workflows.types.generics import StateType, is_workflow_class
 from vellum.workflows.types.stack import Stack
 from vellum.workflows.types.utils import datetime_now, deepcopy_with_exclusions, get_class_attr_names, infer_types
 
 if TYPE_CHECKING:
+    from vellum.workflows import BaseWorkflow
     from vellum.workflows.nodes.bases import BaseNode
 
 logger = logging.getLogger(__name__)
@@ -264,16 +265,16 @@ class StateMeta(UniversalBaseModel):
     @field_validator("node_outputs", mode="before")
     @classmethod
     def deserialize_node_outputs(cls, node_outputs: Any, info: ValidationInfo):
-        if isinstance(node_outputs, dict) and isinstance(info.context, dict):
-            raw_workflow_nodes = info.context.get("nodes")
-            workflow_node_outputs = {}
-            if isinstance(raw_workflow_nodes, list):
-                for node in raw_workflow_nodes:
-                    if not is_node_class(node):
-                        continue
+        if isinstance(node_outputs, dict):
+            workflow_definition = cls._get_workflow(info)
+            if not workflow_definition:
+                return node_outputs
 
-                    for output in node.Outputs:
-                        workflow_node_outputs[str(output)] = output
+            raw_workflow_nodes = workflow_definition.get_nodes()
+            workflow_node_outputs = {}
+            for node in raw_workflow_nodes:
+                for output in node.Outputs:
+                    workflow_node_outputs[str(output)] = output
 
             node_output_keys = list(node_outputs.keys())
             deserialized_node_outputs = {}
@@ -292,18 +293,31 @@ class StateMeta(UniversalBaseModel):
     @classmethod
     def deserialize_node_execution_cache(cls, node_execution_cache: Any, info: ValidationInfo):
         if isinstance(node_execution_cache, dict):
-            nodes_cache: Dict[str, Type["BaseNode"]] = {}
-            raw_workflow_nodes = info.context.get("nodes") if isinstance(info.context, dict) else []
-            if isinstance(raw_workflow_nodes, list):
-                for node in raw_workflow_nodes:
-                    if not is_node_class(node):
-                        continue
+            workflow_definition = cls._get_workflow(info)
+            if not workflow_definition:
+                return node_execution_cache
 
-                    nodes_cache[str(node)] = node
+            nodes_cache: Dict[str, Type["BaseNode"]] = {}
+            raw_workflow_nodes = workflow_definition.get_nodes()
+            for node in raw_workflow_nodes:
+                nodes_cache[str(node)] = node
 
             return NodeExecutionCache.deserialize(node_execution_cache, nodes_cache)
 
         return node_execution_cache
+
+    @field_validator("workflow_inputs", mode="before")
+    @classmethod
+    def deserialize_workflow_inputs(cls, workflow_inputs: Any, info: ValidationInfo):
+        workflow_definition = cls._get_workflow(info)
+
+        if workflow_definition:
+            if workflow_inputs is None:
+                return workflow_definition.get_inputs_class()()
+            if isinstance(workflow_inputs, dict):
+                return workflow_definition.get_inputs_class()(**workflow_inputs)
+
+        return workflow_inputs
 
     @field_serializer("external_inputs")
     def serialize_external_inputs(
@@ -330,6 +344,20 @@ class StateMeta(UniversalBaseModel):
         memo[id(self.__snapshot_callback__)] = None
 
         return super().__deepcopy__(memo)
+
+    @classmethod
+    def _get_workflow(cls, info: ValidationInfo) -> Optional[Type["BaseWorkflow"]]:
+        if not info.context:
+            return None
+
+        if not isinstance(info.context, dict):
+            return None
+
+        workflow_definition = info.context.get("workflow_definition")
+        if not is_workflow_class(workflow_definition):
+            return None
+
+        return workflow_definition
 
 
 class BaseState(metaclass=_BaseStateMeta):
