@@ -125,8 +125,7 @@ class ToolCallingNode(BaseNode):
         # TODO: fix mypy error
         self._function_nodes = {
             function.name: create_function_node(
-                function=function,
-                function_callable=self.function_callables[function.name]  # type: ignore
+                function=function, function_callable=self.function_callables[function.name]  # type: ignore
             )
             for function in self.functions
             if function.name is not None
