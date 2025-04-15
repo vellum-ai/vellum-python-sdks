@@ -301,7 +301,6 @@ def test_prompt_deployment_node__provider_error_with_fallbacks(vellum_client):
                 error={
                     "code": "PROVIDER_ERROR",
                     "message": "The model provider encountered an error",
-                    "details": {"provider": "openai"},
                 },
             ),
         ]
@@ -423,7 +422,6 @@ def test_prompt_deployment_node_multiple_provider_errors(vellum_client):
                 error={
                     "code": "PROVIDER_ERROR",
                     "message": "The primary provider encountered an error",
-                    "details": {"provider": "openai"},
                 },
             ),
         ]
