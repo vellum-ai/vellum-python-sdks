@@ -39,10 +39,10 @@ class ToolRouterNode(InlinePromptNode):
 
 
 def create_tool_router_node(
-    model_name: str,
-    prompt_blocks: List[PromptBlock],
+    ml_model: str,
+    blocks: List[PromptBlock],
     functions: List[FunctionDefinition],
-    input_values: Optional[EntityInputsInterface],
+    prompt_inputs: Optional[EntityInputsInterface],
 ) -> Type[ToolRouterNode]:
     Ports = type("Ports", (), {})
     for function in functions:
@@ -64,10 +64,10 @@ def create_tool_router_node(
         "ToolRouterNode",
         (ToolRouterNode,),
         {
-            "ml_model": model_name,
-            "blocks": prompt_blocks,
+            "ml_model": ml_model,
+            "blocks": blocks,
             "functions": functions,
-            "prompt_inputs": input_values,
+            "prompt_inputs": prompt_inputs,
             "Ports": Ports,
             "__module__": __name__,
         },

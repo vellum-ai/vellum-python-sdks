@@ -116,10 +116,10 @@ class ToolCallingNode(BaseNode):
 
     def _build_graph(self) -> None:
         self.tool_router_node = create_tool_router_node(
-            model_name=self.ml_model,
-            prompt_blocks=self.blocks,
+            ml_model=self.ml_model,
+            blocks=self.blocks,
             functions=self.functions,
-            input_values=self.prompt_inputs,
+            prompt_inputs=self.prompt_inputs,
         )
 
         self._function_nodes = {function.name: create_function_node(function) for function in self.functions}
