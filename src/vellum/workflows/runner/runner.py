@@ -90,6 +90,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self.workflow = workflow
         self._is_resuming = False
+        self._should_emit_initial_state = True
         if entrypoint_nodes:
             if len(list(entrypoint_nodes)) > 1:
                 raise ValueError("Cannot resume from multiple nodes")
@@ -127,6 +128,10 @@ class WorkflowRunner(Generic[StateType]):
                 self._initial_state.meta.span_id = uuid4()
             else:
                 self._initial_state = self.workflow.get_default_state(normalized_inputs)
+                # We don't want to emit the initial state on the base case of Workflow Runs, since
+                # all of that data is redundant and is derivable. It also clearly communicates that
+                # there was no initial state provided by the user to invoke the workflow.
+                self._should_emit_initial_state = False
             self._entrypoints = self.workflow.get_entrypoints()
 
         # This queue is responsible for sending events from WorkflowRunner to the outside world
@@ -502,6 +507,7 @@ class WorkflowRunner(Generic[StateType]):
             body=WorkflowExecutionInitiatedBody(
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
+                initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
             ),
             parent=self._execution_context.parent_context,
         )

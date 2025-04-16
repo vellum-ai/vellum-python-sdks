@@ -146,7 +146,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
 
     WorkflowEvent = Union[  # type: ignore
         GenericWorkflowEvent,
-        WorkflowExecutionInitiatedEvent[InputsType],  # type: ignore[valid-type]
+        WorkflowExecutionInitiatedEvent[InputsType, StateType],  # type: ignore[valid-type]
         WorkflowExecutionFulfilledEvent[Outputs],
         WorkflowExecutionSnapshottedEvent[StateType],  # type: ignore[valid-type]
     ]
