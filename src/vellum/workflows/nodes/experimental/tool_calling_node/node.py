@@ -90,9 +90,7 @@ class ToolCallingNode(BaseNode):
 
             subworkflow = ToolCallingWorkflow(
                 parent_state=self.state,
-                context=WorkflowContext(
-                    vellum_client=self._context.vellum_client, generated_files=self._context.generated_files
-                ),
+                context=WorkflowContext.create_from(self._context),
             )
 
             terminal_event = subworkflow.run()
