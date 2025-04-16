@@ -132,7 +132,7 @@ class ToolCallingNode(BaseNode):
 
         # Add connections from ports of router to function nodes and back to router
         for function_name, FunctionNodeClass in self._function_nodes.items():
-            router_port = getattr(self.tool_router_node.Ports, function_name)  # type: ignore  # mypy thinks name is still optional
+            router_port = getattr(self.tool_router_node.Ports, function_name)  # type: ignore  # mypy thinks name is still optional # noqa: E501
             edge_graph = router_port >> FunctionNodeClass >> self.tool_router_node
             graph_set.add(edge_graph)
 
