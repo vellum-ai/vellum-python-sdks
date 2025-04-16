@@ -58,9 +58,10 @@ def create_tool_router_node(
 ) -> Type[ToolRouterNode]:
     Ports = type("Ports", (), {})
     for function in functions:
-        # TODO: We should think about how to handle this
         if function.name is None:
+            # We should not raise an error here since we filter out functions without names
             raise ValueError("Function name is required")
+
         function_name = function.name
         port_condition = LazyReference(
             lambda: (

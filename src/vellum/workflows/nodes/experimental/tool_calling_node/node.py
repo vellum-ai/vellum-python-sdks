@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
 from vellum.client.types.chat_message_request import ChatMessageRequest
@@ -59,7 +59,7 @@ class ToolCallingNode(BaseNode):
         This dynamically builds a graph with router and function nodes,
         then executes the workflow.
         """
-        # TODO: We should parse input values and add them to the state
+        self._validate_functions()
 
         initial_chat_history = []
 
@@ -120,20 +120,19 @@ class ToolCallingNode(BaseNode):
             prompt_inputs=self.prompt_inputs,
         )
 
-        # TODO: fix mypy error
         self._function_nodes = {
             function.name: create_function_node(
-                function=function, function_callable=self.function_callables[function.name]  # type: ignore
+                function=function,
+                function_callable=cast(Callable[..., Any], self.function_callables[function.name]),  # type: ignore
             )
             for function in self.functions
-            if function.name is not None
         }
 
         graph_set = set()
 
         # Add connections from ports of router to function nodes and back to router
         for function_name, FunctionNodeClass in self._function_nodes.items():
-            router_port = getattr(self.tool_router_node.Ports, function_name)
+            router_port = getattr(self.tool_router_node.Ports, function_name)  # type: ignore  # mypy thinks name is still optional
             edge_graph = router_port >> FunctionNodeClass >> self.tool_router_node
             graph_set.add(edge_graph)
 
@@ -141,3 +140,8 @@ class ToolCallingNode(BaseNode):
         graph_set.add(default_port)
 
         self._graph = Graph.from_set(graph_set)
+
+    def _validate_functions(self) -> None:
+        for function in self.functions:
+            if function.name is None:
+                raise ValueError("Function name is required")
