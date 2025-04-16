@@ -1,16 +1,13 @@
 import pytest
-from collections import defaultdict
 from copy import deepcopy
 import json
 from queue import Queue
-from typing import Dict
+from typing import Dict, cast
 
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
-
-snapshot_count: Dict[int, int] = defaultdict(int)
 
 
 @pytest.fixture()
@@ -27,9 +24,19 @@ class MockState(BaseState):
     foo: str
     nested_dict: Dict[str, int] = {}
 
-    def __snapshot__(self) -> None:
-        global snapshot_count
-        snapshot_count[id(self)] += 1
+    __snapshot_count__: int = 0
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.__snapshot_callback__ = lambda _: self.__mock_snapshot__()
+
+    def __mock_snapshot__(self) -> None:
+        self.__snapshot_count__ += 1
+
+    def __deepcopy__(self, memo: dict) -> "MockState":
+        new_state = cast(MockState, super().__deepcopy__(memo))
+        new_state.__snapshot_count__ = 0
+        return new_state
 
 
 class MockNode(BaseNode):
@@ -43,50 +50,50 @@ class MockNode(BaseNode):
 def test_state_snapshot__node_attribute_edit():
     # GIVEN an initial state instance
     state = MockState(foo="bar")
-    assert snapshot_count[id(state)] == 0
+    assert state.__snapshot_count__ == 0
 
     # WHEN we edit an attribute
     state.foo = "baz"
 
     # THEN the snapshot is emitted
-    assert snapshot_count[id(state)] == 1
+    assert state.__snapshot_count__ == 1
 
 
 def test_state_snapshot__node_output_edit():
     # GIVEN an initial state instance
     state = MockState(foo="bar")
-    assert snapshot_count[id(state)] == 0
+    assert state.__snapshot_count__ == 0
 
     # WHEN we add a Node Output to state
     for output in MockNode.Outputs:
         state.meta.node_outputs[output] = "hello"
 
     # THEN the snapshot is emitted
-    assert snapshot_count[id(state)] == 1
+    assert state.__snapshot_count__ == 1
 
 
 def test_state_snapshot__nested_dictionary_edit():
     # GIVEN an initial state instance
     state = MockState(foo="bar")
-    assert snapshot_count[id(state)] == 0
+    assert state.__snapshot_count__ == 0
 
     # WHEN we edit a nested dictionary
     state.nested_dict["hello"] = 1
 
     # THEN the snapshot is emitted
-    assert snapshot_count[id(state)] == 1
+    assert state.__snapshot_count__ == 1
 
 
 def test_state_snapshot__external_input_edit():
     # GIVEN an initial state instance
     state = MockState(foo="bar")
-    assert snapshot_count[id(state)] == 0
+    assert state.__snapshot_count__ == 0
 
     # WHEN we add an external input to state
     state.meta.external_inputs[MockNode.ExternalInputs.message] = "hello"
 
     # THEN the snapshot is emitted
-    assert snapshot_count[id(state)] == 1
+    assert state.__snapshot_count__ == 1
 
 
 def test_state_deepcopy():
@@ -103,7 +110,6 @@ def test_state_deepcopy():
     assert deepcopied_state.meta.node_outputs == state.meta.node_outputs
 
 
-@pytest.mark.skip(reason="https://app.shortcut.com/vellum/story/5654")
 def test_state_deepcopy__with_node_output_updates():
     # GIVEN an initial state instance
     state = MockState(foo="bar")
@@ -121,10 +127,10 @@ def test_state_deepcopy__with_node_output_updates():
     assert deepcopied_state.meta.node_outputs[MockNode.Outputs.baz] == "hello"
 
     # AND the original state has had the correct number of snapshots
-    assert snapshot_count[id(state)] == 2
+    assert state.__snapshot_count__ == 2
 
     # AND the copied state has had the correct number of snapshots
-    assert snapshot_count[id(deepcopied_state)] == 0
+    assert deepcopied_state.__snapshot_count__ == 0
 
 
 def test_state_json_serialization__with_node_output_updates():
@@ -158,10 +164,10 @@ def test_state_deepcopy__with_external_input_updates():
     assert deepcopied_state.meta.external_inputs[MockNode.ExternalInputs.message] == "hello"
 
     # AND the original state has had the correct number of snapshots
-    assert snapshot_count[id(state)] == 2
+    assert state.__snapshot_count__ == 2
 
     # AND the copied state has had the correct number of snapshots
-    assert snapshot_count[id(deepcopied_state)] == 0
+    assert deepcopied_state.__snapshot_count__ == 0
 
 
 def test_state_json_serialization__with_queue():

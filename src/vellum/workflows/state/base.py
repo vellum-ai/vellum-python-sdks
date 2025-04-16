@@ -1,4 +1,5 @@
 from collections import defaultdict
+from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import field
 from datetime import datetime
@@ -404,11 +405,11 @@ class BaseState(metaclass=_BaseStateMeta):
     meta: StateMeta = field(init=False)
 
     __lock__: Lock = field(init=False)
-    __is_initializing__: bool = field(init=False)
+    __is_quiet__: bool = field(init=False)
     __snapshot_callback__: Callable[["BaseState"], None] = field(init=False)
 
     def __init__(self, meta: Optional[StateMeta] = None, **kwargs: Any) -> None:
-        self.__is_initializing__ = True
+        self.__is_quiet__ = True
         self.__snapshot_callback__ = lambda state: None
         self.__lock__ = Lock()
 
@@ -418,14 +419,14 @@ class BaseState(metaclass=_BaseStateMeta):
         # Make all class attribute values snapshottable
         for name, value in self.__class__.__dict__.items():
             if not name.startswith("_") and name != "meta":
-                # Bypass __is_initializing__ instead of `setattr`
+                # Bypass __is_quiet__ instead of `setattr`
                 snapshottable_value = _make_snapshottable(value, self.__snapshot__)
                 super().__setattr__(name, snapshottable_value)
 
         for name, value in kwargs.items():
             setattr(self, name, value)
 
-        self.__is_initializing__ = False
+        self.__is_quiet__ = False
 
     def __deepcopy__(self, memo: Any) -> "BaseState":
         new_state = deepcopy_with_exclusions(
@@ -472,7 +473,7 @@ class BaseState(metaclass=_BaseStateMeta):
         return self.__dict__[key]
 
     def __setattr__(self, name: str, value: Any) -> None:
-        if name.startswith("_") or self.__is_initializing__:
+        if name.startswith("_"):
             super().__setattr__(name, value)
             return
 
@@ -513,10 +514,32 @@ class BaseState(metaclass=_BaseStateMeta):
         Snapshots the current state to the workflow emitter. The invoked callback is overridden by the
         workflow runner.
         """
+        if self.__is_quiet__:
+            return
+
         try:
             self.__snapshot_callback__(deepcopy(self))
         except Exception:
             logger.exception("Failed to snapshot Workflow state.")
+
+    @contextmanager
+    def __quiet__(self):
+        prev = self.__is_quiet__
+        self.__is_quiet__ = True
+        try:
+            yield
+        finally:
+            self.__is_quiet__ = prev
+
+    @contextmanager
+    def __atomic__(self):
+        prev = self.__is_quiet__
+        self.__is_quiet__ = True
+        try:
+            yield
+        finally:
+            self.__is_quiet__ = prev
+            self.__snapshot__()
 
     @classmethod
     def __get_pydantic_core_schema__(

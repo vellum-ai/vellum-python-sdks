@@ -13,7 +13,7 @@ def test_run_workflow__happy_path():
 
     # THEN there should only be 1 snapshot event
     snapshot_events = [event for event in events if event.name == "workflow.execution.snapshotted"]
-    assert len(snapshot_events) == 1
+    assert len(snapshot_events) == 1, snapshot_events[0].state.meta.node_outputs
 
     # AND the snapshot should have both fulfilled outputs
     assert snapshot_events[0].state.meta.node_outputs[StreamingNode.Outputs.stream] == [
