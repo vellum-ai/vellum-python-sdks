@@ -32,6 +32,9 @@ def test_workflow__happy_path():
     assert final_terminal_event.name == "workflow.execution.fulfilled"
     assert final_terminal_event.outputs.final_value == "hello sunny world"
 
+    # AND the workflow execution should have the same span id
+    assert final_terminal_event.span_id == terminal_event.span_id
+
 
 def test_workflow__happy_path_stream():
     """
@@ -68,3 +71,7 @@ def test_workflow__happy_path_stream():
     final_event = events[-1]
     assert final_event.name == "workflow.execution.fulfilled"
     assert final_event.outputs.final_value == "hello sunny world"
+
+    # AND the workflow execution should have the same span id
+    assert events[0].span_id == terminal_event.span_id
+    assert final_event.span_id == terminal_event.span_id

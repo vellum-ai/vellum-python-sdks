@@ -8,23 +8,26 @@ def test_run_workflow__happy_path():
     # GIVEN a workflow that we expect to run from the middle of
     workflow = RunFromNodeWorkflow()
 
-    # WHEN the workflow is run
-    terminal_event = workflow.run(
-        entrypoint_nodes=[NextNode],
-        state=BaseState(
-            meta=StateMeta(
-                node_outputs={
-                    StartNode.Outputs.next_value: 42,
-                },
-            )
-        ),
+    # AND a state from a previous workflow execution
+    previous_state = BaseState(
+        meta=StateMeta(
+            node_outputs={
+                StartNode.Outputs.next_value: 42,
+            },
+        )
     )
+
+    # WHEN the workflow is run
+    terminal_event = workflow.run(entrypoint_nodes=[NextNode], state=previous_state)
 
     # THEN the workflow should be fulfilled
     assert terminal_event.name == "workflow.execution.fulfilled"
 
     # AND the final value should be dependent on the intermediate State value
     assert terminal_event.outputs == {"final_value": 43}
+
+    # AND the workflow execution should have a new span id
+    assert terminal_event.span_id != previous_state.meta.span_id
 
 
 def test_stream_workflow__node_inputs():

@@ -37,6 +37,9 @@ def test_workflow__happy_path_multi_stop():
     assert final_terminal_event.name == "workflow.execution.fulfilled"
     assert final_terminal_event.outputs.final_value == "sunny"
 
+    # AND the workflow execution should have the same span id
+    assert final_terminal_event.span_id == terminal_event.span_id
+
 
 def test_workflow__happy_path_multi_stop_invalid_external_input():
     """

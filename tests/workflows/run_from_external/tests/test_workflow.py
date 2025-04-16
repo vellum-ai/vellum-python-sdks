@@ -35,3 +35,6 @@ def test_run_workflow__happy_path(mock_random_int):
 
     # AND the final value should be as expected
     assert terminal_event.outputs == {"final_value": 47}
+
+    # AND the workflow execution should have the same span id
+    assert terminal_event.span_id == terminal_event.span_id
