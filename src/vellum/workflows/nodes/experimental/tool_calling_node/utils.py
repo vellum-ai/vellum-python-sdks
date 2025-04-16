@@ -1,10 +1,12 @@
 from collections.abc import Callable
 import json
-from typing import Any, Iterator, List, Optional, Type
+from typing import Any, Iterator, List, Optional, Type, cast
 
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
+from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
+from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
@@ -22,25 +24,29 @@ class FunctionNode(BaseNode):
 
 class ToolRouterNode(InlinePromptNode):
     def run(self) -> Iterator[BaseOutput]:
-        self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}
+        self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}  # type: ignore
         generator = super().run()
         for output in generator:
-            if output.name == "results":
-                if output.value[0].type == "STRING":
-                    self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=output.value[0].value))
-                elif output.value[0].type == "FUNCTION_CALL":
-                    self.state.chat_history.append(
-                        ChatMessage(
-                            role="FUNCTION",
-                            content=FunctionCallChatMessageContent(
-                                value=FunctionCallChatMessageContentValue(
-                                    name=output.value[0].value.name,
-                                    arguments=output.value[0].value.arguments,
-                                    id=output.value[0].value.id,
-                                ),
-                            ),
-                        )
-                    )
+            if output.name == "results" and output.value:
+                values = cast(List[Any], output.value)
+                if values and len(values) > 0:
+                    if isinstance(values[0], StringVellumValue):
+                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
+                    elif isinstance(values[0], FunctionCallVellumValue):
+                        function_call = values[0].value
+                        if function_call is not None:
+                            self.state.chat_history.append(
+                                ChatMessage(
+                                    role="FUNCTION",
+                                    content=FunctionCallChatMessageContent(
+                                        value=FunctionCallChatMessageContentValue(
+                                            name=function_call.name,
+                                            arguments=function_call.arguments,
+                                            id=function_call.id,
+                                        ),
+                                    ),
+                                )
+                            )
             yield output
 
 
