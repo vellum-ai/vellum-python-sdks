@@ -69,7 +69,13 @@ class BasePromptNode(BaseNode, Generic[StateType]):
         return outputs
 
     def _handle_api_error(self, e: ApiError):
-        if e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
+        if e.status_code and e.status_code == 403 and isinstance(e.body, dict):
+            raise NodeException(
+                message=e.body.get("detail", "Provider credentials is missing or unavailable"),
+                code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+            )
+
+        elif e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
             raise NodeException(
                 message=e.body.get("detail", "Failed to execute Prompt"),
                 code=WorkflowErrorCode.INVALID_INPUTS,

@@ -491,3 +491,29 @@ def test_prompt_deployment_node__no_fallbacks(vellum_client):
 
     # AND the client should have been called only once (for the primary model)
     assert vellum_client.execute_prompt_stream.call_count == 1
+
+
+def test_prompt_deployment_node__provider_credentials_missing(vellum_client):
+    # GIVEN a Prompt Deployment Node
+    class TestPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "test_deployment"
+        prompt_inputs = {}
+
+    # AND the client responds with a 403 error of provider credentials missing
+    primary_error = ApiError(
+        body={"detail": "Provider credentials is missing or unavailable"},
+        status_code=403,
+    )
+
+    vellum_client.execute_prompt_stream.side_effect = primary_error
+
+    # WHEN we run the node
+    node = TestPromptDeploymentNode()
+
+    # THEN the node should raise an exception
+    with pytest.raises(NodeException) as exc_info:
+        list(node.run())
+
+    # AND the exception should contain the original error message
+    assert exc_info.value.message == "Provider credentials is missing or unavailable"
+    assert exc_info.value.code == WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE
