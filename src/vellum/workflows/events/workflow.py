@@ -54,8 +54,10 @@ class WorkflowEventDisplayContext(UniversalBaseModel):
     workflow_outputs: Dict[str, UUID]
 
 
-class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsType]):
+class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsType, StateType]):
     inputs: InputsType
+    initial_state: Optional[StateType] = None
+
     # It is still the responsibility of the workflow server to populate this context. The SDK's
     # Workflow Runner will always leave this field None.
     #
@@ -67,14 +69,22 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(inputs)
 
+    @field_serializer("initial_state")
+    def serialize_initial_state(self, initial_state: Optional[StateType], _info: Any) -> Optional[Dict[str, Any]]:
+        return default_serializer(initial_state)
 
-class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType]):
+
+class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType, StateType]):
     name: Literal["workflow.execution.initiated"] = "workflow.execution.initiated"
-    body: WorkflowExecutionInitiatedBody[InputsType]
+    body: WorkflowExecutionInitiatedBody[InputsType, StateType]
 
     @property
     def inputs(self) -> InputsType:
         return self.body.inputs
+
+    @property
+    def initial_state(self) -> Optional[StateType]:
+        return self.body.initial_state
 
 
 class WorkflowExecutionStreamingBody(_BaseWorkflowExecutionBody):
