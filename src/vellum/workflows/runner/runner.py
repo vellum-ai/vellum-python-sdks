@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import logging
 from queue import Empty, Queue
 from threading import Event as ThreadingEvent, Thread
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
 from vellum.workflows.constants import undefined
@@ -98,7 +98,8 @@ class WorkflowRunner(Generic[StateType]):
             # https://app.shortcut.com/vellum/story/4408
             node = next(iter(entrypoint_nodes))
             if state:
-                self._initial_state = state
+                self._initial_state = deepcopy(state)
+                self._initial_state.meta.span_id = uuid4()
             else:
                 self._initial_state = self.workflow.get_state_at_node(node)
             self._entrypoints = entrypoint_nodes
@@ -123,6 +124,7 @@ class WorkflowRunner(Generic[StateType]):
             if state:
                 self._initial_state = deepcopy(state)
                 self._initial_state.meta.workflow_inputs = normalized_inputs
+                self._initial_state.meta.span_id = uuid4()
             else:
                 self._initial_state = self.workflow.get_default_state(normalized_inputs)
             self._entrypoints = self.workflow.get_entrypoints()
