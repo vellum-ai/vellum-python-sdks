@@ -335,7 +335,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
 
         if not last_event:
             return WorkflowExecutionRejectedEvent(
-                trace_id=uuid4(),
+                trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
                 body=WorkflowExecutionRejectedBody(
                     error=WorkflowError(
@@ -348,7 +348,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
 
         if not first_event:
             return WorkflowExecutionRejectedEvent(
-                trace_id=uuid4(),
+                trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
                 body=WorkflowExecutionRejectedBody(
                     error=WorkflowError(
@@ -367,7 +367,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             return last_event
 
         return WorkflowExecutionRejectedEvent(
-            trace_id=first_event.trace_id,
+            trace_id=self._execution_context.trace_id,
             span_id=first_event.span_id,
             body=WorkflowExecutionRejectedBody(
                 workflow_definition=self.__class__,
@@ -482,21 +482,11 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         return self.get_inputs_class()()
 
     def get_default_state(self, workflow_inputs: Optional[InputsType] = None) -> StateType:
-        execution_context = self._execution_context
         return self.get_state_class()(
-            meta=(
-                StateMeta(
-                    parent=self._parent_state,
-                    workflow_inputs=workflow_inputs or self.get_default_inputs(),
-                    trace_id=execution_context.trace_id,
-                    workflow_definition=self.__class__,
-                )
-                if execution_context and int(execution_context.trace_id)
-                else StateMeta(
-                    parent=self._parent_state,
-                    workflow_inputs=workflow_inputs or self.get_default_inputs(),
-                    workflow_definition=self.__class__,
-                )
+            meta=StateMeta(
+                parent=self._parent_state,
+                workflow_inputs=workflow_inputs or self.get_default_inputs(),
+                workflow_definition=self.__class__,
             )
         )
 
