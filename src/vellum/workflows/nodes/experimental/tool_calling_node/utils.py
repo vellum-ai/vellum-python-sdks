@@ -3,6 +3,9 @@ import json
 from typing import Any, Iterator, List, Optional, Type
 
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
+from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
+from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.outputs.base import BaseOutput
@@ -18,15 +21,26 @@ class FunctionNode(BaseNode):
 
 
 class ToolRouterNode(InlinePromptNode):
-    # TODO: We should include chat history in our next prompt input
     def run(self) -> Iterator[BaseOutput]:
+        self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}
         generator = super().run()
-        text = None
         for output in generator:
-            if output.name == "text":
-                text = output.value
-                if hasattr(self.state, "chat_history"):
-                    self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=text))
+            if output.name == "results":
+                if output.value[0].type == "STRING":
+                    self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=output.value[0].value))
+                elif output.value[0].type == "FUNCTION_CALL":
+                    self.state.chat_history.append(
+                        ChatMessage(
+                            role="FUNCTION",
+                            content=FunctionCallChatMessageContent(
+                                value=FunctionCallChatMessageContentValue(
+                                    name=output.value[0].value.name,
+                                    arguments=output.value[0].value.arguments,
+                                    id=output.value[0].value.id,
+                                ),
+                            ),
+                        )
+                    )
             yield output
 
 
@@ -52,6 +66,17 @@ def create_tool_router_node(
         setattr(Ports, function_name, port)
 
     setattr(Ports, "default", Port.on_else())
+
+    # Add a chat history block to blocks
+    blocks.append(
+        VariablePromptBlock(
+            block_type="VARIABLE",
+            input_variable="chat_history",
+            state=None,
+            cache_config=None,
+        )
+    )
+
     node = type(
         "ToolRouterNode",
         (ToolRouterNode,),

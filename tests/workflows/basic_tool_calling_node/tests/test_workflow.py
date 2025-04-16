@@ -7,6 +7,8 @@ from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
+from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
@@ -82,39 +84,30 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         == "Based on the function call, the current temperature in Miami is 70 degrees metric."
     )
     assert terminal_event.outputs.chat_history == [
+        ChatMessage(text="Hello, how are you?", role="USER"),
+        ChatMessage(text="I'm good, thank you!", role="ASSISTANT"),
         ChatMessage(
-            text="Hello, how are you?",
-            role="USER",
-            content=None,
-            source=None,
-        ),
-        ChatMessage(
-            text="I'm good, thank you!",
-            role="ASSISTANT",
-            content=None,
-            source=None,
-        ),
-        ChatMessage(
-            text='{\n    "arguments": {\n        "location": "Miami",\n        "unit": "metric"\n    },\n    "id": "call_7115tNTmEACTsQRGwKpJipJK",\n    "name": "get_current_weather",\n    "state": "FULFILLED"\n}',  # noqa: E501
-            role="ASSISTANT",
-            content=None,
-            source=None,
+            text=None,
+            role="FUNCTION",
+            content=FunctionCallChatMessageContent(
+                type="FUNCTION_CALL",
+                value=FunctionCallChatMessageContentValue(
+                    name="get_current_weather",
+                    arguments={"location": "Miami", "unit": "metric"},
+                    id="call_7115tNTmEACTsQRGwKpJipJK",
+                ),
+            ),
         ),
         ChatMessage(
             text="The current weather in Miami is sunny with a temperature of 70 degrees metric.",
             role="FUNCTION",
-            content=None,
-            source=None,
         ),
         ChatMessage(
             text="Based on the function call, the current temperature in Miami is 70 degrees metric.",
             role="ASSISTANT",
-            content=None,
-            source=None,
         ),
     ]
 
-    # Existing assertions for the API calls
     first_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[0]
     assert first_call.kwargs == {
         "ml_model": "gpt-4o-mini",
@@ -189,6 +182,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                     )
                 ],
             ),
+            VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
         ],
         "settings": None,
         "functions": [
@@ -222,8 +216,24 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 key="chat_history",
                 type="CHAT_HISTORY",
                 value=[
-                    ChatMessage(role="USER", text="Hello, how are you?"),
-                    ChatMessage(role="ASSISTANT", text="I'm good, thank you!"),
+                    ChatMessage(text="Hello, how are you?", role="USER"),
+                    ChatMessage(text="I'm good, thank you!", role="ASSISTANT"),
+                    ChatMessage(
+                        text=None,
+                        role="FUNCTION",
+                        content=FunctionCallChatMessageContent(
+                            type="FUNCTION_CALL",
+                            value=FunctionCallChatMessageContentValue(
+                                name="get_current_weather",
+                                arguments={"location": "Miami", "unit": "metric"},
+                                id="call_7115tNTmEACTsQRGwKpJipJK",
+                            ),
+                        ),
+                    ),
+                    ChatMessage(
+                        text="The current weather in Miami is sunny with a temperature of 70 degrees metric.",
+                        role="FUNCTION",
+                    ),
                 ],
             ),
         ],
@@ -287,6 +297,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                     )
                 ],
             ),
+            VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
         ],
         "settings": None,
         "functions": [
