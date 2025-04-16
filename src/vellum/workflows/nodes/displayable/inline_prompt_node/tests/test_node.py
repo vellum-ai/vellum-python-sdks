@@ -170,8 +170,13 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
             WorkflowErrorCode.INTERNAL_ERROR,
             "Failed to execute Prompt",
         ),
+        (
+            ApiError(status_code=403, body={"detail": "Provider credentials is missing or unavailable"}),
+            WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+            "Provider credentials is missing or unavailable",
+        ),
     ],
-    ids=["404", "invalid_dict", "invalid_body", "no_status_code", "500"],
+    ids=["404", "invalid_dict", "invalid_body", "no_status_code", "500", "403"],
 )
 def test_inline_prompt_node__api_error__invalid_inputs_node_exception(
     vellum_adhoc_prompt_client, exception, expected_code, expected_message
