@@ -852,6 +852,85 @@ export declare namespace AdornmentNodeSerializer {
   }
 }
 
+export const DefaultConditionNodePortSerializer: ObjectSchema<
+  DefaultConditionNodePortSerializer.Raw,
+  Omit<DefaultNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+});
+
+export declare namespace DefaultConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+  }
+}
+
+export const IfConditionNodePortSerializer: ObjectSchema<
+  IfConditionNodePortSerializer.Raw,
+  Omit<IfConditionNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  expression: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace IfConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    expression?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+export const ElifConditionNodePortSerializer: ObjectSchema<
+  ElifConditionNodePortSerializer.Raw,
+  Omit<ElifConditionNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+  expression: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace ElifConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+    expression?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+export const ElseConditionNodePortSerializer: ObjectSchema<
+  ElseConditionNodePortSerializer.Raw,
+  Omit<ElseConditionNodePort, "type">
+> = objectSchema({
+  id: stringSchema(),
+  name: stringSchema(),
+});
+
+export declare namespace ElseConditionNodePortSerializer {
+  interface Raw {
+    id: string;
+    name: string;
+  }
+}
+
+const NodePortSerializer = unionSchema("type", {
+  DEFAULT: DefaultConditionNodePortSerializer,
+  IF: IfConditionNodePortSerializer,
+  ELIF: ElifConditionNodePortSerializer,
+  ELSE: ElseConditionNodePortSerializer,
+});
+
+export declare namespace NodePortSerializer {
+  type Raw =
+    | DefaultConditionNodePortSerializer.Raw
+    | IfConditionNodePortSerializer.Raw
+    | ElifConditionNodePortSerializer.Raw
+    | ElseConditionNodePortSerializer.Raw;
+}
+
 export declare namespace BaseWorkflowNodeSerializer {
   interface Raw {
     base?: CodeResourceDefinitionSerializer.Raw | null;
@@ -867,6 +946,7 @@ export declare namespace BaseDisplayableWorkflowNodeSerializer {
     adornments?: AdornmentNodeSerializer.Raw[] | null;
     outputs?: NodeOutputSerializer.Raw[] | null;
     attributes?: NodeAttributeSerializer.Raw[] | null;
+    ports?: NodePortSerializer.Raw[] | null;
   }
 }
 
@@ -887,6 +967,7 @@ export const EntrypointNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace EntrypointNodeSerializer {
@@ -1166,6 +1247,7 @@ export const PromptNodeSerializer: ObjectSchema<
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   outputs: listSchema(NodeOutputSerializer).optional(),
   attributes: listSchema(NodeAttributeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace PromptNodeSerializer {
@@ -1188,6 +1270,7 @@ export const SubworkflowNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace SubworkflowNodeSerializer {
@@ -1300,6 +1383,7 @@ export const MapNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace MapNodeSerializer {
@@ -1329,6 +1413,7 @@ export const GuardrailNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace GuardrailNodeSerializer {
@@ -1404,6 +1489,7 @@ export const CodeExecutionNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace CodeExecutionNodeSerializer {
@@ -1480,6 +1566,7 @@ export const SearchNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace SearchNodeSerializer {
@@ -1571,6 +1658,7 @@ export const ConditionalNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace ConditionalNodeSerializer {
@@ -1604,6 +1692,7 @@ export const TemplatingNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace TemplatingNodeSerializer {
@@ -1642,6 +1731,7 @@ export const FinalOutputNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   outputs: listSchema(NodeOutputSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace FinalOutputNodeSerializer {
@@ -1698,6 +1788,7 @@ export const MergeNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace MergeNodeSerializer {
@@ -1771,6 +1862,7 @@ export const ApiNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace ApiNodeSerializer {
@@ -1813,6 +1905,7 @@ export const NoteNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace NoteNodeSerializer {
@@ -1846,6 +1939,7 @@ export const ErrorNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  ports: listSchema(NodePortSerializer).optional(),
 });
 
 export declare namespace ErrorNodeSerializer {
@@ -1858,85 +1952,6 @@ export declare namespace ErrorNodeSerializer {
       error_output_id: string;
     };
   }
-}
-
-export const DefaultConditionNodePortSerializer: ObjectSchema<
-  DefaultConditionNodePortSerializer.Raw,
-  Omit<DefaultNodePort, "type">
-> = objectSchema({
-  id: stringSchema(),
-  name: stringSchema(),
-});
-
-export declare namespace DefaultConditionNodePortSerializer {
-  interface Raw {
-    id: string;
-    name: string;
-  }
-}
-
-export const IfConditionNodePortSerializer: ObjectSchema<
-  IfConditionNodePortSerializer.Raw,
-  Omit<IfConditionNodePort, "type">
-> = objectSchema({
-  id: stringSchema(),
-  name: stringSchema(),
-  expression: WorkflowValueDescriptorSerializer.optional(),
-});
-
-export declare namespace IfConditionNodePortSerializer {
-  interface Raw {
-    id: string;
-    name: string;
-    expression?: WorkflowValueDescriptorSerializer.Raw | null;
-  }
-}
-
-export const ElifConditionNodePortSerializer: ObjectSchema<
-  ElifConditionNodePortSerializer.Raw,
-  Omit<ElifConditionNodePort, "type">
-> = objectSchema({
-  id: stringSchema(),
-  name: stringSchema(),
-  expression: WorkflowValueDescriptorSerializer.optional(),
-});
-
-export declare namespace ElifConditionNodePortSerializer {
-  interface Raw {
-    id: string;
-    name: string;
-    expression?: WorkflowValueDescriptorSerializer.Raw | null;
-  }
-}
-
-export const ElseConditionNodePortSerializer: ObjectSchema<
-  ElseConditionNodePortSerializer.Raw,
-  Omit<ElseConditionNodePort, "type">
-> = objectSchema({
-  id: stringSchema(),
-  name: stringSchema(),
-});
-
-export declare namespace ElseConditionNodePortSerializer {
-  interface Raw {
-    id: string;
-    name: string;
-  }
-}
-
-const NodePortSerializer = unionSchema("type", {
-  DEFAULT: DefaultConditionNodePortSerializer,
-  IF: IfConditionNodePortSerializer,
-  ELIF: ElifConditionNodePortSerializer,
-  ELSE: ElseConditionNodePortSerializer,
-});
-
-export declare namespace NodePortSerializer {
-  type Raw =
-    | DefaultConditionNodePortSerializer.Raw
-    | IfConditionNodePortSerializer.Raw
-    | ElifConditionNodePortSerializer.Raw
-    | ElseConditionNodePortSerializer.Raw;
 }
 
 export const NodeTriggerSerializer: ObjectSchema<

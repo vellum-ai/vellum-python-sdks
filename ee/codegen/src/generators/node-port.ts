@@ -3,10 +3,11 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
-import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { BaseNodeContext } from "src/context/node-context/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   NodePort as NodePortType,
+  WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
 import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
@@ -14,13 +15,13 @@ import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
 export declare namespace NodePorts {
   export interface Args {
     nodePorts: NodePortType[];
-    nodeContext: GenericNodeContext;
+    nodeContext: BaseNodeContext<WorkflowDataNode>;
     workflowContext: WorkflowContext;
   }
 }
 
 export class NodePorts extends AstNode {
-  private nodeContext: GenericNodeContext;
+  private nodeContext: BaseNodeContext<WorkflowDataNode>;
   private workflowContext: WorkflowContext;
   private astNode: AstNode | undefined = undefined;
 

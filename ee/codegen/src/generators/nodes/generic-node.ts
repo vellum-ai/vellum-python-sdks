@@ -4,7 +4,6 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { NodeOutputs } from "src/generators/node-outputs";
-import { NodePorts } from "src/generators/node-port";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -68,11 +67,6 @@ export class GenericNode extends BaseSingleFileNode<
     }
 
     statements.push(
-      new NodePorts({
-        nodePorts: this.nodeData.ports,
-        nodeContext: this.nodeContext,
-        workflowContext: this.workflowContext,
-      }),
       new NodeOutputs({
         nodeOutputs: this.nodeData.outputs,
         nodeContext: this.nodeContext,
