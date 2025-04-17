@@ -331,7 +331,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
     @cached_property
     def workflow_id(self) -> UUID:
         """Can be overridden as a class attribute to specify a custom workflow id."""
-        return uuid4_from_hash(self._workflow.__qualname__)
+        return self._workflow.__id__
 
     def add_error(self, error: Exception) -> None:
         if self._dry_run:
@@ -513,14 +513,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 display_data=overrides.display_data,
             )
 
-        entrypoint_node_id = uuid4_from_hash(f"{self.workflow_id}|entrypoint_node_id")
-        entrypoint_node_source_handle_id = uuid4_from_hash(f"{self.workflow_id}|entrypoint_node_source_handle_id")
-
-        return WorkflowMetaDisplay(
-            entrypoint_node_id=entrypoint_node_id,
-            entrypoint_node_source_handle_id=entrypoint_node_source_handle_id,
-            entrypoint_node_display=NodeDisplayData(),
-        )
+        return WorkflowMetaDisplay.get_default(self._workflow)
 
     def _generate_workflow_input_display(
         self, workflow_input: WorkflowInputReference, overrides: Optional[WorkflowInputsDisplay] = None

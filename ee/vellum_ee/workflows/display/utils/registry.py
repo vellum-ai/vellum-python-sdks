@@ -25,6 +25,10 @@ def register_workflow_display_class(
     _workflow_display_registry[workflow_class] = workflow_display_class
 
 
+def get_default_workflow_display_class() -> Type["BaseWorkflowDisplay"]:
+    return _workflow_display_registry[BaseWorkflow]
+
+
 def get_from_node_display_registry(node_class: Type[BaseNode]) -> Optional[Type["BaseNodeDisplay"]]:
     return _node_display_registry.get(node_class)
 
