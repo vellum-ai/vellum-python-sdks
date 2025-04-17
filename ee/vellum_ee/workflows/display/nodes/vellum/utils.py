@@ -8,6 +8,7 @@ from vellum.workflows.references import NodeReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 from vellum_ee.workflows.display.utils.vellum import (
     ConstantValuePointer,
@@ -76,7 +77,12 @@ def create_node_input_value_pointer_rules(
                 node_input_value_pointer_rules.extend(rhs_rules)
         else:
             # Non-CoalesceExpression case
-            node_input_value_pointer_rules.append(create_node_input_value_pointer_rule(value, display_context))
+            try:
+                rule = create_node_input_value_pointer_rule(value, display_context)
+            except UnsupportedSerializationException:
+                return node_input_value_pointer_rules
+
+            node_input_value_pointer_rules.append(rule)
     else:
         pointer = create_pointer(value, pointer_type)
         node_input_value_pointer_rules.append(pointer)

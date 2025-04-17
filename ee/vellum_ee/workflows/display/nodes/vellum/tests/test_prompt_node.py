@@ -6,6 +6,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.references.lazy import LazyReference
+from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.nodes.vellum.inline_prompt_node import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -127,4 +128,56 @@ def test_serialize_node__prompt_inputs(GetDisplayClass, expected_input_id):
                 "combinator": "OR",
             },
         }
+    ]
+
+
+def test_serialize_node__prompt_inputs__state_reference():
+    # GIVEN a state definition
+    class MyState(BaseState):
+        foo: str
+
+    # AND a prompt node with inputs
+    class MyPromptNode(InlinePromptNode):
+        prompt_inputs = {"foo": MyState.foo, "bar": "baz"}
+        blocks = []
+        ml_model = "gpt-4o"
+
+    # AND a workflow with the prompt node
+    class Workflow(BaseWorkflow):
+        graph = MyPromptNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should skip the state reference input rule
+    my_prompt_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(MyPromptNode.__id__)
+    )
+
+    assert my_prompt_node["inputs"] == [
+        {
+            "id": "e47e0a80-afbb-4888-b06b-8dc78edd8572",
+            "key": "foo",
+            "value": {
+                "rules": [],
+                "combinator": "OR",
+            },
+        },
+        {
+            "id": "3750feb9-5d5c-4150-b62d-a9924f466888",
+            "key": "bar",
+            "value": {
+                "rules": [
+                    {
+                        "type": "CONSTANT_VALUE",
+                        "data": {
+                            "type": "STRING",
+                            "value": "baz",
+                        },
+                    }
+                ],
+                "combinator": "OR",
+            },
+        },
     ]
