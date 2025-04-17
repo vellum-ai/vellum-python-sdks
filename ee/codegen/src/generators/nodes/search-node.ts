@@ -329,7 +329,10 @@ export class SearchNode extends BaseSingleFileNode<
   ): Map<string, string> {
     const result = new Map<string, string>();
 
-    const traverse = (logicalExpression: VellumLogicalExpression) => {
+    const traverse = (
+      logicalExpression: VellumLogicalExpression,
+      conditionPath: number[]
+    ) => {
       if (logicalExpression.type === "LOGICAL_CONDITION") {
         const lhsQueryInput = this.nodeInputsById.get(
           logicalExpression.lhsVariableId
@@ -338,14 +341,26 @@ export class SearchNode extends BaseSingleFileNode<
           logicalExpression.rhsVariableId
         )?.nodeInputData?.id;
         if (!lhsQueryInput) {
-          throw new NodeAttributeGenerationError(
-            `Could not find search node query input for id ${logicalExpression.lhsVariableId}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `Could not find search node query input for the left hand side of condition ${conditionPath.join(
+                " -> "
+              )}`,
+              "WARNING"
+            )
           );
+          return;
         }
         if (!isUnaryOperator(logicalExpression.operator) && !rhsQueryInput) {
-          throw new NodeAttributeGenerationError(
-            `Could not find search node query input for id ${logicalExpression.rhsVariableId}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `Could not find search node query input for the right hand side of condition ${conditionPath.join(
+                " -> "
+              )}`,
+              "WARNING"
+            )
           );
+          return;
         }
 
         result.set(logicalExpression.lhsVariableId, lhsQueryInput);
@@ -354,13 +369,13 @@ export class SearchNode extends BaseSingleFileNode<
           result.set(logicalExpression.rhsVariableId, rhsQueryInput);
         }
       } else if (logicalExpression.type === "LOGICAL_CONDITION_GROUP") {
-        logicalExpression.conditions.forEach((condition) =>
-          traverse(condition)
+        logicalExpression.conditions.forEach((condition, index) =>
+          traverse(condition, [...conditionPath, index])
         );
       }
     };
 
-    traverse(rawData);
+    traverse(rawData, []);
 
     return result;
   }

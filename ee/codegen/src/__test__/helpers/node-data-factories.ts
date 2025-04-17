@@ -116,6 +116,7 @@ export function searchNodeDataFactory(args?: {
   metadataFilterInputs?: NodeInput[];
   errorOutputId?: string;
   limitInput?: ConstantValuePointer;
+  queryInput?: NodeInput;
   includeDocumentIndexInput?: boolean;
 }): SearchNode {
   const errorOutputId = args?.errorOutputId;
@@ -176,6 +177,22 @@ export function searchNodeDataFactory(args?: {
     },
   ];
 
+  const queryInput = args?.queryInput ?? {
+    id: "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a",
+    key: "query",
+    value: {
+      rules: [
+        {
+          type: "INPUT_VARIABLE",
+          data: {
+            inputVariableId: "a6ef8809-346e-469c-beed-2e5c4e9844c5",
+          },
+        },
+      ],
+      combinator: "OR",
+    },
+  };
+
   const nodeData: SearchNode = {
     id: "search",
     type: WorkflowNodeType.SEARCH,
@@ -186,32 +203,17 @@ export function searchNodeDataFactory(args?: {
       errorOutputId,
       resultsOutputId: "77839b3c-fe1c-4dcb-9c61-2fac827f729b",
       textOutputId: "d56d7c49-7b45-4933-9779-2bd7f82c2141",
-      queryNodeInputId: "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a",
+      queryNodeInputId: queryInput.id,
       documentIndexNodeInputId: "b49bc1ab-2ad5-4cf2-8966-5cc87949900d",
       weightsNodeInputId: "1daf3180-4b92-472a-8665-a7703c84a94e",
       limitNodeInputId: "161d264e-d04e-4c37-8e50-8bbb4c90c46e",
       separatorNodeInputId: "4eddefc0-90d5-422a-aec2-bc94c8f1d83c",
       resultMergingEnabledNodeInputId: "dc9f880b-81bc-4644-b025-8f7d5db23a48",
       externalIdFiltersNodeInputId: "61933e79-b0c2-4e3c-bf07-e2d93b9d9c54",
-      metadataFiltersNodeInputId:
-        metadataFiltersNodeInputId ?? "7c43b315-d1f2-4727-9540-6cc3fd4641f3",
+      metadataFiltersNodeInputId,
     },
     inputs: [
-      {
-        id: "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a",
-        key: "query",
-        value: {
-          rules: [
-            {
-              type: "INPUT_VARIABLE",
-              data: {
-                inputVariableId: "a6ef8809-346e-469c-beed-2e5c4e9844c5",
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
+      queryInput,
       ...(includeDocumentIndexInput
         ? [
             {

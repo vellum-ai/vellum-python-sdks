@@ -496,3 +496,109 @@ class SearchNode(BaseSearchNode):
     chunk_separator = "\\n\\n#####\\n\\n"
 "
 `;
+
+exports[`TextSearchNode > should codegen successfully without metadata filters mapped properly > LHS missing on getNodeDisplayClassBodyStatements 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
+
+from ...nodes.search_node import SearchNode
+
+
+class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
+    label = "Search Node"
+    node_id = UUID("search")
+    target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
+    metadata_filter_input_id_by_operand_id = {}
+    node_input_ids_by_name = {
+        "query": UUID("2f5bc81d-6ee8-4101-9a55-4ddeae954425"),
+        "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
+        "weights": UUID("1daf3180-4b92-472a-8665-a7703c84a94e"),
+        "limit": UUID("161d264e-d04e-4c37-8e50-8bbb4c90c46e"),
+        "separator": UUID("4eddefc0-90d5-422a-aec2-bc94c8f1d83c"),
+        "result_merging_enabled": UUID("dc9f880b-81bc-4644-b025-8f7d5db23a48"),
+        "external_id_filters": UUID("61933e79-b0c2-4e3c-bf07-e2d93b9d9c54"),
+        "metadata_filters": UUID("7c43b315-d1f2-4727-9540-6cc3fd4641f3"),
+        "filters.metadata.conditions.0.lhs": UUID(
+            "1237381c-2e78-4306-bd62-be8ecc900d02"
+        ),
+        "filters.metadata.conditions.0.rhs": UUID(
+            "3a72e524-aaf5-4b00-a8b4-b71a3192e8aa"
+        ),
+    }
+    output_display = {
+        SearchNode.Outputs.results: NodeOutputDisplay(
+            id=UUID("77839b3c-fe1c-4dcb-9c61-2fac827f729b"), name="results"
+        ),
+        SearchNode.Outputs.text: NodeOutputDisplay(
+            id=UUID("d56d7c49-7b45-4933-9779-2bd7f82c2141"), name="text"
+        ),
+    }
+    port_displays = {
+        SearchNode.Ports.default: PortDisplayOverrides(
+            id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`TextSearchNode > should codegen successfully without metadata filters mapped properly > RHS missing on getNodeDisplayClassBodyStatements 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
+
+from ...nodes.search_node import SearchNode
+
+
+class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
+    label = "Search Node"
+    node_id = UUID("search")
+    target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
+    metadata_filter_input_id_by_operand_id = {}
+    node_input_ids_by_name = {
+        "query": UUID("d10ba907-d29e-410f-9562-66222147bc69"),
+        "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
+        "weights": UUID("1daf3180-4b92-472a-8665-a7703c84a94e"),
+        "limit": UUID("161d264e-d04e-4c37-8e50-8bbb4c90c46e"),
+        "separator": UUID("4eddefc0-90d5-422a-aec2-bc94c8f1d83c"),
+        "result_merging_enabled": UUID("dc9f880b-81bc-4644-b025-8f7d5db23a48"),
+        "external_id_filters": UUID("61933e79-b0c2-4e3c-bf07-e2d93b9d9c54"),
+        "metadata_filters": UUID("7c43b315-d1f2-4727-9540-6cc3fd4641f3"),
+        "filters.metadata.conditions.0.lhs": UUID(
+            "9263f669-dfb4-4d69-820d-15beca7583b3"
+        ),
+        "filters.metadata.conditions.0.rhs": UUID(
+            "75d44663-2ae3-45f7-b015-202736625f0c"
+        ),
+    }
+    output_display = {
+        SearchNode.Outputs.results: NodeOutputDisplay(
+            id=UUID("77839b3c-fe1c-4dcb-9c61-2fac827f729b"), name="results"
+        ),
+        SearchNode.Outputs.text: NodeOutputDisplay(
+            id=UUID("d56d7c49-7b45-4933-9779-2bd7f82c2141"), name="text"
+        ),
+    }
+    port_displays = {
+        SearchNode.Ports.default: PortDisplayOverrides(
+            id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
