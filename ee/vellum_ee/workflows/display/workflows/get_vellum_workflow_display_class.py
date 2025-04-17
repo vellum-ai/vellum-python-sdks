@@ -1,33 +1,45 @@
-from typing import Optional, Type
+import types
+from typing import TYPE_CHECKING, Optional, Type
 
 from vellum.workflows.types.generics import WorkflowType
-from vellum_ee.workflows.display.types import WorkflowDisplayContext, WorkflowDisplayType
+from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.registry import get_from_workflow_display_registry
+
+if TYPE_CHECKING:
+    from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+
+def _get_workflow_display_class(*, workflow_class: Type[WorkflowType]) -> Type["BaseWorkflowDisplay"]:
+    workflow_display_class = get_from_workflow_display_registry(workflow_class)
+    if workflow_display_class:
+        return workflow_display_class
+
+    base_workflow_display_class = _get_workflow_display_class(
+        workflow_class=workflow_class.__bases__[0],
+    )
+
+    # `base_workflow_display_class` is always a Generic class, so it's safe to index into it
+    WorkflowDisplayBaseClass = base_workflow_display_class[workflow_class]  # type: ignore[index]
+
+    WorkflowDisplayClass = types.new_class(
+        f"{workflow_class.__name__}Display",
+        bases=(WorkflowDisplayBaseClass,),
+    )
+
+    return WorkflowDisplayClass
 
 
 def get_workflow_display(
     *,
-    base_display_class: Type[WorkflowDisplayType],
     workflow_class: Type[WorkflowType],
-    root_workflow_class: Optional[Type[WorkflowType]] = None,
     parent_display_context: Optional[WorkflowDisplayContext] = None,
     dry_run: bool = False,
-) -> WorkflowDisplayType:
-    try:
-        workflow_display_class = base_display_class.get_from_workflow_display_registry(workflow_class)
-    except KeyError:
-        try:
-            return get_workflow_display(
-                base_display_class=base_display_class,
-                workflow_class=workflow_class.__bases__[0],
-                root_workflow_class=workflow_class if root_workflow_class is None else root_workflow_class,
-                parent_display_context=parent_display_context,
-                dry_run=dry_run,
-            )
-        except IndexError:
-            return base_display_class(workflow_class)
-
-    return workflow_display_class(  # type: ignore[return-value]
-        workflow_class,
+    # DEPRECATED: The following arguments will be removed in 0.15.0
+    root_workflow_class: Optional[Type[WorkflowType]] = None,
+    base_display_class: Optional[Type["BaseWorkflowDisplay"]] = None,
+) -> "BaseWorkflowDisplay":
+    return _get_workflow_display_class(workflow_class=workflow_class)(
+        workflow=workflow_class,
         parent_display_context=parent_display_context,
         dry_run=dry_run,
     )

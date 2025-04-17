@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Dict, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Dict, Tuple, Type
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa: F401
@@ -20,7 +20,6 @@ from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDispl
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
-WorkflowDisplayType = TypeVar("WorkflowDisplayType", bound="BaseWorkflowDisplay")
 
 WorkflowInputsDisplays = Dict[WorkflowInputReference, WorkflowInputsDisplay]
 StateValueDisplays = Dict[StateValueReference, StateValueDisplay]
