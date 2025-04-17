@@ -104,11 +104,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         """Can be overridden as a class attribute to specify a custom workflow id."""
         return uuid4_from_hash(self._workflow.__qualname__)
 
-    @property
-    @abstractmethod
-    def node_display_base_class(self) -> Type[BaseNodeDisplay]:
-        pass
-
     def add_error(self, error: Exception) -> None:
         if self._dry_run:
             self._errors.append(error)
@@ -159,13 +154,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             port_displays[port] = node_display.get_node_port_display(port)
 
     def _get_node_display(self, node: Type[BaseNode]) -> BaseNodeDisplay:
-        node_display_class = get_node_display_class(self.node_display_base_class, node)
-        node_display = node_display_class()
-
-        if not isinstance(node_display, self.node_display_base_class):
-            raise ValueError(f"{node.__name__} must be a subclass of {self.node_display_base_class.__name__}")
-
-        return node_display
+        node_display_class = get_node_display_class(node)
+        return node_display_class()
 
     @cached_property
     def display_context(self) -> WorkflowDisplayContext:

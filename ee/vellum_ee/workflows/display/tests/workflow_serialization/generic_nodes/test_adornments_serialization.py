@@ -10,7 +10,6 @@ from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -148,7 +147,6 @@ def test_serialize_node__try(serialize_node):
 
     input_id = uuid4()
     serialized_node = serialize_node(
-        base_class=BaseNodeVellumDisplay,
         node_class=InnerTryGenericNode,
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
         global_node_displays={
@@ -283,7 +281,10 @@ def test_serialize_node__stacked():
                                 "test_adornments_serialization",
                             ],
                         },
-                        "trigger": {"id": "6e4af17f-bbee-4777-b10d-af042cd6e16a", "merge_behavior": "AWAIT_ATTRIBUTES"},
+                        "trigger": {
+                            "id": "6e4af17f-bbee-4777-b10d-af042cd6e16a",
+                            "merge_behavior": "AWAIT_ATTRIBUTES",
+                        },
                         "ports": [{"id": "408cd5fb-3a3e-4eb2-9889-61111bd6a129", "name": "default", "type": "DEFAULT"}],
                         "adornments": [
                             {

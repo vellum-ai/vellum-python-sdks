@@ -21,8 +21,6 @@ logger = logging.getLogger(__name__)
 
 
 class VellumWorkflowDisplay(BaseWorkflowDisplay[WorkflowType]):
-    node_display_base_class = BaseNodeDisplay
-
     def serialize(self) -> JsonObject:
         input_variables: JsonArray = []
         for workflow_input_reference, workflow_input_display in self.display_context.workflow_input_displays.items():
