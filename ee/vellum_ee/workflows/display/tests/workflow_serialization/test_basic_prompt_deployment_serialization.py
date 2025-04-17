@@ -4,7 +4,6 @@ from uuid import uuid4
 from deepdiff import DeepDiff
 
 from vellum import DeploymentRead
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_text_prompt_deployment.workflow import BasicTextPromptDeployment
@@ -25,9 +24,7 @@ def test_serialize_workflow(vellum_client):
     vellum_client.deployments.retrieve.return_value = deployment
 
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=BasicTextPromptDeployment
-    )
+    workflow_display = get_workflow_display(workflow_class=BasicTextPromptDeployment)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow

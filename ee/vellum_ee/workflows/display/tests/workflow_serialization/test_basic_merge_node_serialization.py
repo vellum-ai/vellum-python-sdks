@@ -1,6 +1,5 @@
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_merge_node.await_all_workflow import AwaitAllPassingWorkflow
@@ -9,9 +8,7 @@ from tests.workflows.basic_merge_node.await_all_workflow import AwaitAllPassingW
 def test_serialize_workflow__await_all():
     # GIVEN a Workflow that uses an await all merge node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=AwaitAllPassingWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=AwaitAllPassingWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow

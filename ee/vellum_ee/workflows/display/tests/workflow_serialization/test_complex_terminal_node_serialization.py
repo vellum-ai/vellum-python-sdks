@@ -2,7 +2,6 @@ import pytest
 
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.complex_final_output_node.missing_final_output_node import MissingFinalOutputNodeWorkflow
@@ -11,9 +10,7 @@ from tests.workflows.complex_final_output_node.missing_workflow_output import Mi
 
 def test_serialize_workflow__missing_final_output_node():
     # GIVEN a Workflow that is missing a Terminal Node
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=MissingFinalOutputNodeWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=MissingFinalOutputNodeWorkflow)
 
     # WHEN we serialize it
     serialized_workflow: dict = workflow_display.serialize()
@@ -179,9 +176,7 @@ def test_serialize_workflow__missing_final_output_node():
 
 def test_serialize_workflow__missing_workflow_output():
     # GIVEN a Workflow that contains a terminal node that is unreferenced by the Workflow's Outputs
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=MissingWorkflowOutputWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=MissingWorkflowOutputWorkflow)
 
     # WHEN we serialize it, it should throw an error
     with pytest.raises(ValueError) as exc_info:

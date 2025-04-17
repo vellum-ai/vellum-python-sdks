@@ -16,7 +16,6 @@ from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 class Inputs(BaseInputs):
@@ -169,7 +168,7 @@ def test_serialize_node__lazy_reference_with_string():
         graph = LazyReferenceGenericNode >> OtherNode
 
     # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=Workflow)
+    workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN the node should properly serialize the attribute reference
@@ -257,10 +256,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
         graph = GenericNode
 
     # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=Workflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=Workflow)
     with pytest.raises(Exception) as exc_info:
         workflow_display.serialize()
 

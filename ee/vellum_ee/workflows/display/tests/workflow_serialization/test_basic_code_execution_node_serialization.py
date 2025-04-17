@@ -1,7 +1,6 @@
 from deepdiff import DeepDiff
 
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_code_execution_node.try_workflow import TrySimpleCodeExecutionWorkflow
@@ -12,9 +11,7 @@ from tests.workflows.basic_code_execution_node.workflow_with_code import SimpleC
 def test_serialize_workflow_with_filepath():
     # GIVEN a Workflow with a code execution node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=SimpleCodeExecutionWithFilepathWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=SimpleCodeExecutionWithFilepathWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
@@ -253,9 +250,7 @@ def test_serialize_workflow_with_filepath():
 def test_serialize_workflow_with_code():
     # GIVEN a Workflow with a code execution node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=SimpleCodeExecutionWithCodeWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=SimpleCodeExecutionWithCodeWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
@@ -482,9 +477,7 @@ def test_serialize_workflow_with_code():
 def test_serialize_workflow__try_wrapped():
     # GIVEN a Workflow with a code execution node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=TrySimpleCodeExecutionWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=TrySimpleCodeExecutionWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow

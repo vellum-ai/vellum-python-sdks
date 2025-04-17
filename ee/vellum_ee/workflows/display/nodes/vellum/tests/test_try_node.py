@@ -5,7 +5,6 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 def test_try_node_display__serialize_with_error_output() -> None:
@@ -28,7 +27,7 @@ def test_try_node_display__serialize_with_error_output() -> None:
         graph = MyNode >> OtherNode
 
     # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=MyWorkflow)
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
     serialized_workflow = cast(Dict[str, Any], workflow_display.serialize())
 
     # THEN the correct inputs should be serialized on the node

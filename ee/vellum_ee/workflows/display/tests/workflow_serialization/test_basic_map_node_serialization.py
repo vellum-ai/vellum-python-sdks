@@ -1,6 +1,5 @@
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_map_node.workflow import SimpleMapExample
@@ -9,7 +8,7 @@ from tests.workflows.basic_map_node.workflow import SimpleMapExample
 def test_serialize_workflow():
     # GIVEN a Workflow that uses a MapNode
     # WHEN we serialize it
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=SimpleMapExample)
+    workflow_display = get_workflow_display(workflow_class=SimpleMapExample)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow

@@ -4,7 +4,6 @@ from typing import Any, Dict
 from deepdiff import DeepDiff
 
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -17,7 +16,7 @@ def test_code_to_display_data(code_to_display_fixture_paths, workspace_secret_cl
     module_path = ".".join(base_module_path + code_sub_path)
 
     workflow = BaseWorkflow.load_from_module(module_path)
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow)
+    workflow_display = get_workflow_display(workflow_class=workflow)
     actual_serialized_workflow: dict = workflow_display.serialize()
 
     with open(expected_display_data_file_path) as file:

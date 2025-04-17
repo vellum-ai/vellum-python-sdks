@@ -22,7 +22,7 @@ from vellum_ee.workflows.display.utils.vellum import (
     NodeOutputPointer,
 )
 from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplayOverrides, WorkflowMetaVellumDisplay
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
 class Inputs(BaseInputs):
@@ -109,7 +109,7 @@ def test_create_node_input_value_pointer_rules(
     rules = create_node_input_value_pointer_rules(
         descriptor,
         WorkflowDisplayContext(
-            workflow_display_class=VellumWorkflowDisplay,
+            workflow_display_class=BaseWorkflowDisplay,
             workflow_display=WorkflowMetaVellumDisplay(
                 entrypoint_node_id=uuid4(),
                 entrypoint_node_source_handle_id=uuid4(),

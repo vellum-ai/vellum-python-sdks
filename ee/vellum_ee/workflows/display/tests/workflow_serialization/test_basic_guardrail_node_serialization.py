@@ -1,6 +1,5 @@
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_guardrail_node.workflow import BasicGuardrailNodeWorkflow
@@ -9,14 +8,17 @@ from tests.workflows.basic_guardrail_node.workflow import BasicGuardrailNodeWork
 def test_serialize_workflow():
     # GIVEN a workflow that uses a guardrail node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=BasicGuardrailNodeWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=BasicGuardrailNodeWorkflow)
 
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the workflow
-    assert serialized_workflow.keys() == {"workflow_raw_data", "input_variables", "state_variables", "output_variables"}
+    assert serialized_workflow.keys() == {
+        "workflow_raw_data",
+        "input_variables",
+        "state_variables",
+        "output_variables",
+    }
 
     # AND its input variables should be what we expect
     input_variables = serialized_workflow["input_variables"]
