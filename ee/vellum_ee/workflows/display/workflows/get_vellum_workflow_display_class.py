@@ -41,7 +41,6 @@ def get_workflow_display(
     base_display_class: Optional[Type["BaseWorkflowDisplay"]] = None,
 ) -> "BaseWorkflowDisplay":
     return _get_workflow_display_class(workflow_class=workflow_class)(
-        workflow=workflow_class,
         parent_display_context=parent_display_context,
         dry_run=dry_run,
     )
