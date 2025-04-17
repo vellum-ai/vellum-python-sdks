@@ -8,7 +8,7 @@ from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
 from vellum.workflows.constants import undefined
-from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context, get_parent_context
+from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
@@ -30,7 +30,7 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, WorkflowParentContext
+from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionInitiatedBody,
@@ -374,11 +374,16 @@ class WorkflowRunner(Generic[StateType]):
 
         logger.debug(f"Finished running node: {node.__class__.__name__}")
 
-    def _context_run_work_item(self, node: BaseNode[StateType], span_id: UUID, parent_context=None) -> None:
-        execution = get_execution_context()
+    def _context_run_work_item(
+        self,
+        node: BaseNode[StateType],
+        span_id: UUID,
+        parent_context: ParentContext,
+        trace_id: UUID,
+    ) -> None:
         with execution_context(
-            parent_context=parent_context or execution.parent_context,
-            trace_id=execution.trace_id,
+            parent_context=parent_context,
+            trace_id=trace_id,
         ):
             self._run_work_item(node, span_id)
 
@@ -428,14 +433,19 @@ class WorkflowRunner(Generic[StateType]):
             if not node_class.Trigger.should_initiate(state, all_deps, node_span_id):
                 return
 
-            current_parent = get_parent_context()
+            execution = get_execution_context()
             node = node_class(state=state, context=self.workflow.context)
             state.meta.node_execution_cache.initiate_node_execution(node_class, node_span_id)
             self._active_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
 
             worker_thread = Thread(
                 target=self._context_run_work_item,
-                kwargs={"node": node, "span_id": node_span_id, "parent_context": current_parent},
+                kwargs={
+                    "node": node,
+                    "span_id": node_span_id,
+                    "parent_context": execution.parent_context,
+                    "trace_id": execution.trace_id,
+                },
             )
             worker_thread.start()
 

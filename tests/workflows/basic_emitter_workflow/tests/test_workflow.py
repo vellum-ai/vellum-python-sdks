@@ -58,6 +58,8 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
 
     assert events[1].name == "node.execution.initiated"
     assert events[1].node_definition == StartNode
+    assert events[1].trace_id == trace_id
+    assert events[1].span_id == start_node_span_id
 
     assert events[2].name == "workflow.execution.snapshotted"
     assert default_serializer(events[2].state) == {
@@ -90,6 +92,8 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
 
     assert events[4].name == "node.execution.initiated"
     assert events[4].node_definition == NextNode
+    assert events[4].trace_id == trace_id
+    assert events[4].span_id == next_node_span_id
 
     assert events[5].name == "workflow.execution.snapshotted"
     assert default_serializer(events[5].state) == {
