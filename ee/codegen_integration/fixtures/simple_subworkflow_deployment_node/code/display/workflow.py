@@ -9,7 +9,7 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
 from ..nodes.final_output import FinalOutput
@@ -17,7 +17,7 @@ from ..nodes.subworkflow_deployment import SubworkflowDeployment
 from ..workflow import Workflow
 
 
-class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("39a5155a-d137-4a56-be36-d525802df463"),
         entrypoint_node_source_handle_id=UUID("beddfefc-dc34-483d-b313-f6a2a2e0737e"),

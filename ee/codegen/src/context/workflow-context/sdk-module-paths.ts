@@ -7,13 +7,6 @@ export function generateSdkModulePaths(
 
   return {
     WORKFLOWS_MODULE_PATH: workflowsSdkModulePath,
-    WORKFLOWS_DISPLAY_MODULE_PATH: [
-      "vellum_ee",
-      "workflows",
-      "display",
-      "workflows",
-      "vellum_workflow_display",
-    ] as const,
     CORE_NODES_MODULE_PATH: [...nodesModulePath, "core"] as const,
     DISPLAYABLE_NODES_MODULE_PATH: [...nodesModulePath, "displayable"] as const,
     INPUTS_MODULE_PATH: [...workflowsSdkModulePath, "inputs"] as const,
