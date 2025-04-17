@@ -2,7 +2,6 @@ from collections.abc import Callable
 from typing import Any, ClassVar, List, Optional
 
 from vellum import ChatMessage, PromptBlock
-from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -59,25 +58,12 @@ class ToolCallingNode(BaseNode):
         then executes the workflow.
         """
 
-        initial_chat_history = []
-
-        # Extract chat history from prompt inputs if available
-        if self.prompt_inputs and "chat_history" in self.prompt_inputs:
-            chat_history_input = self.prompt_inputs["chat_history"]
-            if isinstance(chat_history_input, list) and all(
-                isinstance(msg, (ChatMessage, ChatMessageRequest)) for msg in chat_history_input
-            ):
-                initial_chat_history = [
-                    msg if isinstance(msg, ChatMessage) else ChatMessage.model_validate(msg.model_dump())
-                    for msg in chat_history_input
-                ]
-
         self._build_graph()
 
         with execution_context(parent_context=get_parent_context()):
 
             class ToolCallingState(BaseState):
-                chat_history: List[ChatMessage] = initial_chat_history
+                chat_history: List[ChatMessage] = []
 
             class ToolCallingWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
                 graph = self._graph
