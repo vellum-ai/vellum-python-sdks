@@ -332,4 +332,50 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("basic with with access field in ports", () => {
+    it("getNodeFile", async () => {
+      const nodeData = genericNodeFactory({
+        nodePorts: [
+          {
+            id: "port-1",
+            name: "access",
+            type: "IF",
+            expression: {
+              type: "BINARY_EXPRESSION",
+              operator: "accessField",
+              lhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "JSON",
+                  value: {
+                    foo: "bar",
+                  },
+                },
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "foo",
+                },
+              },
+            },
+          },
+        ],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

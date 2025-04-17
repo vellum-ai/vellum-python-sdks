@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
+import { WorkflowContext } from "src/context";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 
@@ -12,6 +13,7 @@ export declare namespace Expression {
     operator: string;
     rhs?: AstNode | undefined;
     base?: AstNode | undefined;
+    workflowContext: WorkflowContext;
   }
 }
 
@@ -36,10 +38,11 @@ function isNodeInput(node: AstNode): node is NodeInput {
 
 export class Expression extends AstNode {
   private readonly astNode: AstNode;
-
-  constructor({ lhs, operator, rhs, base }: Expression.Args) {
+  private readonly workflowContext: WorkflowContext;
+  constructor({ lhs, operator, rhs, base, workflowContext }: Expression.Args) {
     super();
     this.astNode = this.generateAstNode({ lhs, operator, rhs, base });
+    this.workflowContext = workflowContext;
   }
 
   private generateAstNode({
@@ -47,7 +50,7 @@ export class Expression extends AstNode {
     operator,
     rhs,
     base,
-  }: Expression.Args): AstNode {
+  }: Omit<Expression.Args, "workflowContext">): AstNode {
     this.inheritReferences(lhs);
     if (rhs) {
       this.inheritReferences(rhs);
@@ -98,9 +101,21 @@ export class Expression extends AstNode {
     ) {
       rawLhs = this.generateLhsAsConstantReference(lhs);
     }
+    this.inheritReferences(rawLhs);
+
+    if (operator === "access_field") {
+      if (!rhs) {
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            "rhs must be defined if operator is access_field"
+          )
+        );
+        return `${rawLhs.toString()}[""]`;
+      }
+      return `${rawLhs.toString()}[${rhs.toString()}]`;
+    }
 
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
-    this.inheritReferences(rawLhs);
     return `${rawLhs.toString()}.${operator}${rhsExpression}`;
   }
 
