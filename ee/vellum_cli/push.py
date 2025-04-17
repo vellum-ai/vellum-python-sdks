@@ -36,9 +36,6 @@ def push_command(
     logger = load_cli_logger()
     config = load_vellum_cli_config()
 
-    if not config.workflows:
-        raise ValueError("No Workflows found in project to push.")
-
     workflow_configs = (
         [
             w
@@ -61,6 +58,8 @@ def push_command(
             )
             config.workflows.append(new_config)
             workflow_configs = [new_config]
+        elif not module:
+            raise ValueError("No Workflows found in project to push.")
         else:
             raise ValueError(f"No workflow config for '{module}' found in project to push.")
 
