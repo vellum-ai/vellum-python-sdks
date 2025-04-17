@@ -37,8 +37,12 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             execution_context=ExecutionContext(trace_id=trace_id),
         ),
     )
+
+    # AND we have known serialized ids for the nodes and outputs
     serialized_start_node_id = str(StartNode.__id__)
     serialized_next_node_id = str(NextNode.__id__)
+    serialized_start_node_output_id = str(StartNode.__output_ids__["final_value"])
+    serialized_next_node_output_id = str(NextNode.__output_ids__["final_value"])
 
     # WHEN the workflow is run
     frozen_datetime = datetime(2024, 1, 1, 12, 0, 0)
@@ -70,7 +74,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             "updated_ts": "2024-01-01T12:00:00",
             "workflow_inputs": {},
             "external_inputs": {},
-            "node_outputs": {"StartNode.Outputs.final_value": "Hello, World!"},
+            "node_outputs": {serialized_start_node_output_id: "Hello, World!"},
             "parent": None,
             "node_execution_cache": {
                 "node_executions_fulfilled": {serialized_start_node_id: [str(start_node_span_id)]},
@@ -105,7 +109,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             "workflow_inputs": {},
             "external_inputs": {},
             "node_outputs": {
-                "StartNode.Outputs.final_value": "Hello, World!",
+                serialized_start_node_output_id: "Hello, World!",
             },
             "parent": None,
             "node_execution_cache": {
@@ -141,8 +145,8 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             "workflow_inputs": {},
             "external_inputs": {},
             "node_outputs": {
-                "StartNode.Outputs.final_value": "Hello, World!",
-                "NextNode.Outputs.final_value": "Score: 13",
+                serialized_start_node_output_id: "Hello, World!",
+                serialized_next_node_output_id: "Score: 13",
             },
             "node_execution_cache": {
                 "node_executions_fulfilled": {

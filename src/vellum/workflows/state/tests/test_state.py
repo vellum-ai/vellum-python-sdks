@@ -47,6 +47,9 @@ class MockNode(BaseNode):
         baz: str
 
 
+MOCK_NODE_OUTPUT_ID = "e4dc3136-0c27-4bda-b3ab-ea355d5219d6"
+
+
 def test_state_snapshot__node_attribute_edit():
     # GIVEN an initial state instance
     state = MockState(foo="bar")
@@ -144,7 +147,7 @@ def test_state_json_serialization__with_node_output_updates():
     json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
 
     # THEN the state is serialized correctly
-    assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": "hello"}
+    assert json_state["meta"]["node_outputs"] == {MOCK_NODE_OUTPUT_ID: "hello"}
 
 
 def test_state_deepcopy__with_external_input_updates():
@@ -185,7 +188,7 @@ def test_state_json_serialization__with_queue():
     json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
 
     # THEN the state is serialized correctly with the queue turned into a list
-    assert json_state["meta"]["node_outputs"] == {"MockNode.Outputs.baz": ["test1", "test2"]}
+    assert json_state["meta"]["node_outputs"] == {MOCK_NODE_OUTPUT_ID: ["test1", "test2"]}
 
 
 def test_state_snapshot__deepcopy_fails__logs_error(mock_deepcopy, mock_logger):
