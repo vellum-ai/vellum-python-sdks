@@ -2,7 +2,11 @@ import pytest
 from uuid import UUID
 
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.ports.port import Port
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
+from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 
 @pytest.fixture
@@ -46,3 +50,35 @@ def test_get_id(node_info):
 
     assert node_display().node_id == expected_id
     assert node_display.infer_node_class().__id__ == expected_id
+
+
+def test_serialize_condition__accessor_expression():
+    # GIVEN a node with an accessor expression in a Port
+    class MyNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            foo = Port.on_if(ConstantValueReference({"hello": "world"})["hello"])
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(MyNode)
+    data = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the condition should be serialized correctly
+    assert data["ports"] == [
+        {
+            "id": "7de6ea94-7f6c-475e-8f38-ec8ac317fd19",
+            "name": "foo",
+            "type": "IF",
+            "expression": {
+                "type": "BINARY_EXPRESSION",
+                "lhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "JSON",
+                        "value": {"hello": "world"},
+                    },
+                },
+                "operator": "accessField",
+                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
+            },
+        }
+    ]

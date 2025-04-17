@@ -6,6 +6,7 @@ from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
@@ -16,6 +17,7 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
+from vellum_ee.workflows.display.utils.registry import get_default_workflow_display_class
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
@@ -33,8 +35,8 @@ PortDisplays = Dict[Port, PortDisplay]
 
 @dataclass
 class WorkflowDisplayContext:
-    workflow_display_class: Type["BaseWorkflowDisplay"]
-    workflow_display: WorkflowMetaDisplay
+    workflow_display_class: Type["BaseWorkflowDisplay"] = field(default_factory=get_default_workflow_display_class)
+    workflow_display: WorkflowMetaDisplay = field(default_factory=lambda: WorkflowMetaDisplay.get_default(BaseWorkflow))
     workflow_input_displays: WorkflowInputsDisplays = field(default_factory=dict)
     global_workflow_input_displays: WorkflowInputsDisplays = field(default_factory=dict)
     state_value_displays: StateValueDisplays = field(default_factory=dict)
