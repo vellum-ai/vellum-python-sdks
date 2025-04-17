@@ -10,6 +10,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState, StateMeta
 
 
@@ -278,5 +279,7 @@ def test_node_outputs__inherits_instance():
     bar_output = InheritedNode.Outputs.bar
 
     # THEN the output reference instances are correct
+    assert isinstance(foo_output, OutputReference)
     assert foo_output.instance is undefined
+    assert isinstance(bar_output, OutputReference)
     assert bar_output.instance == "hello"
