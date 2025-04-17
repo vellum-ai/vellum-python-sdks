@@ -60,6 +60,29 @@ describe("GenericNode", () => {
     });
   });
 
+  describe("basic without node outputs should skip node outputs class", () => {
+    beforeEach(async () => {
+      const nodeData = genericNodeFactory({
+        nodeOutputs: [],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
   describe("basic with node output as attribute", () => {
     beforeEach(async () => {
       const referencedNode = inlinePromptNodeDataInlineVariantFactory({

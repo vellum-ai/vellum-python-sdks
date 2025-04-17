@@ -100,9 +100,6 @@ from vellum.workflows.references import LazyReference
 
 class FirstNode(BaseNode):
     forward = LazyReference("SecondNode.Outputs.output")
-
-    class Outputs(BaseNode.Outputs):
-        pass
 "
 `;
 
