@@ -14,7 +14,6 @@ class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):
         "fontSize": 12,
         "fontWeight": "bold",
     }
-    node_input_ids_by_name = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0), width=None, height=None
     )
