@@ -227,7 +227,14 @@
                     "nodes",
                     "search_node"
                   ]
-                }
+                },
+                "ports": [
+                  {
+                    "id": "b2c00256-11db-43e4-9282-8f0265f72650",
+                    "name": "default",
+                    "type": "DEFAULT"
+                  }
+                ]
               },
               {
                 "id": "f3fe1e6e-5a4a-42d8-9cfe-9ecbcb935f72",
@@ -396,7 +403,14 @@
             "nodes",
             "subworkflow_node"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "fa5c22bc-2499-43fa-880f-75fb20d0587f",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "075932b7-c6ba-4c3a-8c8f-d6b043f8fe48",

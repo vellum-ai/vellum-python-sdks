@@ -111,6 +111,7 @@ def test_serialize_workflow_with_filepath():
             "module": ["tests", "workflows", "basic_code_execution_node", "workflow"],
             "name": "SimpleCodeExecutionNode",
         },
+        "ports": [{"id": "832f81ec-427b-42a8-825c-e62c43c1f961", "name": "default", "type": "DEFAULT"}],
     }
     assert not DeepDiff(
         [
@@ -343,6 +344,7 @@ def test_serialize_workflow_with_code():
             "name": "SimpleCodeExecutionNode",
             "module": ["tests", "workflows", "basic_code_execution_node", "workflow_with_code"],
         },
+        "ports": [{"id": "832f81ec-427b-42a8-825c-e62c43c1f961", "name": "default", "type": "DEFAULT"}],
     }
     assert not DeepDiff(
         [
@@ -603,6 +605,7 @@ def test_serialize_workflow__try_wrapped():
                 ],
             }
         ],
+        "ports": [{"id": "832f81ec-427b-42a8-825c-e62c43c1f961", "name": "default", "type": "DEFAULT"}],
     }
 
     final_output_nodes = workflow_raw_data["nodes"][2:]

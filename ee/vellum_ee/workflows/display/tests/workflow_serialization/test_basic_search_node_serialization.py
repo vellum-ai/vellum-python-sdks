@@ -239,6 +239,7 @@ def test_serialize_workflow():
             "name": "SimpleSearchNode",
             "module": ["tests", "workflows", "basic_search_node", "workflow"],
         },
+        "ports": [{"id": "00ae06b3-f8d9-4ae6-9fbf-e4ff4d520e9b", "name": "default", "type": "DEFAULT"}],
     }
 
     final_output_node = workflow_raw_data["nodes"][2]

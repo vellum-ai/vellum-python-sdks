@@ -72,6 +72,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},
                 {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
             ],
+            "ports": self.serialize_ports(display_context),
         }
 
     def _generate_node_and_prompt_inputs(

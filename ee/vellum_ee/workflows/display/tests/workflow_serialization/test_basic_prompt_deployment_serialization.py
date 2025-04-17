@@ -157,6 +157,7 @@ def test_serialize_workflow(vellum_client):
             "module": ["tests", "workflows", "basic_text_prompt_deployment", "workflow"],
             "name": "ExamplePromptDeploymentNode",
         },
+        "ports": [{"id": "2f26c7e0-283d-4f04-b639-adebb56bc679", "name": "default", "type": "DEFAULT"}],
     }
 
     final_output_node = workflow_raw_data["nodes"][2]

@@ -113,7 +113,14 @@
             "code_execution_node"
           ],
           "name": "CodeExecutionNode"
-        }
+        },
+        "ports": [
+          {
+            "id": "734e3a85-f96e-408e-89f1-703bcc486e8a",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "72cb9f1e-aedd-47af-861e-4f38d27053b6",
@@ -233,7 +240,14 @@
                     "templating_node"
                   ],
                   "name": "TemplatingNode"
-                }
+                },
+                "ports": [
+                  {
+                    "id": "401d5aee-afc0-4b7c-88a6-faaa753fd5c6",
+                    "name": "default",
+                    "type": "DEFAULT"
+                  }
+                ]
               },
               {
                 "id": "4b0a7578-e5ec-4d72-b396-62abdecbd101",
@@ -417,7 +431,14 @@
                     "nodes",
                     "search_node"
                   ]
-                }
+                },
+                "ports": [
+                  {
+                    "id": "7c8b42ff-7a21-4011-bf7b-44e06a5eb4c5",
+                    "name": "default",
+                    "type": "DEFAULT"
+                  }
+                ]
               },
               {
                 "id": "d9d29911-dd45-45d5-9ac8-1a06bb596c2f",
@@ -634,7 +655,14 @@
             "nodes",
             "map_node"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "239a1483-e4f5-4650-81a4-21c77d72cc5e",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "fa0d5829-f259-4db8-a11a-b12fd7237ea5",

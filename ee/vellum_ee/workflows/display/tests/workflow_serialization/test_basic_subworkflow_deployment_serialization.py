@@ -154,6 +154,7 @@ def test_serialize_workflow(vellum_client):
             "module": ["tests", "workflows", "basic_subworkflow_deployment", "workflow"],
             "name": "ExampleSubworkflowDeploymentNode",
         },
+        "ports": [{"id": "ab0db8a9-7b53-4d88-8667-273b31303273", "name": "default", "type": "DEFAULT"}],
     }
 
     assert not DeepDiff(

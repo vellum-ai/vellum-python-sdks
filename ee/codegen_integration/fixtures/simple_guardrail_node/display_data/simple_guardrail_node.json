@@ -92,7 +92,14 @@
             "guardrail_node"
           ],
           "name": "GuardrailNode"
-        }
+        },
+        "ports": [
+          {
+            "id": "92aafe31-101b-47d3-86f2-e261c7747c16",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "a9455dc7-85f5-43a9-8be7-f131bc5f08e2",

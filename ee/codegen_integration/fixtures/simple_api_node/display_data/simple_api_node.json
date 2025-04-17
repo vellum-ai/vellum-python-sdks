@@ -260,7 +260,14 @@
             "api_node"
           ],
           "name": "ApiNode"
-        }
+        },
+        "ports": [
+          {
+            "id": "b8ad3fd2-c96c-4ae8-8eae-d234fb13a139",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "dad01b99-c0b4-4904-a75e-066fa947d256",

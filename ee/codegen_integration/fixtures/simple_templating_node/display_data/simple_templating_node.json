@@ -79,7 +79,14 @@
             "templating_node"
           ],
           "name": "TemplatingNode"
-        }
+        },
+        "ports": [
+          {
+            "id": "9bce9d0a-3b0e-478e-8a97-f0510715a5a0",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "f0347fdc-1611-446c-b1da-408511d4181b",

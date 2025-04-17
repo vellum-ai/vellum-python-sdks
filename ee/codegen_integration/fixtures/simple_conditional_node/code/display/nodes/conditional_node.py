@@ -57,7 +57,9 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         "8cb78e86-89d2-4ec6-9537-1fb89dc948d2.value": UUID("b608c4fc-2c4e-4bbb-94d7-12cfa105bbdf"),
     }
     port_displays = {
-        ConditionalNode.Ports.branch_1: PortDisplayOverrides(id=UUID("8e2b2af3-db06-4025-9395-a6d08a8b9256"))
+        ConditionalNode.Ports.branch_1: PortDisplayOverrides(id=UUID("8e2b2af3-db06-4025-9395-a6d08a8b9256")),
+        ConditionalNode.Ports.branch_2: PortDisplayOverrides(id=UUID("babf673e-0bec-421e-aede-3ea323853bd8")),
+        ConditionalNode.Ports.branch_3: PortDisplayOverrides(id=UUID("25d955d1-5c7e-4e37-8afe-1015b496e59d")),
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=1943.4147273142412, y=292.2355134030261), width=480, height=234

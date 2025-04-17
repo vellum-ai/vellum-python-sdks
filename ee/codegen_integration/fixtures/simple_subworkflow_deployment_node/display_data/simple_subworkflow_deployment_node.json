@@ -78,7 +78,14 @@
             "subworkflow_deployment"
           ],
           "name": "SubworkflowDeployment"
-        }
+        },
+        "ports": [
+          {
+            "id": "fc38b3bd-5c08-4729-9e37-211c415637ad",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "eb72f89e-f831-4fc1-a54f-dec7f429fff9",

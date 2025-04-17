@@ -177,7 +177,55 @@
             "conditional_node"
           ],
           "name": "ConditionalNode"
-        }
+        },
+        "ports": [
+          {
+            "type": "IF",
+            "id": "8e2b2af3-db06-4025-9395-a6d08a8b9256",
+            "name": "branch_1",
+            "expression": {
+              "type": "BINARY_EXPRESSION",
+              "lhs": {
+                "type": "WORKFLOW_INPUT",
+                "input_variable_id": "5f64210f-ec43-48ce-ae40-40a9ba4c4c11"
+              },
+              "operator": "=",
+              "rhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                  "type": "STRING",
+                  "value": "Hello World!"
+                }
+              }
+            }
+          },
+          {
+            "type": "ELIF",
+            "id": "babf673e-0bec-421e-aede-3ea323853bd8",
+            "name": "branch_2",
+            "expression": {
+              "type": "BINARY_EXPRESSION",
+              "lhs": {
+                "type": "WORKFLOW_INPUT",
+                "input_variable_id": "b81c5c88-9528-47d0-8106-14a75520ed47"
+              },
+              "operator": "=",
+              "rhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                  "type": "STRING",
+                  "value": "testing"
+                }
+              }
+            }
+          },
+          {
+            "type": "ELSE",
+            "id": "25d955d1-5c7e-4e37-8afe-1015b496e59d",
+            "name": "branch_3",
+            "expression": null
+          }
+        ]
       },
       {
         "id": "b0d2bd58-fa00-4eea-98fb-bc09ee1427dd",

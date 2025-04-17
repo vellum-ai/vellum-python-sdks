@@ -79,7 +79,14 @@
             "templating_node_2"
           ],
           "name": "TemplatingNode2"
-        }
+        },
+        "ports": [
+          {
+            "id": "a5ae5a5c-ad8a-4a19-a726-f3b8ed1fbb1b",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
@@ -127,7 +134,14 @@
             "merge_node"
           ],
           "name": "MergeNode"
-        }
+        },
+        "ports": [
+          {
+            "id": "e0e666c4-a90b-4a95-928e-144bab251356",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "7f7823e9-b97a-4bbe-bfcf-40aed8db24c9",
@@ -220,7 +234,14 @@
             "templating_node_3"
           ],
           "name": "TemplatingNode3"
-        }
+        },
+        "ports": [
+          {
+            "id": "e51cd1b6-6c1f-4436-aaed-36cb38e7615d",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "7ea2c9ed-efb3-4d20-bf3d-7fafdaf6d842",
@@ -353,7 +374,14 @@
             "templating_node_1"
           ],
           "name": "TemplatingNode1"
-        }
+        },
+        "ports": [
+          {
+            "id": "e900aa36-b59e-4d13-bb66-21967eb02214",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       }
     ],
     "edges": [
