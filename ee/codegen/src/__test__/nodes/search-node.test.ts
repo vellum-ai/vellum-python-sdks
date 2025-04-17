@@ -7,7 +7,10 @@ import { afterEach, beforeEach, vi } from "vitest";
 import { workflowContextFactory } from "src/__test__/helpers";
 import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  nodeInputFactory,
+  searchNodeDataFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import {
@@ -15,7 +18,6 @@ import {
   ValueGenerationError,
 } from "src/generators/errors";
 import { SearchNode } from "src/generators/nodes/search-node";
-
 describe("TextSearchNode", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
@@ -405,6 +407,151 @@ describe("TextSearchNode", () => {
     it("getNodeDisplayFile", async () => {
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("should codegen successfully without metadata filters mapped properly", () => {
+    it("LHS missing on getNodeDisplayClassBodyStatements", async () => {
+      const workflowContext = workflowContextFactory({ strict: false });
+
+      const nodeData = searchNodeDataFactory({
+        metadataFilters: {
+          type: "LOGICAL_CONDITION_GROUP",
+          conditions: [
+            {
+              type: "LOGICAL_CONDITION",
+              operator: "=",
+              lhsVariableId: "9263f669-dfb4-4d69-820d-15beca7583b3",
+              rhsVariableId: "8a3b603a-5c73-47f6-a2e5-88f3de7bd847",
+            },
+          ],
+          combinator: "AND",
+          negated: false,
+        },
+        metadataFilterInputs: [
+          nodeInputFactory({
+            id: "1237381c-2e78-4306-bd62-be8ecc900d02",
+            key: "filters.metadata.conditions.0.lhs",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "field",
+              },
+            },
+          }),
+          nodeInputFactory({
+            id: "3c56555f-45dc-43d5-9d1c-b7cecf70cea1",
+            key: "filters.metadata.conditions.0.rhs",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "foo",
+              },
+            },
+          }),
+        ],
+        queryInput: nodeInputFactory({
+          id: "2f5bc81d-6ee8-4101-9a55-4ddeae954425",
+          key: "query",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: { type: "STRING", value: "find me documents" },
+          },
+        }),
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toBe(
+        "Could not find search node query input for the left hand side of condition 0"
+      );
+      expect(errors[0]?.severity).toEqual("WARNING");
+    });
+
+    it("RHS missing on getNodeDisplayClassBodyStatements", async () => {
+      const workflowContext = workflowContextFactory({ strict: false });
+
+      const lhsVariableId = "9263f669-dfb4-4d69-820d-15beca7583b3";
+      const nodeData = searchNodeDataFactory({
+        metadataFilters: {
+          type: "LOGICAL_CONDITION_GROUP",
+          conditions: [
+            {
+              type: "LOGICAL_CONDITION",
+              operator: "=",
+              lhsVariableId,
+              rhsVariableId: "8a3b603a-5c73-47f6-a2e5-88f3de7bd847",
+            },
+          ],
+          combinator: "AND",
+          negated: false,
+        },
+        metadataFilterInputs: [
+          nodeInputFactory({
+            id: lhsVariableId,
+            key: "filters.metadata.conditions.0.lhs",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "field",
+              },
+            },
+          }),
+          nodeInputFactory({
+            id: "3c56555f-45dc-43d5-9d1c-b7cecf70cea1",
+            key: "filters.metadata.conditions.0.rhs",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "foo",
+              },
+            },
+          }),
+        ],
+        queryInput: nodeInputFactory({
+          id: "2f5bc81d-6ee8-4101-9a55-4ddeae954425",
+          key: "query",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: { type: "STRING", value: "find me documents" },
+          },
+        }),
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toBe(
+        "Could not find search node query input for the right hand side of condition 0"
+      );
+      expect(errors[0]?.severity).toEqual("WARNING");
     });
   });
 });
