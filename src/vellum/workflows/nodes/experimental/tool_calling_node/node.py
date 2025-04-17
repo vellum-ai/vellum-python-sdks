@@ -1,7 +1,7 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, Dict, List, Optional, cast
+from typing import Any, ClassVar, List, Optional
 
-from vellum import ChatMessage, FunctionDefinition, PromptBlock
+from vellum import ChatMessage, PromptBlock
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -35,8 +35,7 @@ class ToolCallingNode(BaseNode):
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
-    functions: ClassVar[List[FunctionDefinition]] = []
-    function_callables: ClassVar[Dict[str, Callable[..., Any]]] = {}
+    functions: ClassVar[List[Callable[..., Any]]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     # TODO: https://linear.app/vellum/issue/APO-342/support-tool-call-max-retries
     max_tool_calls: ClassVar[int] = 1
@@ -59,7 +58,6 @@ class ToolCallingNode(BaseNode):
         This dynamically builds a graph with router and function nodes,
         then executes the workflow.
         """
-        self._validate_functions()
 
         initial_chat_history = []
 
@@ -121,9 +119,8 @@ class ToolCallingNode(BaseNode):
         )
 
         self._function_nodes = {
-            function.name: create_function_node(
+            function.__name__: create_function_node(
                 function=function,
-                function_callable=cast(Callable[..., Any], self.function_callables[function.name]),  # type: ignore
             )
             for function in self.functions
         }
@@ -132,7 +129,7 @@ class ToolCallingNode(BaseNode):
 
         # Add connections from ports of router to function nodes and back to router
         for function_name, FunctionNodeClass in self._function_nodes.items():
-            router_port = getattr(self.tool_router_node.Ports, function_name)  # type: ignore  # mypy thinks name is still optional # noqa: E501
+            router_port = getattr(self.tool_router_node.Ports, function_name)
             edge_graph = router_port >> FunctionNodeClass >> self.tool_router_node
             graph_set.add(edge_graph)
 
@@ -140,8 +137,3 @@ class ToolCallingNode(BaseNode):
         graph_set.add(default_port)
 
         self._graph = Graph.from_set(graph_set)
-
-    def _validate_functions(self) -> None:
-        for function in self.functions:
-            if function.name is None:
-                raise ValueError("Function name is required")

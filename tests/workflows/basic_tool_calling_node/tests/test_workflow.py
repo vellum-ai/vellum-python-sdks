@@ -190,16 +190,13 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 state=None,
                 cache_config=None,
                 name="get_current_weather",
-                description="Get the current weather",
+                description=None,
                 parameters={
                     "type": "object",
-                    "properties": {
-                        "location": {"type": "string", "description": "City and state, e.g. San Francisco, CA"},
-                        "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
-                    },
-                    "required": ["location"],
+                    "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
+                    "required": ["location", "unit"],
                 },
-                forced=False,
+                forced=None,
                 strict=None,
             )
         ],
@@ -305,16 +302,13 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 state=None,
                 cache_config=None,
                 name="get_current_weather",
-                description="Get the current weather",
+                description=None,
                 parameters={
                     "type": "object",
-                    "properties": {
-                        "location": {"type": "string", "description": "City and state, e.g. San Francisco, CA"},
-                        "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
-                    },
-                    "required": ["location"],
+                    "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
+                    "required": ["location", "unit"],
                 },
-                forced=False,
+                forced=None,
                 strict=None,
             )
         ],
