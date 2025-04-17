@@ -1,9 +1,10 @@
 from copy import copy
 from functools import cached_property
 import importlib
+import inspect
 import logging
 from uuid import UUID
-from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, Union, cast, get_args
+from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
@@ -18,6 +19,7 @@ from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
+from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
@@ -80,12 +82,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     def __init__(
         self,
-        workflow: Type[WorkflowType],
         *,
         parent_display_context: Optional[WorkflowDisplayContext] = None,
         dry_run: bool = False,
     ):
-        self._workflow = workflow
         self._parent_display_context = parent_display_context
         self._errors: List[Exception] = []
         self._dry_run = dry_run
@@ -591,7 +591,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     @staticmethod
     def gather_event_display_context(
-        module_path: str, workflow_class: Type[BaseWorkflow]
+        module_path: str,
+        # DEPRECATED: This will be removed in the 0.15.0 release
+        workflow_class: Optional[Type[BaseWorkflow]] = None,
     ) -> Union[WorkflowEventDisplayContext, None]:
         workflow_display_module = f"{module_path}.display.workflow"
         try:
@@ -599,11 +601,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         except ModuleNotFoundError:
             return None
 
-        workflow_display = display_class.WorkflowDisplay(workflow_class)
-        if not isinstance(workflow_display, BaseWorkflowDisplay):
+        WorkflowDisplayClass = display_class.WorkflowDisplay
+        if not isinstance(WorkflowDisplayClass, type) or not issubclass(WorkflowDisplayClass, BaseWorkflowDisplay):
             return None
 
-        return workflow_display.get_event_display_context()
+        return WorkflowDisplayClass().get_event_display_context()
 
     def get_event_display_context(self):
         display_context = self.display_context
@@ -713,6 +715,27 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         return EdgeDisplay(
             id=uuid4_from_hash(f"{self.workflow_id}|id|{source_node_id}|{target_node_id}"),
         )
+
+    @classmethod
+    def infer_workflow_class(cls) -> Type[BaseWorkflow]:
+        original_base = get_original_base(cls)
+        workflow_class = get_args(original_base)[0]
+        if isinstance(workflow_class, TypeVar):
+            bounded_class = workflow_class.__bound__
+            if inspect.isclass(bounded_class) and issubclass(bounded_class, BaseWorkflow):
+                return bounded_class
+
+            if isinstance(bounded_class, ForwardRef) and bounded_class.__forward_arg__ == BaseWorkflow.__name__:
+                return BaseWorkflow
+
+        if issubclass(workflow_class, BaseWorkflow):
+            return workflow_class
+
+        raise ValueError(f"Workflow {cls.__name__} must be a subclass of {BaseWorkflow.__name__}")
+
+    @property
+    def _workflow(self) -> Type[WorkflowType]:
+        return cast(Type[WorkflowType], self.__class__.infer_workflow_class())
 
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
