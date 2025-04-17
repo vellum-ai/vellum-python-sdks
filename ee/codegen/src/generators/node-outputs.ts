@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -17,7 +18,7 @@ export declare namespace NodeOutputs {
 }
 
 export class NodeOutputs extends AstNode {
-  private astNode: AstNode;
+  private astNode: AstNode | undefined;
 
   public constructor(args: NodeOutputs.Args) {
     super();
@@ -33,20 +34,24 @@ export class NodeOutputs extends AstNode {
     nodeOutputs: NodeOutputType[],
     nodeContext: GenericNodeContext,
     workflowContext: WorkflowContext
-  ): AstNode {
+  ): AstNode | undefined {
+    if (nodeOutputs.length === 0) {
+      return undefined;
+    }
+
     const baseNodeClassNameAlias =
       nodeContext.baseNodeClassName === nodeContext.nodeClassName
         ? `Base${nodeContext.baseNodeClassName}`
         : undefined;
 
     const clazz = python.class_({
-      name: "Outputs",
+      name: OUTPUTS_CLASS_NAME,
       extends_: [
         python.reference({
           name: nodeContext.baseNodeClassName,
           modulePath: nodeContext.baseNodeClassModulePath,
           alias: baseNodeClassNameAlias,
-          attribute: ["Outputs"],
+          attribute: [OUTPUTS_CLASS_NAME],
         }),
       ],
     });
