@@ -51,6 +51,7 @@ from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
+from vellum_ee.workflows.display.utils.registry import register_node_display_class
 from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator
 
 if TYPE_CHECKING:
@@ -121,9 +122,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     # Once all nodes are Generic Nodes, we may replace this with a trigger_id or trigger attribute
     target_handle_id: ClassVar[Optional[UUID]] = None
 
-    # Used to store the mapping between node types and their display classes
-    _node_display_registry: Dict[Type[NodeType], Type["BaseNodeDisplay"]] = {}
-
     def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
         node = self._node
         node_id = self.node_id
@@ -149,7 +147,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         adornments = kwargs.get("adornments", None)
         wrapped_node = get_wrapped_node(node)
         if wrapped_node is not None:
-            display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
+            display_class = get_node_display_class(wrapped_node)
 
             adornment: JsonObject = {
                 "id": str(node_id),
@@ -280,10 +278,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return self.get_target_handle_id()
 
-    @classmethod
-    def get_from_node_display_registry(cls, node_class: Type[NodeType]) -> Optional[Type["BaseNodeDisplay"]]:
-        return cls._node_display_registry.get(node_class)
-
     @cached_property
     def node_id(self) -> UUID:
         """Can be overridden as a class attribute to specify a custom node id."""
@@ -344,14 +338,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
-        if not cls._node_display_registry:
-            cls._node_display_registry[BaseNode] = BaseNodeDisplay
 
         node_class = cls.infer_node_class()
         if node_class is BaseNode:
             return
 
-        cls._node_display_registry[node_class] = cls
+        register_node_display_class(node_class=node_class, node_display_class=cls)
 
     def _get_generic_node_display_data(self) -> NodeDisplayData:
         explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
@@ -458,3 +450,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         # If it's not any of the references we know about,
         # then try to serialize it as a nested value
         return self.serialize_condition(display_context, value)
+
+
+register_node_display_class(node_class=BaseNode, node_display_class=BaseNodeDisplay)

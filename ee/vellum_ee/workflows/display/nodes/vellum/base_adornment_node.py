@@ -14,6 +14,7 @@ from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeV
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.registry import register_node_display_class
 
 _BaseAdornmentNodeType = TypeVar("_BaseAdornmentNodeType", bound=BaseAdornmentNode)
 
@@ -31,7 +32,7 @@ def _recursively_replace_wrapped_node(node_class: Type[BaseNode], wrapped_node_d
     # 1. The node display class' parameterized type
     original_base_node_display = get_original_base(wrapped_node_display_class)
     original_base_node_display.__args__ = (wrapped_node_class,)
-    wrapped_node_display_class._node_display_registry[wrapped_node_class] = wrapped_node_display_class
+    register_node_display_class(node_class=wrapped_node_class, node_display_class=wrapped_node_display_class)
     wrapped_node_display_class.__annotate_node__()
 
     # 2. The node display class' output displays
@@ -89,7 +90,7 @@ class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Ge
                 "Unable to serialize standalone adornment nodes. Please use adornment nodes as a decorator."
             )
 
-        wrapped_node_display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
+        wrapped_node_display_class = get_node_display_class(wrapped_node)
         wrapped_node_display = wrapped_node_display_class()
         additional_kwargs = get_additional_kwargs(wrapped_node_display.node_id) if get_additional_kwargs else {}
         serialized_wrapped_node = wrapped_node_display.serialize(display_context, **kwargs, **additional_kwargs)

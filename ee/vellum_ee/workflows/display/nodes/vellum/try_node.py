@@ -10,7 +10,6 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_adornment_node import BaseAdornmentNodeDisplay
@@ -82,7 +81,7 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
         if not inner_node:
             return super().get_node_output_display(output)
 
-        node_display_class = get_node_display_class(BaseNodeDisplay, inner_node)
+        node_display_class = get_node_display_class(inner_node)
         node_display = node_display_class()
         if output.name == "error":
             return inner_node, NodeOutputDisplay(
