@@ -37,6 +37,8 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             execution_context=ExecutionContext(trace_id=trace_id),
         ),
     )
+    serialized_start_node_id = str(StartNode.__id__)
+    serialized_next_node_id = str(NextNode.__id__)
 
     # WHEN the workflow is run
     frozen_datetime = datetime(2024, 1, 1, 12, 0, 0)
@@ -47,7 +49,6 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     time.sleep(0.01)
 
     # THEN the emitter should have emitted all of the expected events
-    base_module = ".".join(__name__.split(".")[:-2])
     events = list(emitter.events)
 
     assert events[0].name == "workflow.execution.initiated"
@@ -72,8 +73,8 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             "node_outputs": {"StartNode.Outputs.final_value": "Hello, World!"},
             "parent": None,
             "node_execution_cache": {
-                "node_executions_fulfilled": {f"{base_module}.workflow.StartNode": [str(start_node_span_id)]},
-                "node_executions_initiated": {f"{base_module}.workflow.StartNode": [str(start_node_span_id)]},
+                "node_executions_fulfilled": {serialized_start_node_id: [str(start_node_span_id)]},
+                "node_executions_initiated": {serialized_start_node_id: [str(start_node_span_id)]},
                 "node_executions_queued": {},
                 "dependencies_invoked": {},
             },
@@ -109,17 +110,17 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             "parent": None,
             "node_execution_cache": {
                 "node_executions_fulfilled": {
-                    f"{base_module}.workflow.StartNode": [str(start_node_span_id)],
+                    serialized_start_node_id: [str(start_node_span_id)],
                 },
                 "node_executions_initiated": {
-                    f"{base_module}.workflow.StartNode": [str(start_node_span_id)],
-                    f"{base_module}.workflow.NextNode": [str(next_node_span_id)],
+                    serialized_start_node_id: [str(start_node_span_id)],
+                    serialized_next_node_id: [str(next_node_span_id)],
                 },
                 "node_executions_queued": {
-                    f"{base_module}.workflow.NextNode": [],
+                    serialized_next_node_id: [],
                 },
                 "dependencies_invoked": {
-                    str(next_node_span_id): [f"{base_module}.workflow.StartNode"],
+                    str(next_node_span_id): [serialized_start_node_id],
                 },
             },
             "workflow_definition": {
@@ -145,18 +146,18 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             },
             "node_execution_cache": {
                 "node_executions_fulfilled": {
-                    f"{base_module}.workflow.StartNode": [str(start_node_span_id)],
-                    f"{base_module}.workflow.NextNode": [str(next_node_span_id)],
+                    serialized_start_node_id: [str(start_node_span_id)],
+                    serialized_next_node_id: [str(next_node_span_id)],
                 },
                 "node_executions_initiated": {
-                    f"{base_module}.workflow.StartNode": [str(start_node_span_id)],
-                    f"{base_module}.workflow.NextNode": [str(next_node_span_id)],
+                    serialized_start_node_id: [str(start_node_span_id)],
+                    serialized_next_node_id: [str(next_node_span_id)],
                 },
                 "node_executions_queued": {
-                    f"{base_module}.workflow.NextNode": [],
+                    serialized_next_node_id: [],
                 },
                 "dependencies_invoked": {
-                    str(next_node_span_id): [f"{base_module}.workflow.StartNode"],
+                    str(next_node_span_id): [serialized_start_node_id],
                 },
             },
             "parent": None,

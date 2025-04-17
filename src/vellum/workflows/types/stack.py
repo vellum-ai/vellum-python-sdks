@@ -37,3 +37,14 @@ class Stack(Generic[_T]):
 
     def dump(self) -> List[_T]:
         return [item for item in self._items][::-1]
+
+    @classmethod
+    def from_list(cls, items: List[_T]) -> "Stack[_T]":
+        stack = cls()
+        stack.extend(items)
+        return stack
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Stack):
+            return False
+        return self._items == other._items

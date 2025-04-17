@@ -1,5 +1,5 @@
 import pytest
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
@@ -7,6 +7,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.stack import Stack
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -340,6 +341,10 @@ def test_base_workflow__deserialize_state():
         class Outputs(BaseNode.Outputs):
             foo: str
 
+    # AND a node id for node A
+    node_a_id = uuid4()
+    NodeA.__id__ = node_a_id
+
     # AND a workflow that uses all three
     class TestWorkflow(BaseWorkflow[Inputs, State]):
         graph = NodeA
@@ -360,16 +365,16 @@ def test_base_workflow__deserialize_state():
                 },
                 "node_execution_cache": {
                     "dependencies_invoked": {
-                        last_span_id: ["test_base_workflow__deserialize_state.<locals>.NodeA"],
+                        last_span_id: [str(node_a_id)],
                     },
                     "node_executions_initiated": {
-                        "test_base_workflow__deserialize_state.<locals>.NodeA": [last_span_id],
+                        str(node_a_id): [last_span_id],
                     },
                     "node_executions_fulfilled": {
-                        "test_base_workflow__deserialize_state.<locals>.NodeA": [last_span_id],
+                        str(node_a_id): [last_span_id],
                     },
                     "node_executions_queued": {
-                        "test_base_workflow__deserialize_state.<locals>.NodeA": [],
+                        str(node_a_id): [],
                     },
                 },
                 "parent": None,
@@ -384,8 +389,57 @@ def test_base_workflow__deserialize_state():
     assert isinstance(state.meta.workflow_inputs, Inputs)
     assert state.meta.workflow_inputs.baz == "My input baz"
 
-    # AND the node execution cache should deserialize
-    assert state.meta.node_execution_cache
+    # AND the node execution cache should deserialize correctly
+    assert state.meta.node_execution_cache._node_executions_initiated == {NodeA: {UUID(last_span_id)}}
+    assert state.meta.node_execution_cache._node_executions_fulfilled == {NodeA: Stack.from_list([UUID(last_span_id)])}
+    assert state.meta.node_execution_cache._node_executions_queued == {NodeA: []}
+    assert state.meta.node_execution_cache._dependencies_invoked == {UUID(last_span_id): {NodeA}}
+
+
+def test_base_workflow__deserialize_legacy_node_execution_cache():
+
+    # GIVEN a state definition
+    class State(BaseState):
+        bar: str
+
+    # AND a node
+    class NodeA(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow that uses both
+    class TestWorkflow(BaseWorkflow[BaseInputs, State]):
+        graph = NodeA
+
+    # WHEN we deserialize the state that had a legacy node execution cache format
+    last_span_id = str(uuid4())
+    node_a_full_name = "vellum.workflows.workflows.tests.test_base_workflow.test_base_workflow__deserialize_legacy_node_execution_cache.<locals>.NodeA"  # noqa: E501
+    state = TestWorkflow.deserialize_state(
+        {
+            "meta": {
+                "node_execution_cache": {
+                    "dependencies_invoked": {
+                        last_span_id: [node_a_full_name],
+                    },
+                    "node_executions_initiated": {
+                        node_a_full_name: [last_span_id],
+                    },
+                    "node_executions_fulfilled": {
+                        node_a_full_name: [last_span_id],
+                    },
+                    "node_executions_queued": {
+                        node_a_full_name: [],
+                    },
+                },
+            },
+        },
+    )
+
+    # THEN the node execution cache should deserialize correctly
+    assert state.meta.node_execution_cache._node_executions_initiated == {NodeA: {UUID(last_span_id)}}
+    assert state.meta.node_execution_cache._node_executions_fulfilled == {NodeA: Stack.from_list([UUID(last_span_id)])}
+    assert state.meta.node_execution_cache._node_executions_queued == {NodeA: []}
+    assert state.meta.node_execution_cache._dependencies_invoked == {UUID(last_span_id): {NodeA}}
 
 
 def test_base_workflow__deserialize_state_with_optional_inputs():
