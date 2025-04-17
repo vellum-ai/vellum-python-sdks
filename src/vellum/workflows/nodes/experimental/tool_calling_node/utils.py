@@ -5,8 +5,6 @@ from typing import Any, Iterator, List, Optional, Type, cast
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
-from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
-from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
@@ -30,9 +28,9 @@ class ToolRouterNode(InlinePromptNode):
             if output.name == "results" and output.value:
                 values = cast(List[Any], output.value)
                 if values and len(values) > 0:
-                    if isinstance(values[0], StringVellumValue):
+                    if values[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
-                    elif isinstance(values[0], FunctionCallVellumValue):
+                    elif values[0].type == "FUNCTION_CALL":
                         function_call = values[0].value
                         if function_call is not None:
                             self.state.chat_history.append(
