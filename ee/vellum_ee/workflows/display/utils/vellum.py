@@ -41,6 +41,7 @@ from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
+from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 
 if TYPE_CHECKING:
@@ -164,7 +165,7 @@ def create_node_input_value_pointer_rule(
         vellum_value = primitive_to_vellum_value(value)
         return ConstantValuePointer(type="CONSTANT_VALUE", data=vellum_value)
 
-    raise ValueError(f"Unsupported descriptor type: {value.__class__.__name__}")
+    raise UnsupportedSerializationException(f"Unsupported descriptor type: {value.__class__.__name__}")
 
 
 def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperator:
