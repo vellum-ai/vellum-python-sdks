@@ -32,7 +32,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        if_port = Port.on_if(ConstantValueReference("hello").is_null())
+        if_port = Port.on_if(ConstantValueReference("new hello").is_null())
 "
 `;
 

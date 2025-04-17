@@ -1043,7 +1043,7 @@ describe("Conditional Node with NodePorts defined", () => {
             type: "CONSTANT_VALUE",
             value: {
               type: "STRING",
-              value: "hello",
+              value: "new hello",
             },
           },
           operator: "null",
@@ -1087,7 +1087,7 @@ describe("Conditional Node with NodePorts defined", () => {
                 type: "CONSTANT_VALUE",
                 data: {
                   type: "STRING",
-                  value: "hello",
+                  value: "original hello",
                 },
               },
             ],
