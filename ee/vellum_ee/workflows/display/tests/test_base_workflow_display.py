@@ -6,19 +6,16 @@ from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplayOverrides
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
-def test_vellum_workflow_display__serialize_empty_workflow():
+def test_base_workflow_display__serialize_empty_workflow():
     # GIVEN an empty workflow
     class ExampleWorkflow(BaseWorkflow):
         pass
 
-    display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=ExampleWorkflow,
-    )
+    display = get_workflow_display(workflow_class=ExampleWorkflow)
 
     # WHEN serializing the workflow
     exec_config = display.serialize()
@@ -30,18 +27,18 @@ def test_vellum_workflow_display__serialize_empty_workflow():
         "output_variables": [],
         "workflow_raw_data": {
             "definition": {
-                "module": ["vellum_ee", "workflows", "display", "tests", "test_vellum_workflow_display"],
+                "module": ["vellum_ee", "workflows", "display", "tests", "test_base_workflow_display"],
                 "name": "ExampleWorkflow",
             },
             "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
             "edges": [],
             "nodes": [
                 {
-                    "data": {"label": "Entrypoint Node", "source_handle_id": "508b8b82-3517-4672-a155-18c9c7b9c545"},
+                    "data": {"label": "Entrypoint Node", "source_handle_id": "0af025a4-3b25-457d-a7ae-e3a7ba15c86c"},
                     "base": None,
                     "definition": None,
                     "display_data": {"position": {"x": 0.0, "y": 0.0}},
-                    "id": "9eef0c18-f322-4d56-aa89-f088d3e53f6a",
+                    "id": "3c41cdd9-999a-48b8-9088-f6dfa1369bfd",
                     "inputs": [],
                     "type": "ENTRYPOINT",
                 }
@@ -62,7 +59,7 @@ def test_vellum_workflow_display__serialize_input_variables_with_capitalized_var
     class ExampleWorkflow(BaseWorkflow[Inputs, BaseState]):
         graph = StartNode
 
-    class ExampleWorkflowDisplay(VellumWorkflowDisplay[ExampleWorkflow]):
+    class ExampleWorkflowDisplay(BaseWorkflowDisplay[ExampleWorkflow]):
         inputs_display = {
             Inputs.foo: WorkflowInputsVellumDisplayOverrides(
                 id=UUID("97b63d71-5413-417f-9cf5-49e1b4fd56e4"), name="Foo", required=True
@@ -108,10 +105,7 @@ def test_vellum_workflow_display_serialize_valid_handle_ids_for_base_nodes():
             final_value = EndNode.Outputs.hello
 
     # AND a display class for this workflow
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=Workflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=Workflow)
 
     # WHEN we serialize the workflow
     exec_config = workflow_display.serialize()
@@ -169,10 +163,7 @@ def test_vellum_workflow_display__serialize_with_unused_nodes_and_edges():
             final = NodeA.Outputs.result
 
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=Workflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=Workflow)
 
     # WHEN we serialize the workflow
     exec_config = workflow_display.serialize()
@@ -245,10 +236,7 @@ def test_vellum_workflow_display__serialize_with_parse_json_expression():
             final = JsonNode.Outputs.json_result
 
     # AND a display class for this workflow
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=Workflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=Workflow)
 
     # WHEN we serialize the workflow
     exec_config = workflow_display.serialize()

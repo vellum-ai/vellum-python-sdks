@@ -20,7 +20,6 @@ from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_conditional_node.workflow import CategoryWorkflow
@@ -30,7 +29,7 @@ from tests.workflows.basic_conditional_node.workflow_with_only_one_conditional_n
 def test_serialize_workflow():
     # GIVEN a Workflow that uses a ConditionalNode
     # WHEN we serialize it
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=CategoryWorkflow)
+    workflow_display = get_workflow_display(workflow_class=CategoryWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
@@ -779,7 +778,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
     # GIVEN a simple workflow with one conditional node
     workflow_cls = create_simple_workflow(descriptor)
 
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow_cls)
+    workflow_display = get_workflow_display(workflow_class=workflow_cls)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
@@ -885,7 +884,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
     # GIVEN a simple workflow with one conditional node
     workflow_cls = create_simple_workflow(descriptor)
 
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow_cls)
+    workflow_display = get_workflow_display(workflow_class=workflow_cls)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow
@@ -978,7 +977,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
     # GIVEN a simple workflow with one conditional node
     workflow_cls = create_simple_workflow(descriptor)
 
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=workflow_cls)
+    workflow_display = get_workflow_display(workflow_class=workflow_cls)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow

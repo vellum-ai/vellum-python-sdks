@@ -4,7 +4,6 @@ from uuid import uuid4
 from deepdiff import DeepDiff
 
 from vellum import WorkspaceSecretRead
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_api_node.workflow import SimpleAPIWorkflow
@@ -24,7 +23,7 @@ def test_serialize_workflow(vellum_client):
     vellum_client.workspace_secrets.retrieve.return_value = workspace_secret
 
     # WHEN we serialize it
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=SimpleAPIWorkflow)
+    workflow_display = get_workflow_display(workflow_class=SimpleAPIWorkflow)
 
     serialized_workflow: dict = workflow_display.serialize()
 

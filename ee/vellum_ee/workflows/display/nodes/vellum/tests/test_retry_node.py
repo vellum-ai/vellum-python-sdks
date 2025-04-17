@@ -5,7 +5,6 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 def test_retry_node_parameters():
@@ -21,7 +20,7 @@ def test_retry_node_parameters():
         graph = MyRetryNode
 
     # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=MyWorkflow)
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
     serialized_workflow = cast(Dict[str, Any], workflow_display.serialize())
 
     # THEN the correct inputs should be serialized on the node

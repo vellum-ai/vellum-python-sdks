@@ -1,6 +1,5 @@
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_error_node.workflow import BasicErrorNodeWorkflow
@@ -9,9 +8,7 @@ from tests.workflows.basic_error_node.workflow import BasicErrorNodeWorkflow
 def test_serialize_workflow():
     # GIVEN a Workflow with an error node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=BasicErrorNodeWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=BasicErrorNodeWorkflow)
 
     serialized_workflow: dict = workflow_display.serialize()
 

@@ -14,7 +14,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowInputsDisplays,
 )
 from vellum_ee.workflows.display.vellum import WorkflowMetaVellumDisplay
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
 @pytest.fixture()
@@ -30,7 +30,7 @@ def serialize_node():
         node_display = node_display_class()
 
         context: WorkflowDisplayContext = WorkflowDisplayContext(
-            workflow_display_class=VellumWorkflowDisplay,
+            workflow_display_class=BaseWorkflowDisplay,
             workflow_display=WorkflowMetaVellumDisplay(
                 entrypoint_node_id=uuid4(),
                 entrypoint_node_source_handle_id=uuid4(),

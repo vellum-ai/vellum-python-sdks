@@ -1,17 +1,14 @@
 from deepdiff import DeepDiff
 
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_generic_node.workflow import BasicGenericNodeWorkflow
 
 
-def test_serialize_workflow(vellum_client):
+def test_serialize_workflow():
     # GIVEN a Workflow that uses a generic node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=BasicGenericNodeWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=BasicGenericNodeWorkflow)
 
     serialized_workflow: dict = workflow_display.serialize()
 

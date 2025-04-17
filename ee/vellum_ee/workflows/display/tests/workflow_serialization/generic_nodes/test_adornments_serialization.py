@@ -13,7 +13,6 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 class Inputs(BaseInputs):
@@ -123,10 +122,7 @@ def test_serialize_node__retry__no_display():
         graph = StartNode
 
     # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=MyWorkflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
     exec_config = workflow_display.serialize()
 
     # THEN the workflow display is created successfully
@@ -218,10 +214,7 @@ def test_serialize_node__try__no_display():
         graph = StartNode
 
     # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=MyWorkflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
 
     exec_config = workflow_display.serialize()
 
@@ -240,10 +233,7 @@ def test_serialize_node__stacked():
         graph = InnerStackedGenericNode
 
     # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=StackedWorkflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=StackedWorkflow)
     exec_config = workflow_display.serialize()
 
     # THEN the workflow display is created successfully

@@ -11,7 +11,6 @@ from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDispla
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -32,10 +31,7 @@ def test_serialize_workflow__node_referenced_in_workflow_outputs_not_in_graph():
             final = OutNode.Outputs.foo
 
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=Workflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=Workflow)
 
     # THEN it should raise an error
     with pytest.raises(ValueError) as exc_info:
@@ -57,10 +53,7 @@ def test_serialize_workflow__workflow_outputs_reference_non_node_outputs():
             final = FirstWorkflow.Outputs.foo
 
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=Workflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=Workflow)
 
     # THEN it should raise an error
     with pytest.raises(ValueError) as exc_info:
@@ -91,10 +84,7 @@ def test_serialize_workflow__node_display_class_not_registered():
             answer = StartNode.Outputs.result
 
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
-        workflow_class=MyWorkflow,
-    )
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
     data = workflow_display.serialize()
 
     # THEN it should should succeed
@@ -111,7 +101,7 @@ def test_get_event_display_context__node_display_filled_without_base_display():
         graph = StartNode
 
     # WHEN we gather the event display context
-    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
 
     # THEN the node display should be included
     assert StartNode.__id__ in display_context.node_displays
@@ -134,7 +124,7 @@ def test_get_event_display_context__node_display_filled_without_output_display()
         pass
 
     # WHEN we gather the event display context
-    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
 
     # THEN the node display should be included
     assert StartNode.__id__ in display_context.node_displays
@@ -160,7 +150,7 @@ def test_get_event_display_context__node_display_to_include_subworkflow_display(
         graph = SubworkflowNode
 
     # WHEN we gather the event display context
-    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
     assert SubworkflowNode.__id__ in display_context.node_displays
@@ -201,7 +191,7 @@ def test_get_event_display_context__node_display_for_adornment_nodes(
         node_id = inner_node_id
 
     # WHEN we gather the event display context
-    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
     assert adornment_node_id in display_context.node_displays
@@ -228,7 +218,7 @@ def test_get_event_display_context__templating_node_input_display():
         graph = DataNode >> MyNode
 
     # WHEN we gather the event display context
-    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
     assert MyNode.__id__ in display_context.node_displays
@@ -259,7 +249,7 @@ def test_get_event_display_context__node_display_for_mutiple_adornments():
         node_id = innermost_node_id
 
     # WHEN we gather the event display context
-    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
 
     # THEN the subworkflow display should be included
     assert node_id in display_context.node_displays
@@ -285,7 +275,7 @@ def test_get_event_display_context__workflow_output_display_with_none():
             bar = "baz"
 
     # WHEN we gather the event display context
-    display_context = VellumWorkflowDisplay(MyWorkflow).get_event_display_context()
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
 
     # THEN the workflow output display should be included
     assert display_context.workflow_outputs.keys() == {"foo", "bar"}

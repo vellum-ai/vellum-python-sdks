@@ -6,7 +6,6 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum_ee.workflows.display.nodes.vellum.templating_node import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 def _no_display_class(Node: Type[TemplatingNode]):
@@ -53,7 +52,7 @@ def test_serialize_node__templating_node_inputs(GetDisplayClass, expected_input_
     GetDisplayClass(MyTemplatingNode)
 
     # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=Workflow)
+    workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN the node should properly serialize the inputs

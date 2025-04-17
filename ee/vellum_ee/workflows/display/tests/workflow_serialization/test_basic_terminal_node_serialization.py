@@ -1,4 +1,3 @@
-from vellum_ee.workflows.display.workflows import VellumWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_final_output_node.workflow import BasicFinalOutputNodeWorkflow
@@ -7,9 +6,7 @@ from tests.workflows.basic_final_output_node.workflow import BasicFinalOutputNod
 def test_serialize_workflow():
     # GIVEN a Workflow that uses a Final Output Node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay, workflow_class=BasicFinalOutputNodeWorkflow
-    )
+    workflow_display = get_workflow_display(workflow_class=BasicFinalOutputNodeWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the Workflow

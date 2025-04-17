@@ -4,7 +4,6 @@ from vellum.client.types.vellum_error import VellumError
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.core.error_node.node import ErrorNode
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 def test_error_node_display__serialize_with_vellum_error() -> None:
@@ -20,7 +19,7 @@ def test_error_node_display__serialize_with_vellum_error() -> None:
         graph = MyNode
 
     # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=MyWorkflow)
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
     serialized_workflow = cast(Dict[str, Any], workflow_display.serialize())
 
     # THEN the correct inputs should be serialized on the node

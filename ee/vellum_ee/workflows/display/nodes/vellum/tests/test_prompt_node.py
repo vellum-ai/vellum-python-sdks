@@ -8,7 +8,6 @@ from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePro
 from vellum.workflows.references.lazy import LazyReference
 from vellum_ee.workflows.display.nodes.vellum.inline_prompt_node import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 def test_serialize_node__lazy_reference_in_prompt_inputs():
@@ -27,7 +26,7 @@ def test_serialize_node__lazy_reference_in_prompt_inputs():
         graph = LazyReferencePromptNode >> OtherNode
 
     # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=Workflow)
+    workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN the node should properly serialize the attribute reference
@@ -103,7 +102,7 @@ def test_serialize_node__prompt_inputs(GetDisplayClass, expected_input_id):
     GetDisplayClass(MyPromptNode)
 
     # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(base_display_class=VellumWorkflowDisplay, workflow_class=Workflow)
+    workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN the node should properly serialize the inputs

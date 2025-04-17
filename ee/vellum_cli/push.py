@@ -17,7 +17,6 @@ from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
 
 def push_command(
@@ -105,7 +104,6 @@ def push_command(
     # https://app.shortcut.com/vellum/story/5585
     workflow = BaseWorkflow.load_from_module(workflow_config.module)
     workflow_display = get_workflow_display(
-        base_display_class=VellumWorkflowDisplay,
         workflow_class=workflow,
         dry_run=dry_run or False,
     )
