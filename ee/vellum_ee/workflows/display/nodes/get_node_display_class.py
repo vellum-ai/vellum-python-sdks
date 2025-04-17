@@ -1,6 +1,6 @@
 import types
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, Type
+from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.generics import NodeType
@@ -18,8 +18,10 @@ def get_node_display_class(node_class: Type[NodeType]) -> Type["BaseNodeDisplay"
 
     base_node_display_class = get_node_display_class(node_class.__bases__[0])
 
+    # mypy gets upset at dynamic TypeVar's, but it's technically allowed by python
+    _NodeClassType = TypeVar(f"_{node_class.__name__}Type", bound=node_class)  # type: ignore[misc]
     # `base_node_display_class` is always a Generic class, so it's safe to index into it
-    NodeDisplayBaseClass = base_node_display_class[node_class]  # type: ignore[index]
+    NodeDisplayBaseClass = base_node_display_class[_NodeClassType]  # type: ignore[index]
 
     def _get_node_input_ids_by_ref(path: str, inst: Any):
         if isinstance(inst, dict):
@@ -43,7 +45,7 @@ def get_node_display_class(node_class: Type[NodeType]) -> Type["BaseNodeDisplay"
 
     NodeDisplayClass = types.new_class(
         f"{node_class.__name__}Display",
-        bases=(NodeDisplayBaseClass,),
+        bases=(NodeDisplayBaseClass, Generic[_NodeClassType]),
         exec_body=exec_body,
     )
 

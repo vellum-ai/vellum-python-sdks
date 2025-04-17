@@ -279,3 +279,28 @@ def test_get_event_display_context__workflow_output_display_with_none():
 
     # THEN the workflow output display should be included
     assert display_context.workflow_outputs.keys() == {"foo", "bar"}
+
+
+def test_serialize_workflow__inherited_node_display_class_not_registered():
+    # GIVEN a node meant to be used as a base
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    # AND a node that inherits from it
+    class InheritedNode(StartNode):
+        foo: str
+
+    # AND a workflow that uses the inherited node
+    class MyWorkflow(BaseWorkflow):
+        graph = InheritedNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            answer = InheritedNode.Outputs.result
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should should succeed
+    assert data is not None
