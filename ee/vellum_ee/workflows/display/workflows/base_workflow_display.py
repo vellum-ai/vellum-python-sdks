@@ -591,7 +591,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     @staticmethod
     def gather_event_display_context(
-        module_path: str, workflow_class: Type[BaseWorkflow]
+        module_path: str,
+        # DEPRECATED: This will be removed in the 0.15.0 release
+        workflow_class: Optional[Type[BaseWorkflow]] = None,
     ) -> Union[WorkflowEventDisplayContext, None]:
         workflow_display_module = f"{module_path}.display.workflow"
         try:
@@ -599,11 +601,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         except ModuleNotFoundError:
             return None
 
-        workflow_display = display_class.WorkflowDisplay(workflow_class)
-        if not isinstance(workflow_display, BaseWorkflowDisplay):
+        WorkflowDisplayClass = display_class.WorkflowDisplay
+        if not isinstance(WorkflowDisplayClass, type) or not issubclass(WorkflowDisplayClass, BaseWorkflowDisplay):
             return None
 
-        return workflow_display.get_event_display_context()
+        return WorkflowDisplayClass().get_event_display_context()
 
     def get_event_display_context(self):
         display_context = self.display_context
