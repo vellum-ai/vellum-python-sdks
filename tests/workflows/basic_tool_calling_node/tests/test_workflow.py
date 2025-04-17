@@ -39,7 +39,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             expected_outputs = [
                 FunctionCallVellumValue(
                     value=FunctionCall(
-                        arguments={"location": "Miami", "unit": "metric"},
+                        arguments={"location": "Miami", "unit": "celsius"},
                         id="call_7115tNTmEACTsQRGwKpJipJK",
                         name="get_current_weather",
                         state="FULFILLED",
@@ -49,7 +49,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         else:
             expected_outputs = [
                 StringVellumValue(
-                    value="Based on the function call, the current temperature in Miami is 70 degrees metric."
+                    value="Based on the function call, the current temperature in Miami is 70 degrees celsius."
                 )
             ]
 
@@ -81,7 +81,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert (
         terminal_event.outputs.text
-        == "Based on the function call, the current temperature in Miami is 70 degrees metric."
+        == "Based on the function call, the current temperature in Miami is 70 degrees celsius."
     )
     assert terminal_event.outputs.chat_history == [
         ChatMessage(text="Hello, how are you?", role="USER"),
@@ -93,17 +93,17 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 type="FUNCTION_CALL",
                 value=FunctionCallChatMessageContentValue(
                     name="get_current_weather",
-                    arguments={"location": "Miami", "unit": "metric"},
+                    arguments={"location": "Miami", "unit": "celsius"},
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
             ),
         ),
         ChatMessage(
-            text="The current weather in Miami is sunny with a temperature of 70 degrees metric.",
+            text="The current weather in Miami is sunny with a temperature of 70 degrees celsius.",
             role="FUNCTION",
         ),
         ChatMessage(
-            text="Based on the function call, the current temperature in Miami is 70 degrees metric.",
+            text="Based on the function call, the current temperature in Miami is 70 degrees celsius.",
             role="ASSISTANT",
         ),
     ]
@@ -225,13 +225,13 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                             type="FUNCTION_CALL",
                             value=FunctionCallChatMessageContentValue(
                                 name="get_current_weather",
-                                arguments={"location": "Miami", "unit": "metric"},
+                                arguments={"location": "Miami", "unit": "celsius"},
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
                     ),
                     ChatMessage(
-                        text="The current weather in Miami is sunny with a temperature of 70 degrees metric.",
+                        text="The current weather in Miami is sunny with a temperature of 70 degrees celsius.",
                         role="FUNCTION",
                     ),
                 ],
