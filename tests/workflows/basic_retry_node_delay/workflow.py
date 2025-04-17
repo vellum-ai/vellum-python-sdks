@@ -20,8 +20,8 @@ class StartNode(BaseNode):
 class Subworkflow(BaseWorkflow[RetryNode.SubworkflowInputs, BaseState]):
     graph = StartNode
 
-    class Outputs(StartNode.Outputs):
-        pass
+    class Outputs(BaseWorkflow.Outputs):
+        execution_count = StartNode.Outputs.execution_count
 
 
 class RetryableNode(RetryNode):
@@ -29,7 +29,7 @@ class RetryableNode(RetryNode):
     delay = 0.1  # 0.1 second between retries
     subworkflow = Subworkflow
 
-    class Outputs(Subworkflow.Outputs):
+    class Outputs(RetryNode.Outputs):
         pass
 
 

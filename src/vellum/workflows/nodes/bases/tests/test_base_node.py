@@ -4,11 +4,13 @@ from typing import Optional
 
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.tests.test_utils import FixtureState
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState, StateMeta
 
 
@@ -259,3 +261,25 @@ def test_resolve_value__for_falsy_values(falsy_value, expected_type):
 
     # THEN the output has the correct value
     assert falsy_output.value == falsy_value
+
+
+def test_node_outputs__inherits_instance():
+    # GIVEN a node with two outputs, one with and one without a default instance
+    class MyNode(BaseNode):
+        class Outputs:
+            foo: str
+            bar = "hello"
+
+    # AND a node that inherits from MyNode
+    class InheritedNode(MyNode):
+        pass
+
+    # WHEN we reference each output
+    foo_output = InheritedNode.Outputs.foo
+    bar_output = InheritedNode.Outputs.bar
+
+    # THEN the output reference instances are correct
+    assert isinstance(foo_output, OutputReference)
+    assert foo_output.instance is undefined
+    assert isinstance(bar_output, OutputReference)
+    assert bar_output.instance == "hello"

@@ -32,7 +32,7 @@ class FinalNode(BaseNode):
 
 class TestConditionalNode(ConditionalNode):
     class Ports(ConditionalNode.Ports):
-        branch_1 = Port.on_if(Node.Outputs.error.contains("Provider Error"))
+        branch_1 = Port.on_if(Node.Outputs.error.is_not_nil())
         branch_2 = Port.on_else()
 
 

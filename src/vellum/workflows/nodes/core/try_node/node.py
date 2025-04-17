@@ -4,7 +4,6 @@ from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
@@ -24,7 +23,7 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
     on_error_code: Optional[WorkflowErrorCode] = None
 
-    class Outputs(BaseNode.Outputs):
+    class Outputs(BaseAdornmentNode.Outputs):
         error: Optional[WorkflowError] = None
 
     def run(self) -> Iterator[BaseOutput]:
