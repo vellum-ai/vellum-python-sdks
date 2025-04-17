@@ -45,6 +45,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowInputsDisplays,
     WorkflowOutputDisplays,
 )
+from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -72,9 +73,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     # Used to explicitly specify display data for a workflow's ports.
     port_displays: PortDisplays = {}
-
-    # Used to store the mapping between workflows and their display classes
-    _workflow_display_registry: Dict[Type[WorkflowType], Type["BaseWorkflowDisplay"]] = {}
 
     _errors: List[Exception]
 
@@ -329,13 +327,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "state_variables": state_variables,
             "output_variables": output_variables,
         }
-
-    @classmethod
-    def get_from_workflow_display_registry(cls, workflow_class: Type[WorkflowType]) -> Type["BaseWorkflowDisplay"]:
-        try:
-            return cls._workflow_display_registry[workflow_class]
-        except KeyError:
-            return cls._workflow_display_registry[WorkflowType]  # type: ignore [misc]
 
     @cached_property
     def workflow_id(self) -> UUID:
@@ -596,7 +587,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         super().__init_subclass__(**kwargs)
 
         workflow_class = get_args(cls.__orig_bases__[0])[0]  # type: ignore [attr-defined]
-        cls._workflow_display_registry[workflow_class] = cls
+        register_workflow_display_class(workflow_class=workflow_class, workflow_display_class=cls)
 
     @staticmethod
     def gather_event_display_context(
@@ -722,3 +713,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         return EdgeDisplay(
             id=uuid4_from_hash(f"{self.workflow_id}|id|{source_node_id}|{target_node_id}"),
         )
+
+
+register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
