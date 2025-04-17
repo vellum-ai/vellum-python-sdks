@@ -88,7 +88,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         ChatMessage(text="I'm good, thank you!", role="ASSISTANT"),
         ChatMessage(
             text=None,
-            role="FUNCTION",
+            role="ASSISTANT",
             content=FunctionCallChatMessageContent(
                 type="FUNCTION_CALL",
                 value=FunctionCallChatMessageContentValue(
@@ -220,7 +220,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                     ChatMessage(text="I'm good, thank you!", role="ASSISTANT"),
                     ChatMessage(
                         text=None,
-                        role="FUNCTION",
+                        role="ASSISTANT",
                         content=FunctionCallChatMessageContent(
                             type="FUNCTION_CALL",
                             value=FunctionCallChatMessageContentValue(

@@ -35,7 +35,7 @@ class ToolRouterNode(InlinePromptNode):
                         if function_call is not None:
                             self.state.chat_history.append(
                                 ChatMessage(
-                                    role="FUNCTION",
+                                    role="ASSISTANT",
                                     content=FunctionCallChatMessageContent(
                                         value=FunctionCallChatMessageContentValue(
                                             name=function_call.name,
