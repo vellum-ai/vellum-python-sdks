@@ -4,7 +4,7 @@ import { VELLUM_WORKFLOW_NODES_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
 import { NodeOutputNotFoundError } from "src/generators/errors";
-import { WorkflowDataNode } from "src/types/vellum";
+import { NodePort as NodePortType, WorkflowDataNode } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getNodeLabel } from "src/utils/nodes";
 import {
@@ -77,7 +77,9 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       this.nodeDisplayModuleName
     );
 
-    const portContexts = this.createPortContexts();
+    const portContexts = this.nodeData.ports
+      ? this.createPortContextsFromNodePortAttribute(this.nodeData.ports)
+      : this.createPortContexts();
     portContexts.forEach((portContext) => {
       this.workflowContext.addPortContext(portContext);
     });
@@ -97,6 +99,21 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     VellumVariableType
   >;
   protected abstract createPortContexts(): PortContext[];
+
+  protected createPortContextsFromNodePortAttribute(
+    nodePorts: NodePortType[]
+  ): PortContext[] {
+    return nodePorts.map(
+      (port) =>
+        new PortContext({
+          workflowContext: this.workflowContext,
+          nodeContext: this,
+          portId: port.id,
+          portName: port.name,
+          isDefault: port.type === "DEFAULT",
+        })
+    );
+  }
 
   public getNodeLabel(): string {
     return getNodeLabel(this.nodeData);

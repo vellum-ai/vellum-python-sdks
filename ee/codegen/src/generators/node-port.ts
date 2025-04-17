@@ -109,21 +109,24 @@ export class NodePorts extends AstNode {
     if (!attribute) {
       return undefined;
     }
+    const descriptor = this.buildDescriptor(nodePort);
     return python.invokeMethod({
       methodReference: python.reference({
         name: "Port",
         modulePath: this.workflowContext.sdkModulePathNames.PORTS_MODULE_PATH,
         attribute: [attribute],
       }),
-      arguments_: [
-        python.methodArgument({
-          value: this.buildDescriptor(nodePort),
-        }),
-      ],
+      arguments_: descriptor
+        ? [
+            python.methodArgument({
+              value: descriptor,
+            }),
+          ]
+        : [],
     });
   }
 
-  private buildDescriptor(nodePort: NodePortType): AstNode {
+  private buildDescriptor(nodePort: NodePortType): AstNode | undefined {
     let expression: WorkflowValueDescriptorType | undefined;
 
     switch (nodePort.type) {
@@ -140,7 +143,7 @@ export class NodePorts extends AstNode {
     }
 
     if (!expression) {
-      return python.TypeInstantiation.none();
+      return undefined;
     }
     return new WorkflowValueDescriptor({
       workflowValueDescriptor: expression,
