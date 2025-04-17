@@ -430,6 +430,7 @@ describe("TextSearchNode", () => {
         },
         metadataFilterInputs: [
           nodeInputFactory({
+            id: "1237381c-2e78-4306-bd62-be8ecc900d02",
             key: "filters.metadata.conditions.0.lhs",
             value: {
               type: "CONSTANT_VALUE",
@@ -440,6 +441,7 @@ describe("TextSearchNode", () => {
             },
           }),
           nodeInputFactory({
+            id: "3c56555f-45dc-43d5-9d1c-b7cecf70cea1",
             key: "filters.metadata.conditions.0.rhs",
             value: {
               type: "CONSTANT_VALUE",
@@ -511,6 +513,7 @@ describe("TextSearchNode", () => {
             },
           }),
           nodeInputFactory({
+            id: "3c56555f-45dc-43d5-9d1c-b7cecf70cea1",
             key: "filters.metadata.conditions.0.rhs",
             value: {
               type: "CONSTANT_VALUE",
@@ -522,6 +525,7 @@ describe("TextSearchNode", () => {
           }),
         ],
         queryInput: nodeInputFactory({
+          id: "2f5bc81d-6ee8-4101-9a55-4ddeae954425",
           key: "query",
           value: {
             type: "CONSTANT_VALUE",

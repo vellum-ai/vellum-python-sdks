@@ -528,7 +528,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             "1237381c-2e78-4306-bd62-be8ecc900d02"
         ),
         "filters.metadata.conditions.0.rhs": UUID(
-            "3a72e524-aaf5-4b00-a8b4-b71a3192e8aa"
+            "3c56555f-45dc-43d5-9d1c-b7cecf70cea1"
         ),
     }
     output_display = {
@@ -569,7 +569,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {}
     node_input_ids_by_name = {
-        "query": UUID("d10ba907-d29e-410f-9562-66222147bc69"),
+        "query": UUID("2f5bc81d-6ee8-4101-9a55-4ddeae954425"),
         "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
         "weights": UUID("1daf3180-4b92-472a-8665-a7703c84a94e"),
         "limit": UUID("161d264e-d04e-4c37-8e50-8bbb4c90c46e"),
@@ -581,7 +581,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             "9263f669-dfb4-4d69-820d-15beca7583b3"
         ),
         "filters.metadata.conditions.0.rhs": UUID(
-            "75d44663-2ae3-45f7-b015-202736625f0c"
+            "3c56555f-45dc-43d5-9d1c-b7cecf70cea1"
         ),
     }
     output_display = {
