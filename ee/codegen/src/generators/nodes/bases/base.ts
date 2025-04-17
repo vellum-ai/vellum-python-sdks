@@ -484,24 +484,26 @@ export abstract class BaseNode<
       nodeClass.add(statement)
     );
 
-    const nodeInputIdsByNameField = python.field({
-      name: "node_input_ids_by_name",
-      initializer: python.TypeInstantiation.dict(
-        Array.from(this.nodeInputsByKey).map<{
-          key: AstNode;
-          value: AstNode;
-        }>(([key, nodeInput]) => {
-          const nodeAttributeName = this.nodeAttributeNameByNodeInputId.get(
-            nodeInput.nodeInputData.id
-          );
-          return {
-            key: python.TypeInstantiation.str(nodeAttributeName ?? key),
-            value: new UuidOrString(nodeInput.nodeInputData.id),
-          };
-        })
-      ),
-    });
-    nodeClass.add(nodeInputIdsByNameField);
+    if (this.nodeInputsByKey.size > 0) {
+      const nodeInputIdsByNameField = python.field({
+        name: "node_input_ids_by_name",
+        initializer: python.TypeInstantiation.dict(
+          Array.from(this.nodeInputsByKey).map<{
+            key: AstNode;
+            value: AstNode;
+          }>(([key, nodeInput]) => {
+            const nodeAttributeName = this.nodeAttributeNameByNodeInputId.get(
+              nodeInput.nodeInputData.id
+            );
+            return {
+              key: python.TypeInstantiation.str(nodeAttributeName ?? key),
+              value: new UuidOrString(nodeInput.nodeInputData.id),
+            };
+          })
+        ),
+      });
+      nodeClass.add(nodeInputIdsByNameField);
+    }
 
     try {
       const outputDisplay = this.getOutputDisplay();
