@@ -1,6 +1,5 @@
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
-from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
@@ -47,22 +46,7 @@ class GetCurrentWeatherNode(ToolCallingNode):
             ],
         ),
     ]
-    function_callables = {"get_current_weather": get_current_weather}
-    functions = [
-        FunctionDefinition(
-            name="get_current_weather",
-            description="Get the current weather",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "location": {"type": "string", "description": "City and state, e.g. San Francisco, CA"},
-                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
-                },
-                "required": ["location"],
-            },
-            forced=False,
-        ),
-    ]
+    functions = [get_current_weather]
     prompt_inputs = {
         "question": "What's the weather like in San Francisco?",
         "chat_history": [

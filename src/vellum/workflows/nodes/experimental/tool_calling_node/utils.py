@@ -51,16 +51,12 @@ class ToolRouterNode(InlinePromptNode):
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
-    functions: List[FunctionDefinition],
+    functions: List[Callable[..., Any]],
     prompt_inputs: Optional[EntityInputsInterface],
 ) -> Type[ToolRouterNode]:
     Ports = type("Ports", (), {})
     for function in functions:
-        if function.name is None:
-            # We should not raise an error here since we filter out functions without names
-            raise ValueError("Function name is required")
-
-        function_name = function.name
+        function_name = function.__name__
         port_condition = LazyReference(
             lambda: (
                 ToolRouterNode.Outputs.results[0]["type"].equals("FUNCTION_CALL")
@@ -98,7 +94,7 @@ def create_tool_router_node(
     return node
 
 
-def create_function_node(function: FunctionDefinition, function_callable: Callable[..., Any]) -> Type[FunctionNode]:
+def create_function_node(function: Callable[..., Any]) -> Type[FunctionNode]:
     """
     Create a FunctionNode class for a given function.
 
@@ -113,14 +109,14 @@ def create_function_node(function: FunctionDefinition, function_callable: Callab
         arguments = outputs["arguments"]
 
         # Call the original function directly with the arguments
-        result = function_callable(**arguments)
+        result = function(**arguments)
 
         self.state.chat_history.append(ChatMessage(role="FUNCTION", text=result))
 
         return self.Outputs()
 
     node = type(
-        f"FunctionNode_{function.name}",
+        f"FunctionNode_{function.__name__}",
         (FunctionNode,),
         {
             "function": function,
