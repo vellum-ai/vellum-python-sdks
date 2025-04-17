@@ -57,9 +57,11 @@ def create_adornment(
         class Subworkflow(BaseWorkflow):
             graph = inner_cls
 
-            # mypy is wrong here, this works and is defined
-            class Outputs(inner_cls.Outputs):  # type: ignore[name-defined]
+            class Outputs(BaseWorkflow.Outputs):
                 pass
+
+        for output_reference in inner_cls.Outputs:
+            setattr(Subworkflow.Outputs, output_reference.name, output_reference)
 
         dynamic_module = f"{inner_cls.__module__}.{inner_cls.__name__}.{ADORNMENT_MODULE_NAME}"
         # This dynamic module allows calls to `type_hints` to work

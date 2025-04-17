@@ -147,8 +147,9 @@ class _BaseOutputsMeta(type):
             instance = vars(cls).get(name, undefined)
             if instance is undefined:
                 for base in cls.__mro__[1:]:
-                    if hasattr(base, name):
-                        instance = getattr(base, name)
+                    inherited_output_reference = getattr(base, name, undefined)
+                    if isinstance(inherited_output_reference, OutputReference):
+                        instance = inherited_output_reference.instance
                         break
 
             types = infer_types(cls, name)
