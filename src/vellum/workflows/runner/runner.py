@@ -246,7 +246,8 @@ class WorkflowRunner(Generic[StateType]):
                         instance=None,
                         outputs_class=node.Outputs,
                     )
-                    node.state.meta.node_outputs[output_descriptor] = streaming_output_queues[output.name]
+                    with node.state.__quiet__():
+                        node.state.meta.node_outputs[output_descriptor] = streaming_output_queues[output.name]
                     initiated_output: BaseOutput = BaseOutput(name=output.name)
                     initiated_ports = initiated_output > ports
                     self._workflow_event_inner_queue.put(
@@ -304,13 +305,14 @@ class WorkflowRunner(Generic[StateType]):
 
             node.state.meta.node_execution_cache.fulfill_node_execution(node.__class__, span_id)
 
-            for descriptor, output_value in outputs:
-                if output_value is undefined:
-                    if descriptor in node.state.meta.node_outputs:
-                        del node.state.meta.node_outputs[descriptor]
-                    continue
+            with node.state.__atomic__():
+                for descriptor, output_value in outputs:
+                    if output_value is undefined:
+                        if descriptor in node.state.meta.node_outputs:
+                            del node.state.meta.node_outputs[descriptor]
+                        continue
 
-                node.state.meta.node_outputs[descriptor] = output_value
+                    node.state.meta.node_outputs[descriptor] = output_value
 
             invoked_ports = ports(outputs, node.state)
             self._workflow_event_inner_queue.put(
