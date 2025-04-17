@@ -80,6 +80,11 @@ class _BaseWorkflowMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         if "graph" not in dct:
             dct["graph"] = set()
+            for base in bases:
+                base_graph = getattr(base, "graph", None)
+                if base_graph:
+                    dct["graph"] = base_graph
+                    break
 
         if "Outputs" in dct:
             outputs_class = dct["Outputs"]

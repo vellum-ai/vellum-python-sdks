@@ -304,3 +304,26 @@ def test_serialize_workflow__inherited_node_display_class_not_registered():
 
     # THEN it should should succeed
     assert data is not None
+
+
+def test_serialize_workflow__inherited_workflow_display_class_not_registered():
+    # GIVEN a node
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    # AND a workflow that uses the node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND a workflow that inherits from it
+    class InheritedWorkflow(MyWorkflow):
+        class Outputs(MyWorkflow.Outputs):
+            answer = StartNode.Outputs.result
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=InheritedWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should should succeed
+    assert data is not None
