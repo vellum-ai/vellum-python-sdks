@@ -7,13 +7,14 @@ import logging
 from queue import Queue
 from threading import Lock
 from uuid import UUID, uuid4
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, cast
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
 from pydantic_core import core_schema
 
 from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
@@ -109,18 +110,30 @@ class NodeExecutionCache:
         self._node_executions_queued = defaultdict(list)
 
     @classmethod
-    def deserialize(cls, raw_data: dict, nodes: Dict[str, Type["BaseNode"]]):
+    def deserialize(cls, raw_data: dict, nodes: Dict[Union[str, UUID], Type["BaseNode"]]):
         cache = cls()
+
+        def get_node_class(node_id: Any) -> Optional[Type["BaseNode"]]:
+            if not isinstance(node_id, str):
+                return None
+
+            if is_valid_uuid(node_id):
+                return nodes.get(UUID(node_id))
+
+            return nodes.get(node_id)
 
         dependencies_invoked = raw_data.get("dependencies_invoked")
         if isinstance(dependencies_invoked, dict):
             for execution_id, dependencies in dependencies_invoked.items():
-                cache._dependencies_invoked[UUID(execution_id)] = {nodes[dep] for dep in dependencies if dep in nodes}
+                dependency_classes = {get_node_class(dep) for dep in dependencies}
+                cache._dependencies_invoked[UUID(execution_id)] = {
+                    dep_class for dep_class in dependency_classes if dep_class is not None
+                }
 
         node_executions_fulfilled = raw_data.get("node_executions_fulfilled")
         if isinstance(node_executions_fulfilled, dict):
             for node, execution_ids in node_executions_fulfilled.items():
-                node_class = nodes.get(node)
+                node_class = get_node_class(node)
                 if not node_class:
                     continue
 
@@ -131,7 +144,7 @@ class NodeExecutionCache:
         node_executions_initiated = raw_data.get("node_executions_initiated")
         if isinstance(node_executions_initiated, dict):
             for node, execution_ids in node_executions_initiated.items():
-                node_class = nodes.get(node)
+                node_class = get_node_class(node)
                 if not node_class:
                     continue
 
@@ -142,7 +155,7 @@ class NodeExecutionCache:
         node_executions_queued = raw_data.get("node_executions_queued")
         if isinstance(node_executions_queued, dict):
             for node, execution_ids in node_executions_queued.items():
-                node_class = nodes.get(node)
+                node_class = get_node_class(node)
                 if not node_class:
                     continue
 
@@ -193,17 +206,18 @@ class NodeExecutionCache:
     def dump(self) -> Dict[str, Any]:
         return {
             "dependencies_invoked": {
-                str(execution_id): [str(dep) for dep in dependencies]
+                str(execution_id): [str(dep.__id__) for dep in dependencies]
                 for execution_id, dependencies in self._dependencies_invoked.items()
             },
             "node_executions_initiated": {
-                str(node): list(execution_ids) for node, execution_ids in self._node_executions_initiated.items()
+                str(node.__id__): list(execution_ids) for node, execution_ids in self._node_executions_initiated.items()
             },
             "node_executions_fulfilled": {
-                str(node): execution_ids.dump() for node, execution_ids in self._node_executions_fulfilled.items()
+                str(node.__id__): execution_ids.dump()
+                for node, execution_ids in self._node_executions_fulfilled.items()
             },
             "node_executions_queued": {
-                str(node): execution_ids for node, execution_ids in self._node_executions_queued.items()
+                str(node.__id__): execution_ids for node, execution_ids in self._node_executions_queued.items()
             },
         }
 
@@ -316,10 +330,11 @@ class StateMeta(UniversalBaseModel):
             if not workflow_definition:
                 return node_execution_cache
 
-            nodes_cache: Dict[str, Type["BaseNode"]] = {}
+            nodes_cache: Dict[Union[str, UUID], Type["BaseNode"]] = {}
             raw_workflow_nodes = workflow_definition.get_nodes()
             for node in raw_workflow_nodes:
                 nodes_cache[str(node)] = node
+                nodes_cache[node.__id__] = node
 
             return NodeExecutionCache.deserialize(node_execution_cache, nodes_cache)
 
