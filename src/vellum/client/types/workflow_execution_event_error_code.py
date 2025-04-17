@@ -6,6 +6,7 @@ WorkflowExecutionEventErrorCode = typing.Union[
     typing.Literal[
         "WORKFLOW_INITIALIZATION",
         "WORKFLOW_CANCELLED",
+        "PROVIDER_CREDENTIALS_UNAVAILABLE",
         "NODE_EXECUTION_COUNT_LIMIT_REACHED",
         "INTERNAL_SERVER_ERROR",
         "NODE_EXECUTION",

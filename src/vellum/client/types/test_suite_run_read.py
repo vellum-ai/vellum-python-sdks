@@ -9,6 +9,7 @@ from .test_suite_run_state import TestSuiteRunState
 import pydantic
 import typing
 from .test_suite_run_exec_config import TestSuiteRunExecConfig
+from .test_suite_run_progress import TestSuiteRunProgress
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
 
@@ -32,6 +33,8 @@ class TestSuiteRunRead(UniversalBaseModel):
     """
     Configuration that defines how the Test Suite should be run
     """
+
+    progress: typing.Optional[TestSuiteRunProgress] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

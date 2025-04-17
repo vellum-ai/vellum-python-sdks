@@ -11,6 +11,7 @@ VellumSdkErrorCodeEnum = typing.Union[
         "INVALID_CODE",
         "INVALID_TEMPLATE",
         "INTERNAL_ERROR",
+        "PROVIDER_CREDENTIALS_UNAVAILABLE",
         "PROVIDER_ERROR",
         "USER_DEFINED_ERROR",
         "WORKFLOW_CANCELLED",
