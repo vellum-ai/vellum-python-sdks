@@ -3,7 +3,7 @@ from uuid import UUID
 from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..nodes.final_output import FinalOutput
 from ..nodes.merge_node import MergeNode
@@ -13,7 +13,7 @@ from ..nodes.templating_node_3 import TemplatingNode3
 from ..workflow import Workflow
 
 
-class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("b8b9eb69-4af1-4953-b576-aa59eb138696"),
         entrypoint_node_source_handle_id=UUID("1095ae85-1e2f-4433-aacf-fac30fe12ff3"),

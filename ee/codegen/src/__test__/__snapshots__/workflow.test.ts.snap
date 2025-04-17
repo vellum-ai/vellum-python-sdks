@@ -81,15 +81,13 @@ from vellum_ee.workflows.display.vellum import (
     WorkflowDisplayData,
     WorkflowDisplayDataViewport,
 )
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import (
-    VellumWorkflowDisplay,
-)
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
 from ..workflow import TestWorkflow
 
 
-class TestWorkflowDisplay(VellumWorkflowDisplay[TestWorkflow]):
+class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("entrypoint"),
         entrypoint_node_source_handle_id=UUID("<source_handle_id>"),
