@@ -21,56 +21,57 @@ export class ConditionalNode extends BaseSingleFileNode<
   protected getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    const inputFieldKeysByRuleId = new Map<string, string>();
-    const valueInputKeysByRuleId = new Map<string, string>();
-    this.constructMapContextForAllConditions(
-      inputFieldKeysByRuleId,
-      valueInputKeysByRuleId,
-      this.nodeData.data
-    );
+    if (isNilOrEmpty(this.nodeData.ports)) {
+      const inputFieldKeysByRuleId = new Map<string, string>();
+      const valueInputKeysByRuleId = new Map<string, string>();
+      this.constructMapContextForAllConditions(
+        inputFieldKeysByRuleId,
+        valueInputKeysByRuleId,
+        this.nodeData.data
+      );
 
-    const baseNodeClassRef = this.getNodeBaseClass();
+      const baseNodeClassRef = this.getNodeBaseClass();
 
-    const ref = python.reference({
-      name: baseNodeClassRef.name,
-      modulePath: baseNodeClassRef.modulePath,
-      alias: baseNodeClassRef.alias,
-      attribute: ["Ports"],
-    });
+      const ref = python.reference({
+        name: baseNodeClassRef.name,
+        modulePath: baseNodeClassRef.modulePath,
+        alias: baseNodeClassRef.alias,
+        attribute: ["Ports"],
+      });
 
-    this.getNodeBaseClass().inheritReferences(ref);
+      this.getNodeBaseClass().inheritReferences(ref);
 
-    const portsClass = python.class_({
-      name: "Ports",
-      extends_: [ref],
-    });
-    Array.from(this.workflowContext.portContextById.entries()).forEach(
-      ([portId, context]) => {
-        const conditionDataWithIndex = [
-          ...this.nodeData.data.conditions.entries(),
-        ].find(([_, condition]) => condition.sourceHandleId === portId);
+      const portsClass = python.class_({
+        name: "Ports",
+        extends_: [ref],
+      });
+      Array.from(this.workflowContext.portContextById.entries()).forEach(
+        ([portId, context]) => {
+          const conditionDataWithIndex = [
+            ...this.nodeData.data.conditions.entries(),
+          ].find(([_, condition]) => condition.sourceHandleId === portId);
 
-        if (!conditionDataWithIndex) {
-          return;
+          if (!conditionDataWithIndex) {
+            return;
+          }
+
+          portsClass.addField(
+            python.field({
+              name: context.portName,
+              initializer: new ConditionalNodePort({
+                portContext: context,
+                inputFieldKeysByRuleId: inputFieldKeysByRuleId,
+                valueInputKeysByRuleId: valueInputKeysByRuleId,
+                conditionDataWithIndex: conditionDataWithIndex,
+                nodeInputsByKey: this.nodeInputsByKey,
+                nodeLabel: this.nodeData.data.label,
+              }),
+            })
+          );
         }
-
-        portsClass.addField(
-          python.field({
-            name: context.portName,
-            initializer: new ConditionalNodePort({
-              portContext: context,
-              inputFieldKeysByRuleId: inputFieldKeysByRuleId,
-              valueInputKeysByRuleId: valueInputKeysByRuleId,
-              conditionDataWithIndex: conditionDataWithIndex,
-              nodeInputsByKey: this.nodeInputsByKey,
-              nodeLabel: this.nodeData.data.label,
-            }),
-          })
-        );
-      }
-    );
-
-    statements.push(portsClass);
+      );
+      statements.push(portsClass);
+    }
     return statements;
   }
 
