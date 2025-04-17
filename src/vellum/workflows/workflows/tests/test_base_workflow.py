@@ -327,7 +327,6 @@ def test_workflow__unsupported_graph_item():
 
 
 def test_base_workflow__deserialize_state():
-
     # GIVEN a state definition
     class State(BaseState):
         bar: str
@@ -345,6 +344,10 @@ def test_base_workflow__deserialize_state():
     node_a_id = uuid4()
     NodeA.__id__ = node_a_id
 
+    # AND an output id for NodeA.Outputs.foo
+    node_a_output_id = uuid4()
+    NodeA.__output_ids__["foo"] = node_a_output_id
+
     # AND a workflow that uses all three
     class TestWorkflow(BaseWorkflow[Inputs, State]):
         graph = NodeA
@@ -361,7 +364,7 @@ def test_base_workflow__deserialize_state():
                 "updated_ts": "2025-04-14T19:22:18.504902",
                 "external_inputs": {},
                 "node_outputs": {
-                    "test_base_workflow__deserialize_state.<locals>.NodeA.Outputs.foo": "My node A output foo"
+                    str(node_a_output_id): "My node A output foo",
                 },
                 "node_execution_cache": {
                     "dependencies_invoked": {
@@ -440,6 +443,36 @@ def test_base_workflow__deserialize_legacy_node_execution_cache():
     assert state.meta.node_execution_cache._node_executions_fulfilled == {NodeA: Stack.from_list([UUID(last_span_id)])}
     assert state.meta.node_execution_cache._node_executions_queued == {NodeA: []}
     assert state.meta.node_execution_cache._dependencies_invoked == {UUID(last_span_id): {NodeA}}
+
+
+def test_base_workflow__deserialize_legacy_node_outputs():
+
+    # GIVEN a state definition
+    class State(BaseState):
+        bar: str
+
+    # AND a node
+    class NodeA(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow that uses both
+    class TestWorkflow(BaseWorkflow[BaseInputs, State]):
+        graph = NodeA
+
+    # WHEN we deserialize the state that had a legacy node execution cache format
+    state = TestWorkflow.deserialize_state(
+        {
+            "meta": {
+                "node_outputs": {
+                    "test_base_workflow__deserialize_legacy_node_outputs.<locals>.NodeA.Outputs.foo": "My node A output foo",  # noqa: E501
+                },
+            },
+        },
+    )
+
+    # THEN the node execution cache should deserialize correctly
+    assert state.meta.node_outputs == {NodeA.Outputs.foo: "My node A output foo"}
 
 
 def test_base_workflow__deserialize_state_with_optional_inputs():

@@ -293,7 +293,7 @@ class StateMeta(UniversalBaseModel):
 
     @field_serializer("node_outputs")
     def serialize_node_outputs(self, node_outputs: Dict[OutputReference, Any], _info: Any) -> Dict[str, Any]:
-        return {str(descriptor): value for descriptor, value in node_outputs.items()}
+        return {str(descriptor.id): value for descriptor, value in node_outputs.items()}
 
     @field_validator("node_outputs", mode="before")
     @classmethod
@@ -304,15 +304,22 @@ class StateMeta(UniversalBaseModel):
                 return node_outputs
 
             raw_workflow_nodes = workflow_definition.get_nodes()
-            workflow_node_outputs = {}
+            workflow_node_outputs: Dict[Union[str, UUID], OutputReference] = {}
             for node in raw_workflow_nodes:
                 for output in node.Outputs:
                     workflow_node_outputs[str(output)] = output
+                    output_id = node.__output_ids__.get(output.name)
+                    if output_id:
+                        workflow_node_outputs[output_id] = output
 
             node_output_keys = list(node_outputs.keys())
             deserialized_node_outputs = {}
             for node_output_key in node_output_keys:
-                output_reference = workflow_node_outputs.get(node_output_key)
+                if is_valid_uuid(node_output_key):
+                    output_reference = workflow_node_outputs.get(UUID(node_output_key))
+                else:
+                    output_reference = workflow_node_outputs.get(node_output_key)
+
                 if not output_reference:
                     continue
 

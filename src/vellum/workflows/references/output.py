@@ -1,4 +1,6 @@
+from functools import cached_property
 from queue import Queue
+from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, Generator, Generic, Optional, Tuple, Type, TypeVar, cast
 
 from pydantic import GetCoreSchemaHandler
@@ -30,6 +32,24 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
     @property
     def outputs_class(self) -> Type["BaseOutputs"]:
         return self._outputs_class
+
+    @cached_property
+    def id(self) -> UUID:
+        self._outputs_class = self._outputs_class
+
+        node_class = getattr(self._outputs_class, "_node_class", None)
+        if not node_class:
+            return uuid4()
+
+        output_ids = getattr(node_class, "__output_ids__", {})
+        if not isinstance(output_ids, dict):
+            return uuid4()
+
+        output_id = output_ids.get(self.name)
+        if not isinstance(output_id, UUID):
+            return uuid4()
+
+        return output_id
 
     def resolve(self, state: "BaseState") -> _OutputType:
         node_output = state.meta.node_outputs.get(self, undefined)
