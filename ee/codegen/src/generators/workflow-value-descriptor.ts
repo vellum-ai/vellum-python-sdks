@@ -84,6 +84,7 @@ export class WorkflowValueDescriptor extends AstNode {
         return new Expression({
           lhs,
           operator: operator,
+          workflowContext: this.workflowContext,
         });
       }
       case "BINARY_EXPRESSION": {
@@ -94,6 +95,7 @@ export class WorkflowValueDescriptor extends AstNode {
           lhs,
           operator: operator,
           rhs,
+          workflowContext: this.workflowContext,
         });
       }
       case "TERNARY_EXPRESSION": {
@@ -106,6 +108,7 @@ export class WorkflowValueDescriptor extends AstNode {
           operator: operator,
           rhs: rhs,
           base: base,
+          workflowContext: this.workflowContext,
         });
       }
       default:

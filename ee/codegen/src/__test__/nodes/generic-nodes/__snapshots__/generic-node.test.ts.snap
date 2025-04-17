@@ -143,6 +143,35 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with with access field in ports > getNodeFile 1`] = `
+"from vellum.workflows.nodes import BaseNode
+from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
+
+from ..inputs import Inputs
+
+
+class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.count
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+
+    class Ports(BaseNode.Ports):
+        access = Port.on_if(
+            ConstantValueReference(
+                {
+                    "foo": "bar",
+                }
+            )["foo"]
+        )
+"
+`;
+
 exports[`GenericNode > basic without node outputs > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
 

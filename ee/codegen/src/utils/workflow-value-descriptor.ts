@@ -38,6 +38,7 @@ export function convertOperatorType(
     notBetween: "not_between",
     parseJson: "parse_json",
     coalesce: "coalesce",
+    accessField: "access_field",
   };
 
   return operatorMappings[operator] || "equals"; // return default operator if not found
