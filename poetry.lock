@@ -163,20 +163,20 @@ ujson = ["ujson (>=5.7.0)"]
 
 [[package]]
 name = "cdktf"
-version = "0.20.11"
+version = "0.20.12"
 description = "Cloud Development Kit for Terraform"
 optional = false
 python-versions = "~=3.8"
 files = [
-    {file = "cdktf-0.20.11-py3-none-any.whl", hash = "sha256:98f607dd50506c1c85bc8b47c6b8f4b5607a9d87ad2f99f6819709a29abce101"},
-    {file = "cdktf-0.20.11.tar.gz", hash = "sha256:d25ed9d7a68d482a314da0096fcf67cc55765488777b75be69f359ed99c956d3"},
+    {file = "cdktf-0.20.12-py3-none-any.whl", hash = "sha256:673ac0c9cd9e10aee5dae95a668e6969793b6d4297d1eb67817c25b31494614b"},
+    {file = "cdktf-0.20.12.tar.gz", hash = "sha256:9280beb6b33a322d857749104364482e82ae260e6e9131d33f1611ef72e7fe56"},
 ]
 
 [package.dependencies]
 constructs = ">=10.3.0,<11.0.0"
-jsii = ">=1.102.0,<2.0.0"
+jsii = ">=1.106.0,<2.0.0"
 publication = ">=0.0.3"
-typeguard = ">=2.13.3,<2.14.0"
+typeguard = ">=2.13.3,<4.3.0"
 
 [[package]]
 name = "certifi"
