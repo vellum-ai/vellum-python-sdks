@@ -9,6 +9,7 @@ import {
   conditionalNodeFactory,
   conditionalNodeWithNullOperatorFactory,
   nodeInputFactory,
+  nodePortFactory,
   templatingNodeFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
@@ -18,6 +19,7 @@ import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import {
   ConditionalNode as ConditionalNodeType,
   NodeInputValuePointerRule,
+  NodePort,
   WorkflowNodeType,
 } from "src/types/vellum";
 
@@ -1020,5 +1022,103 @@ describe("Conditional Node with OR combinator generates pipe operator", () => {
     node.getNodeFile().write(writer);
     const generatedCode = await writer.toStringFormatted();
     expect(generatedCode).toMatchSnapshot();
+  });
+});
+
+describe("Conditional Node with NodePorts defined", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const nodePortsData: NodePort[] = [
+      nodePortFactory({
+        type: "IF",
+        expression: {
+          type: "UNARY_EXPRESSION",
+          lhs: {
+            type: "CONSTANT_VALUE",
+            value: {
+              type: "STRING",
+              value: "new hello",
+            },
+          },
+          operator: "null",
+        },
+      }),
+    ];
+
+    const nodeData: ConditionalNodeType = {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "d93fecd6-0f6c-4c13-b572-2254404650cd",
+            type: "IF",
+            sourceHandleId: "b9a8c7af-68bf-42e0-9643-a62d73734c74",
+            data: {
+              id: "55f430c7-a98e-4c40-a2b3-455f7152556a",
+              rules: [
+                {
+                  id: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c",
+                  fieldNodeInputId: "f804da22-b3d2-43d0-8c6f-321434c28ead",
+                  operator: "null",
+                },
+              ],
+              combinator: "AND",
+            },
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "f804da22-b3d2-43d0-8c6f-321434c28ead",
+          key: "895d82e8-e6d4-4033-9ae4-581e8c2dc45c.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "original hello",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+      ports: nodePortsData,
+    };
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });

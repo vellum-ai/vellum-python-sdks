@@ -24,6 +24,18 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`Conditional Node with NodePorts defined > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        if_port = Port.on_if(ConstantValueReference("new hello").is_null())
+"
+`;
+
 exports[`Conditional Node with OR combinator generates pipe operator > should generate code with pipe operator for OR conditions 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
