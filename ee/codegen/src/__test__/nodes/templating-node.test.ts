@@ -5,12 +5,18 @@ import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import { templatingNodeFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  nodePortFactory,
+  templatingNodeFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { NodeNotFoundError } from "src/generators/errors";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
-import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
+import {
+  NodePort,
+  TemplatingNode as TemplatingNodeType,
+} from "src/types/vellum";
 
 describe("TemplatingNode", () => {
   let workflowContext: WorkflowContext;
@@ -238,6 +244,52 @@ describe("TemplatingNode", () => {
       expect(workflowContext.getErrors()[0]?.message).toContain(
         "Failed to find node with id "
       );
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with node ports", () => {
+    beforeEach(async () => {
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "input-1",
+            key: "count",
+            type: "NUMBER",
+          },
+          workflowContext,
+        })
+      );
+      const sourceHandleId = "308675dd-2e68-45a5-86fa-b2647a92f553";
+      const nodePortsData: NodePort[] = [
+        nodePortFactory({
+          type: "IF",
+          id: sourceHandleId,
+        }),
+        nodePortFactory({
+          type: "ELSE",
+          id: "1db0ebfd-c07e-49ed-9c4e-4822d3010367",
+        }),
+      ];
+
+      const nodeData = templatingNodeFactory({
+        sourceHandleId: sourceHandleId,
+        nodePorts: nodePortsData,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TemplatingNodeContext;
+
+      node = new TemplatingNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeDisplayFile", async () => {
+      node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });

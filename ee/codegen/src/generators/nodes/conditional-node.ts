@@ -311,56 +311,62 @@ export class ConditionalNode extends BaseSingleFileNode<
   }
 
   protected getPortDisplay(): python.Field | undefined {
-    const portDisplayOverridesDict = new Map();
+    if (this.nodeData.ports) {
+      return super.getPortDisplay();
+    } else {
+      const portDisplayOverridesDict = new Map();
 
-    Array.from(this.workflowContext.portContextById.entries()).forEach(
-      ([portId, context]) => {
-        const conditionData = this.nodeData.data.conditions.find(
-          (condition) => condition.sourceHandleId === portId
-        );
+      Array.from(this.workflowContext.portContextById.entries()).forEach(
+        ([portId, context]) => {
+          const conditionData = this.nodeData.data.conditions.find(
+            (condition) => condition.sourceHandleId === portId
+          );
 
-        if (!conditionData) {
-          return;
-        }
+          if (!conditionData) {
+            return;
+          }
 
-        const edge = this.workflowContext.workflowRawData.edges.find(
-          (edge) => edge.sourceHandleId === portId
-        );
+          const edge = this.workflowContext.workflowRawData.edges.find(
+            (edge) => edge.sourceHandleId === portId
+          );
 
-        if (!edge) {
-          return;
-        }
+          if (!edge) {
+            return;
+          }
 
-        const portDisplayOverrides = python.instantiateClass({
-          classReference: python.reference({
-            name: "PortDisplayOverrides",
-            modulePath:
-              this.workflowContext.sdkModulePathNames
-                .NODE_DISPLAY_TYPES_MODULE_PATH,
-          }),
-          arguments_: [
-            python.methodArgument({
-              name: "id",
-              value: python.TypeInstantiation.uuid(edge.sourceHandleId),
+          const portDisplayOverrides = python.instantiateClass({
+            classReference: python.reference({
+              name: "PortDisplayOverrides",
+              modulePath:
+                this.workflowContext.sdkModulePathNames
+                  .NODE_DISPLAY_TYPES_MODULE_PATH,
             }),
-          ],
-        });
+            arguments_: [
+              python.methodArgument({
+                name: "id",
+                value: python.TypeInstantiation.uuid(edge.sourceHandleId),
+              }),
+            ],
+          });
 
-        portDisplayOverridesDict.set(context.portName, portDisplayOverrides);
-      }
-    );
-    return python.field({
-      name: "port_displays",
-      initializer: python.TypeInstantiation.dict(
-        Array.from(portDisplayOverridesDict.entries()).map(([key, value]) => ({
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [PORTS_CLASS_NAME, key],
-          }),
-          value: value,
-        }))
-      ),
-    });
+          portDisplayOverridesDict.set(context.portName, portDisplayOverrides);
+        }
+      );
+      return python.field({
+        name: "port_displays",
+        initializer: python.TypeInstantiation.dict(
+          Array.from(portDisplayOverridesDict.entries()).map(
+            ([key, value]) => ({
+              key: python.reference({
+                name: this.nodeContext.nodeClassName,
+                modulePath: this.nodeContext.nodeModulePath,
+                attribute: [PORTS_CLASS_NAME, key],
+              }),
+              value: value,
+            })
+          )
+        ),
+      });
+    }
   }
 }

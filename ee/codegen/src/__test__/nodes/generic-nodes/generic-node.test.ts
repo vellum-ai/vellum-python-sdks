@@ -7,6 +7,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   genericNodeFactory,
   inlinePromptNodeDataInlineVariantFactory,
+  nodePortFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
@@ -36,7 +37,12 @@ describe("GenericNode", () => {
 
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = genericNodeFactory();
+      const nodePortData = [
+        nodePortFactory({
+          id: "2544f9e4-d6e6-4475-b6a9-13393115d77c",
+        }),
+      ];
+      const nodeData = genericNodeFactory({ nodePorts: nodePortData });
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -106,9 +112,16 @@ describe("GenericNode", () => {
         },
       ];
 
+      const nodePortData = [
+        nodePortFactory({
+          id: "2544f9e4-d6e6-4475-b6a9-13393115d77c",
+        }),
+      ];
+
       const nodeData = genericNodeFactory({
         label: "MyCustomNode",
         nodeAttributes: nodeAttributes,
+        nodePorts: nodePortData,
       });
 
       const nodeContext = (await createNodeContext({
@@ -283,9 +296,16 @@ describe("GenericNode", () => {
         },
       ];
 
+      const nodePortData = [
+        nodePortFactory({
+          id: "2544f9e4-d6e6-4475-b6a9-13393115d77c",
+        }),
+      ];
+
       const nodeData = genericNodeFactory({
         label: "MyCustomNode",
         adornments: adornments,
+        nodePorts: nodePortData,
       });
 
       const nodeContext = (await createNodeContext({

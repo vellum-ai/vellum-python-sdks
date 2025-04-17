@@ -666,6 +666,7 @@ export function templatingNodeFactory({
   templateNodeInputId,
   inputs,
   template,
+  nodePorts,
 }: {
   id?: string;
   label?: string;
@@ -676,6 +677,7 @@ export function templatingNodeFactory({
   templateNodeInputId?: string;
   inputs?: NodeInput[];
   template?: ConstantValuePointer;
+  nodePorts?: NodePort[];
 } = {}): TemplatingNode {
   const defaultTemplate: ConstantValuePointer = {
     type: "CONSTANT_VALUE",
@@ -715,6 +717,7 @@ export function templatingNodeFactory({
       outputType: outputType,
     },
     inputs: nodeInputs,
+    ports: nodePorts,
   };
   return nodeData;
 }

@@ -213,6 +213,67 @@ export abstract class BaseNode<
   }
 
   protected getPortDisplay(): python.Field | undefined {
+    if (this.nodeData.ports) {
+      return this.getPortDisplayFromAttribute();
+    } else {
+      return this.getPortDisplayFromSourceHandle();
+    }
+  }
+
+  protected getPortDisplayFromAttribute(): python.Field | undefined {
+    if (!this.nodeData.ports) {
+      return;
+    } else {
+      const portDisplayOverridesDict = new Map();
+      const portIds = new Set(this.nodeData.ports.map((port) => port.id));
+
+      Array.from(this.workflowContext.portContextById.entries()).forEach(
+        ([portId, context]) => {
+          const isPortInCurrentNode = portIds.has(portId);
+          console.log(portIds);
+          console.log(portId)
+          if (isPortInCurrentNode) {
+            const portDisplayOverrides = python.instantiateClass({
+              classReference: python.reference({
+                name: "PortDisplayOverrides",
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_TYPES_MODULE_PATH,
+              }),
+              arguments_: [
+                python.methodArgument({
+                  name: "id",
+                  value: python.TypeInstantiation.uuid(portId),
+                }),
+              ],
+            });
+
+            portDisplayOverridesDict.set(
+              context.portName,
+              portDisplayOverrides
+            );
+          }
+        }
+      );
+      return python.field({
+        name: "port_displays",
+        initializer: python.TypeInstantiation.dict(
+          Array.from(portDisplayOverridesDict.entries()).map(
+            ([key, value]) => ({
+              key: python.reference({
+                name: this.nodeContext.nodeClassName,
+                modulePath: this.nodeContext.nodeModulePath,
+                attribute: [PORTS_CLASS_NAME, key],
+              }),
+              value: value,
+            })
+          )
+        ),
+      });
+    }
+  }
+
+  protected getPortDisplayFromSourceHandle(): python.Field | undefined {
     if (
       !("data" in this.nodeData) ||
       !("sourceHandleId" in this.nodeData.data)
