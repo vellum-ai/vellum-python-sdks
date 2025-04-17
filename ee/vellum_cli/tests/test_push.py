@@ -133,6 +133,58 @@ def test_push__happy_path(mock_module, vellum_client, base_command):
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
+def test_push__no_config__module_found(mock_module, vellum_client):
+    # GIVEN no config file set
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    mock_module.set_pyproject_toml({"workflows": []})
+
+    # AND a workflow exists in the module successfully
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully
+    new_workflow_sandbox_id = str(uuid4())
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=new_workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module])
+
+    # THEN it should successfully push the workflow
+    assert result.exit_code == 0, result.stdout
+
+    # Get the last part of the module path and format it
+    expected_artifact_name = f"{mock_module.module.replace('.', '__')}.tar.gz"
+
+    # AND we should have called the push API with the correct args
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
+    assert call_args["workflow_sandbox_id"] is None
+    assert "deplyment_config" not in call_args
+
+    # AND we should have pushed the correct artifact
+    assert call_args["artifact"].name == expected_artifact_name
+    extracted_files = _extract_tar_gz(call_args["artifact"].read())
+    assert extracted_files["workflow.py"] == workflow_py_file_content
+
+    # AND there should be a new entry in the lock file
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        assert lock_file_content["workflows"][0] == {
+            "container_image_name": None,
+            "container_image_tag": None,
+            "deployments": [],
+            "ignore": None,
+            "module": module,
+            "target_directory": None,
+            "workflow_sandbox_id": new_workflow_sandbox_id,
+            "workspace": "default",
+        }
+
+
 @pytest.mark.parametrize(
     "base_command",
     [
