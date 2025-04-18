@@ -434,6 +434,17 @@ ${errors.slice(0, 3).map((err) => {
     const visited = new Set<string>();
     const tempVisited = new Set<string>(); // Used to detect cycles
 
+    const processNode = (nodeId: string) => {
+      const node = nodesById[nodeId];
+      if (node && !visited.has(nodeId)) {
+        orderedNodes.push(node);
+      }
+
+      // Mark as fully processed
+      visited.add(nodeId);
+      tempVisited.delete(nodeId);
+    };
+
     // DFS function that ensures dependencies are processed first
     const visit = (nodeId: string) => {
       // Skip if already processed
@@ -442,7 +453,9 @@ ${errors.slice(0, 3).map((err) => {
       }
 
       // Return early if we've already visited this node in the current path (cycle)
+      // Make sure we add the node that started the cycle first
       if (tempVisited.has(nodeId)) {
+        processNode(nodeId);
         return;
       }
 
@@ -456,14 +469,7 @@ ${errors.slice(0, 3).map((err) => {
       }
 
       // All dependencies processed, now safe to add this node
-      const node = nodesById[nodeId];
-      if (node) {
-        orderedNodes.push(node);
-      }
-
-      // Mark as fully processed
-      visited.add(nodeId);
-      tempVisited.delete(nodeId);
+      processNode(nodeId);
     };
 
     // Visit each node to ensure all are processed

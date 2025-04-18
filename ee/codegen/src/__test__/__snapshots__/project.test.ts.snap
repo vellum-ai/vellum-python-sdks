@@ -24,6 +24,8 @@ exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyRefe
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
 
+from .start_node import StartNode
+
 
 class RouterNode(BaseNode):
     class Ports(BaseNode.Ports):
