@@ -667,6 +667,7 @@ export function templatingNodeFactory({
   templateNodeInputId,
   inputs,
   template,
+  nodePorts,
 }: {
   id?: string;
   label?: string;
@@ -677,6 +678,7 @@ export function templatingNodeFactory({
   templateNodeInputId?: string;
   inputs?: NodeInput[];
   template?: ConstantValuePointer;
+  nodePorts?: NodePort[];
 } = {}): TemplatingNode {
   const defaultTemplate: ConstantValuePointer = {
     type: "CONSTANT_VALUE",
@@ -716,6 +718,7 @@ export function templatingNodeFactory({
       outputType: outputType,
     },
     inputs: nodeInputs,
+    ports: nodePorts,
   };
   return nodeData;
 }
@@ -1421,7 +1424,10 @@ export function errorNodeDataFactory({
 export function nodePortFactory(port: Partial<NodePort> = {}): NodePort {
   const portType = port.type ?? "DEFAULT";
   const portId = port.id ?? uuidv4();
-  const portName = port.name ?? `${portType.toLowerCase()}_port`;
+  const portName =
+    port.type === "DEFAULT"
+      ? "default"
+      : port.name ?? `${portType.toLowerCase()}_port`;
 
   if (port.type === "IF" || port.type === "ELIF") {
     return {
