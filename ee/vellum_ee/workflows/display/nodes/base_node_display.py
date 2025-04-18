@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from functools import cached_property
 import inspect
 from uuid import UUID
@@ -493,14 +492,14 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         if (
             isinstance(value, list)
             and len(value) > 0
-            and all(isinstance(function, (FunctionDefinition, Callable)) for function in value)
+            and all(isinstance(function, FunctionDefinition) or callable(function) for function in value)
         ):
             normalized_functions = [
                 function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
                 for function in value
             ]
 
-            functions = [
+            functions: JsonArray = [
                 {
                     "id": str(uuid4_from_hash(f"{str(self.node_id)}-FUNCTION_DEFINITION-{i}")),
                     "block_type": "FUNCTION_DEFINITION",
