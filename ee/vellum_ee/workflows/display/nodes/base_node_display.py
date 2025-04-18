@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from functools import cached_property
 import inspect
 from uuid import UUID
@@ -18,6 +19,7 @@ from typing import (
 )
 
 from vellum.client.types.code_resource_definition import CodeResourceDefinition
+from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -61,6 +63,7 @@ from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
@@ -486,6 +489,35 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
             raise ValueError("Nested references are not supported.")
+
+        if (
+            isinstance(value, list)
+            and len(value) > 0
+            and all(isinstance(function, (FunctionDefinition, Callable)) for function in value)
+        ):
+            normalized_functions = [
+                function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
+                for function in value
+            ]
+
+            functions = [
+                {
+                    "id": str(uuid4_from_hash(f"{str(self.node_id)}-FUNCTION_DEFINITION-{i}")),
+                    "block_type": "FUNCTION_DEFINITION",
+                    "properties": {
+                        "function_name": function.name,
+                        "function_description": function.description,
+                        "function_parameters": function.parameters,
+                        "function_forced": function.forced,
+                        "function_strict": function.strict,
+                    },
+                }
+                for i, function in enumerate(normalized_functions)
+            ]
+            return {
+                "type": "FUNCTION_DEFINITIONS",
+                "functions": functions,
+            }
 
         if not isinstance(value, BaseDescriptor):
             vellum_value = primitive_to_vellum_value(value)
