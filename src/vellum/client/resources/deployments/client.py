@@ -351,7 +351,7 @@ class DeploymentsClient:
             The name of the Release Tag associated with this Deployment that you'd like to update.
 
         history_item_id : typing.Optional[str]
-            The ID of the Deployment History Item to tag
+            The ID of the Release to tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -895,7 +895,7 @@ class AsyncDeploymentsClient:
             The name of the Release Tag associated with this Deployment that you'd like to update.
 
         history_item_id : typing.Optional[str]
-            The ID of the Deployment History Item to tag
+            The ID of the Release to tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
