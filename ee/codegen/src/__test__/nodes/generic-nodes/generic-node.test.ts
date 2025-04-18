@@ -378,4 +378,27 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("basic with custom base", () => {
+    it("getNodeFile", async () => {
+      const nodeData = genericNodeFactory({
+        base: {
+          name: "MockNetworkingClient",
+          module: ["path", "to", "mock_networking_client"],
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

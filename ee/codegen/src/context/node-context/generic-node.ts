@@ -8,6 +8,13 @@ export class GenericNodeContext extends BaseNodeContext<GenericNodeType> {
   baseNodeClassName = "BaseNode";
   baseNodeDisplayClassName = "BaseNodeDisplay";
 
+  constructor(args: BaseNodeContext.Args<GenericNodeType>) {
+    super(args);
+
+    if (args.nodeData.base) {
+      this.baseNodeClassName = args.nodeData.base.name;
+    }
+  }
   getNodeOutputNamesById(): Record<string, string> {
     return Object.fromEntries(
       this.nodeData.outputs.map((output) => [output.id, output.name])
