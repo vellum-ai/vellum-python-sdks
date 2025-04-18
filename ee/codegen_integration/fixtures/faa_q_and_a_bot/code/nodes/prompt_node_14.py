@@ -19,9 +19,7 @@ class PromptNode14(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
-                            text="""Summarize the weather. Just use plain text, no special characters, no commas, no mathematical signs like + -""",
+                            text="""Summarize the weather. Just use plain text, no special characters, no commas, no mathematical signs like + -"""
                         )
                     ]
                 )

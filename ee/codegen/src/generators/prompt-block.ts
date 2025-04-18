@@ -2,7 +2,6 @@ import { python } from "@fern-api/python-ast";
 import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
-import { PlainTextPromptBlock as PlainTextPromptBlockType } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import {
@@ -14,6 +13,7 @@ import {
   JinjaPromptTemplateBlock,
   RichTextPromptTemplateBlock,
   VariablePromptTemplateBlock,
+  PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
 
 // Flesh out unit tests for various prompt configurations
@@ -31,6 +31,8 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
         return this.generateVariablePromptBlock(promptBlock);
       case "RICH_TEXT":
         return this.generateRichTextPromptBlock(promptBlock);
+      case "PLAIN_TEXT":
+        return this.generatePlainTextPromptBlock(promptBlock);
     }
   }
 
@@ -50,6 +52,9 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
         break;
       case "RICH_TEXT":
         pathName = "RichTextPromptBlock";
+        break;
+      case "PLAIN_TEXT":
+        pathName = "PlainTextPromptBlock";
         break;
     }
     return python.reference({
@@ -126,8 +131,12 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
     }
 
     const childBlocks = promptBlock.properties.blocks.filter(
-      (block): block is PromptTemplateBlockExcludingFunctionDefinition =>
-        block.blockType !== "FUNCTION_DEFINITION"
+      (
+        block
+      ): block is Exclude<
+        PromptTemplateBlockExcludingFunctionDefinition,
+        PlainTextPromptTemplateBlock
+      > => block.blockType !== "FUNCTION_DEFINITION"
     );
     classArgs.push(
       new MethodArgument({
@@ -176,36 +185,11 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
   }
 
   private generatePlainTextPromptBlock(
-    promptBlock: PlainTextPromptBlockType
+    promptBlock: PlainTextPromptTemplateBlock
   ): python.ClassInstantiation {
-    const classArgs: MethodArgument[] = [];
-
-    if (promptBlock.state) {
-      classArgs.push(
-        new MethodArgument({
-          name: "state",
-          value: python.TypeInstantiation.str(promptBlock.state),
-        })
-      );
-    }
-
-    let cacheConfigValue = python.TypeInstantiation.none();
-    if (
-      promptBlock.cacheConfig !== undefined &&
-      promptBlock.cacheConfig !== null
-    ) {
-      if (promptBlock.cacheConfig.type) {
-        cacheConfigValue = python.TypeInstantiation.str(
-          promptBlock.cacheConfig.type
-        );
-      }
-    }
-    classArgs.push(
-      new MethodArgument({
-        name: "cache_config",
-        value: cacheConfigValue,
-      })
-    );
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+    ];
 
     classArgs.push(
       new MethodArgument({
@@ -219,10 +203,7 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
     );
 
     const plainBlock = python.instantiateClass({
-      classReference: python.reference({
-        name: "PlainTextPromptBlock",
-        modulePath: VELLUM_CLIENT_MODULE_PATH,
-      }),
+      classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
 

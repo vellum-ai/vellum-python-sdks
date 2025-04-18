@@ -19,13 +19,11 @@ class PromptNode16(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 Respond with the IATA airport name this incoming message is about. For example, respond only with \"SJC\", \"SFO\", \"EWR\" or \"JFK\"
 
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="most_recent_message"),
                     ]

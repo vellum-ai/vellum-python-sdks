@@ -8,13 +8,7 @@ class PromptNode19(InlinePromptNode):
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
             blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            state="ENABLED", cache_config=None, text="""Respond with \"Sorry I don\'t know\""""
-                        )
-                    ]
-                )
+                RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""Respond with \"Sorry I don\'t know\"""")])
             ],
         ),
     ]

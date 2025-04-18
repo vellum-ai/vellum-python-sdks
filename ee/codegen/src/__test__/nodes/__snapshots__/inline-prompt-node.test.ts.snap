@@ -63,13 +63,11 @@ class PromptNode(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\\
 Summarize the following text:
 
 \\
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="text"),
                     ]
@@ -157,13 +155,11 @@ class PromptNode(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\\
 Summarize the following text:
 
 \\
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="text"),
                     ]
@@ -260,13 +256,11 @@ class PromptNode(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\\
 Summarize the following text:
 
 \\
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="text"),
                     ]
@@ -783,13 +777,7 @@ from ..inputs import Inputs
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
-        RichTextPromptBlock(
-            blocks=[
-                PlainTextPromptBlock(
-                    state="ENABLED", cache_config=None, text="""Hello World!"""
-                )
-            ]
-        ),
+        RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""Hello World!""")]),
     ]
     prompt_inputs = {
         "text": Inputs.text,
@@ -859,13 +847,7 @@ from ..inputs import Inputs
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
-        RichTextPromptBlock(
-            blocks=[
-                PlainTextPromptBlock(
-                    state="ENABLED", cache_config=None, text="""Hello World!"""
-                )
-            ]
-        ),
+        RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""Hello World!""")]),
     ]
     prompt_inputs = {
         "text": Inputs.text,
@@ -944,13 +926,7 @@ from ..inputs import Inputs
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
-        RichTextPromptBlock(
-            blocks=[
-                PlainTextPromptBlock(
-                    state="ENABLED", cache_config=None, text="""Hello World!"""
-                )
-            ]
-        ),
+        RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""Hello World!""")]),
     ]
     prompt_inputs = {
         "text": Inputs.text,

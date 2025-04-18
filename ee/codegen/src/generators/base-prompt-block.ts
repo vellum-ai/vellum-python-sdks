@@ -10,12 +10,12 @@ import { WorkflowContext } from "src/context/workflow-context";
 import {
   FunctionDefinitionPromptTemplateBlock,
   PromptTemplateBlock,
+  PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
 
-export type PromptTemplateBlockExcludingFunctionDefinition = Exclude<
-  PromptTemplateBlock,
-  FunctionDefinitionPromptTemplateBlock
->;
+export type PromptTemplateBlockExcludingFunctionDefinition =
+  | Exclude<PromptTemplateBlock, FunctionDefinitionPromptTemplateBlock>
+  | PlainTextPromptTemplateBlock;
 
 export declare namespace BasePromptBlock {
   interface Args<T extends PromptTemplateBlockExcludingFunctionDefinition> {
