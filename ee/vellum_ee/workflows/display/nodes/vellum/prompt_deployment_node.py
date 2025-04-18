@@ -5,7 +5,7 @@ from vellum.workflows.nodes.displayable.prompt_deployment_node import PromptDepl
 from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.vellum_client import create_vellum_client
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -13,9 +13,7 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 _PromptDeploymentNodeType = TypeVar("_PromptDeploymentNodeType", bound=PromptDeploymentNode)
 
 
-class BasePromptDeploymentNodeDisplay(
-    BaseNodeVellumDisplay[_PromptDeploymentNodeType], Generic[_PromptDeploymentNodeType]
-):
+class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType], Generic[_PromptDeploymentNodeType]):
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:

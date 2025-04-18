@@ -16,7 +16,7 @@ from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.nodes.displayable import ConditionalNode
 from vellum.workflows.types.core import ConditionType, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator
@@ -40,7 +40,7 @@ class ConditionId:
     rule_group_id: Optional[str]
 
 
-class BaseConditionalNodeDisplay(BaseNodeVellumDisplay[_ConditionalNodeType], Generic[_ConditionalNodeType]):
+class BaseConditionalNodeDisplay(BaseNodeDisplay[_ConditionalNodeType], Generic[_ConditionalNodeType]):
     source_handle_ids: ClassVar[Dict[int, UUID]]
     rule_ids: ClassVar[List[RuleIdMap]]
     condition_ids: ClassVar[list[ConditionId]]

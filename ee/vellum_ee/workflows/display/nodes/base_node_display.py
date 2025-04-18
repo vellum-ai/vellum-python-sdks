@@ -49,7 +49,7 @@ from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
-from vellum.workflows.nodes.utils import get_wrapped_node
+from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
 from vellum.workflows.references.constant import ConstantValueReference
@@ -275,6 +275,13 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             port_id = uuid4_from_hash(f"{self.node_id}|ports|{port.name}")
 
         return PortDisplay(id=port_id, node_id=self.node_id)
+
+    def get_source_handle_id(self, port_displays: Dict[Port, PortDisplay]) -> UUID:
+        unadorned_node = get_unadorned_node(self._node)
+        default_port = unadorned_node.Ports.default
+
+        default_port_display = port_displays[default_port]
+        return default_port_display.id
 
     def get_trigger_id(self) -> UUID:
         return self.get_target_handle_id()

@@ -31,7 +31,6 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -241,14 +240,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 )
 
                 if source_node_display:
-                    if isinstance(source_node_display, BaseNodeVellumDisplay):
-                        source_handle_id = source_node_display.get_source_handle_id(
-                            port_displays=self.display_context.port_displays
-                        )
-                    else:
-                        source_handle_id = source_node_display.get_node_port_display(
-                            source_node_display._node.Ports.default
-                        ).id
+                    source_handle_id = source_node_display.get_source_handle_id(
+                        port_displays=self.display_context.port_displays
+                    )
 
                     synthetic_output_edges.append(
                         {
@@ -617,9 +611,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         node_event_displays = {}
         for node_id in node_displays:
             node, current_node_display = node_displays[node_id]
-            input_display = {}
-            if isinstance(current_node_display, BaseNodeVellumDisplay):
-                input_display = current_node_display.node_input_ids_by_name
+            input_display = current_node_display.node_input_ids_by_name
             output_display = {
                 output.name: current_node_display.output_display[output].id
                 for output in current_node_display.output_display

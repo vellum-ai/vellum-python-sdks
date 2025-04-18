@@ -10,7 +10,6 @@ from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -72,7 +71,7 @@ def _recursively_replace_wrapped_node(node_class: Type[BaseNode], wrapped_node_d
         )
 
 
-class BaseAdornmentNodeDisplay(BaseNodeVellumDisplay[_BaseAdornmentNodeType], Generic[_BaseAdornmentNodeType]):
+class BaseAdornmentNodeDisplay(BaseNodeDisplay[_BaseAdornmentNodeType], Generic[_BaseAdornmentNodeType]):
     __wrapped_node_display__: Optional[Type[BaseNodeDisplay]] = None
 
     def serialize(

@@ -6,7 +6,7 @@ from vellum.workflows.nodes.displayable.code_execution_node import CodeExecution
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -14,7 +14,7 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 _CodeExecutionNodeType = TypeVar("_CodeExecutionNodeType", bound=CodeExecutionNode)
 
 
-class BaseCodeExecutionNodeDisplay(BaseNodeVellumDisplay[_CodeExecutionNodeType], Generic[_CodeExecutionNodeType]):
+class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Generic[_CodeExecutionNodeType]):
     output_id: ClassVar[Optional[UUID]] = None
     log_output_id: ClassVar[Optional[UUID]] = None
 

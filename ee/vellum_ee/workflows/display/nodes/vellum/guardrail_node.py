@@ -3,7 +3,7 @@ from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import GuardrailNode
 from vellum.workflows.types.core import JsonObject
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -11,7 +11,7 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 _GuardrailNodeType = TypeVar("_GuardrailNodeType", bound=GuardrailNode)
 
 
-class BaseGuardrailNodeDisplay(BaseNodeVellumDisplay[_GuardrailNodeType], Generic[_GuardrailNodeType]):
+class BaseGuardrailNodeDisplay(BaseNodeDisplay[_GuardrailNodeType], Generic[_GuardrailNodeType]):
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:

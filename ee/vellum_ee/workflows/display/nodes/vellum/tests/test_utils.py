@@ -9,7 +9,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.references import LazyReference
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input_value_pointer_rules
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -36,7 +36,7 @@ class MyNodeA(BaseNode):
         output: str
 
 
-class MyNodeADisplay(BaseNodeVellumDisplay[MyNodeA]):
+class MyNodeADisplay(BaseNodeDisplay[MyNodeA]):
     pass
 
 

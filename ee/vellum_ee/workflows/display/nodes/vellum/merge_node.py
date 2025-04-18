@@ -4,13 +4,13 @@ from typing import Any, ClassVar, Generic, List, Optional, TypeVar
 from vellum.workflows.nodes.displayable import MergeNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _MergeNodeType = TypeVar("_MergeNodeType", bound=MergeNode)
 
 
-class BaseMergeNodeDisplay(BaseNodeVellumDisplay[_MergeNodeType], Generic[_MergeNodeType]):
+class BaseMergeNodeDisplay(BaseNodeDisplay[_MergeNodeType], Generic[_MergeNodeType]):
     target_handle_ids: ClassVar[List[UUID]]
 
     def __init__(self):

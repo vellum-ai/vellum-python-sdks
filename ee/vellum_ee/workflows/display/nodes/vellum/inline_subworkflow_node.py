@@ -5,7 +5,7 @@ from vellum import VellumVariable
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.types.core import JsonObject
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -17,7 +17,7 @@ _InlineSubworkflowNodeType = TypeVar("_InlineSubworkflowNodeType", bound=InlineS
 
 
 class BaseInlineSubworkflowNodeDisplay(
-    BaseNodeVellumDisplay[_InlineSubworkflowNodeType], Generic[_InlineSubworkflowNodeType]
+    BaseNodeDisplay[_InlineSubworkflowNodeType], Generic[_InlineSubworkflowNodeType]
 ):
     workflow_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
