@@ -82,3 +82,21 @@ def test_serialize_condition__accessor_expression():
             },
         }
     ]
+
+
+def test_serialize_display_data():
+    # GIVEN a node with an accessor expression in a Port
+    class MyNode(BaseNode):
+        """I hope this works"""
+
+        pass
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(MyNode)
+    data = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the condition should be serialized correctly
+    assert data["display_data"] == {
+        "position": {"x": 0.0, "y": 0.0},
+        "comment": {"value": "I hope this works"},
+    }

@@ -64,7 +64,7 @@ from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum_ee.workflows.display.editor.types import NodeDisplayData
+from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
@@ -223,7 +223,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             "id": str(node_id),
             "label": node.__qualname__,
             "type": "GENERIC",
-            "display_data": self._get_generic_node_display_data().dict(),
+            "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
             "trigger": {
@@ -363,9 +363,32 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         register_node_display_class(node_class=node_class, node_display_class=cls)
 
-    def _get_generic_node_display_data(self) -> NodeDisplayData:
+    def get_display_data(self) -> NodeDisplayData:
         explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
-        return explicit_value if explicit_value else NodeDisplayData()
+        docstring = self._node.__doc__
+
+        if explicit_value and explicit_value.comment and docstring:
+            comment = (
+                NodeDisplayComment(value=docstring, expanded=explicit_value.comment.expanded)
+                if explicit_value.comment.expanded
+                else NodeDisplayComment(value=docstring)
+            )
+            return NodeDisplayData(
+                position=explicit_value.position,
+                width=explicit_value.width,
+                height=explicit_value.height,
+                comment=comment,
+            )
+
+        if explicit_value:
+            return explicit_value
+
+        if docstring:
+            return NodeDisplayData(
+                comment=NodeDisplayComment(value=docstring),
+            )
+
+        return NodeDisplayData()
 
     def serialize_condition(self, display_context: "WorkflowDisplayContext", condition: BaseDescriptor) -> JsonObject:
         if isinstance(
