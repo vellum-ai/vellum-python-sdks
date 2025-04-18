@@ -84,6 +84,7 @@ def test_serialize_workflow__await_all():
                 "module": ["tests", "workflows", "basic_merge_node", "await_all_workflow"],
                 "name": "AwaitAllMergeNode",
             },
+            "ports": [{"id": "3bbc469f-0fb0-4b3d-a28b-746fefec2818", "name": "default", "type": "DEFAULT"}],
         },
         merge_node,
         ignore_order_func=lambda x: x.path() == "root['data']['target_handles']",

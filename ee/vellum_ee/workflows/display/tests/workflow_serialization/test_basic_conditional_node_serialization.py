@@ -425,6 +425,87 @@ def test_serialize_workflow():
                 "name": "CategoryConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow"],
             },
+            "ports": [
+                {
+                    "id": "3a45b81f-95e4-4cbd-8997-bfdbe30251e8",
+                    "name": "category_question",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {"type": "WORKFLOW_INPUT", "input_variable_id": "eece050a-432e-4a2c-8c87-9480397e4cbf"},
+                        "operator": "=",
+                        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "question"}},
+                    },
+                },
+                {
+                    "id": "7202f702-1ebc-4067-ab1e-ec67e49158ee",
+                    "name": "category_complaint",
+                    "type": "ELIF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {"type": "WORKFLOW_INPUT", "input_variable_id": "eece050a-432e-4a2c-8c87-9480397e4cbf"},
+                        "operator": "=",
+                        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "complaint"}},
+                    },
+                },
+                {
+                    "id": "cf45705d-1a47-43a6-9d24-a7fdf78baae0",
+                    "name": "category_compliment",
+                    "type": "ELIF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {"type": "WORKFLOW_INPUT", "input_variable_id": "eece050a-432e-4a2c-8c87-9480397e4cbf"},
+                        "operator": "=",
+                        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "compliment"}},
+                    },
+                },
+                {
+                    "id": "f04610dd-61cf-41b0-b337-2235e101cdb0",
+                    "name": "category_statement",
+                    "type": "ELIF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": "eece050a-432e-4a2c-8c87-9480397e4cbf",
+                            },
+                            "operator": "=",
+                            "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "statement"}},
+                        },
+                        "operator": "and",
+                        "rhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": "eece050a-432e-4a2c-8c87-9480397e4cbf",
+                                },
+                                "operator": "=",
+                                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "statement"}},
+                            },
+                            "operator": "and",
+                            "rhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": "eece050a-432e-4a2c-8c87-9480397e4cbf",
+                                },
+                                "operator": "=",
+                                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "statement"}},
+                            },
+                        },
+                    },
+                },
+                {
+                    "id": "f9dde637-ea90-465f-a871-caf8380ae377",
+                    "name": "category_fallthrough",
+                    "type": "ELSE",
+                    "expression": None,
+                },
+            ],
         },
         conditional_node,
         ignore_order=True,
@@ -873,6 +954,25 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 "name": "SimpleConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
+            "ports": [
+                {
+                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "name": "text_str",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "123"}},
+                        "operator": f"{operator}",
+                        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "123"}},
+                    },
+                },
+                {
+                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "name": "text_fallthrough",
+                    "type": "ELSE",
+                    "expression": None,
+                },
+            ],
         },
         conditional_node,
         ignore_order=True,
@@ -966,6 +1066,24 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                 "name": "SimpleConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
+            "ports": [
+                {
+                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "name": "text_str",
+                    "type": "IF",
+                    "expression": {
+                        "type": "UNARY_EXPRESSION",
+                        "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "123"}},
+                        "operator": f"{operator}",
+                    },
+                },
+                {
+                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "name": "text_fallthrough",
+                    "type": "ELSE",
+                    "expression": None,
+                },
+            ],
         },
         conditional_node,
         ignore_order=True,
@@ -1072,6 +1190,26 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                 "name": "SimpleConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
+            "ports": [
+                {
+                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "name": "text_str",
+                    "type": "IF",
+                    "expression": {
+                        "type": "TERNARY_EXPRESSION",
+                        "base": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "123"}},
+                        "operator": f"{operator}",
+                        "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "123"}},
+                        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "123"}},
+                    },
+                },
+                {
+                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "name": "text_fallthrough",
+                    "type": "ELSE",
+                    "expression": None,
+                },
+            ],
         },
         conditional_node,
         ignore_order=True,

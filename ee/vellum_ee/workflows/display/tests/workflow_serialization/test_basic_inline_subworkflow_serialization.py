@@ -299,6 +299,7 @@ def test_serialize_workflow():
                 "name": "ExampleInlineSubworkflowNode",
                 "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
             },
+            "ports": [{"id": "cfd831bc-ee7f-44d0-8d76-0ba0cd0277dc", "name": "default", "type": "DEFAULT"}],
         },
         subworkflow_node,
         ignore_order=True,

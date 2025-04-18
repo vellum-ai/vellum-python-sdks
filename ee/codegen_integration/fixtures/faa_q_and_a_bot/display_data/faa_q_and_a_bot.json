@@ -94,7 +94,14 @@
             "nodes",
             "most_recent_message"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "ab8e97b4-4ee4-42bc-8f43-e2c9c457ad21",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "393c798a-111a-4f73-bfee-5efb93228dcb",
@@ -274,6 +281,13 @@
             "type": "ARRAY",
             "value": null
           }
+        ],
+        "ports": [
+          {
+            "id": "f743c0c0-8ced-445d-bf1c-bef1f2b26895",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       },
       {
@@ -351,7 +365,14 @@
             "nodes",
             "templating_node"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "0f8cbd50-1919-4c2e-8b1b-1ad741b5da35",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "903aa4b9-70b6-4d32-a12e-488926403836",
@@ -568,7 +589,78 @@
             "nodes",
             "conditional_node"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "d4f0db7d-b04a-4c4d-b9d3-aa3eb61fa3a2",
+            "name": "branch_1",
+            "type": "IF",
+            "expression": {
+              "lhs": {
+                "node_id": "557f9b98-2229-437e-844b-cac7868a0534",
+                "node_output_id": "adf0256c-cdcd-4e62-92a3-a9c1b8e70e0f",
+                "type": "NODE_OUTPUT"
+              },
+              "operator": "=",
+              "rhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                  "type": "STRING",
+                  "value": "weather"
+                }
+              },
+              "type": "BINARY_EXPRESSION"
+            }
+          },
+          {
+            "id": "d3489082-f03f-4121-ae60-877fd361c5fe",
+            "name": "branch_2",
+            "type": "ELIF",
+            "expression": {
+              "lhs": {
+                "node_id": "557f9b98-2229-437e-844b-cac7868a0534",
+                "node_output_id": "adf0256c-cdcd-4e62-92a3-a9c1b8e70e0f",
+                "type": "NODE_OUTPUT"
+              },
+              "operator": "=",
+              "rhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                  "type": "STRING",
+                  "value": "flight status"
+                }
+              },
+              "type": "BINARY_EXPRESSION"
+            }
+          },
+          {
+            "id": "a913cb88-261b-4fa8-9915-d215e19749ee",
+            "name": "branch_3",
+            "type": "ELIF",
+            "expression": {
+              "lhs": {
+                "node_id": "557f9b98-2229-437e-844b-cac7868a0534",
+                "node_output_id": "adf0256c-cdcd-4e62-92a3-a9c1b8e70e0f",
+                "type": "NODE_OUTPUT"
+              },
+              "operator": "=",
+              "rhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                  "type": "STRING",
+                  "value": "faa"
+                }
+              },
+              "type": "BINARY_EXPRESSION"
+            }
+          },
+          {
+            "id": "fec240f8-8baf-40f9-87e7-f268bff4ed94",
+            "name": "branch_4",
+            "type": "ELSE",
+            "expression": null
+          }
+        ]
       },
       {
         "id": "fbe1571c-e904-40f6-a414-55adf3b72817",
@@ -751,7 +843,14 @@
             "nodes",
             "faa_document_store"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "0b203edd-ed4c-4593-9e17-deaeb2780e14",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
@@ -828,7 +927,14 @@
             "nodes",
             "formatted_search_results"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "886d79d2-2a97-4c15-8172-e9a157c9090d",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
@@ -1020,6 +1126,13 @@
             "type": "ARRAY",
             "value": null
           }
+        ],
+        "ports": [
+          {
+            "id": "ce8e3d37-4c41-4dce-aede-a343d2e1108a",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       },
       {
@@ -1162,6 +1275,13 @@
             "type": "ARRAY",
             "value": null
           }
+        ],
+        "ports": [
+          {
+            "id": "aa013fc4-618d-4cf4-88ce-639c56588aa3",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       },
       {
@@ -1271,7 +1391,14 @@
             "nodes",
             "templating_node_15"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "8eaafb2e-a666-4dc9-96c3-52839df75632",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "81246ab6-153a-4c87-9f28-b6c28c915cf1",
@@ -1436,7 +1563,14 @@
             "nodes",
             "api_node"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "5fd01b0b-f0fb-488b-a9c7-4ba1dd7df80e",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "9722b9da-0164-40fb-9270-a0fc9b87b1f9",
@@ -1634,6 +1768,13 @@
             "type": "ARRAY",
             "value": null
           }
+        ],
+        "ports": [
+          {
+            "id": "e80fd429-37ff-4054-9bd3-bd56568716e5",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       },
       {
@@ -1746,6 +1887,13 @@
             "type": "ARRAY",
             "value": null
           }
+        ],
+        "ports": [
+          {
+            "id": "7b6c38d1-907d-4074-935e-b84a2a02786b",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       },
       {
@@ -1806,7 +1954,14 @@
             "nodes",
             "subworkflow_node"
           ]
-        }
+        },
+        "ports": [
+          {
+            "id": "de5b0a72-e46f-4534-89a9-b78725694dd2",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
@@ -1947,6 +2102,13 @@
             "name": "results",
             "type": "ARRAY",
             "value": null
+          }
+        ],
+        "ports": [
+          {
+            "id": "23556dd8-b9f8-4cf7-9c24-291f9d0a223a",
+            "name": "default",
+            "type": "DEFAULT"
           }
         ]
       },

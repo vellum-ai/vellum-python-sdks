@@ -118,6 +118,7 @@ def test_serialize_workflow():
             "module": ["tests", "workflows", "basic_guardrail_node", "workflow"],
             "name": "ExampleGuardrailNode",
         },
+        "ports": [{"id": "0ed87407-697e-4ae9-ab9b-6c5cc2e57cf7", "name": "default", "type": "DEFAULT"}],
     }
 
     final_output_node = workflow_raw_data["nodes"][2]

@@ -277,6 +277,7 @@ def test_serialize_workflow():
                 "name": "MapFruitsNode",
                 "module": ["tests", "workflows", "basic_map_node", "workflow"],
             },
+            "ports": [{"id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0", "name": "default", "type": "DEFAULT"}],
         },
         map_node,
         ignore_order=True,

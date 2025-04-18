@@ -159,6 +159,13 @@
             "type": "ARRAY",
             "value": null
           }
+        ],
+        "ports": [
+          {
+            "id": "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       },
       {

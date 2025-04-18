@@ -192,4 +192,5 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
+            "ports": self.serialize_ports(display_context),
         }

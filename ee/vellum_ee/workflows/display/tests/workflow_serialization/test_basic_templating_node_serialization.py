@@ -113,6 +113,7 @@ def test_serialize_workflow():
                 "name": "ExampleTemplatingNode",
                 "module": ["tests", "workflows", "basic_templating_node", "workflow_with_json_input"],
             },
+            "ports": [{"id": "39317827-df43-4f5a-bfbc-20bffc839748", "name": "default", "type": "DEFAULT"}],
         },
         templating_node,
     )

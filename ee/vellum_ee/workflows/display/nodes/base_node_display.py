@@ -30,6 +30,7 @@ from vellum.workflows.expressions.contains import ContainsExpression
 from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
 from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
 from vellum.workflows.expressions.does_not_end_with import DoesNotEndWithExpression
+from vellum.workflows.expressions.does_not_equal import DoesNotEqualExpression
 from vellum.workflows.expressions.ends_with import EndsWithExpression
 from vellum.workflows.expressions.equals import EqualsExpression
 from vellum.workflows.expressions.greater_than import GreaterThanExpression
@@ -177,29 +178,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             existing_adornments = adornments if adornments is not None else []
             return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
 
-        ports: JsonArray = []
-        for port in node.Ports:
-            id = str(self.get_node_port_display(port).id)
-
-            if port._condition_type:
-                ports.append(
-                    {
-                        "id": id,
-                        "name": port.name,
-                        "type": port._condition_type.value,
-                        "expression": (
-                            self.serialize_condition(display_context, port._condition) if port._condition else None
-                        ),
-                    }
-                )
-            else:
-                ports.append(
-                    {
-                        "id": id,
-                        "name": port.name,
-                        "type": "DEFAULT",
-                    }
-                )
+        ports = self.serialize_ports(display_context)
 
         outputs: JsonArray = []
         for output in node.Outputs:
@@ -235,6 +214,35 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             "attributes": attributes,
             "outputs": outputs,
         }
+
+    def serialize_ports(self, display_context: "WorkflowDisplayContext") -> JsonArray:
+        """Serialize the ports of the node."""
+        node = self._node
+        ports: JsonArray = []
+
+        for port in node.Ports:
+            id = str(self.get_node_port_display(port).id)
+            if port._condition_type:
+                ports.append(
+                    {
+                        "id": id,
+                        "name": port.name,
+                        "type": port._condition_type.value,
+                        "expression": (
+                            self.serialize_condition(display_context, port._condition) if port._condition else None
+                        ),
+                    }
+                )
+            else:
+                ports.append(
+                    {
+                        "id": id,
+                        "name": port.name,
+                        "type": "DEFAULT",
+                    }
+                )
+
+        return ports
 
     def get_base(self) -> CodeResourceDefinition:
         node = self._node
@@ -438,6 +446,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 DoesNotBeginWithExpression,
                 DoesNotContainExpression,
                 DoesNotEndWithExpression,
+                DoesNotEqualExpression,
                 EndsWithExpression,
                 EqualsExpression,
                 GreaterThanExpression,

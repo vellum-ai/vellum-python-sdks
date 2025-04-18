@@ -194,6 +194,7 @@ def test_serialize_workflow(vellum_client):
                 "name": "SimpleAPINode",
                 "module": ["tests", "workflows", "basic_api_node", "workflow"],
             },
+            "ports": [{"id": "7c33b4d3-9204-4bd5-9371-80ee34f83073", "name": "default", "type": "DEFAULT"}],
         },
         api_node,
     )
