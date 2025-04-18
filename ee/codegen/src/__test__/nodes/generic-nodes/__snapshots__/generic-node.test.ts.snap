@@ -11,7 +11,6 @@ from ...nodes.my_custom_node import MyCustomNode
 
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
-    node_input_ids_by_name = {}
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
@@ -60,7 +59,6 @@ from ...nodes.my_custom_node import MyCustomNode
 @BaseMapNodeDisplay.wrap(node_id=UUID("adornment-2"))
 @BaseRetryNodeDisplay.wrap(node_id=UUID("adornment-3"))
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
-    node_input_ids_by_name = {}
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
@@ -139,7 +137,6 @@ from ...nodes.my_custom_node import MyCustomNode
 
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
-    node_input_ids_by_name = {}
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")

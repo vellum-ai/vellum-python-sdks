@@ -226,12 +226,9 @@ export abstract class BaseNode<
     } else {
       const portDisplayOverridesDict = new Map();
       const portIds = new Set(this.nodeData.ports.map((port) => port.id));
-
       Array.from(this.workflowContext.portContextById.entries()).forEach(
         ([portId, context]) => {
           const isPortInCurrentNode = portIds.has(portId);
-          console.log(portIds);
-          console.log(portId)
           if (isPortInCurrentNode) {
             const portDisplayOverrides = python.instantiateClass({
               classReference: python.reference({
@@ -255,22 +252,26 @@ export abstract class BaseNode<
           }
         }
       );
-      return python.field({
-        name: "port_displays",
-        initializer: python.TypeInstantiation.dict(
-          Array.from(portDisplayOverridesDict.entries()).map(
-            ([key, value]) => ({
-              key: python.reference({
-                name: this.nodeContext.nodeClassName,
-                modulePath: this.nodeContext.nodeModulePath,
-                attribute: [PORTS_CLASS_NAME, key],
-              }),
-              value: value,
-            })
-          )
-        ),
-      });
+
+      if (portDisplayOverridesDict.size > 0) {
+        return python.field({
+          name: "port_displays",
+          initializer: python.TypeInstantiation.dict(
+            Array.from(portDisplayOverridesDict.entries()).map(
+              ([key, value]) => ({
+                key: python.reference({
+                  name: this.nodeContext.nodeClassName,
+                  modulePath: this.nodeContext.nodeModulePath,
+                  attribute: [PORTS_CLASS_NAME, key],
+                }),
+                value: value,
+              })
+            )
+          ),
+        });
+      }
     }
+    return;
   }
 
   protected getPortDisplayFromSourceHandle(): python.Field | undefined {

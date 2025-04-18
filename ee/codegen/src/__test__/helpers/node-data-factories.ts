@@ -1423,7 +1423,10 @@ export function errorNodeDataFactory({
 export function nodePortFactory(port: Partial<NodePort> = {}): NodePort {
   const portType = port.type ?? "DEFAULT";
   const portId = port.id ?? uuidv4();
-  const portName = port.name ?? `${portType.toLowerCase()}_port`;
+  const portName =
+    port.type === "DEFAULT"
+      ? "default"
+      : port.name ?? `${portType.toLowerCase()}_port`;
 
   if (port.type === "IF" || port.type === "ELIF") {
     return {
