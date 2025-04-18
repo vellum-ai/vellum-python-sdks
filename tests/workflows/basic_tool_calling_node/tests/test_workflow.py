@@ -15,6 +15,7 @@ from vellum.client.types.initiated_execute_prompt_event import InitiatedExecuteP
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
+from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.string_vellum_value import StringVellumValue
@@ -84,8 +85,6 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         == "Based on the function call, the current temperature in Miami is 70 degrees celsius."
     )
     assert terminal_event.outputs.chat_history == [
-        ChatMessage(text="Hello, how are you?", role="USER"),
-        ChatMessage(text="I'm good, thank you!", role="ASSISTANT"),
         ChatMessage(
             text=None,
             role="ASSISTANT",
@@ -113,13 +112,10 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         "ml_model": "gpt-4o-mini",
         "input_values": [
             PromptRequestStringInput(key="question", type="STRING", value="What's the weather like in San Francisco?"),
-            PromptRequestChatHistoryInput(
+            PromptRequestJsonInput(
                 key="chat_history",
-                type="CHAT_HISTORY",
-                value=[
-                    ChatMessage(role="USER", text="Hello, how are you?"),
-                    ChatMessage(role="ASSISTANT", text="I'm good, thank you!"),
-                ],
+                type="JSON",
+                value=[],
             ),
         ],
         "input_variables": [
@@ -134,7 +130,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             VellumVariable(
                 id=str(first_call_input_id_2),
                 key="chat_history",
-                type="CHAT_HISTORY",
+                type="JSON",
                 required=None,
                 default=None,
                 extensions=None,
@@ -213,8 +209,6 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 key="chat_history",
                 type="CHAT_HISTORY",
                 value=[
-                    ChatMessage(text="Hello, how are you?", role="USER"),
-                    ChatMessage(text="I'm good, thank you!", role="ASSISTANT"),
                     ChatMessage(
                         text=None,
                         role="ASSISTANT",
