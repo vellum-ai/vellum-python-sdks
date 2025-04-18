@@ -14,9 +14,7 @@ _FinalOutputNodeType = TypeVar("_FinalOutputNodeType", bound=FinalOutputNode)
 
 
 class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[_FinalOutputNodeType]):
-    output_id: ClassVar[Optional[UUID]] = None
     output_name: ClassVar[Optional[str]] = None
-    node_input_id: ClassVar[Optional[UUID]] = None
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
