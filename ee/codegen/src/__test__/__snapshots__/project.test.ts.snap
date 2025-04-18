@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference 1`] = `
+exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference when there is a long branch 1`] = `
 "from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.displayable import APINode as BaseAPINode
 from vellum.workflows.references import VellumSecretReference
