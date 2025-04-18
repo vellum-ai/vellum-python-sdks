@@ -20,6 +20,18 @@ class APINode(BaseAPINode):
 "
 `;
 
+exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference when there is a simple loop 1`] = `
+"from vellum.workflows.nodes import BaseNode
+from vellum.workflows.ports import Port
+
+
+class RouterNode(BaseNode):
+    class Ports(BaseNode.Ports):
+        top = Port.on_if(StartNode.Outputs.result.equals("top"))
+        bottom = Port.on_else()
+"
+`;
+
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should generate unused_graphs if final output is not used 1`] = `
 "from vellum.workflows import BaseWorkflow
 

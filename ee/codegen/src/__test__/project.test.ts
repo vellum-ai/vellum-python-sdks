@@ -2119,7 +2119,7 @@ baz = foo + bar
     });
   });
   describe("LazyReference", () => {
-    it("should not generate LazyReference", async () => {
+    it("should not generate LazyReference when there is a long branch", async () => {
       //   graph = (
       //     {
       //         parallel-node-1
@@ -2519,6 +2519,221 @@ baz = foo + bar
 
       await project.generateCode();
       expectProjectFileToMatchSnapshot(project, ["nodes", "api_node.py"]);
+    });
+
+    it("should not generate LazyReference when there is a simple loop", async () => {
+      //   graph = (
+      //     StartNode >> {
+      //         RouterNode.Ports.top >> TopNode >> StartNode,
+      //         RouterNode.Ports.bottom >> BottomNode,
+      //     }
+      // )
+      const entrypointNodeId = uuidv4();
+      const entrypointSourceHandleId = uuidv4();
+
+      const startNodeId = uuidv4();
+      const startSourceHandleId = uuidv4();
+      const startTargetHandleId = uuidv4();
+      const startOutputId = uuidv4();
+
+      const routerNodeId = uuidv4();
+      const routerIfSourceHandleId = uuidv4();
+      const routerElseSourceHandleId = uuidv4();
+      const routerTargetHandleId = uuidv4();
+
+      const topNodeId = uuidv4();
+      const topSourceHandleId = uuidv4();
+      const topTargetHandleId = uuidv4();
+
+      const bottomNodeId = uuidv4();
+      const bottomTargetHandleId = uuidv4();
+
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "edge-1",
+              type: "DEFAULT",
+              source_node_id: entrypointNodeId,
+              target_node_id: startNodeId,
+              source_handle_id: entrypointSourceHandleId,
+              target_handle_id: startTargetHandleId,
+            },
+            {
+              id: "edge-2",
+              type: "DEFAULT",
+              source_node_id: startNodeId,
+              target_node_id: routerNodeId,
+              source_handle_id: startSourceHandleId,
+              target_handle_id: routerTargetHandleId,
+            },
+            {
+              id: "edge-3",
+              type: "DEFAULT",
+              source_node_id: routerNodeId,
+              target_node_id: topNodeId,
+              source_handle_id: routerIfSourceHandleId,
+              target_handle_id: topTargetHandleId,
+            },
+            {
+              id: "edge-4",
+              type: "DEFAULT",
+              source_node_id: topNodeId,
+              target_node_id: bottomNodeId,
+              source_handle_id: routerElseSourceHandleId,
+              target_handle_id: bottomTargetHandleId,
+            },
+            {
+              id: "edge-5",
+              type: "DEFAULT",
+              source_node_id: topNodeId,
+              target_node_id: startNodeId,
+              source_handle_id: topSourceHandleId,
+              target_handle_id: startTargetHandleId,
+            },
+          ],
+          nodes: [
+            {
+              id: entrypointNodeId,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: entrypointSourceHandleId,
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+              definition: null,
+            },
+            {
+              id: startNodeId,
+              base: {
+                name: "BaseNode",
+                module: ["vellum", "workflows", "nodes", "bases", "base"],
+              },
+              type: "GENERIC",
+              label: "Start Node",
+              trigger: {
+                id: startTargetHandleId,
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: startSourceHandleId,
+                  type: "DEFAULT",
+                  name: "default",
+                },
+              ],
+              outputs: [
+                {
+                  id: startOutputId,
+                  type: "STRING",
+                  name: "result",
+                  value: null,
+                },
+              ],
+              attributes: [],
+              definition: null,
+            },
+            {
+              id: routerNodeId,
+              base: {
+                name: "BaseNode",
+                module: ["vellum", "workflows", "nodes", "bases", "base"],
+              },
+              type: "GENERIC",
+              label: "Router Node",
+              trigger: {
+                id: routerTargetHandleId,
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: routerIfSourceHandleId,
+                  type: "IF",
+                  name: "top",
+                  expression: {
+                    type: "BINARY_EXPRESSION",
+                    operator: "=",
+                    lhs: {
+                      type: "NODE_OUTPUT",
+                      node_id: startNodeId,
+                      node_output_id: startOutputId,
+                    },
+                    rhs: {
+                      type: "CONSTANT_VALUE",
+                      value: {
+                        type: "STRING",
+                        value: "top",
+                      },
+                    },
+                  },
+                },
+                {
+                  id: routerElseSourceHandleId,
+                  type: "ELSE",
+                  name: "bottom",
+                },
+              ],
+              outputs: [],
+              attributes: [],
+              definition: null,
+            },
+            {
+              id: topNodeId,
+              base: {
+                name: "BaseNode",
+                module: ["vellum", "workflows", "nodes", "bases", "base"],
+              },
+              type: "GENERIC",
+              label: "Top Node",
+              trigger: {
+                id: topTargetHandleId,
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: topSourceHandleId,
+                  type: "DEFAULT",
+                  name: "default",
+                },
+              ],
+              outputs: [],
+              attributes: [],
+              definition: null,
+            },
+            {
+              id: bottomNodeId,
+              base: {
+                name: "BaseNode",
+                module: ["vellum", "workflows", "nodes", "bases", "base"],
+              },
+              type: "GENERIC",
+              label: "Bottom Node",
+              trigger: {
+                id: bottomTargetHandleId,
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [],
+              outputs: [],
+              attributes: [],
+              definition: null,
+            },
+          ],
+          definition: null,
+          output_values: [],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+      expectProjectFileToMatchSnapshot(project, ["nodes", "router_node.py"]);
     });
   });
 });
