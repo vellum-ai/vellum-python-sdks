@@ -3,7 +3,7 @@ from typing import ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import ErrorNode
 from vellum.workflows.types.core import JsonObject
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -11,7 +11,7 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 _ErrorNodeType = TypeVar("_ErrorNodeType", bound=ErrorNode)
 
 
-class BaseErrorNodeDisplay(BaseNodeVellumDisplay[_ErrorNodeType], Generic[_ErrorNodeType]):
+class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeType]):
     error_output_id: ClassVar[Optional[UUID]] = None
 
     name: ClassVar[str] = "error-node"

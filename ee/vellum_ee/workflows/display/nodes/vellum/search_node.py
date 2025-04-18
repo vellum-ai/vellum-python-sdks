@@ -11,7 +11,7 @@ from vellum.workflows.nodes.displayable.search_node import SearchNode
 from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -28,7 +28,7 @@ class VariableIdMap:
     rhs: Optional["VariableIdMap"]
 
 
-class BaseSearchNodeDisplay(BaseNodeVellumDisplay[_SearchNodeType], Generic[_SearchNodeType]):
+class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNodeType]):
     # A mapping between the id of the operand (e.g. "lhs_variable_id" or "rhs_variable_id") and the id of the node input
     # that the operand is pointing to.
     metadata_filter_input_id_by_operand_id: Dict[UUID, UUID] = {}

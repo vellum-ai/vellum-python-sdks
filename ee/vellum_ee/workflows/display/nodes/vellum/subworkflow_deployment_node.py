@@ -4,7 +4,7 @@ from typing import Generic, Optional, TypeVar
 from vellum.workflows.nodes import SubworkflowDeploymentNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.vellum_client import create_vellum_client
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -13,7 +13,7 @@ _SubworkflowDeploymentNodeType = TypeVar("_SubworkflowDeploymentNodeType", bound
 
 
 class BaseSubworkflowDeploymentNodeDisplay(
-    BaseNodeVellumDisplay[_SubworkflowDeploymentNodeType], Generic[_SubworkflowDeploymentNodeType]
+    BaseNodeDisplay[_SubworkflowDeploymentNodeType], Generic[_SubworkflowDeploymentNodeType]
 ):
 
     def serialize(

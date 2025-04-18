@@ -2,13 +2,13 @@ from typing import Any, ClassVar, Dict, Generic, TypeVar, Union
 
 from vellum.workflows.nodes import NoteNode
 from vellum.workflows.types.core import JsonObject
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _NoteNodeType = TypeVar("_NoteNodeType", bound=NoteNode)
 
 
-class BaseNoteNodeDisplay(BaseNodeVellumDisplay[_NoteNodeType], Generic[_NoteNodeType]):
+class BaseNoteNodeDisplay(BaseNodeDisplay[_NoteNodeType], Generic[_NoteNodeType]):
     text: ClassVar[str] = ""
     style: ClassVar[Union[Dict[str, Any], None]] = None
 

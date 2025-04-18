@@ -4,7 +4,7 @@ from typing import Generic, Optional, TypeVar
 from vellum.workflows.nodes.core.templating_node import TemplatingNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -14,7 +14,7 @@ _TemplatingNodeType = TypeVar("_TemplatingNodeType", bound=TemplatingNode)
 TEMPLATE_INPUT_NAME = TemplatingNode.template.name
 
 
-class BaseTemplatingNodeDisplay(BaseNodeVellumDisplay[_TemplatingNodeType], Generic[_TemplatingNodeType]):
+class BaseTemplatingNodeDisplay(BaseNodeDisplay[_TemplatingNodeType], Generic[_TemplatingNodeType]):
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:

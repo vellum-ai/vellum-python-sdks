@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar, cast
 from vellum.workflows.nodes.displayable import APINode
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
-from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -13,7 +13,7 @@ from vellum_ee.workflows.display.utils.vellum import WorkspaceSecretPointer
 _APINodeType = TypeVar("_APINodeType", bound=APINode)
 
 
-class BaseAPINodeDisplay(BaseNodeVellumDisplay[_APINodeType], Generic[_APINodeType]):
+class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
     # A mapping between node input keys and their ids for inputs representing additional header keys
     additional_header_key_input_ids: ClassVar[Optional[Dict[str, UUID]]] = None
 
