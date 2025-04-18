@@ -1206,6 +1206,143 @@ client.submit_workflow_execution_actuals(
 </details>
 
 ## AdHoc
+<details><summary><code>client.ad_hoc.<a href="src/vellum/resources/ad_hoc/client.py">adhoc_execute_prompt</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import (
+    JinjaPromptBlock,
+    PromptParameters,
+    PromptRequestStringInput,
+    Vellum,
+    VellumVariable,
+)
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.ad_hoc.adhoc_execute_prompt(
+    ml_model="ml_model",
+    input_values=[
+        PromptRequestStringInput(
+            key="key",
+            value="value",
+        )
+    ],
+    input_variables=[
+        VellumVariable(
+            id="id",
+            key="key",
+            type="STRING",
+        )
+    ],
+    parameters=PromptParameters(),
+    blocks=[
+        JinjaPromptBlock(
+            template="template",
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**ml_model:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**input_values:** `typing.Sequence[PromptRequestInput]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**input_variables:** `typing.Sequence[VellumVariable]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parameters:** `PromptParameters` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**blocks:** `typing.Sequence[PromptBlock]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**settings:** `typing.Optional[PromptSettings]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**functions:** `typing.Optional[typing.Sequence[FunctionDefinition]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand_meta:** `typing.Optional[AdHocExpandMeta]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.ad_hoc.<a href="src/vellum/resources/ad_hoc/client.py">adhoc_execute_prompt_stream</a>(...)</code></summary>
 <dl>
 <dd>
@@ -2110,7 +2247,7 @@ client.deployments.update_deployment_release_tag(
 <dl>
 <dd>
 
-**history_item_id:** `typing.Optional[str]` — The ID of the Deployment History Item to tag
+**history_item_id:** `typing.Optional[str]` — The ID of the Release to tag
     
 </dd>
 </dl>
