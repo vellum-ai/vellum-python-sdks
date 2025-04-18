@@ -20,25 +20,21 @@ class PromptNode9(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
  Question:
 ---------------
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="question"),
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 
 
 Policy Quotes:
 -----------------------
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="context"),
                     ]
@@ -46,13 +42,11 @@ Policy Quotes:
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 You are an expert on FAA rules, guidelines, and safety. Answer the above question given the context. Provide citation of the policy you got it from at the end of the response. If you don\'t know the answer, say \"Sorry, I don\'t know\"
 
 Limit your response to 250 words. Just use plain text, no special characters, no commas, no mathematical signs like + -\
-""",
+"""
                         )
                     ]
                 ),

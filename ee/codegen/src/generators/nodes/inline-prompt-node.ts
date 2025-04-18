@@ -14,6 +14,7 @@ import {
   InlinePromptNode as InlinePromptNodeType,
   FunctionDefinitionPromptTemplateBlock,
   InlinePromptNodeData,
+  PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
 
 const INPUTS_PREFIX = "prompt_inputs";
@@ -38,8 +39,12 @@ export class InlinePromptNode extends BaseSingleFileNode<
     const nodeData: InlinePromptNodeData = this.nodeData.data;
     const blocksExcludingFunctionDefinition =
       nodeData.execConfig.promptTemplateBlockData.blocks.filter(
-        (block): block is PromptTemplateBlockExcludingFunctionDefinition =>
-          block.blockType !== "FUNCTION_DEFINITION"
+        (
+          block
+        ): block is Exclude<
+          PromptTemplateBlockExcludingFunctionDefinition,
+          PlainTextPromptTemplateBlock
+        > => block.blockType !== "FUNCTION_DEFINITION"
       );
 
     const functionDefinitions =

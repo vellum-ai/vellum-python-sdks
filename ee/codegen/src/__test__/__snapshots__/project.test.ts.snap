@@ -248,13 +248,11 @@ class Prompt(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\\
 Summarize the following text: hello today is feb 7 bad weather
 
 \\
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="text"),
                     ]

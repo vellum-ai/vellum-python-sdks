@@ -19,13 +19,11 @@ class PromptNode18(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 Based on the below JSON response from an airline flight status tracker API, which flights are on the ground? And which airports are they going from and to? Where are they right now?
 
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="text"),
                     ]
@@ -38,8 +36,6 @@ Based on the below JSON response from an airline flight status tracker API, whic
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
  Respond in the following format
 
@@ -50,7 +46,7 @@ The flights that are on the ground are:
    - **Arrival Airport:** SJC (San Jose International Airport)
    - **Current Location:** Latitude 37.3664, Longitude -121.929 (San Jose International Airport)
 \
-""",
+"""
                         )
                     ]
                 )
@@ -60,13 +56,7 @@ The flights that are on the ground are:
             chat_role="USER",
             blocks=[
                 RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
-                            text=""" Just use plain text and no special characters""",
-                        )
-                    ]
+                    blocks=[PlainTextPromptBlock(text=""" Just use plain text and no special characters""")]
                 )
             ],
         ),

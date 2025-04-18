@@ -19,13 +19,11 @@ class PromptNode(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 Summarize the following text:
 
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="text"),
                     ]

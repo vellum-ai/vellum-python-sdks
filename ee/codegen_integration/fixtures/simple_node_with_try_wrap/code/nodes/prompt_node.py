@@ -19,13 +19,11 @@ class PromptNode(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 What is the origin of the following phrase
 
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="text"),
                     ]

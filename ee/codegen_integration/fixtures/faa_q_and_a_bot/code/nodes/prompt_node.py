@@ -19,8 +19,6 @@ class PromptNode(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 You are an expert classifier. You will analyze the chat and output one of the following in JSON format: 
 
@@ -28,7 +26,7 @@ You are an expert classifier. You will analyze the chat and output one of the fo
 2. \"flight status\" if it is about which flights are currently in transit at a certain airport
 3. \"faa\" if the question is about any FAA related aviation policies
 4. \"other\" if the question is about anything else\
-""",
+"""
                         )
                     ]
                 )
