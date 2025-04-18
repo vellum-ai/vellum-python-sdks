@@ -51,10 +51,21 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     this.nodeData = args.nodeData;
     this.importOrder = args.importOrder;
 
-    this.baseNodeClassModulePath =
-      args.nodeData.type === "GENERIC"
-        ? VELLUM_WORKFLOW_NODES_MODULE_PATH
-        : this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;
+    if (args.nodeData.type === "GENERIC") {
+      if (
+        args.nodeData.base &&
+        !args.nodeData.base.module
+          .join(".")
+          .startsWith(VELLUM_WORKFLOW_NODES_MODULE_PATH.join("."))
+      ) {
+        this.baseNodeClassModulePath = args.nodeData.base.module;
+      } else {
+        this.baseNodeClassModulePath = VELLUM_WORKFLOW_NODES_MODULE_PATH;
+      }
+    } else {
+      this.baseNodeClassModulePath =
+        this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;
+    }
     this.baseNodeDisplayClassModulePath =
       this.workflowContext.sdkModulePathNames.NODE_DISPLAY_MODULE_PATH;
 

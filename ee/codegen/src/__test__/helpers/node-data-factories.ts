@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import {
+  CodeResourceDefinition,
   PromptParameters,
   VellumVariable,
   VellumVariableType,
@@ -1462,6 +1463,7 @@ export function genericNodeFactory({
   nodeAttributes,
   nodeOutputs,
   adornments,
+  base,
 }: {
   id?: string;
   label?: string;
@@ -1470,13 +1472,14 @@ export function genericNodeFactory({
   nodeAttributes?: NodeAttribute[];
   nodeOutputs?: NodeOutput[];
   adornments?: AdornmentNode[];
+  base?: CodeResourceDefinition;
 } = {}): GenericNode {
   const label = _label ?? "MyCustomNode";
   const nodeData: GenericNode = {
     id: id ?? uuidv4(),
     label,
     type: WorkflowNodeType.GENERIC,
-    base: {
+    base: base ?? {
       module: ["vellum", "workflows", "nodes", "bases", "base"],
       name: "BaseNode",
     },
