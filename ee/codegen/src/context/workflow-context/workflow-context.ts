@@ -158,7 +158,7 @@ export class WorkflowContext {
           ...parentNode.nodeContext.nodeModulePath,
           GENERATED_WORKFLOW_MODULE_NAME,
         ]
-      : [this.moduleName, GENERATED_WORKFLOW_MODULE_NAME];
+      : [...this.moduleName.split("."), GENERATED_WORKFLOW_MODULE_NAME];
     this.workflowClassName = workflowClassName;
     this.vellumApiKey = vellumApiKey;
     this.vellumApiEnvironment = vellumApiEnvironment;

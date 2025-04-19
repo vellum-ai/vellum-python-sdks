@@ -112,6 +112,19 @@ class MyCustomNode(MockNetworkingClient):
 "
 `;
 
+exports[`GenericNode > basic with custom, same module, base > getNodeFile 1`] = `
+"from .mock_networking_client import MockNetworkingClient
+
+
+class MyCustomNode(MockNetworkingClient):
+    class NodeTrigger(MockNetworkingClient.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(MockNetworkingClient.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with default node trigger > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
 
