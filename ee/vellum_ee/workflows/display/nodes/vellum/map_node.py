@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Dict, Generic, List, Optional, TypeVar, cast
+from typing import Generic, Optional, TypeVar, cast
 
 from vellum.workflows.nodes import MapNode
 from vellum.workflows.types.core import JsonObject
@@ -36,24 +36,26 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
             parent_display_context=display_context,
         )
         serialized_subworkflow = subworkflow_display.serialize()
+        if not isinstance(serialized_subworkflow["input_variables"], list):
+            raise ValueError("input_variables must be a list")
 
-        renamed_input_variables = []
-        for input_variable in cast(List[Dict[str, str]], serialized_subworkflow["input_variables"]):
-            if input_variable["key"] == "all_items":
-                renamed_item = {**input_variable, "key": "items"}
-                renamed_input_variables.append(renamed_item)
-            else:
-                renamed_input_variables.append(input_variable)
+        input_variables = serialized_subworkflow["input_variables"]
 
         # Note: This must match the items input ID for the map node's node input
         items_workflow_input_id = next(
-            input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "items"
+            input_variable["id"]
+            for input_variable in input_variables
+            if isinstance(input_variable, dict) and input_variable["key"] == "items"
         )
         item_workflow_input_id = next(
-            input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "item"
+            input_variable["id"]
+            for input_variable in input_variables
+            if isinstance(input_variable, dict) and input_variable["key"] == "item"
         )
         index_workflow_input_id = next(
-            input_variable["id"] for input_variable in renamed_input_variables if input_variable["key"] == "index"
+            input_variable["id"]
+            for input_variable in input_variables
+            if isinstance(input_variable, dict) and input_variable["key"] == "index"
         )
 
         return {
@@ -67,7 +69,7 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "INLINE",
                 "workflow_raw_data": serialized_subworkflow["workflow_raw_data"],
-                "input_variables": cast(JsonObject, renamed_input_variables),
+                "input_variables": cast(JsonObject, input_variables),
                 "output_variables": serialized_subworkflow["output_variables"],
                 "concurrency": raise_if_descriptor(node.max_concurrency),
                 "items_input_id": items_workflow_input_id,
