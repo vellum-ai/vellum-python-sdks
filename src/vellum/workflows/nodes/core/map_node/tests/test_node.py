@@ -116,3 +116,59 @@ def test_map_node__inner_try():
     # THEN the workflow should succeed
     assert outputs[-1].name == "final_output"
     assert len(outputs[-1].value) == 2
+
+
+def test_map_node__nested_map_node():
+    # GIVEN the inner map node's inputs
+    class VegetableMapNodeInputs(MapNode.SubworkflowInputs):
+        item: str
+
+    # AND the outer map node's inputs
+    class FruitMapNodeInputs(MapNode.SubworkflowInputs):
+        item: str
+
+    # AND a simple node that concats both attributes
+    class SimpleConcatNode(BaseNode):
+        fruit = FruitMapNodeInputs.item
+        vegetable = VegetableMapNodeInputs.item
+
+        class Outputs(BaseNode.Outputs):
+            medley: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(medley=f"{self.fruit} {self.vegetable}")
+
+    # AND a workflow using that node
+    class VegetableMapNodeWorkflow(BaseWorkflow[VegetableMapNodeInputs, BaseState]):
+        graph = SimpleConcatNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = SimpleConcatNode.Outputs.medley
+
+    # AND an inner map node referencing that workflow
+    class VegetableMapNode(MapNode):
+        items = ["carrot", "potato"]
+        subworkflow = VegetableMapNodeWorkflow
+
+    # AND an outer subworkflow referencing the inner map node
+    class FruitMapNodeWorkflow(BaseWorkflow[FruitMapNodeInputs, BaseState]):
+        graph = VegetableMapNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = VegetableMapNode.Outputs.final_output
+
+    # AND an outer map node referencing the outer subworkflow
+    class FruitMapNode(MapNode):
+        items = ["apple", "banana"]
+        subworkflow = FruitMapNodeWorkflow
+
+    # WHEN we run the workflow
+    stream = FruitMapNode().run()
+    outputs = list(stream)
+
+    # THEN the workflow should succeed
+    assert outputs[-1].name == "final_output"
+    assert outputs[-1].value == [
+        ["apple carrot", "apple potato"],
+        ["banana carrot", "banana potato"],
+    ]

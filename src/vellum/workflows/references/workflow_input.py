@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Generic, Optional, Tuple, Type, TypeVar, cast
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.types.generics import import_workflow_class
 
 if TYPE_CHECKING:
     from vellum.workflows.inputs.base import BaseInputs
@@ -29,7 +30,10 @@ class WorkflowInputReference(BaseDescriptor[_InputType], Generic[_InputType]):
         return self._inputs_class
 
     def resolve(self, state: "BaseState") -> _InputType:
-        if hasattr(state.meta.workflow_inputs, self._name):
+        if hasattr(state.meta.workflow_inputs, self._name) and (
+            state.meta.workflow_definition == self._inputs_class.__parent_class__
+            or not issubclass(self._inputs_class.__parent_class__, import_workflow_class())
+        ):
             return cast(_InputType, getattr(state.meta.workflow_inputs, self._name))
 
         if state.meta.parent:

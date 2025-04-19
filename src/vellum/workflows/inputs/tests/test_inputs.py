@@ -61,3 +61,4 @@ def test_base_inputs__supports_inherited_inputs():
     # THEN both references should be available
     assert BottomInputs.first.name == "first"
     assert BottomInputs.second.name == "second"
+    assert len([ref for ref in BottomInputs]) == 2
