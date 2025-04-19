@@ -15,10 +15,23 @@ from vellum.workflows.types.utils import get_class_attr_names, infer_types
 @dataclass_transform(kw_only_default=True)
 class _BaseInputsMeta(type):
     def __getattribute__(cls, name: str) -> Any:
-        if not name.startswith("_") and name in cls.__annotations__ and issubclass(cls, BaseInputs):
-            instance = vars(cls).get(name, undefined)
-            types = infer_types(cls, name)
+        if name.startswith("_") or not issubclass(cls, BaseInputs):
+            return super().__getattribute__(name)
 
+        attr_names = get_class_attr_names(cls)
+        if name in attr_names:
+            # We first try to resolve the instance that this class attribute name is mapped to. If it's not found,
+            # we iterate through its inheritance hierarchy to find the first base class that has this attribute
+            # and use its mapping.
+            instance = vars(cls).get(name, undefined)
+            if instance is undefined:
+                for base in cls.__mro__[1:]:
+                    inherited_input_reference = getattr(base, name, undefined)
+                    if isinstance(inherited_input_reference, (ExternalInputReference, WorkflowInputReference)):
+                        instance = inherited_input_reference.instance
+                        break
+
+            types = infer_types(cls, name)
             if getattr(cls, "__descriptor_class__", None) is ExternalInputReference:
                 return ExternalInputReference(name=name, types=types, instance=instance, inputs_class=cls)
             else:

@@ -47,3 +47,17 @@ def test_base_inputs_with_default():
 
     # THEN it should use the default value
     assert inputs.string_with_default == "default_value"
+
+
+def test_base_inputs__supports_inherited_inputs():
+    # GIVEN an inputs class
+    class TopInputs(BaseInputs):
+        first: str
+
+    # WHEN we inherit from the base inputs class
+    class BottomInputs(TopInputs):
+        second: int
+
+    # THEN both references should be available
+    assert BottomInputs.first.name == "first"
+    assert BottomInputs.second.name == "second"
