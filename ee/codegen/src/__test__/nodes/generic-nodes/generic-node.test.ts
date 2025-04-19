@@ -431,8 +431,9 @@ describe("GenericNode", () => {
       const nodeData = genericNodeFactory({
         base: {
           name: "MockNetworkingClient",
-          module: ["path", "to", "mock_networking_client"],
+          module: ["my", "custom", "path", "nodes", "mock_networking_client"],
         },
+        nodeAttributes: [],
       });
 
       const nodeContext = (await createNodeContext({

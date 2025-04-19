@@ -33,7 +33,10 @@ export function getGeneratedNodesModulePath(
       GENERATED_NODES_MODULE_NAME,
     ];
   } else {
-    modulePath = [workflowContext.moduleName, GENERATED_NODES_MODULE_NAME];
+    modulePath = [
+      ...workflowContext.modulePath.slice(0, -1),
+      GENERATED_NODES_MODULE_NAME,
+    ];
   }
 
   return modulePath;
