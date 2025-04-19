@@ -12,11 +12,11 @@ from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 
 _FinalOutputNodeType = TypeVar("_FinalOutputNodeType", bound=FinalOutputNode)
 
+NODE_INPUT_KEY = "node_input"
+
 
 class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[_FinalOutputNodeType]):
-    output_id: ClassVar[Optional[UUID]] = None
     output_name: ClassVar[Optional[str]] = None
-    node_input_id: ClassVar[Optional[UUID]] = None
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
@@ -24,7 +24,7 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
 
         node_input = create_node_input(
             node_id,
-            "node_input",
+            NODE_INPUT_KEY,
             # Get the pointer that the Terminal Node's output is referencing
             node.Outputs.value.instance,
             display_context,
@@ -58,13 +58,13 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
         }
 
     def _get_output_id(self) -> UUID:
-        explicit_value = self._get_explicit_node_display_attr("output_id", UUID)
-        return explicit_value if explicit_value else uuid4_from_hash(f"{self.node_id}|output_id")
+        explicit_value = self.output_display.get(self._node.Outputs.value)
+        return explicit_value.id if explicit_value else uuid4_from_hash(f"{self.node_id}|output_id")
 
     def _get_output_name(self) -> str:
         explicit_value = self._get_explicit_node_display_attr("output_name", str)
         return explicit_value if explicit_value else to_kebab_case(self._node.__name__)
 
     def _get_node_input_id(self) -> UUID:
-        explicit_value = self._get_explicit_node_display_attr("node_input_id", UUID)
+        explicit_value = self.node_input_ids_by_name.get(NODE_INPUT_KEY)
         return explicit_value if explicit_value else uuid4_from_hash(f"{self.node_id}|node_input_id")

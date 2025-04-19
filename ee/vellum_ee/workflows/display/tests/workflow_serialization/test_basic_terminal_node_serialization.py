@@ -68,7 +68,7 @@ def test_serialize_workflow():
             "label": "Basic Final Output Node",
             "name": "basic-final-output-node",
             "target_handle_id": "0173d3c6-11d1-44b7-b070-ca9ff5119046",
-            "output_id": "97349956-d228-4b51-a64b-1331f788373f",
+            "output_id": "aa63e3f6-fde3-4d19-84ef-29982d44d709",
             "output_type": "STRING",
             "node_input_id": "5322567a-f40c-400a-96b3-c3b054db543e",
         },
@@ -98,7 +98,7 @@ def test_serialize_workflow():
         },
         "outputs": [
             {
-                "id": "97349956-d228-4b51-a64b-1331f788373f",
+                "id": "aa63e3f6-fde3-4d19-84ef-29982d44d709",
                 "name": "value",
                 "type": "STRING",
                 "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e39a7b63-de15-490a-ae9b-8112c767aea0"},

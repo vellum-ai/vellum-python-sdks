@@ -103,24 +103,8 @@ export class FinalOutputNode extends BaseSingleFileNode<
 
     statements.push(
       python.field({
-        name: "output_id",
-        initializer: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
-      })
-    );
-
-    statements.push(
-      python.field({
         name: "output_name",
         initializer: python.TypeInstantiation.str(this.nodeData.data.name),
-      })
-    );
-
-    statements.push(
-      python.field({
-        name: "node_input_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.nodeInputId
-        ),
       })
     );
 
