@@ -419,6 +419,17 @@ export abstract class BaseNode<
 
   protected getNodePorts(): AstNode | undefined {
     if (this.nodeData.ports) {
+      if (this.nodeData.ports.length === 0) {
+        return undefined;
+      }
+
+      if (
+        this.nodeData.ports.length === 1 &&
+        this.nodeData.ports[0]?.type === "DEFAULT"
+      ) {
+        return undefined;
+      }
+
       return new NodePorts({
         nodePorts: this.nodeData.ports,
         nodeContext: this.nodeContext,

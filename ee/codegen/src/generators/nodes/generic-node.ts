@@ -66,13 +66,16 @@ export class GenericNode extends BaseSingleFileNode<
       );
     }
 
-    statements.push(
-      new NodeOutputs({
-        nodeOutputs: this.nodeData.outputs,
-        nodeContext: this.nodeContext,
-        workflowContext: this.workflowContext,
-      })
-    );
+    if (this.nodeData.outputs.length > 0) {
+      statements.push(
+        new NodeOutputs({
+          nodeOutputs: this.nodeData.outputs,
+          nodeContext: this.nodeContext,
+          workflowContext: this.workflowContext,
+        })
+      );
+    }
+
     return statements;
   }
 

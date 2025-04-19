@@ -18,7 +18,7 @@ export declare namespace NodeOutputs {
 }
 
 export class NodeOutputs extends AstNode {
-  private astNode: AstNode | undefined;
+  private astNode: AstNode;
 
   public constructor(args: NodeOutputs.Args) {
     super();
@@ -34,11 +34,7 @@ export class NodeOutputs extends AstNode {
     nodeOutputs: NodeOutputType[],
     nodeContext: GenericNodeContext,
     workflowContext: WorkflowContext
-  ): AstNode | undefined {
-    if (nodeOutputs.length === 0) {
-      return undefined;
-    }
-
+  ): AstNode {
     const baseNodeClassNameAlias =
       nodeContext.baseNodeClassName === nodeContext.nodeClassName
         ? `Base${nodeContext.baseNodeClassName}`
