@@ -9,9 +9,11 @@ from pydantic import BaseModel, create_model
 from vellum.client.types.function_call import FunctionCall
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.ports.port import Port
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import Json
 from vellum.workflows.types.generics import NodeType
 
@@ -54,7 +56,18 @@ def create_adornment(
         # https://app.shortcut.com/vellum/story/4116
         from vellum.workflows import BaseWorkflow
 
-        class Subworkflow(BaseWorkflow):
+        SubworkflowInputs = getattr(adornable_cls, "SubworkflowInputs", None)
+        BaseSubworkflowInputs = (
+            SubworkflowInputs
+            if isinstance(SubworkflowInputs, type) and issubclass(SubworkflowInputs, BaseInputs)
+            else BaseInputs
+        )
+
+        # mypy is too conservative here - you can absolutely inherit from dynamic classes in python
+        class Inputs(BaseSubworkflowInputs):  # type: ignore[misc, valid-type]
+            pass
+
+        class Subworkflow(BaseWorkflow[Inputs, BaseState]):
             graph = inner_cls
 
             class Outputs(BaseWorkflow.Outputs):

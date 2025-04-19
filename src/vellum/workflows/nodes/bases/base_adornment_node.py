@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Tuple, Type
 
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode, BaseNodeMeta
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.output import OutputReference
@@ -12,6 +13,14 @@ if TYPE_CHECKING:
 class _BaseAdornmentNodeMeta(BaseNodeMeta):
     def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         node_class = super().__new__(cls, name, bases, dct)
+
+        SubworkflowInputs = dct.get("SubworkflowInputs")
+        if (
+            isinstance(SubworkflowInputs, type)
+            and issubclass(SubworkflowInputs, BaseInputs)
+            and SubworkflowInputs.__parent_class__ is type(None)
+        ):
+            SubworkflowInputs.__parent_class__ = node_class
 
         subworkflow_attribute = dct.get("subworkflow")
         if not subworkflow_attribute:

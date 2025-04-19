@@ -101,6 +101,7 @@ class WorkflowRunner(Generic[StateType]):
             if state:
                 self._initial_state = deepcopy(state)
                 self._initial_state.meta.span_id = uuid4()
+                self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:
                 self._initial_state = self.workflow.get_state_at_node(node)
             self._entrypoints = entrypoint_nodes
@@ -126,6 +127,7 @@ class WorkflowRunner(Generic[StateType]):
                 self._initial_state = deepcopy(state)
                 self._initial_state.meta.workflow_inputs = normalized_inputs
                 self._initial_state.meta.span_id = uuid4()
+                self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:
                 self._initial_state = self.workflow.get_default_state(normalized_inputs)
                 # We don't want to emit the initial state on the base case of Workflow Runs, since

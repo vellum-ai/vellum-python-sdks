@@ -8,12 +8,12 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.state import BaseState
 
 
-class Inputs(BaseInputs):
+class InnerInputs(BaseInputs):
     items: List[str]
 
 
 class InnerNode(BaseNode):
-    items = Inputs.items
+    items = InnerInputs.items
 
     class Outputs(BaseNode.Outputs):
         processed: List[str]
@@ -28,22 +28,26 @@ class InnerNode(BaseNode):
         yield BaseOutput(value=processed_fruits, name="processed")
 
 
-class InnerWorkflow(BaseWorkflow[Inputs, BaseState]):
+class InnerWorkflow(BaseWorkflow[InnerInputs, BaseState]):
     graph = InnerNode
 
     class Outputs(BaseWorkflow.Outputs):
         processed = InnerNode.Outputs.processed
 
 
-class SubworkflowNode(InlineSubworkflowNode[BaseState, Inputs, BaseState]):
-    subworkflow_inputs = {"items": Inputs.items}  # type: ignore[dict-item]
+class OuterInputs(BaseInputs):
+    items: List[str]
+
+
+class SubworkflowNode(InlineSubworkflowNode[BaseState, InnerInputs, BaseState]):
+    subworkflow_inputs = {"items": OuterInputs.items}  # type: ignore[dict-item]
     subworkflow = InnerWorkflow
 
     class Outputs(InlineSubworkflowNode.Outputs):
         processed = InnerWorkflow.Outputs.processed
 
 
-class StreamingInlineSubworkflowExample(BaseWorkflow[Inputs, BaseState]):
+class StreamingInlineSubworkflowExample(BaseWorkflow[OuterInputs, BaseState]):
     """
     This Workflow ensures that we support streaming within the context of an InlineSubworkflowNode.
     """

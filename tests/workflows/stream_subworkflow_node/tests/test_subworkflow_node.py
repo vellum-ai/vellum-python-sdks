@@ -4,7 +4,7 @@ from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 from tests.workflows.stream_subworkflow_node.workflow import (
     InnerNode,
     InnerWorkflow,
-    Inputs,
+    OuterInputs,
     StreamingInlineSubworkflowExample,
     SubworkflowNode,
 )
@@ -20,12 +20,15 @@ def test_workflow_stream__happy_path():
 
     # WHEN we stream the events of the Workflow
     stream = workflow.stream(
-        inputs=Inputs(items=["apple", "banana", "cherry"]),
+        inputs=OuterInputs(items=["apple", "banana", "cherry"]),
         event_filter=all_workflow_event_filter,
     )
     events = list(stream)
 
-    # THEN we see the expected events in the correct relative order
+    # THEN the subworkflow fulfilled
+    assert events[-1].name == "workflow.execution.fulfilled", events[-1]
+
+    # AND we see the expected events in the correct relative order
     workflow_initiated_events = [e for e in events if e.name.startswith("workflow.execution.initiated")]
     node_initiated_events = [e for e in events if e.name.startswith("node.execution.initiated")]
 

@@ -47,8 +47,9 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
                     parent_state=self.state,
                     context=WorkflowContext.create_from(self._context),
                 )
+                inputs_class = subworkflow.get_inputs_class()
                 subworkflow_stream = subworkflow.stream(
-                    inputs=self.SubworkflowInputs(attempt_number=attempt_number),
+                    inputs=inputs_class(attempt_number=attempt_number),
                     event_filter=all_workflow_event_filter,
                     node_output_mocks=self._context._get_all_node_output_mocks(),
                 )
