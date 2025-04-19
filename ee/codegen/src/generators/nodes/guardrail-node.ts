@@ -21,8 +21,11 @@ export class GuardrailNode extends BaseSingleFileNode<
     const statements: AstNode[] = [];
 
     if (!this.nodeData.data.metricDefinitionId) {
-      throw new NodeAttributeGenerationError(
-        "metric_definition_id is required"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "metric_definition_id is required",
+          "WARNING"
+        )
       );
     }
 
@@ -51,7 +54,12 @@ export class GuardrailNode extends BaseSingleFileNode<
     );
 
     if (!this.nodeData.data.releaseTag) {
-      throw new NodeAttributeGenerationError("release_tag is required");
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "release_tag is required",
+          "WARNING"
+        )
+      );
     }
 
     statements.push(
@@ -105,8 +113,11 @@ export class GuardrailNode extends BaseSingleFileNode<
           const name = this.nodeContext.getNodeOutputNameById(output.id);
 
           if (!name) {
-            throw new NodeAttributeGenerationError(
-              `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
+            this.workflowContext.addError(
+              new NodeAttributeGenerationError(
+                `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`,
+                "WARNING"
+              )
             );
           }
           return {
