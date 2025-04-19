@@ -46,6 +46,19 @@ class MapNode(BaseMapNode):
 "
 `;
 
+exports[`MapNode > basic > map node inputs file 1`] = `
+"from typing import Any, Optional, Union
+
+from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    items: Optional[Any] = None
+    item: Optional[Any] = None
+    index: Optional[Union[float, int]] = None
+"
+`;
+
 exports[`MapNode > with additional output > map node display file 1`] = `
 "# flake8: noqa: F401, F403
 
