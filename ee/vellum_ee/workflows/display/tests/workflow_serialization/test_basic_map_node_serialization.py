@@ -254,7 +254,7 @@ def test_serialize_workflow():
                         "extensions": {"color": None},
                     },
                     {
-                        "id": "d6fc6c7a-235f-4b98-86f3-e258d1198f93",
+                        "id": "0acef1e7-caa1-4d9f-bb69-6981729af18d",
                         "key": "items",
                         "type": "JSON",
                         "required": True,
@@ -264,7 +264,7 @@ def test_serialize_workflow():
                 ],
                 "output_variables": [{"id": "2a957315-fae0-4366-8a35-f0b315c5eade", "key": "count", "type": "NUMBER"}],
                 "concurrency": None,
-                "items_input_id": "d6fc6c7a-235f-4b98-86f3-e258d1198f93",
+                "items_input_id": "0acef1e7-caa1-4d9f-bb69-6981729af18d",
                 "item_input_id": "b29bb546-9bc8-4136-857d-8c7a464ba9d4",
                 "index_input_id": "17e7ca49-668f-450d-a792-e1f97d13db67",
             },

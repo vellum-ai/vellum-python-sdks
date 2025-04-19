@@ -62,7 +62,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
         item: MapNodeItemType  # type: ignore[valid-type]
         index: int
-        all_items: List[MapNodeItemType]  # type: ignore[valid-type]
+        items: List[MapNodeItemType]  # type: ignore[valid-type]
 
     def run(self) -> Iterator[BaseOutput]:
         mapped_items: Dict[str, List] = defaultdict(list)
@@ -178,7 +178,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         )
         SubworkflowInputsClass = self.subworkflow.get_inputs_class()
         events = subworkflow.stream(
-            inputs=SubworkflowInputsClass(index=index, item=item, all_items=self.items),
+            inputs=SubworkflowInputsClass(index=index, item=item, items=self.items),
             node_output_mocks=self._context._get_all_node_output_mocks(),
             event_filter=all_workflow_event_filter,
         )

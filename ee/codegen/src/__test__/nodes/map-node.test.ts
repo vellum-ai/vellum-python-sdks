@@ -52,6 +52,15 @@ describe("MapNode", () => {
       ).toMatchSnapshot();
     });
 
+    it(`map node inputs file`, async () => {
+      expect(
+        await readFile(
+          join(tempDir, "code", "nodes", "map_node", "inputs.py"),
+          "utf-8"
+        )
+      ).toMatchSnapshot();
+    });
+
     it(`map node display file`, async () => {
       expect(
         await readFile(
