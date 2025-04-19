@@ -196,6 +196,15 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with only \`pass\` > getNodeFile 1`] = `
+"from vellum.workflows.nodes import BaseNode
+
+
+class MyCustomNode(BaseNode):
+    pass
+"
+`;
+
 exports[`GenericNode > basic with with access field in ports > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
