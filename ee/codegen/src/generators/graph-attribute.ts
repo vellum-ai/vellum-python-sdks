@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import {
   PORTS_CLASS_NAME,
@@ -11,6 +10,7 @@ import {
   NodeDefinitionGenerationError,
   NodeNotFoundError,
 } from "src/generators/errors";
+import { Writer } from "src/generators/extensions";
 import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
 
 import type { WorkflowContext } from "src/context";

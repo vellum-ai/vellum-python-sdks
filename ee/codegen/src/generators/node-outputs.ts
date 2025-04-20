@@ -1,10 +1,10 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { Writer } from "src/generators/extensions";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";

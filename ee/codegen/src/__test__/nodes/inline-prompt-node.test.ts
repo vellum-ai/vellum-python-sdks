@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { beforeEach } from "vitest";
 
@@ -10,6 +9,7 @@ import {
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
+import { Writer } from "src/generators/extensions";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
 import {
   NodeAttribute as NodeAttributeType,

@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { vi } from "vitest";
@@ -11,6 +10,7 @@ import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-fa
 import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
   WorkflowDataNode,

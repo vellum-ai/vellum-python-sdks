@@ -1,10 +1,10 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 
 export declare namespace Expression {

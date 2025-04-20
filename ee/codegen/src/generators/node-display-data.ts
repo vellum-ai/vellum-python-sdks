@@ -1,9 +1,9 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
+import { Writer } from "src/generators/extensions";
 import { NodeDisplayData as NodeDisplayDataType } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
 
