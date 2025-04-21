@@ -97,5 +97,42 @@ describe("Workflow Sandbox", () => {
       const sandboxFile = await generateSandboxFile(inputVariables, false);
       expect(sandboxFile).toMatchSnapshot();
     });
+
+    it("should properly handle special characters with escaped quotes", async () => {
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "special_characters_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      // Create sandbox input with a URL containing quotes that would normally be escaped
+      const sandboxInputs: WorkflowSandboxInputs[] = [
+        [
+          {
+            name: inputVariable.key,
+            type: "STRING",
+            value: '\\"special characters\\"',
+          },
+        ],
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+      expect(result).toMatchSnapshot();
+    });
   });
 });
