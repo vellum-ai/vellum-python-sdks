@@ -1303,12 +1303,18 @@ export function apiNodeFactory({
 }
 
 export function codeExecutionNodeFactory({
+  id,
+  outputId,
+  label,
   codeInputValueRule,
   codeOutputValueType,
   runtimeInput,
   generateLogOutputId = true,
   code,
 }: {
+  id?: string;
+  outputId?: string;
+  label?: string;
   codeInputValueRule?: NodeInputValuePointerRule;
   codeOutputValueType?: VellumVariableType;
   runtimeInput?: NodeInput;
@@ -1334,12 +1340,12 @@ export function codeExecutionNodeFactory({
       },
     } as NodeInput);
   const nodeData: CodeExecutionNode = {
-    id: "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
+    id: id ?? "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
     type: "CODE_EXECUTION",
     data: {
-      label: "Code Execution Node",
+      label: label ?? "Code Execution Node",
       codeInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
-      outputId: "81b270c0-4deb-4db3-aae5-138f79531b2b",
+      outputId: outputId ?? "81b270c0-4deb-4db3-aae5-138f79531b2b",
       outputType: codeOutputValueType ?? "STRING",
       logOutputId: generateLogOutputId
         ? "46abb839-400b-4766-997e-9c463b526139"
