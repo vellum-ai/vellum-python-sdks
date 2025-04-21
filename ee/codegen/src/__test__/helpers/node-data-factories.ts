@@ -8,6 +8,7 @@ import {
 
 import { edgesFactory } from "./edge-data-factories";
 
+import { NodeDataFactoryBuilder } from "src/__test__/helpers/node-data-factory-builder";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   AdornmentNode,
@@ -1313,7 +1314,7 @@ export function codeExecutionNodeFactory({
   runtimeInput?: NodeInput;
   generateLogOutputId?: boolean;
   code?: string;
-} = {}): CodeExecutionNode {
+} = {}): NodeDataFactoryBuilder<CodeExecutionNode> {
   const runtime =
     runtimeInput ??
     ({
@@ -1377,7 +1378,8 @@ export function codeExecutionNodeFactory({
       },
     },
   };
-  return nodeData;
+
+  return new NodeDataFactoryBuilder<CodeExecutionNode>(nodeData);
 }
 
 export function errorNodeDataFactory({

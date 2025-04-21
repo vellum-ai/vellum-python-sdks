@@ -12,13 +12,18 @@ import { workflowContextFactory } from "src/__test__/helpers";
 import {
   codeExecutionNodeFactory,
   nodeInputFactory,
+  nodePortFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
-import { NodeInput, NodeInputValuePointerRule } from "src/types/vellum";
+import {
+  NodeInput,
+  NodeInputValuePointerRule,
+  NodePort,
+} from "src/types/vellum";
 
 describe("CodeExecutionNode", () => {
   let tempDir: string;
@@ -37,7 +42,7 @@ describe("CodeExecutionNode", () => {
 
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = codeExecutionNodeFactory();
+      const nodeData = codeExecutionNodeFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -65,7 +70,7 @@ describe("CodeExecutionNode", () => {
     it("should accept int and float", async () => {
       const nodeData = codeExecutionNodeFactory({
         codeOutputValueType: "NUMBER",
-      });
+      }).build();
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
@@ -97,7 +102,7 @@ describe("CodeExecutionNode", () => {
 
       const nodeData = codeExecutionNodeFactory({
         code,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -131,7 +136,7 @@ describe("CodeExecutionNode", () => {
             value: null,
           },
         },
-      });
+      }).build();
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
@@ -176,7 +181,7 @@ describe("CodeExecutionNode", () => {
         });
         const nodeData = codeExecutionNodeFactory({
           runtimeInput,
-        });
+        }).build();
         const nodeContext = (await createNodeContext({
           workflowContext,
           nodeData,
@@ -223,7 +228,7 @@ describe("CodeExecutionNode", () => {
             },
           },
         }),
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -263,7 +268,7 @@ describe("CodeExecutionNode", () => {
       ) as unknown as WorkspaceSecretRead
     );
 
-    const nodeData = codeExecutionNodeFactory();
+    const nodeData = codeExecutionNodeFactory().build();
     const bearer_input = uuid();
     nodeData.inputs.push({
       id: bearer_input,
@@ -309,7 +314,7 @@ describe("CodeExecutionNode", () => {
         )
       );
 
-      const nodeData = codeExecutionNodeFactory();
+      const nodeData = codeExecutionNodeFactory().build();
       const bearer_input = uuid();
       nodeData.inputs.push({
         id: bearer_input,
@@ -352,7 +357,7 @@ describe("CodeExecutionNode", () => {
     it("should not generate log output id if not given", async () => {
       const nodeData = codeExecutionNodeFactory({
         generateLogOutputId: false,
-      });
+      }).build();
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
@@ -364,6 +369,42 @@ describe("CodeExecutionNode", () => {
       });
 
       node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe.skip("basic with ports", () => {
+    beforeEach(async () => {
+      const ifPortId = "3e9a8943-db9d-4586-a657-3f4ce1c1b595";
+      const elsePortId = "27aee210-2375-43e0-8dad-8856d9ff3cfb";
+      const nodePortsData: NodePort[] = [
+        nodePortFactory({
+          type: "IF",
+          id: ifPortId,
+        }),
+        nodePortFactory({
+          type: "ELSE",
+          id: elsePortId,
+        }),
+      ];
+
+      const nodeData = codeExecutionNodeFactory()
+        .withPorts(nodePortsData)
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      node = new CodeExecutionNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
