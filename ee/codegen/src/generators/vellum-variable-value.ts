@@ -31,7 +31,7 @@ class StringVellumValue extends AstNode {
   }
 
   private generateAstNode(value: string): AstNode {
-    return python.TypeInstantiation.str(value);
+    return python.TypeInstantiation.str(removeEscapeCharacters(value));
   }
 
   public write(writer: Writer): void {
