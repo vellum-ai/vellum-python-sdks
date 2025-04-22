@@ -5,8 +5,4 @@ def test_run_workflow():
     workflow = ElseWithNoIfWorkflow()
     terminal_event = workflow.run(inputs=Inputs(value="foo"))
     assert terminal_event.name == "workflow.execution.rejected"
-    base_module = __name__.split(".")[:-2]
-    assert (
-        terminal_event.error.message
-        == f"Class {'.'.join(base_module)}.workflow.ElseWithNoIfNode.Ports containing on_elif or on_else port conditions must have at least one on_if condition"  # noqa E501
-    )
+    assert terminal_event.error.message == "Port conditions must be in the following order: on_if, on_elif, on_else"

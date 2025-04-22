@@ -19,7 +19,7 @@ class PassthroughNode(BaseNode):
 class SingleInvokeNode(BaseNode):
     class Ports(NodePorts):
         if_branch: Port = Port.on_if(Inputs.value.equals("hello"))
-        else_if_branch: Port = Port.on_if(Inputs.value.equals("world"))
+        else_if_branch: Port = Port.on_elif(Inputs.value.equals("world"))
         else_branch: Port = Port.on_else()
 
 

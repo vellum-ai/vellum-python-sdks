@@ -13,7 +13,7 @@ class Inputs(BaseInputs):
 
 class OutOfOrderNode(BaseNode):
     class Ports(NodePorts):
-        else_if_branch: Port = Port.on_if(Inputs.value.equals("hello"))
+        else_if_branch: Port = Port.on_elif(Inputs.value.equals("hello"))
         else_branch: Port = Port.on_else()
         if_branch: Port = Port.on_if(Inputs.value.equals("world"))
 

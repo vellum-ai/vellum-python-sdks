@@ -14,27 +14,57 @@ PORT_TYPE_PRIORITIES = {
 def validate_ports(ports: List[Port]) -> bool:
     # We don't want to validate ports with no condition (default ports)
     port_types = [port._condition_type for port in ports if port._condition_type is not None]
-    sorted_port_types = sorted(port_types, key=lambda port_type: PORT_TYPE_PRIORITIES[port_type])
-
-    if sorted_port_types != port_types:
-        raise ValueError("Port conditions must be in the following order: on_if, on_elif, on_else")
-
-    counter = Counter(port_types)
-    number_of_if_ports = counter[ConditionType.IF]
-    number_of_elif_ports = counter[ConditionType.ELIF]
-    number_of_else_ports = counter[ConditionType.ELSE]
     ports_class = f"{ports[0].node_class}.Ports"
 
-    if number_of_if_ports == 0 and (number_of_elif_ports > 0 or number_of_else_ports > 0):
-        raise ValueError(
-            f"Class {ports_class} containing on_elif or on_else port conditions must have at least one on_if condition"
-        )
+    # Check all ports by port groups
+    port_groups: List[List[ConditionType]] = []
+    current_port_group: List[ConditionType] = []
 
-    if number_of_elif_ports > 0 and number_of_if_ports != 1:
-        raise ValueError(f"Class {ports_class} containing on_elif ports must have exactly one on_if condition")
+    for port_type in port_types:
+        # Start a new group only if we see an IF
+        if port_type == ConditionType.IF:
+            # Only append the current group if it's not empty and starts with an IF
+            if current_port_group and current_port_group[0] == ConditionType.IF:
+                port_groups.append(current_port_group)
+            current_port_group = [port_type]
+        else:
+            # If we see an ELIF or ELSE without a preceding IF, that's an error
+            if not current_port_group:
+                raise ValueError("Port conditions must be in the following order: on_if, on_elif, on_else")
+            current_port_group.append(port_type)
 
-    if number_of_else_ports > 1:
-        raise ValueError(f"Class {ports_class} must have at most one on_else port condition")
+    if current_port_group and current_port_group[0] == ConditionType.IF:
+        port_groups.append(current_port_group)
+    elif current_port_group:
+        # If the last group doesn't start with IF, that's an error
+        raise ValueError("Port conditions must be in the following order: on_if, on_elif, on_else")
 
-    enforce_single_invoked_conditional_port = number_of_elif_ports > 0 or number_of_if_ports <= 1
-    return enforce_single_invoked_conditional_port
+    # Validate each port group
+    for group in port_groups:
+        # Check that each port group is in the correct order
+        sorted_group = sorted(group, key=lambda port_type: PORT_TYPE_PRIORITIES[port_type])
+        if sorted_group != group:
+            raise ValueError("Port conditions must be in the following order: on_if, on_elif, on_else")
+
+        # Count the types in this port group
+        counter = Counter(group)
+        number_of_if_ports = counter[ConditionType.IF]
+        number_of_elif_ports = counter[ConditionType.ELIF]
+        number_of_else_ports = counter[ConditionType.ELSE]
+
+        # Apply the rules to each port group
+        if number_of_if_ports != 1:
+            raise ValueError(f"Class {ports_class} must have exactly one on_if condition")
+
+        if number_of_if_ports == 1 and number_of_else_ports == 0:
+            raise ValueError(
+                f"Class {ports_class} must have exactly one on_if condition and exactly one on_else condition"
+            )
+
+        if number_of_elif_ports > 0 and number_of_if_ports != 1:
+            raise ValueError(f"Class {ports_class} containing on_elif ports must have exactly one on_if condition")
+
+        if number_of_else_ports > 1:
+            raise ValueError(f"Class {ports_class} must have at most one on_else condition")
+
+    return True
