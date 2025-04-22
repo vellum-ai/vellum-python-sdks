@@ -27,7 +27,7 @@ class ExampleBaseInlinePromptNode(BaseInlinePromptNode):
     prompt_inputs = {
         "noun": WorkflowInputs.noun,
     }
-    settings = PromptSettings(timeout=1)
+    settings = PromptSettings(timeout=1, stream_enabled=True)
 
 
 class BasicInlinePromptWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
