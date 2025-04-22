@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   CodeResourceDefinition,
   PromptParameters,
+  PromptSettings,
   VellumVariable,
   VellumVariableType,
 } from "vellum-ai/api";
@@ -470,6 +471,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
   adornments,
   outputs,
   attributes,
+  settings,
 }: {
   blockType?: string;
   errorOutputId?: string;
@@ -478,6 +480,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
   adornments?: AdornmentNode[];
   outputs?: NodeOutput[];
   attributes?: NodeAttribute[];
+  settings?: PromptSettings;
 }): PromptNode {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
@@ -513,6 +516,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
           blocks: [block],
           version: 1,
         },
+        settings: settings,
       },
       mlModelName: "gpt-4o-mini",
     },
