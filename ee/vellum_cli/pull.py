@@ -179,6 +179,13 @@ def pull_command(
     except ApiError as e:
         if e.status_code == 401 or e.status_code == 403:
             raise Exception("Please make sure your `VELLUM_API_KEY` environment variable is set correctly.")
+
+        if e.status_code == 500:
+            raise Exception(
+                "The Pull API failed with an unexpected error. Please try again later and contact support if the problem persists."  # noqa: E501
+            )
+
+        # TODO: We should return an Origin header in to validate this case
         raise Exception(
             "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
         )
