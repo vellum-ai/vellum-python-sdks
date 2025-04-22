@@ -3,12 +3,10 @@
 from __future__ import annotations
 from ..core.pydantic_utilities import UniversalBaseModel
 from .api_request_parent_context import ApiRequestParentContext
-from .node_event_display_context import NodeEventDisplayContext
 from .node_parent_context import NodeParentContext
 from .prompt_deployment_parent_context import PromptDeploymentParentContext
 from .span_link import SpanLink
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
-from .workflow_event_display_context import WorkflowEventDisplayContext
 from .workflow_parent_context import WorkflowParentContext
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
 import typing
@@ -40,11 +38,9 @@ class WorkflowExecutionSpan(UniversalBaseModel):
 
 
 update_forward_refs(ApiRequestParentContext, WorkflowExecutionSpan=WorkflowExecutionSpan)
-update_forward_refs(NodeEventDisplayContext, WorkflowExecutionSpan=WorkflowExecutionSpan)
 update_forward_refs(NodeParentContext, WorkflowExecutionSpan=WorkflowExecutionSpan)
 update_forward_refs(PromptDeploymentParentContext, WorkflowExecutionSpan=WorkflowExecutionSpan)
 update_forward_refs(SpanLink, WorkflowExecutionSpan=WorkflowExecutionSpan)
 update_forward_refs(WorkflowDeploymentParentContext, WorkflowExecutionSpan=WorkflowExecutionSpan)
-update_forward_refs(WorkflowEventDisplayContext, WorkflowExecutionSpan=WorkflowExecutionSpan)
 update_forward_refs(WorkflowParentContext, WorkflowExecutionSpan=WorkflowExecutionSpan)
 update_forward_refs(WorkflowSandboxParentContext, WorkflowExecutionSpan=WorkflowExecutionSpan)

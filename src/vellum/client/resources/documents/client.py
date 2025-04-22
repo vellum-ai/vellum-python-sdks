@@ -106,7 +106,6 @@ class DocumentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this document.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -154,7 +153,6 @@ class DocumentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this document.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -203,7 +201,6 @@ class DocumentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this document.
 
         label : typing.Optional[str]
             A human-readable label for the document. Defaults to the originally uploaded file's file name.
@@ -471,7 +468,6 @@ class AsyncDocumentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this document.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -527,7 +523,6 @@ class AsyncDocumentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this document.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -584,7 +579,6 @@ class AsyncDocumentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this document.
 
         label : typing.Optional[str]
             A human-readable label for the document. Defaults to the originally uploaded file's file name.

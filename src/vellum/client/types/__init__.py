@@ -109,6 +109,7 @@ from .execute_api_request_bearer_token import ExecuteApiRequestBearerToken
 from .execute_api_request_body import ExecuteApiRequestBody
 from .execute_api_request_headers_value import ExecuteApiRequestHeadersValue
 from .execute_api_response import ExecuteApiResponse
+from .execute_api_response_json import ExecuteApiResponseJson
 from .execute_prompt_event import ExecutePromptEvent
 from .execute_prompt_response import ExecutePromptResponse
 from .execute_workflow_response import ExecuteWorkflowResponse
@@ -237,7 +238,6 @@ from .named_test_case_string_variable_value_request import NamedTestCaseStringVa
 from .named_test_case_variable_value import NamedTestCaseVariableValue
 from .named_test_case_variable_value_request import NamedTestCaseVariableValueRequest
 from .new_member_join_behavior_enum import NewMemberJoinBehaviorEnum
-from .node_event_display_context import NodeEventDisplayContext
 from .node_execution_fulfilled_body import NodeExecutionFulfilledBody
 from .node_execution_fulfilled_event import NodeExecutionFulfilledEvent
 from .node_execution_initiated_body import NodeExecutionInitiatedBody
@@ -542,7 +542,6 @@ from .workflow_deployment_release import WorkflowDeploymentRelease
 from .workflow_deployment_release_workflow_deployment import WorkflowDeploymentReleaseWorkflowDeployment
 from .workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
 from .workflow_error import WorkflowError
-from .workflow_event_display_context import WorkflowEventDisplayContext
 from .workflow_event_error import WorkflowEventError
 from .workflow_event_execution_read import WorkflowEventExecutionRead
 from .workflow_execution_actual import WorkflowExecutionActual
@@ -715,6 +714,7 @@ __all__ = [
     "ExecuteApiRequestBody",
     "ExecuteApiRequestHeadersValue",
     "ExecuteApiResponse",
+    "ExecuteApiResponseJson",
     "ExecutePromptEvent",
     "ExecutePromptResponse",
     "ExecuteWorkflowResponse",
@@ -839,7 +839,6 @@ __all__ = [
     "NamedTestCaseVariableValue",
     "NamedTestCaseVariableValueRequest",
     "NewMemberJoinBehaviorEnum",
-    "NodeEventDisplayContext",
     "NodeExecutionFulfilledBody",
     "NodeExecutionFulfilledEvent",
     "NodeExecutionInitiatedBody",
@@ -1128,7 +1127,6 @@ __all__ = [
     "WorkflowDeploymentReleaseWorkflowDeployment",
     "WorkflowDeploymentReleaseWorkflowVersion",
     "WorkflowError",
-    "WorkflowEventDisplayContext",
     "WorkflowEventError",
     "WorkflowEventExecutionRead",
     "WorkflowExecutionActual",

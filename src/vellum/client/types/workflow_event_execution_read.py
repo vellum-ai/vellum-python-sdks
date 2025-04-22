@@ -10,8 +10,6 @@ from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
 from .workflow_parent_context import WorkflowParentContext
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
 from .array_vellum_value import ArrayVellumValue
-from .node_event_display_context import NodeEventDisplayContext
-from .workflow_event_display_context import WorkflowEventDisplayContext
 import typing
 import datetime as dt
 from .execution_vellum_value import ExecutionVellumValue
@@ -56,5 +54,3 @@ update_forward_refs(WorkflowDeploymentParentContext, WorkflowEventExecutionRead=
 update_forward_refs(WorkflowParentContext, WorkflowEventExecutionRead=WorkflowEventExecutionRead)
 update_forward_refs(WorkflowSandboxParentContext, WorkflowEventExecutionRead=WorkflowEventExecutionRead)
 update_forward_refs(ArrayVellumValue, WorkflowEventExecutionRead=WorkflowEventExecutionRead)
-update_forward_refs(NodeEventDisplayContext, WorkflowEventExecutionRead=WorkflowEventExecutionRead)
-update_forward_refs(WorkflowEventDisplayContext, WorkflowEventExecutionRead=WorkflowEventExecutionRead)

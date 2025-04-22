@@ -8,6 +8,7 @@ import pydantic
 
 class PromptSettings(UniversalBaseModel):
     timeout: typing.Optional[float] = None
+    stream_enabled: typing.Optional[bool] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

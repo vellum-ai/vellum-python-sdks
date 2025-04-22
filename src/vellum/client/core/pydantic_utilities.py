@@ -8,12 +8,9 @@ from collections import defaultdict
 import typing_extensions
 
 import pydantic
-import logging
 
 from .datetime_utils import serialize_datetime
 from .serialization import convert_and_respect_annotation_metadata
-
-logger = logging.getLogger(__name__)
 
 IS_PYDANTIC_V2 = pydantic.VERSION.startswith("2.")
 
@@ -248,10 +245,7 @@ def update_forward_refs(model: typing.Type["Model"], **localns: typing.Any) -> N
     if IS_PYDANTIC_V2:
         model.model_rebuild(raise_errors=False)  # type: ignore # Pydantic v2
     else:
-        try:
-            model.update_forward_refs(**localns)
-        except Exception as e:
-            logger.warning("[WARN] Failed to update forward refs for model %s", model.__name__)
+        model.update_forward_refs(**localns)
 
 
 # Mirrors Pydantic's internal typing

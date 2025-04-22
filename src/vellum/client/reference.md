@@ -3408,7 +3408,7 @@ client.documents.retrieve(
 <dl>
 <dd>
 
-**id:** `str` — A UUID string identifying this document.
+**id:** `str` 
     
 </dd>
 </dl>
@@ -3478,7 +3478,7 @@ client.documents.destroy(
 <dl>
 <dd>
 
-**id:** `str` — A UUID string identifying this document.
+**id:** `str` 
     
 </dd>
 </dl>
@@ -3548,7 +3548,7 @@ client.documents.partial_update(
 <dl>
 <dd>
 
-**id:** `str` — A UUID string identifying this document.
+**id:** `str` 
     
 </dd>
 </dl>
