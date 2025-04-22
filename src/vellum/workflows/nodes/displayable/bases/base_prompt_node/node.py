@@ -4,7 +4,7 @@ from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Union
 from vellum import AdHocExecutePromptEvent, ExecutePromptEvent, PromptOutput
 from vellum.client.core.api_error import ApiError
 from vellum.core import RequestOptions
-from vellum.workflows.errors.types import WorkflowErrorCode, vellum_error_to_workflow_error
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
@@ -17,8 +17,6 @@ class BasePromptNode(BaseNode, Generic[StateType]):
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
 
     request_options: Optional[RequestOptions] = None
-
-    run_with_stream: bool = True
 
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
@@ -41,35 +39,9 @@ class BasePromptNode(BaseNode, Generic[StateType]):
                 code=WorkflowErrorCode.INTERNAL_ERROR,
             )
 
+    @abstractmethod
     def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
-        self._validate()
-        try:
-            prompt_event_stream = self._get_prompt_event_stream()
-        except ApiError as e:
-            self._handle_api_error(e)
-
-        if self.run_with_stream:
-            # We don't use the INITIATED event anyway, so we can just skip it
-            # and use the exception handling to catch other api level errors
-            try:
-                next(prompt_event_stream)
-            except ApiError as e:
-                self._handle_api_error(e)
-
-        outputs: Optional[List[PromptOutput]] = None
-        for event in prompt_event_stream:
-            if event.state == "INITIATED":
-                continue
-            elif event.state == "STREAMING":
-                yield BaseOutput(name="results", delta=event.output.value)
-            elif event.state == "FULFILLED":
-                outputs = event.outputs
-                yield BaseOutput(name="results", value=event.outputs)
-            elif event.state == "REJECTED":
-                workflow_error = vellum_error_to_workflow_error(event.error)
-                raise NodeException.of(workflow_error)
-
-        return outputs
+        pass
 
     def _handle_api_error(self, e: ApiError):
         if e.status_code and e.status_code == 403 and isinstance(e.body, dict):

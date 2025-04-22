@@ -5,11 +5,14 @@ from uuid import uuid4
 from typing import Any, Iterator, List
 
 from vellum import (
+    AdHocExecutePromptEvent,
     ChatMessagePromptBlock,
+    FulfilledAdHocExecutePromptEvent,
     JinjaPromptBlock,
     PlainTextPromptBlock,
     PromptBlock,
     PromptParameters,
+    PromptSettings,
     RichTextPromptBlock,
     VariablePromptBlock,
 )
@@ -321,14 +324,14 @@ def test_inline_prompt_node__streaming_disabled(vellum_adhoc_prompt_client):
             logit_bias=None,
             custom_parameters={},
         )
-        run_with_stream = False
+        settings = PromptSettings(stream_enabled=False)
 
     # AND a known response from invoking an inline prompt
     expected_output: list[PromptOutput] = [StringVellumValue(value="Hello, world!")]
 
-    def generate_prompt_event(*args: Any, **kwargs: Any) -> ExecutePromptEvent:
+    def generate_prompt_event(*args: Any, **kwargs: Any) -> AdHocExecutePromptEvent:
         execution_id = str(uuid4())
-        return FulfilledExecutePromptEvent(
+        return FulfilledAdHocExecutePromptEvent(
             execution_id=execution_id,
             outputs=expected_output,
         )
@@ -364,7 +367,7 @@ def test_inline_prompt_node__streaming_disabled(vellum_adhoc_prompt_client):
             custom_parameters={},
         ),
         request_options=mock.ANY,
-        settings=None,
+        settings=PromptSettings(stream_enabled=False),
     )
 
 
@@ -400,7 +403,7 @@ def test_inline_prompt_node__json_output_with_streaming_disabled(vellum_adhoc_pr
                 },
             },
         )
-        run_with_stream = False
+        settings = PromptSettings(stream_enabled=False)
 
     # AND a known JSON response from invoking an inline prompt
     expected_json = {"result": "Hello, world!"}
@@ -408,9 +411,9 @@ def test_inline_prompt_node__json_output_with_streaming_disabled(vellum_adhoc_pr
         StringVellumValue(value=json.dumps(expected_json)),
     ]
 
-    def generate_prompt_event(*args: Any, **kwargs: Any) -> ExecutePromptEvent:
+    def generate_prompt_event(*args: Any, **kwargs: Any) -> AdHocExecutePromptEvent:
         execution_id = str(uuid4())
-        return FulfilledExecutePromptEvent(
+        return FulfilledAdHocExecutePromptEvent(
             execution_id=execution_id,
             outputs=expected_outputs,
         )
@@ -468,5 +471,5 @@ def test_inline_prompt_node__json_output_with_streaming_disabled(vellum_adhoc_pr
             },
         ),
         request_options=mock.ANY,
-        settings=None,
+        settings=PromptSettings(stream_enabled=False),
     )
