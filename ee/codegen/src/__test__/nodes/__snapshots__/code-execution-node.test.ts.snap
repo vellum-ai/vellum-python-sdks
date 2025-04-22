@@ -112,6 +112,53 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`CodeExecutionNode > basic with ports > with ports referencing current node output > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.ports import Port
+from vellum.workflows.references import LazyReference
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+
+    class Ports(BaseCodeExecutionNode.Ports):
+        if_port = Port.on_if(
+            LazyReference(lambda: CodeExecutionNode.Outputs.result).equals(
+                "Hello, World!"
+            )
+        )
+        else_port = Port.on_else()
+"
+`;
+
+exports[`CodeExecutionNode > basic with ports > with ports referencing upstream node output > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.ports import Port
+from vellum.workflows.state import BaseState
+
+from .upstream_code_node import UpstreamCodeNode
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+
+    class Ports(BaseCodeExecutionNode.Ports):
+        if_port = Port.on_if(UpstreamCodeNode.Outputs.result.equals("Upstream node"))
+        else_port = Port.on_else()
+"
+`;
+
 exports[`CodeExecutionNode > code representation: Base case > should generate the correct node class 1`] = `
 "from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
 from vellum.workflows.state import BaseState

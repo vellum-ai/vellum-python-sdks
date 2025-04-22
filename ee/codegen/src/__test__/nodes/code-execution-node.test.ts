@@ -373,39 +373,121 @@ describe("CodeExecutionNode", () => {
     });
   });
 
-  describe.skip("basic with ports", () => {
-    beforeEach(async () => {
-      const ifPortId = "3e9a8943-db9d-4586-a657-3f4ce1c1b595";
-      const elsePortId = "27aee210-2375-43e0-8dad-8856d9ff3cfb";
-      const nodePortsData: NodePort[] = [
-        nodePortFactory({
-          type: "IF",
-          id: ifPortId,
-        }),
-        nodePortFactory({
-          type: "ELSE",
-          id: elsePortId,
-        }),
-      ];
+  describe("basic with ports", () => {
+    const ifPortId = "3e9a8943-db9d-4586-a657-3f4ce1c1b595";
+    const elsePortId = "27aee210-2375-43e0-8dad-8856d9ff3cfb";
 
-      const nodeData = codeExecutionNodeFactory()
-        .withPorts(nodePortsData)
-        .build();
+    describe("with ports referencing current node output", () => {
+      beforeEach(async () => {
+        const codeExecutionNodeData = codeExecutionNodeFactory();
 
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as CodeExecutionContext;
+        const nodePortsData: NodePort[] = [
+          nodePortFactory({
+            type: "IF",
+            id: ifPortId,
+            expression: {
+              type: "BINARY_EXPRESSION",
+              operator: "=",
+              lhs: {
+                type: "NODE_OUTPUT",
+                nodeId: codeExecutionNodeData.nodeData.id,
+                nodeOutputId: codeExecutionNodeData.nodeData.data.outputId,
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "Hello, World!",
+                },
+              },
+            },
+          }),
+          nodePortFactory({
+            type: "ELSE",
+            id: elsePortId,
+          }),
+        ];
 
-      node = new CodeExecutionNode({
-        workflowContext,
-        nodeContext,
+        const nodeData = codeExecutionNodeData.withPorts(nodePortsData).build();
+
+        const nodeContext = (await createNodeContext({
+          workflowContext,
+          nodeData,
+        })) as CodeExecutionContext;
+
+        node = new CodeExecutionNode({
+          workflowContext,
+          nodeContext,
+        });
+      });
+
+      it("getNodeFile", async () => {
+        node.getNodeFile().write(writer);
+        expect(await writer.toStringFormatted()).toMatchSnapshot();
       });
     });
 
-    it("getNodeFile", async () => {
-      node.getNodeFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    describe("with ports referencing upstream node output", () => {
+      beforeEach(async () => {
+        const upstreamNodeId = uuid();
+        const upstreamOutputId = uuid();
+        const upstreamCodeExecNodeData = codeExecutionNodeFactory({
+          id: upstreamNodeId,
+          outputId: upstreamOutputId,
+          label: "Upstream code node",
+        }).build();
+
+        (await createNodeContext({
+          workflowContext,
+          nodeData: upstreamCodeExecNodeData,
+        })) as CodeExecutionContext;
+
+        const codeExecutionNodeData = codeExecutionNodeFactory();
+
+        const nodePortsData: NodePort[] = [
+          nodePortFactory({
+            type: "IF",
+            id: ifPortId,
+            expression: {
+              type: "BINARY_EXPRESSION",
+              operator: "=",
+              lhs: {
+                type: "NODE_OUTPUT",
+                nodeId: upstreamNodeId,
+                nodeOutputId: upstreamOutputId,
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "Upstream node",
+                },
+              },
+            },
+          }),
+          nodePortFactory({
+            type: "ELSE",
+            id: elsePortId,
+          }),
+        ];
+
+        const nodeData = codeExecutionNodeData.withPorts(nodePortsData).build();
+
+        const nodeContext = (await createNodeContext({
+          workflowContext,
+          nodeData,
+        })) as CodeExecutionContext;
+
+        node = new CodeExecutionNode({
+          workflowContext,
+          nodeContext,
+        });
+      });
+
+      it("getNodeFile", async () => {
+        node.getNodeFile().write(writer);
+        expect(await writer.toStringFormatted()).toMatchSnapshot();
+      });
     });
   });
 });

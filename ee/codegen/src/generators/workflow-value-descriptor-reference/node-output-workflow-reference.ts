@@ -41,11 +41,40 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
           ],
         });
       }
-      return python.reference({
-        name: nodeContext.nodeClassName,
-        modulePath: nodeContext.nodeModulePath,
-        attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],
-      });
+      if (this.nodeContext?.nodeClassName === nodeContext.nodeClassName) {
+        return python.instantiateClass({
+          classReference: python.reference({
+            name: "LazyReference",
+            modulePath: [
+              ...this.nodeContext.workflowContext.sdkModulePathNames
+                .WORKFLOWS_MODULE_PATH,
+              "references",
+            ],
+          }),
+          arguments_: [
+            python.methodArgument({
+              value: python.lambda({
+                body: python.accessAttribute({
+                  lhs: python.reference({
+                    name: nodeContext.nodeClassName,
+                    modulePath: [],
+                  }),
+                  rhs: python.reference({
+                    name: `${OUTPUTS_CLASS_NAME}.${nodeOutputName}`,
+                    modulePath: [],
+                  }),
+                }),
+              }),
+            }),
+          ],
+        });
+      } else {
+        return python.reference({
+          name: nodeContext.nodeClassName,
+          modulePath: nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],
+        });
+      }
     }
     return undefined;
   }

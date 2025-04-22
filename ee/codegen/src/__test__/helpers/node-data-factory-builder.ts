@@ -1,6 +1,10 @@
-import { NodeAttribute, NodePort } from "src/types/vellum";
+import {
+  NodeAttribute,
+  NodePort,
+  WorkflowDataNode as WorkflowDataNodeType,
+} from "src/types/vellum";
 
-export class NodeDataFactoryBuilder<T> {
+export class NodeDataFactoryBuilder<T extends WorkflowDataNodeType> {
   public nodeData: T;
 
   constructor(nodeData: T) {
