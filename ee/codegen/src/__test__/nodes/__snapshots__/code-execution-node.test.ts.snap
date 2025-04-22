@@ -129,7 +129,9 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 
     class Ports(BaseCodeExecutionNode.Ports):
         if_port = Port.on_if(
-            LazyReference("CodeExecutionNode.Outputs.result").equals("Hello, World!")
+            LazyReference(lambda: CodeExecutionNode.Outputs.result).equals(
+                "Hello, World!"
+            )
         )
         else_port = Port.on_else()
 "

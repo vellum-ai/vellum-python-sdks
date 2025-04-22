@@ -53,9 +53,18 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
           }),
           arguments_: [
             python.methodArgument({
-              value: python.TypeInstantiation.str(
-                `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
-              ),
+              value: python.lambda({
+                body: python.accessAttribute({
+                  lhs: python.reference({
+                    name: nodeContext.nodeClassName,
+                    modulePath: [],
+                  }),
+                  rhs: python.reference({
+                    name: `${OUTPUTS_CLASS_NAME}.${nodeOutputName}`,
+                    modulePath: [],
+                  }),
+                }),
+              }),
             }),
           ],
         });
