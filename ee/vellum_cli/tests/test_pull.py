@@ -950,6 +950,29 @@ def test_pull__unauthorized_error_path(vellum_client):
     assert str(result.exception) == "Please make sure your `VELLUM_API_KEY` environment variable is set correctly."
 
 
+def test_pull__unexpected_error_path(vellum_client):
+    workflow_deployment = "test-workflow-deployment-id"
+
+    # GIVEN an unauthorized error with the error message from the API
+    def mock_error_generator():
+        yield b""
+        raise ApiError(status_code=500, body={"detail": "Internal server error"})
+
+    vellum_client.workflows.pull.return_value = mock_error_generator()
+
+    # WHEN the user runs the pull command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+
+    # THEN the command returns an error
+    assert result.exit_code == 1
+    assert (
+        str(result.exception)
+        == """The Pull API failed with an unexpected error. \
+Please try again later and contact support if the problem persists."""
+    )
+
+
 @pytest.mark.parametrize(
     "workflow_deployment",
     [
