@@ -18,6 +18,8 @@ class BasePromptNode(BaseNode, Generic[StateType]):
 
     request_options: Optional[RequestOptions] = None
 
+    run_with_stream: bool = True
+
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
@@ -46,12 +48,13 @@ class BasePromptNode(BaseNode, Generic[StateType]):
         except ApiError as e:
             self._handle_api_error(e)
 
-        # We don't use the INITIATED event anyway, so we can just skip it
-        # and use the exception handling to catch other api level errors
-        try:
-            next(prompt_event_stream)
-        except ApiError as e:
-            self._handle_api_error(e)
+        if self.run_with_stream:
+            # We don't use the INITIATED event anyway, so we can just skip it
+            # and use the exception handling to catch other api level errors
+            try:
+                next(prompt_event_stream)
+            except ApiError as e:
+                self._handle_api_error(e)
 
         outputs: Optional[List[PromptOutput]] = None
         for event in prompt_event_stream:
