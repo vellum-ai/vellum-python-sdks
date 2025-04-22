@@ -13,6 +13,7 @@ from vellum.workflows.workflows.base import BaseWorkflow
 class ThresholdNode(BaseNode):
     class Ports(BaseNode.Ports):
         failed = Port.on_if(LazyReference(lambda: ThresholdNode.Outputs.error.is_not_undefined()))
+        else_branch = Port.on_else()
 
     class Outputs(BaseNode.Outputs):
         message: str

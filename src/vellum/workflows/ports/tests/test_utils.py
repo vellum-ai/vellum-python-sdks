@@ -48,7 +48,7 @@ def test_valid_multiple_if_else_group():
     ports = [port for port in TestNode.Ports]
     result = validate_ports(ports)
 
-    assert result is True
+    assert result is False
 
 
 def test_valid_multiple_if_elif_else_group():
@@ -64,7 +64,7 @@ def test_valid_multiple_if_elif_else_group():
     ports = [port for port in TestNode.Ports]
     result = validate_ports(ports)
 
-    assert result is True
+    assert result is False
 
 
 def test_invalid_single_if_else_group():

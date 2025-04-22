@@ -67,4 +67,5 @@ def validate_ports(ports: List[Port]) -> bool:
         if number_of_else_ports > 1:
             raise ValueError(f"Class {ports_class} must have at most one on_else condition")
 
-    return True
+    enforce_single_invoked_conditional_port = len(port_groups) <= 1
+    return enforce_single_invoked_conditional_port
