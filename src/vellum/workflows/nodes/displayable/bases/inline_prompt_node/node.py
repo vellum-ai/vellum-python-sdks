@@ -1,6 +1,6 @@
 import json
 from uuid import uuid4
-from typing import Callable, ClassVar, Generic, Iterator, List, Optional, Set, Tuple, Union
+from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -8,6 +8,7 @@ from vellum import (
     ChatMessage,
     FunctionDefinition,
     PromptBlock,
+    PromptOutput,
     PromptParameters,
     PromptRequestChatHistoryInput,
     PromptRequestInput,
@@ -15,17 +16,19 @@ from vellum import (
     PromptRequestStringInput,
     VellumVariable,
 )
-from vellum.client import RequestOptions
+from vellum.client import ApiError, RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.rich_text_child_block import RichTextChildBlock
 from vellum.workflows.constants import OMIT
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.errors.types import vellum_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.functions import compile_function_definition
@@ -103,17 +106,63 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             else None
         )
 
-        return self._context.vellum_client.ad_hoc.adhoc_execute_prompt_stream(
-            ml_model=self.ml_model,
-            input_values=input_values,
-            input_variables=input_variables,
-            parameters=self.parameters,
-            blocks=self.blocks,
-            settings=self.settings,
-            functions=normalized_functions,
-            expand_meta=self.expand_meta,
-            request_options=request_options,
-        )
+        if self.settings and not self.settings.stream_enabled:
+            # This endpoint is returning a single event, so we need to wrap it in a generator
+            # to match the existing interface.
+            response = self._context.vellum_client.ad_hoc.adhoc_execute_prompt(
+                ml_model=self.ml_model,
+                input_values=input_values,
+                input_variables=input_variables,
+                parameters=self.parameters,
+                blocks=self.blocks,
+                settings=self.settings,
+                functions=normalized_functions,
+                expand_meta=self.expand_meta,
+                request_options=request_options,
+            )
+            return iter([response])
+        else:
+            return self._context.vellum_client.ad_hoc.adhoc_execute_prompt_stream(
+                ml_model=self.ml_model,
+                input_values=input_values,
+                input_variables=input_variables,
+                parameters=self.parameters,
+                blocks=self.blocks,
+                settings=self.settings,
+                functions=normalized_functions,
+                expand_meta=self.expand_meta,
+                request_options=request_options,
+            )
+
+    def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
+        self._validate()
+        try:
+            prompt_event_stream = self._get_prompt_event_stream()
+        except ApiError as e:
+            self._handle_api_error(e)
+
+        if not self.settings or (self.settings and self.settings.stream_enabled):
+            # We don't use the INITIATED event anyway, so we can just skip it
+            # and use the exception handling to catch other api level errors
+            try:
+                next(prompt_event_stream)
+            except ApiError as e:
+                self._handle_api_error(e)
+
+        outputs: Optional[List[PromptOutput]] = None
+        for event in prompt_event_stream:
+            if event.state == "INITIATED":
+                continue
+            elif event.state == "STREAMING":
+                yield BaseOutput(name="results", delta=event.output.value)
+            elif event.state == "FULFILLED":
+                outputs = event.outputs
+                yield BaseOutput(name="results", value=event.outputs)
+            elif event.state == "REJECTED":
+                workflow_error = vellum_error_to_workflow_error(event.error)
+                raise NodeException.of(workflow_error)
+
+        return outputs
 
     def _compile_prompt_inputs(self) -> Tuple[List[VellumVariable], List[PromptRequestInput]]:
         input_variables: List[VellumVariable] = []

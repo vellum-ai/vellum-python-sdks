@@ -3,14 +3,14 @@ from uuid import uuid4
 from typing import Any, Iterator, List
 
 from vellum import (
+    AdHocExecutePromptEvent,
     ChatMessagePromptBlock,
-    ExecutePromptEvent,
-    FulfilledExecutePromptEvent,
-    InitiatedExecutePromptEvent,
+    FulfilledAdHocExecutePromptEvent,
+    InitiatedAdHocExecutePromptEvent,
     JinjaPromptBlock,
     PromptOutput,
     PromptRequestStringInput,
-    StreamingExecutePromptEvent,
+    StreamingAdHocExecutePromptEvent,
     StringVellumValue,
     VellumVariable,
 )
@@ -32,11 +32,11 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
         StringVellumValue(value="I'm looking up the weather for you now."),
     ]
 
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[AdHocExecutePromptEvent]:
         execution_id = str(uuid4())
-        events: List[ExecutePromptEvent] = [
-            InitiatedExecutePromptEvent(execution_id=execution_id),
-            FulfilledExecutePromptEvent(
+        events: List[AdHocExecutePromptEvent] = [
+            InitiatedAdHocExecutePromptEvent(execution_id=execution_id),
+            FulfilledAdHocExecutePromptEvent(
                 execution_id=execution_id,
                 outputs=expected_outputs,
             ),
@@ -91,7 +91,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
         expand_meta=OMIT,
         functions=None,
         request_options=mock.ANY,
-        settings=PromptSettings(timeout=1),
+        settings=PromptSettings(timeout=1, stream_enabled=True),
     )
 
 
@@ -106,20 +106,20 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
         StringVellumValue(value="It was hot"),
     ]
 
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[AdHocExecutePromptEvent]:
         execution_id = str(uuid4())
-        events: List[ExecutePromptEvent] = [
-            InitiatedExecutePromptEvent(execution_id=execution_id),
-            StreamingExecutePromptEvent(
+        events: List[AdHocExecutePromptEvent] = [
+            InitiatedAdHocExecutePromptEvent(execution_id=execution_id),
+            StreamingAdHocExecutePromptEvent(
                 execution_id=execution_id, output=StringVellumValue(value="It"), output_index=0
             ),
-            StreamingExecutePromptEvent(
+            StreamingAdHocExecutePromptEvent(
                 execution_id=execution_id, output=StringVellumValue(value=" was"), output_index=0
             ),
-            StreamingExecutePromptEvent(
+            StreamingAdHocExecutePromptEvent(
                 execution_id=execution_id, output=StringVellumValue(value=" hot"), output_index=0
             ),
-            FulfilledExecutePromptEvent(
+            FulfilledAdHocExecutePromptEvent(
                 execution_id=execution_id,
                 outputs=expected_outputs,
             ),
