@@ -73,6 +73,7 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
+    run_with_stream = True
 "
 `;
 
@@ -156,6 +157,7 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
+    run_with_stream = True
 "
 `;
 
@@ -232,5 +234,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
+    run_with_stream = True
 "
 `;

@@ -142,6 +142,17 @@ export class InlinePromptNode extends BaseSingleFileNode<
       })
     );
 
+    if (this.nodeData.data.execConfig.settings) {
+      statements.push(
+        python.field({
+          name: "run_with_stream",
+          initializer: python.TypeInstantiation.bool(
+            this.nodeData.data.execConfig.settings.streamEnabled ?? true
+          ),
+        })
+      );
+    }
+
     return statements;
   }
 

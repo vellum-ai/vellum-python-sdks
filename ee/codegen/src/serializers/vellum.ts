@@ -556,11 +556,13 @@ const PromptSettingsSerializer: ObjectSchema<
   PromptSettings
 > = objectSchema({
   timeout: numberSchema().optional(),
+  streamEnabled: propertySchema("stream_enabled", booleanSchema().optional()),
 });
 
 export declare namespace PromptSettingsSerializer {
   interface Raw {
     timeout?: number | null;
+    stream_enabled?: boolean | null;
   }
 }
 

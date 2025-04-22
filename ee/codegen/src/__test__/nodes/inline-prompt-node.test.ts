@@ -1,5 +1,6 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
+import { PromptSettings } from "vellum-ai/api";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -254,6 +255,33 @@ describe("InlinePromptNode", () => {
       ];
       const nodeData = inlinePromptNodeDataInlineVariantFactory({
         attributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with stream setting false", () => {
+    let node: InlinePromptNode;
+    beforeEach(async () => {
+      const promptSettings: PromptSettings = {
+        streamEnabled: false,
+      };
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        settings: promptSettings,
       });
 
       const nodeContext = (await createNodeContext({
