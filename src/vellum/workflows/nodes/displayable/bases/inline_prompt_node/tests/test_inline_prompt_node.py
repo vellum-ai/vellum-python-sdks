@@ -296,3 +296,177 @@ def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client):
         request_options=mock.ANY,
         settings=None,
     )
+
+
+def test_inline_prompt_node__streaming_disabled(vellum_adhoc_prompt_client):
+    # GIVEN an InlinePromptNode
+    class Inputs(BaseInputs):
+        input: str
+
+    class State(BaseState):
+        pass
+
+    # AND it has streaming disabled
+    class MyInlinePromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+        parameters = PromptParameters(
+            stop=[],
+            temperature=0.0,
+            max_tokens=4096,
+            top_p=1.0,
+            top_k=0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            logit_bias=None,
+            custom_parameters={},
+        )
+        run_with_stream = False
+
+    # AND a known response from invoking an inline prompt
+    expected_output: list[PromptOutput] = [StringVellumValue(value="Hello, world!")]
+
+    def generate_prompt_event(*args: Any, **kwargs: Any) -> ExecutePromptEvent:
+        execution_id = str(uuid4())
+        return FulfilledExecutePromptEvent(
+            execution_id=execution_id,
+            outputs=expected_output,
+        )
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.side_effect = generate_prompt_event
+
+    # WHEN the node is run
+    node = MyInlinePromptNode()
+    outputs = [o for o in node.run()]
+
+    # THEN the node should have produced the outputs we expect
+    result_output = outputs[0]
+    assert result_output.name == "results"
+    assert result_output.value == expected_output
+
+    # AND we should have made the expected call to Vellum search
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.assert_called_once_with(
+        blocks=[],
+        expand_meta=Ellipsis,
+        functions=None,
+        input_values=[],
+        input_variables=[],
+        ml_model="gpt-4o",
+        parameters=PromptParameters(
+            stop=[],
+            temperature=0.0,
+            max_tokens=4096,
+            top_p=1.0,
+            top_k=0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            logit_bias=None,
+            custom_parameters={},
+        ),
+        request_options=mock.ANY,
+        settings=None,
+    )
+
+
+def test_inline_prompt_node__json_output_with_streaming_disabled(vellum_adhoc_prompt_client):
+    # GIVEN an InlinePromptNode
+    class Inputs(BaseInputs):
+        input: str
+
+    class State(BaseState):
+        pass
+
+    class MyInlinePromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+        parameters = PromptParameters(
+            stop=[],
+            temperature=0.0,
+            max_tokens=4096,
+            top_p=1.0,
+            top_k=0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            logit_bias=None,
+            custom_parameters={
+                "json_mode": False,
+                "json_schema": {
+                    "name": "get_result",
+                    "schema": {
+                        "type": "object",
+                        "required": ["result"],
+                        "properties": {"result": {"type": "string", "description": ""}},
+                    },
+                },
+            },
+        )
+        run_with_stream = False
+
+    # AND a known JSON response from invoking an inline prompt
+    expected_json = {"result": "Hello, world!"}
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value=json.dumps(expected_json)),
+    ]
+
+    def generate_prompt_event(*args: Any, **kwargs: Any) -> ExecutePromptEvent:
+        execution_id = str(uuid4())
+        return FulfilledExecutePromptEvent(
+            execution_id=execution_id,
+            outputs=expected_outputs,
+        )
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.side_effect = generate_prompt_event
+
+    # WHEN the node is run
+    node = MyInlinePromptNode(
+        state=State(
+            meta=StateMeta(workflow_inputs=Inputs(input="Generate JSON.")),
+        )
+    )
+    outputs = [o for o in node.run()]
+
+    # THEN the node should have produced the outputs we expect
+    results_output = outputs[0]
+    assert results_output.name == "results"
+    assert results_output.value == expected_outputs
+
+    text_output = outputs[1]
+    assert text_output.name == "text"
+    assert text_output.value == '{"result": "Hello, world!"}'
+
+    json_output = outputs[2]
+    assert json_output.name == "json"
+    assert json_output.value == expected_json
+
+    # AND we should have made the expected call to Vellum search
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.assert_called_once_with(
+        blocks=[],
+        expand_meta=Ellipsis,
+        functions=None,
+        input_values=[],
+        input_variables=[],
+        ml_model="gpt-4o",
+        parameters=PromptParameters(
+            stop=[],
+            temperature=0.0,
+            max_tokens=4096,
+            top_p=1.0,
+            top_k=0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            logit_bias=None,
+            custom_parameters={
+                "json_mode": False,
+                "json_schema": {
+                    "name": "get_result",
+                    "schema": {
+                        "type": "object",
+                        "required": ["result"],
+                        "properties": {"result": {"type": "string", "description": ""}},
+                    },
+                },
+            },
+        ),
+        request_options=mock.ANY,
+        settings=None,
+    )
