@@ -89,7 +89,6 @@ Summarize the following text:
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -283,7 +282,6 @@ Summarize the following text:
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -355,7 +353,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -507,7 +504,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -578,7 +574,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -728,7 +723,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -799,7 +793,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -949,7 +942,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -1020,7 +1012,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -1170,12 +1161,11 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
 exports[`InlinePromptNode > basic with stream setting false > getNodeFile 1`] = `
-"from vellum import JinjaPromptBlock, PromptParameters
+"from vellum import JinjaPromptBlock, PromptParameters, PromptSettings
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
 from ..inputs import Inputs
@@ -1200,7 +1190,7 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = False
+    settings = PromptSettings(stream_enabled=False)
 "
 `;
 
@@ -1233,7 +1223,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;
 
@@ -1268,7 +1257,6 @@ class PromptNode(InlinePromptNode):
             "foo": "bar",
         },
     )
-    run_with_stream = True
 "
 `;
 
@@ -1342,6 +1330,5 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    run_with_stream = True
 "
 `;

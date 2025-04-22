@@ -516,9 +516,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
           blocks: [block],
           version: 1,
         },
-        settings: settings ?? {
-          streamEnabled: true,
-        },
+        settings: settings,
       },
       mlModelName: "gpt-4o-mini",
     },

@@ -1,7 +1,8 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { isNil } from "lodash";
 
-import { OUTPUTS_CLASS_NAME } from "src/constants";
+import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
 import { NodeAttributeGenerationError } from "src/generators/errors";
@@ -16,6 +17,7 @@ import {
   InlinePromptNodeData,
   PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
+import { isNilOrEmpty } from "src/utils/typing";
 
 const INPUTS_PREFIX = "prompt_inputs";
 
@@ -143,14 +145,40 @@ export class InlinePromptNode extends BaseSingleFileNode<
     );
 
     if (this.nodeData.data.execConfig.settings) {
-      statements.push(
-        python.field({
-          name: "run_with_stream",
-          initializer: python.TypeInstantiation.bool(
-            this.nodeData.data.execConfig.settings.streamEnabled ?? true
-          ),
-        })
-      );
+      const timeout = this.nodeData.data.execConfig.settings.timeout;
+      const streamEnabled =
+        this.nodeData.data.execConfig.settings.streamEnabled;
+      const args = [];
+      if (!isNil(timeout)) {
+        args.push(
+          python.methodArgument({
+            name: "timeout",
+            value: python.TypeInstantiation.float(timeout),
+          })
+        );
+      }
+      if (!isNil(streamEnabled)) {
+        args.push(
+          python.methodArgument({
+            name: "stream_enabled",
+            value: python.TypeInstantiation.bool(streamEnabled),
+          })
+        );
+      }
+      if (!isNilOrEmpty(args)) {
+        statements.push(
+          python.field({
+            name: "settings",
+            initializer: python.instantiateClass({
+              classReference: python.reference({
+                name: "PromptSettings",
+                modulePath: [...VELLUM_CLIENT_MODULE_PATH],
+              }),
+              arguments_: args,
+            }),
+          })
+        );
+      }
     }
 
     return statements;
