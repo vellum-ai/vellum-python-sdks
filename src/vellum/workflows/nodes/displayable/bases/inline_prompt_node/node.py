@@ -106,21 +106,18 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         if not self.run_with_stream:
             # This endpoint is returning a single event, so we need to wrap it in a generator
             # to match the existing interface.
-            def single_prompt_event_generator():
-                response = self._context.vellum_client.ad_hoc.adhoc_execute_prompt(
-                    ml_model=self.ml_model,
-                    input_values=input_values,
-                    input_variables=input_variables,
-                    parameters=self.parameters,
-                    blocks=self.blocks,
-                    settings=self.settings,
-                    functions=normalized_functions,
-                    expand_meta=self.expand_meta,
-                    request_options=request_options,
-                )
-                yield response
-
-            return single_prompt_event_generator()
+            response = self._context.vellum_client.ad_hoc.adhoc_execute_prompt(
+                ml_model=self.ml_model,
+                input_values=input_values,
+                input_variables=input_variables,
+                parameters=self.parameters,
+                blocks=self.blocks,
+                settings=self.settings,
+                functions=normalized_functions,
+                expand_meta=self.expand_meta,
+                request_options=request_options,
+            )
+            return iter([response])
         else:
             return self._context.vellum_client.ad_hoc.adhoc_execute_prompt_stream(
                 ml_model=self.ml_model,
