@@ -50,9 +50,9 @@ class DeploymentRead(UniversalBaseModel):
     A human-readable description of the deployment
     """
 
-    active_model_version_ids: typing.List[str] = pydantic.Field()
+    active_model_version_ids: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Deprecated. The Prompt execution endpoints return a `prompt_version_id` that could be used instead.
+    Deprecated. This now always returns a null value.
     """
 
     last_deployed_history_item_id: str = pydantic.Field()

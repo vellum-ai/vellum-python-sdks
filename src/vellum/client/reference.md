@@ -4270,6 +4270,113 @@ client.prompts.pull(
 </dl>
 </details>
 
+<details><summary><code>client.prompts.<a href="src/vellum/resources/prompts/client.py">push</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Used to push updates to a Prompt in Vellum.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import (
+    JinjaPromptBlock,
+    PromptExecConfig,
+    PromptParameters,
+    Vellum,
+    VellumVariable,
+)
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.push(
+    exec_config=PromptExecConfig(
+        ml_model="ml_model",
+        input_variables=[
+            VellumVariable(
+                id="id",
+                key="key",
+                type="STRING",
+            )
+        ],
+        parameters=PromptParameters(),
+        blocks=[
+            JinjaPromptBlock(
+                template="template",
+            )
+        ],
+    ),
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**exec_config:** `PromptExecConfig` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_variant_id:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_sandbox_id:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Sandboxes
 <details><summary><code>client.sandboxes.<a href="src/vellum/resources/sandboxes/client.py">deploy_prompt</a>(...)</code></summary>
 <dl>
