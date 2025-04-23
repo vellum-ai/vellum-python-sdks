@@ -177,14 +177,14 @@ describe("Workflow", () => {
         label: "Templating Node",
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
-      });
+      }).build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: "7e09927b-6d6f-4829-92c9-54e66bdcaf81",
         label: "Templating Node",
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb99",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2949",
-      });
+      }).build();
 
       const edges: WorkflowEdge[] = [
         {
@@ -245,7 +245,7 @@ describe("Workflow", () => {
         label: "Templating Node",
         sourceHandleId: "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
         targetHandleId: "3feb7e71-ec63-4d58-82ba-c3df829a2948",
-      });
+      }).build();
 
       const edges: WorkflowEdge[] = [
         {
@@ -298,7 +298,7 @@ describe("Workflow", () => {
 
       const topNode = templatingNodeFactory({
         label: "Top Node",
-      });
+      }).build();
 
       const edges = edgesFactory([
         [entrypointNode, startNode],

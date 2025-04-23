@@ -41,6 +41,7 @@ import {
   VellumLogicalConditionGroup,
   WorkflowDataNode,
   WorkflowNodeType,
+  WorkflowValueDescriptor,
 } from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
@@ -481,7 +482,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
   outputs?: NodeOutput[];
   attributes?: NodeAttribute[];
   settings?: PromptSettings;
-}): PromptNode {
+}): NodeDataFactoryBuilder<PromptNode> {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
     id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
@@ -542,7 +543,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
     outputs,
     attributes,
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<PromptNode>(nodeData);
 }
 
 export function inlinePromptNodeDataLegacyVariantFactory({
@@ -684,7 +685,7 @@ export function templatingNodeFactory({
   inputs?: NodeInput[];
   template?: ConstantValuePointer;
   nodePorts?: NodePort[];
-} = {}): TemplatingNode {
+} = {}): NodeDataFactoryBuilder<TemplatingNode> {
   const defaultTemplate: ConstantValuePointer = {
     type: "CONSTANT_VALUE",
     data: {
@@ -725,7 +726,7 @@ export function templatingNodeFactory({
     inputs: nodeInputs,
     ports: nodePorts,
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<TemplatingNode>(nodeData);
 }
 
 export function subworkflowDeploymentNodeDataFactory(): SubworkflowNode {
@@ -767,7 +768,7 @@ export function conditionalNodeWithNullOperatorFactory({
 }: {
   nodeOutputReference: NodeOutputData;
   id?: string;
-}): ConditionalNode {
+}): NodeDataFactoryBuilder<ConditionalNode> {
   const nodeData: ConditionalNode = {
     id: id ?? "b81a4453-7b80-41ea-bd55-c62df8878fd3",
     type: WorkflowNodeType.CONDITIONAL,
@@ -840,7 +841,7 @@ export function conditionalNodeWithNullOperatorFactory({
       },
     },
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<ConditionalNode>(nodeData);
 }
 
 export function conditionalNodeFactory({
@@ -1473,6 +1474,149 @@ export function nodePortsFactory(ports?: Partial<NodePort>[]): NodePort[] {
   );
 }
 
+export function nodeAttributeFactory(
+  attribute: Partial<NodeAttribute> = {}
+): NodeAttribute {
+  return {
+    id: attribute.id ?? uuidv4(),
+    name: attribute.name ?? "default_attribute",
+    value: attribute.value,
+  };
+}
+
+export function adornmentNodeFactory(
+  adornment: Partial<AdornmentNode> = {}
+): AdornmentNode {
+  // Default to TryNode if no base is provided
+  const defaultBase = {
+    name: "TryNode",
+    module: ["vellum", "workflows", "nodes", "core", "try_node", "node"],
+  };
+
+  return {
+    id: adornment.id ?? uuidv4(),
+    label:
+      adornment.label ??
+      (adornment.base?.name === "RetryNode" ? "Retry" : "Try"),
+    base: adornment.base ?? defaultBase,
+    attributes: adornment.attributes ?? [],
+  };
+}
+
+export function tryAdornmentFactory({
+  errorCode,
+  id,
+}: {
+  errorCode?: string;
+  id?: string;
+} = {}): AdornmentNode {
+  const attributes: NodeAttribute[] = [];
+
+  if (errorCode) {
+    attributes.push(
+      nodeAttributeFactory({
+        name: "on_error_code",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "STRING",
+            value: errorCode,
+          },
+        } as WorkflowValueDescriptor,
+      })
+    );
+  }
+
+  return adornmentNodeFactory({
+    id,
+    label: "Try",
+    base: {
+      name: "TryNode",
+      module: ["vellum", "workflows", "nodes", "core", "try_node", "node"],
+    },
+    attributes,
+  });
+}
+
+export function retryAdornmentFactory({
+  errorCode,
+  maxAttempts,
+  delay,
+  id,
+}: {
+  errorCode?: string;
+  maxAttempts?: number;
+  delay?: number;
+  id?: string;
+} = {}): AdornmentNode {
+  const attributes: NodeAttribute[] = [];
+
+  if (errorCode) {
+    attributes.push(
+      nodeAttributeFactory({
+        name: "retry_on_error_code",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "STRING",
+            value: errorCode,
+          },
+        } as WorkflowValueDescriptor,
+      })
+    );
+  }
+
+  if (maxAttempts) {
+    attributes.push(
+      nodeAttributeFactory({
+        name: "max_attempts",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "NUMBER",
+            value: maxAttempts,
+          },
+        } as WorkflowValueDescriptor,
+      })
+    );
+  }
+
+  if (delay) {
+    attributes.push(
+      nodeAttributeFactory({
+        name: "delay",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "NUMBER",
+            value: delay,
+          },
+        } as WorkflowValueDescriptor,
+      })
+    );
+  }
+
+  return adornmentNodeFactory({
+    id,
+    label: "Retry",
+    base: {
+      name: "RetryNode",
+      module: ["vellum", "workflows", "nodes", "core", "retry_node", "node"],
+    },
+    attributes,
+  });
+}
+
+export function adornmentNodesFactory(
+  adornments?: Partial<AdornmentNode>[]
+): AdornmentNode[] {
+  return (
+    adornments?.map((adornment) => adornmentNodeFactory(adornment)) ?? [
+      tryAdornmentFactory(),
+    ]
+  );
+}
+
 export function genericNodeFactory({
   id,
   label: _label,
@@ -1628,7 +1772,7 @@ export function mapNodeDataFactory({
   outputVariables,
 }: { outputVariables?: VellumVariable[] } = {}): MapNode {
   const entrypoint = entrypointNodeDataFactory();
-  const templatingNode = templatingNodeFactory();
+  const templatingNode = templatingNodeFactory().nodeData;
   return {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "MAP",
@@ -1694,19 +1838,17 @@ export function mapNodeDataFactory({
 export function inlineSubworkflowNodeDataFactory({
   label,
   nodes,
-  adornments,
 }: {
   label?: string;
   nodes?: Array<WorkflowDataNode>;
-  adornments?: AdornmentNode[];
-} = {}): SubworkflowNode {
+} = {}): NodeDataFactoryBuilder<SubworkflowNode> {
   const entrypoint = entrypointNodeDataFactory();
-  const templatingNode = templatingNodeFactory();
+  const templatingNode = templatingNodeFactory().nodeData;
   const outputVariableId = "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb";
 
   const workflowNodes = [entrypoint, ...(nodes ?? [templatingNode])];
 
-  return {
+  const nodeData: SubworkflowNode = {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "SUBWORKFLOW",
     data: {
@@ -1738,6 +1880,6 @@ export function inlineSubworkflowNodeDataFactory({
       targetHandleId: "3fe4b4a6-5ed2-4307-ac1c-02389337c4f2",
     },
     inputs: [],
-    ...(adornments && { adornments }),
   };
+  return new NodeDataFactoryBuilder<SubworkflowNode>(nodeData);
 }

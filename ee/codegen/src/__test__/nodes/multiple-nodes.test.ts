@@ -49,7 +49,7 @@ describe("InlinePromptNode referenced by Conditional Node", () => {
     const promptNode = inlinePromptNodeDataInlineVariantFactory({
       blockType: "JINJA",
       errorOutputId: errorOutputId,
-    });
+    }).build();
 
     await createNodeContext({
       workflowContext,
@@ -207,7 +207,7 @@ describe("InlinePromptNode referenced by Templating Node", () => {
 
     const promptNode = inlinePromptNodeDataInlineVariantFactory({
       blockType: "JINJA",
-    });
+    }).build();
 
     (await createNodeContext({
       workflowContext,
@@ -252,7 +252,7 @@ describe("InlinePromptNode referenced by Templating Node", () => {
           },
         },
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,
@@ -333,7 +333,7 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
 
     const promptNode = inlinePromptNodeDataInlineVariantFactory({
       blockType: "JINJA",
-    });
+    }).build();
 
     await createNodeContext({
       workflowContext,
@@ -394,7 +394,7 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
           },
         },
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,
@@ -446,7 +446,7 @@ describe("InlinePromptNode json output referenced by TemplatingNode", () => {
     ];
     const promptNode = inlinePromptNodeDataInlineVariantFactory({
       outputs: nodeOutputs,
-    });
+    }).build();
 
     (await createNodeContext({
       workflowContext,
@@ -478,7 +478,7 @@ describe("InlinePromptNode json output referenced by TemplatingNode", () => {
           },
         }),
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,
@@ -585,7 +585,7 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
           },
         }),
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,

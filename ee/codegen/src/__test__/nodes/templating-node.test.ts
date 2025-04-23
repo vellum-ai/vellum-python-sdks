@@ -41,7 +41,7 @@ describe("TemplatingNode", () => {
 
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = templatingNodeFactory();
+      const nodeData = templatingNodeFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -69,7 +69,7 @@ describe("TemplatingNode", () => {
     beforeEach(async () => {
       const nodeData = templatingNodeFactory({
         outputType: VellumVariableType.Json,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -100,7 +100,7 @@ describe("TemplatingNode", () => {
     beforeEach(async () => {
       templatingNodeData = templatingNodeFactory({
         errorOutputId,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -162,7 +162,7 @@ describe("TemplatingNode", () => {
             },
           },
         ],
-      });
+      }).build();
 
       const nextTemplatingNodeContext = (await createNodeContext({
         workflowContext,
@@ -226,7 +226,7 @@ describe("TemplatingNode", () => {
             },
           },
         ],
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -275,7 +275,7 @@ describe("TemplatingNode", () => {
       const nodeData = templatingNodeFactory({
         sourceHandleId: sourceHandleId,
         nodePorts: nodePortsData,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,

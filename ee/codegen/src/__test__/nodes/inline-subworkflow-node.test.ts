@@ -1,18 +1,19 @@
 import { mkdir, readFile, rm } from "fs/promises";
 import { join } from "path";
 
-import { v4 as uuidv4 } from "uuid";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import {
   inlineSubworkflowNodeDataFactory,
+  retryAdornmentFactory,
   templatingNodeFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext } from "src/context";
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
 import { InlineSubworkflowNode } from "src/generators/nodes/inline-subworkflow-node";
+import { AdornmentNode } from "src/types/vellum";
 
 describe("InlineSubworkflowNode", () => {
   let tempDir: string;
@@ -32,7 +33,7 @@ describe("InlineSubworkflowNode", () => {
         absolutePathToOutputDirectory: tempDir,
         moduleName: "code",
       });
-      const nodeData = inlineSubworkflowNodeDataFactory();
+      const nodeData = inlineSubworkflowNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -87,8 +88,8 @@ describe("InlineSubworkflowNode", () => {
       });
       const nodeData = inlineSubworkflowNodeDataFactory({
         label: "My node",
-        nodes: [templatingNodeFactory({ label: "My node" })],
-      });
+        nodes: [templatingNodeFactory({ label: "My node" }).build()],
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -147,51 +148,20 @@ describe("InlineSubworkflowNode", () => {
         absolutePathToOutputDirectory: tempDir,
         moduleName: "code",
       });
+      const adornments: AdornmentNode[] = [
+        retryAdornmentFactory({
+          id: "ae49ef72-6ad7-441a-a20d-76c71ad851ef",
+          maxAttempts: 3,
+          delay: 2,
+        }),
+      ];
+
       const nodeData = inlineSubworkflowNodeDataFactory({
         label: "My node",
-        nodes: [templatingNodeFactory({ label: "My node" })],
-        adornments: [
-          {
-            id: "ae49ef72-6ad7-441a-a20d-76c71ad851ef",
-            label: "RetryNodeLabel",
-            base: {
-              name: "RetryNode",
-              module: [
-                "vellum",
-                "workflows",
-                "nodes",
-                "core",
-                "retry_node",
-                "node",
-              ],
-            },
-            attributes: [
-              {
-                id: uuidv4(),
-                name: "max_attempts",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 3,
-                  },
-                },
-              },
-              {
-                id: uuidv4(),
-                name: "delay",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 2,
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      });
+        nodes: [templatingNodeFactory({ label: "My node" }).build()],
+      })
+        .withAdornments(adornments)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,

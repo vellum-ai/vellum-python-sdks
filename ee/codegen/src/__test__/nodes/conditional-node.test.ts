@@ -199,13 +199,13 @@ describe("ConditionalNode with null operator", () => {
     workflowContext = workflowContextFactory();
     writer = new Writer();
 
-    const templatingNode = templatingNodeFactory();
+    const templatingNode = templatingNodeFactory().build();
     const nodeData = conditionalNodeWithNullOperatorFactory({
       nodeOutputReference: {
         nodeId: templatingNode.id,
         outputId: templatingNode.data.outputId,
       },
-    });
+    }).build();
 
     workflowContext.addInputVariableContext(
       inputVariableContextFactory({

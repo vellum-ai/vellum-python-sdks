@@ -4,10 +4,14 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import { inlinePromptNodeDataInlineVariantFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  inlinePromptNodeDataInlineVariantFactory,
+  retryAdornmentFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
+import { AdornmentNode } from "src/types/vellum";
 
 describe("InlinePromptRetryNode", () => {
   let workflowContext: WorkflowContext;
@@ -64,7 +68,7 @@ describe("InlinePromptRetryNode", () => {
             ],
           },
         ],
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -133,7 +137,7 @@ describe("InlinePromptRetryNode", () => {
             ],
           },
         ],
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -161,52 +165,21 @@ describe("InlinePromptRetryNode", () => {
     let node: InlinePromptNode;
     const ERROR_OUTPUT_ID = "e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f";
 
+    const adornments: AdornmentNode[] = [
+      retryAdornmentFactory({
+        id: "e5de8d57-ae0d-4a4a-afb3-eb4cd6bdb0ac",
+        maxAttempts: 3,
+        delay: 2,
+      }),
+    ];
+
     beforeEach(async () => {
       const nodeData = inlinePromptNodeDataInlineVariantFactory({
         blockType: "JINJA",
         errorOutputId: ERROR_OUTPUT_ID,
-        adornments: [
-          {
-            id: "e5de8d57-ae0d-4a4a-afb3-eb4cd6bdb0ac",
-            label: "RetryNodeLabel",
-            base: {
-              name: "RetryNode",
-              module: [
-                "vellum",
-                "workflows",
-                "nodes",
-                "core",
-                "retry_node",
-                "node",
-              ],
-            },
-            attributes: [
-              {
-                id: uuidv4(),
-                name: "max_attempts",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 3,
-                  },
-                },
-              },
-              {
-                id: uuidv4(),
-                name: "delay",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 2,
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      });
+      })
+        .withAdornments(adornments)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,

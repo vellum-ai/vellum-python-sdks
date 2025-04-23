@@ -3,7 +3,7 @@ import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
-import { PORTS_CLASS_NAME } from "src/constants";
+import { PORTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import {
@@ -15,10 +15,10 @@ import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
 import { NODE_DEFAULT_ATTRIBUTES } from "src/generators/nodes/constants";
 import { UuidOrString } from "src/generators/uuid-or-string";
-import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import {
   AdornmentNode,
+  ConstantValueWorkflowReference,
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
@@ -355,11 +355,19 @@ export abstract class BaseNode<
     return [];
   }
 
+  private hasTryAdornment(adornments: AdornmentNode[]): boolean {
+    return (
+      adornments.find((adornment) => adornment.base.name === "TryNode") !==
+      undefined
+    );
+  }
+
   protected getNodeDecorators(): python.Decorator[] | undefined {
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
+    const adornments = this.getAdornments();
 
-    if (errorOutputId) {
+    if (errorOutputId && !this.hasTryAdornment(adornments)) {
       decorators.push(
         python.decorator({
           callable: python.invokeMethod({
@@ -375,14 +383,7 @@ export abstract class BaseNode<
       );
     }
 
-    const adornments = this.getAdornments();
-
     for (const adornment of adornments) {
-      // TODO: remove this check when we remove errorOutputId
-      if (errorOutputId && adornment.base.name === "TryNode") {
-        continue;
-      }
-
       // Filter out attributes that match their default values
       const filteredAttributes = adornment.attributes.filter((attr) =>
         this.filterAttribute(adornment.base.name, attr.name, attr.value)
@@ -397,17 +398,54 @@ export abstract class BaseNode<
                 attribute: ["wrap"],
                 modulePath: adornment.base.module,
               }),
-              arguments_: filteredAttributes.map((attr) =>
-                python.methodArgument({
-                  name: attr.name,
-                  value: new WorkflowValueDescriptor({
-                    workflowValueDescriptor: attr.value,
-                    nodeContext: this.nodeContext,
-                    workflowContext: this.workflowContext,
-                    iterableConfig: { endWithComma: false },
-                  }),
+              arguments_: filteredAttributes
+                .map((attr) => {
+                  if (attr.value) {
+                    const constantValue =
+                      attr.value as ConstantValueWorkflowReference;
+                    // This is for error codes on try and retry args
+                    if (
+                      constantValue.type === "CONSTANT_VALUE" &&
+                      constantValue.value &&
+                      constantValue.value.type === "STRING" &&
+                      constantValue.value.value !== undefined
+                    ) {
+                      return python.methodArgument({
+                        name: attr.name,
+                        value: python.accessAttribute({
+                          lhs: python.reference({
+                            name: "WorkflowErrorCode",
+                            modulePath: [
+                              ...VELLUM_CLIENT_MODULE_PATH,
+                              "workflows",
+                              "errors",
+                              "types",
+                            ],
+                          }),
+                          rhs: python.reference({
+                            name: constantValue.value.value,
+                            modulePath: [],
+                          }),
+                        }),
+                      });
+                    } else if (
+                      constantValue.type === "CONSTANT_VALUE" &&
+                      constantValue.value &&
+                      constantValue.value.type === "NUMBER" &&
+                      constantValue.value.value !== undefined
+                    ) {
+                      const numValue = constantValue.value.value;
+                      return python.methodArgument({
+                        name: attr.name,
+                        value: Number.isInteger(numValue)
+                          ? python.TypeInstantiation.int(numValue)
+                          : python.TypeInstantiation.float(numValue),
+                      });
+                    }
+                  }
+                  return undefined;
                 })
-              ),
+                .filter((arg) => arg !== undefined),
             }),
           })
         );
@@ -485,8 +523,9 @@ export abstract class BaseNode<
     const nodeContext = this.nodeContext;
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
+    const adornments = this.getAdornments();
 
-    if (errorOutputId) {
+    if (errorOutputId && !this.hasTryAdornment(adornments)) {
       decorators.push(
         python.decorator({
           callable: python.invokeMethod({
@@ -514,15 +553,23 @@ export abstract class BaseNode<
         })
       );
     }
-    const adornments = this.getAdornments();
 
     for (const adornment of adornments) {
-      // TODO: remove this check when we remove errorOutputId
-      if (errorOutputId && adornment.base.name === "TryNode") {
-        continue;
-      }
-
       if (adornment.base) {
+        const args = [
+          new MethodArgument({
+            name: "node_id",
+            value: python.TypeInstantiation.uuid(adornment.id),
+          }),
+        ];
+        if (adornment.base.name === "TryNode" && errorOutputId) {
+          args.push(
+            new MethodArgument({
+              name: "error_output_id",
+              value: python.TypeInstantiation.uuid(errorOutputId),
+            })
+          );
+        }
         decorators.push(
           python.decorator({
             callable: python.invokeMethod({
@@ -535,12 +582,7 @@ export abstract class BaseNode<
               }),
               // TODO: When we define output transformations, that's what we'd use here. eg, `error_output_id`.
               // https://linear.app/vellum/issue/APO-213/define-output-transformations-for-node-adornments
-              arguments_: [
-                new MethodArgument({
-                  name: "node_id",
-                  value: python.TypeInstantiation.uuid(adornment.id),
-                }),
-              ],
+              arguments_: args,
             }),
           })
         );

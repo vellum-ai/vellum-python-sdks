@@ -1,0 +1,57 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Adorned Node > Retry adornment no error code > getNodeFile 1`] = `
+"from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+@RetryNode.wrap()
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {}
+"
+`;
+
+exports[`Adorned Node > retry adornment with error code and max attempts and delay > getNodeFile 1`] = `
+"from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+@RetryNode.wrap(
+    retry_on_error_code=WorkflowErrorCode.INVALID_CODE, max_attempts=5, delay=2.5
+)
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {}
+"
+`;
+
+exports[`Adorned Node > try adornment no error code > getNodeFile 1`] = `
+"from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+@TryNode.wrap()
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {}
+"
+`;
+
+exports[`Adorned Node > try adornment with error code > getNodeFile 1`] = `
+"from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+@TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_CODE)
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {}
+"
+`;

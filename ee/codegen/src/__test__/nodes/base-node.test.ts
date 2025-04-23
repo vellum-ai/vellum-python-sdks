@@ -55,7 +55,7 @@ describe("BaseNode", () => {
             },
           },
         ],
-      });
+      }).build();
       const templatingNodeContext = (await createNodeContext({
         workflowContext,
         nodeData: templatingNodeData,
@@ -77,7 +77,7 @@ describe("BaseNode", () => {
     it("should throw the expected error when a input references an invalid output", async () => {
       const workflowContext = workflowContextFactory();
 
-      const templatingNodeData = templatingNodeFactory();
+      const templatingNodeData = templatingNodeFactory().build();
       await createNodeContext({
         workflowContext,
         nodeData: templatingNodeData,
@@ -122,7 +122,7 @@ describe("BaseNode", () => {
             },
           },
         ],
-      });
+      }).build();
       const templatingNode2Context = (await createNodeContext({
         workflowContext,
         nodeData: templatingNode2Data,

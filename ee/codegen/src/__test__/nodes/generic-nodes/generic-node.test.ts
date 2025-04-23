@@ -93,7 +93,7 @@ describe("GenericNode", () => {
     beforeEach(async () => {
       const referencedNode = inlinePromptNodeDataInlineVariantFactory({
         blockType: "JINJA",
-      });
+      }).build();
 
       await createNodeContext({
         workflowContext,
