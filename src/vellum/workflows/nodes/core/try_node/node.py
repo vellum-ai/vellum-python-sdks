@@ -1,4 +1,4 @@
-from typing import Callable, Generic, Iterator, Optional, Set, Type
+from typing import Callable, Generic, Iterator, Optional, Set, Type, Union
 
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
@@ -22,7 +22,7 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     """
 
     # TODO: We could remove str after we support generating enum values.
-    on_error_code: Optional[WorkflowErrorCode | str] = None
+    on_error_code: Optional[Union[WorkflowErrorCode, str]] = None
 
     class Outputs(BaseAdornmentNode.Outputs):
         error: Optional[WorkflowError] = None
