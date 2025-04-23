@@ -1,4 +1,4 @@
-from typing import Callable, Generic, Iterator, Optional, Set, Type
+from typing import Callable, Generic, Iterator, Optional, Set, Type, Union
 
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
@@ -21,7 +21,8 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
-    on_error_code: Optional[WorkflowErrorCode] = None
+    # TODO: We could remove str after we support generating enum values.
+    on_error_code: Optional[Union[WorkflowErrorCode, str]] = None
 
     class Outputs(BaseAdornmentNode.Outputs):
         error: Optional[WorkflowError] = None
@@ -65,7 +66,9 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
                     message="Subworkflow unexpectedly paused within Try Node",
                 )
             elif event.name == "workflow.execution.rejected":
-                if self.on_error_code and self.on_error_code != event.error.code:
+                # TODO: We should remove this once we support generating enum values.
+                event_error_code = event.error.code.value if isinstance(self.on_error_code, str) else event.error.code
+                if self.on_error_code and self.on_error_code != event_error_code:
                     exception = NodeException(
                         code=WorkflowErrorCode.INVALID_OUTPUTS,
                         message=f"""Unexpected rejection: {event.error.code.value}.
