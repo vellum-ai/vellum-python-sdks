@@ -824,7 +824,7 @@ export const NodeAttributeSerializer: ObjectSchema<
 > = objectSchema({
   id: stringSchema(),
   name: stringSchema(),
-  value: WorkflowValueDescriptorSerializer.optional(),
+  value: WorkflowValueDescriptorSerializer.optional().nullable(),
 });
 
 export declare namespace NodeAttributeSerializer {

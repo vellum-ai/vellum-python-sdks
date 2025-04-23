@@ -1686,6 +1686,150 @@ baz = foo + bar
       expectProjectFileToExist(project, ["display", "nodes", "prompt.py"]);
       expectProjectFileToMatchSnapshot(project, ["nodes", "prompt.py"]);
     });
+
+    it("should correctly generate default code for adornments", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "dacda579-09e1-4244-8c2c-e024d24814af",
+              type: "DEFAULT",
+              source_node_id: "8f677851-0c8b-4ea2-9b44-71a48afe1b29",
+              target_node_id: "46b280af-49aa-4bfc-b377-2ba80136f090",
+              source_handle_id: "6a80add9-a37d-4280-bcc4-425c6e95b997",
+              target_handle_id: "b22d4b55-41ac-4898-9374-8d2c4dd7e58e",
+            },
+            {
+              id: "cd4ac61a-a326-44e2-bd60-737fcbfa9963",
+              type: "DEFAULT",
+              source_node_id: "46b280af-49aa-4bfc-b377-2ba80136f090",
+              target_node_id: "a8c692de-383e-4184-9a83-9efb924cc45d",
+              source_handle_id: "7556f35c-674d-45e3-9f88-74899bc03ea1",
+              target_handle_id: "e251f19c-1ec7-453b-8d0f-419b7aae64fc",
+            },
+          ],
+          nodes: [
+            {
+              id: "46b280af-49aa-4bfc-b377-2ba80136f090",
+              base: null,
+              data: {
+                label: "Prompt",
+                variant: "INLINE",
+                output_id: "959e7566-1e49-438d-9cd6-a2564b5e931b",
+                exec_config: {
+                  settings: null,
+                  parameters: {},
+                  input_variables: [],
+                  prompt_template_block_data: {
+                    blocks: [],
+                    version: 1,
+                  },
+                },
+                ml_model_name: "gpt-4o-mini",
+                array_output_id: "7cffec7b-d1bc-432f-ac2a-f7ace819bf5f",
+                error_output_id: "c204055c-fc9f-4fb5-9c58-babada7b0d89",
+                source_handle_id: "7556f35c-674d-45e3-9f88-74899bc03ea1",
+                target_handle_id: "b22d4b55-41ac-4898-9374-8d2c4dd7e58e",
+              },
+              type: "PROMPT",
+              ports: [],
+              inputs: [],
+              outputs: [],
+              trigger: {},
+              adornments: [
+                {
+                  id: "c204055c-fc9f-4fb5-9c58-babada7b0d89",
+                  base: {
+                    name: "TryNode",
+                    module: [
+                      "vellum",
+                      "workflows",
+                      "nodes",
+                      "core",
+                      "try_node",
+                      "node",
+                    ],
+                  },
+                  label: "Try",
+                  attributes: [
+                    {
+                      id: "b1bcf28e-a8d8-4746-9736-f96f7de73c73",
+                      name: "on_error_code",
+                      value: null,
+                    },
+                  ],
+                },
+                {
+                  id: "8792b525-e6cb-4c46-8c7e-1921b3597483",
+                  base: {
+                    name: "RetryNode",
+                    module: [
+                      "vellum",
+                      "workflows",
+                      "nodes",
+                      "core",
+                      "retry_node",
+                      "node",
+                    ],
+                  },
+                  label: "Retry",
+                  attributes: [
+                    {
+                      id: "0e2fb942-c7b1-4123-8ee6-5b24514031b0",
+                      name: "retry_on_error_code",
+                      value: null,
+                    },
+                    {
+                      id: "e242a0a9-bc6d-49fd-951d-3f01a4cc17fd",
+                      name: "max_attempts",
+                      value: {
+                        type: "CONSTANT_VALUE",
+                        value: { type: "NUMBER", value: 1.0 },
+                      },
+                    },
+                    {
+                      id: "38e8eb87-f99f-4cf9-846d-baab5612a65f",
+                      name: "delay",
+                      value: null,
+                    },
+                  ],
+                },
+              ],
+              attributes: [],
+            },
+            {
+              id: "8f677851-0c8b-4ea2-9b44-71a48afe1b29",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "6a80add9-a37d-4280-bcc4-425c6e95b997",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+            },
+          ],
+          output_values: [],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(project, ["nodes", "prompt.py"]);
+      expectProjectFileToExist(project, ["display", "nodes", "prompt.py"]);
+      expectProjectFileToMatchSnapshot(project, ["nodes", "prompt.py"]);
+    });
   });
   describe("combinator normalization", () => {
     it("should normalize AND to OR combinators", async () => {
