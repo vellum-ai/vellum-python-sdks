@@ -8,11 +8,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.experimental.tool_calling_node.utils import (
-    ToolRouterNode,
-    create_function_node,
-    create_tool_router_node,
-)
+from vellum.workflows.nodes.experimental.tool_calling_node.utils import create_function_node, create_tool_router_node
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
@@ -69,7 +65,7 @@ class ToolCallingNode(BaseNode):
                 graph = self._graph
 
                 class Outputs(BaseWorkflow.Outputs):
-                    text: str = ToolRouterNode.Outputs.text
+                    text: str = self.tool_router_node.Outputs.text
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
 
             subworkflow = ToolCallingWorkflow(
@@ -107,6 +103,7 @@ class ToolCallingNode(BaseNode):
         self._function_nodes = {
             function.__name__: create_function_node(
                 function=function,
+                tool_router_node=self.tool_router_node,
             )
             for function in self.functions
         }

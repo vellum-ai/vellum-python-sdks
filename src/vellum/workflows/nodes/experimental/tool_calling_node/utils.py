@@ -59,8 +59,8 @@ def create_tool_router_node(
         function_name = function.__name__
         port_condition = LazyReference(
             lambda: (
-                ToolRouterNode.Outputs.results[0]["type"].equals("FUNCTION_CALL")
-                & ToolRouterNode.Outputs.results[0]["value"]["name"].equals(function_name)
+                node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
+                & node.Outputs.results[0]["value"]["name"].equals(function_name)
             )
         )
         port = Port.on_if(port_condition)
@@ -78,23 +78,26 @@ def create_tool_router_node(
         )
     )
 
-    node = type(
-        "ToolRouterNode",
-        (ToolRouterNode,),
-        {
-            "ml_model": ml_model,
-            "blocks": blocks,
-            "functions": functions,
-            "prompt_inputs": prompt_inputs,
-            "Ports": Ports,
-            "__module__": __name__,
-        },
+    node = cast(
+        Type[ToolRouterNode],
+        type(
+            "ToolRouterNode",
+            (ToolRouterNode,),
+            {
+                "ml_model": ml_model,
+                "blocks": blocks,
+                "functions": functions,
+                "prompt_inputs": prompt_inputs,
+                "Ports": Ports,
+                "__module__": __name__,
+            },
+        ),
     )
 
     return node
 
 
-def create_function_node(function: Callable[..., Any]) -> Type[FunctionNode]:
+def create_function_node(function: Callable[..., Any], tool_router_node: Type[ToolRouterNode]) -> Type[FunctionNode]:
     """
     Create a FunctionNode class for a given function.
 
@@ -103,7 +106,7 @@ def create_function_node(function: Callable[..., Any]) -> Type[FunctionNode]:
 
     # Create a class-level wrapper that calls the original function
     def execute_function(self) -> BaseNode.Outputs:
-        outputs = self.state.meta.node_outputs.get(ToolRouterNode.Outputs.text)
+        outputs = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
         # first parse into json
         outputs = json.loads(outputs)
         arguments = outputs["arguments"]
