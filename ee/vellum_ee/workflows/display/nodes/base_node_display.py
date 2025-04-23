@@ -157,7 +157,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                     {
                         "id": id,
                         "name": attribute.name,
-                        "value": self.serialize_value(display_context, attribute.instance),
+                        "value": (
+                            self.serialize_value(display_context, attribute.instance) if attribute.instance else None
+                        ),
                     }
                 )
             except ValueError as e:

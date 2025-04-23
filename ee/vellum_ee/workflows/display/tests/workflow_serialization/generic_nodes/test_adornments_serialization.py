@@ -76,7 +76,7 @@ def test_serialize_node__retry(serialize_node):
                         {
                             "id": "8a07dc58-3fed-41d4-8ca6-31ee0bb86c61",
                             "name": "delay",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                            "value": None,
                         },
                         {
                             "id": "f388e93b-8c68-4f54-8577-bbd0c9091557",
@@ -86,12 +86,12 @@ def test_serialize_node__retry(serialize_node):
                         {
                             "id": "73a02e62-4535-4e1f-97b5-1264ca8b1d71",
                             "name": "retry_on_condition",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                            "value": None,
                         },
                         {
                             "id": "c91782e3-140f-4938-9c23-d2a7b85dcdd8",
                             "name": "retry_on_error_code",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                            "value": None,
                         },
                     ],
                 }
@@ -183,7 +183,7 @@ def test_serialize_node__try(serialize_node):
                         {
                             "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
                             "name": "on_error_code",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                            "value": None,
                         }
                     ],
                 }
@@ -288,7 +288,7 @@ def test_serialize_node__stacked():
                                     {
                                         "id": "c91782e3-140f-4938-9c23-d2a7b85dcdd8",
                                         "name": "retry_on_error_code",
-                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                        "value": None,
                                     },
                                     {
                                         "id": "f388e93b-8c68-4f54-8577-bbd0c9091557",
@@ -298,12 +298,12 @@ def test_serialize_node__stacked():
                                     {
                                         "id": "8a07dc58-3fed-41d4-8ca6-31ee0bb86c61",
                                         "name": "delay",
-                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                        "value": None,
                                     },
                                     {
                                         "id": "73a02e62-4535-4e1f-97b5-1264ca8b1d71",
                                         "name": "retry_on_condition",
-                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                        "value": None,
                                     },
                                 ],
                             },
@@ -318,7 +318,7 @@ def test_serialize_node__stacked():
                                     {
                                         "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
                                         "name": "on_error_code",
-                                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                        "value": None,
                                     }
                                 ],
                             },

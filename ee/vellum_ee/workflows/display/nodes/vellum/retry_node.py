@@ -33,7 +33,11 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
                 {
                     "id": id,
                     "name": attribute.name,
-                    "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
+                    "value": (
+                        self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance))
+                        if attribute.instance
+                        else None
+                    ),
                 }
             )
 

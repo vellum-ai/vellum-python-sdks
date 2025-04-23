@@ -600,7 +600,7 @@ def test_serialize_workflow__try_wrapped():
                     {
                         "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
                         "name": "on_error_code",
-                        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        "value": None,
                     }
                 ],
             }
