@@ -162,13 +162,7 @@
               {
                 "id": "55821c68-5207-4a5b-8345-e89dee65f71a",
                 "name": "on_error_code",
-                "value": {
-                  "type": "CONSTANT_VALUE",
-                  "value": {
-                    "type": "JSON",
-                    "value": null
-                  }
-                }
+                "value": null
               }
             ]
           }
