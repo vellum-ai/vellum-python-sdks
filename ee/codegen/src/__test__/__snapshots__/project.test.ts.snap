@@ -304,8 +304,8 @@ Summarize the following text: hello today is feb 7 bad weather
 
 exports[`WorkflowProjectGenerator > retry node adornment > should correctly generate default code for adornments 1`] = `
 "from vellum import PromptParameters
-from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
 

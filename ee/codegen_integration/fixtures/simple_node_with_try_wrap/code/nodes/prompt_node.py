@@ -5,7 +5,7 @@ from vellum import (
     RichTextPromptBlock,
     VariablePromptBlock,
 )
-from vellum.workflows.nodes.core import TryNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
 
