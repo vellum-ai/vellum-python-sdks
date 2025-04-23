@@ -816,7 +816,7 @@ export type WorkflowValueDescriptor =
 export interface NodeAttribute {
   id: string;
   name: string;
-  value?: WorkflowValueDescriptor;
+  value?: WorkflowValueDescriptor | null;
 }
 
 export interface AdornmentNode {

@@ -21,7 +21,7 @@ import {
 export namespace WorkflowValueDescriptor {
   export interface Args {
     nodeContext?: BaseNodeContext<WorkflowDataNode>;
-    workflowValueDescriptor?: WorkflowValueDescriptorType;
+    workflowValueDescriptor?: WorkflowValueDescriptorType | null;
     workflowContext: WorkflowContext;
     iterableConfig?: IterableConfig;
   }
@@ -46,7 +46,7 @@ export class WorkflowValueDescriptor extends AstNode {
   }
 
   private generateWorkflowValueDescriptor(
-    workflowValueDescriptor: WorkflowValueDescriptorType | undefined
+    workflowValueDescriptor: WorkflowValueDescriptorType | null | undefined
   ): AstNode {
     if (isNil(workflowValueDescriptor)) {
       return python.TypeInstantiation.none();

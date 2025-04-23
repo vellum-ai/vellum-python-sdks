@@ -640,6 +640,33 @@ export abstract class BaseNode<
       return true; // Include if no config exists for this attribute
     }
 
-    return attrConfig.defaultValue !== attributeValue; // Include if value differs from default
+    const extractedValue = this.extractConstantValue(attributeValue);
+    return attrConfig.defaultValue !== extractedValue; // Include if value differs from default
+  }
+
+  private extractConstantValue(attributeValue: unknown): unknown {
+    if (
+      typeof attributeValue === "object" &&
+      attributeValue !== null &&
+      "type" in attributeValue &&
+      attributeValue.type === "CONSTANT_VALUE" &&
+      "value" in attributeValue
+    ) {
+      const value = attributeValue.value;
+
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        "type" in value &&
+        value.type === "JSON" &&
+        "value" in value
+      ) {
+        return value.value;
+      }
+
+      return value;
+    }
+
+    return attributeValue;
   }
 }
