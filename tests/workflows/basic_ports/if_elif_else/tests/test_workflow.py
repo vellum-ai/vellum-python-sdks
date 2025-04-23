@@ -1,8 +1,8 @@
-from tests.workflows.basic_ports.multiple_if_with_elif.workflow import Inputs, MultipleIfWithElifWorkflow
+from tests.workflows.basic_ports.if_elif_else.workflow import IfElifElseWorkflow, Inputs
 
 
 def test_run_workflow():
-    workflow = MultipleIfWithElifWorkflow()
+    workflow = IfElifElseWorkflow()
     terminal_event = workflow.run(inputs=Inputs(value="foo"))
 
     assert terminal_event.name == "workflow.execution.fulfilled"

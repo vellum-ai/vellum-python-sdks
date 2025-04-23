@@ -24,8 +24,9 @@ class SecondPassthroughNode(BaseNode):
 class MultipleInvokesNode(BaseNode):
     class Ports(NodePorts):
         if_branch: Port = Port.on_if(Inputs.value.begins_with("hi"))
-        another_if_branch: Port = Port.on_if(Inputs.value.ends_with("lol"))
         else_branch: Port = Port.on_else()
+        another_if_branch: Port = Port.on_if(Inputs.value.ends_with("lol"))
+        another_else_branch: Port = Port.on_else()
 
 
 class MultipleInvokesWorkflow(BaseWorkflow[Inputs, BaseState]):

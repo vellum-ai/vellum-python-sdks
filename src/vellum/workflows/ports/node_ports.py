@@ -2,7 +2,7 @@ from typing import Any, Dict, Iterator, Optional, Set, Tuple, Type
 
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
-from vellum.workflows.ports.utils import validate_ports
+from vellum.workflows.ports.utils import get_port_groups, validate_ports
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import ConditionType
 
@@ -54,7 +54,8 @@ class NodePorts(metaclass=_NodePortsMeta):
                 resolved_condition = port.resolve_condition(state)
                 if resolved_condition:
                     invoked_ports.add(port)
-                    break
+                    if len(get_port_groups(all_ports)) <= 1:
+                        break
 
             elif port._condition_type == ConditionType.ELSE and not invoked_ports:
                 invoked_ports.add(port)

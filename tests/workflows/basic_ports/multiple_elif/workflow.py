@@ -11,15 +11,15 @@ class Inputs(BaseInputs):
     value: str
 
 
-class OutOfOrderNode(BaseNode):
+class MultipleElifNode(BaseNode):
     class Ports(NodePorts):
-        else_if_branch: Port = Port.on_elif(Inputs.value.equals("hello"))
+        elif_branch: Port = Port.on_elif(Inputs.value.equals("foo"))
+        another_elif_branch: Port = Port.on_elif(Inputs.value.equals("foo"))
         else_branch: Port = Port.on_else()
-        if_branch: Port = Port.on_if(Inputs.value.equals("world"))
 
 
-class OutOfOrderWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = OutOfOrderNode
+class MultipleElifWorkflow(BaseWorkflow[Inputs, BaseState]):
+    graph = MultipleElifNode
 
     class Outputs(BaseOutputs):
         pass
