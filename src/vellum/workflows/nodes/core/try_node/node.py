@@ -67,8 +67,8 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
             elif event.name == "workflow.execution.rejected":
                 # TODO: This is a hack to support the case where the on_error_code is a string.
                 # We should remove this once we support generating enum values.
-                error_code = event.error.code.value if isinstance(self.on_error_code, str) else event.error.code
-                if self.on_error_code and self.on_error_code != error_code:
+                event_error_code = event.error.code.value if isinstance(self.on_error_code, str) else event.error.code
+                if self.on_error_code and self.on_error_code != event_error_code:
                     exception = NodeException(
                         code=WorkflowErrorCode.INVALID_OUTPUTS,
                         message=f"""Unexpected rejection: {event.error.code.value}.
