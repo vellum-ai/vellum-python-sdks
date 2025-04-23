@@ -11,10 +11,9 @@ PORT_TYPE_PRIORITIES = {
 }
 
 
-def validate_ports(ports: List[Port]) -> bool:
+def get_port_groups(ports: List[Port]) -> List[List[ConditionType]]:
     # We don't want to validate ports with no condition (default ports)
     port_types = [port._condition_type for port in ports if port._condition_type is not None]
-    ports_class = f"{ports[0].node_class}.Ports"
 
     # Check all ports by port groups
     port_groups: List[List[ConditionType]] = []
@@ -39,6 +38,12 @@ def validate_ports(ports: List[Port]) -> bool:
         # If the last group doesn't start with IF, that's an error
         raise ValueError("Port conditions must be in the following order: on_if, on_elif, on_else")
 
+    return port_groups
+
+
+def validate_ports(ports: List[Port]) -> bool:
+    ports_class = f"{ports[0].node_class}.Ports"
+    port_groups = get_port_groups(ports)
     # Validate each port group
     for group in port_groups:
         # Check that each port group is in the correct order
