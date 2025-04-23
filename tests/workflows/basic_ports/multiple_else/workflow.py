@@ -14,6 +14,7 @@ class Inputs(BaseInputs):
 class MultipleElseNode(BaseNode):
     class Ports(NodePorts):
         else_branch: Port = Port.on_else()
+        another_else_branch: Port = Port.on_else()
 
 
 class MultipleElseWorkflow(BaseWorkflow[Inputs, BaseState]):
