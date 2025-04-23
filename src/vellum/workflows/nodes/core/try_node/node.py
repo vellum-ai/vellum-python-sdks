@@ -21,7 +21,8 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
-    on_error_code: Optional[WorkflowErrorCode] = None
+    # TODO: We could remove str after we support generating enum values.
+    on_error_code: Optional[WorkflowErrorCode | str] = None
 
     class Outputs(BaseAdornmentNode.Outputs):
         error: Optional[WorkflowError] = None
@@ -65,8 +66,7 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
                     message="Subworkflow unexpectedly paused within Try Node",
                 )
             elif event.name == "workflow.execution.rejected":
-                # TODO: This is a hack to support the case where the on_error_code is a string.
-                # We should remove this once we support generating enum values.
+                # TODO: We should remove this once we support generating enum values.
                 event_error_code = event.error.code.value if isinstance(self.on_error_code, str) else event.error.code
                 if self.on_error_code and self.on_error_code != event_error_code:
                     exception = NodeException(
