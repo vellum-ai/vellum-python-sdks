@@ -11,15 +11,20 @@ class Inputs(BaseInputs):
     value: str
 
 
+class PassthroughNode(BaseNode):
+    class Outputs(BaseOutputs):
+        value = Inputs.value
+
+
 class MultipleIfWithElifNode(BaseNode):
     class Ports(NodePorts):
-        if_branch: Port = Port.on_if(Inputs.value.equals("hello"))
+        if_branch: Port = Port.on_if(Inputs.value.equals("foo"))
         another_if_branch: Port = Port.on_if(Inputs.value.equals("world"))
         elif_branch: Port = Port.on_elif(Inputs.value.equals("goodbye"))
 
 
 class MultipleIfWithElifWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = MultipleIfWithElifNode
+    graph = MultipleIfWithElifNode.Ports.if_branch >> PassthroughNode
 
     class Outputs(BaseOutputs):
-        pass
+        value = PassthroughNode.Outputs.value

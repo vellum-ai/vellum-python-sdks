@@ -7,7 +7,6 @@ from vellum.workflows.references.constant import ConstantValueReference
 class MyNode(BaseNode):
     class Ports(BaseNode.Ports):
         foo = Port.on_if(ConstantValueReference(1).contains("bar"))
-        else_branch = Port.on_else()
 
 
 class OtherNode(BaseNode):

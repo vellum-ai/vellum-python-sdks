@@ -61,11 +61,6 @@ def validate_ports(ports: List[Port]) -> bool:
         if number_of_if_ports != 1:
             raise ValueError(f"Class {ports_class} must have exactly one on_if condition")
 
-        if number_of_if_ports == 1 and number_of_else_ports == 0:
-            raise ValueError(
-                f"Class {ports_class} must have exactly one on_if condition and exactly one on_else condition"
-            )
-
         if number_of_elif_ports > 0 and number_of_if_ports != 1:
             raise ValueError(f"Class {ports_class} containing on_elif ports must have exactly one on_if condition")
 

@@ -4,9 +4,6 @@ from tests.workflows.basic_ports.multiple_if_with_elif.workflow import Inputs, M
 def test_run_workflow():
     workflow = MultipleIfWithElifWorkflow()
     terminal_event = workflow.run(inputs=Inputs(value="foo"))
-    assert terminal_event.name == "workflow.execution.rejected"
-    base_module = __name__.split(".")[:-2]
-    assert (
-        terminal_event.error.message
-        == f"Class {'.'.join(base_module)}.workflow.MultipleIfWithElifNode.Ports must have exactly one on_if condition and exactly one on_else condition"  # noqa E501
-    )
+
+    assert terminal_event.name == "workflow.execution.fulfilled"
+    assert terminal_event.outputs == {"value": "foo"}
