@@ -41,9 +41,6 @@ def is_nested_class(nested: Any, parent: Type) -> bool:
 
 class BaseNodeMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
-        # TODO: Inherit the inner Output classes from every base class.
-        #   https://app.shortcut.com/vellum/story/4007/support-auto-inheriting-parent-node-outputs
-
         if "Outputs" in dct:
             outputs_class = dct["Outputs"]
             if not any(issubclass(base, BaseOutputs) for base in outputs_class.__bases__):
