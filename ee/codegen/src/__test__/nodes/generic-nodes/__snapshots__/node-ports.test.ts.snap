@@ -26,3 +26,10 @@ exports[`NodePorts > basic with nested expression in port > generates correct po
     else_port = Port.on_else()
 "
 `;
+
+exports[`NodePorts > empty expression for if port > generates correct ports class 1`] = `
+"class Ports(BaseNode.Ports):
+    my_if_port = Port.on_if(None)
+    else_port = Port.on_else()
+"
+`;

@@ -194,4 +194,49 @@ describe("NodePorts", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("empty expression for if port", () => {
+    beforeEach(async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+      const nodePortsData: NodePort[] = [
+        {
+          type: "IF",
+          id: "ae4343de-fe31-4ed9-9447-0cf5c27bef7c",
+          name: "my_if_port",
+          expression: undefined,
+        },
+        nodePortFactory({
+          type: "ELSE",
+        }),
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "MyGenericNode",
+        nodePorts: nodePortsData,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      nodePorts = new NodePorts({
+        nodePorts: nodePortsData,
+        nodeContext,
+        workflowContext,
+      });
+    });
+
+    it("generates correct ports class", async () => {
+      nodePorts.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toEqual(
+        "Expected IF / ELIF Ports to contain an expression"
+      );
+      expect(errors[0]?.severity).toBe("WARNING");
+    });
+  });
 });
