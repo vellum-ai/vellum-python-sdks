@@ -336,6 +336,28 @@ export class GraphAttribute extends AstNode {
       return;
     }
 
+    // Check if this is a cycle edge (target node already exists in the graph)
+    const isCycle = this.isNodeInBranch(targetNode, mutableAst);
+    const isSourceInGraph = this.isNodeInBranch(sourceNode, mutableAst);
+
+    if (
+      sourceNode &&
+      isCycle &&
+      isSourceInGraph &&
+      mutableAst.type === "set" &&
+      this.isDirectCycle(sourceNode, targetNode, this.workflowContext)
+    ) {
+      return {
+        type: "right_shift",
+        lhs: {
+          type: "right_shift",
+          lhs: mutableAst,
+          rhs: { type: "node_reference", reference: sourceNode },
+        },
+        rhs: { type: "node_reference", reference: targetNode },
+      };
+    }
+
     if (mutableAst.type === "empty") {
       return {
         type: "node_reference",
@@ -1211,5 +1233,37 @@ export class GraphAttribute extends AstNode {
     }
 
     return "";
+  }
+
+  /**
+   * Checks if there's a direct cycle between two nodes.
+   * A direct cycle means node1 → node2 and node2 → node1.
+   */
+  private isDirectCycle(
+    node1: BaseNodeContext<WorkflowDataNode> | null,
+    node2: BaseNodeContext<WorkflowDataNode> | null,
+    workflowContext: WorkflowContext
+  ): boolean {
+    if (!node1 || !node2) return false;
+
+    // Check if node1 has an edge to node2
+    const node1ToNode2 = Array.from(workflowContext.getEdgesByPortId().values())
+      .flat()
+      .some(
+        (edge) =>
+          edge.sourceNodeId === node1.nodeData.id &&
+          edge.targetNodeId === node2.nodeData.id
+      );
+
+    // Check if node2 has an edge to node1
+    const node2ToNode1 = Array.from(workflowContext.getEdgesByPortId().values())
+      .flat()
+      .some(
+        (edge) =>
+          edge.sourceNodeId === node2.nodeData.id &&
+          edge.targetNodeId === node1.nodeData.id
+      );
+
+    return node1ToNode2 && node2ToNode1;
   }
 }
