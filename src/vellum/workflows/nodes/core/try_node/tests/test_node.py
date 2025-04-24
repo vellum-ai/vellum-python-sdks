@@ -59,7 +59,7 @@ def test_try_node__retry_on_error_code__missed():
 
 def test_try_node__on_error_code__str():
     # GIVEN a try node that is configured to catch PROVIDER_ERROR
-    @TryNode.wrap(on_error_code="PROVIDER_ERROR")  # type: ignore
+    @TryNode.wrap(on_error_code=WorkflowErrorCode.PROVIDER_ERROR)
     class TestNode(BaseNode):
         class Outputs(BaseOutputs):
             value: int

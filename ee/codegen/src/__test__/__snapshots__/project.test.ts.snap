@@ -197,11 +197,12 @@ class Prompt(InlinePromptNode):
 
 exports[`WorkflowProjectGenerator > adornments > should generate try adornment node with correct attributes 1`] = `
 "from vellum import PromptParameters
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
 
-@TryNode.wrap(on_error_code="INVALID_WORKFLOW")
+@TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW)
 class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []

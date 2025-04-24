@@ -3,7 +3,7 @@ import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
-import { PORTS_CLASS_NAME } from "src/constants";
+import { PORTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import {
@@ -15,7 +15,6 @@ import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
 import { NODE_DEFAULT_ATTRIBUTES } from "src/generators/nodes/constants";
 import { UuidOrString } from "src/generators/uuid-or-string";
-import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import {
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
@@ -23,6 +22,7 @@ import {
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
+  ConstantValueWorkflowReference,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -383,17 +383,54 @@ export abstract class BaseNode<
                 attribute: ["wrap"],
                 modulePath: adornment.base.module,
               }),
-              arguments_: filteredAttributes.map((attr) =>
-                python.methodArgument({
-                  name: attr.name,
-                  value: new WorkflowValueDescriptor({
-                    workflowValueDescriptor: attr.value,
-                    nodeContext: this.nodeContext,
-                    workflowContext: this.workflowContext,
-                    iterableConfig: { endWithComma: false },
-                  }),
+              arguments_: filteredAttributes
+                .map((attr) => {
+                  if (attr.value) {
+                    const constantValue =
+                      attr.value as ConstantValueWorkflowReference;
+                    // This is for error codes on try and retry args
+                    if (
+                      constantValue.type === "CONSTANT_VALUE" &&
+                      constantValue.value &&
+                      constantValue.value.type === "STRING" &&
+                      constantValue.value.value !== undefined
+                    ) {
+                      return python.methodArgument({
+                        name: attr.name,
+                        value: python.accessAttribute({
+                          lhs: python.reference({
+                            name: "WorkflowErrorCode",
+                            modulePath: [
+                              ...VELLUM_CLIENT_MODULE_PATH,
+                              "workflows",
+                              "errors",
+                              "types",
+                            ],
+                          }),
+                          rhs: python.reference({
+                            name: constantValue.value.value,
+                            modulePath: [],
+                          }),
+                        }),
+                      });
+                    } else if (
+                      constantValue.type === "CONSTANT_VALUE" &&
+                      constantValue.value &&
+                      constantValue.value.type === "NUMBER" &&
+                      constantValue.value.value !== undefined
+                    ) {
+                      const numValue = constantValue.value.value;
+                      return python.methodArgument({
+                        name: attr.name,
+                        value: Number.isInteger(numValue)
+                          ? python.TypeInstantiation.int(numValue)
+                          : python.TypeInstantiation.float(numValue),
+                      });
+                    }
+                  }
+                  return undefined;
                 })
-              ),
+                .filter((arg) => arg !== undefined),
             }),
           })
         );
