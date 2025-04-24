@@ -15,6 +15,7 @@ import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
 import { NODE_DEFAULT_ATTRIBUTES } from "src/generators/nodes/constants";
 import { UuidOrString } from "src/generators/uuid-or-string";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import {
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
@@ -419,12 +420,14 @@ export abstract class BaseNode<
                       constantValue.value.type === "NUMBER" &&
                       constantValue.value.value !== undefined
                     ) {
-                      const numValue = constantValue.value.value;
                       return python.methodArgument({
                         name: attr.name,
-                        value: Number.isInteger(numValue)
-                          ? python.TypeInstantiation.int(numValue)
-                          : python.TypeInstantiation.float(numValue),
+                        value: new WorkflowValueDescriptor({
+                          workflowValueDescriptor: constantValue,
+                          nodeContext: this.nodeContext,
+                          workflowContext: this.workflowContext,
+                          iterableConfig: { endWithComma: false },
+                        }),
                       });
                     }
                   }

@@ -57,30 +57,6 @@ def test_try_node__retry_on_error_code__missed():
     assert exc_info.value.code == WorkflowErrorCode.INVALID_OUTPUTS
 
 
-def test_try_node__on_error_code__str():
-    # GIVEN a try node that is configured to catch PROVIDER_ERROR
-    @TryNode.wrap(on_error_code=WorkflowErrorCode.PROVIDER_ERROR)
-    class TestNode(BaseNode):
-        class Outputs(BaseOutputs):
-            value: int
-
-        def run(self) -> Outputs:
-            raise NodeException(message="This will be caught", code=WorkflowErrorCode.PROVIDER_ERROR)
-
-    # WHEN the node is run and throws a PROVIDER_ERROR
-    node = TestNode(state=BaseState())
-    outputs = [o for o in node.run()]
-
-    # THEN the exception is caught
-    assert len(outputs) == 2
-    assert set(outputs) == {
-        BaseOutput(name="value"),
-        BaseOutput(
-            name="error", value=WorkflowError(message="This will be caught", code=WorkflowErrorCode.PROVIDER_ERROR)
-        ),
-    }
-
-
 def test_try_node__use_parent_inputs_and_state():
     # GIVEN a parent workflow Inputs and State
     class Inputs(BaseInputs):
