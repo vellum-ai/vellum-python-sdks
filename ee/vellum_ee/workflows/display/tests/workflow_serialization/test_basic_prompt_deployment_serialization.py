@@ -101,7 +101,7 @@ def test_serialize_workflow(vellum_client):
         "type": "PROMPT",
         "inputs": [
             {
-                "id": "509cf3d4-db72-483e-897a-0f7f20e70d03",
+                "id": "947d7ead-0fad-4e5f-aa3a-d06029ac94bc",
                 "key": "city",
                 "value": {
                     "combinator": "OR",
@@ -116,7 +116,7 @@ def test_serialize_workflow(vellum_client):
                 },
             },
             {
-                "id": "7d6ec5ac-c582-4153-bd8a-b8794c367420",
+                "id": "3deebdd7-2900-4d8c-93f2-e5b90649ac42",
                 "key": "date",
                 "value": {
                     "combinator": "OR",

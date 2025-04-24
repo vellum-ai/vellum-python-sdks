@@ -11,10 +11,16 @@ import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base"
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
 
+const INPUTS_PREFIX = "subworkflow_inputs";
+
 export class SubworkflowDeploymentNode extends BaseSingleFileNode<
   SubworkflowNodeType,
   SubworkflowDeploymentNodeContext
 > {
+  protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
+    return `${INPUTS_PREFIX}.${nodeInputKey}`;
+  }
+
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
@@ -52,7 +58,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
 
     statements.push(
       python.field({
-        name: "subworkflow_inputs",
+        name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
             key: python.TypeInstantiation.str(key),
