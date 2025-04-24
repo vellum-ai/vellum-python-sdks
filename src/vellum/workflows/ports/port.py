@@ -115,5 +115,5 @@ class Port:
             and self._condition is None
         ):
             raise WorkflowInitializationException(
-                f"Class {self.node_class}'s {self.name} port should have a defined condition and cannot be empty"
+                f"Class {self.node_class.__name__}'s {self.name} should have a defined condition and cannot be empty."
             )
