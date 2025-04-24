@@ -1410,7 +1410,7 @@ baz = foo + bar
       expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
     });
   });
-  describe("retry node adornment", () => {
+  describe("adornments", () => {
     it("should correctly generate code for a prompt node with retry adornment", async () => {
       const displayData = {
         workflow_raw_data: {
