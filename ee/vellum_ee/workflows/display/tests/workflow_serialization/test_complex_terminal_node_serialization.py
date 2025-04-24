@@ -90,7 +90,7 @@ def test_serialize_workflow__missing_final_output_node():
                 "type": "TERMINAL",
                 "data": {
                     "label": "First Final Output Node",
-                    "name": "first-final-output-node",
+                    "name": "alpha",
                     "target_handle_id": "a0c2eb7a-398e-4f28-b63d-f3bae9b563ee",
                     "output_id": "0cd02933-c5b9-47c9-aede-e97c5870e8aa",
                     "output_type": "STRING",

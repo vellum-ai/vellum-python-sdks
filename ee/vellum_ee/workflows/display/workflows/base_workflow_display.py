@@ -124,26 +124,24 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 }
             )
 
-        nodes: JsonArray = []
+        serialized_nodes: Dict[UUID, JsonObject] = {}
         edges: JsonArray = []
 
         # Add a single synthetic node for the workflow entrypoint
         entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
         entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
-        nodes.append(
-            {
-                "id": str(entrypoint_node_id),
-                "type": "ENTRYPOINT",
-                "inputs": [],
-                "data": {
-                    "label": "Entrypoint Node",
-                    "source_handle_id": str(entrypoint_node_source_handle_id),
-                },
-                "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
-                "base": None,
-                "definition": None,
+        serialized_nodes[entrypoint_node_id] = {
+            "id": str(entrypoint_node_id),
+            "type": "ENTRYPOINT",
+            "inputs": [],
+            "data": {
+                "label": "Entrypoint Node",
+                "source_handle_id": str(entrypoint_node_source_handle_id),
             },
-        )
+            "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
+            "base": None,
+            "definition": None,
+        }
 
         # Add all the nodes in the workflow
         for node in self._workflow.get_nodes():
@@ -155,7 +153,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 self.add_error(e)
                 continue
 
-            nodes.append(serialized_node)
+            serialized_nodes[node_display.node_id] = serialized_node
 
         # Add all unused nodes in the workflow
         for node in self._workflow.get_unused_nodes():
@@ -167,7 +165,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 self.add_error(e)
                 continue
 
-            nodes.append(serialized_node)
+            serialized_nodes[node_display.node_id] = serialized_node
 
         synthetic_output_edges: JsonArray = []
         output_variables: JsonArray = []
@@ -185,9 +183,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for workflow_output, workflow_output_display in self.display_context.workflow_output_displays.items():
             final_output_node_id = uuid4_from_hash(f"{self.workflow_id}|node_id|{workflow_output.name}")
             inferred_type = infer_vellum_variable_type(workflow_output)
-
             # Remove the terminal node output from the unreferenced set
-            unreferenced_final_output_node_outputs.discard(cast(OutputReference, workflow_output.instance))
+            if isinstance(workflow_output.instance, OutputReference):
+                unreferenced_final_output_node_outputs.discard(workflow_output.instance)
 
             if workflow_output.instance not in final_output_node_outputs:
                 # Create a synthetic terminal node only if there is no terminal node for this output
@@ -220,24 +218,22 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 )
                 synthetic_display_data = NodeDisplayData().dict()
                 synthetic_node_label = "Final Output"
-                nodes.append(
-                    {
-                        "id": str(final_output_node_id),
-                        "type": "TERMINAL",
-                        "data": {
-                            "label": synthetic_node_label,
-                            "name": workflow_output_display.name,
-                            "target_handle_id": synthetic_target_handle_id,
-                            "output_id": str(workflow_output_display.id),
-                            "output_type": inferred_type,
-                            "node_input_id": str(node_input.id),
-                        },
-                        "inputs": [node_input.dict()],
-                        "display_data": synthetic_display_data,
-                        "base": final_output_node_base,
-                        "definition": None,
-                    }
-                )
+                serialized_nodes[final_output_node_id] = {
+                    "id": str(final_output_node_id),
+                    "type": "TERMINAL",
+                    "data": {
+                        "label": synthetic_node_label,
+                        "name": workflow_output_display.name,
+                        "target_handle_id": synthetic_target_handle_id,
+                        "output_id": str(workflow_output_display.id),
+                        "output_type": inferred_type,
+                        "node_input_id": str(node_input.id),
+                    },
+                    "inputs": [node_input.dict()],
+                    "display_data": synthetic_display_data,
+                    "base": final_output_node_base,
+                    "definition": None,
+                }
 
                 if source_node_display:
                     source_handle_id = source_node_display.get_source_handle_id(
@@ -254,6 +250,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                             "type": "DEFAULT",
                         }
                     )
+
+            elif isinstance(workflow_output.instance, OutputReference):
+                terminal_node_id = workflow_output.instance.outputs_class._node_class.__id__
+                serialized_terminal_node = serialized_nodes.get(terminal_node_id)
+                if serialized_terminal_node and isinstance(serialized_terminal_node["data"], dict):
+                    serialized_terminal_node["data"]["name"] = workflow_output_display.name
 
             output_variables.append(
                 {
@@ -309,7 +311,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         return {
             "workflow_raw_data": {
-                "nodes": nodes,
+                "nodes": list(serialized_nodes.values()),
                 "edges": edges,
                 "display_data": self.display_context.workflow_display.display_data.dict(),
                 "definition": {

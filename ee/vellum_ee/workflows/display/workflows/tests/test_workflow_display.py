@@ -6,6 +6,7 @@ from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubwo
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
@@ -327,3 +328,43 @@ def test_serialize_workflow__inherited_workflow_display_class_not_registered():
 
     # THEN it should should succeed
     assert data is not None
+
+
+def test_serialize_workflow__terminal_node_mismatches_workflow_output_name():
+    # GIVEN a node
+    class ExitNode(FinalOutputNode):
+        class Outputs(FinalOutputNode.Outputs):
+            value = "hello"
+
+    # AND a workflow that uses the node
+    class MyWorkflow(BaseWorkflow):
+        graph = ExitNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            answer = ExitNode.Outputs.value
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should have an output name that matches the workflow output
+    assert isinstance(data["workflow_raw_data"], dict)
+    assert isinstance(data["workflow_raw_data"]["nodes"], list)
+    terminal_node = [
+        node for node in data["workflow_raw_data"]["nodes"] if isinstance(node, dict) and node["type"] == "TERMINAL"
+    ][0]
+    assert isinstance(terminal_node["data"], dict)
+    assert terminal_node["data"]["name"] == "answer"
+
+    # AND the output variable should have the correct name
+    assert isinstance(data["output_variables"], list)
+    assert isinstance(data["output_variables"][0], dict)
+    assert data["output_variables"][0]["key"] == "answer"
+    assert data["output_variables"][0]["type"] == "STRING"
+
+    # TODO: AND the output value should have the correct name
+    # output_variable_id = data["output_variables"][0]["id"]
+    # assert isinstance(data["workflow_raw_data"]["output_values"], list)
+    # assert isinstance(data["workflow_raw_data"]["output_values"][0], dict)
+    # assert data["workflow_raw_data"]["output_values"][0]["output_variable_id"] == output_variable_id
+    # assert data["workflow_raw_data"]["output_values"][0]["value"] is None
