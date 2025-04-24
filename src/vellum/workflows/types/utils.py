@@ -7,6 +7,7 @@ from typing import (
     ClassVar,
     Dict,
     Generic,
+    List,
     Optional,
     Set,
     Tuple,
@@ -101,22 +102,42 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
         )
 
 
-def get_class_attr_names(cls: Type) -> Set[str]:
-    # gets type-annotated attributes `foo: int`
-    type_annotated_attributes: Set[str] = set()
+def get_class_attr_names(cls: Type) -> List[str]:
+    # make sure we don't duplicate attributes
+    collected_attributes: Set[str] = set()
 
-    # gets attributes declared `foo = 1`
-    class_attributes: Set[str] = set()
+    # we want to preserve the order of attributes on each class
+    ordered_attr_names: List[str] = []
 
-    for base in reversed(cls.__mro__):
+    for base in cls.__mro__:
+        # gets attributes declared `foo = 1`
+        for class_attribute in vars(base).keys():
+            if class_attribute in collected_attributes:
+                continue
+
+            if class_attribute.startswith("_"):
+                continue
+
+            collected_attributes.add(class_attribute)
+            ordered_attr_names.append(class_attribute)
+
+        # gets type-annotated attributes `foo: int`
         ann = base.__dict__.get("__annotations__", {})
-        type_annotated_attributes.update(ann.keys())
+        for attr_name in ann.keys():
+            if not isinstance(attr_name, str):
+                continue
 
-        base_vars = vars(base).keys()
-        class_attributes.update(base_vars)
+            if attr_name in collected_attributes:
+                continue
+
+            if attr_name.startswith("_"):
+                continue
+
+            collected_attributes.add(attr_name)
+            ordered_attr_names.append(attr_name)
 
     # combine and filter out private attributes
-    return {a for a in list(set(class_attributes) | set(type_annotated_attributes)) if not a.startswith("_")}
+    return ordered_attr_names
 
 
 def deepcopy_with_exclusions(
