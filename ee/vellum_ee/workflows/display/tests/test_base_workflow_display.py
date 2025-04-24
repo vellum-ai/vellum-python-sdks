@@ -43,6 +43,7 @@ def test_base_workflow_display__serialize_empty_workflow():
                     "type": "ENTRYPOINT",
                 }
             ],
+            "output_values": [],
         },
     }
 

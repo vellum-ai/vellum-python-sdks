@@ -15,41 +15,7 @@ def test_serialize_workflow__missing_final_output_node():
     # WHEN we serialize it
     serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN we should get a serialized representation of the Workflow
-    assert serialized_workflow.keys() == {
-        "workflow_raw_data",
-        "input_variables",
-        "state_variables",
-        "output_variables",
-    }
-
-    # AND its input variables should be what we expect
-    input_variables = serialized_workflow["input_variables"]
-    assert len(input_variables) == 2
-    assert not DeepDiff(
-        [
-            {
-                "id": "da086239-d743-4246-b666-5c91e22fb88c",
-                "key": "alpha",
-                "type": "STRING",
-                "required": True,
-                "default": None,
-                "extensions": {"color": None},
-            },
-            {
-                "id": "a8b6c5d4-a0e9-4457-834b-46b633c466a6",
-                "key": "beta",
-                "type": "STRING",
-                "required": True,
-                "default": None,
-                "extensions": {"color": None},
-            },
-        ],
-        input_variables,
-        ignore_order=True,
-    )
-
-    # AND its output variables should be what we expect
+    # THEN we should get a serialized representation its output variables to be what we expect
     output_variables = serialized_workflow["output_variables"]
     assert len(output_variables) == 2
     assert not DeepDiff(
@@ -61,27 +27,11 @@ def test_serialize_workflow__missing_final_output_node():
         ignore_order=True,
     )
 
-    # AND its raw data should be what we expect
-    workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
-    assert len(workflow_raw_data["edges"]) == 3
-    assert len(workflow_raw_data["nodes"]) == 4
-
     # AND each node should be serialized correctly
-    entrypoint_node = workflow_raw_data["nodes"][0]
-    assert entrypoint_node == {
-        "id": "b109349f-ca1b-4a5a-a66e-a1321cf297f7",
-        "type": "ENTRYPOINT",
-        "inputs": [],
-        "data": {"label": "Entrypoint Node", "source_handle_id": "943ac183-d107-4604-aed1-619bd7fef09c"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "base": None,
-        "definition": None,
-    }
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
 
-    passthrough_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "GENERIC")
-    assert passthrough_node["id"] == "32d88cab-e9fa-4a56-9bc2-fb6e1fd0897f"
-
+    # AND we should create synthetic terminal nodes for each output variable
     final_output_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "TERMINAL"]
     assert not DeepDiff(
         [

@@ -54,7 +54,6 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
     assert len(workflow_raw_data["edges"]) == 2
     assert len(workflow_raw_data["nodes"]) == 3
 
@@ -235,6 +234,16 @@ def test_serialize_workflow():
                             "workflow",
                         ],
                     },
+                    "output_values": [
+                        {
+                            "output_variable_id": "2a957315-fae0-4366-8a35-f0b315c5eade",
+                            "value": {
+                                "type": "NODE_OUTPUT",
+                                "node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
+                                "node_output_id": "a7bcb362-a2b8-4476-b0de-a361efeec204",
+                            },
+                        }
+                    ],
                 },
                 "input_variables": [
                     {

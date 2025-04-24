@@ -105,7 +105,8 @@
         "code",
         "workflow"
       ]
-    }
+    },
+    "output_values": []
   },
   "input_variables": [
     {

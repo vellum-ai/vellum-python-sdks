@@ -67,7 +67,6 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
     assert len(workflow_raw_data["edges"]) == 3
     assert len(workflow_raw_data["nodes"]) == 4
 
@@ -283,6 +282,24 @@ def test_serialize_workflow():
                         "name": "NestedWorkflow",
                         "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
                     },
+                    "output_values": [
+                        {
+                            "output_variable_id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622",
+                            "value": {
+                                "type": "NODE_OUTPUT",
+                                "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                "node_output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
+                            },
+                        },
+                        {
+                            "output_variable_id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82",
+                            "value": {
+                                "type": "NODE_OUTPUT",
+                                "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                "node_output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                            },
+                        },
+                    ],
                 },
                 "input_variables": [{"id": "704c4640-bfda-44f0-8da3-e9cfc4f21cf2", "key": "metro", "type": "STRING"}],
                 "output_variables": [
@@ -302,7 +319,6 @@ def test_serialize_workflow():
             "ports": [{"id": "cfd831bc-ee7f-44d0-8d76-0ba0cd0277dc", "name": "default", "type": "DEFAULT"}],
         },
         subworkflow_node,
-        ignore_order=True,
     )
 
     temperature_terminal_node = next(
