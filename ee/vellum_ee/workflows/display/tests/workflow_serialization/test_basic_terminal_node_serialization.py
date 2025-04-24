@@ -66,7 +66,7 @@ def test_serialize_workflow():
         "type": "TERMINAL",
         "data": {
             "label": "Basic Final Output Node",
-            "name": "basic-final-output-node",
+            "name": "value",
             "target_handle_id": "0173d3c6-11d1-44b7-b070-ca9ff5119046",
             "output_id": "aa63e3f6-fde3-4d19-84ef-29982d44d709",
             "output_type": "STRING",
