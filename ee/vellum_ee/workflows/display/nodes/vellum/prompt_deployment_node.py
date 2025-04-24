@@ -28,7 +28,10 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
                     input_name=variable_name,
                     value=variable_value,
                     display_context=display_context,
-                    input_id=self.node_input_ids_by_name.get(variable_name),
+                    input_id=self.node_input_ids_by_name.get(
+                        f"{PromptDeploymentNode.prompt_inputs.name}.{variable_name}"
+                    )
+                    or self.node_input_ids_by_name.get(variable_name),
                 )
                 for variable_name, variable_value in prompt_inputs.items()
             ]
