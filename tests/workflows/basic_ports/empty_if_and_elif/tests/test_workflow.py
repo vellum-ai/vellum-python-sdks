@@ -1,0 +1,62 @@
+import pytest
+
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.exceptions import WorkflowInitializationException
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import BaseNode
+from vellum.workflows.ports import NodePorts, Port
+from vellum.workflows.state import BaseState
+
+
+# Had to do it this way since pytest's exception manager doesn't catch if
+# I created the workflow and imported it/created it
+def create_empty_if_workflow():
+    class Inputs(BaseInputs):
+        pass
+
+    class EmptyIfNode(BaseNode):
+        class Ports(NodePorts):
+            if_branch: Port = Port.on_if()
+            else_branch: Port = Port.on_else()
+
+    class EmptyIfWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = EmptyIfNode
+
+    return EmptyIfWorkflow
+
+
+def create_empty_elif_workflow():
+    class Inputs(BaseInputs):
+        value: str
+
+    class EmptyElIfNode(BaseNode):
+        class Ports(NodePorts):
+            if_branch: Port = Port.on_if(Inputs.value.equals("foo"))
+            elif_branch: Port = Port.on_elif()
+            else_branch: Port = Port.on_else()
+
+    class EmptyElIfWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = EmptyElIfNode
+
+    return EmptyElIfWorkflow
+
+
+@pytest.mark.parametrize(
+    "workflow_factory,description,name",
+    [
+        (create_empty_if_workflow, "IF", "EmptyIfNode"),
+        (create_empty_elif_workflow, "ELIF", "EmptyElIfNode"),
+    ],
+    ids=["empty_if", "empty_elif"],
+)
+def test_empty_conditional_ports(workflow_factory, description, name):
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        workflow_cls = workflow_factory()
+        workflow_cls()
+
+    base_module = __name__.split(".")
+    assert (
+        str(exc_info.value)
+        == f"Class {'.'.join(base_module)}.{workflow_factory.__name__}.<locals>.{name}'s {description.lower()}_branch "
+        f"port should have a defined condition and cannot be empty"
+    )

@@ -4,6 +4,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   NodePort as NodePortType,
@@ -110,19 +111,36 @@ export class NodePorts extends AstNode {
       return undefined;
     }
     const descriptor = this.buildDescriptor(nodePort);
+    const args = [];
+    if (descriptor) {
+      args.push(
+        python.methodArgument({
+          value: descriptor,
+        })
+      );
+    } else if (
+      isNilOrEmpty(descriptor) &&
+      (attribute === "on_if" || attribute === "on_elif")
+    ) {
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Expected IF / ELIF Ports to contain an expression",
+          "WARNING"
+        )
+      );
+      args.push(
+        python.methodArgument({
+          value: python.TypeInstantiation.none(),
+        })
+      );
+    }
     return python.invokeMethod({
       methodReference: python.reference({
         name: "Port",
         modulePath: this.workflowContext.sdkModulePathNames.PORTS_MODULE_PATH,
         attribute: [attribute],
       }),
-      arguments_: descriptor
-        ? [
-            python.methodArgument({
-              value: descriptor,
-            }),
-          ]
-        : [],
+      arguments_: args,
     });
   }
 

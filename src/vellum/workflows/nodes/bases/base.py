@@ -111,6 +111,7 @@ class BaseNodeMeta(type):
         # Add cls to relevant nested classes, since python should've been doing this by default
         for port in node_class.Ports:
             port.node_class = node_class
+            port.validate()
 
         node_class.Execution.node_class = node_class
         node_class.Trigger.node_class = node_class

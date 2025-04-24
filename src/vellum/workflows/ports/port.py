@@ -7,7 +7,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import NodeException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.graph import Graph, GraphTarget
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import ConditionType
@@ -73,11 +73,11 @@ class Port:
         return Graph.from_edge(edge)
 
     @staticmethod
-    def on_if(condition: BaseDescriptor, fork_state: bool = False) -> "Port":
+    def on_if(condition: Optional[BaseDescriptor] = None, fork_state: bool = False):
         return Port(condition=condition, condition_type=ConditionType.IF, fork_state=fork_state)
 
     @staticmethod
-    def on_elif(condition: BaseDescriptor, fork_state: bool = False) -> "Port":
+    def on_elif(condition: Optional[BaseDescriptor] = None, fork_state: bool = False) -> "Port":
         return Port(condition=condition, condition_type=ConditionType.ELIF, fork_state=fork_state)
 
     @staticmethod
@@ -107,3 +107,13 @@ class Port:
         cls, source_type: Type[Any], handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
         return core_schema.is_instance_schema(cls)
+
+    def validate(self):
+        if (
+            not self.default
+            and self._condition_type in (ConditionType.IF, ConditionType.ELIF)
+            and self._condition is None
+        ):
+            raise WorkflowInitializationException(
+                f"Class {self.node_class}'s {self.name} port should have a defined condition and cannot be empty"
+            )
