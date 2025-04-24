@@ -358,29 +358,14 @@ export abstract class BaseNode<
   protected getNodeDecorators(): python.Decorator[] | undefined {
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
-
-    if (errorOutputId) {
-      decorators.push(
-        python.decorator({
-          callable: python.invokeMethod({
-            methodReference: python.reference({
-              name: "TryNode",
-              attribute: ["wrap"],
-              modulePath:
-                this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH,
-            }),
-            arguments_: [],
-          }),
-        })
-      );
-    }
+    let tryAdornmentExists = false;
 
     const adornments = this.getAdornments();
 
     for (const adornment of adornments) {
       // TODO: remove this check when we remove errorOutputId
-      if (errorOutputId && adornment.base.name === "TryNode") {
-        continue;
+      if (adornment.base.name === "TryNode") {
+        tryAdornmentExists = true;
       }
 
       // Filter out attributes that match their default values
@@ -412,6 +397,22 @@ export abstract class BaseNode<
           })
         );
       }
+    }
+
+    if (errorOutputId && !tryAdornmentExists) {
+      decorators.push(
+        python.decorator({
+          callable: python.invokeMethod({
+            methodReference: python.reference({
+              name: "TryNode",
+              attribute: ["wrap"],
+              modulePath:
+                this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH,
+            }),
+            arguments_: [],
+          }),
+        })
+      );
     }
 
     return decorators.length > 0 ? decorators : undefined;

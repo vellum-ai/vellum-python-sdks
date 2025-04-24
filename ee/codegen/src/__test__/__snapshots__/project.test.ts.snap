@@ -117,6 +117,31 @@ class FirstNode(BaseNode):
 "
 `;
 
+exports[`WorkflowProjectGenerator > Try adornment node > should generate try adornment node with correct attributes 1`] = `
+"from vellum import PromptParameters
+from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+
+@TryNode.wrap(on_error_code="INVALID_WORKFLOW")
+class Prompt(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = []
+    prompt_inputs = {}
+    parameters = PromptParameters(
+        stop=[],
+        temperature=None,
+        max_tokens=None,
+        top_p=None,
+        top_k=None,
+        frequency_penalty=None,
+        presence_penalty=None,
+        logit_bias=None,
+        custom_parameters=None,
+    )
+"
+`;
+
 exports[`WorkflowProjectGenerator > code execution node at project level > should not autoformat the script file 1`] = `
 "import foo, bar
 baz = foo + bar
@@ -279,8 +304,8 @@ Summarize the following text: hello today is feb 7 bad weather
 
 exports[`WorkflowProjectGenerator > retry node adornment > should correctly generate default code for adornments 1`] = `
 "from vellum import PromptParameters
-from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
 

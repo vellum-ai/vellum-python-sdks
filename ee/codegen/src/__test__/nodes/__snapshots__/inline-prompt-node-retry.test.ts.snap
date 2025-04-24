@@ -135,8 +135,8 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 from ..inputs import Inputs
 
 
-@TryNode.wrap()
 @RetryNode.wrap(max_attempts=3, delay=2)
+@TryNode.wrap()
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
