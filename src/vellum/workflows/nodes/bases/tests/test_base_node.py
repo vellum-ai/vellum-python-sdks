@@ -283,3 +283,23 @@ def test_node_outputs__inherits_instance():
     assert foo_output.instance is undefined
     assert isinstance(bar_output, OutputReference)
     assert bar_output.instance == "hello"
+
+
+def test_base_node__iterate_over_attributes__preserves_order():
+    # GIVEN a node with two attributes
+    class MyNode(BaseNode):
+        foo = "foo"
+        bar = "bar"
+
+    # AND a node that inherits from MyNode
+    class InheritedNode(MyNode):
+        baz = "baz"
+        qux = "qux"
+        quux = "quux"
+
+    # WHEN we iterate over the attributes, multiple times
+    for i in range(10):
+        attribute_names = [attr.name for attr in InheritedNode]
+
+        # THEN the attributes are in the correct order
+        assert attribute_names == ["baz", "qux", "quux", "foo", "bar"], f"Iteration {i} failed"

@@ -83,9 +83,9 @@ def test_infer_types(cls, attr_name, expected_type):
 @pytest.mark.parametrize(
     "cls, expected_attr_names",
     [
-        (ExampleClass, {"alpha", "beta", "gamma", "epsilon", "zeta", "eta", "kappa", "mu"}),
-        (ExampleGenericClass, {"delta"}),
-        (ExampleInheritedClass, {"alpha", "beta", "gamma", "epsilon", "zeta", "eta", "theta", "kappa", "mu"}),
+        (ExampleClass, ["beta", "epsilon", "alpha", "gamma", "zeta", "eta", "kappa", "mu"]),
+        (ExampleGenericClass, ["delta"]),
+        (ExampleInheritedClass, ["theta", "beta", "epsilon", "alpha", "gamma", "zeta", "eta", "kappa", "mu"]),
     ],
 )
 def test_class_attr_names(cls, expected_attr_names):
