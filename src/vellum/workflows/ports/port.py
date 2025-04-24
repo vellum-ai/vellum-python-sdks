@@ -7,7 +7,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import NodeException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.graph import Graph, GraphTarget
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import ConditionType
@@ -73,11 +73,15 @@ class Port:
         return Graph.from_edge(edge)
 
     @staticmethod
-    def on_if(condition: BaseDescriptor, fork_state: bool = False) -> "Port":
+    def on_if(condition: Optional[BaseDescriptor] = None, fork_state: bool = False):
+        if condition is None:
+            raise WorkflowInitializationException("Please verify that your IF ports have defined expressions")
         return Port(condition=condition, condition_type=ConditionType.IF, fork_state=fork_state)
 
     @staticmethod
-    def on_elif(condition: BaseDescriptor, fork_state: bool = False) -> "Port":
+    def on_elif(condition: Optional[BaseDescriptor] = None, fork_state: bool = False) -> "Port":
+        if condition is None:
+            raise WorkflowInitializationException("Please verify that your ELIF ports have defined expressions")
         return Port(condition=condition, condition_type=ConditionType.ELIF, fork_state=fork_state)
 
     @staticmethod
