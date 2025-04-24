@@ -18,6 +18,7 @@ import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import {
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
   AdornmentNode,
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
@@ -629,45 +630,32 @@ export abstract class BaseNode<
   private filterAttribute(
     nodeName: string,
     attributeName: string,
-    attributeValue: unknown
+    attributeValue?: WorkflowValueDescriptorType | null
   ): boolean {
-    const nodeConfig = NODE_DEFAULT_ATTRIBUTES[nodeName];
-    if (!nodeConfig) {
-      return true; // Include if no config exists for this node
+    if (attributeValue === undefined) {
+      return true;
     }
 
-    const attrConfig = nodeConfig[attributeName];
+    const nodeConfig = NODE_DEFAULT_ATTRIBUTES[nodeName];
+    const attrConfig = nodeConfig?.[attributeName];
     if (!attrConfig) {
-      return true; // Include if no config exists for this attribute
+      return true;
+    }
+
+    if (attributeValue === null) {
+      return attrConfig.defaultValue !== null;
     }
 
     const extractedValue = this.extractConstantValue(attributeValue);
-    return attrConfig.defaultValue !== extractedValue; // Include if value differs from default
+    return attrConfig.defaultValue !== extractedValue;
   }
 
-  private extractConstantValue(attributeValue: unknown): unknown {
-    if (
-      typeof attributeValue === "object" &&
-      attributeValue !== null &&
-      "type" in attributeValue &&
-      attributeValue.type === "CONSTANT_VALUE" &&
-      "value" in attributeValue
-    ) {
-      const value = attributeValue.value;
+  private extractConstantValue(
+    attributeValue: WorkflowValueDescriptorType
+  ): unknown {
+    if (attributeValue.type !== "CONSTANT_VALUE") return attributeValue;
 
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        "type" in value &&
-        value.type === "JSON" &&
-        "value" in value
-      ) {
-        return value.value;
-      }
-
-      return value;
-    }
-
-    return attributeValue;
+    const value = attributeValue.value;
+    return value.type === "JSON" ? value.value : value;
   }
 }
