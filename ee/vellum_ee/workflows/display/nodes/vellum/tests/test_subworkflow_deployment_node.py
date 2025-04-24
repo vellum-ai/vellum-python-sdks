@@ -14,14 +14,14 @@ def _no_display_class(Node: Type[SubworkflowDeploymentNode]):  # type: ignore
 
 def _display_class_with_node_input_ids_by_name(Node: Type[SubworkflowDeploymentNode]):
     class SubworkflowNodeDisplay(SubworkflowDeploymentNode[Node]):  # type: ignore[valid-type]
-        node_input_ids_by_name = {"foo": UUID("74996e96-b7e5-4936-98e3-b88415782944")}
+        node_input_ids_by_name = {"foo": UUID("aff4f838-577e-44b9-ac5c-6d8213abbb9c")}
 
     return SubworkflowNodeDisplay
 
 
 def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[SubworkflowDeploymentNode]):
     class SubworkflowNodeDisplay(SubworkflowDeploymentNode[Node]):  # type: ignore[valid-type]
-        node_input_ids_by_name = {"subworkflow_inputs.foo": UUID("74996e96-b7e5-4936-98e3-b88415782944")}
+        node_input_ids_by_name = {"subworkflow_inputs.foo": UUID("aff4f838-577e-44b9-ac5c-6d8213abbb9c")}
 
     return SubworkflowNodeDisplay
 
@@ -55,9 +55,9 @@ def mock_fetch_deployment(mocker):
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "74996e96-b7e5-4936-98e3-b88415782944"),
-        (_display_class_with_node_input_ids_by_name, "74996e96-b7e5-4936-98e3-b88415782944"),
-        (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "74996e96-b7e5-4936-98e3-b88415782944"),
+        (_no_display_class, "aff4f838-577e-44b9-ac5c-6d8213abbb9c"),
+        (_display_class_with_node_input_ids_by_name, "aff4f838-577e-44b9-ac5c-6d8213abbb9c"),
+        (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "aff4f838-577e-44b9-ac5c-6d8213abbb9c"),
     ],
     ids=[
         "no_display_class",
