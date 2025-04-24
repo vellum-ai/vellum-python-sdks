@@ -19,7 +19,7 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator
+from vellum_ee.workflows.display.utils.expressions import convert_descriptor_to_operator
 from vellum_ee.workflows.display.vellum import NodeInput
 
 _ConditionalNodeType = TypeVar("_ConditionalNodeType", bound=ConditionalNode)

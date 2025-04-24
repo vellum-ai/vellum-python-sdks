@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any
 
+from vellum.client.types.logical_operator import LogicalOperator
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.expressions.and_ import AndExpression
@@ -38,10 +39,58 @@ from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
-from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
+
+
+def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperator:
+    if isinstance(descriptor, EqualsExpression):
+        return "="
+    elif isinstance(descriptor, DoesNotEqualExpression):
+        return "!="
+    elif isinstance(descriptor, LessThanExpression):
+        return "<"
+    elif isinstance(descriptor, GreaterThanExpression):
+        return ">"
+    elif isinstance(descriptor, LessThanOrEqualToExpression):
+        return "<="
+    elif isinstance(descriptor, GreaterThanOrEqualToExpression):
+        return ">="
+    elif isinstance(descriptor, ContainsExpression):
+        return "contains"
+    elif isinstance(descriptor, BeginsWithExpression):
+        return "beginsWith"
+    elif isinstance(descriptor, EndsWithExpression):
+        return "endsWith"
+    elif isinstance(descriptor, DoesNotContainExpression):
+        return "doesNotContain"
+    elif isinstance(descriptor, DoesNotBeginWithExpression):
+        return "doesNotBeginWith"
+    elif isinstance(descriptor, DoesNotEndWithExpression):
+        return "doesNotEndWith"
+    elif isinstance(descriptor, (IsNullExpression, IsNilExpression, IsUndefinedExpression)):
+        return "null"
+    elif isinstance(descriptor, (IsNotNullExpression, IsNotNilExpression, IsNotUndefinedExpression)):
+        return "notNull"
+    elif isinstance(descriptor, InExpression):
+        return "in"
+    elif isinstance(descriptor, NotInExpression):
+        return "notIn"
+    elif isinstance(descriptor, BetweenExpression):
+        return "between"
+    elif isinstance(descriptor, NotBetweenExpression):
+        return "notBetween"
+    elif isinstance(descriptor, AndExpression):
+        return "and"
+    elif isinstance(descriptor, OrExpression):
+        return "or"
+    elif isinstance(descriptor, CoalesceExpression):
+        return "coalesce"
+    elif isinstance(descriptor, ParseJsonExpression):
+        return "parseJson"
+    else:
+        raise ValueError(f"Unsupported descriptor type: {descriptor}")
 
 
 def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplayContext") -> BaseDescriptor:
