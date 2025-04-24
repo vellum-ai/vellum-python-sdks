@@ -486,14 +486,14 @@ export abstract class BaseNode<
     const nodeContext = this.nodeContext;
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
-    let tryNodeAdornmentExists = false;
+    let tryAdornmentExists = false;
 
     const adornments = this.getAdornments();
 
     for (const adornment of adornments) {
       // TODO: remove this check when we remove errorOutputId
       if (adornment.base.name === "TryNode") {
-        tryNodeAdornmentExists = true;
+        tryAdornmentExists = true;
       }
 
       if (adornment.base) {
@@ -521,7 +521,7 @@ export abstract class BaseNode<
       }
     }
 
-    if (errorOutputId && !tryNodeAdornmentExists) {
+    if (errorOutputId && !tryAdornmentExists) {
       decorators.push(
         python.decorator({
           callable: python.invokeMethod({
