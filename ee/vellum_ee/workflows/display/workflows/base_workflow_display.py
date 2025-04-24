@@ -46,6 +46,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowInputsDisplays,
     WorkflowOutputDisplays,
 )
+from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -169,6 +170,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         synthetic_output_edges: JsonArray = []
         output_variables: JsonArray = []
+        output_values: JsonArray = []
         final_output_nodes = [
             node for node in self.display_context.node_displays.keys() if issubclass(node, FinalOutputNode)
         ]
@@ -257,6 +259,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 if serialized_terminal_node and isinstance(serialized_terminal_node["data"], dict):
                     serialized_terminal_node["data"]["name"] = workflow_output_display.name
 
+            output_values.append(
+                {
+                    "output_variable_id": str(workflow_output_display.id),
+                    "value": serialize_value(self.display_context, workflow_output.instance),
+                }
+            )
+
             output_variables.append(
                 {
                     "id": str(workflow_output_display.id),
@@ -318,6 +327,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "name": self._workflow.__name__,
                     "module": cast(JsonArray, self._workflow.__module__.split(".")),
                 },
+                "output_values": output_values,
             },
             "input_variables": input_variables,
             "state_variables": state_variables,

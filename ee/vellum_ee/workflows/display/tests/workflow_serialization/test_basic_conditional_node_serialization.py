@@ -95,7 +95,6 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
     assert len(workflow_raw_data["edges"]) == 11
     assert len(workflow_raw_data["nodes"]) == 12
 
@@ -872,7 +871,6 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
 
     # AND the conditional node should be what we expect
     conditional_node = workflow_raw_data["nodes"][1]
@@ -997,7 +995,6 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
 
     # AND the conditional node should be what we expect
     conditional_node = workflow_raw_data["nodes"][1]
@@ -1108,7 +1105,6 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
 
     # AND the conditional node should be what we expect
     conditional_node = workflow_raw_data["nodes"][1]

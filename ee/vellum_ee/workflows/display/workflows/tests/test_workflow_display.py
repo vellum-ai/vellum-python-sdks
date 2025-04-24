@@ -362,9 +362,13 @@ def test_serialize_workflow__terminal_node_mismatches_workflow_output_name():
     assert data["output_variables"][0]["key"] == "answer"
     assert data["output_variables"][0]["type"] == "STRING"
 
-    # TODO: AND the output value should have the correct name
-    # output_variable_id = data["output_variables"][0]["id"]
-    # assert isinstance(data["workflow_raw_data"]["output_values"], list)
-    # assert isinstance(data["workflow_raw_data"]["output_values"][0], dict)
-    # assert data["workflow_raw_data"]["output_values"][0]["output_variable_id"] == output_variable_id
-    # assert data["workflow_raw_data"]["output_values"][0]["value"] is None
+    # AND the output value should have the correct name
+    output_variable_id = data["output_variables"][0]["id"]
+    assert isinstance(data["workflow_raw_data"]["output_values"], list)
+    assert isinstance(data["workflow_raw_data"]["output_values"][0], dict)
+    assert data["workflow_raw_data"]["output_values"][0]["output_variable_id"] == output_variable_id
+    assert data["workflow_raw_data"]["output_values"][0]["value"] == {
+        "type": "NODE_OUTPUT",
+        "node_id": str(ExitNode.__id__),
+        "node_output_id": str(ExitNode.__output_ids__["value"]),
+    }

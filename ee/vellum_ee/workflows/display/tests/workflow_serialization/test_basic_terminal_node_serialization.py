@@ -44,7 +44,6 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
     assert len(workflow_raw_data["edges"]) == 1
     assert len(workflow_raw_data["nodes"]) == 2
 

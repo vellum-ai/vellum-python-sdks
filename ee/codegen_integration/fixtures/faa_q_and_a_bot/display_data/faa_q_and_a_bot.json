@@ -147,9 +147,7 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": [
-                      "classification"
-                    ],
+                    "required": ["classification"],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -2395,7 +2393,17 @@
         "code",
         "workflow"
       ]
-    }
+    },
+    "output_values": [
+      {
+        "output_variable_id": "8c6e5464-8916-4039-b911-cf707855d372",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
+          "node_output_id": "8c6e5464-8916-4039-b911-cf707855d372"
+        }
+      }
+    ]
   },
   "input_variables": [
     {

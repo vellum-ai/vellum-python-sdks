@@ -376,7 +376,17 @@
         "code",
         "workflow"
       ]
-    }
+    },
+    "output_values": [
+      {
+        "output_variable_id": "e53bdfb1-f74d-43f0-a3fc-24c7a5162a62",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "dad01b99-c0b4-4904-a75e-066fa947d256",
+          "node_output_id": "e53bdfb1-f74d-43f0-a3fc-24c7a5162a62"
+        }
+      }
+    ]
   },
   "input_variables": [
     {

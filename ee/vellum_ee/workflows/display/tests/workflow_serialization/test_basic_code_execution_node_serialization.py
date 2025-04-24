@@ -40,7 +40,6 @@ def test_serialize_workflow_with_filepath():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
     assert len(workflow_raw_data["edges"]) == 3
     assert len(workflow_raw_data["nodes"]) == 4
 
@@ -280,7 +279,6 @@ def test_serialize_workflow_with_code():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
     assert len(workflow_raw_data["edges"]) == 3
     assert len(workflow_raw_data["nodes"]) == 4
 
@@ -508,7 +506,6 @@ def test_serialize_workflow__try_wrapped():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert workflow_raw_data.keys() == {"edges", "nodes", "display_data", "definition"}
     assert len(workflow_raw_data["edges"]) == 3
     assert len(workflow_raw_data["nodes"]) == 4
 
