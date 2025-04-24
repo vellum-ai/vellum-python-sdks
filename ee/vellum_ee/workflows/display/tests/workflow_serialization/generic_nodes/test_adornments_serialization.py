@@ -237,8 +237,12 @@ def test_serialize_node__stacked():
     exec_config = workflow_display.serialize()
 
     # THEN the workflow display is created successfully
+    assert isinstance(exec_config["workflow_raw_data"], dict)
+    assert isinstance(exec_config["workflow_raw_data"]["nodes"], list)
     inner_stacked_generic_node = [
-        node for node in exec_config["workflow_raw_data"]["nodes"] if node["type"] == "GENERIC"
+        node
+        for node in exec_config["workflow_raw_data"]["nodes"]
+        if isinstance(node, dict) and node["type"] == "GENERIC"
     ][0]
     assert not DeepDiff(
         {
