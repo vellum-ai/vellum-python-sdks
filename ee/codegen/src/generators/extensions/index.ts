@@ -12,3 +12,4 @@
  */
 
 export * from "./protected-python-file";
+export * from "./writer";

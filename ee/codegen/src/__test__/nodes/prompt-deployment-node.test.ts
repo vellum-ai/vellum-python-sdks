@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { ReleaseReviews as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { VellumError } from "vellum-ai/errors";
@@ -8,6 +7,7 @@ import { workflowContextFactory } from "src/__test__/helpers";
 import { promptDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
+import { Writer } from "src/generators/extensions";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
 

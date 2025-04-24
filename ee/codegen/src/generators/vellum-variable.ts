@@ -1,10 +1,10 @@
 import { python } from "@fern-api/python-ast";
 import { Type } from "@fern-api/python-ast/Type";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 import { VellumValue as VellumValueType } from "vellum-ai/api/types";
 
+import { Writer } from "src/generators/extensions";
 import { VellumValue } from "src/generators/vellum-variable-value";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 

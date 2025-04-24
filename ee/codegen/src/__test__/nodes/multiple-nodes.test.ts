@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { WorkflowDeploymentRelease } from "vellum-ai/api";
 import {
@@ -22,6 +21,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
+import { Writer } from "src/generators/extensions";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";

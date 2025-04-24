@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { Writer } from "src/generators/extensions";
 import { NodeTrigger as NodeTriggerType } from "src/types/vellum";
 
 export declare namespace NodeTrigger {

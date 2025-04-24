@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { VellumVariable } from "vellum-ai/api";
 import { StringInput } from "vellum-ai/api/types";
 
@@ -6,6 +5,7 @@ import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
 
 import * as codegen from "src/codegen";
+import { Writer } from "src/generators/extensions";
 import { WorkflowSandboxInputs } from "src/types/vellum";
 
 describe("Workflow Sandbox", () => {
