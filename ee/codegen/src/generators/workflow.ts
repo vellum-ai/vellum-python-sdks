@@ -34,8 +34,6 @@ import { DictEntry, isDefined } from "src/utils/typing";
 
 export declare namespace Workflow {
   interface Args {
-    /* The name of the module that the workflow class belongs to */
-    moduleName: string;
     /* The context for the workflow */
     workflowContext: WorkflowContext;
     /* The inputs for the workflow */
@@ -147,7 +145,7 @@ export class Workflow {
 
     const workflowClassRef = python.reference({
       name: this.workflowContext.workflowClassName,
-      modulePath: this.workflowContext.modulePath,
+      modulePath: this.getWorkflowFile().getModulePath(),
     });
 
     const workflowDisplayClass = python.class_({
@@ -653,21 +651,8 @@ class WorkflowFile extends BasePersistedFile {
     this.workflow = workflow;
   }
 
-  protected getModulePath(): string[] {
-    let modulePath: string[];
-    if (this.workflowContext.parentNode) {
-      modulePath = [
-        ...this.workflowContext.parentNode.getNodeModulePath(),
-        GENERATED_WORKFLOW_MODULE_NAME,
-      ];
-    } else {
-      modulePath = [
-        this.workflowContext.moduleName,
-        GENERATED_WORKFLOW_MODULE_NAME,
-      ];
-    }
-
-    return modulePath;
+  public getModulePath(): string[] {
+    return this.workflowContext.modulePath;
   }
 
   protected getFileStatements(): AstNode[] {
@@ -690,22 +675,19 @@ class WorkflowDisplayFile extends BasePersistedFile {
     this.workflow = workflow;
   }
 
-  protected getModulePath(): string[] {
-    let modulePath: string[];
+  public getModulePath(): string[] {
     if (this.workflowContext.parentNode) {
-      modulePath = [
+      return [
         ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
         GENERATED_WORKFLOW_MODULE_NAME,
       ];
     } else {
-      modulePath = [
-        this.workflowContext.moduleName,
+      return [
+        ...this.workflowContext.modulePath.slice(0, -1),
         GENERATED_DISPLAY_MODULE_NAME,
         GENERATED_WORKFLOW_MODULE_NAME,
       ];
     }
-
-    return modulePath;
   }
 
   protected getFileStatements(): AstNode[] {

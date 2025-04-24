@@ -26,7 +26,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
   }
 
   protected getModulePath(): string[] {
-    return [this.workflowContext.moduleName, "sandbox"];
+    return [...this.workflowContext.modulePath.slice(0, -1), "sandbox"];
   }
 
   protected getFileStatements(): AstNode[] {

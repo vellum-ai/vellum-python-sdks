@@ -28,10 +28,15 @@ describe("WorkflowProjectGenerator", () => {
   ) {
     const completeFilePath = join(
       tempDir,
-      project.getModuleName(),
+      ...project.getModulePath(),
       ...filePath
     );
-    expect(fs.existsSync(completeFilePath)).toBe(true);
+    expect(
+      fs.existsSync(completeFilePath),
+      `File does not exist: ${completeFilePath}. Files generated:\n${Object.keys(
+        getAllFilesInDir(join(tempDir))
+      ).join("\n")}`
+    ).toBe(true);
     expect(fs.readFileSync(completeFilePath, "utf-8")).toMatchSnapshot();
   }
 
@@ -41,17 +46,23 @@ describe("WorkflowProjectGenerator", () => {
   ) {
     const completeFilePath = join(
       tempDir,
-      project.getModuleName(),
+      ...project.getModulePath(),
       ...filePath
     );
-    expect(fs.existsSync(completeFilePath)).toBe(true);
+
+    expect(
+      fs.existsSync(completeFilePath),
+      `File does not exist: ${completeFilePath}. Files generated:\n${Object.keys(
+        getAllFilesInDir(join(tempDir))
+      ).join("\n")}`
+    ).toBe(true);
   }
 
   function expectErrorLog(
     project: WorkflowProjectGenerator,
     expectedContents: string = ""
   ) {
-    const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
+    const errorLogPath = join(tempDir, ...project.getModulePath(), "error.log");
     const errorLog = fs.existsSync(errorLogPath)
       ? fs.readFileSync(errorLogPath, "utf-8")
       : "";
@@ -134,7 +145,7 @@ describe("WorkflowProjectGenerator", () => {
         await project.generateCode();
 
         const generatedFiles = getAllFilesInDir(
-          join(tempDir, project.getModuleName())
+          join(tempDir, ...project.getModulePath())
         );
         const expectedFiles = getAllFilesInDir(codeDir, excludeFilesAtPaths);
 
@@ -2973,6 +2984,91 @@ baz = foo + bar
 
       await project.generateCode();
       expectProjectFileToMatchSnapshot(project, ["nodes", "router_node.py"]);
+    });
+  });
+
+  describe("modules", () => {
+    it("should generate code in the same module as the project", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "templating",
+              type: "TEMPLATING",
+              data: {
+                label: "Templating Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              definition: {
+                name: "TemplatingNode",
+                module: ["my", "module", "templating_node"],
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "foo",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "templating",
+              target_handle_id: "template_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "my.module",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot(project, [
+        "nodes",
+        "templating_node.py",
+      ]);
     });
   });
 });
