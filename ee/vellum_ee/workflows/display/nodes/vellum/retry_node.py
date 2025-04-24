@@ -1,7 +1,6 @@
 import inspect
-from typing import Any, Generic, Tuple, Type, TypeVar, cast
+from typing import Any, Generic, Tuple, Type, TypeVar
 
-from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
@@ -13,6 +12,7 @@ from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_di
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_adornment_node import BaseAdornmentNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.expressions import serialize_value
 
 _RetryNodeType = TypeVar("_RetryNodeType", bound=RetryNode)
 
@@ -33,7 +33,7 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
                 {
                     "id": id,
                     "name": attribute.name,
-                    "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
+                    "value": serialize_value(display_context, attribute.instance),
                 }
             )
 
