@@ -486,8 +486,42 @@ export abstract class BaseNode<
     const nodeContext = this.nodeContext;
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
+    let tryNodeAdornmentExists = false;
 
-    if (errorOutputId) {
+    const adornments = this.getAdornments();
+
+    for (const adornment of adornments) {
+      // TODO: remove this check when we remove errorOutputId
+      if (adornment.base.name === "TryNode") {
+        tryNodeAdornmentExists = true;
+      }
+
+      if (adornment.base) {
+        decorators.push(
+          python.decorator({
+            callable: python.invokeMethod({
+              methodReference: python.reference({
+                name: `Base${adornment.base.name}Display`,
+                attribute: ["wrap"],
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_MODULE_PATH,
+              }),
+              // TODO: When we define output transformations, that's what we'd use here. eg, `error_output_id`.
+              // https://linear.app/vellum/issue/APO-213/define-output-transformations-for-node-adornments
+              arguments_: [
+                new MethodArgument({
+                  name: "node_id",
+                  value: python.TypeInstantiation.uuid(adornment.id),
+                }),
+              ],
+            }),
+          })
+        );
+      }
+    }
+
+    if (errorOutputId && !tryNodeAdornmentExists) {
       decorators.push(
         python.decorator({
           callable: python.invokeMethod({
@@ -514,38 +548,6 @@ export abstract class BaseNode<
           }),
         })
       );
-    }
-    const adornments = this.getAdornments();
-
-    for (const adornment of adornments) {
-      // TODO: remove this check when we remove errorOutputId
-      if (errorOutputId && adornment.base.name === "TryNode") {
-        continue;
-      }
-
-      if (adornment.base) {
-        decorators.push(
-          python.decorator({
-            callable: python.invokeMethod({
-              methodReference: python.reference({
-                name: `Base${adornment.base.name}Display`,
-                attribute: ["wrap"],
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .NODE_DISPLAY_MODULE_PATH,
-              }),
-              // TODO: When we define output transformations, that's what we'd use here. eg, `error_output_id`.
-              // https://linear.app/vellum/issue/APO-213/define-output-transformations-for-node-adornments
-              arguments_: [
-                new MethodArgument({
-                  name: "node_id",
-                  value: python.TypeInstantiation.uuid(adornment.id),
-                }),
-              ],
-            }),
-          })
-        );
-      }
     }
 
     const nodeClass = python.class_({

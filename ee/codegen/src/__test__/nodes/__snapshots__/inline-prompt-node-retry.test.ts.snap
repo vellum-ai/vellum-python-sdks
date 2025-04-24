@@ -93,11 +93,11 @@ from vellum_ee.workflows.display.nodes.types import (
 from ...nodes.prompt_node import PromptNode
 
 
+@BaseRetryNodeDisplay.wrap(node_id=UUID("e5de8d57-ae0d-4a4a-afb3-eb4cd6bdb0ac"))
 @BaseTryNodeDisplay.wrap(
     node_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
     error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
 )
-@BaseRetryNodeDisplay.wrap(node_id=UUID("e5de8d57-ae0d-4a4a-afb3-eb4cd6bdb0ac"))
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
