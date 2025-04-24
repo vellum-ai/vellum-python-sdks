@@ -1,8 +1,7 @@
 import inspect
 from uuid import UUID
-from typing import Any, ClassVar, Generic, Optional, Tuple, Type, TypeVar, cast
+from typing import Any, ClassVar, Generic, Optional, Tuple, Type, TypeVar
 
-from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
@@ -14,6 +13,7 @@ from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_di
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.vellum.base_adornment_node import BaseAdornmentNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.expressions import serialize_value
 
 _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
 
@@ -37,7 +37,7 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
                 {
                     "id": id,
                     "name": attribute.name,
-                    "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
+                    "value": serialize_value(display_context, attribute.instance),
                 }
             )
 

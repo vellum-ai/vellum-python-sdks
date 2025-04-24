@@ -20,45 +20,10 @@ from typing import (
 from vellum.client.types.code_resource_definition import CodeResourceDefinition
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
-from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.expressions.accessor import AccessorExpression
-from vellum.workflows.expressions.and_ import AndExpression
-from vellum.workflows.expressions.begins_with import BeginsWithExpression
-from vellum.workflows.expressions.between import BetweenExpression
-from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
-from vellum.workflows.expressions.contains import ContainsExpression
-from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
-from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
-from vellum.workflows.expressions.does_not_end_with import DoesNotEndWithExpression
-from vellum.workflows.expressions.does_not_equal import DoesNotEqualExpression
-from vellum.workflows.expressions.ends_with import EndsWithExpression
-from vellum.workflows.expressions.equals import EqualsExpression
-from vellum.workflows.expressions.greater_than import GreaterThanExpression
-from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
-from vellum.workflows.expressions.in_ import InExpression
-from vellum.workflows.expressions.is_nil import IsNilExpression
-from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
-from vellum.workflows.expressions.is_not_null import IsNotNullExpression
-from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
-from vellum.workflows.expressions.is_null import IsNullExpression
-from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
-from vellum.workflows.expressions.less_than import LessThanExpression
-from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
-from vellum.workflows.expressions.not_between import NotBetweenExpression
-from vellum.workflows.expressions.not_in import NotInExpression
-from vellum.workflows.expressions.or_ import OrExpression
-from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
-from vellum.workflows.references.constant import ConstantValueReference
-from vellum.workflows.references.execution_count import ExecutionCountReference
-from vellum.workflows.references.lazy import LazyReference
-from vellum.workflows.references.state_value import StateValueReference
-from vellum.workflows.references.vellum_secret import VellumSecretReference
-from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.types.utils import get_original_base
@@ -68,10 +33,8 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
-from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
+from vellum_ee.workflows.display.utils.expressions import serialize_condition, serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
-from vellum_ee.workflows.display.utils.vellum import convert_descriptor_to_operator
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -157,7 +120,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                     {
                         "id": id,
                         "name": attribute.name,
-                        "value": self.serialize_value(display_context, attribute.instance),
+                        "value": serialize_value(display_context, attribute.instance),
                     }
                 )
             except ValueError as e:
@@ -184,7 +147,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         for output in node.Outputs:
             type = primitive_type_to_vellum_variable_type(output)
             value = (
-                self.serialize_value(display_context, output.instance)
+                serialize_value(display_context, output.instance)
                 if output.instance is not None and output.instance != undefined
                 else None
             )
@@ -229,7 +192,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                         "name": port.name,
                         "type": port._condition_type.value,
                         "expression": (
-                            self.serialize_condition(display_context, port._condition) if port._condition else None
+                            serialize_condition(display_context, port._condition) if port._condition else None
                         ),
                     }
                 )
@@ -404,138 +367,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             )
 
         return NodeDisplayData()
-
-    def serialize_condition(self, display_context: "WorkflowDisplayContext", condition: BaseDescriptor) -> JsonObject:
-        if isinstance(
-            condition,
-            (
-                IsNullExpression,
-                IsNotNullExpression,
-                IsNilExpression,
-                IsNotNilExpression,
-                IsUndefinedExpression,
-                IsNotUndefinedExpression,
-                ParseJsonExpression,
-            ),
-        ):
-            lhs = self.serialize_value(display_context, condition._expression)
-            return {
-                "type": "UNARY_EXPRESSION",
-                "lhs": lhs,
-                "operator": convert_descriptor_to_operator(condition),
-            }
-        elif isinstance(condition, (BetweenExpression, NotBetweenExpression)):
-            base = self.serialize_value(display_context, condition._value)
-            lhs = self.serialize_value(display_context, condition._start)
-            rhs = self.serialize_value(display_context, condition._end)
-
-            return {
-                "type": "TERNARY_EXPRESSION",
-                "base": base,
-                "operator": convert_descriptor_to_operator(condition),
-                "lhs": lhs,
-                "rhs": rhs,
-            }
-        elif isinstance(
-            condition,
-            (
-                AndExpression,
-                BeginsWithExpression,
-                CoalesceExpression,
-                ContainsExpression,
-                DoesNotBeginWithExpression,
-                DoesNotContainExpression,
-                DoesNotEndWithExpression,
-                DoesNotEqualExpression,
-                EndsWithExpression,
-                EqualsExpression,
-                GreaterThanExpression,
-                GreaterThanOrEqualToExpression,
-                InExpression,
-                LessThanExpression,
-                LessThanOrEqualToExpression,
-                NotInExpression,
-                OrExpression,
-            ),
-        ):
-            lhs = self.serialize_value(display_context, condition._lhs)
-            rhs = self.serialize_value(display_context, condition._rhs)
-
-            return {
-                "type": "BINARY_EXPRESSION",
-                "lhs": lhs,
-                "operator": convert_descriptor_to_operator(condition),
-                "rhs": rhs,
-            }
-        elif isinstance(condition, AccessorExpression):
-            return {
-                "type": "BINARY_EXPRESSION",
-                "lhs": self.serialize_value(display_context, condition._base),
-                "operator": "accessField",
-                "rhs": self.serialize_value(display_context, condition._field),
-            }
-
-        raise UnsupportedSerializationException(f"Unsupported condition type: {condition.__class__.__name__}")
-
-    def serialize_value(self, display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
-        if isinstance(value, ConstantValueReference):
-            return self.serialize_value(display_context, value._value)
-
-        if isinstance(value, LazyReference):
-            child_descriptor = get_child_descriptor(value, display_context)
-            return self.serialize_value(display_context, child_descriptor)
-
-        if isinstance(value, WorkflowInputReference):
-            workflow_input_display = display_context.global_workflow_input_displays[value]
-            return {
-                "type": "WORKFLOW_INPUT",
-                "input_variable_id": str(workflow_input_display.id),
-            }
-
-        if isinstance(value, StateValueReference):
-            state_value_display = display_context.global_state_value_displays[value]
-            return {
-                "type": "STATE_VALUE",
-                "state_variable_id": str(state_value_display.id),
-            }
-
-        if isinstance(value, OutputReference):
-            upstream_node, output_display = display_context.global_node_output_displays[value]
-            upstream_node_display = display_context.global_node_displays[upstream_node]
-
-            return {
-                "type": "NODE_OUTPUT",
-                "node_id": str(upstream_node_display.node_id),
-                "node_output_id": str(output_display.id),
-            }
-
-        if isinstance(value, VellumSecretReference):
-            return {
-                "type": "VELLUM_SECRET",
-                "vellum_secret_name": value.name,
-            }
-
-        if isinstance(value, ExecutionCountReference):
-            node_class_display = display_context.global_node_displays[value.node_class]
-
-            return {
-                "type": "EXECUTION_COUNTER",
-                "node_id": str(node_class_display.node_id),
-            }
-
-        if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
-            raise ValueError("Nested references are not supported.")
-
-        if not isinstance(value, BaseDescriptor):
-            vellum_value = primitive_to_vellum_value(value)
-            return {
-                "type": "CONSTANT_VALUE",
-                "value": vellum_value.dict(),
-            }
-
-        # If it's not any of the references we know about,
-        # then try to serialize it as a nested value
-        return self.serialize_condition(display_context, value)
 
 
 register_node_display_class(node_class=BaseNode, node_display_class=BaseNodeDisplay)

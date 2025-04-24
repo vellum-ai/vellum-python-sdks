@@ -2,36 +2,9 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.array_vellum_value import ArrayVellumValue
-from vellum.client.types.logical_operator import LogicalOperator
 from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_variable_type import VellumVariableType
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.expressions.and_ import AndExpression
-from vellum.workflows.expressions.begins_with import BeginsWithExpression
-from vellum.workflows.expressions.between import BetweenExpression
-from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
-from vellum.workflows.expressions.contains import ContainsExpression
-from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
-from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
-from vellum.workflows.expressions.does_not_end_with import DoesNotEndWithExpression
-from vellum.workflows.expressions.does_not_equal import DoesNotEqualExpression
-from vellum.workflows.expressions.ends_with import EndsWithExpression
-from vellum.workflows.expressions.equals import EqualsExpression
-from vellum.workflows.expressions.greater_than import GreaterThanExpression
-from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
-from vellum.workflows.expressions.in_ import InExpression
-from vellum.workflows.expressions.is_nil import IsNilExpression
-from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
-from vellum.workflows.expressions.is_not_null import IsNotNullExpression
-from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
-from vellum.workflows.expressions.is_null import IsNullExpression
-from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
-from vellum.workflows.expressions.less_than import LessThanExpression
-from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
-from vellum.workflows.expressions.not_between import NotBetweenExpression
-from vellum.workflows.expressions.not_in import NotInExpression
-from vellum.workflows.expressions.or_ import OrExpression
-from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.references import OutputReference, WorkflowInputReference
@@ -166,52 +139,3 @@ def create_node_input_value_pointer_rule(
         return ConstantValuePointer(type="CONSTANT_VALUE", data=vellum_value)
 
     raise UnsupportedSerializationException(f"Unsupported descriptor type: {value.__class__.__name__}")
-
-
-def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperator:
-    if isinstance(descriptor, EqualsExpression):
-        return "="
-    elif isinstance(descriptor, DoesNotEqualExpression):
-        return "!="
-    elif isinstance(descriptor, LessThanExpression):
-        return "<"
-    elif isinstance(descriptor, GreaterThanExpression):
-        return ">"
-    elif isinstance(descriptor, LessThanOrEqualToExpression):
-        return "<="
-    elif isinstance(descriptor, GreaterThanOrEqualToExpression):
-        return ">="
-    elif isinstance(descriptor, ContainsExpression):
-        return "contains"
-    elif isinstance(descriptor, BeginsWithExpression):
-        return "beginsWith"
-    elif isinstance(descriptor, EndsWithExpression):
-        return "endsWith"
-    elif isinstance(descriptor, DoesNotContainExpression):
-        return "doesNotContain"
-    elif isinstance(descriptor, DoesNotBeginWithExpression):
-        return "doesNotBeginWith"
-    elif isinstance(descriptor, DoesNotEndWithExpression):
-        return "doesNotEndWith"
-    elif isinstance(descriptor, (IsNullExpression, IsNilExpression, IsUndefinedExpression)):
-        return "null"
-    elif isinstance(descriptor, (IsNotNullExpression, IsNotNilExpression, IsNotUndefinedExpression)):
-        return "notNull"
-    elif isinstance(descriptor, InExpression):
-        return "in"
-    elif isinstance(descriptor, NotInExpression):
-        return "notIn"
-    elif isinstance(descriptor, BetweenExpression):
-        return "between"
-    elif isinstance(descriptor, NotBetweenExpression):
-        return "notBetween"
-    elif isinstance(descriptor, AndExpression):
-        return "and"
-    elif isinstance(descriptor, OrExpression):
-        return "or"
-    elif isinstance(descriptor, CoalesceExpression):
-        return "coalesce"
-    elif isinstance(descriptor, ParseJsonExpression):
-        return "parseJson"
-    else:
-        raise ValueError(f"Unsupported descriptor type: {descriptor}")
