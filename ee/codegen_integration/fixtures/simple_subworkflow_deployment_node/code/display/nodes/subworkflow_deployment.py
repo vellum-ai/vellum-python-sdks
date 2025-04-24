@@ -11,7 +11,7 @@ class SubworkflowDeploymentDisplay(BaseSubworkflowDeploymentNodeDisplay[Subworkf
     label = "Subworkflow Deployment"
     node_id = UUID("07d76e33-f3df-4235-8493-07e341208bf5")
     target_handle_id = UUID("30771282-5c0a-4a98-a3a8-4c7eeda30d23")
-    node_input_ids_by_name = {"test": UUID("97b63d71-5413-417f-9cf5-49e1b4fd56e4")}
+    node_input_ids_by_name = {"subworkflow_inputs.test": UUID("97b63d71-5413-417f-9cf5-49e1b4fd56e4")}
     output_display = {
         SubworkflowDeployment.Outputs.chat_history: NodeOutputDisplay(
             id=UUID("53970e88-0bf6-4364-86b3-840d78a2afe5"), name="chat_history"
