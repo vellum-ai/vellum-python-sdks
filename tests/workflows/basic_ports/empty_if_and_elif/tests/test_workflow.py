@@ -54,9 +54,7 @@ def test_empty_conditional_ports(workflow_factory, description, name):
         workflow_cls = workflow_factory()
         workflow_cls()
 
-    base_module = __name__.split(".")
     assert (
         str(exc_info.value)
-        == f"Class {'.'.join(base_module)}.{workflow_factory.__name__}.<locals>.{name}'s {description.lower()}_branch "
-        f"port should have a defined condition and cannot be empty"
+        == f"Class {name}'s {description.lower()}_branch should have a defined condition and cannot be empty."  # noqa: E501
     )
