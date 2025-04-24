@@ -74,14 +74,10 @@ class Port:
 
     @staticmethod
     def on_if(condition: Optional[BaseDescriptor] = None, fork_state: bool = False):
-        if condition is None:
-            raise WorkflowInitializationException("Please verify that your IF ports have defined expressions")
         return Port(condition=condition, condition_type=ConditionType.IF, fork_state=fork_state)
 
     @staticmethod
     def on_elif(condition: Optional[BaseDescriptor] = None, fork_state: bool = False) -> "Port":
-        if condition is None:
-            raise WorkflowInitializationException("Please verify that your ELIF ports have defined expressions")
         return Port(condition=condition, condition_type=ConditionType.ELIF, fork_state=fork_state)
 
     @staticmethod
@@ -111,3 +107,13 @@ class Port:
         cls, source_type: Type[Any], handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
         return core_schema.is_instance_schema(cls)
+
+    def validate(self):
+        if (
+            not self.default
+            and self._condition_type in (ConditionType.IF, ConditionType.ELIF)
+            and self._condition is None
+        ):
+            raise WorkflowInitializationException(
+                f"Class {self.node_class}'s {self.name} port should have a defined condition and cannot be empty"
+            )

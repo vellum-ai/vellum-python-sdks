@@ -42,16 +42,21 @@ def create_empty_elif_workflow():
 
 
 @pytest.mark.parametrize(
-    "workflow_factory,description",
+    "workflow_factory,description,name",
     [
-        (create_empty_if_workflow, "IF"),
-        (create_empty_elif_workflow, "ELIF"),
+        (create_empty_if_workflow, "IF", "EmptyIfNode"),
+        (create_empty_elif_workflow, "ELIF", "EmptyElIfNode"),
     ],
     ids=["empty_if", "empty_elif"],
 )
-def test_empty_conditional_ports(workflow_factory, description):
+def test_empty_conditional_ports(workflow_factory, description, name):
     with pytest.raises(WorkflowInitializationException) as exc_info:
         workflow_cls = workflow_factory()
         workflow_cls()
 
-    assert str(exc_info.value) == f"Please verify that your {description} ports have defined expressions"
+    base_module = __name__.split(".")
+    assert (
+        str(exc_info.value)
+        == f"Class {'.'.join(base_module)}.{workflow_factory.__name__}.<locals>.{name}'s {description.lower()}_branch "
+        f"port should have a defined condition and cannot be empty"
+    )
