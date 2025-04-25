@@ -15,7 +15,7 @@ from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.types.code_execution_node_wrappers import ListWrapper, StringValueWrapper
+from vellum.workflows.types.code_execution_node_wrappers import DictWrapper, ListWrapper, StringValueWrapper
 from vellum.workflows.types.core import Json
 from vellum.workflows.types.generics import NodeType
 
@@ -182,6 +182,8 @@ def _get_type_name(obj: Any) -> str:
         return "str"
     if inspect.isclass(obj) and issubclass(obj, ListWrapper):
         return "list"
+    if inspect.isclass(obj) and issubclass(obj, DictWrapper):
+        return "dict"
     if isinstance(obj, type):
         return obj.__name__
 
