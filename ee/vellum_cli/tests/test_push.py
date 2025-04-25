@@ -7,6 +7,7 @@ from unittest import mock
 from uuid import uuid4
 
 from click.testing import CliRunner
+from httpx import Response
 
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
@@ -548,6 +549,80 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         api_key="aaabbbcccddd",
         environment=mock.ANY,
     )
+
+    # AND the vellum lock file should have been updated with the correct workspace
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        assert lock_file_content["workflows"][1] == {
+            "module": module,
+            "workflow_sandbox_id": new_workflow_sandbox_id,
+            "workspace": "my_other_workspace",
+            "container_image_name": None,
+            "container_image_tag": None,
+            "deployments": [],
+            "ignore": None,
+            "target_directory": None,
+        }
+
+
+def test_push__workspace_option__uses_different_api_url_env(mock_module, mock_httpx_transport):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND a different workspace is set in the pyproject.toml
+    set_pyproject_toml(
+        {
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": workflow_sandbox_id,
+                }
+            ],
+            "workspaces": [
+                {
+                    "name": "my_other_workspace",
+                    "api_url": "MY_OTHER_VELLUM_API_URL",
+                }
+            ],
+        }
+    )
+
+    # AND the .env file has the other api key stored
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write(
+            """\
+VELLUM_API_KEY=abcdef123456
+MY_OTHER_VELLUM_API_URL=https://app.aws-vpc-staging.vellum.ai
+"""
+        )
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns a new workflow sandbox id
+    new_workflow_sandbox_id = str(uuid4())
+    mock_httpx_transport.handle_request.return_value = Response(
+        status_code=200,
+        text=json.dumps(
+            {
+                "workflow_sandbox_id": new_workflow_sandbox_id,
+            }
+        ),
+    )
+
+    # WHEN calling `vellum push` on strict mode
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module, "--workspace", "my_other_workspace"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the push API once with the correct api url
+    request = mock_httpx_transport.handle_request.call_args[0][0]
+    assert str(request.url) == "https://app.aws-vpc-staging.vellum.ai/v1/workflows/push"
 
     # AND the vellum lock file should have been updated with the correct workspace
     with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
