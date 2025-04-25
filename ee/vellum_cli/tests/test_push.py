@@ -134,6 +134,38 @@ def test_push__happy_path(mock_module, vellum_client, base_command):
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
+def test_push__verify_default_url_in_raw_httpx_transport(mock_module, mock_httpx_transport):
+    # GIVEN a single workflow configured
+    module = mock_module.module
+    temp_dir = mock_module.temp_dir
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully
+    mock_httpx_transport.handle_request.return_value = Response(
+        status_code=200,
+        text=json.dumps(
+            {
+                "workflow_sandbox_id": str(uuid4()),
+            }
+        ),
+    )
+
+    # WHEN calling `vellum push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the correct args
+    mock_httpx_transport.handle_request.assert_called_once()
+    request = mock_httpx_transport.handle_request.call_args[0][0]
+    assert str(request.url) == "https://api.vellum.ai/v1/workflows/push"
+
+    # AND the new URL is in the message at the end
+    assert "Visit at: https://app.vellum.ai/workflow-sandboxes/" in result.output
+
+
 def test_push__no_config__module_found(mock_module, vellum_client):
     # GIVEN no config file set
     temp_dir = mock_module.temp_dir
@@ -637,6 +669,9 @@ MY_OTHER_VELLUM_API_URL=https://app.aws-vpc-staging.vellum.ai
             "ignore": None,
             "target_directory": None,
         }
+
+    # AND the new URL is in the message at the end
+    assert "Visit at: https://app.aws-vpc-staging.vellum.ai/workflow-sandboxes/" in result.output
 
 
 def test_push__workspace_option__both_options_already_configured(mock_module, vellum_client_class):
