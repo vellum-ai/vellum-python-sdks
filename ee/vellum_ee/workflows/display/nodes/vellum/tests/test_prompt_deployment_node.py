@@ -5,6 +5,7 @@ from typing import Type
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import PromptDeploymentNode
+from vellum_ee.workflows.display.nodes.vellum.prompt_deployment_node import BasePromptDeploymentNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -13,14 +14,14 @@ def _no_display_class(Node: Type[PromptDeploymentNode]):  # type: ignore
 
 
 def _display_class_with_node_input_ids_by_name(Node: Type[PromptDeploymentNode]):
-    class PromptDeploymentNodeDisplay(PromptDeploymentNode[Node]):  # type: ignore[valid-type]
+    class PromptDeploymentNodeDisplay(BasePromptDeploymentNodeDisplay[Node]):  # type: ignore[valid-type]
         node_input_ids_by_name = {"foo": UUID("6037747a-1d35-4094-b363-4369fc92c5d4")}
 
     return PromptDeploymentNodeDisplay
 
 
 def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[PromptDeploymentNode]):
-    class PromptDeploymentNodeDisplay(PromptDeploymentNode[Node]):  # type: ignore[valid-type]
+    class PromptDeploymentNodeDisplay(BasePromptDeploymentNodeDisplay[Node]):  # type: ignore[valid-type]
         node_input_ids_by_name = {"prompt_inputs.foo": UUID("6037747a-1d35-4094-b363-4369fc92c5d4")}
 
     return PromptDeploymentNodeDisplay
@@ -51,7 +52,7 @@ def mock_fetch_deployment(mocker):
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "6037747a-1d35-4094-b363-4369fc92c5d4"),
+        (_no_display_class, "016187d6-2830-4256-a61d-e52f9bf6355e"),
         (_display_class_with_node_input_ids_by_name, "6037747a-1d35-4094-b363-4369fc92c5d4"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "6037747a-1d35-4094-b363-4369fc92c5d4"),
     ],

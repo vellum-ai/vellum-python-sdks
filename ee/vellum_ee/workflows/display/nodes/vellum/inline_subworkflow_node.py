@@ -21,6 +21,8 @@ class BaseInlineSubworkflowNodeDisplay(
 ):
     workflow_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
+    __serializable_inputs__ = {InlineSubworkflowNode.subworkflow_inputs}
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:

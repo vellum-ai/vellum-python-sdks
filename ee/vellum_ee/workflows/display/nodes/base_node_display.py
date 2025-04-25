@@ -9,6 +9,7 @@ from typing import (
     ForwardRef,
     Generic,
     Optional,
+    Set,
     Tuple,
     Type,
     TypeVar,
@@ -24,6 +25,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
+from vellum.workflows.references.node import NodeReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.types.utils import get_original_base
@@ -98,12 +100,18 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     # Default values set by the metaclass
     output_display: Dict[OutputReference, NodeOutputDisplay]
     port_displays: Dict[Port, PortDisplayOverrides] = {}
-    node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
     attribute_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
+    # START: Attributes for backwards compatible serialization
     # Used to explicitly set the target handle id for a node
     # Once all nodes are Generic Nodes, we may replace this with a trigger_id or trigger attribute
     target_handle_id: ClassVar[Optional[UUID]] = None
+    # Used to explicitly set the input ids for each node input
+    node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
+    # Used by each class extending BaseNodeDisplay to specify which attributes are meant to be serialized
+    # as the former `"inputs"` field
+    __serializable_inputs__: Set[NodeReference] = set()
+    # END: Attributes for backwards compatible serialization
 
     def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
         node = self._node

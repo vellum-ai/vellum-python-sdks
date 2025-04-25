@@ -9,6 +9,7 @@ from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 
 _ErrorNodeType = TypeVar("_ErrorNodeType", bound=ErrorNode)
+LEGACY_INPUT_NAME = "error_source_input_id"
 
 
 class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeType]):
@@ -17,24 +18,24 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
     # DEPRECATED: Remove in 0.15.0 once removed from the vellum-side
     name: ClassVar[Optional[str]] = None
 
+    __serializable_inputs__ = {ErrorNode.error}
+
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs) -> JsonObject:
         node_id = self.node_id
-        error_source_input_id = self.node_input_ids_by_name.get("error_source_input_id")
+        error_source_input_id = self.node_input_ids_by_name.get(
+            ErrorNode.error.name,
+        ) or self.node_input_ids_by_name.get(LEGACY_INPUT_NAME)
 
         error_attribute = raise_if_descriptor(self._node.error)
-        input_values_by_name = {
-            "error_source_input_id": error_attribute,
-        }
 
         node_inputs = [
             create_node_input(
                 node_id=node_id,
-                input_name=variable_name,
-                value=variable_value,
+                input_name=LEGACY_INPUT_NAME,
+                value=error_attribute,
                 display_context=display_context,
-                input_id=self.node_input_ids_by_name.get(variable_name),
+                input_id=error_source_input_id,
             )
-            for variable_name, variable_value in input_values_by_name.items()
         ]
 
         node_data: dict[str, Any] = {

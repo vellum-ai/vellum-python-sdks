@@ -20,6 +20,17 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
     # A mapping between node input keys and their ids for inputs representing additional header values
     additional_header_value_input_ids: ClassVar[Optional[Dict[str, UUID]]] = None
 
+    __serializable_inputs__ = {
+        APINode.url,
+        APINode.method,
+        APINode.json,
+        APINode.headers,
+        APINode.api_key_header_key,
+        APINode.api_key_header_value,
+        APINode.bearer_token_value,
+        APINode.authorization_type,
+    }
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
     ) -> JsonObject:

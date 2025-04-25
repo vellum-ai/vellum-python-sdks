@@ -78,7 +78,7 @@ def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[Inl
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "8aa4ce7f-5eb8-41b7-abd0-ea2b40c8fb88"),
+        (_no_display_class, "9b036991-67ff-4cd0-a4d7-b4ed581e8b6d"),
         (_display_class_with_node_input_ids_by_name, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
     ],
@@ -165,7 +165,7 @@ def test_serialize_node__prompt_inputs__state_reference():
             },
         },
         {
-            "id": "3750feb9-5d5c-4150-b62d-a9924f466888",
+            "id": "b83c40f7-0159-442f-af03-e80870363c52",
             "key": "bar",
             "value": {
                 "rules": [

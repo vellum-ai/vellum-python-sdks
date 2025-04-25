@@ -29,7 +29,7 @@ def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[Cod
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "e3cdb222-324e-4ad1-abb2-bdd7881b3a0e"),
+        (_no_display_class, "a5dbe403-0b00-4df6-b8f7-ed5f7794b003"),
         (_display_class_with_node_input_ids_by_name, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
     ],

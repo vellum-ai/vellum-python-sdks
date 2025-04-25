@@ -18,6 +18,11 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
     output_id: ClassVar[Optional[UUID]] = None
     log_output_id: ClassVar[Optional[UUID]] = None
 
+    __serializable_inputs__ = {
+        CodeExecutionNode.code,
+        CodeExecutionNode.code_inputs,
+    }
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
