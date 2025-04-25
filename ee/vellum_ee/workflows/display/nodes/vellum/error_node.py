@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import ErrorNode
@@ -12,13 +12,12 @@ _ErrorNodeType = TypeVar("_ErrorNodeType", bound=ErrorNode)
 
 
 class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeType]):
+    # DEPRECATED: Remove in 0.15.0 once removed from the vellum-side
     error_output_id: ClassVar[Optional[UUID]] = None
-
+    # DEPRECATED: Remove in 0.15.0 once removed from the vellum-side
     name: ClassVar[str] = "error-node"
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext, **kwargs) -> JsonObject:
         node_id = self.node_id
         error_source_input_id = self.node_input_ids_by_name.get("error_source_input_id")
 
@@ -47,7 +46,7 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
                 "label": self.label,
                 "target_handle_id": str(self.get_target_handle_id()),
                 "error_source_input_id": str(error_source_input_id),
-                "error_output_id": str(self.error_output_id),
+                "error_output_id": str(self.error_output_id) if self.error_output_id else str(uuid4()),
             },
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
