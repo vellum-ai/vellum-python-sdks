@@ -6,6 +6,7 @@ import logging
 from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
+from vellum.client import Vellum as VellumClient
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -21,6 +22,7 @@ from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
@@ -84,9 +86,16 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         self,
         *,
         parent_display_context: Optional[WorkflowDisplayContext] = None,
+        client: Optional[VellumClient] = None,
         dry_run: bool = False,
     ):
         self._parent_display_context = parent_display_context
+        self._client = client or (
+            # propagate the client from the parent display context if it is not provided
+            self._parent_display_context.client
+            if self._parent_display_context
+            else create_vellum_client()
+        )
         self._errors: List[Exception] = []
         self._dry_run = dry_run
 
@@ -494,6 +503,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             )
 
         return WorkflowDisplayContext(
+            client=self._client,
             workflow_display=workflow_meta_display,
             workflow_input_displays=workflow_input_displays,
             global_workflow_input_displays=global_workflow_input_displays,

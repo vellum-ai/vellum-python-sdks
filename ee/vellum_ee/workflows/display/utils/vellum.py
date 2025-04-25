@@ -13,7 +13,6 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 
@@ -118,8 +117,7 @@ def create_node_input_value_pointer_rule(
         workflow_input_display = display_context.global_workflow_input_displays[value]
         return InputVariablePointer(data=InputVariableData(input_variable_id=str(workflow_input_display.id)))
     if isinstance(value, VellumSecretReference):
-        vellum_client = create_vellum_client()
-        workspace_secret = vellum_client.workspace_secrets.retrieve(
+        workspace_secret = display_context.client.workspace_secrets.retrieve(
             id=value.name,
         )
         return WorkspaceSecretPointer(

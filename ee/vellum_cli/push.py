@@ -106,6 +106,7 @@ def push_command(
     workflow = BaseWorkflow.load_from_module(workflow_config.module)
     workflow_display = get_workflow_display(
         workflow_class=workflow,
+        client=client,
         dry_run=dry_run or False,
     )
     exec_config = workflow_display.serialize()

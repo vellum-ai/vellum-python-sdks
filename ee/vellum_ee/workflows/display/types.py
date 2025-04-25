@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Dict, Tuple, Type
 
+from vellum.client import Vellum as VellumClient
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa: F401
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.vellum_client import create_vellum_client
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
@@ -35,6 +37,7 @@ PortDisplays = Dict[Port, PortDisplay]
 
 @dataclass
 class WorkflowDisplayContext:
+    client: VellumClient = field(default_factory=create_vellum_client)
     workflow_display_class: Type["BaseWorkflowDisplay"] = field(default_factory=get_default_workflow_display_class)
     workflow_display: WorkflowMetaDisplay = field(default_factory=lambda: WorkflowMetaDisplay.get_default(BaseWorkflow))
     workflow_input_displays: WorkflowInputsDisplays = field(default_factory=dict)
