@@ -10,9 +10,7 @@ import { VellumEnvironmentUrls } from "vellum-ai";
 import * as codegen from "./codegen";
 import {
   GENERATED_DISPLAY_MODULE_NAME,
-  GENERATED_DISPLAY_NODE_MODULE_PATH,
   GENERATED_NODES_MODULE_NAME,
-  GENERATED_NODES_PATH,
 } from "./constants";
 import { createNodeContext, WorkflowContext } from "./context";
 import { InputVariableContext } from "./context/input-variable-context";
@@ -171,6 +169,10 @@ ${errors.slice(0, 3).map((err) => {
     return this.workflowContext.moduleName;
   }
 
+  public getModulePath(): string[] {
+    return this.workflowContext.modulePath.slice(0, -1);
+  }
+
   public async generateCode(): Promise<void> {
     const assets = await this.generateAssets().catch((error) => {
       this.workflowContext.addError(error);
@@ -185,7 +187,7 @@ ${errors.slice(0, 3).map((err) => {
 
     const absolutePathToModuleDirectory = join(
       this.workflowContext.absolutePathToOutputDirectory,
-      this.workflowContext.moduleName
+      ...this.getModulePath()
     );
 
     await mkdir(absolutePathToModuleDirectory, {
@@ -226,19 +228,14 @@ ${errors.slice(0, 3).map((err) => {
       comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
         python.starImport({
-          modulePath: [
-            this.workflowContext.moduleName,
-            GENERATED_DISPLAY_MODULE_NAME,
-          ],
+          modulePath: [...this.getModulePath(), GENERATED_DISPLAY_MODULE_NAME],
         })
       );
     }
 
     const rootInitFile = codegen.initFile({
       workflowContext: this.workflowContext,
-      modulePath: this.workflowContext.parentNode
-        ? [...this.workflowContext.parentNode.getNodeModulePath()]
-        : [this.workflowContext.moduleName],
+      modulePath: this.getModulePath(),
       statements,
       imports,
       comments,
@@ -271,7 +268,7 @@ ${errors.slice(0, 3).map((err) => {
       imports.push(
         python.starImport({
           modulePath: [
-            this.workflowContext.moduleName,
+            ...this.getModulePath(),
             GENERATED_DISPLAY_MODULE_NAME,
             "nodes",
           ],
@@ -280,7 +277,7 @@ ${errors.slice(0, 3).map((err) => {
       imports.push(
         python.starImport({
           modulePath: [
-            this.workflowContext.moduleName,
+            ...this.getModulePath(),
             GENERATED_DISPLAY_MODULE_NAME,
             "workflow",
           ],
@@ -291,8 +288,8 @@ ${errors.slice(0, 3).map((err) => {
     const rootDisplayInitFile = codegen.initFile({
       workflowContext: this.workflowContext,
       modulePath: this.workflowContext.parentNode
-        ? [...this.workflowContext.parentNode.getNodeDisplayModulePath()]
-        : [this.workflowContext.moduleName, GENERATED_DISPLAY_MODULE_NAME],
+        ? this.workflowContext.parentNode.getNodeDisplayModulePath()
+        : [...this.getModulePath(), GENERATED_DISPLAY_MODULE_NAME],
       statements,
       imports,
       comments,
@@ -306,8 +303,6 @@ ${errors.slice(0, 3).map((err) => {
     workflow: Workflow;
     nodes: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[];
   }> {
-    const moduleName = this.workflowContext.moduleName;
-
     this.workflowVersionExecConfig.inputVariables.forEach((inputVariable) => {
       const inputVariableContext = new InputVariableContext({
         inputVariableData: inputVariable,
@@ -389,7 +384,6 @@ ${errors.slice(0, 3).map((err) => {
     const nodes = await this.generateNodes(nodeIds);
 
     const workflow = codegen.workflow({
-      moduleName,
       workflowContext: this.workflowContext,
       inputs,
       displayData: this.workflowVersionExecConfig.workflowRawData.displayData,
@@ -701,12 +695,7 @@ ${errors.slice(0, 3).map((err) => {
 
     const rootNodesInitFile = codegen.initFile({
       workflowContext: this.workflowContext,
-      modulePath: this.workflowContext.parentNode
-        ? [
-            ...this.workflowContext.parentNode.getNodeModulePath(),
-            GENERATED_NODES_MODULE_NAME,
-          ]
-        : [this.workflowContext.moduleName, ...GENERATED_NODES_PATH],
+      modulePath: [...this.getModulePath(), GENERATED_NODES_MODULE_NAME],
       statements: rootNodesInitFileStatements,
     });
 
@@ -718,8 +707,9 @@ ${errors.slice(0, 3).map((err) => {
             GENERATED_NODES_MODULE_NAME,
           ]
         : [
-            this.workflowContext.moduleName,
-            ...GENERATED_DISPLAY_NODE_MODULE_PATH,
+            ...this.getModulePath(),
+            GENERATED_DISPLAY_MODULE_NAME,
+            GENERATED_NODES_MODULE_NAME,
           ],
       statements: rootDisplayNodesInitFileStatements,
     });

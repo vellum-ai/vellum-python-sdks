@@ -316,6 +316,17 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
 "
 `;
 
+exports[`WorkflowProjectGenerator > modules > should generate code in the same module as the project 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """foo"""
+    inputs = {}
+"
+`;
+
 exports[`WorkflowProjectGenerator > nodes with output values > should prioritize terminal node data over output values 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState

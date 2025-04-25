@@ -53,7 +53,6 @@ describe("Workflow", () => {
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
-        moduleName: "test",
         workflowContext,
         inputs,
       });

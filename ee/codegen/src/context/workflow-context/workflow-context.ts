@@ -1,3 +1,5 @@
+import { join } from "path";
+
 import { VellumEnvironmentUrls } from "vellum-ai";
 import { WorkspaceSecretRead } from "vellum-ai/api";
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
@@ -187,6 +189,14 @@ export class WorkflowContext {
       globalOutputVariableContextsById ?? new Map();
 
     this.classNames = classNames ?? new Set<string>();
+  }
+
+  public getAbsolutePath(filePath: string): string {
+    return join(
+      this.absolutePathToOutputDirectory,
+      ...this.modulePath.slice(0, -1),
+      filePath
+    );
   }
 
   /* Create a new workflow context for a nested workflow from its parent */

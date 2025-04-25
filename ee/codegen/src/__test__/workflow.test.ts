@@ -29,7 +29,6 @@ import { WorkflowEdge } from "src/types/vellum";
 describe("Workflow", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
-  const moduleName = "test";
   const entrypointNode = entrypointNodeDataFactory();
 
   beforeEach(async () => {
@@ -56,7 +55,6 @@ describe("Workflow", () => {
     it("should generate correct code when there are input variables", async () => {
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -68,7 +66,6 @@ describe("Workflow", () => {
     it("should generate correct code when there are no input variables", async () => {
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -106,7 +103,6 @@ describe("Workflow", () => {
       );
 
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -162,7 +158,6 @@ describe("Workflow", () => {
       });
 
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -223,7 +218,6 @@ describe("Workflow", () => {
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -272,7 +266,6 @@ describe("Workflow", () => {
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -344,7 +337,6 @@ describe("Workflow", () => {
 
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -392,7 +384,6 @@ describe("Workflow", () => {
       );
 
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -421,7 +412,6 @@ describe("Workflow", () => {
       );
       const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -471,7 +461,6 @@ describe("Workflow", () => {
       );
 
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });
@@ -528,7 +517,6 @@ describe("Workflow", () => {
       );
 
       const workflow = codegen.workflow({
-        moduleName,
         workflowContext,
         inputs,
       });

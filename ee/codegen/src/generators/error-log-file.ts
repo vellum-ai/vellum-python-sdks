@@ -1,5 +1,4 @@
 import { writeFile } from "fs/promises";
-import { join } from "path";
 
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
@@ -20,11 +19,7 @@ export class ErrorLogFile extends BasePersistedFile {
       return;
     }
 
-    const filePath = join(
-      this.workflowContext.absolutePathToOutputDirectory,
-      this.workflowContext.moduleName,
-      "error.log"
-    );
+    const filePath = this.workflowContext.getAbsolutePath("error.log");
     const content = errors.map((error) => `- ${error.message}`).join("\n");
 
     await writeFile(

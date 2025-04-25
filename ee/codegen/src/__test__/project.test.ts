@@ -22,36 +22,30 @@ import { WorkflowProjectGenerator } from "src/project";
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
 
-  function expectProjectFileToMatchSnapshot(
-    project: WorkflowProjectGenerator,
-    filePath: string[]
-  ) {
-    const completeFilePath = join(
-      tempDir,
-      project.getModuleName(),
-      ...filePath
-    );
-    expect(fs.existsSync(completeFilePath)).toBe(true);
+  function expectProjectFileToMatchSnapshot(filePath: string[]) {
+    const completeFilePath = join(tempDir, ...filePath);
+    expect(
+      fs.existsSync(completeFilePath),
+      `File does not exist: ${completeFilePath}. Files generated:\n${Object.keys(
+        getAllFilesInDir(join(tempDir))
+      ).join("\n")}`
+    ).toBe(true);
     expect(fs.readFileSync(completeFilePath, "utf-8")).toMatchSnapshot();
   }
 
-  function expectProjectFileToExist(
-    project: WorkflowProjectGenerator,
-    filePath: string[]
-  ) {
-    const completeFilePath = join(
-      tempDir,
-      project.getModuleName(),
-      ...filePath
-    );
-    expect(fs.existsSync(completeFilePath)).toBe(true);
+  function expectProjectFileToExist(filePath: string[]) {
+    const completeFilePath = join(tempDir, ...filePath);
+
+    expect(
+      fs.existsSync(completeFilePath),
+      `File does not exist: ${completeFilePath}. Files generated:\n${Object.keys(
+        getAllFilesInDir(join(tempDir))
+      ).join("\n")}`
+    ).toBe(true);
   }
 
-  function expectErrorLog(
-    project: WorkflowProjectGenerator,
-    expectedContents: string = ""
-  ) {
-    const errorLogPath = join(tempDir, project.getModuleName(), "error.log");
+  function expectErrorLog(filePath: string[], expectedContents: string = "") {
+    const errorLogPath = join(tempDir, ...filePath, "error.log");
     const errorLog = fs.existsSync(errorLogPath)
       ? fs.readFileSync(errorLogPath, "utf-8")
       : "";
@@ -134,7 +128,7 @@ describe("WorkflowProjectGenerator", () => {
         await project.generateCode();
 
         const generatedFiles = getAllFilesInDir(
-          join(tempDir, project.getModuleName())
+          join(tempDir, ...project.getModulePath())
         );
         const expectedFiles = getAllFilesInDir(codeDir, excludeFilesAtPaths);
 
@@ -267,8 +261,8 @@ describe("WorkflowProjectGenerator", () => {
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["workflow.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "bad_node.py"]);
+      expectProjectFileToExist(["code", "workflow.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "bad_node.py"]);
 
       const errors = project.workflowContext.getErrors();
       expect(errors.length).toBe(1);
@@ -376,8 +370,8 @@ describe("WorkflowProjectGenerator", () => {
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["workflow.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "bad_node.py"]);
+      expectProjectFileToExist(["code", "workflow.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "bad_node.py"]);
     });
   });
   describe("include sandbox", () => {
@@ -544,7 +538,7 @@ describe("WorkflowProjectGenerator", () => {
 
       await project.generateCode();
 
-      expectProjectFileToMatchSnapshot(project, ["sandbox.py"]);
+      expectProjectFileToMatchSnapshot(["code", "sandbox.py"]);
     });
   });
   describe("runner config with no container image", () => {
@@ -620,7 +614,7 @@ describe("WorkflowProjectGenerator", () => {
 
       await project.generateCode();
 
-      expectProjectFileToMatchSnapshot(project, ["workflow.py"]);
+      expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
     });
   });
 
@@ -735,8 +729,8 @@ describe("WorkflowProjectGenerator", () => {
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
-      expectProjectFileToExist(project, ["nodes", "templating_node_1.py"]);
+      expectProjectFileToExist(["code", "nodes", "templating_node.py"]);
+      expectProjectFileToExist(["code", "nodes", "templating_node_1.py"]);
     });
   });
 
@@ -834,7 +828,8 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectProjectFileToMatchSnapshot(project, [
+      expectProjectFileToMatchSnapshot([
+        "code",
         "nodes",
         "code_execution_node",
         "script.py",
@@ -954,8 +949,8 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectErrorLog(project);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "first_node.py"]);
+      expectErrorLog(["code"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "first_node.py"]);
     });
   });
 
@@ -1100,8 +1095,8 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
+      expectProjectFileToExist(["code", "nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "final_output.py"]);
     });
   });
 
@@ -1193,24 +1188,26 @@ baz = foo + bar
       await project.generateCode();
 
       // There should be no errors
-      expectErrorLog(project);
+      expectErrorLog(["code"]);
 
       // We should have generated a Workflow that has a graph containing only the first node
-      expectProjectFileToMatchSnapshot(project, ["workflow.py"]);
+      expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
 
       // We should have generated a file for the second node, even though it's not in the graph
-      expectProjectFileToMatchSnapshot(project, ["nodes", "second_node.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "second_node.py"]);
 
       // We should have generated a display file for the second node
-      expectProjectFileToMatchSnapshot(project, [
+      expectProjectFileToMatchSnapshot([
+        "code",
         "display",
         "nodes",
         "second_node.py",
       ]);
 
       // We should have included the second node in our init files
-      expectProjectFileToMatchSnapshot(project, ["nodes", "__init__.py"]);
-      expectProjectFileToMatchSnapshot(project, [
+      expectProjectFileToMatchSnapshot(["code", "nodes", "__init__.py"]);
+      expectProjectFileToMatchSnapshot([
+        "code",
         "display",
         "nodes",
         "__init__.py",
@@ -1346,7 +1343,7 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToMatchSnapshot(project, ["workflow.py"]);
+      expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
     });
   });
 
@@ -1406,8 +1403,8 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["nodes", "final_output.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
+      expectProjectFileToExist(["code", "nodes", "final_output.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "final_output.py"]);
     });
   });
   describe("adornments", () => {
@@ -1682,9 +1679,9 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["nodes", "prompt.py"]);
-      expectProjectFileToExist(project, ["display", "nodes", "prompt.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "prompt.py"]);
+      expectProjectFileToExist(["code", "nodes", "prompt.py"]);
+      expectProjectFileToExist(["code", "display", "nodes", "prompt.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "prompt.py"]);
     });
 
     it("should generate try adornment node with correct attributes", async () => {
@@ -1777,9 +1774,14 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToExist(project, ["nodes", "prompt.py"]);
-      expectProjectFileToExist(project, ["display", "nodes", "prompt.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "prompt.py"]);
+      expectProjectFileToExist(["generic_test", "nodes", "prompt.py"]);
+      expectProjectFileToExist([
+        "generic_test",
+        "display",
+        "nodes",
+        "prompt.py",
+      ]);
+      expectProjectFileToMatchSnapshot(["generic_test", "nodes", "prompt.py"]);
     });
 
     it("should correctly generate default code for adornments", async () => {
@@ -1921,9 +1923,9 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["nodes", "prompt.py"]);
-      expectProjectFileToExist(project, ["display", "nodes", "prompt.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "prompt.py"]);
+      expectProjectFileToExist(["code", "nodes", "prompt.py"]);
+      expectProjectFileToExist(["code", "display", "nodes", "prompt.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "prompt.py"]);
     });
   });
   describe("combinator normalization", () => {
@@ -2009,8 +2011,8 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectProjectFileToExist(project, ["nodes", "final_output.py"]);
-      expectProjectFileToMatchSnapshot(project, ["nodes", "final_output.py"]);
+      expectProjectFileToExist(["code", "nodes", "final_output.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "final_output.py"]);
     });
   });
   describe("should escape special characters", () => {
@@ -2099,11 +2101,8 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
-      expectProjectFileToMatchSnapshot(project, [
-        "nodes",
-        "templating_node.py",
-      ]);
+      expectProjectFileToExist(["code", "nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "templating_node.py"]);
     });
 
     it("should not escape single quotes in node comments", async () => {
@@ -2191,11 +2190,8 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToExist(project, ["nodes", "templating_node.py"]);
-      expectProjectFileToMatchSnapshot(project, [
-        "nodes",
-        "templating_node.py",
-      ]);
+      expectProjectFileToExist(["code", "nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "templating_node.py"]);
     });
   });
   describe("Get generic node files", () => {
@@ -2757,7 +2753,7 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToMatchSnapshot(project, ["nodes", "api_node.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "api_node.py"]);
     });
 
     it("should not generate LazyReference when there is a simple loop", async () => {
@@ -2972,7 +2968,94 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToMatchSnapshot(project, ["nodes", "router_node.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "router_node.py"]);
+    });
+  });
+
+  describe("modules", () => {
+    it("should generate code in the same module as the project", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "templating",
+              type: "TEMPLATING",
+              data: {
+                label: "Templating Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              definition: {
+                name: "TemplatingNode",
+                module: ["my", "module", "templating_node"],
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "foo",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "templating",
+              target_handle_id: "template_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "my.module",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(["my", "module", "nodes", "templating_node.py"]);
+      expectProjectFileToMatchSnapshot([
+        "my",
+        "module",
+        "nodes",
+        "templating_node.py",
+      ]);
     });
   });
 });
