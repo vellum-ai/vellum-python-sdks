@@ -3,7 +3,6 @@ from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import SubworkflowDeploymentNode
 from vellum.workflows.types.core import JsonObject
-from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -37,10 +36,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
             for variable_name, variable_value in subworkflow_inputs.items()
         ]
 
-        # TODO: Pass through the name instead of retrieving the ID
-        # https://app.shortcut.com/vellum/story/4702
-        vellum_client = create_vellum_client()
-        deployment = vellum_client.workflow_deployments.retrieve(
+        deployment = display_context.client.workflow_deployments.retrieve(
             id=str(raise_if_descriptor(node.deployment)),
         )
 

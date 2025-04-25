@@ -14,7 +14,7 @@ from vellum import (
     StringVellumValue,
 )
 from vellum.client.core.api_error import ApiError
-from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
+from vellum.workflows.constants import LATEST_RELEASE_TAG
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import VellumCodeResourceDefinition, WorkflowParentContext
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
@@ -74,11 +74,11 @@ def test_run_workflow__happy_path(vellum_client):
         prompt_deployment_id=None,
         prompt_deployment_name="example_prompt_deployment",
         release_tag=LATEST_RELEASE_TAG,
-        external_id=OMIT,
-        expand_meta=OMIT,
-        raw_overrides=OMIT,
-        expand_raw=OMIT,
-        metadata=OMIT,
+        external_id=None,
+        expand_meta=None,
+        raw_overrides=None,
+        expand_raw=None,
+        metadata=None,
         request_options=ANY,
     )
 
@@ -140,11 +140,11 @@ def test_run_workflow_return_only_function_call__happy_path(vellum_client):
         prompt_deployment_id=None,
         prompt_deployment_name="example_prompt_deployment",
         release_tag=LATEST_RELEASE_TAG,
-        external_id=OMIT,
-        expand_meta=OMIT,
-        raw_overrides=OMIT,
-        expand_raw=OMIT,
-        metadata=OMIT,
+        external_id=None,
+        expand_meta=None,
+        raw_overrides=None,
+        expand_raw=None,
+        metadata=None,
         request_options=ANY,
     )
 
