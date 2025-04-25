@@ -1,9 +1,8 @@
 from uuid import UUID
-from typing import ClassVar, Generic, Optional, TypeVar
+from typing import Any, ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import ErrorNode
 from vellum.workflows.types.core import JsonObject
-from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -16,7 +15,7 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
     # DEPRECATED: Remove in 0.15.0 once removed from the vellum-side
     error_output_id: ClassVar[Optional[UUID]] = None
     # DEPRECATED: Remove in 0.15.0 once removed from the vellum-side
-    name: ClassVar[str] = "error-node"
+    name: ClassVar[Optional[str]] = None
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs) -> JsonObject:
         node_id = self.node_id
@@ -38,22 +37,24 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
             for variable_name, variable_value in input_values_by_name.items()
         ]
 
-        return {
+        node_data: dict[str, Any] = {
             "id": str(node_id),
             "type": "ERROR",
             "inputs": [node_input.dict() for node_input in node_inputs],
             "data": {
-                "name": self.name,
                 "label": self.label,
                 "target_handle_id": str(self.get_target_handle_id()),
                 "error_source_input_id": str(error_source_input_id),
-                "error_output_id": (
-                    str(self.error_output_id)
-                    if self.error_output_id
-                    else str(uuid4_from_hash(f"{node_id}|error_output_id"))
-                ),
             },
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
         }
+
+        if self.name:
+            node_data["data"]["name"] = self.name
+
+        if self.error_output_id:
+            node_data["data"]["error_output_id"] = str(self.error_output_id)
+
+        return node_data

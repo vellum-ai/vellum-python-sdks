@@ -101,11 +101,9 @@ def test_serialize_workflow():
                 }
             ],
             "data": {
-                "name": "error-node",
                 "label": "Fail Node",
                 "target_handle_id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
                 "error_source_input_id": "None",
-                "error_output_id": "d3dbe464-d63e-40fb-ba9c-eb28410105f2",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {
