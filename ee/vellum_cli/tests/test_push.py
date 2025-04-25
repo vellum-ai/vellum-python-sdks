@@ -554,8 +554,43 @@ class ExampleWorkflow(BaseWorkflow):
     graph = StartNode
 """,
         },
+        {
+            "nodes/start_node.py": """\
+from vellum.workflows.nodes import PromptDeploymentNode
+
+class StartNode(PromptDeploymentNode):
+    deployment = "my-deployment"
+""",
+            "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.start_node import StartNode
+
+class ExampleWorkflow(BaseWorkflow):
+    graph = StartNode
+""",
+        },
+        {
+            "nodes/start_node.py": """\
+from vellum.workflows.nodes import SubworkflowDeploymentNode
+
+class StartNode(SubworkflowDeploymentNode):
+    deployment = "my-deployment"
+""",
+            "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.start_node import StartNode
+
+class ExampleWorkflow(BaseWorkflow):
+    graph = StartNode
+""",
+        },
     ],
-    ids=["base_case", "with_secret_reference"],
+    ids=[
+        "base_case",
+        "with_secret_reference",
+        "with_prompt_deployment",
+        "with_subworkflow_deployment",
+    ],
 )
 def test_push__workspace_option__uses_different_api_key(mock_module, vellum_client_class, file_data):
     # GIVEN a single workflow configured

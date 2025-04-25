@@ -4,7 +4,6 @@ from typing import Generic, Optional, TypeVar, cast
 from vellum.workflows.nodes.displayable.prompt_deployment_node import PromptDeploymentNode
 from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonObject
-from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -42,10 +41,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         _, output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
         _, array_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.results)]
 
-        # TODO: Pass through the name instead of retrieving the ID
-        # https://app.shortcut.com/vellum/story/4702
-        vellum_client = create_vellum_client()
-        deployment = vellum_client.deployments.retrieve(
+        deployment = display_context.client.deployments.retrieve(
             id=str(raise_if_descriptor(node.deployment)),
         )
         ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)

@@ -15,7 +15,7 @@ from vellum import (
 )
 from vellum.client import ApiError, RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
-from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
+from vellum.workflows.constants import LATEST_RELEASE_TAG
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
@@ -48,13 +48,13 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     deployment: ClassVar[Union[UUID, str]]
 
     release_tag: str = LATEST_RELEASE_TAG
-    external_id: Optional[str] = OMIT
+    external_id: Optional[str] = None
 
-    expand_meta: Optional[PromptDeploymentExpandMetaRequest] = OMIT
-    raw_overrides: Optional[RawPromptExecutionOverridesRequest] = OMIT
-    expand_raw: Optional[Sequence[str]] = OMIT
-    metadata: Optional[Dict[str, Optional[Any]]] = OMIT
-    ml_model_fallbacks: Optional[Sequence[str]] = OMIT
+    expand_meta: Optional[PromptDeploymentExpandMetaRequest] = None
+    raw_overrides: Optional[RawPromptExecutionOverridesRequest] = None
+    expand_raw: Optional[Sequence[str]] = None
+    metadata: Optional[Dict[str, Optional[Any]]] = None
+    ml_model_fallbacks: Optional[Sequence[str]] = None
 
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
@@ -103,12 +103,7 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                 prompt_event_stream = self._get_prompt_event_stream()
                 next(prompt_event_stream)
             except ApiError as e:
-                if (
-                    e.status_code
-                    and e.status_code < 500
-                    and self.ml_model_fallbacks is not OMIT
-                    and self.ml_model_fallbacks is not None
-                ):
+                if e.status_code and e.status_code < 500 and self.ml_model_fallbacks is not None:
                     prompt_event_stream = self._retry_prompt_stream_with_fallbacks(tried_fallbacks)
                 else:
                     self._handle_api_error(e)
@@ -127,7 +122,6 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                     if (
                         event.error
                         and event.error.code == WorkflowErrorCode.PROVIDER_ERROR.value
-                        and self.ml_model_fallbacks is not OMIT
                         and self.ml_model_fallbacks is not None
                     ):
                         try:
