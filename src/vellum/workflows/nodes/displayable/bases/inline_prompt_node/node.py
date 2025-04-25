@@ -22,6 +22,7 @@ from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.rich_text_child_block import RichTextChildBlock
 from vellum.workflows.constants import OMIT
 from vellum.workflows.context import get_execution_context
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
@@ -39,7 +40,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     Used to execute a Prompt defined inline.
 
     prompt_inputs: EntityInputsInterface - The inputs for the Prompt
-    ml_model: str - Either the ML Model's UUID or its name.
+    ml_model: Union[str, BaseDescriptor] - Either the ML Model's UUID or its name.
     blocks: List[PromptBlock] - The blocks that make up the Prompt
     functions: Optional[List[FunctionDefinition]] - The functions to include in the Prompt
     parameters: PromptParameters - The parameters for the Prompt
@@ -47,7 +48,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution
     """
 
-    ml_model: ClassVar[str]
+    ml_model: ClassVar[Union[str, BaseDescriptor]]
 
     # The blocks that make up the Prompt
     blocks: ClassVar[List[PromptBlock]]

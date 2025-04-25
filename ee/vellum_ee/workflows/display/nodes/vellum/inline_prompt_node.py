@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
@@ -32,6 +33,8 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         node_blocks = raise_if_descriptor(node.blocks)
         function_definitions = raise_if_descriptor(node.functions)
 
+        ml_model = self._get_ml_model_name(display_context)
+
         blocks: list = [
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
@@ -62,7 +65,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                         "blocks": blocks,
                     },
                 },
-                "ml_model_name": raise_if_descriptor(node.ml_model),
+                "ml_model_name": ml_model,
             },
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
@@ -73,6 +76,13 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
             ],
             "ports": self.serialize_ports(display_context),
+            "attributes": [
+                {
+                    "id": uuid.uuid4(),
+                    "name": "ml_model",
+                    "value": ml_model,
+                }
+            ],
         }
 
     def _generate_node_and_prompt_inputs(
@@ -198,3 +208,12 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             block["state"] = "ENABLED"
 
         return block
+
+    def _get_ml_model_name(self, display_context: WorkflowDisplayContext):
+        """Get the ML model name, handling both string and BaseDescriptor types."""
+        node = self._node
+
+        try:
+            return raise_if_descriptor(node.ml_model)
+        except AttributeError:
+            return self.serialize_value(display_context, node.ml_model)
