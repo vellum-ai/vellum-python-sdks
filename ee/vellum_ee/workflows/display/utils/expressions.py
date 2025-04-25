@@ -107,7 +107,7 @@ def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplay
             )
 
         node_class_name = ".".join(reference_parts[:-2])
-        for node in display_context.node_displays.keys():
+        for node in display_context.global_node_displays.keys():
             if node.__name__ == node_class_name:
                 return getattr(node.Outputs, output_name)
 

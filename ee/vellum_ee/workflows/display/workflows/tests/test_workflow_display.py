@@ -7,6 +7,7 @@ from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
@@ -371,4 +372,56 @@ def test_serialize_workflow__terminal_node_mismatches_workflow_output_name():
         "type": "NODE_OUTPUT",
         "node_id": str(ExitNode.__id__),
         "node_output_id": str(ExitNode.__output_ids__["value"]),
+    }
+
+
+def test_serialize_workflow__nested_lazy_reference():
+    # GIVEN an inner node that references the output of an outer node
+    class InnerNode(BaseNode):
+        foo = LazyReference("OuterNode.Outputs.bar")
+
+        class Outputs(BaseNode.Outputs):
+            foo = "foo"
+
+    # AND a workflow that uses the inner node
+    class InnerWorkflow(BaseWorkflow):
+        graph = InnerNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            foo = InnerNode.Outputs.foo
+
+    # AND a subworkflow that uses the inner workflow
+    class SubworkflowNode(InlineSubworkflowNode):
+        subworkflow = InnerWorkflow
+
+    # AND the outer node
+    class OuterNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            bar: str
+
+    # AND a workflow that uses the subworkflow node and the outer node
+    class MyWorkflow(BaseWorkflow):
+        graph = SubworkflowNode >> OuterNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            answer = SubworkflowNode.Outputs.foo
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should have properly serialized the lazy reference
+    subworkflow_node = next(
+        node for node in data["workflow_raw_data"]["nodes"] if isinstance(node, dict) and node["type"] == "SUBWORKFLOW"
+    )
+    inner_node = next(
+        node
+        for node in subworkflow_node["data"]["workflow_raw_data"]["nodes"]
+        if isinstance(node, dict) and node["type"] == "GENERIC"
+    )
+
+    assert inner_node["attributes"][0]["value"] == {
+        "type": "NODE_OUTPUT",
+        "node_id": str(OuterNode.__id__),
+        "node_output_id": str(OuterNode.__output_ids__["bar"]),
     }
