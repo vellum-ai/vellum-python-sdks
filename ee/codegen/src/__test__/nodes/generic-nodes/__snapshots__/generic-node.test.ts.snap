@@ -12,8 +12,8 @@ from ...nodes.my_custom_node import MyCustomNode
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
     attribute_ids_by_name = {
-        "default-attribute": UUID("attr-1-id"),
-        "default-attribute-2": UUID("attr-2-id"),
+        "default-attribute": UUID("990d55db-9d72-452a-b074-9bee1f89ecb9"),
+        "default-attribute-2": UUID("70652383-d93f-4c3a-b194-1ea5cdced8f1"),
     }
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
@@ -76,8 +76,8 @@ from ...nodes.my_custom_node import MyCustomNode
 @BaseRetryNodeDisplay.wrap(node_id=UUID("adornment-3"))
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
     attribute_ids_by_name = {
-        "default-attribute": UUID("attr-1-id"),
-        "default-attribute-2": UUID("attr-2-id"),
+        "default-attribute": UUID("990d55db-9d72-452a-b074-9bee1f89ecb9"),
+        "default-attribute-2": UUID("70652383-d93f-4c3a-b194-1ea5cdced8f1"),
     }
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
