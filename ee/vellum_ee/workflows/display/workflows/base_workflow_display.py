@@ -22,6 +22,7 @@ from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
@@ -89,13 +90,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         dry_run: bool = False,
     ):
         self._parent_display_context = parent_display_context
-        self._client = client
+        self._client = client or (
+            # propagate the client from the parent display context if it is not provided
+            self._parent_display_context.client
+            if self._parent_display_context
+            else create_vellum_client()
+        )
         self._errors: List[Exception] = []
         self._dry_run = dry_run
-
-        # propagate the client from the parent display context if it is not provided
-        if self._parent_display_context and not self._client:
-            self._client = self._parent_display_context.client
 
     def serialize(self) -> JsonObject:
         input_variables: JsonArray = []
