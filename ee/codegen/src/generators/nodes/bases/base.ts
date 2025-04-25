@@ -601,6 +601,22 @@ export abstract class BaseNode<
       nodeClass.add(nodeInputIdsByNameField);
     }
 
+    if (this.nodeData.attributes && this.nodeData.attributes.length > 0) {
+      nodeClass.add(
+        python.field({
+          name: "attribute_ids_by_name",
+          initializer: python.TypeInstantiation.dict(
+            this.nodeData.attributes.map((attribute) => {
+              return {
+                key: python.TypeInstantiation.str(attribute.name),
+                value: python.TypeInstantiation.str(attribute.id),
+              };
+            })
+          ),
+        })
+      );
+    }
+
     try {
       const outputDisplay = this.getOutputDisplay();
       if (outputDisplay) {
