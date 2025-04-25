@@ -880,9 +880,6 @@ def main(output: list[str]) -> list[str]:
     # WHEN we run the node
     node = ExampleCodeExecutionNode()
     outputs = node.run()
-    print("================================================")
-    print("outputs", outputs)
-    print("================================================")
 
     # THEN the node should successfully access the string value
     assert outputs == {"result": ['{"foo": "bar"}', '{"foo2": "bar2"}'], "log": ""}
