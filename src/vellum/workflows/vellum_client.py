@@ -22,7 +22,7 @@ def create_vellum_environment(api_url: Optional[str] = None) -> VellumEnvironmen
     )
 
 
-def _resolve_env(names: List[Optional[str]], default: Optional[str] = None) -> str:
+def _resolve_env(names: List[Optional[str]], default: str = "") -> str:
     for name in names:
         if not name:
             continue
