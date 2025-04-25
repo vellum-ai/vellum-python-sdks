@@ -44,6 +44,18 @@ VELLUM_VALUE_REQUEST_TUPLE = (
     SearchResultsVellumValueRequest,
 )
 
+def is_chat_message_list(value: Any) -> bool:
+    return isinstance(value, list) and (
+        all(isinstance(message, ChatMessage) for message in value)
+        or all(isinstance(message, ChatMessage) for message in value)
+    )
+
+def is_search_result_list(value: Any) -> bool:
+    return isinstance(value, list) and (
+        all(isinstance(search_result, SearchResultRequest) for search_result in value)
+        or all(isinstance(search_result, SearchResult) for search_result in value)
+    )
+
 
 def primitive_to_vellum_value(value: Any) -> VellumValue:
     """Converts a python primitive to a VellumValue"""
@@ -54,16 +66,10 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return StringVellumValue(value=value.value)
     elif isinstance(value, (int, float)):
         return NumberVellumValue(value=value)
-    elif isinstance(value, list) and (
-        all(isinstance(message, ChatMessage) for message in value)
-        or all(isinstance(message, ChatMessage) for message in value)
-    ):
+    elif is_chat_message_list(value):
         chat_messages = cast(Union[List[ChatMessage], List[ChatMessage]], value)
         return ChatHistoryVellumValue(value=chat_messages)
-    elif isinstance(value, list) and (
-        all(isinstance(search_result, SearchResultRequest) for search_result in value)
-        or all(isinstance(search_result, SearchResult) for search_result in value)
-    ):
+    elif is_search_result_list(value):
         search_results = cast(Union[List[SearchResultRequest], List[SearchResult]], value)
         return SearchResultsVellumValue(value=search_results)
     elif isinstance(value, VellumError):

@@ -29,7 +29,7 @@ from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
-from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
+from vellum.workflows.nodes.displayable.bases.utils import is_chat_message_list, is_search_result_list, primitive_to_vellum_value
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
@@ -235,8 +235,14 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             "node_id": str(node_class_display.node_id),
         }
 
-    if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
-        raise ValueError("Nested references are not supported.")
+    if isinstance(value, dict):
+        return {
+            "type": "DICTIONARY_REFERENCE",
+            "entries": [{"key": key, "value": serialize_value(display_context, val)} for key, val in value.items()],
+        }
+
+    if isinstance(value, list) and not is_chat_message_list(value) and not is_search_result_list(value):
+        return {"type": "ARRAY_REFERENCE", "items": [serialize_value(display_context, item) for item in value]}
 
     if not isinstance(value, BaseDescriptor):
         vellum_value = primitive_to_vellum_value(value)
