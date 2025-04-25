@@ -378,7 +378,7 @@ def test_serialize_workflow__terminal_node_mismatches_workflow_output_name():
 def test_serialize_workflow__nested_lazy_reference():
     # GIVEN an inner node that references the output of an outer node
     class InnerNode(BaseNode):
-        foo = LazyReference("OuterNode.Outputs.bar")
+        foo = LazyReference[str]("OuterNode.Outputs.bar")
 
         class Outputs(BaseNode.Outputs):
             foo = "foo"
@@ -408,7 +408,7 @@ def test_serialize_workflow__nested_lazy_reference():
 
     # WHEN we serialize it
     workflow_display = get_workflow_display(workflow_class=MyWorkflow)
-    data = workflow_display.serialize()
+    data: dict = workflow_display.serialize()
 
     # THEN it should have properly serialized the lazy reference
     subworkflow_node = next(
