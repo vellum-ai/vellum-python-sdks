@@ -235,9 +235,11 @@ def push_command(
 """
         )  # type: ignore[attr-defined]
     else:
+        default_api_url = client._client_wrapper._environment.default
+        base_url = default_api_url.split("/v1")[0].replace("//api.", "//app.")
         logger.info(
             f"""Successfully pushed {workflow_config.module} to Vellum!
-Visit at: https://app.vellum.ai/workflow-sandboxes/{response.workflow_sandbox_id}"""
+Visit at: {base_url}/workflow-sandboxes/{response.workflow_sandbox_id}"""
         )
 
     if not workflow_config.workflow_sandbox_id:
