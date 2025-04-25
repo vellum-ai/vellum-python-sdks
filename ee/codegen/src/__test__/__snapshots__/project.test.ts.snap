@@ -117,58 +117,6 @@ class FirstNode(BaseNode):
 "
 `;
 
-exports[`WorkflowProjectGenerator > Try adornment node > should correctly handle different attribute types in adornments 1`] = `
-"from vellum import PromptParameters
-from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.nodes.core.try_node.node import TryNode
-from vellum.workflows.nodes.displayable import InlinePromptNode
-
-
-@TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW, custom_message="This is a regular string")
-class Prompt(InlinePromptNode):
-    ml_model = "gpt-4o-mini"
-    blocks = []
-    prompt_inputs = {}
-    parameters = PromptParameters(
-        stop=[],
-        temperature=None,
-        max_tokens=None,
-        top_p=None,
-        top_k=None,
-        frequency_penalty=None,
-        presence_penalty=None,
-        logit_bias=None,
-        custom_parameters=None,
-    )
-"
-`;
-
-exports[`WorkflowProjectGenerator > Try adornment node > should correctly handle error code and custom string attribute types in adornments 1`] = `
-"from vellum import PromptParameters
-from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.nodes.core.try_node.node import TryNode
-from vellum.workflows.nodes.displayable import InlinePromptNode
-
-
-@TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW, custom_message="This is a regular string")
-class Prompt(InlinePromptNode):
-    ml_model = "gpt-4o-mini"
-    blocks = []
-    prompt_inputs = {}
-    parameters = PromptParameters(
-        stop=[],
-        temperature=None,
-        max_tokens=None,
-        top_p=None,
-        top_k=None,
-        frequency_penalty=None,
-        presence_penalty=None,
-        logit_bias=None,
-        custom_parameters=None,
-    )
-"
-`;
-
 exports[`WorkflowProjectGenerator > adornments > should correctly generate code for a prompt node with retry adornment 1`] = `
 "from vellum import (
     ChatMessagePromptBlock,
@@ -229,6 +177,32 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 
 @TryNode.wrap()
 @RetryNode.wrap(max_attempts=1)
+class Prompt(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = []
+    prompt_inputs = {}
+    parameters = PromptParameters(
+        stop=[],
+        temperature=None,
+        max_tokens=None,
+        top_p=None,
+        top_k=None,
+        frequency_penalty=None,
+        presence_penalty=None,
+        logit_bias=None,
+        custom_parameters=None,
+    )
+"
+`;
+
+exports[`WorkflowProjectGenerator > adornments > should correctly handle error code and custom string attribute types in adornments 1`] = `
+"from vellum import PromptParameters
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+
+@TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW, custom_message="This is a regular string")
 class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
