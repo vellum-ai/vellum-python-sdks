@@ -70,6 +70,7 @@ export class NodeOutputs extends AstNode {
       clazz.addField(field);
     });
 
+    this.inheritReferences(clazz);
     return clazz;
   }
 

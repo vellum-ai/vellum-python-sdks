@@ -474,4 +474,36 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("basic with a JSON output", () => {
+    it("getNodeFile", async () => {
+      const nodeData = genericNodeFactory({
+        nodeAttributes: [],
+        nodeOutputs: [
+          {
+            id: uuidv4(),
+            name: "output",
+            type: "JSON",
+            value: undefined,
+          },
+        ],
+        nodeTrigger: {
+          id: uuidv4(),
+          mergeBehavior: "AWAIT_ATTRIBUTES",
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

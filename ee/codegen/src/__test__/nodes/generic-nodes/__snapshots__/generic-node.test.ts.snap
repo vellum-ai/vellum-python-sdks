@@ -40,6 +40,18 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with a JSON output > getNodeFile 1`] = `
+"from typing import Any
+
+from vellum.workflows.nodes import BaseNode
+
+
+class MyCustomNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output: Any
+"
+`;
+
 exports[`GenericNode > basic with adornments > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
