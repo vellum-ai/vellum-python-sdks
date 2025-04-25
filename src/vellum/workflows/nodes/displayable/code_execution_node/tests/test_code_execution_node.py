@@ -433,6 +433,32 @@ def main(output: list[str]) -> int:
     assert exc_info.value.message == "Expected an output of type 'int', but received 'list'"
 
 
+def test_run_node__run_inline__incorrect_output_type_dict():
+    """Confirm that CodeExecutionNodes raise an error if the output type is incorrect during inline execution."""
+
+    # GIVEN a node that subclasses CodeExecutionNode that returns a dict but is defined to return an int
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, int]):
+        code = """\
+def main(output: dict[str, str]) -> int:
+    return output.value
+"""
+        runtime = "PYTHON_3_11_6"
+
+        code_inputs = {
+            "output": {
+                "foo": "bar",
+            }
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # THEN the node should have produced the exception we expected
+    assert exc_info.value.message == "Expected an output of type 'int', but received 'dict'"
+
+
 def test_run_node__run_inline__valid_dict_to_pydantic():
     """Confirm that CodeExecutionNodes can convert a dict to a Pydantic model during inline execution."""
 
