@@ -1,6 +1,7 @@
 import types
 from typing import TYPE_CHECKING, Generic, Optional, Type, TypeVar
 
+from vellum.client import Vellum as VellumClient
 from vellum.workflows.types.generics import WorkflowType
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.registry import get_from_workflow_display_registry
@@ -35,6 +36,7 @@ def get_workflow_display(
     *,
     workflow_class: Type[WorkflowType],
     parent_display_context: Optional[WorkflowDisplayContext] = None,
+    client: Optional[VellumClient] = None,
     dry_run: bool = False,
     # DEPRECATED: The following arguments will be removed in 0.15.0
     root_workflow_class: Optional[Type[WorkflowType]] = None,
@@ -42,5 +44,6 @@ def get_workflow_display(
 ) -> "BaseWorkflowDisplay":
     return _get_workflow_display_class(workflow_class=workflow_class)(
         parent_display_context=parent_display_context,
+        client=client,
         dry_run=dry_run,
     )

@@ -6,6 +6,7 @@ import logging
 from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
+from vellum.client import Vellum as VellumClient
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -84,11 +85,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         self,
         *,
         parent_display_context: Optional[WorkflowDisplayContext] = None,
+        client: Optional[VellumClient] = None,
         dry_run: bool = False,
     ):
         self._parent_display_context = parent_display_context
+        self._client = client
         self._errors: List[Exception] = []
         self._dry_run = dry_run
+
+        # propagate the client from the parent display context if it is not provided
+        if self._parent_display_context and not self._client:
+            self._client = self._parent_display_context.client
 
     def serialize(self) -> JsonObject:
         input_variables: JsonArray = []
@@ -494,6 +501,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             )
 
         return WorkflowDisplayContext(
+            client=self._client,
             workflow_display=workflow_meta_display,
             workflow_input_displays=workflow_input_displays,
             global_workflow_input_displays=global_workflow_input_displays,

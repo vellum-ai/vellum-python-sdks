@@ -30,19 +30,25 @@ def _extract_tar_gz(tar_gz_bytes: bytes) -> dict[str, str]:
     return files
 
 
-def _ensure_workflow_py(temp_dir: str, module: str) -> str:
-    base_dir = os.path.join(temp_dir, *module.split("."))
+def _ensure_file(temp_dir: str, module: str, file_name: str, content: str) -> str:
+    file_path = os.path.join(temp_dir, *module.split("."), file_name)
+    base_dir = os.path.dirname(file_path)
     os.makedirs(base_dir, exist_ok=True)
+
+    with open(file_path, "w") as f:
+        f.write(content)
+
+    return content
+
+
+def _ensure_workflow_py(temp_dir: str, module: str) -> str:
     workflow_py_file_content = """\
 from vellum.workflows import BaseWorkflow
 
 class ExampleWorkflow(BaseWorkflow):
     pass
 """
-    with open(os.path.join(temp_dir, *module.split("."), "workflow.py"), "w") as f:
-        f.write(workflow_py_file_content)
-
-    return workflow_py_file_content
+    return _ensure_file(temp_dir, module, "workflow.py", workflow_py_file_content)
 
 
 def test_push__no_config(mock_module):
@@ -519,7 +525,39 @@ Files that were different between the original project and the generated artifac
     )
 
 
-def test_push__workspace_option__uses_different_api_key(mock_module, vellum_client_class):
+@pytest.mark.parametrize(
+    "file_data",
+    [
+        {
+            "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+
+class ExampleWorkflow(BaseWorkflow):
+    pass
+"""
+        },
+        {
+            "nodes/start_node.py": """\
+from vellum.workflows.nodes import CodeExecutionNode
+from vellum.workflows.references import VellumSecretReference
+
+class StartNode(CodeExecutionNode):
+    code_inputs = {
+        "foo": VellumSecretReference("MY_SECRET_KEY"),
+    }
+""",
+            "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.start_node import StartNode
+
+class ExampleWorkflow(BaseWorkflow):
+    graph = StartNode
+""",
+        },
+    ],
+    ids=["base_case", "with_secret_reference"],
+)
+def test_push__workspace_option__uses_different_api_key(mock_module, vellum_client_class, file_data):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
     module = mock_module.module
@@ -554,7 +592,8 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         )
 
     # AND a workflow exists in the module successfully
-    _ensure_workflow_py(temp_dir, module)
+    for file_name, content in file_data.items():
+        _ensure_file(temp_dir, module, file_name, content)
 
     # AND the push API call returns a new workflow sandbox id
     new_workflow_sandbox_id = str(uuid4())
