@@ -8,6 +8,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.utils import cast_to_output_type
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.types.code_execution_node_wrappers import ListWrapper, clean_for_dict_wrapper
 from vellum.workflows.types.core import EntityInputsInterface
 
 
@@ -35,58 +36,6 @@ def read_file_from_path(
         return None
 
 
-class ListWrapper(list):
-    def __getitem__(self, key):
-        item = super().__getitem__(key)
-        if not isinstance(item, DictWrapper) and not isinstance(item, ListWrapper):
-            self.__setitem__(key, _clean_for_dict_wrapper(item))
-
-        return super().__getitem__(key)
-
-
-class DictWrapper(dict):
-    """
-    This wraps a dict object to make it behave basically the same as a standard javascript object
-    and enables us to use vellum types here without a shared library since we don't actually
-    typecheck things here.
-    """
-
-    def __getitem__(self, key):
-        return self.__getattr__(key)
-
-    def __getattr__(self, attr):
-        if attr not in self:
-            if attr == "value":
-                # In order to be backwards compatible with legacy Workflows, which wrapped
-                # several values as VellumValue objects, we use the "value" key to return itself
-                return self
-
-            raise AttributeError(f"dict has no key: '{attr}'")
-
-        item = super().__getitem__(attr)
-        if not isinstance(item, DictWrapper) and not isinstance(item, ListWrapper):
-            self.__setattr__(attr, _clean_for_dict_wrapper(item))
-
-        return super().__getitem__(attr)
-
-    def __setattr__(self, name, value):
-        self[name] = value
-
-
-def _clean_for_dict_wrapper(obj):
-    if isinstance(obj, dict):
-        wrapped = DictWrapper(obj)
-        for key in wrapped:
-            wrapped[key] = _clean_for_dict_wrapper(wrapped[key])
-
-        return wrapped
-
-    elif isinstance(obj, list):
-        return ListWrapper(map(lambda item: _clean_for_dict_wrapper(item), obj))
-
-    return obj
-
-
 def run_code_inline(
     code: str,
     inputs: EntityInputsInterface,
@@ -107,12 +56,12 @@ def run_code_inline(
                     (
                         item.model_dump()
                         if isinstance(item, BaseModel)
-                        else _clean_for_dict_wrapper(item) if isinstance(item, (dict, list)) else item
+                        else clean_for_dict_wrapper(item) if isinstance(item, (dict, list, str)) else item
                     )
                     for item in value
                 ]
             )
-        return _clean_for_dict_wrapper(value)
+        return clean_for_dict_wrapper(value)
 
     exec_globals = {
         "__arg__inputs": {name: wrap_value(value) for name, value in inputs.items()},

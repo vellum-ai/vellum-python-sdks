@@ -821,3 +821,65 @@ def main(arg1: list) -> str:
 
     # AND the result should be the correct output
     assert outputs == {"result": "bar", "log": ""}
+
+
+def test_run_node__string_value_wrapper__get_attr():
+    # GIVEN a node that accesses the 'value' property of a string input
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+def main(text: str) -> str:
+    return text.value
+"""
+        code_inputs = {
+            "text": "hello",
+        }
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully access the string value through the .value property
+    assert outputs == {"result": "hello", "log": ""}
+
+
+def test_run_node__string_value_wrapper__get_item():
+    # GIVEN a node that accesses the 'value' property of a string input
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+def main(text: str) -> str:
+    return text["value"]
+"""
+        code_inputs = {
+            "text": "hello",
+        }
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully access the string value through the .value property
+    assert outputs == {"result": "hello", "log": ""}
+
+
+def test_run_node__string_value_wrapper__list_of_dicts():
+    # GIVEN a node that accesses the 'value' property of a string input
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Any]):
+        code = """\
+def main(output: list[str]) -> list[str]:
+    results = []
+    for item in output:
+        results.append(item['value'])
+
+    return results
+"""
+        code_inputs = {"output": ['{"foo": "bar"}', '{"foo2": "bar2"}']}
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully access the string value
+    assert outputs == {"result": ['{"foo": "bar"}', '{"foo2": "bar2"}'], "log": ""}

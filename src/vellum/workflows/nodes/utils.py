@@ -1,4 +1,5 @@
 from functools import cache
+import inspect
 import json
 import sys
 from types import ModuleType
@@ -14,6 +15,7 @@ from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.code_execution_node_wrappers import StringValueWrapper
 from vellum.workflows.types.core import Json
 from vellum.workflows.types.generics import NodeType
 
@@ -176,6 +178,8 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
 
 
 def _get_type_name(obj: Any) -> str:
+    if inspect.isclass(obj) and issubclass(obj, StringValueWrapper):
+        return "str"
     if isinstance(obj, type):
         return obj.__name__
 
