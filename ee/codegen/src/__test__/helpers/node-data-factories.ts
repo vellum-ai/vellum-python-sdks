@@ -1512,7 +1512,7 @@ export function genericNodeFactory({
     ports: nodePorts ?? [nodePortFactory()],
     attributes: nodeAttributes ?? [
       {
-        id: "attr-1-id",
+        id: "990d55db-9d72-452a-b074-9bee1f89ecb9",
         name: "default-attribute",
         value: {
           type: "CONSTANT_VALUE",
@@ -1523,7 +1523,7 @@ export function genericNodeFactory({
         },
       },
       {
-        id: "attr-2-id",
+        id: "70652383-d93f-4c3a-b194-1ea5cdced8f1",
         name: "default-attribute-2",
         value: {
           type: "WORKFLOW_INPUT",

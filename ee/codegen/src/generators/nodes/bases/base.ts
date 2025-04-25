@@ -609,7 +609,7 @@ export abstract class BaseNode<
             this.nodeData.attributes.map((attribute) => {
               return {
                 key: python.TypeInstantiation.str(attribute.name),
-                value: python.TypeInstantiation.str(attribute.id),
+                value: python.TypeInstantiation.uuid(attribute.id),
               };
             })
           ),

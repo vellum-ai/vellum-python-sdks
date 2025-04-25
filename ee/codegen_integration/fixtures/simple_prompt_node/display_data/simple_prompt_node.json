@@ -166,6 +166,19 @@
             "name": "default",
             "type": "DEFAULT"
           }
+        ],
+        "attributes": [
+          {
+            "id": "bb466968-7547-458c-8e8f-5d0fb1eb33f5",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o-mini"
+              }
+            }
+          }
         ]
       },
       {
