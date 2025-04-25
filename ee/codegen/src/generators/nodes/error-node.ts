@@ -29,12 +29,15 @@ export class ErrorNode extends BaseSingleFileNode<
   getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    statements.push(
-      python.field({
-        name: "name",
-        initializer: python.TypeInstantiation.str(this.nodeData.data.name),
-      })
-    );
+    if (this.nodeData.data.name) {
+      // DEPRECATED: To be removed in the 0.15.0 release
+      statements.push(
+        python.field({
+          name: "name",
+          initializer: python.TypeInstantiation.str(this.nodeData.data.name),
+        })
+      );
+    }
 
     statements.push(
       python.field({
@@ -49,14 +52,17 @@ export class ErrorNode extends BaseSingleFileNode<
       })
     );
 
-    statements.push(
-      python.field({
-        name: "error_output_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.errorOutputId
-        ),
-      })
-    );
+    if (this.nodeData.data.errorOutputId) {
+      // DEPRECATED: To be removed in the 0.15.0 release
+      statements.push(
+        python.field({
+          name: "error_output_id",
+          initializer: python.TypeInstantiation.uuid(
+            this.nodeData.data.errorOutputId
+          ),
+        })
+      );
+    }
 
     statements.push(
       python.field({

@@ -11,15 +11,11 @@ export class ErrorNodeContext extends BaseNodeContext<ErrorNode> {
   isCore = true;
 
   getNodeOutputNamesById(): Record<string, string> {
-    return {
-      [this.nodeData.data.errorOutputId]: "error",
-    };
+    return {};
   }
 
   getNodeOutputTypesById(): Record<string, VellumVariableType> {
-    return {
-      [this.nodeData.data.errorOutputId]: "ERROR",
-    };
+    return {};
   }
 
   createPortContexts(): PortContext[] {

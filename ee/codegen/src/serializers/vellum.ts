@@ -1928,10 +1928,10 @@ export const ErrorNodeSerializer: ObjectSchema<
   id: stringSchema(),
   data: objectSchema({
     label: stringSchema(),
-    name: stringSchema(),
+    name: stringSchema().optional(),
     targetHandleId: propertySchema("target_handle_id", stringSchema()),
     errorSourceInputId: propertySchema("error_source_input_id", stringSchema()),
-    errorOutputId: propertySchema("error_output_id", stringSchema()),
+    errorOutputId: propertySchema("error_output_id", stringSchema().optional()),
   }),
   inputs: listSchema(NodeInputSerializer),
   displayData: propertySchema(
@@ -1948,10 +1948,10 @@ export declare namespace ErrorNodeSerializer {
   interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
     data: {
       label: string;
-      name: string;
+      name?: string | null;
       target_handle_id: string;
       error_source_input_id: string;
-      error_output_id: string;
+      error_output_id?: string | null;
     };
   }
 }

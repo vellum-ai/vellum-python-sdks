@@ -640,10 +640,10 @@ export interface NoteNode extends BaseDisplayableWorkflowNode {
 
 export interface ErrorNodeData {
   label: string;
-  name: string;
+  name?: string;
   targetHandleId: string;
   errorSourceInputId: string;
-  errorOutputId: string;
+  errorOutputId?: string;
 }
 
 export interface ErrorNode extends BaseDisplayableWorkflowNode {

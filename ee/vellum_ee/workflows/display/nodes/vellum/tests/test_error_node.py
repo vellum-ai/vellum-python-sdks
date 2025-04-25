@@ -1,7 +1,6 @@
 from typing import Any, Dict, cast
 
 from vellum.client.types.vellum_error import VellumError
-from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.core.error_node.node import ErrorNode
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -44,5 +43,5 @@ def test_error_node_display__serialize_with_vellum_error() -> None:
     }
 
     # AND we serialize the DEPRECATED fields
-    assert is_valid_uuid(serialized_node["data"]["error_output_id"])
-    assert serialized_node["data"]["name"] == "error-node"
+    assert "error_output_id" not in serialized_node["data"]
+    assert "name" not in serialized_node["data"]
