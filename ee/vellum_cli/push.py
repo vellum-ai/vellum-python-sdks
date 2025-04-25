@@ -97,6 +97,7 @@ def push_command(
 
     client = create_vellum_client(
         api_key=api_key,
+        api_url=workspace_config.api_url,
     )
     sys.path.insert(0, os.getcwd())
 

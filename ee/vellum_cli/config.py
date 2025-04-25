@@ -16,10 +16,15 @@ PYPROJECT_TOML_PATH = "pyproject.toml"
 
 class WorkspaceConfig(UniversalBaseModel):
     name: str
-    api_key: str
+    api_key: str = "VELLUM_API_KEY"
+    api_url: Optional[str] = None
 
     def merge(self, other: "WorkspaceConfig") -> "WorkspaceConfig":
-        return WorkspaceConfig(name=self.name or other.name, api_key=self.api_key or other.api_key)
+        return WorkspaceConfig(
+            name=self.name or other.name,
+            api_key=self.api_key or other.api_key,
+            api_url=self.api_url or other.api_url,
+        )
 
 
 DEFAULT_WORKSPACE_CONFIG = WorkspaceConfig(name="default", api_key="VELLUM_API_KEY")
