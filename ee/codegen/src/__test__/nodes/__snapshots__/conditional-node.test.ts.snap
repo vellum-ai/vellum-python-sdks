@@ -24,6 +24,21 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`Conditional Node with AND combinator generates ampersand operator > should generate code with ampersand operator for AND conditions 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        branch_1 = Port.on_if(
+            ConstantValueReference("text").equals("val-1")
+            & ConstantValueReference("text").equals("val-2")
+        )
+"
+`;
+
 exports[`Conditional Node with NodePorts defined > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
@@ -364,7 +379,7 @@ from .templating_node import TemplatingNode
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         branch_1 = Port.on_if(
-            Inputs.field.is_null() and TemplatingNode.Outputs.result.is_nil()
+            Inputs.field.is_null() & TemplatingNode.Outputs.result.is_nil()
         )
 "
 `;
