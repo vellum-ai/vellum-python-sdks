@@ -1,13 +1,12 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
-import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 import { VellumVariableType } from "vellum-ai/api";
 
 import { NodePortGenerationError, ValueGenerationError } from "./errors";
-import { PipeExpression } from "./extensions";
+import { AmpersandExpression, PipeExpression } from "./extensions";
 
 import * as codegen from "src/codegen";
 import { PortContext } from "src/context/port-context";
@@ -112,14 +111,13 @@ export class ConditionalNodePort extends AstNode {
     const combine =
       conditionData.combinator === "AND"
         ? (lhs: AstNode, rhs: AstNode): AstNode => {
-            return python.operator({
-              operator: OperatorType.And,
-              lhs: lhs,
-              rhs: rhs,
+            return new AmpersandExpression({
+              lhs,
+              rhs,
             });
           }
         : (lhs: AstNode, rhs: AstNode): AstNode => {
-            return new PipeExpression(lhs, rhs);
+            return new PipeExpression({ lhs, rhs });
           };
 
     return otherConditions.length > 0
