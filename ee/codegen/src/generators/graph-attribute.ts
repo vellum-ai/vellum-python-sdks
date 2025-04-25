@@ -382,7 +382,50 @@ export class GraphAttribute extends AstNode {
         graphSourceNode,
       });
     } else if (mutableAst.type === "set") {
-      const newSet = mutableAst.values.map((subAst) => {
+      const setAst = mutableAst as GraphSet;
+
+      // Check if this is a cycle edge (target node already exists in the graph)
+      const isCycle = this.isNodeInBranch(targetNode, setAst);
+      const isSourceInGraph =
+        sourceNode && this.isNodeInBranch(sourceNode, setAst);
+
+      // Handle for direct cycles in a set
+      // We already know sourceNode -> targetNode exists (it's the edge we're adding)
+      // So we only need to check if targetNode -> sourceNode exists
+      if (
+        isCycle &&
+        isSourceInGraph &&
+        sourceNode &&
+        Array.from(this.workflowContext.getEdgesByPortId().values())
+          .flat()
+          .some(
+            (e) =>
+              e.sourceNodeId === targetNode.nodeData.id &&
+              e.targetNodeId === sourceNode.nodeData.id
+          )
+      ) {
+        // Create a new set with the same values, but modify the branch that contains the source node
+        const newValues = setAst.values.map((value) => {
+          // Check if this branch contains the source node
+          if (this.isNodeInBranch(sourceNode, value)) {
+            // If it does, append the target node to create the cycle
+            return {
+              type: "right_shift" as const,
+              lhs: value,
+              rhs: { type: "node_reference" as const, reference: targetNode },
+            };
+          }
+          // Otherwise, leave the branch unchanged
+          return value;
+        });
+
+        return {
+          type: "set" as const,
+          values: newValues,
+        };
+      }
+
+      const newSet = setAst.values.map((subAst) => {
         const canBeAdded = this.isNodeInBranch(sourceNode, subAst);
         if (!canBeAdded) {
           return { edgeAddedPriority: 0, original: subAst, value: subAst };
@@ -424,7 +467,7 @@ export class GraphAttribute extends AstNode {
           return {
             type: "set",
             values: [
-              ...mutableAst.values,
+              ...setAst.values,
               { type: "node_reference", reference: targetNode },
             ],
           };

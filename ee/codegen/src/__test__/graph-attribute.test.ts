@@ -12,6 +12,7 @@ import {
   finalOutputNodeFactory,
   genericNodeFactory,
   mergeNodeDataFactory,
+  nodePortFactory,
   nodePortsFactory,
   templatingNodeFactory,
 } from "./helpers/node-data-factories";
@@ -925,6 +926,64 @@ describe("Workflow", () => {
         [entrypointNode, genericNodeData],
         [[genericNodeData, uuidPortName1], firstNode],
         [[genericNodeData, uuidPortName2], secondNode],
+      ]);
+    });
+
+    it("should generate correct graph for a loop with ports", async () => {
+      const EntrypointNode = entrypointNodeDataFactory();
+
+      const ifPortId = "583edca2-29ff-4462-8859-72c07159b777";
+      const elsePortId = "09e71028-e2b1-4a63-a929-f72414351ac6";
+
+      const genericNodeId = "9211255a-f1c7-4211-869f-a0ed344bb2fd";
+
+      const FirstNode = genericNodeFactory({
+        id: genericNodeId,
+        label: "FirstNode",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+            id: ifPortId,
+            expression: {
+              type: "BINARY_EXPRESSION",
+              operator: "=",
+              lhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "Hi",
+                },
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "Some value",
+                },
+              },
+            },
+          }),
+          nodePortFactory({
+            type: "ELSE",
+            id: elsePortId,
+          }),
+        ],
+      });
+
+      const SecondNode = genericNodeFactory({
+        id: "971ae206-1467-42e1-b5fc-60f44727a6bd",
+        label: "SecondNode",
+      });
+
+      const FinalNode = finalOutputNodeFactory({
+        label: "FinalNode",
+      });
+
+      await runGraphTest([
+        [EntrypointNode, FirstNode],
+        [SecondNode, FirstNode],
+        [[FirstNode, "if_port"], FinalNode],
+        [[FirstNode, "else_port"], SecondNode],
       ]);
     });
   });
