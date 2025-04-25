@@ -102,7 +102,7 @@ describe("GenericNode", () => {
 
       const nodeAttributes: NodeAttribute[] = [
         {
-          id: "attr-1",
+          id: "attr-1-id",
           name: "default-attribute",
           value: {
             type: "NODE_OUTPUT",

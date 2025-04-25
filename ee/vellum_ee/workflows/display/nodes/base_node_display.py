@@ -99,6 +99,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     output_display: Dict[OutputReference, NodeOutputDisplay]
     port_displays: Dict[Port, PortDisplayOverrides] = {}
     node_input_ids_by_name: ClassVar[Dict[str, UUID]] = {}
+    attribute_ids_by_name: ClassVar[Dict[str, UUID]] = {}
 
     # Used to explicitly set the target handle id for a node
     # Once all nodes are Generic Nodes, we may replace this with a trigger_id or trigger attribute
@@ -114,7 +115,11 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 # We don't need to serialize generic node attributes containing a subworkflow
                 continue
 
-            id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
+            id = (
+                str(self.attribute_ids_by_name[attribute.name])
+                if self.attribute_ids_by_name
+                else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
+            )
             try:
                 attributes.append(
                     {
