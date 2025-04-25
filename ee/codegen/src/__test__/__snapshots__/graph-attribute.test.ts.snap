@@ -273,14 +273,10 @@ exports[`Workflow > graph > should define nested sets of nodes without compilati
 `;
 
 exports[`Workflow > graph > should generate correct graph for a loop with ports 1`] = `
-"(
-    {
-        FirstNode.Ports.if_port >> FinalNode,
-        FirstNode.Ports.else_port >> SecondNode,
-    }
-    >> SecondNode
-    >> FirstNode
-)
+"{
+    FirstNode.Ports.if_port >> FinalNode,
+    FirstNode.Ports.else_port >> SecondNode >> FirstNode,
+}
 "
 `;
 

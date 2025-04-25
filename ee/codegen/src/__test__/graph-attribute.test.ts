@@ -48,8 +48,6 @@ describe("Workflow", () => {
           return;
         }
 
-        //console.log(node.label, node.id);
-        //console.log(node.data.label, node.id);
         createNodeContext({
           workflowContext,
           nodeData: node,

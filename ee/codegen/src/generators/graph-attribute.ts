@@ -347,14 +347,22 @@ export class GraphAttribute extends AstNode {
       mutableAst.type === "set" &&
       this.isDirectCycle(sourceNode, targetNode, this.workflowContext)
     ) {
+      // Create a new set with the same values, but modify the branch that contains the source node
+      const newValues = mutableAst.values.map((value) => {
+        // Check if this branch contains the source node
+        if (this.isNodeInBranch(sourceNode, value)) {
+          return {
+            type: "right_shift" as const,
+            lhs: value,
+            rhs: { type: "node_reference" as const, reference: targetNode },
+          };
+        }
+        return value;
+      });
+
       return {
-        type: "right_shift",
-        lhs: {
-          type: "right_shift",
-          lhs: mutableAst,
-          rhs: { type: "node_reference", reference: sourceNode },
-        },
-        rhs: { type: "node_reference", reference: targetNode },
+        type: "set" as const,
+        values: newValues,
       };
     }
 
