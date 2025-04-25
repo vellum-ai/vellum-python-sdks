@@ -38,7 +38,6 @@ _fixture_paths = _get_fixtures(
         # TODO: Remove once serialization support is in
         "simple_workflow_node_with_output_values",
     },
-    include_fixtures={"simple_prompt_node"},
 )
 _fixture_ids = [os.path.basename(path) for path in _fixture_paths]
 

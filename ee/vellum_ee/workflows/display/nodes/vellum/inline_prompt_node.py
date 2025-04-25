@@ -1,4 +1,3 @@
-import uuid
 from uuid import UUID
 from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
@@ -11,6 +10,7 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import NodeInput
 
@@ -33,7 +33,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         node_blocks = raise_if_descriptor(node.blocks)
         function_definitions = raise_if_descriptor(node.functions)
 
-        ml_model = self._get_ml_model_name(display_context)
+        ml_model = str(raise_if_descriptor(node.ml_model))
 
         blocks: list = [
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
@@ -45,7 +45,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         )
         blocks.extend(functions)
 
-        return {
+        serialized_node: JsonObject = {
             "id": str(node_id),
             "type": "PROMPT",
             "inputs": [node_input.dict() for node_input in node_inputs],
@@ -76,14 +76,11 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
             ],
             "ports": self.serialize_ports(display_context),
-            "attributes": [
-                {
-                    "id": uuid.uuid4(),
-                    "name": "ml_model",
-                    "value": ml_model,
-                }
-            ],
         }
+        attributes = self._serialize_attributes(display_context)
+        if attributes:
+            serialized_node["attributes"] = attributes
+        return serialized_node
 
     def _generate_node_and_prompt_inputs(
         self,
@@ -209,11 +206,17 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         return block
 
-    def _get_ml_model_name(self, display_context: WorkflowDisplayContext):
-        """Get the ML model name, handling both string and BaseDescriptor types."""
-        node = self._node
+    def _serialize_attributes(self, display_context: "WorkflowDisplayContext"):
+        attribute_instances_by_name = {}
+        for attribute in self._node:
+            if attribute.name in self.attribute_ids_by_name:
+                attribute_instances_by_name[attribute.name] = attribute.instance
 
-        try:
-            return raise_if_descriptor(node.ml_model)
-        except AttributeError:
-            return self.serialize_value(display_context, node.ml_model)
+        return [
+            {
+                "id": str(attr_id),
+                "name": attr_name,
+                "value": serialize_value(display_context, attribute_instances_by_name[attr_name]),
+            }
+            for attr_name, attr_id in self.attribute_ids_by_name.items()
+        ]

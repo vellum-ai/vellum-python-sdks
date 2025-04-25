@@ -14,6 +14,7 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     array_output_id = UUID("771c6fba-5b4a-4092-9d52-693242d7b92c")
     target_handle_id = UUID("3feb7e71-ec63-4d58-82ba-c3df829a2948")
     node_input_ids_by_name = {"prompt_inputs.text": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
+    attribute_ids_by_name = {"ml_model": UUID("bb466968-7547-458c-8e8f-5d0fb1eb33f5")}
     output_display = {
         PromptNode.Outputs.text: NodeOutputDisplay(id=UUID("2d4f1826-de75-499a-8f84-0a690c8136ad"), name="text"),
         PromptNode.Outputs.results: NodeOutputDisplay(id=UUID("771c6fba-5b4a-4092-9d52-693242d7b92c"), name="results"),
