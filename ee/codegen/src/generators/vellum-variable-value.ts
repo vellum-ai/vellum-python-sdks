@@ -18,7 +18,7 @@ import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
-import { IterableConfig } from "src/types/vellum";
+import { AttributeConfig, IterableConfig } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -489,6 +489,7 @@ export namespace VellumValue {
     vellumValue: VellumVariableValueType;
     isRequestType?: boolean;
     iterableConfig?: IterableConfig;
+    attributeConfig?: AttributeConfig;
   };
 }
 
@@ -499,6 +500,7 @@ export class VellumValue extends AstNode {
     vellumValue,
     isRequestType,
     iterableConfig,
+    attributeConfig,
   }: VellumValue.Args) {
     super();
     this.astNode = null;
@@ -509,6 +511,15 @@ export class VellumValue extends AstNode {
     switch (vellumValue.type) {
       case "STRING":
         this.astNode = new StringVellumValue(vellumValue.value);
+        if (attributeConfig) {
+          this.astNode = python.accessAttribute({
+            lhs: attributeConfig.lhs,
+            rhs: python.reference({
+              name: vellumValue.value,
+              modulePath: [],
+            }),
+          });
+        }
         break;
       case "NUMBER":
         this.astNode = new NumberVellumValue(vellumValue.value);

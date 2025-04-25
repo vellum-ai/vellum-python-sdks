@@ -23,7 +23,6 @@ import {
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
-  ConstantValueWorkflowReference,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -384,56 +383,28 @@ export abstract class BaseNode<
                 attribute: ["wrap"],
                 modulePath: adornment.base.module,
               }),
-              arguments_: filteredAttributes
-                .map((attr) => {
-                  if (attr.value) {
-                    const constantValue =
-                      attr.value as ConstantValueWorkflowReference;
-                    // This is for error codes on try and retry args
-                    if (
-                      constantValue.type === "CONSTANT_VALUE" &&
-                      constantValue.value &&
-                      constantValue.value.type === "STRING" &&
-                      constantValue.value.value !== undefined
-                    ) {
-                      return python.methodArgument({
-                        name: attr.name,
-                        value: python.accessAttribute({
-                          lhs: python.reference({
-                            name: "WorkflowErrorCode",
-                            modulePath: [
-                              ...VELLUM_CLIENT_MODULE_PATH,
-                              "workflows",
-                              "errors",
-                              "types",
-                            ],
-                          }),
-                          rhs: python.reference({
-                            name: constantValue.value.value,
-                            modulePath: [],
-                          }),
-                        }),
-                      });
-                    } else if (
-                      constantValue.type === "CONSTANT_VALUE" &&
-                      constantValue.value &&
-                      constantValue.value.type === "NUMBER" &&
-                      constantValue.value.value !== undefined
-                    ) {
-                      return python.methodArgument({
-                        name: attr.name,
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor: constantValue,
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
-                          iterableConfig: { endWithComma: false },
-                        }),
-                      });
-                    }
-                  }
-                  return undefined;
+              arguments_: filteredAttributes.map((attr) =>
+                python.methodArgument({
+                  name: attr.name,
+                  value: new WorkflowValueDescriptor({
+                    workflowValueDescriptor: attr.value,
+                    nodeContext: this.nodeContext,
+                    workflowContext: this.workflowContext,
+                    iterableConfig: { endWithComma: false },
+                    attributeConfig: {
+                      lhs: python.reference({
+                        name: "WorkflowErrorCode",
+                        modulePath: [
+                          ...VELLUM_CLIENT_MODULE_PATH,
+                          "workflows",
+                          "errors",
+                          "types",
+                        ],
+                      }),
+                    },
+                  }),
                 })
-                .filter((arg) => arg !== undefined),
+              ),
             }),
           })
         );

@@ -5,6 +5,7 @@ import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import {
+  AttributeConfig,
   ConstantValueWorkflowReference as ConstantValueWorkflowReferenceType,
   IterableConfig,
   WorkflowDataNode,
@@ -16,6 +17,7 @@ export declare namespace ConstantValueReference {
     workflowContext: WorkflowContext;
     nodeInputWorkflowReferencePointer: ConstantValueWorkflowReferenceType;
     iterableConfig?: IterableConfig;
+    attributeConfig?: AttributeConfig;
   }
 }
 
@@ -31,6 +33,7 @@ export class ConstantValueReference extends BaseNodeInputWorkflowReference<Const
     return codegen.vellumValue({
       vellumValue: constantValueReferencePointer,
       iterableConfig: this.iterableConfig,
+      attributeConfig: this.attributeConfig,
     });
   }
 }
