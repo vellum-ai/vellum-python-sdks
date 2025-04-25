@@ -412,7 +412,7 @@ def main(word: str) -> int:
 def test_run_node__run_inline__incorrect_output_type_list():
     """Confirm that CodeExecutionNodes raise an error if the output type is incorrect during inline execution."""
 
-    # GIVEN a node that subclasses CodeExecutionNode that returns a string but is defined to return an int
+    # GIVEN a node that subclasses CodeExecutionNode that returns a list but is defined to return an int
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, int]):
         code = """\
 def main(output: list[str]) -> int:
