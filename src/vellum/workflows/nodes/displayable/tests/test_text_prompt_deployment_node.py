@@ -9,7 +9,6 @@ from vellum import (
     PromptOutput,
     StringVellumValue,
 )
-from vellum.workflows.constants import OMIT
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import PromptDeploymentNode
 from vellum.workflows.state import BaseState
@@ -66,14 +65,14 @@ def test_text_prompt_deployment_node__basic(vellum_client):
 
     # AND we should have made the expected call to stream the prompt execution
     vellum_client.execute_prompt_stream.assert_called_once_with(
-        expand_meta=OMIT,
-        expand_raw=OMIT,
-        external_id=OMIT,
+        expand_meta=None,
+        expand_raw=None,
+        external_id=None,
         inputs=[],
-        metadata=OMIT,
+        metadata=None,
         prompt_deployment_id=None,
         prompt_deployment_name="my-deployment",
-        raw_overrides=OMIT,
+        raw_overrides=None,
         release_tag="LATEST",
         request_options={
             "additional_body_parameters": {"execution_context": {"parent_context": None, "trace_id": mock.ANY}}
