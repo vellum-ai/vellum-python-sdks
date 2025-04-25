@@ -18,6 +18,11 @@ class ListWrapper(list):
 
         return super().__getitem__(key)
 
+    def __getattr__(self, attr):
+        if attr == "value":
+            return self
+        raise AttributeError(f"'list' object has no attribute '{attr}'")
+
 
 class DictWrapper(dict):
     """
