@@ -336,36 +336,6 @@ export class GraphAttribute extends AstNode {
       return;
     }
 
-    // Check if this is a cycle edge (target node already exists in the graph)
-    const isCycle = this.isNodeInBranch(targetNode, mutableAst);
-    const isSourceInGraph = this.isNodeInBranch(sourceNode, mutableAst);
-
-    if (
-      sourceNode &&
-      isCycle &&
-      isSourceInGraph &&
-      mutableAst.type === "set" &&
-      this.isDirectCycle(sourceNode, targetNode, this.workflowContext)
-    ) {
-      // Create a new set with the same values, but modify the branch that contains the source node
-      const newValues = mutableAst.values.map((value) => {
-        // Check if this branch contains the source node
-        if (this.isNodeInBranch(sourceNode, value)) {
-          return {
-            type: "right_shift" as const,
-            lhs: value,
-            rhs: { type: "node_reference" as const, reference: targetNode },
-          };
-        }
-        return value;
-      });
-
-      return {
-        type: "set" as const,
-        values: newValues,
-      };
-    }
-
     if (mutableAst.type === "empty") {
       return {
         type: "node_reference",
@@ -412,7 +382,50 @@ export class GraphAttribute extends AstNode {
         graphSourceNode,
       });
     } else if (mutableAst.type === "set") {
-      const newSet = mutableAst.values.map((subAst) => {
+      const setAst = mutableAst as GraphSet;
+
+      // Check if this is a cycle edge (target node already exists in the graph)
+      const isCycle = this.isNodeInBranch(targetNode, setAst);
+      const isSourceInGraph =
+        sourceNode && this.isNodeInBranch(sourceNode, setAst);
+
+      // Handle for direct cycles in a set
+      // We already know sourceNode -> targetNode exists (it's the edge we're adding)
+      // So we only need to check if targetNode -> sourceNode exists
+      if (
+        isCycle &&
+        isSourceInGraph &&
+        sourceNode &&
+        Array.from(this.workflowContext.getEdgesByPortId().values())
+          .flat()
+          .some(
+            (e) =>
+              e.sourceNodeId === targetNode.nodeData.id &&
+              e.targetNodeId === sourceNode.nodeData.id
+          )
+      ) {
+        // Create a new set with the same values, but modify the branch that contains the source node
+        const newValues = setAst.values.map((value) => {
+          // Check if this branch contains the source node
+          if (this.isNodeInBranch(sourceNode, value)) {
+            // If it does, append the target node to create the cycle
+            return {
+              type: "right_shift" as const,
+              lhs: value,
+              rhs: { type: "node_reference" as const, reference: targetNode },
+            };
+          }
+          // Otherwise, leave the branch unchanged
+          return value;
+        });
+
+        return {
+          type: "set" as const,
+          values: newValues,
+        };
+      }
+
+      const newSet = setAst.values.map((subAst) => {
         const canBeAdded = this.isNodeInBranch(sourceNode, subAst);
         if (!canBeAdded) {
           return { edgeAddedPriority: 0, original: subAst, value: subAst };
@@ -454,7 +467,7 @@ export class GraphAttribute extends AstNode {
           return {
             type: "set",
             values: [
-              ...mutableAst.values,
+              ...setAst.values,
               { type: "node_reference", reference: targetNode },
             ],
           };
@@ -1241,37 +1254,5 @@ export class GraphAttribute extends AstNode {
     }
 
     return "";
-  }
-
-  /**
-   * Checks if there's a direct cycle between two nodes.
-   * A direct cycle means node1 → node2 and node2 → node1.
-   */
-  private isDirectCycle(
-    node1: BaseNodeContext<WorkflowDataNode> | null,
-    node2: BaseNodeContext<WorkflowDataNode> | null,
-    workflowContext: WorkflowContext
-  ): boolean {
-    if (!node1 || !node2) return false;
-
-    // Check if node1 has an edge to node2
-    const node1ToNode2 = Array.from(workflowContext.getEdgesByPortId().values())
-      .flat()
-      .some(
-        (edge) =>
-          edge.sourceNodeId === node1.nodeData.id &&
-          edge.targetNodeId === node2.nodeData.id
-      );
-
-    // Check if node2 has an edge to node1
-    const node2ToNode1 = Array.from(workflowContext.getEdgesByPortId().values())
-      .flat()
-      .some(
-        (edge) =>
-          edge.sourceNodeId === node2.nodeData.id &&
-          edge.targetNodeId === node1.nodeData.id
-      );
-
-    return node1ToNode2 && node2ToNode1;
   }
 }
