@@ -131,16 +131,24 @@ class BaseNodeMeta(type):
         return {"BaseWorkflow": BaseWorkflow}
 
     def __getattribute__(cls, name: str) -> Any:
-        attribute = super().__getattribute__(name)
-        if (
-            name.startswith("_")
-            or inspect.isfunction(attribute)
-            or inspect.ismethod(attribute)
-            or is_nested_class(attribute, cls)
-            or isinstance(attribute, (property, cached_property))
-            or not issubclass(cls, BaseNode)
-        ):
-            return attribute
+        if name.startswith("_"):
+            return super().__getattribute__(name)
+
+        try:
+            attribute = super().__getattribute__(name)
+            if (
+                inspect.isfunction(attribute)
+                or inspect.ismethod(attribute)
+                or is_nested_class(attribute, cls)
+                or isinstance(attribute, (property, cached_property))
+                or not issubclass(cls, BaseNode)
+            ):
+                return attribute
+        except AttributeError as e:
+            if issubclass(cls, BaseNode) and name in cls.__annotations__:
+                attribute = None
+            else:
+                raise e
 
         types = infer_types(cls, name, cls._localns)
         return NodeReference(

@@ -10,6 +10,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState, StateMeta
 
@@ -303,3 +304,16 @@ def test_base_node__iterate_over_attributes__preserves_order():
 
         # THEN the attributes are in the correct order
         assert attribute_names == ["baz", "qux", "quux", "foo", "bar"], f"Iteration {i} failed"
+
+
+def test_base_node__node_reference_of_annotation():
+    # GIVEN a node with an annotated attribute
+    class MyNode(BaseNode):
+        foo: str
+
+    # WHEN we reference the attribute
+    node_reference = MyNode.foo
+
+    # THEN the node reference is of the correct type
+    assert isinstance(node_reference, NodeReference)
+    assert node_reference.name == "foo"
