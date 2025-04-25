@@ -1,3 +1,4 @@
+import { python } from "@fern-api/python-ast";
 import {
   ChatMessage,
   ConditionCombinator,
@@ -851,4 +852,8 @@ export type OperatorMapping =
 
 export interface IterableConfig {
   endWithComma?: boolean;
+}
+
+export interface AttributeConfig {
+  lhs: python.Reference;
 }

@@ -8,6 +8,7 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { Expression } from "src/generators/expression";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
+  AttributeConfig,
   IterableConfig,
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
@@ -24,6 +25,7 @@ export namespace WorkflowValueDescriptor {
     workflowValueDescriptor?: WorkflowValueDescriptorType | null;
     workflowContext: WorkflowContext;
     iterableConfig?: IterableConfig;
+    attributeConfig?: AttributeConfig;
   }
 }
 
@@ -31,6 +33,7 @@ export class WorkflowValueDescriptor extends AstNode {
   private nodeContext?: BaseNodeContext<WorkflowDataNode>;
   private workflowContext: WorkflowContext;
   private iterableConfig?: IterableConfig;
+  private attributeConfig?: AttributeConfig;
   private astNode: AstNode;
 
   public constructor(args: WorkflowValueDescriptor.Args) {
@@ -39,6 +42,7 @@ export class WorkflowValueDescriptor extends AstNode {
     this.nodeContext = args.nodeContext;
     this.workflowContext = args.workflowContext;
     this.iterableConfig = args.iterableConfig;
+    this.attributeConfig = args.attributeConfig;
     this.astNode = this.generateWorkflowValueDescriptor(
       args.workflowValueDescriptor
     );
@@ -68,6 +72,7 @@ export class WorkflowValueDescriptor extends AstNode {
         workflowContext: this.workflowContext,
         workflowValueReferencePointer: workflowValueDescriptor,
         iterableConfig: this.iterableConfig,
+        attributeConfig: this.attributeConfig,
       });
 
       if (!reference.astNode) {

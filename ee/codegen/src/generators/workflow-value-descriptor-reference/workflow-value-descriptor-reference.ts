@@ -11,6 +11,7 @@ import { NodeOutputWorkflowReference } from "src/generators/workflow-value-descr
 import { VellumSecretWorkflowReference } from "src/generators/workflow-value-descriptor-reference/vellum-secret-workflow-reference";
 import { WorkflowInputReference } from "src/generators/workflow-value-descriptor-reference/workflow-input-reference";
 import {
+  AttributeConfig,
   IterableConfig,
   WorkflowDataNode,
   WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
@@ -23,6 +24,7 @@ export declare namespace WorkflowValueDescriptorReference {
     workflowContext: WorkflowContext;
     workflowValueReferencePointer: WorkflowValueDescriptorReferenceType;
     iterableConfig?: IterableConfig;
+    attributeConfig?: AttributeConfig;
   }
 }
 
@@ -31,6 +33,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
   private workflowContext: WorkflowContext;
   public readonly workflowValueReferencePointer: WorkflowValueDescriptorReferenceType["type"];
   private iterableConfig?: IterableConfig;
+  private attributeConfig?: AttributeConfig;
   public astNode:
     | BaseNodeInputWorkflowReference<WorkflowValueDescriptorReferenceType>
     | undefined;
@@ -44,6 +47,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
     this.workflowValueReferencePointer =
       args.workflowValueReferencePointer.type;
     this.iterableConfig = args.iterableConfig;
+    this.attributeConfig = args.attributeConfig;
 
     this.astNode = this.getAstNode(args.workflowValueReferencePointer);
 
@@ -90,6 +94,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
           iterableConfig: this.iterableConfig,
+          attributeConfig: this.attributeConfig,
         });
       case "VELLUM_SECRET":
         return new VellumSecretWorkflowReference({

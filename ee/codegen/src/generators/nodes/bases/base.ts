@@ -3,7 +3,7 @@ import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
-import { PORTS_CLASS_NAME } from "src/constants";
+import { PORTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import {
@@ -383,17 +383,36 @@ export abstract class BaseNode<
                 attribute: ["wrap"],
                 modulePath: adornment.base.module,
               }),
-              arguments_: filteredAttributes.map((attr) =>
-                python.methodArgument({
+              arguments_: filteredAttributes.map((attr) => {
+                const nodeConfig = NODE_DEFAULT_ATTRIBUTES[adornment.base.name];
+                const attrConfig = nodeConfig?.[attr.name];
+
+                const attributeConfig =
+                  attrConfig?.type === "WorkflowErrorCode"
+                    ? {
+                        lhs: python.reference({
+                          name: "WorkflowErrorCode",
+                          modulePath: [
+                            ...VELLUM_CLIENT_MODULE_PATH,
+                            "workflows",
+                            "errors",
+                            "types",
+                          ],
+                        }),
+                      }
+                    : undefined;
+
+                return python.methodArgument({
                   name: attr.name,
                   value: new WorkflowValueDescriptor({
                     workflowValueDescriptor: attr.value,
                     nodeContext: this.nodeContext,
                     workflowContext: this.workflowContext,
                     iterableConfig: { endWithComma: false },
+                    attributeConfig,
                   }),
-                })
-              ),
+                });
+              }),
             }),
           })
         );

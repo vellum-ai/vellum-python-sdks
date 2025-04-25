@@ -4,6 +4,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import {
+  AttributeConfig,
   IterableConfig,
   WorkflowDataNode,
   WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
@@ -15,6 +16,7 @@ export declare namespace BaseNodeInputWorkflowReference {
     workflowContext: WorkflowContext;
     nodeInputWorkflowReferencePointer: T;
     iterableConfig?: IterableConfig;
+    attributeConfig?: AttributeConfig;
   }
 }
 
@@ -25,6 +27,7 @@ export abstract class BaseNodeInputWorkflowReference<
   public readonly workflowContext: WorkflowContext;
   public readonly nodeInputWorkflowReferencePointer: T;
   public readonly iterableConfig?: IterableConfig;
+  public readonly attributeConfig?: AttributeConfig;
   private astNode: AstNode | undefined;
 
   constructor({
@@ -32,12 +35,14 @@ export abstract class BaseNodeInputWorkflowReference<
     workflowContext,
     nodeInputWorkflowReferencePointer,
     iterableConfig,
+    attributeConfig,
   }: BaseNodeInputWorkflowReference.Args<T>) {
     super();
 
     this.nodeContext = nodeContext;
     this.workflowContext = workflowContext;
     this.iterableConfig = iterableConfig;
+    this.attributeConfig = attributeConfig;
     this.nodeInputWorkflowReferencePointer = nodeInputWorkflowReferencePointer;
 
     this.astNode = this.getAstNode();

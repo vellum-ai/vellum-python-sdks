@@ -1927,6 +1927,111 @@ baz = foo + bar
       expectProjectFileToExist(["code", "display", "nodes", "prompt.py"]);
       expectProjectFileToMatchSnapshot(["code", "nodes", "prompt.py"]);
     });
+
+    it("should correctly handle error code and custom string attribute types in adornments", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "inline-prompt-node",
+              base: null,
+              data: {
+                label: "Prompt",
+                variant: "INLINE",
+                output_id: "959e7566-1e49-438d-9cd6-a2564b5e931b",
+                exec_config: {
+                  settings: null,
+                  parameters: {},
+                  input_variables: [],
+                  prompt_template_block_data: {
+                    blocks: [],
+                    version: 1,
+                  },
+                },
+                ml_model_name: "gpt-4o-mini",
+                array_output_id: "7cffec7b-d1bc-432f-ac2a-f7ace819bf5f",
+                error_output_id: "c204055c-fc9f-4fb5-9c58-babada7b0d89",
+                source_handle_id: "7556f35c-674d-45e3-9f88-74899bc03ea1",
+                target_handle_id: "b22d4b55-41ac-4898-9374-8d2c4dd7e58e",
+              },
+              type: "PROMPT",
+              ports: [],
+              inputs: [],
+              outputs: [],
+              trigger: {},
+              adornments: [
+                {
+                  id: "c204055c-fc9f-4fb5-9c58-babada7b0d89",
+                  base: {
+                    name: "TryNode",
+                    module: [
+                      "vellum",
+                      "workflows",
+                      "nodes",
+                      "core",
+                      "try_node",
+                      "node",
+                    ],
+                  },
+                  label: "Try",
+                  attributes: [
+                    {
+                      id: "b1bcf28e-a8d8-4746-9736-f96f7de73c73",
+                      name: "on_error_code",
+                      value: {
+                        type: "CONSTANT_VALUE",
+                        value: { type: "STRING", value: "INVALID_WORKFLOW" },
+                      },
+                    },
+                    {
+                      id: "custom-attribute-id",
+                      name: "custom_message",
+                      value: {
+                        type: "CONSTANT_VALUE",
+                        value: {
+                          type: "STRING",
+                          value: "This is a regular string",
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+              attributes: [],
+            },
+            {
+              id: "entrypoint-node",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "6a80add9-a37d-4280-bcc4-425c6e95b997",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+            },
+          ],
+          output_values: [],
+        },
+        input_variables: [],
+        output_variables: [],
+        runner_config: {},
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        workflowVersionExecConfigData: displayData,
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToMatchSnapshot(["code", "nodes", "prompt.py"]);
+    });
   });
   describe("combinator normalization", () => {
     it("should normalize AND to OR combinators", async () => {
