@@ -235,6 +235,28 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             "node_id": str(node_class_display.node_id),
         }
 
+    if isinstance(value, list):
+        serialized_items = [serialize_value(display_context, item) for item in value]
+        if all(item["type"] == "CONSTANT_VALUE" for item in serialized_items):
+            constant_values = []
+            for item in serialized_items:
+                value_inner = item["value"]
+                if value_inner["type"] == "JSON" and "items" in value_inner:
+                    # Nested JSON list
+                    constant_values.append(value_inner["items"])
+                else:
+                    constant_values.append(value_inner["value"])
+
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "JSON",
+                    "items": constant_values,
+                },
+            }
+        else:
+            return {"type": "ARRAY_REFERENCE", "items": serialized_items}
+
     if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
         raise ValueError("Nested references are not supported.")
 
