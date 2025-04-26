@@ -29,9 +29,9 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         node_inputs, prompt_inputs = self._generate_node_and_prompt_inputs(node_id, node, display_context)
         input_variable_id_by_name = {prompt_input.key: prompt_input.id for prompt_input in prompt_inputs}
 
-        _, output_display = display_context.global_node_output_displays[node.Outputs.text]
-        _, array_display = display_context.global_node_output_displays[node.Outputs.results]
-        _, json_display = display_context.global_node_output_displays[node.Outputs.json]
+        output_display = self.output_display[node.Outputs.text]
+        array_display = self.output_display[node.Outputs.results]
+        json_display = self.output_display[node.Outputs.json]
         node_blocks = raise_if_descriptor(node.blocks)
         function_definitions = raise_if_descriptor(node.functions)
 
@@ -136,6 +136,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         path: List[int],
     ) -> JsonObject:
         block: JsonObject
+        block_id = uuid4_from_hash(f"{self.node_id}-{prompt_block.block_type}-{'-'.join([str(i) for i in path])}")
         if prompt_block.block_type == "JINJA":
             block = {
                 "block_type": "JINJA",
@@ -171,10 +172,21 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             }
 
         elif prompt_block.block_type == "VARIABLE":
-            block = {
-                "block_type": "VARIABLE",
-                "input_variable_id": input_variable_id_by_name[prompt_block.input_variable],
-            }
+            input_variable_id = input_variable_id_by_name.get(prompt_block.input_variable)
+            if input_variable_id:
+                block = {
+                    "block_type": "VARIABLE",
+                    "input_variable_id": input_variable_id,
+                }
+            else:
+                # Even though this will likely fail in runtime, we want to allow serialization to succeed
+                # in case the block is work in progress or the node is not yet part of the graph
+                block = {
+                    "block_type": "VARIABLE",
+                    "input_variable_id": str(
+                        uuid4_from_hash(f"{block_id}-input_variable-{prompt_block.input_variable}")
+                    ),
+                }
 
         elif prompt_block.block_type == "PLAIN_TEXT":
             block = {
@@ -193,9 +205,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         else:
             raise NotImplementedError(f"Serialization for prompt block type {prompt_block.block_type} not implemented")
 
-        block["id"] = str(
-            uuid4_from_hash(f"{self.node_id}-{prompt_block.block_type}-{'-'.join([str(i) for i in path])}")
-        )
+        block["id"] = str(block_id)
         if prompt_block.cache_config:
             block["cache_config"] = prompt_block.cache_config.dict()
         else:
