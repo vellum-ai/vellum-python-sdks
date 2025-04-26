@@ -87,7 +87,7 @@ def test_serialize_workflow():
             "type": "ERROR",
             "inputs": [
                 {
-                    "id": "690d825f-6ffd-493e-8141-c86d384e6150",
+                    "id": "8e4c8d76-2e02-4d7e-a7bf-d71af392dc49",
                     "key": "error_source_input_id",
                     "value": {
                         "rules": [
@@ -103,7 +103,7 @@ def test_serialize_workflow():
             "data": {
                 "label": "Fail Node",
                 "target_handle_id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
-                "error_source_input_id": "None",
+                "error_source_input_id": "8e4c8d76-2e02-4d7e-a7bf-d71af392dc49",
             },
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {

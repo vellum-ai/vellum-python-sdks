@@ -14,6 +14,7 @@ _SubworkflowDeploymentNodeType = TypeVar("_SubworkflowDeploymentNodeType", bound
 class BaseSubworkflowDeploymentNodeDisplay(
     BaseNodeDisplay[_SubworkflowDeploymentNodeType], Generic[_SubworkflowDeploymentNodeType]
 ):
+    __serializable_inputs__ = {SubworkflowDeploymentNode.subworkflow_inputs}
 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs

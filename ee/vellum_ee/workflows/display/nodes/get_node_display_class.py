@@ -2,7 +2,6 @@ import types
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
 
-from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.registry import get_from_node_display_registry
@@ -30,14 +29,14 @@ def get_node_display_class(node_class: Type[NodeType]) -> Type["BaseNodeDisplay"
                 node_input_ids_by_name.update(_get_node_input_ids_by_ref(f"{path}.{key}", value))
             return node_input_ids_by_name
 
-        if isinstance(inst, BaseDescriptor):
-            return {path: uuid4_from_hash(f"{node_class.__id__}|{path}")}
-
-        return {}
+        return {path: uuid4_from_hash(f"{node_class.__id__}|{path}")}
 
     def exec_body(ns: Dict):
         node_input_ids_by_name: Dict[str, UUID] = {}
         for ref in node_class:
+            if ref not in base_node_display_class.__serializable_inputs__:
+                continue
+
             node_input_ids_by_name.update(_get_node_input_ids_by_ref(ref.name, ref.instance))
 
         if node_input_ids_by_name:

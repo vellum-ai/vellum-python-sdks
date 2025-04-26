@@ -32,6 +32,14 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
     # A mapping between the id of the operand (e.g. "lhs_variable_id" or "rhs_variable_id") and the id of the node input
     # that the operand is pointing to.
     metadata_filter_input_id_by_operand_id: Dict[UUID, UUID] = {}
+    __serializable_inputs__ = {
+        SearchNode.query,
+        SearchNode.document_index,
+        SearchNode.weights,
+        SearchNode.chunk_separator,
+        SearchNode.limit,
+        SearchNode.result_merging,
+    }
 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs

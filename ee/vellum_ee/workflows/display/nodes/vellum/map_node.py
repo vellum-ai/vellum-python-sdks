@@ -13,6 +13,8 @@ _MapNodeType = TypeVar("_MapNodeType", bound=MapNode)
 
 
 class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNodeType]):
+    __serializable_inputs__ = {MapNode.items}  # type: ignore[misc]
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:

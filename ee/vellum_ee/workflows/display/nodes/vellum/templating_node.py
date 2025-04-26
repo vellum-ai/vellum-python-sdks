@@ -15,6 +15,8 @@ TEMPLATE_INPUT_NAME = TemplatingNode.template.name
 
 
 class BaseTemplatingNodeDisplay(BaseNodeDisplay[_TemplatingNodeType], Generic[_TemplatingNodeType]):
+    __serializable_inputs__ = {TemplatingNode.inputs}
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
     ) -> JsonObject:
