@@ -13,7 +13,7 @@ class ErrorNode(BaseNode):
     error: Union[str, VellumError] - The error to raise.
     """
 
-    error: ClassVar[Union[str, WorkflowError, VellumError]] = ""
+    error: ClassVar[Union[str, WorkflowError, VellumError]]
 
     def run(self) -> BaseNode.Outputs:
         if isinstance(self.error, str):
