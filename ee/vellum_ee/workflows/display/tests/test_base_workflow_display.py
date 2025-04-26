@@ -3,6 +3,8 @@ from typing import Dict
 
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.ports.port import Port
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplayOverrides
@@ -285,3 +287,45 @@ def test_vellum_workflow_display__serialize_with_parse_json_expression():
             "operator": "parseJson",
         },
     }
+
+
+def test_serialize__port_with_lazy_reference():
+    # GIVEN a node with a lazy reference in a Port
+    class MyNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            foo = Port.on_if(LazyReference(lambda: MyNode.Outputs.bar))
+
+        class Outputs(BaseNode.Outputs):
+            bar: bool
+
+    # AND a workflow that uses the node
+    class Workflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    exec_config = workflow_display.serialize()
+
+    # THEN the lazy reference should be serialized correctly
+    raw_data = exec_config["workflow_raw_data"]
+    assert isinstance(raw_data, dict)
+
+    nodes = raw_data["nodes"]
+    assert isinstance(nodes, list)
+
+    my_node = nodes[1]
+    assert isinstance(my_node, dict)
+    ports = my_node.get("ports")
+    assert isinstance(ports, list)
+    assert ports == [
+        {
+            "id": "6c26bc2b-6469-47c1-b858-d63f0d311ea6",
+            "name": "foo",
+            "type": "IF",
+            "expression": {
+                "type": "NODE_OUTPUT",
+                "node_id": str(MyNode.__id__),
+                "node_output_id": str(MyNode.__output_ids__["bar"]),
+            },
+        }
+    ]
