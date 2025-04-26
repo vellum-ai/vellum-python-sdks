@@ -28,7 +28,7 @@ from vellum.workflows.types.utils import get_class_attr_names, get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 
 
-def is_nested_class(nested: Any, parent: Type) -> bool:
+def _is_nested_class(nested: Any, parent: Type) -> bool:
     return (
         inspect.isclass(nested)
         # If a class is defined within a function, we don't consider it nested in the class defining that function
@@ -36,7 +36,18 @@ def is_nested_class(nested: Any, parent: Type) -> bool:
         and (len(nested.__qualname__.split(".")) < 2 or nested.__qualname__.split(".")[-2] != "<locals>")
         and nested.__module__ == parent.__module__
         and (nested.__qualname__.startswith(parent.__name__) or nested.__qualname__.startswith(parent.__qualname__))
-    ) or any(is_nested_class(nested, base) for base in parent.__bases__)
+    ) or any(_is_nested_class(nested, base) for base in parent.__bases__)
+
+
+def _is_annotated(cls: Type, name: str) -> bool:
+    if name in cls.__annotations__:
+        return True
+
+    for base in cls.__bases__:
+        if _is_annotated(base, name):
+            return True
+
+    return False
 
 
 class BaseNodeMeta(type):
@@ -136,19 +147,20 @@ class BaseNodeMeta(type):
 
         try:
             attribute = super().__getattribute__(name)
-            if (
-                inspect.isfunction(attribute)
-                or inspect.ismethod(attribute)
-                or is_nested_class(attribute, cls)
-                or isinstance(attribute, (property, cached_property))
-                or not issubclass(cls, BaseNode)
-            ):
-                return attribute
         except AttributeError as e:
-            if issubclass(cls, BaseNode) and name in cls.__annotations__:
+            if _is_annotated(cls, name):
                 attribute = None
             else:
                 raise e
+
+        if (
+            inspect.isfunction(attribute)
+            or inspect.ismethod(attribute)
+            or _is_nested_class(attribute, cls)
+            or isinstance(attribute, (property, cached_property))
+            or not issubclass(cls, BaseNode)
+        ):
+            return attribute
 
         types = infer_types(cls, name, cls._localns)
         return NodeReference(
