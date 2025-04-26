@@ -2,6 +2,7 @@ import pytest
 from uuid import UUID
 from typing import Type
 
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
@@ -181,3 +182,36 @@ def test_serialize_node__prompt_inputs__state_reference():
             },
         },
     ]
+
+
+def test_serialize_node__unreferenced_variable_block__still_serializes():
+    # GIVEN a prompt node with an unreferenced variable block
+    class MyPromptNode(InlinePromptNode):
+        blocks = [VariablePromptBlock(input_variable="foo")]
+
+    # AND a workflow with the prompt node
+    class MyWorkflow(BaseWorkflow):
+        graph = MyPromptNode
+
+    # WHEN the prompt node is serialized
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should skip the state reference input rule
+    assert serialized_workflow["workflow_raw_data"]["nodes"][1]["data"]["exec_config"]["prompt_template_block_data"][
+        "blocks"
+    ] == [
+        {
+            "id": "fecbb5f3-e0a3-42ed-9774-6c68fd5db50c",
+            "block_type": "VARIABLE",
+            "input_variable_id": "ea3f6348-8553-4375-bd27-527df4e4f3c2",
+            "state": "ENABLED",
+            "cache_config": None,
+        }
+    ]
+
+    # AND we should have a warning of the invalid reference
+    # TODO: Come up with a proposal for how nodes should propagate warnings
+    # warnings = list(workflow_display.errors)
+    # assert len(warnings) == 1
+    # assert "Missing input variable 'foo' for prompt block 0" in str(warnings[0])
