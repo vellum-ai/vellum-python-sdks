@@ -4,6 +4,7 @@ from uuid import UUID
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.lazy import LazyReference
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -100,3 +101,26 @@ def test_serialize_display_data():
         "position": {"x": 0.0, "y": 0.0},
         "comment": {"value": "I hope this works"},
     }
+
+
+def test_serialize__port_with_lazy_reference():
+    # GIVEN a node with a lazy reference in a Port
+    class MyNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            foo = Port.on_if(LazyReference(lambda: MyNode.Outputs.bar))
+
+        class Outputs(BaseNode.Outputs):
+            bar: bool
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(MyNode)
+    data = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the lazy reference should be serialized correctly
+    assert data["ports"] == [
+        {
+            "id": "7de6ea94-7f6c-475e-8f38-ec8ac317fd19",
+            "name": "foo",
+            "type": "IF",
+        }
+    ]

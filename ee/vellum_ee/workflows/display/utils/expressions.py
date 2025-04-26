@@ -116,7 +116,7 @@ def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplay
     return value._get()
 
 
-def serialize_condition(display_context: "WorkflowDisplayContext", condition: BaseDescriptor) -> JsonObject:
+def _serialize_condition(display_context: "WorkflowDisplayContext", condition: BaseDescriptor) -> JsonObject:
     if isinstance(
         condition,
         (
@@ -247,4 +247,4 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     # If it's not any of the references we know about,
     # then try to serialize it as a nested value
-    return serialize_condition(display_context, value)
+    return _serialize_condition(display_context, value)

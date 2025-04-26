@@ -35,7 +35,7 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.utils.expressions import serialize_condition, serialize_value
+from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
 
 if TYPE_CHECKING:
@@ -204,9 +204,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                         "id": id,
                         "name": port.name,
                         "type": port._condition_type.value,
-                        "expression": (
-                            serialize_condition(display_context, port._condition) if port._condition else None
-                        ),
+                        "expression": (serialize_value(display_context, port._condition) if port._condition else None),
                     }
                 )
             else:
