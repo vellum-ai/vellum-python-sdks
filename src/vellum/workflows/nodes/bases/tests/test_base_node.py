@@ -317,3 +317,19 @@ def test_base_node__node_reference_of_annotation():
     # THEN the node reference is of the correct type
     assert isinstance(node_reference, NodeReference)
     assert node_reference.name == "foo"
+
+
+def test_base_node__node_reference_of_inherited_annotation():
+    # GIVEN a node with an annotated attribute
+    class MyNode(BaseNode):
+        foo: str
+
+    class InheritedNode(MyNode):
+        bar: str
+
+    # WHEN we reference the attribute
+    node_reference = InheritedNode.foo
+
+    # THEN the node reference is of the correct type
+    assert isinstance(node_reference, NodeReference)
+    assert node_reference.name == "foo"
