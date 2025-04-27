@@ -23,8 +23,8 @@ export class WorkflowInputReference extends BaseNodeInputWorkflowReference<Workf
       return python.TypeInstantiation.none();
     }
     return python.reference({
-      name: "Inputs",
-      modulePath: inputVariableContext.modulePath,
+      name: inputVariableContext.definition.name,
+      modulePath: inputVariableContext.definition.module,
       attribute: [inputVariableContext.name],
     });
   }

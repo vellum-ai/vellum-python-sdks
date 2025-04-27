@@ -19,7 +19,6 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
             viewport=WorkflowDisplayDataViewport(x=-992.7774269608426, y=-82.38774859214823, zoom=0.6534253694599966)
         ),
     )
-    inputs_display = {}
     entrypoint_displays = {
         TemplatingNode: EntrypointDisplay(
             id=UUID("6b52893a-e649-434d-aedd-e8ad73d78dce"),

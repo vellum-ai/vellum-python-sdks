@@ -434,7 +434,6 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=0)),
     )
-    inputs_display = {}
     entrypoint_displays = {
         TemplatingNode: EntrypointDisplay(id=UUID("entry"), edge_display=EdgeDisplay(id=UUID("edge_1")))
     }

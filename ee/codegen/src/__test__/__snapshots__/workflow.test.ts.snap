@@ -2,9 +2,12 @@
 
 exports[`Workflow > write > should generate correct code when there are input variables 1`] = `
 "from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
 
 
-class TestWorkflow(BaseWorkflow):
+class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
     pass
 "
 `;

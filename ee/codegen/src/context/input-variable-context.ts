@@ -1,5 +1,5 @@
 import { isEmpty, isNil } from "lodash";
-import { VellumVariable } from "vellum-ai/api/types";
+import { CodeResourceDefinition, VellumVariable } from "vellum-ai/api/types";
 
 import { WorkflowContext } from "src/context/workflow-context";
 import {
@@ -18,7 +18,7 @@ export declare namespace InputVariableContext {
 export class InputVariableContext {
   private readonly workflowContext: WorkflowContext;
   private readonly inputVariableData: VellumVariable;
-  public readonly modulePath: string[];
+  public readonly definition: CodeResourceDefinition;
 
   public readonly name: string;
 
@@ -28,7 +28,10 @@ export class InputVariableContext {
   }: InputVariableContext.Args) {
     this.workflowContext = workflowContext;
     this.inputVariableData = inputVariableData;
-    this.modulePath = getGeneratedInputsModulePath(workflowContext);
+    this.definition = {
+      name: "Inputs",
+      module: getGeneratedInputsModulePath(workflowContext),
+    };
 
     this.name = this.generateSanitizedInputVariableName();
   }
