@@ -287,8 +287,8 @@ export class WorkflowContext {
     return edgesByPortId;
   }
 
-  public isStateVariableNameUsed(stateVariableName: string): boolean {
-    return this.stateVariableNames.has(stateVariableName);
+  public isInputVariableNameUsed(inputVariableName: string): boolean {
+    return this.inputVariableNames.has(inputVariableName);
   }
 
   private addUsedInputVariableName(inputVariableName: string): void {
@@ -312,6 +312,10 @@ export class WorkflowContext {
       inputVariableContext
     );
     this.addUsedInputVariableName(inputVariableContext.name);
+  }
+
+  public isStateVariableNameUsed(stateVariableName: string): boolean {
+    return this.stateVariableNames.has(stateVariableName);
   }
 
   private addUsedStateVariableName(stateVariableName: string) {

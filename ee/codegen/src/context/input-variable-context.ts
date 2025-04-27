@@ -58,7 +58,7 @@ export class InputVariableContext {
     // Deduplicate the input variable name if it's already in use
     let sanitizedName = initialInputVariableName;
     let numRenameAttempts = 0;
-    while (this.workflowContext.isStateVariableNameUsed(sanitizedName)) {
+    while (this.workflowContext.isInputVariableNameUsed(sanitizedName)) {
       sanitizedName = `${initialInputVariableName}${
         initialInputVariableName.endsWith("_") ? "" : "_"
       }${numRenameAttempts + 1}`;

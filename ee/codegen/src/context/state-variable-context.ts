@@ -6,7 +6,7 @@ import {
   removeEscapeCharacters,
   toPythonSafeSnakeCase,
 } from "src/utils/casing";
-import { getGeneratedInputsModulePath } from "src/utils/paths";
+import { getGeneratedStateModulePath } from "src/utils/paths";
 
 export declare namespace StateVariableContext {
   export type Args = {
@@ -28,9 +28,9 @@ export class StateVariableContext {
   }: StateVariableContext.Args) {
     this.workflowContext = workflowContext;
     this.stateVariableData = stateVariableData;
-    this.modulePath = getGeneratedInputsModulePath(workflowContext);
+    this.modulePath = getGeneratedStateModulePath(workflowContext);
 
-    this.name = this.generateSanitizedInputVariableName();
+    this.name = this.generateSanitizedStateVariableName();
   }
 
   public getStateVariableId(): string {
@@ -46,16 +46,16 @@ export class StateVariableContext {
     return removeEscapeCharacters(this.stateVariableData.key);
   }
 
-  private generateSanitizedInputVariableName(): string {
+  private generateSanitizedStateVariableName(): string {
     const defaultName = "state_";
     const rawStateVariableName = this.stateVariableData.key;
 
     const initialStateVariableName =
       !isNil(rawStateVariableName) && !isEmpty(rawStateVariableName)
-        ? toPythonSafeSnakeCase(rawStateVariableName, "input")
+        ? toPythonSafeSnakeCase(rawStateVariableName, "state")
         : defaultName;
 
-    // Deduplicate the input variable name if it's already in use
+    // Deduplicate the state variable name if it's already in use
     let sanitizedName = initialStateVariableName;
     let numRenameAttempts = 0;
     while (this.workflowContext.isStateVariableNameUsed(sanitizedName)) {
