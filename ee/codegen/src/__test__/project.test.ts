@@ -3274,8 +3274,8 @@ baz = foo + bar
       await project.generateCode();
 
       expectProjectFileToMatchSnapshot(["code", "state.py"]);
-      expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
       expectProjectFileToMatchSnapshot(["code", "display", "workflow.py"]);
+      expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
     });
   });
 });
