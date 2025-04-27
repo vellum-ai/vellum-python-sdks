@@ -36,11 +36,7 @@ export class State extends BasePersistedFile {
     return [this.stateClass];
   }
 
-  private generateStateClass({
-    name,
-  }: {
-    name?: string;
-  } = {}): python.Class | undefined {
+  private generateStateClass(): python.Class | undefined {
     const stateVariableContextsById =
       this.workflowContext.stateVariableContextsById;
 
@@ -48,19 +44,19 @@ export class State extends BasePersistedFile {
     const stateVariables = Array.from(
       [...stateVariableContextsById.values()].filter((stateVariableContext) => {
         return isEqual(
-          stateVariableContext.modulePath.slice(0, -1),
+          stateVariableContext.definition.module.slice(0, -1),
           this.workflowContext.modulePath.slice(0, -1)
         );
       })
     );
 
-    if (stateVariables.length === 0) {
+    const [firstStateVariableContext] = stateVariables;
+    if (!firstStateVariableContext) {
       return;
     }
 
-    const stateClassName = name ?? "State";
     const stateClass = python.class_({
-      name: stateClassName,
+      name: firstStateVariableContext.definition.name,
       extends_: [this.baseStateClassReference],
     });
     this.addReference(this.baseStateClassReference);

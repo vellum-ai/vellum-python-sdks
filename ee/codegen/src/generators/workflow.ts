@@ -301,6 +301,67 @@ export class Workflow {
       );
     }
 
+    if (this.workflowContext.stateVariableContextsById.size > 0) {
+      workflowDisplayClass.add(
+        python.field({
+          name: "state_value_displays",
+          initializer: python.TypeInstantiation.dict(
+            Array.from(this.workflowContext.stateVariableContextsById)
+              .map(([_, stateVariableContext]) => {
+                const overrideArgs: MethodArgument[] = [];
+
+                overrideArgs.push(
+                  python.methodArgument({
+                    name: "id",
+                    value: python.TypeInstantiation.uuid(
+                      stateVariableContext.getStateVariableId()
+                    ),
+                  })
+                );
+
+                overrideArgs.push(
+                  python.methodArgument({
+                    name: "name",
+                    value: python.TypeInstantiation.str(
+                      // Intentionally use the raw name from the input variable data
+                      // rather than the sanitized name from the input variable context
+                      stateVariableContext.getRawName()
+                    ),
+                  })
+                );
+
+                const extensions =
+                  stateVariableContext.getStateVariableData().extensions?.color;
+                if (!isNil(extensions)) {
+                  overrideArgs.push(
+                    python.methodArgument({
+                      name: "color",
+                      value: python.TypeInstantiation.str(extensions),
+                    })
+                  );
+                }
+                return {
+                  key: python.reference({
+                    name: stateVariableContext.definition.name,
+                    modulePath: stateVariableContext.definition.module,
+                    attribute: [stateVariableContext.name],
+                  }),
+                  value: python.instantiateClass({
+                    classReference: python.reference({
+                      name: "StateValueDisplay",
+                      modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
+                    }),
+                    arguments_: overrideArgs,
+                  }),
+                };
+              })
+              .filter(isDefined),
+            { endWithComma: true }
+          ),
+        })
+      );
+    }
+
     workflowDisplayClass.add(
       python.field({
         name: "entrypoint_displays",

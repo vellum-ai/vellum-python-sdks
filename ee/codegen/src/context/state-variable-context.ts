@@ -1,5 +1,5 @@
 import { isEmpty, isNil } from "lodash";
-import { VellumVariable } from "vellum-ai/api/types";
+import { CodeResourceDefinition, VellumVariable } from "vellum-ai/api/types";
 
 import { WorkflowContext } from "src/context/workflow-context";
 import {
@@ -18,7 +18,7 @@ export declare namespace StateVariableContext {
 export class StateVariableContext {
   private readonly workflowContext: WorkflowContext;
   private readonly stateVariableData: VellumVariable;
-  public readonly modulePath: string[];
+  public readonly definition: CodeResourceDefinition;
 
   public readonly name: string;
 
@@ -28,7 +28,10 @@ export class StateVariableContext {
   }: StateVariableContext.Args) {
     this.workflowContext = workflowContext;
     this.stateVariableData = stateVariableData;
-    this.modulePath = getGeneratedStateModulePath(workflowContext);
+    this.definition = {
+      name: "State",
+      module: getGeneratedStateModulePath(workflowContext),
+    };
 
     this.name = this.generateSanitizedStateVariableName();
   }
