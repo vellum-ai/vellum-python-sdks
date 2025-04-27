@@ -3253,7 +3253,8 @@ baz = foo + bar
         output_variables: [],
         state_variables: [
           {
-            id: uuidv4(),
+            // hardcoded id for display file snapshot
+            id: "5bc5356a-154f-4bba-a8ee-eb283bfd2a25",
             key: "foo",
             type: "STRING",
           },
