@@ -97,7 +97,7 @@ class Vellum:
 
 
 
-        Defaults to VellumEnvironment.PRODUCTION
+        Defaults to VellumEnvironment.DEFAULT
 
 
 
@@ -123,7 +123,7 @@ class Vellum:
     def __init__(
         self,
         *,
-        environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
+        environment: VellumEnvironment = VellumEnvironment.DEFAULT,
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -204,7 +204,7 @@ class Vellum:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().base,
             method="POST",
             json={
                 "url": url,
@@ -1440,7 +1440,7 @@ class AsyncVellum:
 
 
 
-        Defaults to VellumEnvironment.PRODUCTION
+        Defaults to VellumEnvironment.DEFAULT
 
 
 
@@ -1466,7 +1466,7 @@ class AsyncVellum:
     def __init__(
         self,
         *,
-        environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
+        environment: VellumEnvironment = VellumEnvironment.DEFAULT,
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -1555,7 +1555,7 @@ class AsyncVellum:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().base,
             method="POST",
             json={
                 "url": url,
