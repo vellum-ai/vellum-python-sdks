@@ -22,7 +22,6 @@ import {
   NodePortNotFoundError,
 } from "src/generators/errors";
 import { GraphAttribute } from "src/generators/graph-attribute";
-import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
 import {
@@ -36,8 +35,6 @@ export declare namespace Workflow {
   interface Args {
     /* The context for the workflow */
     workflowContext: WorkflowContext;
-    /* The inputs for the workflow */
-    inputs: Inputs;
     /* The display data for the workflow */
     displayData?: WorkflowDisplayData;
   }
@@ -45,14 +42,12 @@ export declare namespace Workflow {
 
 export class Workflow {
   public readonly workflowContext: WorkflowContext;
-  private readonly inputs: Inputs;
   private readonly displayData: WorkflowDisplayData | undefined;
 
   private readonly unusedNodes: Set<WorkflowNode>;
   private readonly unusedEdges: Set<WorkflowEdge>;
-  constructor({ workflowContext, inputs, displayData }: Workflow.Args) {
+  constructor({ workflowContext, displayData }: Workflow.Args) {
     this.workflowContext = workflowContext;
-    this.inputs = inputs;
     this.displayData = displayData;
 
     this.unusedNodes = new Set();
@@ -60,33 +55,43 @@ export class Workflow {
   }
 
   private generateParentWorkflowClass(): python.Reference {
-    let parentGenerics: Type[] | undefined;
+    const parentGenerics: Type[] = [];
+    let customGenericsUsed = false;
 
-    if (this.inputs.inputsClass) {
-      let inputsClassRef: python.Reference;
-      if (this.inputs.inputsClass) {
-        inputsClassRef = python.reference({
-          name: this.inputs.inputsClass.name,
-          modulePath: this.inputs.getModulePath(),
-        });
-      } else {
-        inputsClassRef = this.inputs.baseInputsClassReference;
-      }
-
-      const baseStateClassReference = new BaseState({
-        workflowContext: this.workflowContext,
-      });
-
-      parentGenerics = [
-        python.Type.reference(inputsClassRef),
-        python.Type.reference(baseStateClassReference),
-      ];
+    const [firstInputVariableContext] = Array.from(
+      this.workflowContext.inputVariableContextsById.values()
+    );
+    if (firstInputVariableContext) {
+      parentGenerics.push(
+        python.Type.reference(
+          python.reference({
+            name: firstInputVariableContext.definition.name,
+            modulePath: firstInputVariableContext.definition.module,
+          })
+        )
+      );
+      customGenericsUsed = true;
+    } else {
+      parentGenerics.push(
+        python.Type.reference(
+          python.reference({
+            name: "BaseInputs",
+            modulePath:
+              this.workflowContext.sdkModulePathNames.INPUTS_MODULE_PATH,
+          })
+        )
+      );
     }
+
+    const baseStateClassReference = new BaseState({
+      workflowContext: this.workflowContext,
+    });
+    parentGenerics.push(python.Type.reference(baseStateClassReference));
 
     const baseWorkflowClassRef = python.reference({
       name: "BaseWorkflow",
       modulePath: this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
-      genericTypes: parentGenerics,
+      genericTypes: customGenericsUsed ? parentGenerics : undefined,
     });
 
     return baseWorkflowClassRef;
@@ -236,68 +241,65 @@ export class Workflow {
       })
     );
 
-    workflowDisplayClass.add(
-      python.field({
-        name: "inputs_display",
-        initializer: python.TypeInstantiation.dict(
-          Array.from(this.workflowContext.inputVariableContextsById)
-            .map(([_, inputVariableContext]) => {
-              const inputsClass = this.inputs.inputsClass;
-              if (!inputsClass) {
-                return;
-              }
+    if (this.workflowContext.inputVariableContextsById.size > 0) {
+      workflowDisplayClass.add(
+        python.field({
+          name: "inputs_display",
+          initializer: python.TypeInstantiation.dict(
+            Array.from(this.workflowContext.inputVariableContextsById)
+              .map(([_, inputVariableContext]) => {
+                const overrideArgs: MethodArgument[] = [];
 
-              const overrideArgs: MethodArgument[] = [];
-
-              overrideArgs.push(
-                python.methodArgument({
-                  name: "id",
-                  value: python.TypeInstantiation.uuid(
-                    inputVariableContext.getInputVariableId()
-                  ),
-                })
-              );
-
-              overrideArgs.push(
-                python.methodArgument({
-                  name: "name",
-                  value: python.TypeInstantiation.str(
-                    // Intentionally use the raw name from the input variable data
-                    // rather than the sanitized name from the input variable context
-                    inputVariableContext.getRawName()
-                  ),
-                })
-              );
-
-              const extensions =
-                inputVariableContext.getInputVariableData().extensions?.color;
-              if (!isNil(extensions)) {
                 overrideArgs.push(
                   python.methodArgument({
-                    name: "color",
-                    value: python.TypeInstantiation.str(extensions),
+                    name: "id",
+                    value: python.TypeInstantiation.uuid(
+                      inputVariableContext.getInputVariableId()
+                    ),
                   })
                 );
-              }
-              return {
-                key: python.reference({
-                  name: inputsClass.name,
-                  modulePath: this.inputs.getModulePath(),
-                  attribute: [inputVariableContext.name],
-                }),
-                value: python.instantiateClass({
-                  classReference: python.reference({
-                    name: "WorkflowInputsDisplay",
-                    modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
+
+                overrideArgs.push(
+                  python.methodArgument({
+                    name: "name",
+                    value: python.TypeInstantiation.str(
+                      // Intentionally use the raw name from the input variable data
+                      // rather than the sanitized name from the input variable context
+                      inputVariableContext.getRawName()
+                    ),
+                  })
+                );
+
+                const extensions =
+                  inputVariableContext.getInputVariableData().extensions?.color;
+                if (!isNil(extensions)) {
+                  overrideArgs.push(
+                    python.methodArgument({
+                      name: "color",
+                      value: python.TypeInstantiation.str(extensions),
+                    })
+                  );
+                }
+                return {
+                  key: python.reference({
+                    name: inputVariableContext.definition.name,
+                    modulePath: inputVariableContext.definition.module,
+                    attribute: [inputVariableContext.name],
                   }),
-                  arguments_: overrideArgs,
-                }),
-              };
-            })
-            .filter(isDefined)
-        ),
-      })
-    );
+                  value: python.instantiateClass({
+                    classReference: python.reference({
+                      name: "WorkflowInputsDisplay",
+                      modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
+                    }),
+                    arguments_: overrideArgs,
+                  }),
+                };
+              })
+              .filter(isDefined)
+          ),
+        })
+      );
+    }
 
     workflowDisplayClass.add(
       python.field({

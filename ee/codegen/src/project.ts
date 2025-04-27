@@ -426,7 +426,6 @@ ${errors.slice(0, 3).map((err) => {
 
     const workflow = codegen.workflow({
       workflowContext: this.workflowContext,
-      inputs,
       displayData: this.workflowVersionExecConfig.workflowRawData.displayData,
     });
 

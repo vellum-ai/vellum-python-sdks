@@ -25,8 +25,8 @@ export class InputVariablePointerRule extends BaseNodeInputValuePointerRule<Inpu
     }
 
     return python.reference({
-      name: "Inputs",
-      modulePath: inputVariableContext.modulePath,
+      name: inputVariableContext.definition.name,
+      modulePath: inputVariableContext.definition.module,
       attribute: [inputVariableContext.name],
     });
   }

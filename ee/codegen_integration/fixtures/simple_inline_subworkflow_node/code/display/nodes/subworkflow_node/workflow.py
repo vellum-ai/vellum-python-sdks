@@ -19,7 +19,6 @@ class SubworkflowNodeWorkflowDisplay(BaseWorkflowDisplay[SubworkflowNodeWorkflow
             viewport=WorkflowDisplayDataViewport(x=-1196.2209238684252, y=58.34576651524276, zoom=0.8182365497236056)
         ),
     )
-    inputs_display = {}
     entrypoint_displays = {
         SearchNode: EntrypointDisplay(
             id=UUID("c48f318d-4d87-44da-be54-0ecf537608f6"),

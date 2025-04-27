@@ -53,10 +53,19 @@ describe("Workflow", () => {
 
   describe("write", () => {
     it("should generate correct code when there are input variables", async () => {
-      const inputs = codegen.inputs({ workflowContext });
+      const workflowContext = workflowContextFactory();
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "input-variable-id",
+            key: "query",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -64,10 +73,8 @@ describe("Workflow", () => {
     });
 
     it("should generate correct code when there are no input variables", async () => {
-      const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -86,8 +93,6 @@ describe("Workflow", () => {
         })
       );
 
-      const inputs = codegen.inputs({ workflowContext });
-
       workflowContext.addOutputVariableContext(
         new OutputVariableContext({
           outputVariableData: {
@@ -104,7 +109,6 @@ describe("Workflow", () => {
 
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -150,8 +154,6 @@ describe("Workflow", () => {
         })
       );
 
-      const inputs = codegen.inputs({ workflowContext });
-
       await createNodeContext({
         workflowContext: workflowContext,
         nodeData: searchNodeData,
@@ -159,7 +161,6 @@ describe("Workflow", () => {
 
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -216,10 +217,8 @@ describe("Workflow", () => {
         nodeData: templatingNodeData2,
       });
 
-      const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -264,10 +263,8 @@ describe("Workflow", () => {
         nodeData: templatingNodeData1,
       });
 
-      const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -335,10 +332,8 @@ describe("Workflow", () => {
         nodeData: topNode,
       });
 
-      const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -356,8 +351,6 @@ describe("Workflow", () => {
           workflowContext,
         })
       );
-
-      const inputs = codegen.inputs({ workflowContext });
 
       workflowContext.addOutputVariableContext(
         new OutputVariableContext({
@@ -385,7 +378,6 @@ describe("Workflow", () => {
 
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -410,10 +402,8 @@ describe("Workflow", () => {
           workflowContext,
         })
       );
-      const inputs = codegen.inputs({ workflowContext });
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowDisplayFile().write(writer);
@@ -432,8 +422,6 @@ describe("Workflow", () => {
           workflowContext,
         })
       );
-
-      const inputs = codegen.inputs({ workflowContext });
 
       workflowContext.addOutputVariableContext(
         new OutputVariableContext({
@@ -462,7 +450,6 @@ describe("Workflow", () => {
 
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);
@@ -485,7 +472,6 @@ describe("Workflow", () => {
           edges: [],
         },
       });
-      const inputs = codegen.inputs({ workflowContext });
       await createNodeContext({
         workflowContext,
         nodeData: terminalNode,
@@ -518,7 +504,6 @@ describe("Workflow", () => {
 
       const workflow = codegen.workflow({
         workflowContext,
-        inputs,
       });
 
       workflow.getWorkflowFile().write(writer);

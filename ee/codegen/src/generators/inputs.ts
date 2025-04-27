@@ -53,7 +53,7 @@ export class Inputs extends BasePersistedFile {
     const inputVariables = Array.from(
       [...inputVariableContextsById.values()].filter((inputVariableContext) => {
         return isEqual(
-          inputVariableContext.modulePath.slice(0, -1),
+          inputVariableContext.definition.module.slice(0, -1),
           this.workflowContext.modulePath.slice(0, -1)
         );
       })

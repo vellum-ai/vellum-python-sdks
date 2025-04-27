@@ -1,7 +1,7 @@
 import { join } from "path";
 
 import { VellumEnvironmentUrls } from "vellum-ai";
-import { WorkspaceSecretRead } from "vellum-ai/api";
+import { CodeResourceDefinition, WorkspaceSecretRead } from "vellum-ai/api";
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
 import { WorkspaceSecrets as WorkspaceSecretsClient } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 
@@ -60,6 +60,7 @@ export declare namespace WorkflowContext {
     vellumApiKey: string;
     vellumApiEnvironment?: VellumEnvironmentUrls;
     workflowRawData: WorkflowRawData;
+    inputsClassDefinition?: CodeResourceDefinition;
     strict: boolean;
     disableFormatting: boolean;
     classNames?: Set<string>;
