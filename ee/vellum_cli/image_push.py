@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import re
 import subprocess
 from typing import List, Optional
@@ -9,15 +10,28 @@ from docker import DockerClient
 from dotenv import load_dotenv
 
 from vellum.workflows.vellum_client import create_vellum_client, create_vellum_environment
+from vellum_cli.config import load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
 
 _SUPPORTED_ARCHITECTURE = "amd64"
 
 
-def image_push_command(image: str, tags: Optional[List[str]] = None) -> None:
-    load_dotenv()
+def image_push_command(image: str, tags: Optional[List[str]] = None, workspace: Optional[str] = None) -> None:
+    load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     logger = load_cli_logger()
-    vellum_client = create_vellum_client()
+    config = load_vellum_cli_config()
+    workspace_config = next((w for w in config.workspaces if w.name == workspace), None)
+    if not workspace_config:
+        raise ValueError(f"Workspace {workspace} not found")
+
+    api_key = os.getenv(workspace_config.api_key, None)
+    if not api_key:
+        raise ValueError(f"API key {workspace_config.api_key} for workspace {workspace} not found")
+
+    vellum_client = create_vellum_client(
+        api_key=api_key,
+        api_url=workspace_config.api_url,
+    )
 
     # Check if we are self hosted by looking at our base url
     api_url = create_vellum_environment().default
