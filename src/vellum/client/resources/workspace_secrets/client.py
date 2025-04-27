@@ -113,6 +113,9 @@ class WorkspaceSecretsClient:
                 "label": label,
                 "value": value,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -247,6 +250,9 @@ class AsyncWorkspaceSecretsClient:
             json={
                 "label": label,
                 "value": value,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

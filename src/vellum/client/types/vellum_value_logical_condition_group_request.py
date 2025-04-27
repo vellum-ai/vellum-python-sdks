@@ -32,7 +32,4 @@ class VellumValueLogicalConditionGroupRequest(UniversalBaseModel):
 
 from .vellum_value_logical_expression_request import VellumValueLogicalExpressionRequest  # noqa: E402
 
-update_forward_refs(
-    ArrayVellumValueRequest, VellumValueLogicalConditionGroupRequest=VellumValueLogicalConditionGroupRequest
-)
 update_forward_refs(VellumValueLogicalConditionGroupRequest)

@@ -81,6 +81,9 @@ class TestSuiteRunsClient:
                     object_=exec_config, annotation=TestSuiteRunExecConfigRequest, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -289,6 +292,9 @@ class AsyncTestSuiteRunsClient:
                 "exec_config": convert_and_respect_annotation_metadata(
                     object_=exec_config, annotation=TestSuiteRunExecConfigRequest, direction="write"
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

@@ -175,6 +175,9 @@ class PromptsClient:
                 "prompt_variant_id": prompt_variant_id,
                 "prompt_sandbox_id": prompt_sandbox_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -385,6 +388,9 @@ class AsyncPromptsClient:
                 ),
                 "prompt_variant_id": prompt_variant_id,
                 "prompt_sandbox_id": prompt_sandbox_id,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

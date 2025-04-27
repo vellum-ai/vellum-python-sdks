@@ -87,6 +87,9 @@ class WorkflowSandboxesClient:
                 "release_tags": release_tags,
                 "release_description": release_description,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -251,6 +254,9 @@ class AsyncWorkflowSandboxesClient:
                 "label": label,
                 "release_tags": release_tags,
                 "release_description": release_description,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

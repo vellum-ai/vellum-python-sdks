@@ -88,6 +88,9 @@ class SandboxesClient:
                 "release_tags": release_tags,
                 "release_description": release_description,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -176,6 +179,9 @@ class SandboxesClient:
                     object_=inputs, annotation=typing.Sequence[NamedScenarioInputRequest], direction="write"
                 ),
                 "scenario_id": scenario_id,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -321,6 +327,9 @@ class AsyncSandboxesClient:
                 "release_tags": release_tags,
                 "release_description": release_description,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -417,6 +426,9 @@ class AsyncSandboxesClient:
                     object_=inputs, annotation=typing.Sequence[NamedScenarioInputRequest], direction="write"
                 ),
                 "scenario_id": scenario_id,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

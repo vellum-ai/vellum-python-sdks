@@ -34,10 +34,4 @@ from .workflow_deployment_parent_context import WorkflowDeploymentParentContext 
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext  # noqa: E402
 from .parent_context import ParentContext  # noqa: E402
 
-update_forward_refs(ApiRequestParentContext, WorkflowParentContext=WorkflowParentContext)
-update_forward_refs(NodeParentContext, WorkflowParentContext=WorkflowParentContext)
-update_forward_refs(PromptDeploymentParentContext, WorkflowParentContext=WorkflowParentContext)
-update_forward_refs(SpanLink, WorkflowParentContext=WorkflowParentContext)
-update_forward_refs(WorkflowDeploymentParentContext, WorkflowParentContext=WorkflowParentContext)
-update_forward_refs(WorkflowSandboxParentContext, WorkflowParentContext=WorkflowParentContext)
 update_forward_refs(WorkflowParentContext)

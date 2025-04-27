@@ -133,6 +133,9 @@ class AdHocClient:
                     object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -286,6 +289,9 @@ class AdHocClient:
                     object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -302,7 +308,7 @@ class AdHocClient:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 _response.read()
@@ -457,6 +463,9 @@ class AsyncAdHocClient:
                 "expand_meta": convert_and_respect_annotation_metadata(
                     object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -619,6 +628,9 @@ class AsyncAdHocClient:
                     object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -635,7 +647,7 @@ class AsyncAdHocClient:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 await _response.aread()

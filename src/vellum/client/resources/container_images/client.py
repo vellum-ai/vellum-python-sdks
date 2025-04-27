@@ -220,6 +220,9 @@ class ContainerImagesClient:
                 "sha": sha,
                 "tags": tags,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -475,6 +478,9 @@ class AsyncContainerImagesClient:
                 "name": name,
                 "sha": sha,
                 "tags": tags,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

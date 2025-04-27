@@ -490,6 +490,9 @@ class WorkflowDeploymentsClient:
             json={
                 "history_item_id": history_item_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1041,6 +1044,9 @@ class AsyncWorkflowDeploymentsClient:
             method="PATCH",
             json={
                 "history_item_id": history_item_id,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

@@ -152,6 +152,9 @@ class FolderEntitiesClient:
             json={
                 "entity_id": entity_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -316,6 +319,9 @@ class AsyncFolderEntitiesClient:
             method="POST",
             json={
                 "entity_id": entity_id,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

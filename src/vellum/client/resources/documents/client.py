@@ -241,6 +241,9 @@ class DocumentsClient:
                 "status": status,
                 "metadata": metadata,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -626,6 +629,9 @@ class AsyncDocumentsClient:
                 "label": label,
                 "status": status,
                 "metadata": metadata,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

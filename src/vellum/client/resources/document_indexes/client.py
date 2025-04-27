@@ -187,6 +187,9 @@ class DocumentIndexesClient:
                 ),
                 "copy_documents_from_index_id": copy_documents_from_index_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -305,6 +308,9 @@ class DocumentIndexesClient:
                 "label": label,
                 "status": status,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -414,6 +420,9 @@ class DocumentIndexesClient:
             json={
                 "label": label,
                 "status": status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -711,6 +720,9 @@ class AsyncDocumentIndexesClient:
                 ),
                 "copy_documents_from_index_id": copy_documents_from_index_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -845,6 +857,9 @@ class AsyncDocumentIndexesClient:
                 "label": label,
                 "status": status,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -970,6 +985,9 @@ class AsyncDocumentIndexesClient:
             json={
                 "label": label,
                 "status": status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

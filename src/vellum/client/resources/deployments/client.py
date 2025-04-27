@@ -380,6 +380,9 @@ class DeploymentsClient:
             json={
                 "history_item_id": history_item_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -473,6 +476,9 @@ class DeploymentsClient:
                 "expand_meta": convert_and_respect_annotation_metadata(
                     object_=expand_meta, annotation=CompilePromptDeploymentExpandMetaRequest, direction="write"
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -932,6 +938,9 @@ class AsyncDeploymentsClient:
             json={
                 "history_item_id": history_item_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1033,6 +1042,9 @@ class AsyncDeploymentsClient:
                 "expand_meta": convert_and_respect_annotation_metadata(
                     object_=expand_meta, annotation=CompilePromptDeploymentExpandMetaRequest, direction="write"
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

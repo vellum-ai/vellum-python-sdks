@@ -219,6 +219,9 @@ class Vellum:
                     object_=bearer_token, annotation=ExecuteApiRequestBearerToken, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -306,6 +309,9 @@ class Vellum:
                     object_=packages, annotation=typing.Sequence[CodeExecutionPackage], direction="write"
                 ),
                 "output_type": output_type,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -424,6 +430,9 @@ class Vellum:
                 ),
                 "expand_raw": expand_raw,
                 "metadata": metadata,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -575,6 +584,9 @@ class Vellum:
                 "expand_raw": expand_raw,
                 "metadata": metadata,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -591,7 +603,7 @@ class Vellum:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 _response.read()
@@ -718,6 +730,9 @@ class Vellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "metadata": metadata,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -852,6 +867,9 @@ class Vellum:
                 "event_types": event_types,
                 "metadata": metadata,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -868,7 +886,7 @@ class Vellum:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 _response.read()
@@ -972,6 +990,9 @@ class Vellum:
                 "options": convert_and_respect_annotation_metadata(
                     object_=options, annotation=GenerateOptionsRequest, direction="write"
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1098,6 +1119,9 @@ class Vellum:
                     object_=options, annotation=GenerateOptionsRequest, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -1114,7 +1138,7 @@ class Vellum:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 _response.read()
@@ -1225,6 +1249,9 @@ class Vellum:
                 ),
                 "document_index": document_index,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1323,6 +1350,9 @@ class Vellum:
                     object_=actuals, annotation=typing.Sequence[SubmitCompletionActualRequest], direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1416,6 +1446,9 @@ class Vellum:
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1570,6 +1603,9 @@ class AsyncVellum:
                     object_=bearer_token, annotation=ExecuteApiRequestBearerToken, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1665,6 +1701,9 @@ class AsyncVellum:
                     object_=packages, annotation=typing.Sequence[CodeExecutionPackage], direction="write"
                 ),
                 "output_type": output_type,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1791,6 +1830,9 @@ class AsyncVellum:
                 ),
                 "expand_raw": expand_raw,
                 "metadata": metadata,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1950,6 +1992,9 @@ class AsyncVellum:
                 "expand_raw": expand_raw,
                 "metadata": metadata,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -1966,7 +2011,7 @@ class AsyncVellum:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 await _response.aread()
@@ -2101,6 +2146,9 @@ class AsyncVellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "metadata": metadata,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -2243,6 +2291,9 @@ class AsyncVellum:
                 "event_types": event_types,
                 "metadata": metadata,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -2259,7 +2310,7 @@ class AsyncVellum:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 await _response.aread()
@@ -2371,6 +2422,9 @@ class AsyncVellum:
                 "options": convert_and_respect_annotation_metadata(
                     object_=options, annotation=GenerateOptionsRequest, direction="write"
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -2505,6 +2559,9 @@ class AsyncVellum:
                     object_=options, annotation=GenerateOptionsRequest, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         ) as _response:
@@ -2521,7 +2578,7 @@ class AsyncVellum:
                                     object_=json.loads(_text),
                                 ),
                             )
-                        except:
+                        except Exception:
                             pass
                     return
                 await _response.aread()
@@ -2640,6 +2697,9 @@ class AsyncVellum:
                 ),
                 "document_index": document_index,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -2746,6 +2806,9 @@ class AsyncVellum:
                     object_=actuals, annotation=typing.Sequence[SubmitCompletionActualRequest], direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -2847,6 +2910,9 @@ class AsyncVellum:
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

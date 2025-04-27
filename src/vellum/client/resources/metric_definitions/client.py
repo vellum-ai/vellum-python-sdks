@@ -74,6 +74,9 @@ class MetricDefinitionsClient:
                 ),
                 "release_tag": release_tag,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -208,6 +211,9 @@ class AsyncMetricDefinitionsClient:
                     object_=inputs, annotation=typing.Sequence[MetricDefinitionInput], direction="write"
                 ),
                 "release_tag": release_tag,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
