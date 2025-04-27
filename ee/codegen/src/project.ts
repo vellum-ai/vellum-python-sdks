@@ -8,26 +8,13 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
+
 import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_NODES_MODULE_NAME,
-} from "./constants";
-import { createNodeContext, WorkflowContext } from "./context";
-import { InputVariableContext } from "./context/input-variable-context";
-import { WorkflowOutputContext } from "./context/workflow-output-context";
-import { ErrorLogFile, InitFile, Inputs, Workflow } from "./generators";
-import {
-  BaseCodegenError,
-  NodeDefinitionGenerationError,
-  ProjectSerializationError,
-  WorkflowGenerationError,
-} from "./generators/errors";
-import { BaseNode } from "./generators/nodes/bases";
-import { GuardrailNode } from "./generators/nodes/guardrail-node";
-import { InlineSubworkflowNode } from "./generators/nodes/inline-subworkflow-node";
-import { SearchNode } from "./generators/nodes/search-node";
-import { TemplatingNode } from "./generators/nodes/templating-node";
-
+} from "src/constants";
+import { createNodeContext, WorkflowContext } from "src/context";
+import { InputVariableContext } from "src/context/input-variable-context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
@@ -46,18 +33,31 @@ import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subwo
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
 import { OutputVariableContext } from "src/context/output-variable-context";
+import { WorkflowOutputContext } from "src/context/workflow-output-context";
+import { ErrorLogFile, InitFile, Inputs, Workflow } from "src/generators";
+import {
+  BaseCodegenError,
+  NodeDefinitionGenerationError,
+  ProjectSerializationError,
+  WorkflowGenerationError,
+} from "src/generators/errors";
 import { ApiNode } from "src/generators/nodes/api-node";
+import { BaseNode } from "src/generators/nodes/bases";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { ErrorNode } from "src/generators/nodes/error-node";
 import { FinalOutputNode } from "src/generators/nodes/final-output-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
+import { GuardrailNode } from "src/generators/nodes/guardrail-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
+import { InlineSubworkflowNode } from "src/generators/nodes/inline-subworkflow-node";
 import { MapNode } from "src/generators/nodes/map-node";
 import { MergeNode } from "src/generators/nodes/merge-node";
 import { NoteNode } from "src/generators/nodes/note-node";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
+import { SearchNode } from "src/generators/nodes/search-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
+import { TemplatingNode } from "src/generators/nodes/templating-node";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
@@ -67,8 +67,8 @@ import {
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
-import { assertUnreachable, isDefined, isNilOrEmpty } from "src/utils/typing";
-import { getNodeLabel } from "./utils/nodes";
+import { getNodeLabel } from "src/utils/nodes";
+import { isDefined, isNilOrEmpty } from "src/utils/typing";
 
 export interface WorkflowProjectGeneratorOptions {
   /**
@@ -539,7 +539,9 @@ ${errors.slice(0, 3).map((err) => {
                   nodeContext: nodeContext as SubworkflowDeploymentNodeContext,
                 });
               default: {
-                assertUnreachable(variant);
+                throw new NodeDefinitionGenerationError(
+                  `Unsupported Subworkflow Node variant: ${variant}`
+                );
               }
             }
           }
@@ -551,13 +553,14 @@ ${errors.slice(0, 3).map((err) => {
                   workflowContext: this.workflowContext,
                   nodeContext: nodeContext as MapNodeContext,
                 });
-                break;
               case "DEPLOYMENT":
                 throw new NodeDefinitionGenerationError(
                   `DEPLOYMENT variant not yet supported`
                 );
               default: {
-                assertUnreachable(mapNodeVariant);
+                throw new NodeDefinitionGenerationError(
+                  `Unsupported Map Node variant: ${mapNodeVariant}`
+                );
               }
             }
           }
@@ -592,7 +595,9 @@ ${errors.slice(0, 3).map((err) => {
                   `LEGACY variant should have been converted to INLINE variant by this point.`
                 );
               default: {
-                assertUnreachable(promptNodeVariant);
+                throw new NodeDefinitionGenerationError(
+                  `Unsupported Prompt Node variant: ${promptNodeVariant}`
+                );
               }
             }
           }
