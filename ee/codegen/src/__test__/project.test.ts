@@ -19,6 +19,7 @@ import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-fa
 import { SpyMocks } from "src/__test__/utils/SpyMocks";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowProjectGenerator } from "src/project";
+
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
 
