@@ -10,7 +10,7 @@ from docker import DockerClient
 from dotenv import load_dotenv
 
 from vellum.workflows.vellum_client import create_vellum_client, create_vellum_environment
-from vellum_cli.config import load_vellum_cli_config
+from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, load_vellum_cli_config
 from vellum_cli.logger import load_cli_logger
 
 _SUPPORTED_ARCHITECTURE = "amd64"
@@ -20,9 +20,7 @@ def image_push_command(image: str, tags: Optional[List[str]] = None, workspace: 
     load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     logger = load_cli_logger()
     config = load_vellum_cli_config()
-    workspace_config = next((w for w in config.workspaces if w.name == workspace), None)
-    if not workspace_config:
-        raise ValueError(f"Workspace {workspace} not found")
+    workspace_config = next((w for w in config.workspaces if w.name == workspace), DEFAULT_WORKSPACE_CONFIG)
 
     api_key = os.getenv(workspace_config.api_key, None)
     if not api_key:

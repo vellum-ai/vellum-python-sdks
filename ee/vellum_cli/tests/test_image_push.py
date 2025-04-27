@@ -31,6 +31,7 @@ def mock_temp_dir() -> Generator[str, None, None]:
 def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_run, vellum_client, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
 
     # Mock Docker client
     mock_docker_client = MagicMock()
