@@ -2150,6 +2150,10 @@ export const WorkflowVersionExecConfigSerializer: ObjectSchema<
     "output_variables",
     listSchema(VellumVariableSerializer)
   ),
+  stateVariables: propertySchema(
+    "state_variables",
+    listSchema(VellumVariableSerializer)
+  ),
   runnerConfig: propertySchema(
     "runner_config",
     objectSchema({
@@ -2169,6 +2173,7 @@ export declare namespace WorkflowVersionExecConfigSerializer {
   interface Raw {
     workflow_raw_data: WorkflowRawDataSerializer.Raw;
     input_variables: VellumVariableSerializer.Raw[];
+    state_variables: VellumVariableSerializer.Raw[];
     output_variables: VellumVariableSerializer.Raw[];
     runner_config?: {
       container_image_name?: string | null;

@@ -8,59 +8,59 @@ import {
 } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
-export declare namespace InputVariableContext {
+export declare namespace StateVariableContext {
   export type Args = {
-    inputVariableData: VellumVariable;
+    stateVariableData: VellumVariable;
     workflowContext: WorkflowContext;
   };
 }
 
-export class InputVariableContext {
+export class StateVariableContext {
   private readonly workflowContext: WorkflowContext;
-  private readonly inputVariableData: VellumVariable;
+  private readonly stateVariableData: VellumVariable;
   public readonly modulePath: string[];
 
   public readonly name: string;
 
   constructor({
-    inputVariableData,
+    stateVariableData,
     workflowContext,
-  }: InputVariableContext.Args) {
+  }: StateVariableContext.Args) {
     this.workflowContext = workflowContext;
-    this.inputVariableData = inputVariableData;
+    this.stateVariableData = stateVariableData;
     this.modulePath = getGeneratedInputsModulePath(workflowContext);
 
     this.name = this.generateSanitizedInputVariableName();
   }
 
-  public getInputVariableId(): string {
-    return this.inputVariableData.id;
+  public getStateVariableId(): string {
+    return this.stateVariableData.id;
   }
 
-  public getInputVariableData(): VellumVariable {
-    return this.inputVariableData;
+  public getStateVariableData(): VellumVariable {
+    return this.stateVariableData;
   }
 
   public getRawName(): string {
     // This is for an edge case where there are escape characters in the variable
-    return removeEscapeCharacters(this.inputVariableData.key);
+    return removeEscapeCharacters(this.stateVariableData.key);
   }
 
   private generateSanitizedInputVariableName(): string {
-    const defaultName = "input_";
-    const rawInputVariableName = this.inputVariableData.key;
+    const defaultName = "state_";
+    const rawStateVariableName = this.stateVariableData.key;
 
-    const initialInputVariableName =
-      !isNil(rawInputVariableName) && !isEmpty(rawInputVariableName)
-        ? toPythonSafeSnakeCase(rawInputVariableName, "input")
+    const initialStateVariableName =
+      !isNil(rawStateVariableName) && !isEmpty(rawStateVariableName)
+        ? toPythonSafeSnakeCase(rawStateVariableName, "input")
         : defaultName;
 
     // Deduplicate the input variable name if it's already in use
-    let sanitizedName = initialInputVariableName;
+    let sanitizedName = initialStateVariableName;
     let numRenameAttempts = 0;
     while (this.workflowContext.isStateVariableNameUsed(sanitizedName)) {
-      sanitizedName = `${initialInputVariableName}${
-        initialInputVariableName.endsWith("_") ? "" : "_"
+      sanitizedName = `${initialStateVariableName}${
+        initialStateVariableName.endsWith("_") ? "" : "_"
       }${numRenameAttempts + 1}`;
       numRenameAttempts += 1;
     }

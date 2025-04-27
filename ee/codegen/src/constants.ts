@@ -54,6 +54,8 @@ export const GENERATED_WORKFLOW_MODULE_NAME = "workflow";
 
 export const GENERATED_INPUTS_MODULE_NAME = "inputs";
 
+export const GENERATED_STATE_MODULE_NAME = "state";
+
 export const GENERATED_NODES_MODULE_NAME = "nodes";
 
 export const GENERATED_DISPLAY_MODULE_NAME = "display";

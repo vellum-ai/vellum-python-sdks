@@ -2,6 +2,7 @@ import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_INPUTS_MODULE_NAME,
   GENERATED_NODES_MODULE_NAME,
+  GENERATED_STATE_MODULE_NAME,
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { CodeResourceDefinition } from "src/types/vellum";
@@ -13,6 +14,15 @@ export function getGeneratedInputsModulePath(
   return [
     ...workflowContext.modulePath.slice(0, -1),
     GENERATED_INPUTS_MODULE_NAME,
+  ];
+}
+
+export function getGeneratedStateModulePath(
+  workflowContext: WorkflowContext
+): string[] {
+  return [
+    ...workflowContext.modulePath.slice(0, -1),
+    GENERATED_STATE_MODULE_NAME,
   ];
 }
 

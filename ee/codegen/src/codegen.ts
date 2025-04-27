@@ -8,6 +8,7 @@ import {
   Workflow,
 } from "./generators";
 import { BasePersistedFile } from "./generators/base-persisted-file";
+import { State } from "./generators/state";
 import { WorkflowSandboxFile } from "./generators/workflow-sandbox-file";
 
 export function vellumVariable(args: VellumVariable.Args): VellumVariable {
@@ -24,6 +25,10 @@ export function nodeInput(args: NodeInput.Args): NodeInput {
 
 export function inputs(args: Inputs.Args): Inputs {
   return new Inputs(args);
+}
+
+export function state(args: State.Args): State {
+  return new State(args);
 }
 
 export function workflow(args: Workflow.Args): Workflow {
