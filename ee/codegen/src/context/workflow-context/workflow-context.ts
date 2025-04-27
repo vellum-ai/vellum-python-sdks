@@ -10,6 +10,7 @@ import { InputVariableContext } from "src/context/input-variable-context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { OutputVariableContext } from "src/context/output-variable-context";
 import { PortContext } from "src/context/port-context";
+import { StateVariableContext } from "src/context/state-variable-context";
 import { generateSdkModulePaths } from "src/context/workflow-context/sdk-module-paths";
 import { SDK_MODULE_PATHS } from "src/context/workflow-context/types";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
@@ -35,6 +36,8 @@ import { createPythonClassName } from "src/utils/casing";
 
 type InputVariableContextsById = Map<string, InputVariableContext>;
 
+type StateVariableContextsById = Map<string, StateVariableContext>;
+
 type OutputVariableContextsById = Map<string, OutputVariableContext>;
 
 type NodeContextsByNodeId = Map<string, BaseNodeContext<WorkflowDataNode>>;
@@ -48,6 +51,7 @@ export declare namespace WorkflowContext {
     moduleName: string;
     workflowClassName: string;
     globalInputVariableContextsById?: InputVariableContextsById;
+    globalStateVariableContextsById?: StateVariableContextsById;
     globalNodeContextsByNodeId?: NodeContextsByNodeId;
     globalOutputVariableContextsById?: OutputVariableContextsById;
     parentNode?: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
@@ -74,6 +78,11 @@ export class WorkflowContext {
   public readonly inputVariableContextsById: InputVariableContextsById;
   public readonly globalInputVariableContextsById: InputVariableContextsById;
 
+  // Maps workflow state variable IDs to the state variable
+  // Tracks local and global contexts in the case of nested workflows.
+  public readonly stateVariableContextsById: StateVariableContextsById;
+  public readonly globalStateVariableContextsById: StateVariableContextsById;
+
   // Maps workflow output variable IDs to the output variable
   // Tracks local and global contexts in the case of nested workflows.
   public readonly outputVariableContextsById: OutputVariableContextsById;
@@ -84,6 +93,10 @@ export class WorkflowContext {
   // Track what input variables names are used within this workflow so that we can ensure name uniqueness when adding
   // new input variables.
   private readonly inputVariableNames: Set<string> = new Set();
+
+  // Track what state variables names are used within this workflow so that we can ensure name uniqueness when adding
+  // new state variables.
+  private readonly stateVariableNames: Set<string> = new Set();
 
   // Maps node IDs to a mapping of output IDs to output names.
   // Tracks local and global contexts in the case of nested workflows.
@@ -141,6 +154,7 @@ export class WorkflowContext {
     moduleName,
     workflowClassName,
     globalInputVariableContextsById,
+    globalStateVariableContextsById,
     globalNodeContextsByNodeId,
     globalOutputVariableContextsById,
     parentNode,
@@ -168,6 +182,10 @@ export class WorkflowContext {
     this.inputVariableContextsById = new Map();
     this.globalInputVariableContextsById =
       globalInputVariableContextsById ?? new Map();
+
+    this.stateVariableContextsById = new Map();
+    this.globalStateVariableContextsById =
+      globalStateVariableContextsById ?? new Map();
 
     this.nodeContextsByNodeId = new Map();
     this.globalNodeContextsByNodeId = globalNodeContextsByNodeId ?? new Map();
@@ -216,6 +234,7 @@ export class WorkflowContext {
       moduleName: this.moduleName,
       workflowClassName: workflowClassName,
       globalInputVariableContextsById: this.globalInputVariableContextsById,
+      globalStateVariableContextsById: this.globalStateVariableContextsById,
       globalNodeContextsByNodeId: this.globalNodeContextsByNodeId,
       globalOutputVariableContextsById: this.globalOutputVariableContextsById,
       parentNode,
@@ -293,6 +312,32 @@ export class WorkflowContext {
       inputVariableContext
     );
     this.addUsedInputVariableName(inputVariableContext.name);
+  }
+
+  public isStateVariableNameUsed(stateVariableName: string): boolean {
+    return this.stateVariableNames.has(stateVariableName);
+  }
+
+  private addUsedStateVariableName(stateVariableName: string) {
+    this.stateVariableNames.add(stateVariableName);
+  }
+
+  public addStateVariableContext(
+    stateVariableContext: StateVariableContext
+  ): void {
+    const stateVariableId = stateVariableContext.getStateVariableId();
+    if (this.globalStateVariableContextsById.get(stateVariableId)) {
+      throw new WorkflowInputGenerationError(
+        `State variable context already exists for state variable ID: ${stateVariableId}`
+      );
+    }
+
+    this.stateVariableContextsById.set(stateVariableId, stateVariableContext);
+    this.globalStateVariableContextsById.set(
+      stateVariableId,
+      stateVariableContext
+    );
+    this.addUsedStateVariableName(stateVariableContext.name);
   }
 
   public findInputVariableContextById(

@@ -246,6 +246,7 @@ describe("WorkflowProjectGenerator", () => {
         ],
       },
       input_variables: [],
+      state_variables: [],
       output_variables: [],
     };
 
@@ -357,6 +358,7 @@ describe("WorkflowProjectGenerator", () => {
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
       const project = new WorkflowProjectGenerator({
@@ -458,6 +460,7 @@ describe("WorkflowProjectGenerator", () => {
           id: "workflow-chat",
         },
       ],
+      state_variables: [],
       output_variables: [],
     };
     it("should include a sandbox.py file when passed sandboxInputs", async () => {
@@ -599,6 +602,7 @@ describe("WorkflowProjectGenerator", () => {
         ],
       },
       input_variables: [],
+      state_variables: [],
       output_variables: [],
       runner_config: {},
     };
@@ -714,6 +718,7 @@ describe("WorkflowProjectGenerator", () => {
         ],
       },
       input_variables: [],
+      state_variables: [],
       output_variables: [],
       runner_config: {},
     };
@@ -812,6 +817,7 @@ baz = foo + bar
         ],
       },
       input_variables: [],
+      state_variables: [],
       output_variables: [],
       runner_config: {},
     };
@@ -933,6 +939,7 @@ baz = foo + bar
         ],
       },
       input_variables: [],
+      state_variables: [],
       output_variables: [],
       runner_config: {},
     };
@@ -1063,6 +1070,7 @@ baz = foo + bar
         ],
       },
       input_variables: [],
+      state_variables: [],
       output_variables: [
         {
           id: "not-used-output-variable-id",
@@ -1171,6 +1179,7 @@ baz = foo + bar
         ],
       },
       input_variables: [],
+      state_variables: [],
       output_variables: [],
       runner_config: {},
     };
@@ -1330,6 +1339,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -1389,6 +1399,7 @@ baz = foo + bar
           edges: [],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -1665,6 +1676,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -1760,6 +1772,7 @@ baz = foo + bar
           output_values: [],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
         runner_config: {},
       };
@@ -1909,6 +1922,7 @@ baz = foo + bar
           output_values: [],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -2015,6 +2029,7 @@ baz = foo + bar
           output_values: [],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
         runner_config: {},
       };
@@ -2102,6 +2117,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -2193,6 +2209,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -2282,6 +2299,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -2360,6 +2378,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
         runner_config: {},
       };
@@ -2439,6 +2458,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
         runner_config: {},
       };
@@ -2848,6 +2868,7 @@ baz = foo + bar
           output_values: [],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -3063,6 +3084,7 @@ baz = foo + bar
           output_values: [],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -3140,6 +3162,7 @@ baz = foo + bar
           ],
         },
         input_variables: [],
+        state_variables: [],
         output_variables: [],
       };
 
@@ -3162,6 +3185,95 @@ baz = foo + bar
         "nodes",
         "templating_node.py",
       ]);
+    });
+  });
+
+  describe("state", () => {
+    it("should generate a state.py file", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "templating",
+              type: "TEMPLATING",
+              data: {
+                label: "Templating Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              definition: {
+                name: "TemplatingNode",
+                module: ["my", "module", "templating_node"],
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "foo",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "templating",
+              target_handle_id: "template_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        output_variables: [],
+        state_variables: [
+          {
+            id: uuidv4(),
+            key: "foo",
+            type: "STRING",
+          },
+        ],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToMatchSnapshot(["code", "state.py"]);
+      expectProjectFileToMatchSnapshot(["code", "display", "workflow.py"]);
     });
   });
 });

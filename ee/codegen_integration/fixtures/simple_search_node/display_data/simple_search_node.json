@@ -433,5 +433,6 @@
       "key": "final-output",
       "type": "STRING"
     }
-  ]
+  ],
+  "state_variables": []
 }

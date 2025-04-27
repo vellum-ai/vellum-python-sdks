@@ -24,6 +24,7 @@ describe("getOrderedNodes", () => {
         workflowRawData: workflowContext.workflowRawData,
         inputVariables: [],
         outputVariables: [],
+        stateVariables: [],
       },
       moduleName: "test",
     });

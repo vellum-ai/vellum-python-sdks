@@ -8,6 +8,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
+import { StateVariableContext } from "./context/state-variable-context";
 
 import {
   GENERATED_DISPLAY_MODULE_NAME,
@@ -198,6 +199,10 @@ ${errors.slice(0, 3).map((err) => {
 
     const { inputs, workflow, nodes } = assets;
 
+    const state = codegen.state({
+      workflowContext: this.workflowContext,
+    });
+
     const absolutePathToModuleDirectory = join(
       this.workflowContext.absolutePathToOutputDirectory,
       ...this.getModulePath()
@@ -216,6 +221,8 @@ ${errors.slice(0, 3).map((err) => {
       workflow.getWorkflowDisplayFile().persist(),
       // inputs.py
       inputs.persist(),
+      // state.py
+      state.persist(),
       // workflow.py
       workflow.getWorkflowFile().persist(),
       // nodes/*
@@ -322,6 +329,14 @@ ${errors.slice(0, 3).map((err) => {
         workflowContext: this.workflowContext,
       });
       this.workflowContext.addInputVariableContext(inputVariableContext);
+    });
+
+    this.workflowVersionExecConfig.stateVariables.forEach((stateVariable) => {
+      const stateVariableContext = new StateVariableContext({
+        stateVariableData: stateVariable,
+        workflowContext: this.workflowContext,
+      });
+      this.workflowContext.addStateVariableContext(stateVariableContext);
     });
 
     // TODO: Invert / remove this logic once output values are default and terminal nodes don't exist.

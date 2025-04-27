@@ -403,3 +403,41 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
     inputs = {}
 "
 `;
+
+exports[`WorkflowProjectGenerator > state > should generate a state.py file 1`] = `
+"from typing import Optional
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    foo: Optional[str] = None
+"
+`;
+
+exports[`WorkflowProjectGenerator > state > should generate a state.py file 2`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+from ..nodes.templating_node import TemplatingNode
+from ..workflow import Workflow
+
+
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
+    workflow_display = WorkflowMetaDisplay(
+        entrypoint_node_id=UUID("entry"),
+        entrypoint_node_source_handle_id=UUID("entry_source"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None),
+        display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=0)),
+    )
+    inputs_display = {}
+    entrypoint_displays = {
+        TemplatingNode: EntrypointDisplay(id=UUID("entry"), edge_display=EdgeDisplay(id=UUID("edge_1")))
+    }
+    output_displays = {}
+"
+`;
