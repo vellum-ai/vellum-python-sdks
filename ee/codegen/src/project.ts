@@ -17,8 +17,10 @@ import { InputVariableContext } from "./context/input-variable-context";
 import { WorkflowOutputContext } from "./context/workflow-output-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "./generators";
 import {
+  BaseCodegenError,
   NodeDefinitionGenerationError,
   ProjectSerializationError,
+  WorkflowGenerationError,
 } from "./generators/errors";
 import { BaseNode } from "./generators/nodes/bases";
 import { GuardrailNode } from "./generators/nodes/guardrail-node";
@@ -65,7 +67,8 @@ import {
   WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
-import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
+import { assertUnreachable, isDefined, isNilOrEmpty } from "src/utils/typing";
+import { getNodeLabel } from "./utils/nodes";
 
 export interface WorkflowProjectGeneratorOptions {
   /**
@@ -175,7 +178,17 @@ ${errors.slice(0, 3).map((err) => {
 
   public async generateCode(): Promise<void> {
     const assets = await this.generateAssets().catch((error) => {
-      this.workflowContext.addError(error);
+      if (error instanceof BaseCodegenError) {
+        this.workflowContext.addError(error);
+      } else {
+        console.error("Unexpected error generating assets", error);
+        this.workflowContext.addError(
+          new WorkflowGenerationError(
+            `Failed to generate assets for workflow ${this.workflowContext.workflowClassName}.`,
+            "WARNING"
+          )
+        );
+      }
       return null;
     });
 
@@ -371,7 +384,20 @@ ${errors.slice(0, 3).map((err) => {
         await createNodeContext({
           workflowContext: this.workflowContext,
           nodeData,
-        }).catch((error) => this.workflowContext.addError(error));
+        }).catch((error) => {
+          if (error instanceof BaseCodegenError) {
+            this.workflowContext.addError(error);
+          } else {
+            console.error("Unexpected error creating node context", error);
+            const nodeLabel = getNodeLabel(nodeData);
+            this.workflowContext.addError(
+              new NodeDefinitionGenerationError(
+                `Failed to create node context for node ${nodeLabel}.`,
+                "WARNING"
+              )
+            );
+          }
+        });
         return nodeData;
       })
     );
@@ -381,7 +407,7 @@ ${errors.slice(0, 3).map((err) => {
     });
 
     const nodeIds = nodesToGenerate.map((nodeData) => nodeData.id);
-    const nodes = await this.generateNodes(nodeIds);
+    const nodes = this.generateNodes(nodeIds);
 
     const workflow = codegen.workflow({
       workflowContext: this.workflowContext,
@@ -476,60 +502,52 @@ ${errors.slice(0, 3).map((err) => {
     return orderedNodes;
   }
 
-  private async generateNodes(
+  private generateNodes(
     nodeIds: string[]
-  ): Promise<BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[]> {
-    const nodes: BaseNode<
-      WorkflowDataNode,
-      BaseNodeContext<WorkflowDataNode>
-    >[] = [];
-
-    await Promise.all(
-      nodeIds.map(async (nodeId) => {
-        let node: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
-
+  ): BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[] {
+    return nodeIds
+      .map((nodeId) => {
         const nodeContext = this.workflowContext.findNodeContext(nodeId);
         if (!nodeContext) {
           return;
         }
-
+        return nodeContext;
+      })
+      .filter(isDefined)
+      .map((nodeContext) => {
         const nodeData = nodeContext.nodeData;
 
         const nodeType = nodeData.type;
         switch (nodeType) {
           case WorkflowNodeTypeEnum.SEARCH: {
-            node = new SearchNode({
+            return new SearchNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as TextSearchNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.SUBWORKFLOW: {
             const variant = nodeData.data.variant;
             switch (variant) {
               case "INLINE":
-                node = new InlineSubworkflowNode({
+                return new InlineSubworkflowNode({
                   workflowContext: this.workflowContext,
                   nodeContext: nodeContext as InlineSubworkflowNodeContext,
                 });
-                break;
               case "DEPLOYMENT":
-                node = new SubworkflowDeploymentNode({
+                return new SubworkflowDeploymentNode({
                   workflowContext: this.workflowContext,
                   nodeContext: nodeContext as SubworkflowDeploymentNodeContext,
                 });
-                break;
               default: {
                 assertUnreachable(variant);
               }
             }
-            break;
           }
           case WorkflowNodeTypeEnum.MAP: {
             const mapNodeVariant = nodeData.data.variant;
             switch (mapNodeVariant) {
               case "INLINE":
-                node = new MapNode({
+                return new MapNode({
                   workflowContext: this.workflowContext,
                   nodeContext: nodeContext as MapNodeContext,
                 });
@@ -542,38 +560,33 @@ ${errors.slice(0, 3).map((err) => {
                 assertUnreachable(mapNodeVariant);
               }
             }
-            break;
           }
           case WorkflowNodeTypeEnum.METRIC: {
-            node = new GuardrailNode({
+            return new GuardrailNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as GuardrailNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.CODE_EXECUTION: {
-            node = new CodeExecutionNode({
+            return new CodeExecutionNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as CodeExecutionContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.PROMPT: {
             const promptNodeVariant = nodeData.data.variant;
 
             switch (promptNodeVariant) {
               case "INLINE":
-                node = new InlinePromptNode({
+                return new InlinePromptNode({
                   workflowContext: this.workflowContext,
                   nodeContext: nodeContext as InlinePromptNodeContext,
                 });
-                break;
               case "DEPLOYMENT":
-                node = new PromptDeploymentNode({
+                return new PromptDeploymentNode({
                   workflowContext: this.workflowContext,
                   nodeContext: nodeContext as PromptDeploymentNodeContext,
                 });
-                break;
               case "LEGACY":
                 throw new NodeDefinitionGenerationError(
                   `LEGACY variant should have been converted to INLINE variant by this point.`
@@ -582,74 +595,60 @@ ${errors.slice(0, 3).map((err) => {
                 assertUnreachable(promptNodeVariant);
               }
             }
-            break;
           }
           case WorkflowNodeTypeEnum.TEMPLATING: {
-            node = new TemplatingNode({
+            return new TemplatingNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as TemplatingNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.CONDITIONAL: {
-            node = new ConditionalNode({
+            return new ConditionalNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as ConditionalNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.TERMINAL: {
-            node = new FinalOutputNode({
+            return new FinalOutputNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as FinalOutputNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.MERGE: {
-            node = new MergeNode({
+            return new MergeNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as MergeNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.ERROR: {
-            node = new ErrorNode({
+            return new ErrorNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as ErrorNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.NOTE: {
-            node = new NoteNode({
+            return new NoteNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as NoteNodeContext,
             });
-            break;
           }
           case WorkflowNodeTypeEnum.API:
-            node = new ApiNode({
+            return new ApiNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as ApiNodeContext,
             });
-            break;
           case WorkflowNodeTypeEnum.GENERIC:
-            node = new GenericNode({
+            return new GenericNode({
               workflowContext: this.workflowContext,
               nodeContext: nodeContext as GenericNodeContext,
             });
-            break;
           default: {
             throw new NodeDefinitionGenerationError(
               `Unsupported node type: ${nodeType}`
             );
           }
         }
-
-        nodes.push(node);
-      })
-    );
-
-    return nodes;
+      });
   }
 
   private sortAlphabetically(items: string[]): string[] {
