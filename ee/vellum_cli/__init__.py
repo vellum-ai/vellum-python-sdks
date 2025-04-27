@@ -354,9 +354,10 @@ def images() -> None:
     help="Tags the provided image inside of Vellum's repo. "
     "This field does not push multiple local tags of the passed in image.",
 )
-def image_push(image: str, tag: Optional[List[str]] = None) -> None:
+@click.option("--workspace", type=str, help="The specific Workspace config to use when pushing")
+def image_push(image: str, tag: Optional[List[str]] = None, workspace: Optional[str] = None) -> None:
     """Push Docker image to Vellum"""
-    image_push_command(image, tag)
+    image_push_command(image, tag, workspace)
 
 
 @workflows.command(name="init")
