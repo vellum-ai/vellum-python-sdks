@@ -425,3 +425,165 @@ def test_serialize_workflow__nested_lazy_reference():
         "node_id": str(OuterNode.__id__),
         "node_output_id": str(OuterNode.__output_ids__["bar"]),
     }
+
+
+def test_serialize_workflow__array_values():
+    # GIVEN a node with array and nested array values
+    class MyNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            array_value = ["item1", "item2", "item3"]
+            nested_array_value = [["item1", "item2", "item3"], ["item4", "item5", "item6"]]
+            mixed_array_value = [["item1"], "item2", "item3"]
+
+    # AND a workflow that uses these outputs
+    class MyWorkflow(BaseWorkflow):
+        graph = MyNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            array_output = MyNode.Outputs.array_value
+            nested_array_output = MyNode.Outputs.nested_array_value
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should properly serialize the array and dictionary values
+    assert isinstance(data["workflow_raw_data"], dict)
+    assert isinstance(data["workflow_raw_data"]["nodes"], list)
+    raw_nodes = data["workflow_raw_data"]["nodes"]
+    generic_nodes = [node for node in raw_nodes if isinstance(node, dict) and node["type"] == "GENERIC"]
+    assert len(generic_nodes) > 0
+    my_node = generic_nodes[0]
+
+    outputs = my_node["outputs"]
+    assert isinstance(outputs, list)
+
+    array_outputs = [val for val in outputs if isinstance(val, dict) and val["name"] == "array_value"]
+    assert len(array_outputs) > 0
+    array_output = array_outputs[0]
+
+    assert isinstance(array_output, dict)
+    assert "value" in array_output
+    assert array_output["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {"type": "JSON", "items": ["item1", "item2", "item3"]},
+    }
+
+    nested_array_outputs = [val for val in outputs if isinstance(val, dict) and val["name"] == "nested_array_value"]
+    assert len(nested_array_outputs) > 0
+    nested_array_output = nested_array_outputs[0]
+
+    assert isinstance(nested_array_output, dict)
+    assert "value" in nested_array_output
+    assert nested_array_output["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {"type": "JSON", "items": [["item1", "item2", "item3"], ["item4", "item5", "item6"]]},
+    }
+
+    mixed_array_outputs = [val for val in outputs if isinstance(val, dict) and val["name"] == "mixed_array_value"]
+    assert len(mixed_array_outputs) > 0
+    mixed_array_output = mixed_array_outputs[0]
+
+    assert isinstance(mixed_array_output, dict)
+    assert "value" in mixed_array_output
+    assert mixed_array_output["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {"type": "JSON", "items": [["item1"], "item2", "item3"]},
+    }
+
+
+def test_serialize_workflow__array_reference():
+    # GIVEN a node with array containing non-constant values (node references)
+    class FirstNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            value1: str
+            value2: str
+
+    class SecondNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            # Array containing a mix of constants and node references
+            mixed_array = ["constant1", FirstNode.Outputs.value1, "constant2", FirstNode.Outputs.value2]
+            mixed_nested_array = [["constant1", FirstNode.Outputs.value1], ["constant2", FirstNode.Outputs.value2]]
+
+    # AND a workflow that uses these outputs
+    class MyWorkflow(BaseWorkflow):
+        graph = FirstNode >> SecondNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            mixed_array_output = SecondNode.Outputs.mixed_array
+            mixed_nested_array_output = SecondNode.Outputs.mixed_nested_array
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should serialize as an ARRAY_REFERENCE
+    assert isinstance(data["workflow_raw_data"], dict)
+    assert isinstance(data["workflow_raw_data"]["nodes"], list)
+    assert len(data["workflow_raw_data"]["nodes"]) == 5
+    second_node = data["workflow_raw_data"]["nodes"][2]
+    assert isinstance(second_node, dict)
+
+    assert "outputs" in second_node
+    assert isinstance(second_node["outputs"], list)
+    outputs = second_node["outputs"]
+
+    mixed_array_outputs = [val for val in outputs if isinstance(val, dict) and val["name"] == "mixed_array"]
+    assert len(mixed_array_outputs) > 0
+    mixed_array_output = mixed_array_outputs[0]
+
+    assert isinstance(mixed_array_output, dict)
+    assert "value" in mixed_array_output
+    assert mixed_array_output["value"] == {
+        "type": "ARRAY_REFERENCE",
+        "items": [
+            {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
+            {
+                "type": "NODE_OUTPUT",
+                "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
+                "node_output_id": "419b6afa-fab5-493a-ba1e-4606f4641616",
+            },
+            {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
+            {
+                "type": "NODE_OUTPUT",
+                "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
+                "node_output_id": "d1cacc41-478d-49a3-a6b3-1ba2d51291e2",
+            },
+        ],
+    }
+
+    mixed_nested_array_outputs = [
+        val for val in outputs if isinstance(val, dict) and val["name"] == "mixed_nested_array"
+    ]
+    assert len(mixed_nested_array_outputs) > 0
+    mixed_nested_array_output = mixed_nested_array_outputs[0]
+
+    assert isinstance(mixed_nested_array_output, dict)
+    assert "value" in mixed_nested_array_output
+    assert mixed_nested_array_output["value"] == {
+        "type": "ARRAY_REFERENCE",
+        "items": [
+            {
+                "type": "ARRAY_REFERENCE",
+                "items": [
+                    {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
+                    {
+                        "type": "NODE_OUTPUT",
+                        "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
+                        "node_output_id": "419b6afa-fab5-493a-ba1e-4606f4641616",
+                    },
+                ],
+            },
+            {
+                "type": "ARRAY_REFERENCE",
+                "items": [
+                    {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
+                    {
+                        "type": "NODE_OUTPUT",
+                        "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
+                        "node_output_id": "d1cacc41-478d-49a3-a6b3-1ba2d51291e2",
+                    },
+                ],
+            },
+        ],
+    }

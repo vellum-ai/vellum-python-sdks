@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict, cast
 
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -37,7 +37,7 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 
 if TYPE_CHECKING:
@@ -234,6 +234,33 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             "type": "EXECUTION_COUNTER",
             "node_id": str(node_class_display.node_id),
         }
+
+    if isinstance(value, list):
+        serialized_items = [serialize_value(display_context, item) for item in value]
+        if all(isinstance(item, dict) and item["type"] == "CONSTANT_VALUE" for item in serialized_items):
+            constant_values = []
+            for item in serialized_items:
+                item_dict = cast(Dict[str, Any], item)
+                value_inner = item_dict["value"]
+
+                if value_inner["type"] == "JSON" and "items" in value_inner:
+                    # Nested JSON list
+                    constant_values.append(value_inner["items"])
+                else:
+                    constant_values.append(value_inner["value"])
+
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "JSON",
+                    "items": constant_values,
+                },
+            }
+        else:
+            return {
+                "type": "ARRAY_REFERENCE",
+                "items": cast(JsonArray, serialized_items),  # list[JsonObject] -> JsonArray
+            }
 
     if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
         raise ValueError("Nested references are not supported.")
