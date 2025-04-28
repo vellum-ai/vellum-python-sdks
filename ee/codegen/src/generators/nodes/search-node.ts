@@ -64,8 +64,11 @@ export class SearchNode extends BaseSingleFileNode<
         if (limitValue.data.value != null) {
           const parsedInt = parseInt(limitValue.data.value);
           if (isNaN(parsedInt)) {
-            throw new ValueGenerationError(
-              `Failed to parse search node limit value "${limitValue.data.value}" as an integer`
+            this.workflowContext.addError(
+              new ValueGenerationError(
+                `Failed to parse search node limit value "${limitValue.data.value}" as an integer`,
+                "WARNING"
+              )
             );
           }
           bodyStatements.push(
@@ -79,8 +82,11 @@ export class SearchNode extends BaseSingleFileNode<
         limitValue?.type === "CONSTANT_VALUE" &&
         limitValue.data.type !== "NUMBER"
       ) {
-        throw new NodeAttributeGenerationError(
-          `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`,
+            "WARNING"
+          )
         );
       } else {
         bodyStatements.push(
@@ -130,7 +136,9 @@ export class SearchNode extends BaseSingleFileNode<
     const weightsRule =
       this.findNodeInputByName("weights")?.nodeInputData?.value.rules[0];
     if (!weightsRule || weightsRule.type !== "CONSTANT_VALUE") {
-      throw new NodeAttributeGenerationError("weights input is required");
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError("weights input is required", "WARNING")
+      );
     }
 
     // TODO: Determine what we want to cast JSON values to
@@ -141,14 +149,20 @@ export class SearchNode extends BaseSingleFileNode<
       unknown
     >;
     if (typeof semantic_similarity !== "number") {
-      throw new NodeAttributeGenerationError(
-        "semantic_similarity weight must be a number"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "semantic_similarity weight must be a number",
+          "WARNING"
+        )
       );
     }
 
     if (typeof keywords !== "number") {
-      throw new NodeAttributeGenerationError(
-        "keywords weight must be a number"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "keywords weight must be a number",
+          "WARNING"
+        )
       );
     }
 
@@ -176,15 +190,21 @@ export class SearchNode extends BaseSingleFileNode<
     const resultMergingRule = this.findNodeInputByName("result_merging_enabled")
       ?.nodeInputData?.value.rules[0];
     if (!resultMergingRule || resultMergingRule.type !== "CONSTANT_VALUE") {
-      throw new NodeAttributeGenerationError(
-        "result_merging_enabled input is required"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "result_merging_enabled input is required",
+          "WARNING"
+        )
       );
     }
 
     const resultMergingEnabled = resultMergingRule.data.value;
     if (typeof resultMergingEnabled !== "string") {
-      throw new NodeAttributeGenerationError(
-        "result_merging_enabled must be a boolean"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "result_merging_enabled must be a boolean",
+          "WARNING"
+        )
       );
     }
 
@@ -257,10 +277,13 @@ export class SearchNode extends BaseSingleFileNode<
       VellumValueLogicalExpressionSerializer.parse(metadataFilters);
 
     if (!parsedData.ok) {
-      throw new NodeAttributeGenerationError(
-        `Failed to parse metadata filter JSON: ${JSON.stringify(
-          parsedData.errors
-        )}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Failed to parse metadata filter JSON: ${JSON.stringify(
+            parsedData.errors
+          )}`,
+          "WARNING"
+        )
       );
     }
 
@@ -524,8 +547,11 @@ export class SearchNodeMetadataFilters extends AstNode {
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
     if (!lhs) {
-      throw new NodeAttributeGenerationError(
-        `Could not find search node input for id ${lhsId}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Could not find search node input for id ${lhsId}`,
+          "WARNING"
+        )
       );
     }
 
@@ -543,8 +569,11 @@ export class SearchNodeMetadataFilters extends AstNode {
     const rhsId = data.rhsVariableId;
     const rhs = this.nodeInputsById.get(rhsId);
     if (!isUnaryOperator(data.operator) && !rhs) {
-      throw new NodeAttributeGenerationError(
-        `Could not find search node input for id ${rhsId}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Could not find search node input for id ${rhsId}`,
+          "WARNING"
+        )
       );
     }
 

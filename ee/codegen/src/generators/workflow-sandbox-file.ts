@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { WorkflowInputGenerationWarning } from "src/generators/errors";
 import { WorkflowSandboxInputs } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
@@ -92,6 +93,11 @@ if __name__ != "__main__":
             this.workflowContext.findInputVariableContextByRawName(rawName);
 
           if (isNil(inputVariableContext)) {
+            this.workflowContext.addError(
+              new WorkflowInputGenerationWarning(
+                `Input variable context not found for raw name: ${rawName}`
+              )
+            );
             return null;
           }
 
