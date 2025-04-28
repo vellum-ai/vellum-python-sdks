@@ -288,7 +288,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 },
             }
         else:
-            return {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonObject, serialized_entries)}
+            return {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonArray, serialized_entries)}
 
     if not isinstance(value, BaseDescriptor):
         vellum_value = primitive_to_vellum_value(value)
