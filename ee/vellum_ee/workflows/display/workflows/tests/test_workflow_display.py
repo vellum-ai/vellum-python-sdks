@@ -587,3 +587,190 @@ def test_serialize_workflow__array_reference():
             },
         ],
     }
+
+
+def test_serialize_workflow__dict_values():
+    # GIVEN a node with a dictionary value
+    class MyNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            dict_value = {"key1": "value1", "key2": "value2"}
+            nested_dict_value = {
+                "key1": {"key1": "value1", "key2": "value2"},
+                "key2": {"key1": "value1", "key2": "value2"},
+            }
+            mixed_dict_value = {"key1": "value1", "key2": {"key3": "value3", "key4": "value4"}}
+
+    # AND a workflow that uses these outputs
+    class MyWorkflow(BaseWorkflow):
+        graph = MyNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            dict_output = MyNode.Outputs.dict_value
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should serialize as a CONSTANT_VALUE
+    assert isinstance(data["workflow_raw_data"], dict)
+    assert isinstance(data["workflow_raw_data"]["nodes"], list)
+    my_node = next(
+        node for node in data["workflow_raw_data"]["nodes"] if isinstance(node, dict) and node["type"] == "GENERIC"
+    )
+
+    assert isinstance(my_node["outputs"], list)
+    outputs = my_node["outputs"]
+
+    dict_output = next(val for val in outputs if isinstance(val, dict) and val["name"] == "dict_value")
+    assert isinstance(dict_output, dict)
+    assert "value" in dict_output
+    assert dict_output["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
+    }
+
+    nested_dict_output = next(val for val in outputs if isinstance(val, dict) and val["name"] == "nested_dict_value")
+    assert isinstance(nested_dict_output, dict)
+    assert "value" in nested_dict_output
+    assert nested_dict_output["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {
+            "type": "JSON",
+            "value": {
+                "key1": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
+                "key2": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
+            },
+        },
+    }
+
+    mixed_dict_output = next(val for val in outputs if isinstance(val, dict) and val["name"] == "mixed_dict_value")
+    assert isinstance(mixed_dict_output, dict)
+    assert "value" in mixed_dict_output
+    assert mixed_dict_output["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {
+            "type": "JSON",
+            "value": {"key1": "value1", "key2": {"type": "JSON", "value": {"key3": "value3", "key4": "value4"}}},
+        },
+    }
+
+
+def test_serialize_workflow__dict_reference():
+    # GIVEN a node with a dictionary containing non-constant values (node references)
+    class FirstNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            value1: str
+
+    class SecondNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            # Dictionary containing a mix of constants and node references
+            mixed_dict = {
+                "key1": "constant1",
+                "key2": FirstNode.Outputs.value1,
+                "key3": "constant2",
+                "key4": FirstNode.Outputs.value1,
+            }
+            mixed_nested_dict = {
+                "key1": {"key1": "constant1", "key2": FirstNode.Outputs.value1},
+                "key2": {"key1": "constant2", "key2": FirstNode.Outputs.value1},
+            }
+
+    # AND a workflow that uses these outputs
+    class MyWorkflow(BaseWorkflow):
+        graph = FirstNode >> SecondNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            mixed_dict_output = SecondNode.Outputs.mixed_dict
+            mixed_nested_dict_output = SecondNode.Outputs.mixed_nested_dict
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN it should serialize as a CONSTANT_VALUE
+    assert isinstance(data["workflow_raw_data"], dict)
+    assert isinstance(data["workflow_raw_data"]["nodes"], list)
+    second_node = data["workflow_raw_data"]["nodes"][2]
+
+    assert isinstance(second_node, dict)
+    assert "outputs" in second_node
+    assert isinstance(second_node["outputs"], list)
+
+    outputs = second_node["outputs"]
+    mixed_dict_output = next(val for val in outputs if isinstance(val, dict) and val["name"] == "mixed_dict")
+    assert isinstance(mixed_dict_output, dict)
+    assert "value" in mixed_dict_output
+    assert mixed_dict_output["value"] == {
+        "type": "DICTIONARY_REFERENCE",
+        "entries": [
+            {"key": "key1", "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}}},
+            {
+                "key": "key2",
+                "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
+                    "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                },
+            },
+            {"key": "key3", "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}}},
+            {
+                "key": "key4",
+                "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
+                    "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                },
+            },
+        ],
+    }
+
+    mixed_nested_dict_output = next(
+        val for val in outputs if isinstance(val, dict) and val["name"] == "mixed_nested_dict"
+    )
+    assert isinstance(mixed_nested_dict_output, dict)
+    assert "value" in mixed_nested_dict_output
+    assert mixed_nested_dict_output["value"] == {
+        "type": "DICTIONARY_REFERENCE",
+        "entries": [
+            {
+                "key": "key1",
+                "value": {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "key": "key1",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
+                        },
+                        {
+                            "key": "key2",
+                            "value": {
+                                "type": "NODE_OUTPUT",
+                                "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
+                                "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                "key": "key2",
+                "value": {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "key": "key1",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
+                        },
+                        {
+                            "key": "key2",
+                            "value": {
+                                "type": "NODE_OUTPUT",
+                                "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
+                                "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                            },
+                        },
+                    ],
+                },
+            },
+        ],
+    }

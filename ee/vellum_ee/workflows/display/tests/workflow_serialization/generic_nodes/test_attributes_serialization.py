@@ -240,7 +240,7 @@ def test_serialize_node__workflow_input(serialize_node):
     )
 
 
-def test_serialize_node__workflow_input_as_nested_chat_history():
+def test_serialize_node__workflow_input_as_nested_chat_history(serialize_node):
     # GIVEN workflow inputs as chat history
     class Inputs(BaseInputs):
         chat_history: List[ChatMessage]
@@ -256,12 +256,57 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
         graph = GenericNode
 
     # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(workflow_class=Workflow)
-    with pytest.raises(Exception) as exc_info:
-        workflow_display.serialize()
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=GenericNode,
+        global_workflow_input_displays={Inputs.chat_history: WorkflowInputsDisplay(id=input_id)},
+    )
 
-    # THEN we should raise a user facing error
-    assert str(exc_info.value) == "Failed to serialize attribute 'attr': Nested references are not supported."
+    assert not DeepDiff(
+        {
+            "id": "11be9d37-0069-4695-a317-14a3b6519d4e",
+            "label": "test_serialize_node__workflow_input_as_nested_chat_history.<locals>.GenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "GenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "d4548468-85a4-449e-92e0-e2d8b8fd097c", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "c4a9a57d-1380-4689-8500-e8a0b6477291", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "e878bbc9-1231-461e-9e9d-947604da116e",
+                    "name": "attr",
+                    "value": {
+                        "type": "DICTIONARY_REFERENCE",
+                        "entries": [
+                            {
+                                "key": "hello",
+                                "value": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": str(input_id),
+                                },
+                            }
+                        ],
+                    },
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
 
 
 def test_serialize_node__node_output(serialize_node):

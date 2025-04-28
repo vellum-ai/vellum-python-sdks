@@ -262,8 +262,33 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 "items": cast(JsonArray, serialized_items),  # list[JsonObject] -> JsonArray
             }
 
-    if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
-        raise ValueError("Nested references are not supported.")
+    if isinstance(value, dict):
+        serialized_entries = [
+            {"key": key, "value": serialize_value(display_context, val)} for key, val in value.items()
+        ]
+
+        # Check if all entries have constant values
+        if all(entry["value"]["type"] == "CONSTANT_VALUE" for entry in serialized_entries):
+            constant_entries = {}
+            for entry in serialized_entries:
+                entry_value = entry["value"]["value"]
+                if entry_value["type"] == "JSON":
+                    if "items" in entry_value:
+                        constant_entries[entry["key"]] = entry_value["items"]
+                    else:
+                        constant_entries[entry["key"]] = entry_value
+                else:
+                    constant_entries[entry["key"]] = entry_value["value"]
+
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "JSON",
+                    "value": constant_entries,
+                },
+            }
+        else:
+            return {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonObject, serialized_entries)}
 
     if not isinstance(value, BaseDescriptor):
         vellum_value = primitive_to_vellum_value(value)
