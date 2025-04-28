@@ -19,3 +19,8 @@ exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST f
 "VellumSecretReference("API_KEY")
 "
 `;
+
+exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST for WORKFLOW_STATE reference 1`] = `
+"State.some_key
+"
+`;

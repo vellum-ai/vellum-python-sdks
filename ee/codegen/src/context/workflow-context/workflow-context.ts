@@ -347,6 +347,12 @@ export class WorkflowContext {
     return this.globalInputVariableContextsById.get(inputVariableId);
   }
 
+  public findStateVariableContextById(
+    stateVariableId: string
+  ): StateVariableContext | undefined {
+    return this.globalStateVariableContextsById.get(stateVariableId);
+  }
+
   public findOutputVariableContextById(
     outputVariableId: string
   ): OutputVariableContext | undefined {
