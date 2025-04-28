@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict, cast
 
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -237,25 +237,30 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     if isinstance(value, list):
         serialized_items = [serialize_value(display_context, item) for item in value]
-        if all(item["type"] == "CONSTANT_VALUE" for item in serialized_items):
+        if all(isinstance(item, dict) and item["type"] == "CONSTANT_VALUE" for item in serialized_items):
             constant_values = []
             for item in serialized_items:
-                value_inner = item["value"]
+                item_dict = cast(Dict[str, Any], item)
+                value_inner = item_dict["value"]
+
                 if value_inner["type"] == "JSON" and "items" in value_inner:
                     # Nested JSON list
                     constant_values.append(value_inner["items"])
                 else:
                     constant_values.append(value_inner["value"])
 
-            return {
-                "type": "CONSTANT_VALUE",
-                "value": {
-                    "type": "JSON",
-                    "items": constant_values,
+            return cast(
+                JsonObject,
+                {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "JSON",
+                        "items": constant_values,
+                    },
                 },
-            }
+            )
         else:
-            return {"type": "ARRAY_REFERENCE", "items": serialized_items}
+            return cast(JsonObject, {"type": "ARRAY_REFERENCE", "items": serialized_items})
 
     if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
         raise ValueError("Nested references are not supported.")
