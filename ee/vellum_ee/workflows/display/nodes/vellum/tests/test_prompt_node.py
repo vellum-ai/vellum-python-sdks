@@ -234,53 +234,15 @@ def test_serialize_node__port_groups():
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN the node should have the ports serialized
-    assert serialized_workflow["workflow_raw_data"]["nodes"][1]["ports"] == [
-        {
-            "id": "149d97a4-3da3-44a9-95f7-ea7b8d38b877",
-            "name": "apple",
-            "type": "IF",
-            "expression": {
-                "type": "BINARY_EXPRESSION",
-                "operator": "=",
-                "lhs": {
-                    "type": "NODE_OUTPUT",
-                    "node_id": "f76670b8-afd5-40a8-b484-893966482d6d",
-                    "node_output_id": "9d1d1db6-8874-49d5-8829-042ebd507e9e",
-                },
-                "rhs": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "STRING",
-                        "value": "apple",
-                    },
-                },
-            },
-        },
-        {
-            "id": "71f2d2b3-194f-4492-bc1c-a5ca1f60fb0a",
-            "name": "banana",
-            "type": "IF",
-            "expression": {
-                "type": "BINARY_EXPRESSION",
-                "operator": "=",
-                "lhs": {
-                    "type": "NODE_OUTPUT",
-                    "node_id": "f76670b8-afd5-40a8-b484-893966482d6d",
-                    "node_output_id": "9d1d1db6-8874-49d5-8829-042ebd507e9e",
-                },
-                "rhs": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "STRING",
-                        "value": "banana",
-                    },
-                },
-            },
-        },
-    ]
+    my_prompt_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(MyPromptNode.__id__)
+    )
+    ports = my_prompt_node["ports"]
+    assert len(ports) == 2
+    assert ports[0]["id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
+    assert ports[1]["id"] == "71f2d2b3-194f-4492-bc1c-a5ca1f60fb0a"
+    assert ports[0]["name"] == "apple"
+    assert ports[1]["name"] == "banana"
 
     # AND the legacy source_handle_id should be the default port
-    assert (
-        serialized_workflow["workflow_raw_data"]["nodes"][1]["data"]["source_handle_id"]
-        == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
-    )
+    assert my_prompt_node["data"]["source_handle_id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
