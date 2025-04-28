@@ -58,38 +58,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: mypy
-        name: mypy
-        entry: poetry run mypy .
-        language: system
-        exclude: ".*"
-        always_run: true
-        stages: [push]
-
-  - repo: local
-    hooks:
-      - id: pytest
-        name: pytest
-        entry: make test
-        language: system
-        exclude: ".*"
-        always_run: true
-        stages: [push]
-
-  - repo: local
-    hooks:
       - id: tsc
         name: tsc
         entry: bash -c 'cd ee/codegen && npm run types'
-        language: system
-        pass_filenames: false
-        stages: [push]
-
-  - repo: local
-    hooks:
-      - id: vitest
-        name: vitest
-        entry: bash -c 'cd ee/codegen && npm run test'
         language: system
         pass_filenames: false
         stages: [push]
