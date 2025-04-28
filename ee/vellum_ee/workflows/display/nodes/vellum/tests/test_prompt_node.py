@@ -6,6 +6,7 @@ from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
+from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.nodes.vellum.inline_prompt_node import BaseInlinePromptNodeDisplay
@@ -215,3 +216,33 @@ def test_serialize_node__unreferenced_variable_block__still_serializes():
     # warnings = list(workflow_display.errors)
     # assert len(warnings) == 1
     # assert "Missing input variable 'foo' for prompt block 0" in str(warnings[0])
+
+
+def test_serialize_node__port_groups():
+    # GIVEN a prompt node with ports
+    class MyPromptNode(InlinePromptNode):
+        class Ports(InlinePromptNode.Ports):
+            apple = Port.on_if(LazyReference(lambda: MyPromptNode.Outputs.text).equals("apple"))
+            banana = Port.on_if(LazyReference(lambda: MyPromptNode.Outputs.text).equals("banana"))
+
+    # AND a workflow with the prompt node
+    class MyWorkflow(BaseWorkflow):
+        graph = MyPromptNode
+
+    # WHEN the prompt node is serialized
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should have the ports serialized
+    my_prompt_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(MyPromptNode.__id__)
+    )
+    ports = my_prompt_node["ports"]
+    assert len(ports) == 2
+    assert ports[0]["id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
+    assert ports[1]["id"] == "71f2d2b3-194f-4492-bc1c-a5ca1f60fb0a"
+    assert ports[0]["name"] == "apple"
+    assert ports[1]["name"] == "banana"
+
+    # AND the legacy source_handle_id should be the default port
+    assert my_prompt_node["data"]["source_handle_id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"

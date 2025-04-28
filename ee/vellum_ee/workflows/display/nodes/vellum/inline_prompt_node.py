@@ -32,7 +32,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         output_display = self.output_display[node.Outputs.text]
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
-        node_blocks = raise_if_descriptor(node.blocks)
+        node_blocks = raise_if_descriptor(node.blocks) or []
         function_definitions = raise_if_descriptor(node.functions)
 
         ml_model = str(raise_if_descriptor(node.ml_model))
