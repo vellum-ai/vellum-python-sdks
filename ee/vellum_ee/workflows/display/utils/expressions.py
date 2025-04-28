@@ -37,7 +37,7 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 
 if TYPE_CHECKING:
@@ -249,18 +249,18 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 else:
                     constant_values.append(value_inner["value"])
 
-            return cast(
-                JsonObject,
-                {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "JSON",
-                        "items": constant_values,
-                    },
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "JSON",
+                    "items": constant_values,
                 },
-            )
+            }
         else:
-            return cast(JsonObject, {"type": "ARRAY_REFERENCE", "items": serialized_items})
+            return {
+                "type": "ARRAY_REFERENCE",
+                "items": cast(JsonArray, serialized_items),  # list[JsonObject] -> JsonArray
+            }
 
     if isinstance(value, dict) and any(isinstance(v, BaseDescriptor) for v in value.values()):
         raise ValueError("Nested references are not supported.")
