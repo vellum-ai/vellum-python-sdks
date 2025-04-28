@@ -9,6 +9,7 @@ import {
 } from "src/__test__/helpers";
 import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
+import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
@@ -105,8 +106,19 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 
-  it("should handle WORKFLOW_STATE reference with error", async () => {
-    workflowContext = workflowContextFactory({ strict: false });
+  it("should generate correct AST for WORKFLOW_STATE reference", async () => {
+    const workflowContext = workflowContextFactory({ strict: false });
+    workflowContext.addStateVariableContext(
+      stateVariableContextFactory({
+        workflowContext,
+        stateVariableData: {
+          id: "someStateVariableId",
+          key: "some_key",
+          type: "STRING",
+        },
+      })
+    );
+
     const stateReference: WorkflowValueDescriptorReferenceType = {
       type: "WORKFLOW_STATE",
       stateVariableId: "someStateVariableId",
@@ -118,10 +130,6 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
     });
 
     reference.write(writer);
-    const errors = workflowContext.getErrors();
-    expect(errors).toHaveLength(1);
-    expect(errors[0]?.message).toContain(
-      `WORKFLOW_STATE reference pointers is not implemented`
-    );
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });

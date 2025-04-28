@@ -1,9 +1,10 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { WorkflowStateReference } from "./workflow-state-reference";
+
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
-import { ValueGenerationError } from "src/generators/errors";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { ConstantValueReference } from "src/generators/workflow-value-descriptor-reference/constant-value-reference";
 import { ExecutionCounterWorkflowReference } from "src/generators/workflow-value-descriptor-reference/execution-counter-workflow-reference";
@@ -82,12 +83,10 @@ export class WorkflowValueDescriptorReference extends AstNode {
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
       case "WORKFLOW_STATE":
-        this.workflowContext.addError(
-          new ValueGenerationError(
-            "WORKFLOW_STATE reference pointers is not implemented"
-          )
-        );
-        return undefined;
+        return new WorkflowStateReference({
+          workflowContext: this.workflowContext,
+          nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
+        });
       case "CONSTANT_VALUE":
         return new ConstantValueReference({
           nodeContext: this.nodeContext,
