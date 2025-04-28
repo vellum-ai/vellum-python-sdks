@@ -6,12 +6,15 @@ import { isNil } from "lodash";
 import { VellumVariableType } from "vellum-ai/api";
 
 import { NodePortGenerationError, ValueGenerationError } from "./errors";
-import { AmpersandExpression, PipeExpression } from "./extensions";
 
 import * as codegen from "src/codegen";
 import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
 import { NodeInput } from "src/generators/node-inputs";
+import {
+  AmpersandExpression,
+  PipeExpression,
+} from "src/generators/nodes/conditional-node-operator";
 import {
   ConditionalNodeConditionData,
   ConditionalRuleData,
