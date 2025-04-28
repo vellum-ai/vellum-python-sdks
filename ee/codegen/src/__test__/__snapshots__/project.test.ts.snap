@@ -444,3 +444,16 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     output_displays = {}
 "
 `;
+
+exports[`WorkflowProjectGenerator > state > should generate a state.py file 3`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+
+from .nodes.templating_node import TemplatingNode
+from .state import State
+
+
+class Workflow(BaseWorkflow[BaseInputs, State]):
+    graph = TemplatingNode
+"
+`;

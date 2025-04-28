@@ -3275,6 +3275,7 @@ baz = foo + bar
 
       expectProjectFileToMatchSnapshot(["code", "state.py"]);
       expectProjectFileToMatchSnapshot(["code", "display", "workflow.py"]);
+      expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
     });
   });
 });

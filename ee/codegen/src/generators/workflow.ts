@@ -83,10 +83,28 @@ export class Workflow {
       );
     }
 
-    const baseStateClassReference = new BaseState({
-      workflowContext: this.workflowContext,
-    });
-    parentGenerics.push(python.Type.reference(baseStateClassReference));
+    const [firstStateVariableContext] = Array.from(
+      this.workflowContext.stateVariableContextsById.values()
+    );
+    if (firstStateVariableContext) {
+      parentGenerics.push(
+        python.Type.reference(
+          python.reference({
+            name: firstStateVariableContext.definition.name,
+            modulePath: firstStateVariableContext.definition.module,
+          })
+        )
+      );
+      customGenericsUsed = true;
+    } else {
+      parentGenerics.push(
+        python.Type.reference(
+          new BaseState({
+            workflowContext: this.workflowContext,
+          })
+        )
+      );
+    }
 
     const baseWorkflowClassRef = python.reference({
       name: "BaseWorkflow",
