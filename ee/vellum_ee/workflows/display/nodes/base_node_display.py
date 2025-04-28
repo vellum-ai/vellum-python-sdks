@@ -260,10 +260,15 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     def get_source_handle_id(self, port_displays: Dict[Port, PortDisplay]) -> UUID:
         unadorned_node = get_unadorned_node(self._node)
-        default_port = unadorned_node.Ports.default
+        default_port = next((port for port in unadorned_node.Ports if port.default), None)
+        if default_port in port_displays:
+            return port_displays[default_port].id
 
-        default_port_display = port_displays[default_port]
-        return default_port_display.id
+        first_port = next((port for port in unadorned_node.Ports), None)
+        if not first_port:
+            raise ValueError(f"Node {self._node.__name__} must have at least one port.")
+
+        return port_displays[first_port].id
 
     def get_trigger_id(self) -> UUID:
         return self.get_target_handle_id()
