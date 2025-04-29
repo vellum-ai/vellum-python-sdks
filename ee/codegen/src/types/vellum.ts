@@ -734,7 +734,7 @@ export interface RunnerConfig {
 export interface WorkflowVersionExecConfig {
   workflowRawData: WorkflowRawData;
   inputVariables: VellumVariable[];
-  stateVariables: VellumVariable[];
+  stateVariables?: VellumVariable[];
   outputVariables: VellumVariable[];
   runnerConfig?: RunnerConfig;
 }
