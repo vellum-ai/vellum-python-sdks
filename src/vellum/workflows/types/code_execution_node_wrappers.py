@@ -23,6 +23,10 @@ class ListWrapper(list):
             return self
         raise AttributeError(f"'list' object has no attribute '{attr}'")
 
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self[i]
+
 
 class DictWrapper(dict):
     """

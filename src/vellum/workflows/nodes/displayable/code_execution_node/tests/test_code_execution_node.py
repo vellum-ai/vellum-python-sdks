@@ -933,3 +933,30 @@ def main(output: list[str]) -> list[str]:
 
     # THEN the node should successfully access the string value
     assert outputs == {"result": ['{"foo": "bar"}', '{"foo2": "bar2"}'], "log": ""}
+
+
+def test_run_node__iter_list():
+    # GIVEN a node that will return the first string in a list
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+def main(
+    input_list: list
+) -> str:
+    return next((
+        o.value for o in input_list if o.type == "STRING"
+    ), None)
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "input_list": [
+                StringVellumValue(value="foo"),
+                NumberVellumValue(value=1),
+            ]
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully access the string value
+    assert outputs == {"result": "foo", "log": ""}
