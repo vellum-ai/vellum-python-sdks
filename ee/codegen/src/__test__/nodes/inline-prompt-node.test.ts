@@ -300,4 +300,31 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("basic with undefined template", () => {
+    it("should generate node file", async () => {
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        defaultBlock: {
+          blockType: "JINJA",
+          properties: {
+            template: "",
+          },
+          id: uuidv4(),
+          state: "DISABLED",
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

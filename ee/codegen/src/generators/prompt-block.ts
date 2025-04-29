@@ -81,6 +81,13 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
           }),
         })
       );
+    } else {
+      classArgs.push(
+        new MethodArgument({
+          name: "template",
+          value: python.TypeInstantiation.str(""),
+        })
+      );
     }
 
     const jinjaBlock = python.instantiateClass({
