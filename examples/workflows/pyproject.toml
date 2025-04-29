@@ -1,39 +1,16 @@
-# vellum workflows pull customer_support_q_a
-[[tool.vellum.workflows]]
-module = "customer_support_q_a"
-workflow_sandbox_id = "3daec7c3-b4f7-417c-8004-e42a1103179e"
+[tool.poetry]
+name = "vellum-example-workflows"
+version = "0.1.0"
+description = "A list of ready to use examples to jump start your Vellum Workflow development experience"
+authors = ["Vellum <devops@vellum.ai>"]
+license = "MIT"
+readme = "README.md"
 
-# vellum workflows pull document_parsing
-[[tool.vellum.workflows]]
-module = "document_parsing"
-workflow_sandbox_id = "1c3d3daf-a360-4ef9-93e2-7291185086ca"
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+vellum-ai = "0.14.48"
 
-# vellum workflows pull extract_from_image_of_receipt
-[[tool.vellum.workflows]]
-module = "extract_from_image_of_receipt"
-workflow_sandbox_id = "e10e2eb8-b243-4e3f-a0ed-a92a0681e543"
 
-# vellum workflows pull image_processing
-[[tool.vellum.workflows]]
-module = "image_processing"
-workflow_sandbox_id = "965383d3-5da5-45b2-a1fe-9e1fd9ae8c0e"
-
-# vellum workflows pull re_act_agent
-[[tool.vellum.workflows]]
-module = "re_act_agent"
-workflow_sandbox_id = "1ae53c7b-f95d-4d5c-a13e-697f5183a9fc"
-
-# vellum workflows pull reflection_agent
-[[tool.vellum.workflows]]
-module = "reflection_agent"
-workflow_sandbox_id = "b2143965-9f02-4225-a1db-543a83d00452"
-
-# vellum workflows pull router_classifier
-[[tool.vellum.workflows]]
-module = "router_classifier"
-workflow_sandbox_id = "d173ba01-2066-46e9-b481-5057d7d65266"
-
-# vellum workflows pull trust_center_q_a
-[[tool.vellum.workflows]]
-module = "trust_center_q_a"
-workflow_sandbox_id = "f0662f3a-af4f-44a8-85c4-eefe0a1c1c3a"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
