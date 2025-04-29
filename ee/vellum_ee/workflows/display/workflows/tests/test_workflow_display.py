@@ -626,7 +626,10 @@ def test_serialize_workflow__dict_values():
     assert "value" in dict_output
     assert dict_output["value"] == {
         "type": "CONSTANT_VALUE",
-        "value": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
+        "value": {
+            "type": "JSON",
+            "value": {"key1": {"type": "STRING", "value": "value1"}, "key2": {"type": "STRING", "value": "value2"}},
+        },
     }
 
     nested_dict_output = next(val for val in outputs if isinstance(val, dict) and val["name"] == "nested_dict_value")
@@ -637,8 +640,20 @@ def test_serialize_workflow__dict_values():
         "value": {
             "type": "JSON",
             "value": {
-                "key1": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
-                "key2": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
+                "key1": {
+                    "type": "JSON",
+                    "value": {
+                        "key1": {"type": "STRING", "value": "value1"},
+                        "key2": {"type": "STRING", "value": "value2"},
+                    },
+                },
+                "key2": {
+                    "type": "JSON",
+                    "value": {
+                        "key1": {"type": "STRING", "value": "value1"},
+                        "key2": {"type": "STRING", "value": "value2"},
+                    },
+                },
             },
         },
     }
@@ -650,7 +665,16 @@ def test_serialize_workflow__dict_values():
         "type": "CONSTANT_VALUE",
         "value": {
             "type": "JSON",
-            "value": {"key1": "value1", "key2": {"type": "JSON", "value": {"key3": "value3", "key4": "value4"}}},
+            "value": {
+                "key1": {"type": "STRING", "value": "value1"},
+                "key2": {
+                    "type": "JSON",
+                    "value": {
+                        "key3": {"type": "STRING", "value": "value3"},
+                        "key4": {"type": "STRING", "value": "value4"},
+                    },
+                },
+            },
         },
     }
 
