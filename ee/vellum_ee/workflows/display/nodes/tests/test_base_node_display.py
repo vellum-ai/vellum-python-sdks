@@ -4,6 +4,7 @@ from uuid import UUID
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -99,4 +100,20 @@ def test_serialize_display_data():
     assert data["display_data"] == {
         "position": {"x": 0.0, "y": 0.0},
         "comment": {"value": "I hope this works"},
+    }
+
+
+def test_serialize_node__with_unresolved_secret_references(vellum_client):
+    # GIVEN a node has access to a secret reference
+    class MyNode(BaseNode):
+        api_key = VellumSecretReference("MY_API_KEY")
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(MyNode)
+    data: dict = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the condition should be serialized correctly
+    assert data["attributes"][0]["value"] == {
+        "type": "SECRET_REFERENCE",
+        "secret_reference": "MY_API_KEY",
     }
