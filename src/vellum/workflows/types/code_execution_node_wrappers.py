@@ -2,7 +2,7 @@ class StringValueWrapper(str):
     def __getitem__(self, key):
         if key == "value":
             return self
-        raise KeyError(key)
+        return super().__getitem__(key)
 
     def __getattr__(self, attr):
         if attr == "value":

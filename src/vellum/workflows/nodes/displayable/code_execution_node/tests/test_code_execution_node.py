@@ -935,6 +935,24 @@ def main(output: list[str]) -> list[str]:
     assert outputs == {"result": ['{"foo": "bar"}', '{"foo2": "bar2"}'], "log": ""}
 
 
+def test_run_node__string_key_access_still_works():
+    # GIVEN a node that accesses the '0' index of a string input
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Any]):
+        code = """\
+def main(input: str) -> str:
+    return input[0]
+"""
+        code_inputs = {"input": "hello"}
+        runtime = "PYTHON_3_11_6"
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully access the string value
+    assert outputs == {"result": "h", "log": ""}
+
+
 def test_run_node__iter_list():
     # GIVEN a node that will return the first string in a list
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
