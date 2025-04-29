@@ -80,6 +80,16 @@
       "container_image_tag": null,
       "workspace": "default",
       "target_directory": null
+    },
+    {
+      "module": "custom_prompt_node",
+      "workflow_sandbox_id": "a8e57295-afb9-4b8c-8182-936000c5b0e2",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
     }
   ],
   "workspaces": []

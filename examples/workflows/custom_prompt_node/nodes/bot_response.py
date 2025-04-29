@@ -1,8 +1,8 @@
-from classifier.nodes.be_happy import BeHappyPrompt
-from classifier.nodes.cheer_up import CheerUpPrompt
-from classifier.nodes.settle_down import SettleDownPrompt
-
 from vellum.workflows.nodes.displayable import FinalOutputNode
+
+from .be_happy import BeHappyPrompt
+from .cheer_up import CheerUpPrompt
+from .settle_down import SettleDownPrompt
 
 
 class BotResponse(FinalOutputNode):
