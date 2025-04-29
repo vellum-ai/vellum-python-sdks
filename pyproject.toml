@@ -93,7 +93,7 @@ plugins = [
     "vellum.plugins.vellum_mypy",
 ]
 check_untyped_defs = true
-exclude = "venv"
+exclude = ["venv", "examples/workflows"]
 overrides = [
     { module = "deepdiff.*", ignore_missing_imports = true },
     { module = "docker.*", ignore_missing_imports = true },
@@ -111,7 +111,7 @@ build-backend = "poetry.core.masonry.api"
 vellum = "vellum_cli:main"
 
 [tool.isort]
-skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py"]
+skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows"]
 multi_line_output = 3
 force_grid_wrap = 0
 line_length = 120
