@@ -8,7 +8,7 @@ repos:
         # Exclude python files, which might have a valid use for trailing whitespaces (e.g. in triple-quoted strings)
         exclude: '(\.py$)|(.*\.ts\.snap$)|.mock|reference.md'
       - id: end-of-file-fixer
-        exclude: '(reference.md|src/vellum/client)'
+        exclude: '(reference.md|src/vellum/client|examples/workflows/.+/script\.py)'
 
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.35.1
@@ -27,6 +27,7 @@ repos:
     rev: 24.8.0
     hooks:
       - id: black
+        exclude: examples/workflows/.+/script\.py
 
   - repo: local
     hooks:

@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "vellum-example-workflows"
+version = "0.1.0"
+description = "A list of ready to use examples to jump start your Vellum Workflow development experience"
+authors = ["Vellum <devops@vellum.ai>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+vellum-ai = "0.14.48"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
