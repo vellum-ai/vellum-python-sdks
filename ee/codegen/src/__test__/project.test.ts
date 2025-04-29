@@ -1399,7 +1399,6 @@ baz = foo + bar
           edges: [],
         },
         input_variables: [],
-        state_variables: [],
         output_variables: [],
       };
 

@@ -331,13 +331,15 @@ ${errors.slice(0, 3).map((err) => {
       this.workflowContext.addInputVariableContext(inputVariableContext);
     });
 
-    this.workflowVersionExecConfig.stateVariables.forEach((stateVariable) => {
-      const stateVariableContext = new StateVariableContext({
-        stateVariableData: stateVariable,
-        workflowContext: this.workflowContext,
+    if (this.workflowVersionExecConfig.stateVariables) {
+      this.workflowVersionExecConfig.stateVariables.forEach((stateVariable) => {
+        const stateVariableContext = new StateVariableContext({
+          stateVariableData: stateVariable,
+          workflowContext: this.workflowContext,
+        });
+        this.workflowContext.addStateVariableContext(stateVariableContext);
       });
-      this.workflowContext.addStateVariableContext(stateVariableContext);
-    });
+    }
 
     // TODO: Invert / remove this logic once output values are default and terminal nodes don't exist.
     // We are prioritizing terminal nodes as a temporary workaround to bad data from output values lingering in workflows.
