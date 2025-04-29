@@ -936,7 +936,7 @@ def main(output: list[str]) -> list[str]:
 
 
 def test_run_node__iter_list():
-    # GIVEN a node that will return a type
+    # GIVEN a node that will return the first string in a list
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
         code = """\
 def main(
