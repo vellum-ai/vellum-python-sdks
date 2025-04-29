@@ -272,13 +272,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             constant_entries = {}
             for entry in serialized_entries:
                 entry_value = entry["value"]["value"]
-                if entry_value["type"] == "JSON":
-                    if "items" in entry_value:
-                        constant_entries[entry["key"]] = entry_value["items"]
-                    else:
-                        constant_entries[entry["key"]] = entry_value
-                else:
-                    constant_entries[entry["key"]] = entry_value["value"]
+                constant_entries[entry["key"]] = entry_value
 
             return {
                 "type": "CONSTANT_VALUE",
