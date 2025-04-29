@@ -14,9 +14,10 @@ class AnswerFromQADatabaseDisplay(BaseInlinePromptNodeDisplay[AnswerFromQADataba
     array_output_id = UUID("12d21eb9-8e69-43fc-9a85-7862772cfe96")
     target_handle_id = UUID("32491208-05df-4c63-9d78-9e5590fc7962")
     node_input_ids_by_name = {
-        "context_str": UUID("df01e4d5-724e-46bd-95a2-8814f8d73d24"),
-        "customer_question": UUID("55ce3cc9-388d-4aff-a68e-db69ab350e3a"),
+        "prompt_inputs.context_str": UUID("df01e4d5-724e-46bd-95a2-8814f8d73d24"),
+        "prompt_inputs.customer_question": UUID("55ce3cc9-388d-4aff-a68e-db69ab350e3a"),
     }
+    attribute_ids_by_name = {"ml_model": UUID("b65c824f-dd68-4ccd-a636-dddc142001ee")}
     output_display = {
         AnswerFromQADatabase.Outputs.text: NodeOutputDisplay(
             id=UUID("507144b2-1fa7-4dc9-807b-1ac5d3e8222f"), name="text"

@@ -14,9 +14,10 @@ class AnswerFromHelpDocsDisplay(BaseInlinePromptNodeDisplay[AnswerFromHelpDocs])
     array_output_id = UUID("7474b519-c47d-4fc6-9f00-0bd3c9a550d5")
     target_handle_id = UUID("c98a61e2-782d-4f37-a0b7-02b4fdfc8367")
     node_input_ids_by_name = {
-        "context_str": UUID("dc9d9831-85b0-4046-ac16-1f74ecd5ed54"),
-        "customer_question": UUID("f05cec45-79ae-466c-a961-75c63c73f7a0"),
+        "prompt_inputs.context_str": UUID("dc9d9831-85b0-4046-ac16-1f74ecd5ed54"),
+        "prompt_inputs.customer_question": UUID("f05cec45-79ae-466c-a961-75c63c73f7a0"),
     }
+    attribute_ids_by_name = {"ml_model": UUID("b8d31eda-388e-4e53-a5b9-c93796eb2738")}
     output_display = {
         AnswerFromHelpDocs.Outputs.text: NodeOutputDisplay(
             id=UUID("d142f5b3-2d37-4985-acee-36145aeb7f37"), name="text"

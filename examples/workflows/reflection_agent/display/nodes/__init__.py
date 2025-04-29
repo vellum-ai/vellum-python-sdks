@@ -9,13 +9,13 @@ from .note import NoteDisplay
 from .problem_solver_agent import ProblemSolverAgentDisplay
 
 __all__ = [
-    "ProblemSolverAgentDisplay",
     "AddAgentMessageToChatHistoryDisplay",
-    "EvaluatorAgentDisplay",
-    "ExtractStatusDisplay",
-    "NeedsRevisionDisplay",
-    "FinalOutputDisplay",
     "AddEvaluatorMessageToChatHistoryDisplay",
     "ErrorNodeDisplay",
+    "EvaluatorAgentDisplay",
+    "ExtractStatusDisplay",
+    "FinalOutputDisplay",
+    "NeedsRevisionDisplay",
     "NoteDisplay",
+    "ProblemSolverAgentDisplay",
 ]

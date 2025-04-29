@@ -1,13 +1,15 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
 from ..nodes.add_image_to_chat_history import AddImageToChatHistory
@@ -18,7 +20,7 @@ from ..nodes.summarize_image_by_url_chat_history import SummarizeImageByURLChatH
 from ..workflow import Workflow
 
 
-class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("374eff56-51f2-4432-a642-ea35d9fbc455"),
         entrypoint_node_source_handle_id=UUID("061a80b9-549b-441c-a623-21038cddeb6f"),
@@ -30,14 +32,9 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.image_url: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("48d08975-862a-4858-9659-adf59f6648cc"), name="image_url", required=True
-        ),
-        Inputs.workflow_input_chat_history: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("fb7211bb-0f6d-4176-a104-06c2261ebd5c"),
-            name="workflow_input_chat_history",
-            required=False,
-            color="pink",
+        Inputs.image_url: WorkflowInputsDisplay(id=UUID("48d08975-862a-4858-9659-adf59f6648cc"), name="image_url"),
+        Inputs.workflow_input_chat_history: WorkflowInputsDisplay(
+            id=UUID("fb7211bb-0f6d-4176-a104-06c2261ebd5c"), name="workflow_input_chat_history", color="pink"
         ),
     }
     entrypoint_displays = {

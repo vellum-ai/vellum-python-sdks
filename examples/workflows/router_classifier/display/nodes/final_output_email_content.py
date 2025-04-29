@@ -11,9 +11,7 @@ class FinalOutputEmailContentDisplay(BaseFinalOutputNodeDisplay[FinalOutputEmail
     label = "Final Output - Email Content"
     node_id = UUID("879336fa-8d2f-49c7-91e7-1d5ecead8224")
     target_handle_id = UUID("47efd3cb-b7cc-44e7-a7a7-c1294e5b668a")
-    output_id = UUID("84803d2a-ca83-40a3-b138-d8ebf64f8af1")
     output_name = "email_copy"
-    node_input_id = UUID("259f0fd9-e59f-4825-aa8b-4df60c6d64ec")
     node_input_ids_by_name = {"node_input": UUID("259f0fd9-e59f-4825-aa8b-4df60c6d64ec")}
     output_display = {
         FinalOutputEmailContent.Outputs.value: NodeOutputDisplay(

@@ -14,9 +14,10 @@ class EvaluateResumeDisplay(BaseInlinePromptNodeDisplay[EvaluateResume]):
     array_output_id = UUID("5b2b2db7-2456-49f5-99ad-f353303a8228")
     target_handle_id = UUID("77231475-31fd-49f6-8994-dbb64e9f1d6f")
     node_input_ids_by_name = {
-        "resume": UUID("3c5dff6d-b4a6-46cf-a3b6-5a7292124ae9"),
-        "job_description": UUID("55de0eea-10cd-40a4-853e-78b41e444699"),
+        "prompt_inputs.resume": UUID("3c5dff6d-b4a6-46cf-a3b6-5a7292124ae9"),
+        "prompt_inputs.job_description": UUID("55de0eea-10cd-40a4-853e-78b41e444699"),
     }
+    attribute_ids_by_name = {"ml_model": UUID("70c11bc5-4f1b-452b-9089-fb384db2ffe0")}
     output_display = {
         EvaluateResume.Outputs.text: NodeOutputDisplay(id=UUID("0c374fba-f4d8-400f-a1ed-e8716b790d46"), name="text"),
         EvaluateResume.Outputs.results: NodeOutputDisplay(

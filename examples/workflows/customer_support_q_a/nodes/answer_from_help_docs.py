@@ -14,8 +14,6 @@ class AnswerFromHelpDocs(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 You are a Customer Support bot that helps answer questions from customers based on context provided to you from our Help Docs and API docs. If the context is insufficient, say \"Sorry, I don\'t know.\"
 
@@ -30,7 +28,7 @@ The context and customer question will be provided to you in the following forma
 <question>
 ...
 </question>\
-""",
+"""
                         )
                     ]
                 )
@@ -42,8 +40,6 @@ The context and customer question will be provided to you in the following forma
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 <context>
 {{ context_str }}
@@ -52,7 +48,7 @@ The context and customer question will be provided to you in the following forma
 <question>
 {{ customer_question }}  
 </question>\
-""",
+"""
                         )
                     ]
                 )

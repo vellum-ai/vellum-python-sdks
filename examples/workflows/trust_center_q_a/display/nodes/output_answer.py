@@ -11,9 +11,7 @@ class OutputAnswerDisplay(BaseFinalOutputNodeDisplay[OutputAnswer]):
     label = "Output: Answer"
     node_id = UUID("deb0823c-20eb-4cb6-8445-636d37a9c58e")
     target_handle_id = UUID("df4f459e-c3e4-4ae4-ae33-69145f0d2b50")
-    output_id = UUID("519d3b9b-4caa-4928-abd1-ce3130caabee")
     output_name = "answer"
-    node_input_id = UUID("eb02ccd1-a768-4fa8-adde-dff1f335a265")
     node_input_ids_by_name = {"node_input": UUID("eb02ccd1-a768-4fa8-adde-dff1f335a265")}
     output_display = {
         OutputAnswer.Outputs.value: NodeOutputDisplay(id=UUID("519d3b9b-4caa-4928-abd1-ce3130caabee"), name="value")

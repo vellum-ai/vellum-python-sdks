@@ -13,7 +13,8 @@ class WriteRejectionEmailDisplay(BaseInlinePromptNodeDisplay[WriteRejectionEmail
     output_id = UUID("05c32c54-865b-46f9-b68b-1c295ae1b619")
     array_output_id = UUID("6270aae8-b312-4e9d-905e-fbe5f23d25e4")
     target_handle_id = UUID("75a77dde-080f-406f-afb8-7c7d74df4757")
-    node_input_ids_by_name = {"resume_evaluation": UUID("438aafbc-cb61-4b32-b5d6-1cf4f62a5db4")}
+    node_input_ids_by_name = {"prompt_inputs.resume_evaluation": UUID("438aafbc-cb61-4b32-b5d6-1cf4f62a5db4")}
+    attribute_ids_by_name = {"ml_model": UUID("64a17993-f907-4b67-aa6d-db87d8ed61a5")}
     output_display = {
         WriteRejectionEmail.Outputs.text: NodeOutputDisplay(
             id=UUID("05c32c54-865b-46f9-b68b-1c295ae1b619"), name="text"

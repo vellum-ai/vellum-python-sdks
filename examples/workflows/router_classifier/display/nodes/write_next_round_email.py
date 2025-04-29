@@ -13,7 +13,8 @@ class WriteNextRoundEmailDisplay(BaseInlinePromptNodeDisplay[WriteNextRoundEmail
     output_id = UUID("050b67a9-7976-433c-961b-65c3591c1e17")
     array_output_id = UUID("f1809bf4-8f1c-44c0-ad94-9412b4cdd428")
     target_handle_id = UUID("dde07670-5e53-4cc1-ac3f-ec19d6a050e6")
-    node_input_ids_by_name = {"resume_evaluation": UUID("0681162b-315a-4ff4-a5ba-4f205c902538")}
+    node_input_ids_by_name = {"prompt_inputs.resume_evaluation": UUID("0681162b-315a-4ff4-a5ba-4f205c902538")}
+    attribute_ids_by_name = {"ml_model": UUID("3d5b268d-b485-4ee0-9591-4c8932eebb0c")}
     output_display = {
         WriteNextRoundEmail.Outputs.text: NodeOutputDisplay(
             id=UUID("050b67a9-7976-433c-961b-65c3591c1e17"), name="text"

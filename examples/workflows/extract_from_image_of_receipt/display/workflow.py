@@ -1,13 +1,15 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
 from ..nodes.data_extractor import DataExtractor
@@ -15,7 +17,7 @@ from ..nodes.final_output import FinalOutput
 from ..workflow import Workflow
 
 
-class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("6343c92f-e900-41aa-8efa-a0ddabf62d42"),
         entrypoint_node_source_handle_id=UUID("c30f3ded-6947-4206-a443-21bbfef379c1"),
@@ -23,13 +25,11 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
             position=NodeDisplayPosition(x=604.6530102688362, y=-81.4120252975955), width=124, height=48
         ),
         display_data=WorkflowDisplayData(
-            viewport=WorkflowDisplayDataViewport(x=-260.7049966014067, y=182.49045301623968, zoom=0.5854980830446631)
+            viewport=WorkflowDisplayDataViewport(x=-211.11940130297864, y=393.24473293335495, zoom=0.39997596956099407)
         ),
     )
     inputs_display = {
-        Inputs.chat_history: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("cda43bd1-2f3f-449e-93bc-e3e4a7be87ba"), name="chat_history", required=True
-        )
+        Inputs.chat_history: WorkflowInputsDisplay(id=UUID("cda43bd1-2f3f-449e-93bc-e3e4a7be87ba"), name="chat_history")
     }
     entrypoint_displays = {
         DataExtractor: EntrypointDisplay(

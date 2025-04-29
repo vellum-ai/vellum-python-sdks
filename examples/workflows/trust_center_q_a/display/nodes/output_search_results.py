@@ -11,9 +11,7 @@ class OutputSearchResultsDisplay(BaseFinalOutputNodeDisplay[OutputSearchResults]
     label = "Output: Search Results"
     node_id = UUID("11a597f3-6655-47d5-9e79-ebb3c11965d1")
     target_handle_id = UUID("8ebe1a2e-3971-4b1a-9605-2b6a8c59d134")
-    output_id = UUID("3f526b86-e419-4c89-b7fa-beacd0055556")
     output_name = "search_results"
-    node_input_id = UUID("c4e72fc2-fa5b-47fd-849c-a5bddf738558")
     node_input_ids_by_name = {"node_input": UUID("c4e72fc2-fa5b-47fd-849c-a5bddf738558")}
     output_display = {
         OutputSearchResults.Outputs.value: NodeOutputDisplay(

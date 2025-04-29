@@ -9,7 +9,7 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 
 
 class ProblemSolverAgent(InlinePromptNode):
-    """Here we use any context we have from an Evaluator Agent to answer a math problem for a user. If we haven't run the answer through the Evaluator Agent yet, then we initialize an empty Chat History as a "fallback value\" """
+    """Here we use any context we have from an Evaluator Agent to answer a math problem for a user. If we haven't run the answer through the Evaluator Agent yet, then we initialize an empty Chat History as a "fallback value\""""
 
     ml_model = "gpt-4o-mini"
     blocks = [
@@ -19,8 +19,6 @@ class ProblemSolverAgent(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 You are a problem solving agent helping answer a <problem> from a user. You will get feedback from an Evaluator Agent on the quality of your solution and you should use it to iterate upon your solution until you have a satisfactory answer. 
 
@@ -28,16 +26,14 @@ Answer the following math question step by step:
 
 <problem>
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="math_problem"),
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
  
 </problem>\
-""",
+"""
                         ),
                     ]
                 )

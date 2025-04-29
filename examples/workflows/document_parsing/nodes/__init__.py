@@ -4,4 +4,10 @@ from .extract_by_document_url import ExtractByDocumentURL
 from .final_output import FinalOutput
 from .final_output_6 import FinalOutput6
 
-__all__ = ["ExtractByChatHistory", "AddImageToChatHistory", "FinalOutput6", "ExtractByDocumentURL", "FinalOutput"]
+__all__ = [
+    "AddImageToChatHistory",
+    "ExtractByChatHistory",
+    "ExtractByDocumentURL",
+    "FinalOutput",
+    "FinalOutput6",
+]

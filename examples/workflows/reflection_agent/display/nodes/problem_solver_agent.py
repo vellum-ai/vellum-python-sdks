@@ -14,9 +14,10 @@ class ProblemSolverAgentDisplay(BaseInlinePromptNodeDisplay[ProblemSolverAgent])
     array_output_id = UUID("bbd6be27-5b0f-4d54-9a31-0e12efeb92aa")
     target_handle_id = UUID("b9fba906-f169-4ca3-8edc-28f363db3eb8")
     node_input_ids_by_name = {
-        "math_problem": UUID("1b144a04-d5d1-4b03-8314-ee13b515324c"),
-        "chat_history": UUID("122598c5-bcf4-437b-988a-7c6d76151c4c"),
+        "prompt_inputs.math_problem": UUID("1b144a04-d5d1-4b03-8314-ee13b515324c"),
+        "prompt_inputs.chat_history": UUID("122598c5-bcf4-437b-988a-7c6d76151c4c"),
     }
+    attribute_ids_by_name = {"ml_model": UUID("4681a133-2a9b-4ffc-8e69-2fa80f227766")}
     output_display = {
         ProblemSolverAgent.Outputs.text: NodeOutputDisplay(
             id=UUID("c5b21544-5cd2-4df7-9826-74cdf558354f"), name="text"

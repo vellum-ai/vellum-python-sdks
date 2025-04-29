@@ -14,9 +14,10 @@ class AnswerQuestionDisplay(BaseInlinePromptNodeDisplay[AnswerQuestion]):
     array_output_id = UUID("010e1f65-2080-4391-9d1d-a0eaea832021")
     target_handle_id = UUID("30ad35f8-ebba-4364-979d-96ba74211898")
     node_input_ids_by_name = {
-        "chat_history": UUID("6c0b6479-ea6a-4302-958b-22ad1d630efb"),
-        "context": UUID("5e50c27e-4d76-496e-b8ea-98f185308376"),
+        "prompt_inputs.chat_history": UUID("6c0b6479-ea6a-4302-958b-22ad1d630efb"),
+        "prompt_inputs.context": UUID("5e50c27e-4d76-496e-b8ea-98f185308376"),
     }
+    attribute_ids_by_name = {"ml_model": UUID("9fc7da77-c986-44da-ab04-9c78ed73a3e5")}
     output_display = {
         AnswerQuestion.Outputs.text: NodeOutputDisplay(id=UUID("b910a43e-864f-48b4-b57c-e9924d51807b"), name="text"),
         AnswerQuestion.Outputs.results: NodeOutputDisplay(

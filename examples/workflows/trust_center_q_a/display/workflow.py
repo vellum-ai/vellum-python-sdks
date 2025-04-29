@@ -1,13 +1,15 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
 from ..nodes.answer_question import AnswerQuestion
@@ -20,7 +22,7 @@ from ..nodes.search_results import SearchResults
 from ..workflow import Workflow
 
 
-class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("eeb618e0-2b37-4fa0-933a-cd2c9ae73c25"),
         entrypoint_node_source_handle_id=UUID("93d0da15-cfd4-47ec-9f16-b9f8e2bcfb28"),
@@ -30,9 +32,7 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.chat_history: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("499159eb-4f31-4659-9c87-4ad6a727419a"), name="chat_history", required=True
-        )
+        Inputs.chat_history: WorkflowInputsDisplay(id=UUID("499159eb-4f31-4659-9c87-4ad6a727419a"), name="chat_history")
     }
     entrypoint_displays = {
         MostRecentMessage: EntrypointDisplay(

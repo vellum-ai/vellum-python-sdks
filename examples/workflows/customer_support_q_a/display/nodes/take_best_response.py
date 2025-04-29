@@ -14,10 +14,11 @@ class TakeBestResponseDisplay(BaseInlinePromptNodeDisplay[TakeBestResponse]):
     array_output_id = UUID("97641cc0-9ea0-4fd9-87f2-df0808a8928f")
     target_handle_id = UUID("335b9eb8-dc2d-419f-ab1d-5af0cb68d434")
     node_input_ids_by_name = {
-        "question": UUID("9ae1e761-85f7-46f7-9478-e95eecfdeb87"),
-        "support_bot_response_1": UUID("26a360de-e06e-4bbd-bc05-c6dc3f96b538"),
-        "support_bot_response_2": UUID("62a38935-9b81-4379-b58a-768185ad6a5a"),
+        "prompt_inputs.question": UUID("9ae1e761-85f7-46f7-9478-e95eecfdeb87"),
+        "prompt_inputs.support_bot_response_1": UUID("26a360de-e06e-4bbd-bc05-c6dc3f96b538"),
+        "prompt_inputs.support_bot_response_2": UUID("62a38935-9b81-4379-b58a-768185ad6a5a"),
     }
+    attribute_ids_by_name = {"ml_model": UUID("b8fd05a2-7eeb-4ebf-8687-3969b3eca532")}
     output_display = {
         TakeBestResponse.Outputs.text: NodeOutputDisplay(id=UUID("818b9849-3e2d-4149-b982-860f0d18b9cc"), name="text"),
         TakeBestResponse.Outputs.results: NodeOutputDisplay(

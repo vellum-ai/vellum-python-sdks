@@ -8,12 +8,12 @@ from .q_a_bank_lookup import QABankLookupDisplay
 from .take_best_response import TakeBestResponseDisplay
 
 __all__ = [
-    "QABankLookupDisplay",
-    "HelpDocsLookupDisplay",
-    "AnswerFromQADatabaseDisplay",
-    "GetSearchResultsWithMetadataDisplay",
-    "MergeNodeDisplay",
     "AnswerFromHelpDocsDisplay",
-    "TakeBestResponseDisplay",
+    "AnswerFromQADatabaseDisplay",
     "FinalOutputDisplay",
+    "GetSearchResultsWithMetadataDisplay",
+    "HelpDocsLookupDisplay",
+    "MergeNodeDisplay",
+    "QABankLookupDisplay",
+    "TakeBestResponseDisplay",
 ]

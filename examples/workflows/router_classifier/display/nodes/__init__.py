@@ -6,10 +6,10 @@ from .write_next_round_email import WriteNextRoundEmailDisplay
 from .write_rejection_email import WriteRejectionEmailDisplay
 
 __all__ = [
+    "AdvanceOrRejectDisplay",
     "EvaluateResumeDisplay",
     "ExtractScoreDisplay",
-    "AdvanceOrRejectDisplay",
+    "FinalOutputEmailContentDisplay",
     "WriteNextRoundEmailDisplay",
     "WriteRejectionEmailDisplay",
-    "FinalOutputEmailContentDisplay",
 ]

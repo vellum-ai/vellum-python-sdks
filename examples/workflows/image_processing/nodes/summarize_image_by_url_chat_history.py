@@ -17,11 +17,7 @@ class SummarizeImageByURLChatHistory(InlinePromptNode):
             chat_role="SYSTEM",
             blocks=[
                 RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            state="ENABLED", cache_config=None, text="""Please describe what you see in the image. """
-                        )
-                    ]
+                    blocks=[PlainTextPromptBlock(text="""Please describe what you see in the image. """)]
                 )
             ],
         ),

@@ -11,13 +11,11 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
     label = "Final Output"
     node_id = UUID("25746d6b-3749-401e-9111-00a64737949c")
     target_handle_id = UUID("6ff6d0f8-c629-42e7-bbf1-272028c2979e")
-    output_id = UUID("dfa69d72-3f2a-4f56-b639-5f0331ed5dc5")
     output_name = "final-output"
-    node_input_id = UUID("d5983b77-b8f4-4d3c-9aa1-c83830e5a919")
     node_input_ids_by_name = {"node_input": UUID("d5983b77-b8f4-4d3c-9aa1-c83830e5a919")}
     output_display = {
         FinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("dfa69d72-3f2a-4f56-b639-5f0331ed5dc5"), name="value")
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1619.1089509093895, y=-195.73728608411776), width=455, height=239
+        position=NodeDisplayPosition(x=1619.1089509093895, y=-195.73728608411776), width=522, height=400
     )

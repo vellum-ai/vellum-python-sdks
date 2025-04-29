@@ -1,8 +1,8 @@
 from vellum import ChatMessagePromptBlock, FunctionDefinition, JinjaPromptBlock, PromptParameters, VariablePromptBlock
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.references import LazyReference
 
 from ..inputs import Inputs
+from .accumulate_chat_history import AccumulateChatHistory
 
 
 class AgentNode(InlinePromptNode):
@@ -30,7 +30,7 @@ Products Considered:
         VariablePromptBlock(input_variable="chat_history"),
     ]
     prompt_inputs = {
-        "chat_history": LazyReference("AccumulateChatHistory.Outputs.result").coalesce(Inputs.chat_history),
+        "chat_history": AccumulateChatHistory.Outputs.result.coalesce(Inputs.chat_history),
     }
     functions = [
         FunctionDefinition(

@@ -1,13 +1,15 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
 from ..nodes.advance_or_reject import AdvanceOrReject
@@ -19,7 +21,7 @@ from ..nodes.write_rejection_email import WriteRejectionEmail
 from ..workflow import Workflow
 
 
-class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("d42056a1-cb01-4fd2-8eb7-560c9006511a"),
         entrypoint_node_source_handle_id=UUID("24241884-119a-4812-9d50-74b866b47fed"),
@@ -29,11 +31,9 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.resume: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("ce0a66eb-5882-4303-946b-75184270a926"), name="resume", required=True
-        ),
-        Inputs.job_requirements: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("a6f1f373-6a17-43e2-baf4-aeb28d29318f"), name="job_requirements", required=True, color="cyan"
+        Inputs.resume: WorkflowInputsDisplay(id=UUID("ce0a66eb-5882-4303-946b-75184270a926"), name="resume"),
+        Inputs.job_requirements: WorkflowInputsDisplay(
+            id=UUID("a6f1f373-6a17-43e2-baf4-aeb28d29318f"), name="job_requirements", color="cyan"
         ),
     }
     entrypoint_displays = {

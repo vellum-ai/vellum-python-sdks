@@ -5,7 +5,7 @@ from vellum import (
     RichTextPromptBlock,
     VariablePromptBlock,
 )
-from vellum.workflows.nodes.core import TryNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
 from ..inputs import Inputs
@@ -21,12 +21,10 @@ class DataExtractor(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 You are an expert in extracting information from images of receipts. Your task is to accurately parse the receipt image and provide structured data based on the included schema. Only use the information from the image when creating the output and try to be as accurate as possible when grabbing the information from the image. If you don\'t know leave that portion of the JSON output empty
 \
-""",
+"""
                         )
                     ]
                 )

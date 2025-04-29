@@ -26,7 +26,7 @@ class AddImageToChatHistoryDisplay(BaseTemplatingNodeDisplay[AddImageToChatHisto
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=282.3228076068352, y=552.4516595338625),
-        width=457,
-        height=350,
+        width=553,
+        height=746,
         comment=NodeDisplayComment(expanded=True),
     )

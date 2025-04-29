@@ -21,23 +21,19 @@ class WriteRejectionEmail(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 Please write a rejection email to the following candidate. Use the following <resume_evaluation> to give the candidate feedback that is brief, polite, and respectful. 
 
 <resume_evaluation>
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="resume_evaluation"),
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 
 </resume_evaluation>\
-""",
+"""
                         ),
                     ]
                 )

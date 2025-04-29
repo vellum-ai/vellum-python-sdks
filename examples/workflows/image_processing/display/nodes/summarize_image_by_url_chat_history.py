@@ -13,7 +13,8 @@ class SummarizeImageByURLChatHistoryDisplay(BaseInlinePromptNodeDisplay[Summariz
     output_id = UUID("26238951-f3b6-454c-81c6-1a6f7da20919")
     array_output_id = UUID("9b21a9dd-2515-46d9-84a0-c0ef59890b18")
     target_handle_id = UUID("0340e04b-13ff-4698-9fd4-8fdac3d4920d")
-    node_input_ids_by_name = {"chat_history": UUID("9cde4b6f-77c6-47e7-963d-ea0a903c81b8")}
+    node_input_ids_by_name = {"prompt_inputs.chat_history": UUID("9cde4b6f-77c6-47e7-963d-ea0a903c81b8")}
+    attribute_ids_by_name = {"ml_model": UUID("7023b57c-7b7a-42ab-a7ce-e1c077475a03")}
     output_display = {
         SummarizeImageByURLChatHistory.Outputs.text: NodeOutputDisplay(
             id=UUID("26238951-f3b6-454c-81c6-1a6f7da20919"), name="text"

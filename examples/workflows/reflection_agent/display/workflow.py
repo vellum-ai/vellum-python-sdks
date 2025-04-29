@@ -1,13 +1,15 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
 from ..nodes.add_agent_message_to_chat_history import AddAgentMessageToChatHistory
@@ -21,7 +23,7 @@ from ..nodes.problem_solver_agent import ProblemSolverAgent
 from ..workflow import Workflow
 
 
-class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("f30a644b-8dc2-44a6-889c-7fc68ee56faa"),
         entrypoint_node_source_handle_id=UUID("983050f4-430e-4456-87ad-65558edcbaa3"),
@@ -33,9 +35,7 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.math_problem: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("e1819ef5-3ed2-4c9b-b8d5-bb6d3d572002"), name="math_problem", required=True
-        )
+        Inputs.math_problem: WorkflowInputsDisplay(id=UUID("e1819ef5-3ed2-4c9b-b8d5-bb6d3d572002"), name="math_problem")
     }
     entrypoint_displays = {
         ProblemSolverAgent: EntrypointDisplay(

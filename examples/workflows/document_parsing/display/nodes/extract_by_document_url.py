@@ -13,7 +13,8 @@ class ExtractByDocumentURLDisplay(BaseInlinePromptNodeDisplay[ExtractByDocumentU
     output_id = UUID("63a1191f-ee4a-4194-8fc9-531d64a1f301")
     array_output_id = UUID("1bae2ae0-7b6b-4a11-bb4c-85e222d3d5dd")
     target_handle_id = UUID("e876d7e8-2023-43d8-a29d-d1c9ed8df541")
-    node_input_ids_by_name = {"chat_history": UUID("816d73c4-78b7-46e0-b4fd-2c8fbab4886c")}
+    node_input_ids_by_name = {"prompt_inputs.chat_history": UUID("816d73c4-78b7-46e0-b4fd-2c8fbab4886c")}
+    attribute_ids_by_name = {"ml_model": UUID("873c8386-0680-4ec8-8a51-1bcb8b0b068c")}
     output_display = {
         ExtractByDocumentURL.Outputs.text: NodeOutputDisplay(
             id=UUID("63a1191f-ee4a-4194-8fc9-531d64a1f301"), name="text"
@@ -29,5 +30,5 @@ class ExtractByDocumentURLDisplay(BaseInlinePromptNodeDisplay[ExtractByDocumentU
         ExtractByDocumentURL.Ports.default: PortDisplayOverrides(id=UUID("a15192cb-c2c3-44ff-8a62-e35ddb65e67d"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=837.4721057480847, y=667.4771042124831), width=480, height=175
+        position=NodeDisplayPosition(x=837.4721057480847, y=667.4771042124831), width=553, height=518
     )

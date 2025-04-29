@@ -1,13 +1,15 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import (
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowInputsVellumDisplayOverrides,
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ....nodes.invoke_functions.inputs import Inputs
 from ....nodes.invoke_functions.nodes.final_output import FinalOutput
@@ -16,7 +18,7 @@ from ....nodes.invoke_functions.nodes.invoke_function_s_w_code import InvokeFunc
 from ....nodes.invoke_functions.workflow import InvokeFunctionsWorkflow
 
 
-class InvokeFunctionsWorkflowDisplay(VellumWorkflowDisplay[InvokeFunctionsWorkflow]):
+class InvokeFunctionsWorkflowDisplay(BaseWorkflowDisplay[InvokeFunctionsWorkflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("82475913-3e24-4995-aa56-275cd8264944"),
         entrypoint_node_source_handle_id=UUID("5790a065-973f-4482-8cba-7f2ae7b91d29"),
@@ -26,15 +28,9 @@ class InvokeFunctionsWorkflowDisplay(VellumWorkflowDisplay[InvokeFunctionsWorkfl
         ),
     )
     inputs_display = {
-        Inputs.index: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("5e23c5c2-077b-4fe9-b223-9f3d3d374057"), name="index", required=False
-        ),
-        Inputs.items: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("98ee5b96-8446-4cd6-90c7-2141432ff0b6"), name="items", required=False
-        ),
-        Inputs.item: WorkflowInputsVellumDisplayOverrides(
-            id=UUID("81372cd4-6664-4144-9b80-e5fd86ab2960"), name="item", required=False
-        ),
+        Inputs.index: WorkflowInputsDisplay(id=UUID("5e23c5c2-077b-4fe9-b223-9f3d3d374057"), name="index"),
+        Inputs.items: WorkflowInputsDisplay(id=UUID("98ee5b96-8446-4cd6-90c7-2141432ff0b6"), name="items"),
+        Inputs.item: WorkflowInputsDisplay(id=UUID("81372cd4-6664-4144-9b80-e5fd86ab2960"), name="item"),
     }
     entrypoint_displays = {
         InvokeFunctionSWCode: EntrypointDisplay(

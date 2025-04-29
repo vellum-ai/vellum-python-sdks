@@ -8,12 +8,12 @@ from .output_user_question import OutputUserQuestionDisplay
 from .search_results import SearchResultsDisplay
 
 __all__ = [
-    "MostRecentMessageDisplay",
-    "SearchResultsDisplay",
-    "OutputUserQuestionDisplay",
-    "FormattedSearchResultsDisplay",
-    "OutputSearchResultsDisplay",
     "AnswerQuestionDisplay",
-    "OutputAnswerDisplay",
     "CopyOfNoteDisplay",
+    "FormattedSearchResultsDisplay",
+    "MostRecentMessageDisplay",
+    "OutputAnswerDisplay",
+    "OutputSearchResultsDisplay",
+    "OutputUserQuestionDisplay",
+    "SearchResultsDisplay",
 ]

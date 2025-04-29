@@ -19,13 +19,7 @@ class ExtractByChatHistory(InlinePromptNode):
             chat_role="SYSTEM",
             blocks=[
                 RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
-                            text="""What is the small top pressure rating of the 1.5\" valve?""",
-                        )
-                    ]
+                    blocks=[PlainTextPromptBlock(text="""What is the small top pressure rating of the 1.5\" valve?""")]
                 )
             ],
         ),

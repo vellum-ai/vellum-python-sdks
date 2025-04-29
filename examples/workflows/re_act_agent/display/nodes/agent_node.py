@@ -13,7 +13,8 @@ class AgentNodeDisplay(BaseInlinePromptNodeDisplay[AgentNode]):
     output_id = UUID("9066d1a1-6662-4e09-996f-7b92aced9b47")
     array_output_id = UUID("0b0d0975-b66f-4163-b8b6-57566b3bf2b6")
     target_handle_id = UUID("bd7137dc-9c30-4881-8b99-b7697b9df11b")
-    node_input_ids_by_name = {"chat_history": UUID("7d0d3c27-4faa-42fe-a76f-5e4b934b49e9")}
+    node_input_ids_by_name = {"prompt_inputs.chat_history": UUID("7d0d3c27-4faa-42fe-a76f-5e4b934b49e9")}
+    attribute_ids_by_name = {"ml_model": UUID("7869ec4b-c8a9-4780-b862-9220d897ea2b")}
     output_display = {
         AgentNode.Outputs.text: NodeOutputDisplay(id=UUID("9066d1a1-6662-4e09-996f-7b92aced9b47"), name="text"),
         AgentNode.Outputs.results: NodeOutputDisplay(id=UUID("0b0d0975-b66f-4163-b8b6-57566b3bf2b6"), name="results"),

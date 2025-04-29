@@ -2,10 +2,8 @@ from typing import List
 
 from vellum import ChatMessage
 from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.references import LazyReference
 from vellum.workflows.state import BaseState
-
-from .add_agent_message_to_chat_history import AddAgentMessageToChatHistory
-from .evaluator_agent import EvaluatorAgent
 
 
 class AddEvaluatorMessageToChatHistory(TemplatingNode[BaseState, List[ChatMessage]]):
@@ -18,6 +16,6 @@ class AddEvaluatorMessageToChatHistory(TemplatingNode[BaseState, List[ChatMessag
 {{- (chat_history + msg_arr) | tojson -}}\
 """
     inputs = {
-        "chat_history": AddAgentMessageToChatHistory.Outputs.result,
-        "message": EvaluatorAgent.Outputs.text,
+        "chat_history": LazyReference("AddAgentMessageToChatHistory.Outputs.result"),
+        "message": LazyReference("EvaluatorAgent.Outputs.text"),
     }

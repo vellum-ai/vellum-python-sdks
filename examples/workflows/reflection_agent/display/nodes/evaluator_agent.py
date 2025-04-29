@@ -14,9 +14,10 @@ class EvaluatorAgentDisplay(BaseInlinePromptNodeDisplay[EvaluatorAgent]):
     array_output_id = UUID("b1487507-9d8d-4a15-a572-d831e7bc3b65")
     target_handle_id = UUID("a61907e2-6acf-4877-9f57-38b685cb37d6")
     node_input_ids_by_name = {
-        "math_problem": UUID("618cc457-9779-4a91-baa4-1aea562c0a65"),
-        "proposed_solution": UUID("d0b8e3c7-9c74-4f11-b527-8b6f0f4ecc21"),
+        "prompt_inputs.math_problem": UUID("618cc457-9779-4a91-baa4-1aea562c0a65"),
+        "prompt_inputs.proposed_solution": UUID("d0b8e3c7-9c74-4f11-b527-8b6f0f4ecc21"),
     }
+    attribute_ids_by_name = {"ml_model": UUID("02524ab3-400f-48dd-b6b7-126a12fcc031")}
     output_display = {
         EvaluatorAgent.Outputs.text: NodeOutputDisplay(id=UUID("5a8639b1-1735-4287-9d33-fc9dc01dc652"), name="text"),
         EvaluatorAgent.Outputs.results: NodeOutputDisplay(

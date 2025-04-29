@@ -21,23 +21,19 @@ class WriteNextRoundEmail(InlinePromptNode):
                 RichTextPromptBlock(
                     blocks=[
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 Please write an email to the following candidate that congratulates them on moving to the next round interview for a role for which they applied. Use the following <resume_evaluation> to give the candidate feedback that is brief, polite, and respectful.
 
 <resume_evaluation>
 \
-""",
+"""
                         ),
                         VariablePromptBlock(input_variable="resume_evaluation"),
                         PlainTextPromptBlock(
-                            state="ENABLED",
-                            cache_config=None,
                             text="""\
 
 </resume_evaluation>\
-""",
+"""
                         ),
                     ]
                 )

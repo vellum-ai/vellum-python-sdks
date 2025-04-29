@@ -10,7 +10,6 @@ class NoteDisplay(BaseNoteNodeDisplay[Note]):
         "fontSize": 16,
         "backgroundColor": "#FFEF8A",
     }
-    node_input_ids_by_name = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=1717.8720479880744, y=-4.0697246951307875), width=560, height=242
     )
