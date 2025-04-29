@@ -79,8 +79,8 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
 
         packages = raise_if_descriptor(node.packages)
 
-        _, output_display = display_context.global_node_output_displays[node.Outputs.result]
-        _, log_output_display = display_context.global_node_output_displays[node.Outputs.log]
+        output_display = self.output_display[node.Outputs.result]
+        log_output_display = self.output_display[node.Outputs.log]
 
         output_type = primitive_type_to_vellum_variable_type(node.get_output_type())
 
