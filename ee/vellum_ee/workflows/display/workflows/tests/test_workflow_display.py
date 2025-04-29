@@ -637,8 +637,8 @@ def test_serialize_workflow__dict_values():
         "value": {
             "type": "JSON",
             "value": {
-                "key1": {"type": "JSON", "value": {"nested_key1": "value1", "nested_key2": "value2"}},
-                "key2": {"type": "JSON", "value": {"nested_key1": "value1", "nested_key2": "value2"}},
+                "key1": {"nested_key1": "value1", "nested_key2": "value2"},
+                "key2": {"nested_key1": "value1", "nested_key2": "value2"},
             },
         },
     }
@@ -648,10 +648,7 @@ def test_serialize_workflow__dict_values():
     assert "value" in mixed_dict_output
     assert mixed_dict_output["value"] == {
         "type": "CONSTANT_VALUE",
-        "value": {
-            "type": "JSON",
-            "value": {"key1": "value1", "key2": {"type": "JSON", "value": {"key3": "value3", "key4": "value4"}}},
-        },
+        "value": {"type": "JSON", "value": {"key1": "value1", "key2": {"key3": "value3", "key4": "value4"}}},
     }
 
 
