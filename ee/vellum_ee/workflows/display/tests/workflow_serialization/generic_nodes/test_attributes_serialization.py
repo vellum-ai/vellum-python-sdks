@@ -239,7 +239,7 @@ def test_serialize_node__workflow_input(serialize_node):
     )
 
 
-def test_serialize_node__workflow_input_as_nested_chat_history(serialize_node):
+def test_serialize_node__workflow_input_as_nested_chat_history():
     # GIVEN workflow inputs as chat history
     class Inputs(BaseInputs):
         chat_history: List[ChatMessage]
@@ -255,10 +255,12 @@ def test_serialize_node__workflow_input_as_nested_chat_history(serialize_node):
         graph = GenericNode
 
     # WHEN the workflow is serialized
-    input_id = uuid4()
-    serialized_node = serialize_node(
-        node_class=GenericNode,
-        global_workflow_input_displays={Inputs.chat_history: WorkflowInputsDisplay(id=input_id)},
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the attribute reference
+    generic_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(GenericNode.__id__)
     )
 
     assert not DeepDiff(
@@ -294,7 +296,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history(serialize_node):
                                 "key": "hello",
                                 "value": {
                                     "type": "WORKFLOW_INPUT",
-                                    "input_variable_id": str(input_id),
+                                    "input_variable_id": "f727c3f9-f27f-4ac9-abd7-12bf612a094e",
                                 },
                             }
                         ],
@@ -303,7 +305,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history(serialize_node):
             ],
             "outputs": [],
         },
-        serialized_node,
+        generic_node,
         ignore_order=True,
     )
 
