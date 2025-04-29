@@ -595,8 +595,8 @@ def test_serialize_workflow__dict_values():
         class Outputs(BaseNode.Outputs):
             dict_value = {"key1": "value1", "key2": "value2"}
             nested_dict_value = {
-                "key1": {"key1": "value1", "key2": "value2"},
-                "key2": {"key1": "value1", "key2": "value2"},
+                "key1": {"nested_key1": "value1", "nested_key2": "value2"},
+                "key2": {"nested_key1": "value1", "nested_key2": "value2"},
             }
             mixed_dict_value = {"key1": "value1", "key2": {"key3": "value3", "key4": "value4"}}
 
@@ -637,8 +637,8 @@ def test_serialize_workflow__dict_values():
         "value": {
             "type": "JSON",
             "value": {
-                "key1": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
-                "key2": {"type": "JSON", "value": {"key1": "value1", "key2": "value2"}},
+                "key1": {"type": "JSON", "value": {"nested_key1": "value1", "nested_key2": "value2"}},
+                "key2": {"type": "JSON", "value": {"nested_key1": "value1", "nested_key2": "value2"}},
             },
         },
     }
