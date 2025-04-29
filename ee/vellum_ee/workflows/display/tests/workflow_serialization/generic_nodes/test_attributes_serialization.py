@@ -1,4 +1,3 @@
-import pytest
 from uuid import uuid4
 from typing import List
 
@@ -257,11 +256,58 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
 
     # WHEN the workflow is serialized
     workflow_display = get_workflow_display(workflow_class=Workflow)
-    with pytest.raises(Exception) as exc_info:
-        workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN we should raise a user facing error
-    assert str(exc_info.value) == "Failed to serialize attribute 'attr': Nested references are not supported."
+    # THEN the node should properly serialize the attribute reference
+    generic_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(GenericNode.__id__)
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "11be9d37-0069-4695-a317-14a3b6519d4e",
+            "label": "test_serialize_node__workflow_input_as_nested_chat_history.<locals>.GenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "GenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "d4548468-85a4-449e-92e0-e2d8b8fd097c", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "c4a9a57d-1380-4689-8500-e8a0b6477291", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "e878bbc9-1231-461e-9e9d-947604da116e",
+                    "name": "attr",
+                    "value": {
+                        "type": "DICTIONARY_REFERENCE",
+                        "entries": [
+                            {
+                                "key": "hello",
+                                "value": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": "f727c3f9-f27f-4ac9-abd7-12bf612a094e",
+                                },
+                            }
+                        ],
+                    },
+                }
+            ],
+            "outputs": [],
+        },
+        generic_node,
+        ignore_order=True,
+    )
 
 
 def test_serialize_node__node_output(serialize_node):
