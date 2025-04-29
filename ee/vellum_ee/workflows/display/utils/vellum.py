@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
+from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.array_vellum_value import ArrayVellumValue
 from vellum.client.types.vellum_value import VellumValue
@@ -117,13 +118,18 @@ def create_node_input_value_pointer_rule(
         workflow_input_display = display_context.global_workflow_input_displays[value]
         return InputVariablePointer(data=InputVariableData(input_variable_id=str(workflow_input_display.id)))
     if isinstance(value, VellumSecretReference):
-        workspace_secret = display_context.client.workspace_secrets.retrieve(
-            id=value.name,
-        )
+        try:
+            workspace_secret = display_context.client.workspace_secrets.retrieve(
+                id=value.name,
+            )
+            workspace_secret_id: Optional[str] = str(workspace_secret.id)
+        except ApiError:
+            workspace_secret_id = None
+
         return WorkspaceSecretPointer(
             data=WorkspaceSecretData(
                 type="STRING",
-                workspace_secret_id=str(workspace_secret.id),
+                workspace_secret_id=workspace_secret_id,
             ),
         )
     if isinstance(value, ExecutionCountReference):

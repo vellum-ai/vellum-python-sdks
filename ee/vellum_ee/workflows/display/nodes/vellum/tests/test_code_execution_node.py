@@ -2,7 +2,9 @@ import pytest
 from uuid import UUID
 from typing import Type
 
+from vellum.client.core.api_error import ApiError
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.vellum.code_execution_node import BaseCodeExecutionNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -110,3 +112,44 @@ def test_serialize_node__code_node_inputs(GetDisplayClass, expected_input_id):
             },
         },
     ]
+
+
+def test_serialize_node__with_unresolved_secret_references(vellum_client):
+    # GIVEN a node has access to a secret reference
+    class MyNode(CodeExecutionNode):
+        code_inputs = {"api_key": VellumSecretReference("MY_API_KEY")}
+
+    # AND the secret is not found
+    vellum_client.workspace_secrets.retrieve.side_effect = ApiError(
+        status_code=404,
+        body="Secret not found",
+    )
+
+    # AND a workflow with the code node
+    class Workflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    data: dict = workflow_display.serialize()
+
+    # THEN the condition should be serialized correctly
+    node = next(node for node in data["workflow_raw_data"]["nodes"] if node["type"] == "CODE_EXECUTION")
+    assert node["inputs"][0]["value"] == {
+        "combinator": "OR",
+        "rules": [
+            {
+                "type": "WORKSPACE_SECRET",
+                "data": {
+                    "type": "STRING",
+                    "workspace_secret_id": None,
+                },
+            }
+        ],
+    }
+
+    # AND we should have a warning of the invalid reference
+    # TODO: Come up with a proposal for how nodes should propagate warnings
+    # warnings = list(workflow_display.errors)
+    # assert len(warnings) == 1
+    # assert "Failed to resolve secret reference 'MY_API_KEY'" in str(warnings[0])
