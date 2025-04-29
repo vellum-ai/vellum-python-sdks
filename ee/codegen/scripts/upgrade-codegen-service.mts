@@ -4,6 +4,9 @@ import { execSync } from "child_process";
 import packageJson from "../package.json" assert { type: "json" };
 import { readFileSync, writeFileSync } from "node:fs";
 import { getGithubToken } from "./get-github-token.mjs";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const main = async () => {
   const version = packageJson.version;
