@@ -97,7 +97,7 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return value  # type: ignore
 
     try:
-        if isinstance(value, Callable):
+        if callable(value):
             value = compile_function_definition(value)
         json_value = json.dumps(value, cls=DefaultStateEncoder)
     except json.JSONDecodeError:
