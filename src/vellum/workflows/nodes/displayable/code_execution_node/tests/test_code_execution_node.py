@@ -1001,3 +1001,37 @@ def main(input_dict: dict) -> list[str]:
 
     # THEN the node should successfully access the string value
     assert outputs == {"result": ["bar", "qux"], "log": ""}
+
+
+def test_run_node__show_clearer_runtime_error_message():
+    # GIVEN a node that will return the first string in a list
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, list[str]]):
+        code = """\
+def main(items: list[str]) -> list[str]:
+    return first(items)
+
+# Helper function to prove out stack traces
+def first(items: list[str]) -> str:
+    return items[0]
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {"items": []}
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # THEN the node should successfully access the string value
+    assert (
+        exc_info.value.message
+        == """\
+Traceback (most recent call last):
+  File "ExampleCodeExecutionNode.code.py", line 2, in main
+    return first(items)
+  File "ExampleCodeExecutionNode.code.py", line 6, in first
+    return items[0]
+
+IndexError: list index out of range
+"""
+    )
