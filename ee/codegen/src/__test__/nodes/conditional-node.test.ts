@@ -494,7 +494,7 @@ describe("Conditional Node with equals operator to numeric lhs should cast rhs t
     const statusCodeOutputId = uuid4();
     await createNodeContext({
       workflowContext,
-      nodeData: apiNodeFactory({ id: apiNodeId, statusCodeOutputId }),
+      nodeData: apiNodeFactory({ id: apiNodeId, statusCodeOutputId }).build(),
     });
 
     return {

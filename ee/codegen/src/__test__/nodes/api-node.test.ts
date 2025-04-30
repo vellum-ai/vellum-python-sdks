@@ -93,7 +93,7 @@ describe("ApiNode", () => {
       }
     );
 
-    const nodeData = apiNodeFactory(apiNodeProps);
+    const nodeData = apiNodeFactory(apiNodeProps).build();
 
     const nodeContext = (await createNodeContext({
       workflowContext,
@@ -108,7 +108,7 @@ describe("ApiNode", () => {
 
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = apiNodeFactory();
+      const nodeData = apiNodeFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -136,7 +136,7 @@ describe("ApiNode", () => {
     it("should generate empty string when url is missing", async () => {
       const nodeData = apiNodeFactory({
         url: null,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -155,7 +155,7 @@ describe("ApiNode", () => {
     it("should not generate method field when method is GET", async () => {
       const nodeData = apiNodeFactory({
         method: "GET",
-      });
+      }).build();
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
@@ -173,7 +173,7 @@ describe("ApiNode", () => {
     it("should not generate body field when body is None", async () => {
       const nodeData = apiNodeFactory({
         body: null,
-      });
+      }).build();
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
@@ -259,7 +259,7 @@ describe("ApiNode", () => {
     beforeEach(async () => {
       const nodeData = apiNodeFactory({
         errorOutputId: "af589f73-effe-4a80-b48f-fb912ac6ce67",
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -285,7 +285,7 @@ describe("ApiNode", () => {
 
   describe("skip authorization type input id field if undefined", () => {
     beforeEach(async () => {
-      const nodeData = apiNodeFactory({ authorizationTypeInput: null });
+      const nodeData = apiNodeFactory({ authorizationTypeInput: null }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -325,7 +325,7 @@ describe("ApiNode", () => {
             },
           },
         }),
-      });
+      }).build();
 
       const workflowContext = workflowContextFactory({ strict: false });
       const nodeContext = (await createNodeContext({
