@@ -1,4 +1,3 @@
-from collections.abc import Callable
 import enum
 import json
 from typing import Any, List, Union, cast
