@@ -253,7 +253,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 "type": "CONSTANT_VALUE",
                 "value": {
                     "type": "JSON",
-                    "items": constant_values,
+                    "value": constant_values,
                 },
             }
         else:

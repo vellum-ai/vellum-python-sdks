@@ -466,7 +466,7 @@ def test_serialize_workflow__array_values():
     assert "value" in array_output
     assert array_output["value"] == {
         "type": "CONSTANT_VALUE",
-        "value": {"type": "JSON", "items": ["item1", "item2", "item3"]},
+        "value": {"type": "JSON", "value": ["item1", "item2", "item3"]},
     }
 
     nested_array_outputs = [val for val in outputs if isinstance(val, dict) and val["name"] == "nested_array_value"]
@@ -477,7 +477,7 @@ def test_serialize_workflow__array_values():
     assert "value" in nested_array_output
     assert nested_array_output["value"] == {
         "type": "CONSTANT_VALUE",
-        "value": {"type": "JSON", "items": [["item1", "item2", "item3"], ["item4", "item5", "item6"]]},
+        "value": {"type": "JSON", "value": [["item1", "item2", "item3"], ["item4", "item5", "item6"]]},
     }
 
     mixed_array_outputs = [val for val in outputs if isinstance(val, dict) and val["name"] == "mixed_array_value"]
@@ -488,7 +488,7 @@ def test_serialize_workflow__array_values():
     assert "value" in mixed_array_output
     assert mixed_array_output["value"] == {
         "type": "CONSTANT_VALUE",
-        "value": {"type": "JSON", "items": [["item1"], "item2", "item3"]},
+        "value": {"type": "JSON", "value": [["item1"], "item2", "item3"]},
     }
 
 
