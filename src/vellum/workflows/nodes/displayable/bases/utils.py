@@ -96,8 +96,6 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return value  # type: ignore
 
     try:
-        if callable(value):
-            value = compile_function_definition(value)
         json_value = json.dumps(value, cls=DefaultStateEncoder)
     except json.JSONDecodeError:
         raise ValueError(f"Unsupported variable type: {value.__class__.__name__}")
