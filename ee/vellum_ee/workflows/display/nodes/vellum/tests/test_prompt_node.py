@@ -184,6 +184,34 @@ def test_serialize_node__prompt_inputs__state_reference():
         },
     ]
 
+    # AND the prompt attributes should include a dictionary reference with the state reference
+    assert my_prompt_node["attributes"][0] == {
+        "id": "e47e0a80-afbb-4888-b06b-8dc78edd8572",
+        "key": "prompt_inputs",
+        "value": {
+            "type": "DICTIONARY_REFERENCE",
+            "entries": [
+                {
+                    "key": "foo",
+                    "value": {
+                        "type": "STATE_REFERENCE",
+                        "state_variable_id": "e47e0a80-afbb-4888-b06b-8dc78edd8572",
+                    },
+                },
+                {
+                    "key": "bar",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {
+                            "type": "STRING",
+                            "value": "baz",
+                        },
+                    },
+                },
+            ],
+        },
+    }
+
 
 def test_serialize_node__unreferenced_variable_block__still_serializes():
     # GIVEN a prompt node with an unreferenced variable block
