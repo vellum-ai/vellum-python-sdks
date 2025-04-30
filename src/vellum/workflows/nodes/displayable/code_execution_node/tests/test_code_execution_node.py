@@ -850,7 +850,16 @@ def main(arg1: list) -> str:
         node.run()
 
     # AND the result should be the correct output
-    assert exc_info.value.message == "dict has no key: 'invalid'"
+    assert (
+        exc_info.value.message
+        == """\
+Traceback (most recent call last):
+  File "ExampleCodeExecutionNode.code.py", line 2, in main
+    return arg1["invalid"]
+
+AttributeError: dict has no key: 'invalid'
+"""
+    )
 
 
 def test_run_node__execute_code__value_key_access():
