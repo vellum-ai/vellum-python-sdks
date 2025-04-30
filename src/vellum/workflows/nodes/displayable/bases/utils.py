@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import enum
 import json
 from typing import Any, List, Union, cast
@@ -30,6 +31,7 @@ from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_value_request import VellumValueRequest
 from vellum.workflows.errors.types import WorkflowError, workflow_error_to_vellum_error
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.utils.functions import compile_function_definition
 
 VELLUM_VALUE_REQUEST_TUPLE = (
     StringVellumValueRequest,
@@ -95,6 +97,8 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return value  # type: ignore
 
     try:
+        if isinstance(value, Callable):
+            value = compile_function_definition(value)
         json_value = json.dumps(value, cls=DefaultStateEncoder)
     except json.JSONDecodeError:
         raise ValueError(f"Unsupported variable type: {value.__class__.__name__}")
