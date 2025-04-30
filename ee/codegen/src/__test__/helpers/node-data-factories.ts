@@ -865,7 +865,7 @@ export function conditionalNodeFactory({
   includeElif?: boolean;
   conditions?: ConditionalNodeConditionData[] | null;
   inputs?: NodeInput[];
-} = {}): ConditionalNode {
+} = {}): NodeDataFactoryBuilder<ConditionalNode> {
   // Some test may want to pass in conditions directly
   if (!conditions) {
     conditions = [
@@ -1004,7 +1004,7 @@ export function conditionalNodeFactory({
       },
     },
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<ConditionalNode>(nodeData);
 }
 
 export interface ApiNodeFactoryProps {

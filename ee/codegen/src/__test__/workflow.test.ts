@@ -274,7 +274,7 @@ describe("Workflow", () => {
     it("should handle loops of conditionals and import Graph.from_set properly", async () => {
       const startNode = conditionalNodeFactory({
         label: "Start Node",
-      });
+      }).build();
 
       const loopCheckNode = conditionalNodeFactory({
         id: uuidv4(),
@@ -282,7 +282,7 @@ describe("Workflow", () => {
         ifSourceHandleId: uuidv4(),
         elseSourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const finalOutput = finalOutputNodeFactory();
 

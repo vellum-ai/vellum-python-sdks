@@ -59,7 +59,7 @@ describe("InlinePromptNode referenced by Conditional Node", () => {
     const conditionalNode = conditionalNodeFactory({
       inputReferenceId: errorOutputId,
       inputReferenceNodeId: promptNode.id,
-    });
+    }).build();
 
     const conditionalNodeContext = (await createNodeContext({
       workflowContext,
@@ -183,7 +183,7 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
     const conditionalNode = conditionalNodeFactory({
       inputReferenceId: outputId,
       inputReferenceNodeId: promptDeploymentNode.id,
-    });
+    }).build();
 
     const conditionalNodeContext = (await createNodeContext({
       workflowContext,

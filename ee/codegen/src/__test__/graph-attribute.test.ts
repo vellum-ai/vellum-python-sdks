@@ -237,7 +237,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const conditionalNodeData = conditionalNodeFactory();
+      const conditionalNodeData = conditionalNodeFactory().build();
 
       await runGraphTest([
         [entrypointNode, conditionalNodeData],
@@ -405,7 +405,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const conditionalNodeData = conditionalNodeFactory();
+      const conditionalNodeData = conditionalNodeFactory().build();
 
       await runGraphTest([
         [entrypointNode, conditionalNodeData],
@@ -431,7 +431,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const conditionalNodeData = conditionalNodeFactory();
+      const conditionalNodeData = conditionalNodeFactory().build();
 
       await runGraphTest([
         [entrypointNode, conditionalNodeData],
@@ -465,7 +465,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const conditionalNodeData = conditionalNodeFactory();
+      const conditionalNodeData = conditionalNodeFactory().build();
 
       const conditionalNode2Data = conditionalNodeFactory({
         id: uuidv4(),
@@ -473,7 +473,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
         ifSourceHandleId: uuidv4(),
         elseSourceHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, conditionalNodeData],
@@ -516,7 +516,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const conditionalNodeData = conditionalNodeFactory();
+      const conditionalNodeData = conditionalNodeFactory().build();
 
       await runGraphTest([
         [entrypointNode, conditionalNodeData],
