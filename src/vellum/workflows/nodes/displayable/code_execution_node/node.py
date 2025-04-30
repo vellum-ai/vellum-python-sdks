@@ -1,4 +1,5 @@
 import inspect
+import os
 from typing import Any, ClassVar, Dict, Generic, List, Optional, Sequence, Tuple, Type, TypeVar, cast, get_args
 
 from vellum import (
@@ -95,9 +96,9 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
 
     def run(self) -> Outputs:
         output_type = self.__class__.get_output_type()
-        code = self._resolve_code()
+        code, filepath = self._resolve_code()
         if not self.packages and self.runtime == "PYTHON_3_11_6":
-            logs, result = run_code_inline(code, self.code_inputs, output_type)
+            logs, result = run_code_inline(code, self.code_inputs, output_type, filepath)
             return self.Outputs(result=result, log=logs)
 
         else:
@@ -210,7 +211,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
 
         return compiled_inputs
 
-    def _resolve_code(self) -> str:
+    def _resolve_code(self) -> Tuple[str, str]:
         if self.code and self.filepath:
             raise NodeException(
                 message="Cannot specify both `code` and `filepath` for a CodeExecutionNode",
@@ -218,7 +219,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
             )
 
         if self.code:
-            return self.code
+            return self.code, f"{self.__class__.__name__}.code.py"
 
         if not self.filepath:
             raise NodeException(
@@ -235,4 +236,4 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
 
-        return code
+        return code, os.path.join(os.path.dirname(root), self.filepath)

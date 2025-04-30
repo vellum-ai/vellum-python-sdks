@@ -1,5 +1,7 @@
 import io
 import os
+import sys
+import traceback
 from typing import Any, Optional, Tuple, Union
 
 from pydantic import BaseModel
@@ -40,6 +42,7 @@ def run_code_inline(
     code: str,
     inputs: EntityInputsInterface,
     output_type: Any,
+    filepath: str,
 ) -> Tuple[str, Any]:
     log_buffer = io.StringIO()
 
@@ -75,11 +78,29 @@ def run_code_inline(
 __arg__out = main({", ".join(run_args)})
 """
     try:
-        exec(execution_code, exec_globals)
+        compiled_code = compile(execution_code, filepath, "exec")
+        exec(compiled_code, exec_globals)
     except Exception as e:
+        lines = code.splitlines()
+        _, _, tb = sys.exc_info()
+        tb_generator = traceback.walk_tb(tb)
+        stack = traceback.StackSummary.extract(tb_generator)
+
+        # Filter stack to only include frames from the user's code file, and omit the first one
+        filtered_stack = traceback.StackSummary.from_list([frame for frame in stack if frame.filename == filepath][1:])
+        for frame in filtered_stack:
+            if not frame.line and frame.lineno and frame.lineno <= len(lines):
+                # Mypy doesn't like us setting private attributes
+                frame._line = lines[frame.lineno - 1]  # type: ignore[attr-defined]
+
+        error_message = f"""\
+Traceback (most recent call last):
+{''.join(filtered_stack.format())}
+{e.__class__.__name__}: {e}
+"""
         raise NodeException(
             code=WorkflowErrorCode.INVALID_CODE,
-            message=str(e),
+            message=error_message,
         )
 
     logs = log_buffer.getvalue()
