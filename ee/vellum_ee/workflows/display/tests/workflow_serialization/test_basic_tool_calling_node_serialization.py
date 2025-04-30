@@ -86,7 +86,7 @@ def test_serialize_workflow():
                     "type": "CONSTANT_VALUE",
                     "value": {
                         "type": "JSON",
-                        "items": [
+                        "value": [
                             {
                                 "block_type": "CHAT_MESSAGE",
                                 "state": None,
@@ -144,7 +144,7 @@ def test_serialize_workflow():
                     "type": "CONSTANT_VALUE",
                     "value": {
                         "type": "JSON",
-                        "items": [
+                        "value": [
                             {
                                 "state": None,
                                 "cache_config": None,
@@ -187,7 +187,7 @@ def test_serialize_workflow():
                 "id": "4674f1d9-e3af-411f-8a55-40a3a3ab5394",
                 "name": "chat_history",
                 "type": "CHAT_HISTORY",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "items": []}},
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": []}},
             },
         ],
     }
