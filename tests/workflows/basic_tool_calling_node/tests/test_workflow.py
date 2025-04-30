@@ -23,7 +23,7 @@ from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
-from tests.workflows.basic_tool_calling_node.workflow import GetCurrentWeatherWorkflow
+from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow
 
 
 def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_generator):
@@ -73,7 +73,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     second_call_input_id_2 = uuid4_generator()
 
     # GIVEN a get current weather workflow
-    workflow = GetCurrentWeatherWorkflow()
+    workflow = BasicToolCallingNodeWorkflow()
 
     # WHEN the workflow is executed
     terminal_event = workflow.run()
