@@ -1,7 +1,7 @@
 from collections import defaultdict
+import concurrent.futures
 import logging
 from queue import Empty, Queue
-from threading import Thread
 from typing import (
     TYPE_CHECKING,
     Callable,
@@ -75,95 +75,85 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             return
 
         self._event_queue: Queue[Tuple[int, WorkflowEvent]] = Queue()
-        self._concurrency_queue: Queue[Thread] = Queue()
-        fulfilled_iterations: List[bool] = []
-        for index, item in enumerate(self.items):
-            fulfilled_iterations.append(False)
-            current_execution_context = get_execution_context()
-            thread = Thread(
-                target=self._context_run_subworkflow,
-                kwargs={
-                    "item": item,
-                    "index": index,
-                    "current_execution_context": current_execution_context,
-                },
-            )
-            if self.max_concurrency is None:
-                thread.start()
-            else:
-                self._concurrency_queue.put(thread)
+        fulfilled_iterations: List[bool] = [False] * len(self.items)
 
-        if self.max_concurrency is not None:
-            concurrency_count = 0
-            while concurrency_count < self.max_concurrency:
-                is_empty = self._start_thread()
-                if is_empty:
-                    break
+        max_workers = self.max_concurrency if self.max_concurrency is not None else len(self.items)
 
-                concurrency_count += 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = []
+            for index, item in enumerate(self.items):
+                current_execution_context = get_execution_context()
+                future = executor.submit(self._context_run_subworkflow, item, index, current_execution_context)
+                futures.append(future)
 
-        try:
-            while map_node_event := self._event_queue.get():
-                index = map_node_event[0]
-                subworkflow_event = map_node_event[1]
-                self._context._emit_subworkflow_event(subworkflow_event)
+            while not all(fulfilled_iterations):
+                try:
+                    map_node_event = self._event_queue.get(block=False)
+                    index = map_node_event[0]
+                    subworkflow_event = map_node_event[1]
+                    self._context._emit_subworkflow_event(subworkflow_event)
 
-                if not is_workflow_event(subworkflow_event):
-                    continue
+                    if not is_workflow_event(subworkflow_event):
+                        continue
 
-                if subworkflow_event.workflow_definition != self.subworkflow:
-                    continue
+                    if subworkflow_event.workflow_definition != self.subworkflow:
+                        continue
 
-                if subworkflow_event.name == "workflow.execution.initiated":
-                    for output_name in mapped_items.keys():
-                        yield BaseOutput(name=output_name, delta=(None, index, "INITIATED"))
+                    if subworkflow_event.name == "workflow.execution.initiated":
+                        for output_name in mapped_items.keys():
+                            yield BaseOutput(name=output_name, delta=(None, index, "INITIATED"))
 
-                elif subworkflow_event.name == "workflow.execution.fulfilled":
-                    for output_reference, output_value in subworkflow_event.outputs:
-                        if not isinstance(output_reference, OutputReference):
-                            logger.error(
-                                "Invalid key to map node's subworkflow event outputs",
-                                extra={"output_reference_type": type(output_reference)},
+                    elif subworkflow_event.name == "workflow.execution.fulfilled":
+                        for output_reference, output_value in subworkflow_event.outputs:
+                            if not isinstance(output_reference, OutputReference):
+                                logger.error(
+                                    "Invalid key to map node's subworkflow event outputs",
+                                    extra={"output_reference_type": type(output_reference)},
+                                )
+                                continue
+
+                            output_mapped_items = mapped_items[output_reference.name]
+                            if index < 0 or index >= len(output_mapped_items):
+                                logger.error(
+                                    "Invalid map node index",
+                                    extra={"index": index, "output_name": output_reference.name},
+                                )
+                                continue
+
+                            output_mapped_items[index] = output_value
+                            yield BaseOutput(
+                                name=output_reference.name,
+                                delta=(output_value, index, "FULFILLED"),
                             )
-                            continue
 
-                        output_mapped_items = mapped_items[output_reference.name]
-                        if index < 0 or index >= len(output_mapped_items):
-                            logger.error(
-                                "Invalid map node index", extra={"index": index, "output_name": output_reference.name}
-                            )
-                            continue
+                        fulfilled_iterations[index] = True
 
-                        output_mapped_items[index] = output_value
-                        yield BaseOutput(
-                            name=output_reference.name,
-                            delta=(output_value, index, "FULFILLED"),
+                    elif subworkflow_event.name == "workflow.execution.paused":
+                        raise NodeException(
+                            code=WorkflowErrorCode.INVALID_OUTPUTS,
+                            message=f"Subworkflow unexpectedly paused on iteration {index}",
                         )
+                    elif subworkflow_event.name == "workflow.execution.rejected":
+                        raise NodeException(
+                            f"Subworkflow failed on iteration {index} with error: {subworkflow_event.error.message}",
+                            code=subworkflow_event.error.code,
+                        )
+                except Empty:
+                    all_futures_done = all(future.done() for future in futures)
 
-                    fulfilled_iterations[index] = True
-                    if all(fulfilled_iterations):
-                        break
-
-                    if self.max_concurrency is not None:
-                        self._start_thread()
-                elif subworkflow_event.name == "workflow.execution.paused":
-                    raise NodeException(
-                        code=WorkflowErrorCode.INVALID_OUTPUTS,
-                        message=f"Subworkflow unexpectedly paused on iteration {index}",
-                    )
-                elif subworkflow_event.name == "workflow.execution.rejected":
-                    raise NodeException(
-                        f"Subworkflow failed on iteration {index} with error: {subworkflow_event.error.message}",
-                        code=subworkflow_event.error.code,
-                    )
-        except Empty:
-            pass
+                    if all_futures_done:
+                        if not all(fulfilled_iterations):
+                            if self._event_queue.empty():
+                                logger.warning("All threads completed but not all iterations fulfilled")
+                                break
+                        else:
+                            break
 
         for output_name, output_list in mapped_items.items():
             yield BaseOutput(name=output_name, value=output_list)
 
     def _context_run_subworkflow(
-        self, *, item: MapNodeItemType, index: int, current_execution_context: ExecutionContext
+        self, item: MapNodeItemType, index: int, current_execution_context: ExecutionContext
     ) -> None:
         parent_context = current_execution_context.parent_context
         trace_id = current_execution_context.trace_id
@@ -185,14 +175,6 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
         for event in events:
             self._event_queue.put((index, event))
-
-    def _start_thread(self) -> bool:
-        if self._concurrency_queue.empty():
-            return False
-
-        thread = self._concurrency_queue.get()
-        thread.start()
-        return True
 
     @overload
     @classmethod
