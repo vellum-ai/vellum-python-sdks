@@ -245,7 +245,7 @@ def test_inline_prompt_node__chat_history_inputs(vellum_adhoc_prompt_client):
 
 
 @pytest.mark.timeout(5)
-def test_inline_prompt_node__parent_context(mock_httpx_transport, mock_complex_parent_context):
+def test_inline_prompt_node__parent_context(mock_httpx_transport, mock_complex_parent_context, mock_uuid4_generator):
     # GIVEN a prompt node
     class MyNode(InlinePromptNode):
         ml_model = "gpt-4o"
@@ -272,11 +272,8 @@ def test_inline_prompt_node__parent_context(mock_httpx_transport, mock_complex_p
     )
 
     # WHEN the node is run with the complex parent context
-    trace_id = uuid4()
-    with execution_context(
-        parent_context=mock_complex_parent_context,
-        trace_id=trace_id,
-    ):
+    trace_id = mock_uuid4_generator("vellum.workflows.context.uuid4")()
+    with execution_context(parent_context=mock_complex_parent_context):
         outputs = list(MyNode().run())
 
     # THEN the last output is as expected

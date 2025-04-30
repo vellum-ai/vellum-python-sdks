@@ -154,7 +154,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._active_nodes_by_execution_id: Dict[UUID, ActiveNode[StateType]] = {}
         self._cancel_signal = cancel_signal
-        self._execution_context = init_execution_context or get_execution_context()
+        self._execution_context = init_execution_context or get_execution_context() or ExecutionContext()
 
         setattr(
             self._initial_state,
@@ -217,7 +217,7 @@ class WorkflowRunner(Generic[StateType]):
                     break
 
             if not was_mocked:
-                with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
+                with execution_context(parent_context=updated_parent_context):
                     node_run_response = node.run()
 
             ports = node.Ports()
@@ -265,7 +265,7 @@ class WorkflowRunner(Generic[StateType]):
                         ),
                     )
 
-                with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
+                with execution_context(parent_context=updated_parent_context):
                     for output in node_run_response:
                         invoked_ports = output > ports
                         if output.is_initiated:
@@ -383,10 +383,7 @@ class WorkflowRunner(Generic[StateType]):
         parent_context: ParentContext,
         trace_id: UUID,
     ) -> None:
-        with execution_context(
-            parent_context=parent_context,
-            trace_id=trace_id,
-        ):
+        with execution_context(parent_context=parent_context, trace_id=trace_id):
             self._run_work_item(node, span_id)
 
     def _handle_invoked_ports(self, state: StateType, ports: Optional[Iterable[Port]]) -> None:
@@ -593,7 +590,7 @@ class WorkflowRunner(Generic[StateType]):
         for node_cls in self._entrypoints:
             try:
                 if not self._max_concurrency or len(self._active_nodes_by_execution_id) < self._max_concurrency:
-                    with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
+                    with execution_context(parent_context=current_parent):
                         self._run_node_if_ready(self._initial_state, node_cls)
                 else:
                     self._concurrency_queue.put((self._initial_state, node_cls, None))
@@ -623,7 +620,7 @@ class WorkflowRunner(Generic[StateType]):
 
             self._workflow_event_outer_queue.put(event)
 
-            with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
+            with execution_context(parent_context=current_parent):
                 rejection_error = self._handle_work_item_event(event)
 
             if rejection_error:
@@ -634,7 +631,7 @@ class WorkflowRunner(Generic[StateType]):
             while event := self._workflow_event_inner_queue.get_nowait():
                 self._workflow_event_outer_queue.put(event)
 
-                with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
+                with execution_context(parent_context=current_parent):
                     rejection_error = self._handle_work_item_event(event)
 
                 if rejection_error:
