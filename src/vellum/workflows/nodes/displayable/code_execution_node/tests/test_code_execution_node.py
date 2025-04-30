@@ -978,3 +978,26 @@ def main(
 
     # THEN the node should successfully access the string value
     assert outputs == {"result": "foo", "log": ""}
+
+
+def test_run_node__iter_dict():
+    # GIVEN a node that will return the first string in a list
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, list[str]]):
+        code = """\
+def main(input_dict: dict) -> list[str]:
+    return [item.value for item in input_dict]
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "input_dict": {
+                "foo": "bar",
+                "baz": "qux",
+            }
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully access the string value
+    assert outputs == {"result": ["bar", "qux"], "log": ""}
