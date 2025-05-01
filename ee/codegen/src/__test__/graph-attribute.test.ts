@@ -558,7 +558,7 @@ describe("Workflow", () => {
         name: "output-top-node",
         targetHandleId: uuidv4(),
         outputId: uuidv4(),
-      });
+      }).build();
 
       const outputMiddleNode = finalOutputNodeFactory({
         id: uuidv4(),
@@ -566,7 +566,7 @@ describe("Workflow", () => {
         name: "output-middle-node",
         targetHandleId: uuidv4(),
         outputId: uuidv4(),
-      });
+      }).build();
 
       const outputBottomNode = finalOutputNodeFactory({
         id: uuidv4(),
@@ -574,7 +574,7 @@ describe("Workflow", () => {
         name: "output-bottom-node",
         targetHandleId: uuidv4(),
         outputId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, topNode],
@@ -593,7 +593,7 @@ describe("Workflow", () => {
         name: "top-right-node",
         targetHandleId: uuidv4(),
         outputId: uuidv4(),
-      });
+      }).build();
 
       const bottomLeftNode = templatingNodeFactory({
         id: uuidv4(),
@@ -608,7 +608,7 @@ describe("Workflow", () => {
         name: "bottom-right-node",
         targetHandleId: uuidv4(),
         outputId: uuidv4(),
-      });
+      }).build();
 
       /**
        * Currently the snapshot generated for this test is suboptimal. Ideally, we would generate:
@@ -977,7 +977,7 @@ describe("Workflow", () => {
 
       const FinalNode = finalOutputNodeFactory({
         label: "FinalNode",
-      });
+      }).build();
 
       await runGraphTest([
         [EntrypointNode, FirstNode],
