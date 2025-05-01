@@ -115,6 +115,15 @@ jobs:
         with:
           node-version: "18.17.0"
 
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: "access_token"
+          create_credentials_file: true
+          workload_identity_provider: "projects/585775334980/locations/global/workloadIdentityPools/github-pool/providers/github-actions-provider"
+          service_account: "github-gcr-service-account@vocify-prod.iam.gserviceaccount.com"
+          access_token_lifetime: "1200s"
+
       - name: Install dependencies
         run: npm ci
         working-directory: ee/codegen
