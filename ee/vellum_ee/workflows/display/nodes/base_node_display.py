@@ -44,17 +44,39 @@ if TYPE_CHECKING:
 _NodeDisplayAttrType = TypeVar("_NodeDisplayAttrType")
 
 
+def _get_node_input_ids_by_ref(node_class: Type[BaseNode], path: str, inst: Any):
+    if isinstance(inst, dict):
+        node_input_ids_by_name: Dict[str, UUID] = {}
+        for key, value in inst.items():
+            node_input_ids_by_name.update(_get_node_input_ids_by_ref(node_class, f"{path}.{key}", value))
+        return node_input_ids_by_name
+
+    return {path: uuid4_from_hash(f"{node_class.__id__}|{path}")}
+
+
 class BaseNodeDisplayMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         cls = cast(Type["BaseNodeDisplay"], super().__new__(mcs, name, bases, dct))
+        # This cast shouldn't be necessary, but it's a workaround for a mypy bug
+        node_class = cast(Type[BaseNode], cls.infer_node_class() if name != "BaseNodeDisplay" else BaseNode)
 
         if not dct.get("output_display"):
-            node_class = cls.infer_node_class()
             cls.output_display = {
                 ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name)
                 for ref in node_class.Outputs
                 if ref.name in node_class.__output_ids__
             }
+
+        if not dct.get("node_input_ids_by_name"):
+            node_input_ids_by_name: Dict[str, UUID] = {}
+            for ref in node_class:
+                if ref not in cls.__serializable_inputs__:
+                    continue
+
+                node_input_ids_by_name.update(_get_node_input_ids_by_ref(node_class, ref.name, ref.instance))
+
+            if node_input_ids_by_name:
+                cls.node_input_ids_by_name = node_input_ids_by_name
 
         return cls.__annotate_node__()
 
