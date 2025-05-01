@@ -30,7 +30,6 @@ from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_value_request import VellumValueRequest
 from vellum.workflows.errors.types import WorkflowError, workflow_error_to_vellum_error
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.utils.functions import compile_function_definition
 
 VELLUM_VALUE_REQUEST_TUPLE = (
     StringVellumValueRequest,
