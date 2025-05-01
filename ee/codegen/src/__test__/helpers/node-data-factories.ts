@@ -664,7 +664,6 @@ export function templatingNodeFactory({
   templateNodeInputId,
   inputs,
   template,
-  nodePorts,
 }: {
   id?: string;
   label?: string;
@@ -675,8 +674,7 @@ export function templatingNodeFactory({
   templateNodeInputId?: string;
   inputs?: NodeInput[];
   template?: ConstantValuePointer;
-  nodePorts?: NodePort[];
-} = {}): TemplatingNode {
+} = {}): NodeDataFactoryBuilder<TemplatingNode> {
   const defaultTemplate: ConstantValuePointer = {
     type: "CONSTANT_VALUE",
     data: {
@@ -715,9 +713,8 @@ export function templatingNodeFactory({
       outputType: outputType,
     },
     inputs: nodeInputs,
-    ports: nodePorts,
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<TemplatingNode>(nodeData);
 }
 
 export function subworkflowDeploymentNodeDataFactory(): NodeDataFactoryBuilder<SubworkflowNode> {
@@ -1623,7 +1620,7 @@ export function mapNodeDataFactory({
   outputVariables?: VellumVariable[];
 } = {}): NodeDataFactoryBuilder<MapNode> {
   const entrypoint = entrypointNodeDataFactory();
-  const templatingNode = templatingNodeFactory();
+  const templatingNode = templatingNodeFactory().build();
   const nodeData: MapNode = {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "MAP",
@@ -1695,7 +1692,7 @@ export function inlineSubworkflowNodeDataFactory({
   nodes?: Array<WorkflowDataNode>;
 } = {}): NodeDataFactoryBuilder<SubworkflowNode> {
   const entrypoint = entrypointNodeDataFactory();
-  const templatingNode = templatingNodeFactory();
+  const templatingNode = templatingNodeFactory().build();
   const outputVariableId = "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb";
 
   const workflowNodes = [entrypoint, ...(nodes ?? [templatingNode])];

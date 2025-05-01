@@ -252,7 +252,7 @@ describe("InlinePromptNode referenced by Templating Node", () => {
           },
         },
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,
@@ -394,7 +394,7 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
           },
         },
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,
@@ -478,7 +478,7 @@ describe("InlinePromptNode json output referenced by TemplatingNode", () => {
           },
         }),
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,
@@ -585,7 +585,7 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
           },
         }),
       ],
-    });
+    }).build();
 
     const templatingNodeContext = (await createNodeContext({
       workflowContext,
