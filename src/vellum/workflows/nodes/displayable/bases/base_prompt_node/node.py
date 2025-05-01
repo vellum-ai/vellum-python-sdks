@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Union
+from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Set, Union
 
 from vellum import AdHocExecutePromptEvent, ExecutePromptEvent, PromptOutput
 from vellum.client.core.api_error import ApiError
@@ -8,6 +8,8 @@ from vellum.workflows.errors.types import WorkflowErrorCode, vellum_error_to_wor
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.ports.port import Port
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
 
@@ -23,6 +25,31 @@ class BasePromptNode(BaseNode, Generic[StateType]):
 
     class Outputs(BaseOutputs):
         results: List[PromptOutput]
+
+    class Ports(BaseNode.Ports):
+        default = Port(default=True)
+
+        def __call__(self, outputs: BaseOutputs, state: BaseState) -> Set[Port]:
+            if self.__is_streamable__():
+                return set()
+
+            else:
+                return super().__call__(outputs, state)
+
+        def __lt__(self, output: BaseOutput) -> Set[Port]:
+            if output.is_initiated:
+                if self.__is_streamable__():
+                    return {self.default}
+
+            return set()
+
+        def __is_streamable__(self):
+            all_ports = [port for port in self.__class__]
+            if len(all_ports) == 1 and all_ports[0].default:
+                default_port = all_ports[0]
+                return all(edge.to_node.Trigger.is_streamable for edge in default_port.edges)
+
+            return False
 
     @abstractmethod
     def _get_prompt_event_stream(self) -> Union[Iterator[AdHocExecutePromptEvent], Iterator[ExecutePromptEvent]]:
