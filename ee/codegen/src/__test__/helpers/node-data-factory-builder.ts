@@ -1,4 +1,5 @@
 import {
+  AdornmentNode,
   NodeAttribute,
   NodePort,
   WorkflowDataNode as WorkflowDataNodeType,
@@ -23,6 +24,14 @@ export class NodeDataFactoryBuilder<T extends WorkflowDataNodeType> {
     this.nodeData = {
       ...this.nodeData,
       attributes,
+    };
+    return this;
+  }
+
+  withAdornments(adornments: AdornmentNode[]): NodeDataFactoryBuilder<T> {
+    this.nodeData = {
+      ...this.nodeData,
+      adornments,
     };
     return this;
   }

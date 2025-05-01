@@ -468,20 +468,16 @@ export function inlinePromptNodeDataInlineVariantFactory({
   errorOutputId,
   parameters,
   defaultBlock,
-  adornments,
   outputs,
-  attributes,
   settings,
 }: {
   blockType?: string;
   errorOutputId?: string;
   parameters?: PromptParameters;
   defaultBlock?: PromptTemplateBlock;
-  adornments?: AdornmentNode[];
   outputs?: NodeOutput[];
-  attributes?: NodeAttribute[];
   settings?: PromptSettings;
-}): PromptNode {
+}): NodeDataFactoryBuilder<PromptNode> {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
     id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
@@ -537,12 +533,9 @@ export function inlinePromptNodeDataInlineVariantFactory({
         },
       },
     ],
-    // Add adornments if provided
-    adornments,
     outputs,
-    attributes,
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<PromptNode>(nodeData);
 }
 
 export function inlinePromptNodeDataLegacyVariantFactory({

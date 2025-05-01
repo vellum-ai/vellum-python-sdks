@@ -8,6 +8,7 @@ import { inlinePromptNodeDataInlineVariantFactory } from "src/__test__/helpers/n
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
+import { AdornmentNode } from "src/types/vellum";
 
 describe("InlinePromptRetryNode", () => {
   let workflowContext: WorkflowContext;
@@ -32,39 +33,41 @@ describe("InlinePromptRetryNode", () => {
 
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = inlinePromptNodeDataInlineVariantFactory({
-        blockType: "JINJA",
-        adornments: [
-          {
-            id: "cc79c784-d936-44c2-a811-b86a53e6ff68",
-            label: "RetryNodeLabel",
-            base: {
-              name: "RetryNode",
-              module: [
-                "vellum",
-                "workflows",
-                "nodes",
-                "core",
-                "retry_node",
-                "node",
-              ],
-            },
-            attributes: [
-              {
-                id: uuidv4(),
-                name: "max_attempts",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 3,
-                  },
-                },
-              },
+      const adornmentData: AdornmentNode[] = [
+        {
+          id: "cc79c784-d936-44c2-a811-b86a53e6ff68",
+          label: "RetryNodeLabel",
+          base: {
+            name: "RetryNode",
+            module: [
+              "vellum",
+              "workflows",
+              "nodes",
+              "core",
+              "retry_node",
+              "node",
             ],
           },
-        ],
-      });
+          attributes: [
+            {
+              id: uuidv4(),
+              name: "max_attempts",
+              value: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 3,
+                },
+              },
+            },
+          ],
+        },
+      ];
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        blockType: "JINJA",
+      })
+        .withAdornments(adornmentData)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -90,50 +93,52 @@ describe("InlinePromptRetryNode", () => {
     let node: InlinePromptNode;
 
     beforeEach(async () => {
-      const nodeData = inlinePromptNodeDataInlineVariantFactory({
-        blockType: "JINJA",
-        adornments: [
-          {
-            id: "2076aea8-be38-4ff1-8c68-cb853e352d66",
-            label: "RetryNodeLabel",
-            base: {
-              name: "RetryNode",
-              module: [
-                "vellum",
-                "workflows",
-                "nodes",
-                "core",
-                "retry_node",
-                "node",
-              ],
-            },
-            attributes: [
-              {
-                id: uuidv4(),
-                name: "max_attempts",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 3,
-                  },
-                },
-              },
-              {
-                id: uuidv4(),
-                name: "delay",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 2,
-                  },
-                },
-              },
+      const adornmentData: AdornmentNode[] = [
+        {
+          id: "2076aea8-be38-4ff1-8c68-cb853e352d66",
+          label: "RetryNodeLabel",
+          base: {
+            name: "RetryNode",
+            module: [
+              "vellum",
+              "workflows",
+              "nodes",
+              "core",
+              "retry_node",
+              "node",
             ],
           },
-        ],
-      });
+          attributes: [
+            {
+              id: uuidv4(),
+              name: "max_attempts",
+              value: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 3,
+                },
+              },
+            },
+            {
+              id: uuidv4(),
+              name: "delay",
+              value: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 2,
+                },
+              },
+            },
+          ],
+        },
+      ];
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        blockType: "JINJA",
+      })
+        .withAdornments(adornmentData)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -162,51 +167,54 @@ describe("InlinePromptRetryNode", () => {
     const ERROR_OUTPUT_ID = "e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f";
 
     beforeEach(async () => {
+      const adornmentData: AdornmentNode[] = [
+        {
+          id: "e5de8d57-ae0d-4a4a-afb3-eb4cd6bdb0ac",
+          label: "RetryNodeLabel",
+          base: {
+            name: "RetryNode",
+            module: [
+              "vellum",
+              "workflows",
+              "nodes",
+              "core",
+              "retry_node",
+              "node",
+            ],
+          },
+          attributes: [
+            {
+              id: uuidv4(),
+              name: "max_attempts",
+              value: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 3,
+                },
+              },
+            },
+            {
+              id: uuidv4(),
+              name: "delay",
+              value: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 2,
+                },
+              },
+            },
+          ],
+        },
+      ];
+
       const nodeData = inlinePromptNodeDataInlineVariantFactory({
         blockType: "JINJA",
         errorOutputId: ERROR_OUTPUT_ID,
-        adornments: [
-          {
-            id: "e5de8d57-ae0d-4a4a-afb3-eb4cd6bdb0ac",
-            label: "RetryNodeLabel",
-            base: {
-              name: "RetryNode",
-              module: [
-                "vellum",
-                "workflows",
-                "nodes",
-                "core",
-                "retry_node",
-                "node",
-              ],
-            },
-            attributes: [
-              {
-                id: uuidv4(),
-                name: "max_attempts",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 3,
-                  },
-                },
-              },
-              {
-                id: uuidv4(),
-                name: "delay",
-                value: {
-                  type: "CONSTANT_VALUE",
-                  value: {
-                    type: "NUMBER",
-                    value: 2,
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      });
+      })
+        .withAdornments(adornmentData)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
