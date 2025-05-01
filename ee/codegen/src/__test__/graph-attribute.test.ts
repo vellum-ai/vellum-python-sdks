@@ -132,7 +132,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const mergeNodeData = mergeNodeDataFactory();
+      const mergeNodeData = mergeNodeDataFactory().build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -159,7 +159,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const mergeNodeData = mergeNodeDataFactory(3);
+      const mergeNodeData = mergeNodeDataFactory(3).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -188,7 +188,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const mergeNodeData = mergeNodeDataFactory();
+      const mergeNodeData = mergeNodeDataFactory().build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -216,7 +216,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const mergeNodeData = mergeNodeDataFactory();
+      const mergeNodeData = mergeNodeDataFactory().build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -382,7 +382,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const mergeNodeData = mergeNodeDataFactory();
+      const mergeNodeData = mergeNodeDataFactory().build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -539,7 +539,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const mergeNodeData = mergeNodeDataFactory();
+      const mergeNodeData = mergeNodeDataFactory().build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
