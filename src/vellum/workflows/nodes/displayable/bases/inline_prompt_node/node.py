@@ -20,7 +20,6 @@ from vellum.client import ApiError, RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.rich_text_child_block import RichTextChildBlock
-from vellum.workflows.constants import OMIT
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
@@ -56,7 +55,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     functions: Optional[List[Union[FunctionDefinition, Callable]]] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
-    expand_meta: Optional[AdHocExpandMeta] = OMIT
+    expand_meta: Optional[AdHocExpandMeta] = None
 
     settings: Optional[PromptSettings] = None
 

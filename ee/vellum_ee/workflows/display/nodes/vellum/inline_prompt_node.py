@@ -19,6 +19,14 @@ _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
     __serializable_inputs__ = {InlinePromptNode.prompt_inputs}
+    __unserializable_attributes__ = {
+        InlinePromptNode.blocks,
+        InlinePromptNode.functions,
+        InlinePromptNode.parameters,
+        InlinePromptNode.settings,
+        InlinePromptNode.expand_meta,
+        InlinePromptNode.request_options,
+    }
 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
@@ -219,16 +227,25 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         return block
 
     def _serialize_attributes(self, display_context: "WorkflowDisplayContext"):
-        attribute_instances_by_name = {}
+        attributes = []
         for attribute in self._node:
-            if attribute.name in self.attribute_ids_by_name:
-                attribute_instances_by_name[attribute.name] = attribute.instance
+            if attribute in self.__unserializable_attributes__:
+                continue
 
-        return [
-            {
-                "id": str(attr_id),
-                "name": attr_name,
-                "value": serialize_value(display_context, attribute_instances_by_name[attr_name]),
-            }
-            for attr_name, attr_id in self.attribute_ids_by_name.items()
-        ]
+            id = (
+                str(self.attribute_ids_by_name[attribute.name])
+                if self.attribute_ids_by_name
+                else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
+            )
+            try:
+                attributes.append(
+                    {
+                        "id": id,
+                        "name": attribute.name,
+                        "value": serialize_value(display_context, attribute.instance),
+                    }
+                )
+            except ValueError as e:
+                raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
+
+        return attributes
