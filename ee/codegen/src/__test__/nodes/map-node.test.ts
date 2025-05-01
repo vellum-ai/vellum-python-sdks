@@ -28,7 +28,7 @@ describe("MapNode", () => {
         absolutePathToOutputDirectory: tempDir,
         moduleName: "code",
       });
-      const nodeData = mapNodeDataFactory();
+      const nodeData = mapNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -90,7 +90,7 @@ describe("MapNode", () => {
             type: "STRING",
           },
         ],
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
