@@ -1619,10 +1619,10 @@ export function finalOutputNodeFactory({
 
 export function mapNodeDataFactory({
   outputVariables,
-}: { outputVariables?: VellumVariable[] } = {}): MapNode {
+}: { outputVariables?: VellumVariable[] } = {}): NodeDataFactoryBuilder<MapNode> {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory();
-  return {
+  const nodeData: MapNode = {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "MAP",
     data: {
@@ -1682,6 +1682,7 @@ export function mapNodeDataFactory({
       },
     ],
   };
+  return new NodeDataFactoryBuilder<MapNode>(nodeData);
 }
 
 export function inlineSubworkflowNodeDataFactory({
