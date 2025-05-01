@@ -215,9 +215,9 @@ describe("InlinePromptNode", () => {
           type: "JSON",
         },
       ];
-      const nodeData = inlinePromptNodeDataInlineVariantFactory({
-        outputs: nodeOutputs,
-      }).build();
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
+        .withOutputs(nodeOutputs)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,

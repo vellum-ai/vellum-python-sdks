@@ -173,7 +173,7 @@ describe("Prompt Deployment Node referenced by Conditional Node", () => {
     const isErrorOutput = outputId === "72cb22fc-e2f5-4df3-9428-40436d58e57a";
     const promptDeploymentNode = promptDeploymentNodeDataFactory({
       errorOutputId: isErrorOutput ? outputId : undefined,
-    });
+    }).build();
 
     await createNodeContext({
       workflowContext,
@@ -444,9 +444,9 @@ describe("InlinePromptNode json output referenced by TemplatingNode", () => {
         type: "JSON",
       },
     ];
-    const promptNode = inlinePromptNodeDataInlineVariantFactory({
-      outputs: nodeOutputs,
-    }).build();
+    const promptNode = inlinePromptNodeDataInlineVariantFactory({})
+      .withOutputs(nodeOutputs)
+      .build();
 
     (await createNodeContext({
       workflowContext,
@@ -551,9 +551,9 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
         type: "JSON",
       },
     ];
-    const promptDeploymentNode = promptDeploymentNodeDataFactory({
-      outputs: nodeOutputs,
-    });
+    const promptDeploymentNode = promptDeploymentNodeDataFactory()
+      .withOutputs(nodeOutputs)
+      .build();
 
     await createNodeContext({
       workflowContext,

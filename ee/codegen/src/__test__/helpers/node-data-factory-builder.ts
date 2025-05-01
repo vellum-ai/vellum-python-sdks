@@ -1,6 +1,7 @@
 import {
   AdornmentNode,
   NodeAttribute,
+  NodeOutput,
   NodePort,
   WorkflowDataNode as WorkflowDataNodeType,
 } from "src/types/vellum";
@@ -32,6 +33,14 @@ export class NodeDataFactoryBuilder<T extends WorkflowDataNodeType> {
     this.nodeData = {
       ...this.nodeData,
       adornments,
+    };
+    return this;
+  }
+
+  withOutputs(outputs: NodeOutput[]): NodeDataFactoryBuilder<T> {
+    this.nodeData = {
+      ...this.nodeData,
+      outputs,
     };
     return this;
   }

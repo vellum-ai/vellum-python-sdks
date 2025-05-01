@@ -469,14 +469,12 @@ export function inlinePromptNodeDataInlineVariantFactory({
   errorOutputId,
   parameters,
   defaultBlock,
-  outputs,
   settings,
 }: {
   blockType?: string;
   errorOutputId?: string;
   parameters?: PromptParameters;
   defaultBlock?: PromptTemplateBlock;
-  outputs?: NodeOutput[];
   settings?: PromptSettings;
 }): NodeDataFactoryBuilder<PromptNode> {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
@@ -534,7 +532,6 @@ export function inlinePromptNodeDataInlineVariantFactory({
         },
       },
     ],
-    outputs,
   };
   return new NodeDataFactoryBuilder<PromptNode>(nodeData);
 }
@@ -612,13 +609,11 @@ export function inlinePromptNodeDataLegacyVariantFactory({
 export function promptDeploymentNodeDataFactory({
   errorOutputId = undefined,
   mlModelFallbacks,
-  outputs,
 }: {
   errorOutputId?: string;
   mlModelFallbacks?: string[];
-  outputs?: NodeOutput[];
-} = {}): PromptNode {
-  return {
+} = {}): NodeDataFactoryBuilder<PromptNode> {
+  const nodeData: PromptNode = {
     id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
     type: "PROMPT",
     data: {
@@ -652,8 +647,8 @@ export function promptDeploymentNodeDataFactory({
       },
     },
     definition: undefined,
-    outputs: outputs,
   };
+  return new NodeDataFactoryBuilder<PromptNode>(nodeData);
 }
 
 export function templatingNodeFactory({
