@@ -67,7 +67,7 @@ describe("SubworkflowDeploymentNode", () => {
         ],
       } as unknown as WorkflowDeploymentRelease);
 
-      const nodeData = subworkflowDeploymentNodeDataFactory();
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -104,7 +104,7 @@ describe("SubworkflowDeploymentNode", () => {
         })
       );
 
-      const nodeData = subworkflowDeploymentNodeDataFactory();
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
 
       await expect(
         createNodeContext({
@@ -132,7 +132,7 @@ describe("SubworkflowDeploymentNode", () => {
         })
       );
 
-      const nodeData = subworkflowDeploymentNodeDataFactory();
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -164,7 +164,7 @@ describe("SubworkflowDeploymentNode", () => {
         })
       );
 
-      const nodeData = subworkflowDeploymentNodeDataFactory();
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
