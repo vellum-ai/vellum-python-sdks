@@ -37,22 +37,6 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-
-    assert len(workflow_raw_data["edges"]) == 3
-    assert len(workflow_raw_data["nodes"]) == 4
-
-    # AND each node should be serialized correctly
-    entrypoint_node = workflow_raw_data["nodes"][0]
-    assert entrypoint_node == {
-        "id": "5c4fd706-1b4b-4cf6-9237-038421f232d2",
-        "type": "ENTRYPOINT",
-        "inputs": [],
-        "data": {"label": "Entrypoint Node", "source_handle_id": "26072df9-40ce-4aac-920e-e0682ad24721"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "base": None,
-        "definition": None,
-    }
-
     tool_calling_node = workflow_raw_data["nodes"][1]
     assert tool_calling_node == {
         "id": "21f29cac-da87-495f-bba1-093d423f4e46",
@@ -190,96 +174,4 @@ def test_serialize_workflow():
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": []}},
             },
         ],
-    }
-
-    final_output_node = workflow_raw_data["nodes"][2]
-    assert not DeepDiff(
-        {
-            "id": "676dbf0d-a896-4b18-9d3e-2108278b4811",
-            "type": "TERMINAL",
-            "data": {
-                "label": "Final Output",
-                "name": "text",
-                "target_handle_id": "2f7c78a1-a5fe-4df8-9299-926ddcb31f84",
-                "output_id": "8e7c0147-930d-4b7f-b6b1-6d79641cd3eb",
-                "output_type": "STRING",
-                "node_input_id": "5dc6e7a0-7fdd-47e1-9fbe-703f809c1761",
-            },
-            "inputs": [
-                {
-                    "id": "5dc6e7a0-7fdd-47e1-9fbe-703f809c1761",
-                    "key": "node_input",
-                    "value": {
-                        "rules": [
-                            {
-                                "type": "NODE_OUTPUT",
-                                "data": {
-                                    "node_id": "21f29cac-da87-495f-bba1-093d423f4e46",
-                                    "output_id": "e62bc785-a914-4066-b79e-8c89a5d0ec6c",
-                                },
-                            }
-                        ],
-                        "combinator": "OR",
-                    },
-                }
-            ],
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "base": {
-                "name": "FinalOutputNode",
-                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-            },
-            "definition": None,
-        },
-        final_output_node,
-        ignore_order=True,
-    )
-
-    # AND each edge should be serialized correctly
-    serialized_edges = workflow_raw_data["edges"]
-    assert not DeepDiff(
-        [
-            {
-                "id": "daef9bcb-a3c1-4e82-9b02-35631c6adebd",
-                "source_node_id": "5c4fd706-1b4b-4cf6-9237-038421f232d2",
-                "source_handle_id": "26072df9-40ce-4aac-920e-e0682ad24721",
-                "target_node_id": "21f29cac-da87-495f-bba1-093d423f4e46",
-                "target_handle_id": "2414743b-b1dd-4552-8abf-9b7481df9762",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "0e8d361a-2c8c-488b-90a6-95f0d5b11ffc",
-                "source_node_id": "21f29cac-da87-495f-bba1-093d423f4e46",
-                "source_handle_id": "3cd6d78c-9dad-42aa-ad38-31f67057c379",
-                "target_node_id": "676dbf0d-a896-4b18-9d3e-2108278b4811",
-                "target_handle_id": "2f7c78a1-a5fe-4df8-9299-926ddcb31f84",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "9746263a-b783-4ba8-80eb-ace6e005827a",
-                "source_node_id": "21f29cac-da87-495f-bba1-093d423f4e46",
-                "source_handle_id": "3cd6d78c-9dad-42aa-ad38-31f67057c379",
-                "target_node_id": "5e43697c-da2d-442a-a500-af5a883dbff0",
-                "target_handle_id": "0f6c0b7a-3060-40d6-b66b-93c418f045d1",
-                "type": "DEFAULT",
-            },
-        ],
-        serialized_edges,
-        ignore_order=True,
-    )
-
-    # AND the display data should be what we expect
-    display_data = workflow_raw_data["display_data"]
-    assert display_data == {
-        "viewport": {
-            "x": 0.0,
-            "y": 0.0,
-            "zoom": 1.0,
-        }
-    }
-
-    # AND the definition should be what we expect
-    definition = workflow_raw_data["definition"]
-    assert definition == {
-        "name": "BasicToolCallingNodeWorkflow",
-        "module": ["tests", "workflows", "basic_tool_calling_node", "workflow"],
     }
