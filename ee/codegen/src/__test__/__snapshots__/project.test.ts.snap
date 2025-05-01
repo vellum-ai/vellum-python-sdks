@@ -286,6 +286,121 @@ class BadNode(TemplatingNode[BaseState, str]):
 "
 `;
 
+exports[`WorkflowProjectGenerator > generic node > should generate correct tool calling node 1`] = `
+"from vellum.workflows.nodes import ToolCallingNode
+
+
+class GetCurrentWeatherNode(ToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        {
+            "state": None,
+            "blocks": [
+                {
+                    "state": None,
+                    "blocks": [
+                        {
+                            "text": "You are a weather expert",
+                            "state": None,
+                            "block_type": "PLAIN_TEXT",
+                            "cache_config": None,
+                        },
+                    ],
+                    "block_type": "RICH_TEXT",
+                    "cache_config": None,
+                },
+            ],
+            "chat_role": "SYSTEM",
+            "block_type": "CHAT_MESSAGE",
+            "chat_source": None,
+            "cache_config": None,
+            "chat_message_unterminated": None,
+        },
+        {
+            "state": None,
+            "blocks": [
+                {
+                    "state": None,
+                    "blocks": [
+                        {
+                            "state": None,
+                            "block_type": "VARIABLE",
+                            "cache_config": None,
+                            "input_variable": "question",
+                        },
+                    ],
+                    "block_type": "RICH_TEXT",
+                    "cache_config": None,
+                },
+            ],
+            "chat_role": "USER",
+            "block_type": "CHAT_MESSAGE",
+            "chat_source": None,
+            "cache_config": None,
+            "chat_message_unterminated": None,
+        },
+    ]
+    functions = [
+        {
+            "name": "get_current_weather",
+            "state": None,
+            "forced": None,
+            "strict": None,
+            "parameters": {
+                "type": "object",
+                "required": [
+                    "location",
+                    "unit",
+                ],
+                "properties": {
+                    "unit": {
+                        "type": "string",
+                    },
+                    "location": {
+                        "type": "string",
+                    },
+                },
+            },
+            "description": None,
+            "cache_config": None,
+        },
+    ]
+    prompt_inputs = {
+        "question": "What's the weather like in San Francisco?",
+    }
+    max_tool_calls = 1
+
+    class Outputs(ToolCallingNode.Outputs):
+        text = ""
+        chat_history = []
+"
+`;
+
+exports[`WorkflowProjectGenerator > generic node > should generate correct tool calling node 2`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+
+from ...nodes.tool_call import GetCurrentWeatherNode
+
+
+class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    attribute_ids_by_name = {
+        "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
+        "blocks": UUID("beec5344-2eff-47d2-b920-b90367370d79"),
+        "functions": UUID("7b1ab802-3228-43b3-a493-734c94794710"),
+        "prompt_inputs": UUID("38cf126e-a186-4a63-8e30-47c4507413cd"),
+        "max_tool_calls": UUID("723f614a-be30-4f27-90d0-896c740e58d3"),
+    }
+    port_displays = {
+        GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("7b97f998-4be5-478d-94c4-9423db5f6392"))
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=254, y=302), width=None, height=None)
+"
+`;
+
 exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
 "from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
 from vellum.workflows.sandbox import WorkflowSandboxRunner
