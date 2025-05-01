@@ -191,7 +191,7 @@ describe("InlineSubworkflowNode", () => {
       ];
       const nodeData = inlineSubworkflowNodeDataFactory({
         label: "My node",
-        nodes: [templatingNodeFactory({ label: "My node" })],
+        nodes: [templatingNodeFactory({ label: "My node" }).build()],
       })
         .withAdornments(adornmentData)
         .build();
