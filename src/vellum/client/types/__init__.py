@@ -568,7 +568,9 @@ from .workflow_execution_span import WorkflowExecutionSpan
 from .workflow_execution_span_attributes import WorkflowExecutionSpanAttributes
 from .workflow_execution_streaming_body import WorkflowExecutionStreamingBody
 from .workflow_execution_streaming_event import WorkflowExecutionStreamingEvent
-from .workflow_execution_usage_calculation_fulfilled_body import WorkflowExecutionUsageCalculationFulfilledBody
+from .workflow_execution_usage_calculation_error import WorkflowExecutionUsageCalculationError
+from .workflow_execution_usage_calculation_error_code_enum import WorkflowExecutionUsageCalculationErrorCodeEnum
+from .workflow_execution_usage_result import WorkflowExecutionUsageResult
 from .workflow_execution_view_online_eval_metric_result import WorkflowExecutionViewOnlineEvalMetricResult
 from .workflow_execution_workflow_result_event import WorkflowExecutionWorkflowResultEvent
 from .workflow_expand_meta_request import WorkflowExpandMetaRequest
@@ -1154,7 +1156,9 @@ __all__ = [
     "WorkflowExecutionSpanAttributes",
     "WorkflowExecutionStreamingBody",
     "WorkflowExecutionStreamingEvent",
-    "WorkflowExecutionUsageCalculationFulfilledBody",
+    "WorkflowExecutionUsageCalculationError",
+    "WorkflowExecutionUsageCalculationErrorCodeEnum",
+    "WorkflowExecutionUsageResult",
     "WorkflowExecutionViewOnlineEvalMetricResult",
     "WorkflowExecutionWorkflowResultEvent",
     "WorkflowExpandMetaRequest",

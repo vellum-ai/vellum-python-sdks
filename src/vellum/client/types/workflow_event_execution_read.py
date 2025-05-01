@@ -15,7 +15,7 @@ from .execution_vellum_value import ExecutionVellumValue
 from .workflow_error import WorkflowError
 from .workflow_execution_actual import WorkflowExecutionActual
 from .workflow_execution_view_online_eval_metric_result import WorkflowExecutionViewOnlineEvalMetricResult
-from .workflow_execution_usage_calculation_fulfilled_body import WorkflowExecutionUsageCalculationFulfilledBody
+from .workflow_execution_usage_result import WorkflowExecutionUsageResult
 from .vellum_span import VellumSpan
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
@@ -31,7 +31,7 @@ class WorkflowEventExecutionRead(UniversalBaseModel):
     error: typing.Optional[WorkflowError] = None
     latest_actual: typing.Optional[WorkflowExecutionActual] = None
     metric_results: typing.List[WorkflowExecutionViewOnlineEvalMetricResult]
-    usage_results: typing.List[WorkflowExecutionUsageCalculationFulfilledBody]
+    usage_results: typing.Optional[typing.List[WorkflowExecutionUsageResult]] = None
     spans: typing.List[VellumSpan]
 
     if IS_PYDANTIC_V2:

@@ -50,7 +50,7 @@ class DeploymentRead(UniversalBaseModel):
 
     active_model_version_ids: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Deprecated. This now always returns a null value.
+    Deprecated. This now always returns an empty array.
     """
 
     last_deployed_history_item_id: str = pydantic.Field()
