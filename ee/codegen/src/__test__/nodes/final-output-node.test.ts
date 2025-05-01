@@ -47,7 +47,7 @@ describe("FinalOutputNode", () => {
   describe("should codegen successfully without node input", () => {
     beforeEach(async () => {
       workflowContext = workflowContextFactory({ strict: false });
-      const nodeData = finalOutputNodeFactory({ includeInput: false }).build()
+      const nodeData = finalOutputNodeFactory({ includeInput: false }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
