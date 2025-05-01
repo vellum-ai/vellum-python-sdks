@@ -58,7 +58,7 @@ describe("PromptDeploymentNode", () => {
       } as unknown as PromptDeploymentRelease);
       writer = new Writer();
       workflowContext = workflowContextFactory();
-      const nodeData = promptDeploymentNodeDataFactory();
+      const nodeData = promptDeploymentNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -127,7 +127,7 @@ describe("PromptDeploymentNode", () => {
 
       const nodeData = promptDeploymentNodeDataFactory({
         mlModelFallbacks: ["model1"],
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -160,7 +160,7 @@ describe("PromptDeploymentNode", () => {
       );
       writer = new Writer();
       workflowContext = workflowContextFactory({ strict: false });
-      const nodeData = promptDeploymentNodeDataFactory();
+      const nodeData = promptDeploymentNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -230,9 +230,9 @@ describe("PromptDeploymentNode", () => {
       ];
       writer = new Writer();
       workflowContext = workflowContextFactory();
-      const nodeData = promptDeploymentNodeDataFactory({
-        outputs: nodeOutputs,
-      });
+      const nodeData = promptDeploymentNodeDataFactory()
+        .withOutputs(nodeOutputs)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
