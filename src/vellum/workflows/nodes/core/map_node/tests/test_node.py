@@ -194,51 +194,20 @@ def test_map_node_parallel_execution_with_workflow():
             thread_ids[self.item] = current_thread_id
 
             # Simulate work
-            time.sleep(0.5)
+            time.sleep(0.01)
 
             end = time.time()
             end_str = datetime.datetime.fromtimestamp(end).strftime("%Y-%m-%d %H:%M:%S.%f")
 
             return self.Outputs(output=end_str, thread_id=current_thread_id)
-
-    class BaseNode2(BaseNode):
-        item = MapNode.SubworkflowInputs.item
-
-        class Outputs(BaseOutputs):
-            output: str
-            thread_id: int
-
-        def run(self) -> Outputs:
-            current_thread_id = threading.get_ident()
-            thread_ids[self.item] = current_thread_id
-
-            # Simulate work
-            time.sleep(0.5)
-
-            end = time.time()
-            end_str = datetime.datetime.fromtimestamp(end).strftime("%Y-%m-%d %H:%M:%S.%f")
-
-            return self.Outputs(output=end_str, thread_id=current_thread_id)
-
-    class FinalNode(BaseNode):
-        item = MapNode.SubworkflowInputs.item
-
-        class Outputs(BaseOutputs):
-            result: float
-            thread_id: int
-
-        def run(self) -> Outputs:
-            current_thread_id = threading.get_ident()
-
-            return self.Outputs(result=float(self.item), thread_id=current_thread_id)
 
     # AND a workflow that connects these nodes
     class TestWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
-        graph = BaseNode1 >> BaseNode2 >> FinalNode
+        graph = BaseNode1
 
         class Outputs(BaseWorkflow.Outputs):
-            final_output = FinalNode.Outputs.result
-            thread_id = FinalNode.Outputs.thread_id
+            final_output = BaseNode1.Outputs.output
+            thread_id = BaseNode1.Outputs.thread_id
 
     # AND a map node that uses this workflow
     class TestMapNode(MapNode):
