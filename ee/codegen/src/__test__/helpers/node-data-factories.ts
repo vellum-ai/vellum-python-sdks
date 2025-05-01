@@ -346,8 +346,8 @@ export function searchNodeDataFactory(args?: {
   return nodeData;
 }
 
-export function noteNodeDataFactory(): NoteNode {
-  return {
+export function noteNodeDataFactory(): NodeDataFactoryBuilder<NoteNode> {
+  const nodeData: NoteNode = {
     id: "<note-node-id>",
     type: WorkflowNodeType.NOTE,
     inputs: [],
@@ -361,6 +361,7 @@ export function noteNodeDataFactory(): NoteNode {
       },
     },
   };
+  return new NodeDataFactoryBuilder<NoteNode>(nodeData);
 }
 
 export function guardrailNodeDataFactory({

@@ -19,7 +19,7 @@ describe("NoteNode", () => {
 
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = noteNodeDataFactory();
+      const nodeData = noteNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
