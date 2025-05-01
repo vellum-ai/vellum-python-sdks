@@ -277,6 +277,14 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         return cls._get_edges_from_subgraphs(cls.get_unused_subgraphs())
 
     @classmethod
+    def get_all_nodes(cls) -> Iterator[Type[BaseNode]]:
+        """
+        Returns an iterator over all nodes in the Workflow, used or unused.
+        """
+        yield from cls.get_nodes()
+        yield from cls.get_unused_nodes()
+
+    @classmethod
     def get_entrypoints(cls) -> Iterable[Type[BaseNode]]:
         return iter({e for g in cls.get_subgraphs() for e in g.entrypoints})
 
