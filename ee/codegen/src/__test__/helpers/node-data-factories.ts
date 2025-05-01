@@ -1564,7 +1564,7 @@ export function finalOutputNodeFactory({
   outputId?: string;
   name?: string;
   label?: string;
-} = {}): FinalOutputNode {
+} = {}): NodeDataFactoryBuilder<FinalOutputNode> {
   const inputs: NodeInput[] = [];
   const outputs: NodeOutput[] = [];
 
@@ -1621,7 +1621,7 @@ export function finalOutputNodeFactory({
     },
     outputs: outputs,
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<FinalOutputNode>(nodeData);
 }
 
 export function mapNodeDataFactory({

@@ -284,7 +284,7 @@ describe("Workflow", () => {
         targetHandleId: uuidv4(),
       });
 
-      const finalOutput = finalOutputNodeFactory();
+      const finalOutput = finalOutputNodeFactory().build();
 
       const topNode = templatingNodeFactory({
         label: "Top Node",
