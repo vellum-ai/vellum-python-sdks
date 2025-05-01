@@ -97,7 +97,9 @@ export function terminalNodeDataFactory(): FinalOutputNode {
   };
 }
 
-export function mergeNodeDataFactory(numTargetHandles: number = 2): NodeDataFactoryBuilder<MergeNode> {
+export function mergeNodeDataFactory(
+  numTargetHandles: number = 2
+): NodeDataFactoryBuilder<MergeNode> {
   const nodeData: MergeNode = {
     id: "merge-node-1",
     type: WorkflowNodeType.MERGE,
