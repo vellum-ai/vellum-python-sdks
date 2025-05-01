@@ -1687,19 +1687,17 @@ export function mapNodeDataFactory({
 export function inlineSubworkflowNodeDataFactory({
   label,
   nodes,
-  adornments,
 }: {
   label?: string;
   nodes?: Array<WorkflowDataNode>;
-  adornments?: AdornmentNode[];
-} = {}): SubworkflowNode {
+} = {}): NodeDataFactoryBuilder<SubworkflowNode> {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory();
   const outputVariableId = "edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb";
 
   const workflowNodes = [entrypoint, ...(nodes ?? [templatingNode])];
 
-  return {
+  const nodeData: SubworkflowNode = {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "SUBWORKFLOW",
     data: {
@@ -1731,6 +1729,6 @@ export function inlineSubworkflowNodeDataFactory({
       targetHandleId: "3fe4b4a6-5ed2-4307-ac1c-02389337c4f2",
     },
     inputs: [],
-    ...(adornments && { adornments }),
   };
+  return new NodeDataFactoryBuilder<SubworkflowNode>(nodeData);
 }
