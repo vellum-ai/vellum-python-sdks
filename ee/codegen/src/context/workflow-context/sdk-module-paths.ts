@@ -13,6 +13,10 @@ export function generateSdkModulePaths(
     WORKFLOWS_MODULE_PATH: workflowsSdkModulePath,
     CORE_NODES_MODULE_PATH: [...nodesModulePath, "core"] as const,
     DISPLAYABLE_NODES_MODULE_PATH: [...nodesModulePath, "displayable"] as const,
+    EXPERIMENTAL_NODES_MODULE_PATH: [
+      ...nodesModulePath,
+      "experimental",
+    ] as const,
     INPUTS_MODULE_PATH: [
       ...workflowsSdkModulePath,
       GENERATED_INPUTS_MODULE_NAME,
