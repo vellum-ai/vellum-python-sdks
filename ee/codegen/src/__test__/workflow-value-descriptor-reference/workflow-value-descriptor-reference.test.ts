@@ -90,7 +90,7 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
     vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
       mockDocumentIndexFactory() as unknown as DocumentIndexRead
     );
-    const node = searchNodeDataFactory();
+    const node = searchNodeDataFactory().build();
     await nodeContextFactory({ workflowContext, nodeData: node });
     const counterReference: WorkflowValueDescriptorReferenceType = {
       type: "EXECUTION_COUNTER",

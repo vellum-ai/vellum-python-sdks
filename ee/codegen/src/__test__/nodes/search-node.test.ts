@@ -58,7 +58,7 @@ describe("TextSearchNode", () => {
   });
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = searchNodeDataFactory();
+      const nodeData = searchNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -86,7 +86,7 @@ describe("TextSearchNode", () => {
     beforeEach(async () => {
       const nodeData = searchNodeDataFactory({
         errorOutputId: "af589f73-effe-4a80-b48f-fb912ac6ce67",
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -221,7 +221,7 @@ describe("TextSearchNode", () => {
             },
           ],
         },
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -255,7 +255,7 @@ describe("TextSearchNode", () => {
             value: "8",
           },
         },
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -284,7 +284,7 @@ describe("TextSearchNode", () => {
             value: "not-a-number",
           },
         },
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -319,7 +319,7 @@ describe("TextSearchNode", () => {
             value: "{}",
           },
         },
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -354,7 +354,7 @@ describe("TextSearchNode", () => {
         }
       );
 
-      const nodeData = searchNodeDataFactory();
+      const nodeData = searchNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -386,7 +386,7 @@ describe("TextSearchNode", () => {
 
       const nodeData = searchNodeDataFactory({
         includeDocumentIndexInput: false,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -460,7 +460,7 @@ describe("TextSearchNode", () => {
             data: { type: "STRING", value: "find me documents" },
           },
         }),
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -532,7 +532,7 @@ describe("TextSearchNode", () => {
             data: { type: "STRING", value: "find me documents" },
           },
         }),
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,

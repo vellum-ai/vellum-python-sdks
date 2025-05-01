@@ -25,7 +25,7 @@ describe("ExecutionCounterWorkflowReferencePointer", () => {
     vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
       mockDocumentIndexFactory() as unknown as DocumentIndexRead
     );
-    node = searchNodeDataFactory();
+    node = searchNodeDataFactory().build();
     await nodeContextFactory({ workflowContext, nodeData: node });
   });
 

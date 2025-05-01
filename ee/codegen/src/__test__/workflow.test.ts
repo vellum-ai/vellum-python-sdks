@@ -116,7 +116,7 @@ describe("Workflow", () => {
     });
 
     it("should handle edges pointing to non-existent nodes", async () => {
-      const searchNodeData = searchNodeDataFactory();
+      const searchNodeData = searchNodeDataFactory().build();
 
       const edges: WorkflowEdge[] = [
         {

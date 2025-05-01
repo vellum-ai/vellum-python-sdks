@@ -121,7 +121,7 @@ export function searchNodeDataFactory(args?: {
   limitInput?: ConstantValuePointer;
   queryInput?: NodeInput;
   includeDocumentIndexInput?: boolean;
-}): SearchNode {
+}): NodeDataFactoryBuilder<SearchNode> {
   const errorOutputId = args?.errorOutputId;
   const includeDocumentIndexInput = args?.includeDocumentIndexInput ?? true;
 
@@ -343,7 +343,7 @@ export function searchNodeDataFactory(args?: {
     ],
   };
 
-  return nodeData;
+  return new NodeDataFactoryBuilder<SearchNode>(nodeData);
 }
 
 export function noteNodeDataFactory(): NodeDataFactoryBuilder<NoteNode> {
