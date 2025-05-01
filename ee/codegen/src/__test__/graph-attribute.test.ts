@@ -61,20 +61,20 @@ describe("Workflow", () => {
 
   describe("graph", () => {
     it("should be correct for a basic single node case", async () => {
-      const templatingNodeData = templatingNodeFactory();
+      const templatingNodeData = templatingNodeFactory().build();
 
       await runGraphTest([[entrypointNode, templatingNodeData]]);
     });
 
     it("should be correct for a basic multiple nodes case", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -83,21 +83,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for three nodes", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -107,14 +107,14 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a basic single edge case", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -123,14 +123,14 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a basic merge node case", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const mergeNodeData = mergeNodeDataFactory().build();
 
@@ -143,21 +143,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a basic merge node case of multiple nodes", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const mergeNodeData = mergeNodeDataFactory(3).build();
 
@@ -172,21 +172,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a basic merge node and an additional edge", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const mergeNodeData = mergeNodeDataFactory().build();
 
@@ -200,21 +200,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a basic merge between a node and an edge", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const mergeNodeData = mergeNodeDataFactory().build();
 
@@ -228,14 +228,14 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a basic conditional node case", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const conditionalNodeData = conditionalNodeFactory().build();
 
@@ -247,21 +247,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a longer branch", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -271,21 +271,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for set of a branch and a node", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -295,21 +295,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a node to a set", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -319,28 +319,28 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a node to a set to a node", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData4 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 4",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       await runGraphTest([
         [entrypointNode, templatingNodeData1],
@@ -352,35 +352,35 @@ describe("Workflow", () => {
     });
 
     it("should be correct for set of a branch and a node to a node", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData4 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 4",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData5 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 5",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const mergeNodeData = mergeNodeDataFactory().build();
 
@@ -396,14 +396,14 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a single port pointing to a set", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const conditionalNodeData = conditionalNodeFactory().build();
 
@@ -415,21 +415,21 @@ describe("Workflow", () => {
     });
 
     it("should be correct for port within set to a set", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const conditionalNodeData = conditionalNodeFactory().build();
 
@@ -442,28 +442,28 @@ describe("Workflow", () => {
     });
 
     it("should be correct for a nested conditional node within a set", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData4 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 4",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const conditionalNodeData = conditionalNodeFactory().build();
 
@@ -486,35 +486,35 @@ describe("Workflow", () => {
     });
 
     it("should be correct for two branches merging from sets", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData3 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 3",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData4 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 4",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const templatingNodeData5 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 5",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const conditionalNodeData = conditionalNodeFactory().build();
 
@@ -530,14 +530,14 @@ describe("Workflow", () => {
     });
 
     it("should be correct for two branches from the same node", async () => {
-      const templatingNodeData1 = templatingNodeFactory();
+      const templatingNodeData1 = templatingNodeFactory().build();
 
       const templatingNodeData2 = templatingNodeFactory({
         id: uuidv4(),
         label: "Templating Node 2",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const mergeNodeData = mergeNodeDataFactory().build();
 
@@ -550,7 +550,7 @@ describe("Workflow", () => {
     });
 
     it("should define nested sets of nodes without compilation errors", async () => {
-      const topNode = templatingNodeFactory({ label: "Top Node" });
+      const topNode = templatingNodeFactory({ label: "Top Node" }).build();
 
       const outputTopNode = finalOutputNodeFactory({
         id: uuidv4(),
@@ -585,7 +585,9 @@ describe("Workflow", () => {
     });
 
     it("should support an edge between two sets", async () => {
-      const topLeftNode = templatingNodeFactory({ label: "Top Left Node" });
+      const topLeftNode = templatingNodeFactory({
+        label: "Top Left Node",
+      }).build();
 
       const topRightNode = finalOutputNodeFactory({
         id: uuidv4(),
@@ -600,7 +602,7 @@ describe("Workflow", () => {
         label: "Bottom Left Node",
         sourceHandleId: uuidv4(),
         targetHandleId: uuidv4(),
-      });
+      }).build();
 
       const bottomRightNode = finalOutputNodeFactory({
         id: uuidv4(),
