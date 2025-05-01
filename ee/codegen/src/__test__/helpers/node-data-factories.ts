@@ -1031,7 +1031,7 @@ export function apiNodeFactory({
   url = "https://example.vellum.ai",
   method = "POST",
   body = {},
-}: ApiNodeFactoryProps = {}): ApiNode {
+}: ApiNodeFactoryProps = {}): NodeDataFactoryBuilder<ApiNode> {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
     key: "bearer_token_value",
@@ -1303,7 +1303,7 @@ export function apiNodeFactory({
       },
     },
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<ApiNode>(nodeData);
 }
 
 export function codeExecutionNodeFactory({
