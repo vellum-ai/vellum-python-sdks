@@ -1,3 +1,5 @@
+import datetime
+import threading
 import time
 
 from vellum.workflows.inputs.base import BaseInputs
@@ -172,3 +174,50 @@ def test_map_node__nested_map_node():
         ["apple carrot", "apple potato"],
         ["banana carrot", "banana potato"],
     ]
+
+
+def test_map_node_parallel_execution_with_workflow():
+    # TODO: Find a better way to test this such that it represents what a user would see.
+    # https://linear.app/vellum/issue/APO-482/find-a-better-way-to-test-concurrency-with-map-nodes
+    thread_ids = {}
+
+    # GIVEN a series of nodes that simulate work
+    class BaseNode1(BaseNode):
+        item = MapNode.SubworkflowInputs.item
+
+        class Outputs(BaseOutputs):
+            output: str
+            thread_id: int
+
+        def run(self) -> Outputs:
+            current_thread_id = threading.get_ident()
+            thread_ids[self.item] = current_thread_id
+
+            # Simulate work
+            time.sleep(0.01)
+
+            end = time.time()
+            end_str = datetime.datetime.fromtimestamp(end).strftime("%Y-%m-%d %H:%M:%S.%f")
+
+            return self.Outputs(output=end_str, thread_id=current_thread_id)
+
+    # AND a workflow that connects these nodes
+    class TestWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = BaseNode1
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = BaseNode1.Outputs.output
+            thread_id = BaseNode1.Outputs.thread_id
+
+    # AND a map node that uses this workflow
+    class TestMapNode(MapNode):
+        items = [1, 2, 3]
+        subworkflow = TestWorkflow
+
+    # WHEN we run the map node
+    node = TestMapNode()
+    list(node.run())
+
+    # AND each item should have run on a different thread
+    thread_ids_list = list(thread_ids.values())
+    assert len(set(thread_ids_list)) == 3
