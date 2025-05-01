@@ -112,7 +112,7 @@ describe("GuardrailNode", () => {
           },
         },
       ],
-    });
+    }).build();
 
     const nodeContext = (await createNodeContext({
       workflowContext,
@@ -210,7 +210,7 @@ describe("GuardrailNode", () => {
       );
       writer = new Writer();
       workflowContext = workflowContextFactory({ strict: false });
-      const nodeData = guardrailNodeDataFactory();
+      const nodeData = guardrailNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,

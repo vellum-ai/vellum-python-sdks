@@ -369,7 +369,7 @@ export function guardrailNodeDataFactory({
 }: {
   errorOutputId?: string;
   inputs?: NodeInput[];
-} = {}): GuardrailNode {
+} = {}): NodeDataFactoryBuilder<GuardrailNode> {
   const nodeData: GuardrailNode = {
     id: "metric",
     type: WorkflowNodeType.METRIC,
@@ -383,7 +383,7 @@ export function guardrailNodeDataFactory({
     },
     inputs: inputs ?? [],
   };
-  return nodeData;
+  return new NodeDataFactoryBuilder<GuardrailNode>(nodeData);
 }
 
 const generateBlockGivenType = (blockType: string): PromptTemplateBlock => {
