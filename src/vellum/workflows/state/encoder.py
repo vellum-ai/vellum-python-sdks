@@ -13,6 +13,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
+from vellum.workflows.utils.functions import compile_function_definition
 
 
 class DefaultStateEncoder(JSONEncoder):
@@ -56,6 +57,9 @@ class DefaultStateEncoder(JSONEncoder):
 
         if isinstance(obj, type):
             return str(obj)
+
+        if callable(obj):
+            return compile_function_definition(obj)
 
         if obj.__class__ in self.encoders:
             return self.encoders[obj.__class__](obj)
