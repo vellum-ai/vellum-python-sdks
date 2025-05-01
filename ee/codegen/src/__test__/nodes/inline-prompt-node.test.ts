@@ -53,7 +53,7 @@ describe("InlinePromptNode", () => {
       beforeEach(async () => {
         const nodeData = inlinePromptNodeDataInlineVariantFactory({
           blockType,
-        });
+        }).build();
 
         const nodeContext = (await createNodeContext({
           workflowContext,
@@ -82,7 +82,7 @@ describe("InlinePromptNode", () => {
         const nodeData = inlinePromptNodeDataInlineVariantFactory({
           blockType,
           errorOutputId: "e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f",
-        });
+        }).build();
 
         const nodeContext = (await createNodeContext({
           workflowContext,
@@ -157,7 +157,7 @@ describe("InlinePromptNode", () => {
           foo: "bar",
         },
       },
-    });
+    }).build();
 
     const nodeContext = (await createNodeContext({
       workflowContext,
@@ -188,7 +188,7 @@ describe("InlinePromptNode", () => {
     const nodeData = inlinePromptNodeDataInlineVariantFactory({
       blockType: "JINJA",
       defaultBlock: block,
-    });
+    }).build();
 
     const nodeContext = (await createNodeContext({
       workflowContext,
@@ -217,7 +217,7 @@ describe("InlinePromptNode", () => {
       ];
       const nodeData = inlinePromptNodeDataInlineVariantFactory({
         outputs: nodeOutputs,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -253,9 +253,9 @@ describe("InlinePromptNode", () => {
           },
         },
       ];
-      const nodeData = inlinePromptNodeDataInlineVariantFactory({
-        attributes: nodeAttributes,
-      });
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
+        .withAttributes(nodeAttributes)
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -282,7 +282,7 @@ describe("InlinePromptNode", () => {
       };
       const nodeData = inlinePromptNodeDataInlineVariantFactory({
         settings: promptSettings,
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -312,7 +312,7 @@ describe("InlinePromptNode", () => {
           id: uuidv4(),
           state: "DISABLED",
         },
-      });
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
