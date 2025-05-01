@@ -57,12 +57,19 @@ def create_tool_router_node(
     Ports = type("Ports", (), {})
     for function in functions:
         function_name = function.__name__
-        port_condition = LazyReference(
-            lambda: (
-                node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
-                & node.Outputs.results[0]["value"]["name"].equals(function_name)
+
+        # Avoid using lambda to capture function_name
+        # lambda will capture the function_name by reference,
+        # and if the function_name is changed, the port_condition will also change.
+        def create_port_condition(fn_name):
+            return LazyReference(
+                lambda: (
+                    node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
+                    & node.Outputs.results[0]["value"]["name"].equals(fn_name)
+                )
             )
-        )
+
+        port_condition = create_port_condition(function_name)
         port = Port.on_if(port_condition)
         setattr(Ports, function_name, port)
 
