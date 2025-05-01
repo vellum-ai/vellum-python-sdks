@@ -19,7 +19,7 @@ describe("MergeNode", () => {
 
   describe("basic", () => {
     beforeEach(async () => {
-      const nodeData = mergeNodeDataFactory();
+      const nodeData = mergeNodeDataFactory().build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,

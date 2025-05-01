@@ -146,7 +146,7 @@ describe("getOrderedNodes", () => {
       label: "Parallel Node 2",
     });
 
-    const mergeNode = mergeNodeDataFactory();
+    const mergeNode = mergeNodeDataFactory().build();
 
     const apiNode = genericNodeFactory({
       id: "api-node",
