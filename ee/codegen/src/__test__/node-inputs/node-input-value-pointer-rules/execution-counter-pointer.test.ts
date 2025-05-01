@@ -28,7 +28,7 @@ describe("ExecutionCounterPointer", () => {
   it("should generate correct Python code", async () => {
     const workflowContext = workflowContextFactory();
 
-    const node = searchNodeDataFactory();
+    const node = searchNodeDataFactory().build();
     const nodeContext = await nodeContextFactory({
       workflowContext,
       nodeData: node,
