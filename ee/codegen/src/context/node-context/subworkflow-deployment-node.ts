@@ -20,12 +20,16 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
       return {};
     }
 
+    const errorOutputId = this.getErrorOutputId();
     return this.workflowDeploymentRelease.workflowVersion.outputVariables.reduce<
       Record<string, string>
-    >((acc, output) => {
-      acc[output.id] = toPythonSafeSnakeCase(output.key, "output");
-      return acc;
-    }, {});
+    >(
+      (acc, output) => {
+        acc[output.id] = toPythonSafeSnakeCase(output.key, "output");
+        return acc;
+      },
+      { ...(errorOutputId ? { [errorOutputId]: "error" } : {}) }
+    );
   }
 
   getNodeOutputTypesById(): Record<string, VellumVariableType> {

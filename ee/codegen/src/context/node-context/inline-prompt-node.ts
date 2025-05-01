@@ -17,12 +17,11 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
     const jsonOutput = this.nodeData.outputs?.find(
       (output) => output.type === "JSON"
     );
+    const errorOutputId = this.getErrorOutputId();
 
     return {
       [this.nodeData.data.outputId]: "text",
-      ...(this.nodeData.data.errorOutputId
-        ? { [this.nodeData.data.errorOutputId]: "error" }
-        : {}),
+      ...(errorOutputId ? { [errorOutputId]: "error" } : {}),
       [this.nodeData.data.arrayOutputId]: "results",
       ...(jsonOutput ? { [jsonOutput.id]: "json" } : {}),
     };

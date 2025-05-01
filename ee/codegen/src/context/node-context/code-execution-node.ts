@@ -27,11 +27,13 @@ export class CodeExecutionContext extends BaseNodeContext<CodeExecutionNodeType>
   }
 
   getNodeOutputNamesById(): Record<string, string> {
+    const errorOutputId = this.getErrorOutputId();
     return {
       [this.nodeData.data.outputId]: "result",
       ...(this.nodeData.data.logOutputId
         ? { [this.nodeData.data.logOutputId]: "logs" }
         : {}),
+      ...(errorOutputId ? { [errorOutputId]: "error" } : {}),
     };
   }
 
