@@ -32,7 +32,7 @@ describe("ConditionalNode", () => {
     workflowContext = workflowContextFactory();
     writer = new Writer();
 
-    const nodeData = conditionalNodeFactory({ includeElif: true });
+    const nodeData = conditionalNodeFactory({ includeElif: true }).build();
 
     workflowContext.addInputVariableContext(
       inputVariableContextFactory({
@@ -555,7 +555,7 @@ describe("Conditional Node with equals operator to numeric lhs should cast rhs t
             },
           }),
         ],
-      });
+      }).build();
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
@@ -587,7 +587,7 @@ describe("Conditional Node warning cases", () => {
       // Non-existent node output reference
       inputReferenceId: uuid4(),
       inputReferenceNodeId: referenceNodeId,
-    });
+    }).build();
 
     const nodeContext = (await createNodeContext({
       workflowContext,
@@ -617,7 +617,7 @@ describe("Conditional Node warning cases", () => {
   it("should log warning when lhs key is missing", async () => {
     const workflowContext = workflowContextFactory({ strict: false });
 
-    const nodeData = conditionalNodeFactory();
+    const nodeData = conditionalNodeFactory().build();
     // Remove the input field key
     nodeData.inputs = [];
 
@@ -665,7 +665,7 @@ describe("ConditionalNode with empty rules array", () => {
           },
         },
       ],
-    });
+    }).build();
 
     workflowContext.addInputVariableContext(
       inputVariableContextFactory({
