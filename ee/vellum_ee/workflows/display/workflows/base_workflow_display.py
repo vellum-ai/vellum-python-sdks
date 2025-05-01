@@ -153,20 +153,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "definition": None,
         }
 
-        # Add all the nodes in the workflow
-        for node in self._workflow.get_nodes():
-            node_display = self.display_context.node_displays[node]
-
-            try:
-                serialized_node = node_display.serialize(self.display_context)
-            except NotImplementedError as e:
-                self.add_error(e)
-                continue
-
-            serialized_nodes[node_display.node_id] = serialized_node
-
-        # Add all unused nodes in the workflow
-        for node in self._workflow.get_unused_nodes():
+        # Add all the nodes in the workflows
+        for node in self._workflow.get_all_nodes():
             node_display = self.display_context.node_displays[node]
 
             try:
@@ -417,16 +405,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         port_displays: PortDisplays = {}
 
-        for node in self._workflow.get_nodes():
-            self._enrich_node_displays(
-                node=node,
-                node_displays=node_displays,
-                global_node_displays=global_node_displays,
-                global_node_output_displays=global_node_output_displays,
-                port_displays=port_displays,
-            )
-
-        for node in self._workflow.get_unused_nodes():
+        for node in self._workflow.get_all_nodes():
             self._enrich_node_displays(
                 node=node,
                 node_displays=node_displays,
