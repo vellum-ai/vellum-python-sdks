@@ -717,8 +717,8 @@ export function templatingNodeFactory({
   return nodeData;
 }
 
-export function subworkflowDeploymentNodeDataFactory(): SubworkflowNode {
-  return {
+export function subworkflowDeploymentNodeDataFactory(): NodeDataFactoryBuilder<SubworkflowNode> {
+  const nodeData: SubworkflowNode = {
     id: "c8f2964c-09b8-44e0-a06d-606319fe5e2a",
     type: "SUBWORKFLOW",
     data: {
@@ -748,6 +748,7 @@ export function subworkflowDeploymentNodeDataFactory(): SubworkflowNode {
     },
     definition: undefined,
   };
+  return new NodeDataFactoryBuilder<SubworkflowNode>(nodeData);
 }
 
 export function conditionalNodeWithNullOperatorFactory({

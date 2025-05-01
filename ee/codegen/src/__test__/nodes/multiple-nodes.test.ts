@@ -324,7 +324,7 @@ describe("Non-existent Subworkflow Deployment Node referenced by Templating Node
       ],
     } as unknown as WorkflowDeploymentRelease);
 
-    const subworkflowNodeData = subworkflowDeploymentNodeDataFactory();
+    const subworkflowNodeData = subworkflowDeploymentNodeDataFactory().build();
 
     await createNodeContext({
       workflowContext: workflowContext,
