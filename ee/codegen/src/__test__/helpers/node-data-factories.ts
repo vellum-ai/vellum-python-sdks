@@ -1619,7 +1619,9 @@ export function finalOutputNodeFactory({
 
 export function mapNodeDataFactory({
   outputVariables,
-}: { outputVariables?: VellumVariable[] } = {}): NodeDataFactoryBuilder<MapNode> {
+}: {
+  outputVariables?: VellumVariable[];
+} = {}): NodeDataFactoryBuilder<MapNode> {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory();
   const nodeData: MapNode = {
