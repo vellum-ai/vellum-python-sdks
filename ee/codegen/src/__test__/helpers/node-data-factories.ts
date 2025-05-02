@@ -1892,20 +1892,7 @@ export function toolCallingNodeFactory({
         },
       },
     ],
-    outputs: nodeOutputs ?? [
-      {
-        id: "73a3c1e6-b632-45c5-a837-50922ccf0d47",
-        name: "text",
-        type: "STRING",
-        value: { type: "CONSTANT_VALUE", value: { type: "STRING", value: "" } },
-      },
-      {
-        id: "7dfce73d-3d56-4bb6-8a7e-cc1b3e38746e",
-        name: "chat_history",
-        type: "CHAT_HISTORY",
-        value: { type: "CONSTANT_VALUE", value: { type: "JSON", value: [] } },
-      },
-    ],
+    outputs: nodeOutputs ?? [],
     adornments: adornments,
   };
   return nodeData;
