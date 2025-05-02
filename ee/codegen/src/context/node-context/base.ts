@@ -59,12 +59,6 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
           .startsWith(VELLUM_WORKFLOW_NODES_MODULE_PATH.join("."))
       ) {
         this.baseNodeClassModulePath = args.nodeData.base.module;
-      } else if (
-        args.nodeData.base &&
-        args.nodeData.base.name === "ToolCallingNode"
-      ) {
-        this.baseNodeClassModulePath =
-          this.workflowContext.sdkModulePathNames.EXPERIMENTAL_NODES_MODULE_PATH;
       } else {
         this.baseNodeClassModulePath = VELLUM_WORKFLOW_NODES_MODULE_PATH;
       }
