@@ -35,10 +35,16 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
     }
 
     return Object.fromEntries(
-      this.metricDefinitionsHistoryItem.outputVariables.map((variable) => [
-        variable.id,
-        variable.type,
-      ])
+      this.metricDefinitionsHistoryItem.outputVariables.map((variable) => {
+        // If the variable key is "score", hardcode the type to "NUMBER". We assume float on sdk side anyway
+        if (variable.key === "score") {
+          return [variable.id, "NUMBER"];
+        } else if (variable.key === "normalized_score") {
+          return [variable.id, "NUMBER"];
+        } else if (variable.key === "log") {
+          return [variable.id, "STRING"];
+        } else return [variable.id, variable.type];
+      })
     );
   }
 
