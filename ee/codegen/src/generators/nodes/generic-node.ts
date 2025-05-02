@@ -102,7 +102,10 @@ export class GenericNode extends BaseSingleFileNode<
 
     const relativePath = `nodes/${fileName}`;
 
-    this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+    // Dont add tool calling nodes to mergeable node files
+    if (this.nodeData.base.name !== "ToolCallingNode") {
+      this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+    }
 
     await super.persist();
   }
