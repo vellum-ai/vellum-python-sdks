@@ -1,6 +1,9 @@
 import { VellumVariableType } from "vellum-ai/api";
 
-import { VELLUM_WORKFLOW_NODES_MODULE_PATH } from "src/constants";
+import {
+  VELLUM_WORKFLOW_BASE_NODES_MODULE_PATH,
+  VELLUM_WORKFLOW_NODES_MODULE_PATH,
+} from "src/constants";
 import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
 import { NodeOutputNotFoundError } from "src/generators/errors";
@@ -56,15 +59,9 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
         args.nodeData.base &&
         !args.nodeData.base.module
           .join(".")
-          .startsWith(VELLUM_WORKFLOW_NODES_MODULE_PATH.join("."))
+          .startsWith(VELLUM_WORKFLOW_BASE_NODES_MODULE_PATH.join("."))
       ) {
         this.baseNodeClassModulePath = args.nodeData.base.module;
-      } else if (
-        args.nodeData.base &&
-        args.nodeData.base.name === "ToolCallingNode"
-      ) {
-        this.baseNodeClassModulePath =
-          this.workflowContext.sdkModulePathNames.EXPERIMENTAL_NODES_MODULE_PATH;
       } else {
         this.baseNodeClassModulePath = VELLUM_WORKFLOW_NODES_MODULE_PATH;
       }
