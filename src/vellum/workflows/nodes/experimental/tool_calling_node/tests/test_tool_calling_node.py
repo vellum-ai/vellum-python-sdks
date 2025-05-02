@@ -30,7 +30,6 @@ def test_port_condition_match_function_name():
             node_outputs={
                 router_node.Outputs.results: [
                     FunctionCallVellumValue(
-                        type="FUNCTION_CALL",
                         value=FunctionCall(
                             arguments={}, id="call_zp7pBQjGAOBCr7lo0AbR1HXT", name="first_function", state="FULFILLED"
                         ),
