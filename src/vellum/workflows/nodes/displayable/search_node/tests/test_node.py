@@ -1,4 +1,7 @@
+import json
+
 from vellum import SearchResponse, SearchResult, SearchResultDocument
+from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.json_vellum_value_request import JsonVellumValueRequest
 from vellum.client.types.search_filters_request import SearchFiltersRequest
 from vellum.client.types.search_request_options_request import SearchRequestOptionsRequest
@@ -13,6 +16,7 @@ from vellum.workflows.nodes.displayable.bases.types import (
     SearchFilters,
 )
 from vellum.workflows.nodes.displayable.search_node.node import SearchNode
+from vellum.workflows.state.base import BaseState
 
 
 def test_run_workflow__happy_path(vellum_client):
@@ -172,3 +176,42 @@ def test_run_workflow__happy_path__options_attribute(vellum_client):
             ),
         ),
     )
+
+
+def test_run_workflow__chat_history_as_query(vellum_client):
+    """
+    Confirm that we can successfully invoke a Search node with a chat history as the query param,
+    backwards compatible with original workflows
+    """
+
+    # GIVEN a state definition with a chat history
+    class MyState(BaseState):
+        chat_history: list[ChatMessage]
+
+    # AND a Search Node that uses the chat history as the query param
+    class MySearchNode(SearchNode[MyState]):
+        query = MyState.chat_history  # type: ignore[assignment]
+        document_index = "document_index"
+        limit = 1
+
+    # AND a Search request that will return a 200 ok resposne
+    search_response = SearchResponse(
+        results=[
+            SearchResult(
+                text="Search query", score="0.0", keywords=["keywords"], document=SearchResultDocument(label="label")
+            )
+        ]
+    )
+
+    vellum_client.search.return_value = search_response
+
+    # WHEN we run the workflow
+    outputs = MySearchNode(state=MyState(chat_history=[ChatMessage(role="USER", text="Hello, world!")])).run()
+
+    # THEN the workflow should have completed successfully
+    assert outputs.text == "Search query"
+
+    # AND the options should be as expected
+    assert json.loads(vellum_client.search.call_args.kwargs["query"]) == [
+        {"role": "USER", "text": "Hello, world!", "source": None, "content": None}
+    ]
