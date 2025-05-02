@@ -17,6 +17,10 @@ class PromptNode9Display(BaseInlinePromptNodeDisplay[PromptNode9]):
         "prompt_inputs.question": UUID("c583f59e-2a5e-47c0-b244-2894b90d3d21"),
         "prompt_inputs.context": UUID("ded72461-3d6a-4633-a45e-e7cc9189941b"),
     }
+    attribute_ids_by_name = {
+        "ml_model": UUID("8ae0df7b-2d57-48d7-a396-37f3e3ef4c75"),
+        "prompt_inputs": UUID("8036c42e-206f-4185-ad09-2f7abdddc125"),
+    }
     output_display = {
         PromptNode9.Outputs.text: NodeOutputDisplay(id=UUID("e9c9ddb8-4057-4755-bbbd-6ca0291aac9a"), name="text"),
         PromptNode9.Outputs.results: NodeOutputDisplay(id=UUID("3e174b5c-2e40-4bda-ba0c-eae3e617c988"), name="results"),
