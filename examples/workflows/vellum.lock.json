@@ -52,6 +52,56 @@
       "target_directory": null
     },
     {
+      "module": "function_calling_demo",
+      "workflow_sandbox_id": "4da762fd-9dad-4ee4-a063-b32f5188721e",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "aws-staging",
+      "target_directory": null
+    },
+    {
+      "module": "function_calling_demo",
+      "workflow_sandbox_id": "54f05f90-ecdd-4c43-af93-e8f4c65f34e3",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
+    },
+    {
+      "module": "function_calling_demo",
+      "workflow_sandbox_id": "24bebdfb-82b3-4ed9-bf41-5e105bd0fb81",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
+    },
+    {
+      "module": "function_calling_demo",
+      "workflow_sandbox_id": "7f1b1c2f-c7b5-45e4-9f18-e6dedd2f199a",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
+    },
+    {
+      "module": "function_calling_demo",
+      "workflow_sandbox_id": "790e20d9-ca1f-482a-b746-63e94b879952",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
+    },
+    {
       "module": "image_processing",
       "workflow_sandbox_id": "965383d3-5da5-45b2-a1fe-9e1fd9ae8c0e",
       "ignore": "sandbox.py",
@@ -102,5 +152,11 @@
       "target_directory": null
     }
   ],
-  "workspaces": []
+  "workspaces": [
+    {
+      "name": "aws-staging",
+      "api_key": "AWS_STAGING_VELLUM_API_KEY",
+      "api_url": "AWS_STAGING_VELLUM_API_URL"
+    }
+  ]
 }
