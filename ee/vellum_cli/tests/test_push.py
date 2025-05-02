@@ -870,3 +870,45 @@ def test_push__create_new_config_for_existing_module(mock_module, vellum_client)
         new_config = new_configs[0]
         assert new_config["workflow_sandbox_id"] == new_workflow_sandbox_id
         assert new_config["workspace"] == "default"
+
+
+def test_push__use_default_workspace_if_not_specified__multiple_workflows_configured(mock_module, vellum_client):
+    # GIVEN a config with a workspace configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    workflow_sandbox_id = str(uuid4())
+    mock_module.set_pyproject_toml(
+        {
+            "workspaces": [
+                {"name": "my_other_workspace"},
+            ],
+            "workflows": [
+                {"module": module, "workflow_sandbox_id": workflow_sandbox_id, "workspace": "default"},
+                {"module": module, "workflow_sandbox_id": str(uuid4()), "workspace": "my_other_workspace"},
+            ],
+        }
+    )
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` with a module without a workspace specified
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND check that lockfile should maintain that this workflow is using the default workspace
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        configs = [w for w in lock_file_content["workflows"] if w["module"] == module]
+        assert len(configs) == 2
+        config = configs[0]
+        assert config["workflow_sandbox_id"] == workflow_sandbox_id
+        assert config["workspace"] == "default"
