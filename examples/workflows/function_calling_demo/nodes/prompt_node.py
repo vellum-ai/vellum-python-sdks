@@ -6,7 +6,7 @@ from .accumulate_chat_history import AccumulateChatHistory
 
 
 class PromptNode(InlinePromptNode):
-    ml_model = "7dd6f3d4-000a-4fa3-952d-9ada6b9b2e38"
+    ml_model = "gpt-3.5-turbo"
     blocks = [
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
