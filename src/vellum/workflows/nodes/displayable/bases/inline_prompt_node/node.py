@@ -145,7 +145,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                     "blocks": self.blocks,
                 }
             )
-            self.blocks = exec_config.blocks
+            self.blocks = exec_config.blocks  # type: ignore
         except Exception as e:
             raise NodeException(
                 message=f"Failed to compile blocks: {e}",
