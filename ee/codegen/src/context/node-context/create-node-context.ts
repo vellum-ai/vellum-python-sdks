@@ -16,6 +16,7 @@ import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-dep
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
+import { ToolCallingNodeContext } from "src/context/node-context/tool-calling-node";
 import {
   BaseCodegenError,
   NodeDefinitionGenerationError,
@@ -171,6 +172,15 @@ function buildNodeContext(
     }
     case WorkflowNodeType.GENERIC: {
       const genericNodeData = nodeData;
+      if (
+        genericNodeData.base &&
+        genericNodeData.base.name === "ToolCallingNode"
+      ) {
+        return new ToolCallingNodeContext({
+          ...args,
+          nodeData: genericNodeData,
+        });
+      }
       return new GenericNodeContext({
         ...args,
         nodeData: genericNodeData,

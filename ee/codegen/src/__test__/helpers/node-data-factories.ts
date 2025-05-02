@@ -1732,3 +1732,181 @@ export function inlineSubworkflowNodeDataFactory({
   };
   return new NodeDataFactoryBuilder<SubworkflowNode>(nodeData);
 }
+
+export function toolCallingNodeFactory({
+  id,
+  label: _label,
+  nodeTrigger,
+  nodePorts,
+  nodeAttributes,
+  nodeOutputs,
+  adornments,
+}: {
+  id?: string;
+  label?: string;
+  nodeTrigger?: NodeTrigger;
+  nodePorts?: NodePort[];
+  nodeAttributes?: NodeAttribute[];
+  nodeOutputs?: NodeOutput[];
+  adornments?: AdornmentNode[];
+} = {}): GenericNode {
+  const label = _label ?? "Tool Calling Node";
+  const nodeData: GenericNode = {
+    id: id ?? "a72bbfd6-9eb5-48af-9c43-55f1d0a75106",
+    label,
+    type: WorkflowNodeType.GENERIC,
+    base: {
+      name: "ToolCallingNode",
+      module: [
+        "vellum",
+        "workflows",
+        "nodes",
+        "experimental",
+        "tool_calling_node",
+      ],
+    },
+    definition: undefined,
+    trigger: nodeTrigger ?? {
+      id: "trigger-id",
+      mergeBehavior: "AWAIT_ALL",
+    },
+    ports: nodePorts ?? [
+      {
+        id: "7b97f998-4be5-478d-94c4-9423db5f6392",
+        name: "default",
+        type: "DEFAULT",
+      },
+    ],
+    attributes: nodeAttributes ?? [
+      {
+        id: "75bd1347-dca2-4cba-b0b0-a20a2923ebcc",
+        name: "ml_model",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: { type: "STRING", value: "gpt-4o-mini" },
+        },
+      },
+      {
+        id: "beec5344-2eff-47d2-b920-b90367370d79",
+        name: "blocks",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [
+              {
+                state: null,
+                blocks: [
+                  {
+                    state: null,
+                    blocks: [
+                      {
+                        text: "You are a weather expert",
+                        state: null,
+                        block_type: "PLAIN_TEXT",
+                        cache_config: null,
+                      },
+                    ],
+                    block_type: "RICH_TEXT",
+                    cache_config: null,
+                  },
+                ],
+                chat_role: "SYSTEM",
+                block_type: "CHAT_MESSAGE",
+                chat_source: null,
+                cache_config: null,
+                chat_message_unterminated: null,
+              },
+              {
+                state: null,
+                blocks: [
+                  {
+                    state: null,
+                    blocks: [
+                      {
+                        state: null,
+                        block_type: "VARIABLE",
+                        cache_config: null,
+                        input_variable: "question",
+                      },
+                    ],
+                    block_type: "RICH_TEXT",
+                    cache_config: null,
+                  },
+                ],
+                chat_role: "USER",
+                block_type: "CHAT_MESSAGE",
+                chat_source: null,
+                cache_config: null,
+                chat_message_unterminated: null,
+              },
+            ],
+          },
+        },
+      },
+      {
+        id: "7b1ab802-3228-43b3-a493-734c94794710",
+        name: "functions",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [
+              {
+                name: "get_current_weather",
+                state: null,
+                forced: null,
+                strict: null,
+                parameters: {
+                  type: "object",
+                  required: ["location", "unit"],
+                  properties: {
+                    unit: { type: "string" },
+                    location: { type: "string" },
+                  },
+                },
+                description: null,
+                cache_config: null,
+              },
+            ],
+          },
+        },
+      },
+      {
+        id: "38cf126e-a186-4a63-8e30-47c4507413cd",
+        name: "prompt_inputs",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: { question: "What's the weather like in San Francisco?" },
+          },
+        },
+      },
+      {
+        id: "723f614a-be30-4f27-90d0-896c740e58d3",
+        name: "max_tool_calls",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: { type: "NUMBER", value: 1.0 },
+        },
+      },
+    ],
+    outputs: nodeOutputs ?? [
+      {
+        id: "73a3c1e6-b632-45c5-a837-50922ccf0d47",
+        name: "text",
+        type: "STRING",
+        value: { type: "CONSTANT_VALUE", value: { type: "STRING", value: "" } },
+      },
+      {
+        id: "7dfce73d-3d56-4bb6-8a7e-cc1b3e38746e",
+        name: "chat_history",
+        type: "CHAT_HISTORY",
+        value: { type: "CONSTANT_VALUE", value: { type: "JSON", value: [] } },
+      },
+    ],
+    adornments: adornments,
+  };
+  return nodeData;
+}

@@ -676,6 +676,20 @@ export interface GenericNode extends BaseWorkflowNode {
   outputs: NodeOutput[];
 }
 
+export interface ToolCallingNode extends BaseWorkflowNode {
+  id: string;
+  label: string;
+  type: "GENERIC";
+  displayData?: GenericNodeDisplayData;
+  base: CodeResourceDefinition;
+  definition?: CodeResourceDefinition;
+  trigger: NodeTrigger;
+  ports: NodePort[];
+  adornments?: AdornmentNode[];
+  attributes: NodeAttribute[];
+  outputs: NodeOutput[];
+}
+
 export type WorkflowDataNode =
   | PromptNode
   | SearchNode
@@ -690,7 +704,8 @@ export type WorkflowDataNode =
   | ApiNode
   | NoteNode
   | ErrorNode
-  | GenericNode;
+  | GenericNode
+  | ToolCallingNode;
 
 export type WorkflowNode = WorkflowDataNode | EntrypointNode | FinalOutputNode;
 

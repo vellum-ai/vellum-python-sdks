@@ -1,0 +1,123 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ToolCallingNode > basic > getNodeDisplayFile 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+
+from ...nodes.tool_calling_node import ToolCallingNode
+
+
+class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
+    attribute_ids_by_name = {
+        "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
+        "blocks": UUID("beec5344-2eff-47d2-b920-b90367370d79"),
+        "functions": UUID("7b1ab802-3228-43b3-a493-734c94794710"),
+        "prompt_inputs": UUID("38cf126e-a186-4a63-8e30-47c4507413cd"),
+        "max_tool_calls": UUID("723f614a-be30-4f27-90d0-896c740e58d3"),
+    }
+    port_displays = {
+        ToolCallingNode.Ports.default_port: PortDisplayOverrides(
+            id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`ToolCallingNode > basic > getNodeFile 1`] = `
+"from vellum.workflows.nodes.experimental import ToolCallingNode as BaseToolCallingNode
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        {
+            "state": None,
+            "blocks": [
+                {
+                    "state": None,
+                    "blocks": [
+                        {
+                            "text": "You are a weather expert",
+                            "state": None,
+                            "block_type": "PLAIN_TEXT",
+                            "cache_config": None,
+                        },
+                    ],
+                    "block_type": "RICH_TEXT",
+                    "cache_config": None,
+                },
+            ],
+            "chat_role": "SYSTEM",
+            "block_type": "CHAT_MESSAGE",
+            "chat_source": None,
+            "cache_config": None,
+            "chat_message_unterminated": None,
+        },
+        {
+            "state": None,
+            "blocks": [
+                {
+                    "state": None,
+                    "blocks": [
+                        {
+                            "state": None,
+                            "block_type": "VARIABLE",
+                            "cache_config": None,
+                            "input_variable": "question",
+                        },
+                    ],
+                    "block_type": "RICH_TEXT",
+                    "cache_config": None,
+                },
+            ],
+            "chat_role": "USER",
+            "block_type": "CHAT_MESSAGE",
+            "chat_source": None,
+            "cache_config": None,
+            "chat_message_unterminated": None,
+        },
+    ]
+    functions = [
+        {
+            "name": "get_current_weather",
+            "state": None,
+            "forced": None,
+            "strict": None,
+            "parameters": {
+                "type": "object",
+                "required": [
+                    "location",
+                    "unit",
+                ],
+                "properties": {
+                    "unit": {
+                        "type": "string",
+                    },
+                    "location": {
+                        "type": "string",
+                    },
+                },
+            },
+            "description": None,
+            "cache_config": None,
+        },
+    ]
+    prompt_inputs = {
+        "question": "What's the weather like in San Francisco?",
+    }
+    max_tool_calls = 1
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseToolCallingNode.Outputs):
+        text = ""
+        chat_history = []
+"
+`;
