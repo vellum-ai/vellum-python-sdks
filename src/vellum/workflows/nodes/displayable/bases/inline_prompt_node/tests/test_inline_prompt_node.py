@@ -553,6 +553,7 @@ def test_inline_prompt_node__dict_blocks(vellum_adhoc_prompt_client):
     node = MyInlinePromptNode()
     outputs = [o for o in node.run()]
 
+    # THEN the node should have produced the outputs we expect
     results_output = outputs[0]
     assert results_output.name == "results"
     assert results_output.value == expected_outputs
