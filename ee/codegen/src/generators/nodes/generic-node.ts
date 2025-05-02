@@ -97,12 +97,26 @@ export class GenericNode extends BaseSingleFileNode<
   }
 
   public async persist(): Promise<void> {
-    const modulePath = this.getModulePath();
-    const fileName = modulePath[modulePath.length - 1] + ".py";
+    // Exclude nodes in the core, displayable, or experimental modules
+    const baseModulePath = this.nodeData.base?.module;
+    if (baseModulePath) {
+      const isExcludedPath = [
+        this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH,
+        this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH,
+        this.workflowContext.sdkModulePathNames.EXPERIMENTAL_NODES_MODULE_PATH,
+      ].some((excludedPath) =>
+        excludedPath.every((part, index) => baseModulePath[index] === part)
+      );
 
-    const relativePath = `nodes/${fileName}`;
+      if (!isExcludedPath) {
+        const modulePath = this.getModulePath();
+        const fileName = modulePath[modulePath.length - 1] + ".py";
 
-    this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+        const relativePath = `nodes/${fileName}`;
+
+        this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+      }
+    }
 
     await super.persist();
   }
