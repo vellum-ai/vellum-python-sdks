@@ -13,7 +13,13 @@ from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.vellum_client import create_vellum_client
-from vellum_cli.config import VellumCliConfig, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
+from vellum_cli.config import (
+    DEFAULT_WORKSPACE_CONFIG,
+    VellumCliConfig,
+    WorkflowConfig,
+    WorkflowDeploymentConfig,
+    load_vellum_cli_config,
+)
 from vellum_cli.logger import load_cli_logger
 
 ERROR_LOG_FILE_NAME = "error.log"
@@ -43,6 +49,7 @@ def _resolve_workflow_config(
     module: Optional[str] = None,
     workflow_sandbox_id: Optional[str] = None,
     workflow_deployment: Optional[str] = None,
+    workspace: Optional[str] = None,
 ) -> WorkflowConfigResolutionResult:
     if workflow_sandbox_id and workflow_deployment:
         raise ValueError("Cannot specify both workflow_sandbox_id and workflow_deployment")
@@ -53,6 +60,7 @@ def _resolve_workflow_config(
             workflow_config = WorkflowConfig(
                 workflow_sandbox_id=workflow_sandbox_id,
                 module=module,
+                workspace=workspace or DEFAULT_WORKSPACE_CONFIG.name,
             )
             config.workflows.append(workflow_config)
             return WorkflowConfigResolutionResult(
@@ -132,8 +140,9 @@ def pull_command(
     strict: Optional[bool] = None,
     include_sandbox: Optional[bool] = None,
     target_directory: Optional[str] = None,
+    workspace: Optional[str] = None,
 ) -> None:
-    load_dotenv()
+    load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     logger = load_cli_logger()
     config = load_vellum_cli_config()
 
@@ -142,6 +151,7 @@ def pull_command(
         module=module,
         workflow_sandbox_id=workflow_sandbox_id,
         workflow_deployment=workflow_deployment,
+        workspace=workspace,
     )
 
     workflow_config = workflow_config_result.workflow_config
@@ -157,7 +167,20 @@ def pull_command(
     else:
         logger.info(f"Pulling workflow from {pk}...")
 
-    client = create_vellum_client()
+    resolved_workspace = workspace or workflow_config.workspace or DEFAULT_WORKSPACE_CONFIG.name
+    workspace_config = (
+        next((w for w in config.workspaces if w.name == resolved_workspace), DEFAULT_WORKSPACE_CONFIG)
+        if workspace
+        else DEFAULT_WORKSPACE_CONFIG
+    )
+    api_key = os.getenv(workspace_config.api_key)
+    if not api_key:
+        raise ValueError(f"No API key value found in environment for workspace '{workspace_config.name}'.")
+
+    client = create_vellum_client(
+        api_key=api_key,
+        api_url=workspace_config.api_url,
+    )
     query_parameters = {}
 
     if include_json:

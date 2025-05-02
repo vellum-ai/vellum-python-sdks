@@ -3,6 +3,7 @@ import io
 import json
 import os
 import tempfile
+from unittest import mock
 from uuid import uuid4
 import zipfile
 
@@ -1284,3 +1285,74 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
         assert lock_data["workflows"][0]["deployments"][0]["label"] == deployment_label
 
     os.chdir(current_dir)
+
+
+def test_pull__workspace_option__uses_different_api_key(mock_module, vellum_client_class):
+    # GIVEN a module and workflow_sandbox_id
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    set_pyproject_toml = mock_module.set_pyproject_toml
+    workflow_sandbox_id = str(uuid4())
+
+    # AND a different workspace is set in the pyproject.toml
+    set_pyproject_toml(
+        {
+            "workflows": [],
+            "workspaces": [
+                {
+                    "name": "my_other_workspace",
+                    "api_key": "MY_OTHER_VELLUM_API_KEY",
+                }
+            ],
+        }
+    )
+
+    # AND the .env file has the other api key stored
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write(
+            """
+VELLUM_API_KEY=abcdef123456
+MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
+"""
+        )
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client_class.return_value.workflows.pull.return_value = iter(
+        [_zip_file_map({"workflow.py": "print('hello')"})]
+    )
+
+    # WHEN calling `vellum pull` with --workspace
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_main,
+        [
+            "workflows",
+            "pull",
+            module,
+            "--workflow-sandbox-id",
+            workflow_sandbox_id,
+            "--workspace",
+            "my_other_workspace",
+        ],
+    )
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the vellum client with the correct api key
+    vellum_client_class.assert_called_once_with(
+        api_key="aaabbbcccddd",
+        environment=mock.ANY,
+    )
+
+    # AND the vellum lock file should have been updated with the correct workspace
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        assert lock_file_content["workflows"][0]["workspace"] == "my_other_workspace"
+        assert lock_file_content["workflows"][0]["workflow_sandbox_id"] == workflow_sandbox_id
+
+    # AND the workflow.py file is written as expected
+    workflow_py = os.path.join(temp_dir, *module.split("."), "workflow.py")
+    assert os.path.exists(workflow_py)
+    with open(workflow_py) as f:
+        assert f.read() == "print('hello')"
