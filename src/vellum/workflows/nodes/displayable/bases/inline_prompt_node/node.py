@@ -18,9 +18,9 @@ from vellum import (
 )
 from vellum.client import ApiError, RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
+from vellum.client.types.prompt_exec_config import PromptExecConfig
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.rich_text_child_block import RichTextChildBlock
-from vellum.prompts.blocks.compilation import compile_blocks_to_prompt_blocks
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
@@ -136,7 +136,16 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
     def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
         try:
-            self.blocks = compile_blocks_to_prompt_blocks(self.blocks)  # type: ignore
+            # Compile dict blocks into PromptBlocks
+            exec_config = PromptExecConfig.model_validate(
+                {
+                    "ml_model": "",
+                    "input_variables": [],
+                    "parameters": {},
+                    "blocks": self.blocks,
+                }
+            )
+            self.blocks = exec_config.blocks
         except Exception as e:
             raise NodeException(
                 message=f"Failed to compile blocks: {e}",
