@@ -18,11 +18,14 @@ export class InlineSubworkflowNodeContext extends BaseNodeContext<SubworkflowNod
         `SubworkflowNode only supports INLINE variant. Received: ${this.nodeData.data.variant}`
       );
     }
-
-    return subworkflowNodeData.outputVariables.reduce((acc, variable) => {
-      acc[variable.id] = variable.key;
-      return acc;
-    }, {} as Record<string, string>);
+    const errorOutputId = this.getErrorOutputId();
+    return subworkflowNodeData.outputVariables.reduce(
+      (acc, variable) => {
+        acc[variable.id] = variable.key;
+        return acc;
+      },
+      { ...(errorOutputId ? { [errorOutputId]: "error" } : {}) }
+    );
   }
 
   getNodeOutputTypesById(): Record<string, VellumVariableType> {

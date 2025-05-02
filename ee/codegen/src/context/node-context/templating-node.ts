@@ -10,11 +10,10 @@ export class TemplatingNodeContext extends BaseNodeContext<TemplatingNode> {
   isCore = true;
 
   protected getNodeOutputNamesById(): Record<string, string> {
+    const errorOutputId = this.getErrorOutputId();
     return {
       [this.nodeData.data.outputId]: "result",
-      ...(this.nodeData.data.errorOutputId
-        ? { [this.nodeData.data.errorOutputId]: "error" }
-        : {}),
+      ...(errorOutputId ? { [errorOutputId]: "error" } : {}),
     };
   }
 

@@ -2,6 +2,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { ValueGenerationError } from "src/generators/errors";
+import { WorkflowDataNode } from "src/types/vellum";
 
 export function isDefined<TValue>(value: TValue | undefined): value is TValue {
   return value !== undefined;
@@ -35,4 +36,20 @@ export function isNilOrEmpty<T>(
 export interface DictEntry {
   key: AstNode;
   value: AstNode;
+}
+
+type NodeWithErrorOutput = WorkflowDataNode & {
+  data: { errorOutputId?: string };
+};
+
+export function hasErrorOutput(
+  node: WorkflowDataNode
+): node is NodeWithErrorOutput {
+  return (
+    node &&
+    typeof node === "object" &&
+    "data" in node &&
+    node.data &&
+    "errorOutputId" in node.data
+  );
 }

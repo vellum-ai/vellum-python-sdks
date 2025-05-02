@@ -17,6 +17,7 @@ import {
   promptDeploymentNodeDataFactory,
   subworkflowDeploymentNodeDataFactory,
   templatingNodeFactory,
+  inlineSubworkflowNodeDataFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
@@ -24,7 +25,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
-import { NodeOutput as NodeOutputType } from "src/types/vellum";
+import { NodeOutput as NodeOutputType, AdornmentNode } from "src/types/vellum";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
@@ -595,6 +596,59 @@ describe("PromptDeploymentNode json output referenced by TemplatingNode", () => 
     node = new TemplatingNode({
       workflowContext,
       nodeContext: templatingNodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
+describe("Inline Subworkflow Try adornment referenced by Conditional Node", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const tryAdornment: AdornmentNode = {
+      id: "ae49ef72-6ad7-441a-a20d-76c71ad851ef",
+      label: "TryNodeLabel",
+      base: {
+        name: "TryNode",
+        module: ["vellum", "workflows", "nodes", "core", "try_node", "node"],
+      },
+      attributes: [],
+    };
+
+    const subworkflowNode = inlineSubworkflowNodeDataFactory({
+      label: "Subworkflow with Try",
+      nodes: [templatingNodeFactory({ label: "Inner node" }).build()],
+    })
+      .withAdornments([tryAdornment])
+      .build();
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: subworkflowNode,
+    });
+
+    const conditionalNode = conditionalNodeFactory({
+      inputReferenceId: tryAdornment.id,
+      inputReferenceNodeId: subworkflowNode.id,
+    }).build();
+
+    const conditionalNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: conditionalNode,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext: conditionalNodeContext,
     });
   });
 

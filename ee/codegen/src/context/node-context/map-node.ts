@@ -19,10 +19,17 @@ export class MapNodeContext extends BaseNodeContext<MapNodeType> {
       );
     }
 
-    return subworkflowNodeData.outputVariables.reduce((acc, variable) => {
-      acc[variable.id] = variable.key;
-      return acc;
-    }, {} as Record<string, string>);
+    const errorOutputId = this.getErrorOutputId();
+    return subworkflowNodeData.outputVariables.reduce(
+      (acc, variable) => {
+        acc[variable.id] = variable.key;
+        return acc;
+      },
+      { ...(errorOutputId ? { [errorOutputId]: "error" } : {}) } as Record<
+        string,
+        string
+      >
+    );
   }
 
   getNodeOutputTypesById(): Record<string, VellumVariableType> {

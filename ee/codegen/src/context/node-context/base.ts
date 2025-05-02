@@ -14,6 +14,7 @@ import {
   getGeneratedNodeDisplayModulePath,
   getGeneratedNodeModuleInfo,
 } from "src/utils/paths";
+import { hasErrorOutput } from "src/utils/typing";
 
 export declare namespace BaseNodeContext {
   interface Args<T extends WorkflowDataNode> {
@@ -219,5 +220,21 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       }
     }
     return false;
+  }
+
+  protected getErrorOutputId(): string | undefined {
+    const TRY_NODE_NAME = "TryNode";
+    const tryNodes = this.nodeData.adornments?.filter((adornment) => {
+      return adornment.base.name === TRY_NODE_NAME;
+    });
+
+    const tryNode = tryNodes?.at(-1);
+
+    let fallbackErrorOutputId: string | undefined = undefined;
+    if (hasErrorOutput(this.nodeData)) {
+      fallbackErrorOutputId = this.nodeData.data.errorOutputId;
+    }
+
+    return tryNode ? tryNode.id : fallbackErrorOutputId;
   }
 }

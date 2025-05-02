@@ -14,12 +14,11 @@ export class TextSearchNodeContext extends BaseNodeContext<SearchNode> {
   documentIndex: DocumentIndexRead | null = null;
 
   getNodeOutputNamesById(): Record<string, string> {
+    const errorOutputId = this.getErrorOutputId();
     return {
       [this.nodeData.data.resultsOutputId]: "results",
       [this.nodeData.data.textOutputId]: "text",
-      ...(this.nodeData.data.errorOutputId
-        ? { [this.nodeData.data.errorOutputId]: "error" }
-        : {}),
+      ...(errorOutputId ? { [errorOutputId]: "error" } : {}),
     };
   }
 
