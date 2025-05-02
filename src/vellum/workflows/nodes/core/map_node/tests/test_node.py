@@ -194,7 +194,7 @@ def test_map_node_parallel_execution_with_workflow():
             thread_ids[self.item] = current_thread_id
 
             # Simulate work
-            time.sleep(0.01)
+            time.sleep(0.1)
 
             end = time.time()
             end_str = datetime.datetime.fromtimestamp(end).strftime("%Y-%m-%d %H:%M:%S.%f")
