@@ -12,11 +12,19 @@ from vellum import (
     VellumDocument,
     VellumVariable,
 )
+from vellum.client.types.audio_prompt_block import AudioPromptBlock
 from vellum.client.types.audio_vellum_value import AudioVellumValue
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
+from vellum.client.types.document_prompt_block import DocumentPromptBlock
 from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_prompt_block import FunctionCallPromptBlock
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
+from vellum.client.types.image_prompt_block import ImagePromptBlock
 from vellum.client.types.image_vellum_value import ImageVellumValue
+from vellum.client.types.jinja_prompt_block import JinjaPromptBlock
 from vellum.client.types.number_input import NumberInput
+from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_audio import VellumAudio
 from vellum.client.types.vellum_image import VellumImage
 from vellum.prompts.blocks.exceptions import PromptCompilationError
@@ -252,3 +260,95 @@ def _sanitize_inputs(inputs: Sequence[PromptInput]) -> list[PromptInput]:
             sanitized_inputs.append(input_)
 
     return sanitized_inputs
+
+
+def compile_blocks_to_prompt_blocks(blocks: list[Union[PromptBlock, dict]]) -> list[PromptBlock]:
+    """
+    Convert dict/prompt block to appropriate PromptBlock classes based on block_type.
+    """
+    converted_blocks = []
+    for block in blocks:
+        # If the block is already a PromptBlock instance, keep it as is
+        if not isinstance(block, dict):
+            converted_blocks.append(block)
+            continue
+
+        block_type = block.get("block_type")
+        if block_type == "CHAT_MESSAGE":
+            # Convert nested blocks recursively
+            nested_blocks = block.get("blocks", [])
+            converted_nested_blocks = compile_blocks_to_prompt_blocks(nested_blocks)
+
+            converted_blocks.append(
+                ChatMessagePromptBlock(
+                    chat_role=block.get("chat_role"),
+                    blocks=converted_nested_blocks,
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "JINJA":
+            converted_blocks.append(
+                JinjaPromptBlock(
+                    template=block.get("template"),
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "VARIABLE":
+            converted_blocks.append(
+                VariablePromptBlock(
+                    input_variable=block.get("input_variable"),
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "RICH_TEXT":
+            # Convert nested blocks recursively
+            nested_blocks = block.get("blocks", [])
+            converted_nested_blocks = compile_blocks_to_prompt_blocks(nested_blocks)
+
+            converted_blocks.append(
+                RichTextPromptBlock(
+                    blocks=converted_nested_blocks,
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "PLAIN_TEXT":
+            converted_blocks.append(
+                PlainTextPromptBlock(
+                    text=block.get("text"),
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "IMAGE":
+            converted_blocks.append(
+                ImagePromptBlock(
+                    src=block.get("src"),
+                    metadata=block.get("metadata"),
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "AUDIO":
+            converted_blocks.append(
+                AudioPromptBlock(
+                    src=block.get("src"),
+                    metadata=block.get("metadata"),
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "DOCUMENT":
+            converted_blocks.append(
+                DocumentPromptBlock(
+                    src=block.get("src"),
+                    metadata=block.get("metadata"),
+                    cache_config=block.get("cache_config"),
+                )
+            )
+        elif block_type == "FUNCTION_CALL":
+            converted_blocks.append(
+                FunctionCallPromptBlock(
+                    name=block.get("name"),
+                    arguments=block.get("arguments"),
+                    cache_config=block.get("cache_config"),
+                )
+            )
+
+    return converted_blocks
