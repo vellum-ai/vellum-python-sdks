@@ -45,8 +45,11 @@ def push_command(
         else config.workflows
     )
 
-    if len(workflow_configs) > 1 and workspace:
-        workflow_configs = [w for w in workflow_configs if w.workspace == workspace]
+    if len(workflow_configs) > 1:
+        if workspace:
+            workflow_configs = [w for w in workflow_configs if w.workspace == workspace]
+        else:
+            workflow_configs = [w for w in workflow_configs if w.workspace == DEFAULT_WORKSPACE_CONFIG.name]
 
     if len(workflow_configs) == 0:
         if module and module_exists(module):
