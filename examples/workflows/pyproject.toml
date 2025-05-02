@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-vellum-ai = "0.14.48"
+vellum-ai = "0.14.51"
 boto3 = "^1.38.4"
 
 [tool.poetry.group.dev.dependencies]
@@ -18,6 +18,11 @@ ipdb = "^0.13.13"
 module = "custom_base_node"
 container_image_name = "sdk-examples-utils"
 container_image_tag = "1.0.0"
+
+[[tool.vellum.workspaces]]
+name = "aws-staging"
+api_url = "AWS_STAGING_VELLUM_API_URL"
+api_key = "AWS_STAGING_VELLUM_API_KEY"
 
 
 [build-system]

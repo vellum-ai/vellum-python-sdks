@@ -134,5 +134,7 @@ jobs:
           VELLUM_AUTOMATION_PRIVATE_KEY: ${{ secrets.VELLUM_AUTOMATION_PRIVATE_KEY }}
           VELLUM_AUTOMATION_INSTALLATION_ID: ${{ secrets.VELLUM_AUTOMATION_INSTALLATION_ID }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
-        run: npm run upgrade-codegen-service
+        run: |
+          npm config set @vellum-ai:registry https://us-central1-npm.pkg.dev/vocify-prod/vellum-private-npm/
+          npm run upgrade-codegen-service
         working-directory: ee/codegen

@@ -1,13 +1,12 @@
 from uuid import UUID
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay, BaseTryNodeDisplay
+from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
 from .....nodes.parse_function_call.nodes.parse_function_call import ParseFunctionCall1
 
 
-@BaseTryNodeDisplay.wrap(node_id=UUID("91c2815e-c42e-44ee-a1a2-23c7878eeca1"))
 class ParseFunctionCall1Display(BaseTemplatingNodeDisplay[ParseFunctionCall1]):
     label = "Parse Function Call"
     node_id = UUID("40f2e0f6-9d30-4c94-a09d-d88be7c871d6")
