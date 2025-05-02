@@ -4,6 +4,7 @@ from typing import Type
 
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.ports.port import Port
@@ -145,7 +146,7 @@ def test_serialize_node__prompt_inputs__state_reference():
         ml_model = "gpt-4o"
 
     # AND a workflow with the prompt node
-    class Workflow(BaseWorkflow):
+    class Workflow(BaseWorkflow[BaseInputs, MyState]):
         graph = MyPromptNode
 
     # WHEN the workflow is serialized
@@ -183,6 +184,37 @@ def test_serialize_node__prompt_inputs__state_reference():
             },
         },
     ]
+
+    # AND the prompt attributes should include a dictionary reference with the state reference
+    prompt_inputs_attribute = next(
+        attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
+    )
+    assert prompt_inputs_attribute == {
+        "id": "3b6e1363-e41b-458e-ad28-95a61fdedac1",
+        "name": "prompt_inputs",
+        "value": {
+            "type": "DICTIONARY_REFERENCE",
+            "entries": [
+                {
+                    "key": "foo",
+                    "value": {
+                        "type": "STATE_VALUE",
+                        "state_variable_id": "45649791-c642-4405-aff9-a1fafd780ea1",
+                    },
+                },
+                {
+                    "key": "bar",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {
+                            "type": "STRING",
+                            "value": "baz",
+                        },
+                    },
+                },
+            ],
+        },
+    }
 
 
 def test_serialize_node__unreferenced_variable_block__still_serializes():

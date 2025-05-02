@@ -133,6 +133,10 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     # Used by each class extending BaseNodeDisplay to specify which attributes are meant to be serialized
     # as the former `"inputs"` field
     __serializable_inputs__: Set[NodeReference] = set()
+    # Used by each class extending BaseNodeDisplay to specify which attributes are meant to be opted out
+    # of serialization. It's possible that we keep this one as a user facing api in the future, but
+    # don't want to commit to that decision just yet
+    __unserializable_attributes__: Set[NodeReference] = set()
     # END: Attributes for backwards compatible serialization
 
     def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
@@ -145,9 +149,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 # We don't need to serialize generic node attributes containing a subworkflow
                 continue
 
+            if attribute in self.__unserializable_attributes__:
+                continue
+
             id = (
                 str(self.attribute_ids_by_name[attribute.name])
-                if self.attribute_ids_by_name
+                if self.attribute_ids_by_name.get(attribute.name)
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
             try:

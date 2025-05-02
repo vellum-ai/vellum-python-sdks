@@ -74,7 +74,7 @@ def test_inline_text_prompt_node__basic(vellum_adhoc_prompt_client):
     # AND we should have made the expected call to Vellum search
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.assert_called_once_with(
         blocks=[],
-        expand_meta=Ellipsis,
+        expand_meta=None,
         functions=None,
         input_values=[],
         input_variables=[],

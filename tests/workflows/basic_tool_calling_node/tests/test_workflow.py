@@ -196,7 +196,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 strict=None,
             )
         ],
-        "expand_meta": Ellipsis,
+        "expand_meta": None,
         "request_options": mock.ANY,
     }
 
@@ -306,6 +306,6 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 strict=None,
             )
         ],
-        "expand_meta": Ellipsis,
+        "expand_meta": None,
         "request_options": mock.ANY,
     }

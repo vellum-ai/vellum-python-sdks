@@ -15,7 +15,6 @@ from vellum import (
     VellumVariable,
 )
 from vellum.client.types.prompt_settings import PromptSettings
-from vellum.workflows.constants import OMIT
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
 from tests.workflows.basic_inline_prompt_node.workflow import BasicInlinePromptWorkflow, WorkflowInputs
@@ -88,7 +87,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                 ],
             ),
         ],
-        expand_meta=OMIT,
+        expand_meta=None,
         functions=None,
         request_options=mock.ANY,
         settings=PromptSettings(timeout=1, stream_enabled=True),
