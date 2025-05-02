@@ -8,14 +8,14 @@ import {
   toolCallingNodeFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
-import { ToolCallingNodeContext } from "src/context/node-context/tool-calling-node";
-import { ToolCallingNode } from "src/generators/nodes/tool-calling-node";
+import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { GenericNode } from "src/generators/nodes/generic-node";
 import { NodePort } from "src/types/vellum";
 
 describe("ToolCallingNode", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
-  let node: ToolCallingNode;
+  let node: GenericNode;
 
   beforeEach(() => {
     workflowContext = workflowContextFactory();
@@ -45,9 +45,9 @@ describe("ToolCallingNode", () => {
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
-      })) as ToolCallingNodeContext;
+      })) as GenericNodeContext;
 
-      node = new ToolCallingNode({
+      node = new GenericNode({
         workflowContext,
         nodeContext,
       });
