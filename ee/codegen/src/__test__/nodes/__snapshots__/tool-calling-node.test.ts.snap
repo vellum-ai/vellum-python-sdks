@@ -115,9 +115,6 @@ class ToolCallingNode(BaseToolCallingNode):
     }
     max_tool_calls = 1
 
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
-
     class Outputs(BaseToolCallingNode.Outputs):
         text = ""
         chat_history = []

@@ -1768,7 +1768,7 @@ export function toolCallingNodeFactory({
     definition: undefined,
     trigger: nodeTrigger ?? {
       id: "trigger-id",
-      mergeBehavior: "AWAIT_ALL",
+      mergeBehavior: "AWAIT_ATTRIBUTES",
     },
     ports: nodePorts ?? [
       {
