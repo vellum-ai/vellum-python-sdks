@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Sequence, Union, cast
+from typing import Sequence, Union, cast
 
 from vellum import (
     ChatMessage,
@@ -12,18 +12,11 @@ from vellum import (
     VellumDocument,
     VellumVariable,
 )
-from vellum.client.types.audio_prompt_block import AudioPromptBlock
 from vellum.client.types.audio_vellum_value import AudioVellumValue
-from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
-from vellum.client.types.document_prompt_block import DocumentPromptBlock
 from vellum.client.types.function_call import FunctionCall
-from vellum.client.types.function_call_prompt_block import FunctionCallPromptBlock
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
-from vellum.client.types.image_prompt_block import ImagePromptBlock
 from vellum.client.types.image_vellum_value import ImageVellumValue
-from vellum.client.types.jinja_prompt_block import JinjaPromptBlock
 from vellum.client.types.number_input import NumberInput
-from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_audio import VellumAudio
 from vellum.client.types.vellum_image import VellumImage
 from vellum.prompts.blocks.exceptions import PromptCompilationError
