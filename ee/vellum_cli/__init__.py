@@ -259,6 +259,11 @@ Helpful for running and debugging workflows locally.""",
     help="""Directory to pull the workflow into. If not specified, \
 the workflow will be pulled into the current working directory.""",
 )
+@click.option(
+    "--workspace",
+    type=str,
+    help="The specific Workspace config to use when pulling",
+)
 def workflows_pull(
     module: Optional[str],
     include_json: Optional[bool],
@@ -268,6 +273,7 @@ def workflows_pull(
     strict: Optional[bool],
     include_sandbox: Optional[bool],
     target_directory: Optional[str],
+    workspace: Optional[str],
 ) -> None:
     """
     Pull Workflows from Vellum. If a module is provided, only the Workflow for that module will be pulled.
@@ -283,6 +289,7 @@ def workflows_pull(
         strict=strict,
         include_sandbox=include_sandbox,
         target_directory=target_directory,
+        workspace=workspace,
     )
 
 
