@@ -661,7 +661,7 @@ describe("Inline Subworkflow Try adornment referenced by Conditional Node", () =
   });
 });
 
-describe("GuardrailNode referenced by Conditional Node", () => {
+describe("GuardrailNode with score output as type STRING referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
   let node: ConditionalNode;

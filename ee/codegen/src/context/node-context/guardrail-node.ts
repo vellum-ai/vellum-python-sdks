@@ -39,8 +39,11 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
         // If the variable key is "score", hardcode the type to "NUMBER". We assume float on sdk side anyway
         if (variable.key === "score") {
           return [variable.id, "NUMBER"];
-        }
-        return [variable.id, variable.type];
+        } else if (variable.key === "normalized_score") {
+          return [variable.id, "NUMBER"];
+        } else if (variable.key === "log") {
+          return [variable.id, "STRING"];
+        } else return [variable.id, variable.type];
       })
     );
   }
@@ -67,6 +70,9 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
         this.nodeData.data.releaseTag,
         this.nodeData.data.metricDefinitionId
       );
+      console.log("YERR", this.nodeData.data.metricDefinitionId);
+      console.log("YERR", this.nodeData.data.releaseTag);
+      console.log("YERR", metricDefinitionsHistoryItem);
     } catch (e) {
       if (e instanceof VellumError && e.statusCode === 404) {
         this.workflowContext.addError(
