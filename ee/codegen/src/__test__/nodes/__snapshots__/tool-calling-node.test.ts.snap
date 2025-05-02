@@ -30,7 +30,9 @@ class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
 `;
 
 exports[`ToolCallingNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes.experimental import ToolCallingNode as BaseToolCallingNode
+"from vellum.workflows.nodes.experimental.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
 
 
 class ToolCallingNode(BaseToolCallingNode):
