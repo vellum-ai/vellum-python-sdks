@@ -70,9 +70,6 @@ export class GuardrailNodeContext extends BaseNodeContext<GuardrailNodeType> {
         this.nodeData.data.releaseTag,
         this.nodeData.data.metricDefinitionId
       );
-      console.log("YERR", this.nodeData.data.metricDefinitionId);
-      console.log("YERR", this.nodeData.data.releaseTag);
-      console.log("YERR", metricDefinitionsHistoryItem);
     } catch (e) {
       if (e instanceof VellumError && e.statusCode === 404) {
         this.workflowContext.addError(

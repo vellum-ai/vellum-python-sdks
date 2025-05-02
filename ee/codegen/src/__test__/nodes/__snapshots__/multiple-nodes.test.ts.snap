@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`GuardrailNode referenced by Conditional Node > getNodeFile 1`] = `
+exports[`GuardrailNode with score output as type STRING referenced by Conditional Node > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port
 
