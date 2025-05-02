@@ -146,9 +146,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 }
             )
             self.blocks = exec_config.blocks  # type: ignore
-        except Exception as e:
+        except Exception:
             raise NodeException(
-                message=f"Failed to compile blocks: {e}",
+                message="Failed to compile blocks",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
 

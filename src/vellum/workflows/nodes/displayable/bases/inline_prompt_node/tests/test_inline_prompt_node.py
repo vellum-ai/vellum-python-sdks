@@ -561,3 +561,61 @@ def test_inline_prompt_node__dict_blocks(vellum_adhoc_prompt_client):
     text_output = outputs[1]
     assert text_output.name == "text"
     assert text_output.value == '{"result": "Hello, world!"}'
+
+
+def test_inline_prompt_node__dict_blocks_error(vellum_adhoc_prompt_client):
+    # GIVEN a node that has an error (wrong block type)
+    class MyInlinePromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [
+            {  # type: ignore
+                "state": None,
+                "blocks": [
+                    {
+                        "state": None,
+                        "blocks": [
+                            {
+                                "text": "You are a weather expert",
+                                "state": None,
+                                "block_type": "PLAIN_TEXT",
+                                "cache_config": None,
+                            }
+                        ],
+                        "block_type": "WRONG_BLOCK_TYPE",
+                        "cache_config": None,
+                    }
+                ],
+                "chat_role": "SYSTEM",
+                "block_type": "CHAT_MESSAGE",
+                "chat_source": None,
+                "cache_config": None,
+                "chat_message_unterminated": None,
+            },
+        ]
+        prompt_inputs = {
+            "question": "What is the weather in Tokyo?",
+        }
+        settings = PromptSettings(stream_enabled=False)
+
+    # AND a known JSON response from invoking an inline prompt
+    expected_json = {"result": "Hello, world!"}
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value=json.dumps(expected_json)),
+    ]
+
+    def generate_prompt_event(*args: Any, **kwargs: Any) -> AdHocExecutePromptEvent:
+        execution_id = str(uuid4())
+        return FulfilledAdHocExecutePromptEvent(
+            execution_id=execution_id,
+            outputs=expected_outputs,
+        )
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.side_effect = generate_prompt_event
+
+    node = MyInlinePromptNode()
+    with pytest.raises(NodeException) as excinfo:
+        list(node.run())
+
+    # THEN the node should raise the correct NodeException
+    assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "Failed to compile blocks" == str(excinfo.value)
