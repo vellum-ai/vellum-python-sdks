@@ -132,7 +132,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
             id = (
                 str(self.attribute_ids_by_name[attribute.name])
-                if self.attribute_ids_by_name
+                if self.attribute_ids_by_name.get(attribute.name)
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
             try:

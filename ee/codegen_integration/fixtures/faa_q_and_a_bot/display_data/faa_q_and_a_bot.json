@@ -238,6 +238,33 @@
           "width": 480,
           "height": 168
         },
+        "attributes": [
+          {
+            "id": "3e918914-3f95-4404-8c98-3b66cda834cd",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": { "type": "STRING", "value": "gpt-4o" }
+            }
+          },
+          {
+            "id": "b35a446c-1e59-4119-b7e0-529b7628b561",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "key": "var_1",
+                  "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
+                    "node_output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "base": {
           "name": "InlinePromptNode",
           "module": [
@@ -1075,6 +1102,41 @@
           },
           "ml_model_name": "gpt-4o-mini"
         },
+        "attributes": [
+          {
+            "id": "8ae0df7b-2d57-48d7-a396-37f3e3ef4c75",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": { "type": "STRING", "value": "gpt-4o-mini" }
+            }
+          },
+          {
+            "id": "8036c42e-206f-4185-ad09-2f7abdddc125",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "key": "question",
+                  "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
+                    "node_output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
+                  }
+                },
+                {
+                  "key": "context",
+                  "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
+                    "node_output_id": "8b8543d8-7b70-4345-9802-76fcedb7b651"
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "display_data": {
           "position": {
             "x": 4528.058075069296,
@@ -1224,6 +1286,33 @@
           },
           "ml_model_name": "gpt-4o"
         },
+        "attributes": [
+          {
+            "id": "35c7463b-4fb3-44aa-8c2b-1f30ab4b71ac",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": { "type": "STRING", "value": "gpt-4o" }
+            }
+          },
+          {
+            "id": "35ae3ecc-030b-479d-b6c8-c2ccdd7ae984",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "key": "most_recent_message",
+                  "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
+                    "node_output_id": "6239dc48-5fbc-44bc-b99d-5833d6a386bd"
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "display_data": {
           "position": {
             "x": 2694.0,
@@ -1725,6 +1814,36 @@
           "width": 480,
           "height": 168
         },
+        "attributes": [
+          {
+            "id": "268adb20-f526-4c8f-853d-aebf808925cb",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "STRING",
+                "value": "claude-3-5-sonnet-20241022"
+              }
+            }
+          },
+          {
+            "id": "92d646e7-8288-4b3e-bd50-b10dbe8c782e",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "key": "text",
+                  "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "81246ab6-153a-4c87-9f28-b6c28c915cf1",
+                    "node_output_id": "c3c38fac-f413-4dad-863d-3d388231ba22"
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "base": {
           "name": "InlinePromptNode",
           "module": [
@@ -1836,6 +1955,24 @@
           },
           "ml_model_name": "gpt-4o-2024-05-13"
         },
+        "attributes": [
+          {
+            "id": "2010abdf-1f16-4979-96e4-c6bae7c4cd52",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": { "type": "STRING", "value": "gpt-4o-2024-05-13" }
+            }
+          },
+          {
+            "id": "091ee33c-abc5-461a-9d95-c15cccbcaf39",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": { "type": "JSON", "value": {} }
+            }
+          }
+        ],
         "display_data": {
           "position": {
             "x": 3165.684879595973,
@@ -2052,6 +2189,33 @@
           },
           "ml_model_name": "gpt-4o-mini"
         },
+        "attributes": [
+          {
+            "id": "4c6baea4-e4c9-4ea2-bffd-88d0b7210725",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": { "type": "STRING", "value": "gpt-4o-mini" }
+            }
+          },
+          {
+            "id": "5736796a-5529-4cbe-a930-9b2067e21aca",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "key": "chat_history",
+                  "value": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
+                    "node_output_id": "53970e88-0bf6-4364-86b3-840d78a2afe5"
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "display_data": {
           "position": {
             "x": 4524.0,

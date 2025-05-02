@@ -13,7 +13,6 @@ from vellum import (
     StringVellumValue,
     VellumVariable,
 )
-from vellum.workflows.constants import OMIT
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
 from tests.workflows.basic_inline_prompt_node_with_functions_and_dependencies.workflow import (
@@ -90,7 +89,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
             ),
         ],
         functions=None,
-        expand_meta=OMIT,
+        expand_meta=None,
         request_options=mock.ANY,
         settings=None,
     )

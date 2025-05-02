@@ -178,6 +178,22 @@
                 "value": "gpt-4o-mini"
               }
             }
+          },
+          {
+            "id": "84bafdbf-3ca8-4e48-9ea6-380e90756a7f",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "key": "text",
+                  "value": {
+                    "type": "WORKFLOW_INPUT",
+                    "input_variable_id": "90c6afd3-06cc-430d-aed1-35937c062531"
+                  }
+                }
+              ]
+            }
           }
         ]
       },
