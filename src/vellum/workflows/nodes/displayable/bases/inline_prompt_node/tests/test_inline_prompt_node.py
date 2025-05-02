@@ -480,7 +480,7 @@ def test_inline_prompt_node__dict_blocks(vellum_adhoc_prompt_client):
     class MyInlinePromptNode(InlinePromptNode):
         ml_model = "gpt-4o"
         blocks = [
-            {
+            {  # type: ignore
                 "state": None,
                 "blocks": [
                     {
@@ -503,7 +503,7 @@ def test_inline_prompt_node__dict_blocks(vellum_adhoc_prompt_client):
                 "cache_config": None,
                 "chat_message_unterminated": None,
             },
-            {
+            {  # type: ignore
                 "state": None,
                 "blocks": [
                     {

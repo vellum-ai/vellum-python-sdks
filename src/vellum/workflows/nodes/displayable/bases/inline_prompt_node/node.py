@@ -136,7 +136,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
     def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
         try:
-            self.blocks = compile_blocks_to_prompt_blocks(self.blocks)
+            self.blocks = compile_blocks_to_prompt_blocks(self.blocks)  # type: ignore
         except Exception as e:
             raise NodeException(
                 message=f"Failed to compile blocks: {e}",

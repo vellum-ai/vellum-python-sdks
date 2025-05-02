@@ -1,5 +1,5 @@
 import json
-from typing import Sequence, Union, cast
+from typing import Any, Dict, Sequence, Union, cast
 
 from vellum import (
     ChatMessage,
@@ -262,7 +262,7 @@ def _sanitize_inputs(inputs: Sequence[PromptInput]) -> list[PromptInput]:
     return sanitized_inputs
 
 
-def compile_blocks_to_prompt_blocks(blocks: list[Union[PromptBlock, dict]]) -> list[PromptBlock]:
+def compile_blocks_to_prompt_blocks(blocks: list[Union[PromptBlock, Dict[str, Any]]]) -> list[PromptBlock]:
     """
     Convert dict/prompt block to appropriate PromptBlock classes based on block_type.
     """
@@ -308,13 +308,6 @@ def compile_blocks_to_prompt_blocks(blocks: list[Union[PromptBlock, dict]]) -> l
             converted_blocks.append(
                 RichTextPromptBlock(
                     blocks=converted_nested_blocks,
-                    cache_config=block.get("cache_config"),
-                )
-            )
-        elif block_type == "PLAIN_TEXT":
-            converted_blocks.append(
-                PlainTextPromptBlock(
-                    text=block.get("text"),
                     cache_config=block.get("cache_config"),
                 )
             )
