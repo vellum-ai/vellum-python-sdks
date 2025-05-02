@@ -1,5 +1,19 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`GuardrailNode referenced by Conditional Node > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+
+from .guardrail_node import GuardrailNode
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        branch_1 = Port.on_if(GuardrailNode.Outputs.score.equals(1))
+        branch_2 = Port.on_else()
+"
+`;
+
 exports[`Inline Subworkflow Try adornment referenced by Conditional Node > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port

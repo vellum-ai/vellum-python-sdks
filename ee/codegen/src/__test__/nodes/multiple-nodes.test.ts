@@ -1,10 +1,12 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { WorkflowDeploymentRelease } from "vellum-ai/api";
+import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
 import {
   ReleaseReviews as PromptDeploymentReleaseClient,
   ReleaseReviews as WorkflowReleaseClient,
 } from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { MetricDefinitionHistoryItem } from "vellum-ai/api/types/MetricDefinitionHistoryItem";
 import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { beforeEach, expect, vi } from "vitest";
 
@@ -18,6 +20,7 @@ import {
   subworkflowDeploymentNodeDataFactory,
   templatingNodeFactory,
   inlineSubworkflowNodeDataFactory,
+  guardrailNodeDataFactory,
 } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
@@ -639,6 +642,147 @@ describe("Inline Subworkflow Try adornment referenced by Conditional Node", () =
     const conditionalNode = conditionalNodeFactory({
       inputReferenceId: tryAdornment.id,
       inputReferenceNodeId: subworkflowNode.id,
+    }).build();
+
+    const conditionalNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: conditionalNode,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext: conditionalNodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    node.getNodeFile().write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
+describe("GuardrailNode referenced by Conditional Node", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    vi.spyOn(
+      MetricDefinitionsClient.prototype,
+      "metricDefinitionHistoryItemRetrieve"
+    ).mockResolvedValue({
+      id: "mocked-metric-output-id",
+      label: "mocked-metric-output-label",
+      name: "mocked-metric-output-name",
+      description: "mocked-metric-output-description",
+      outputVariables: [
+        { id: "score-output-id", key: "score", type: "STRING" },
+      ],
+    } as unknown as MetricDefinitionHistoryItem);
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "a6ef8809-346e-469c-beed-2e5c4e9844c5",
+          key: "expected",
+          type: "STRING",
+        },
+        workflowContext,
+      })
+    );
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "1472503c-1662-4da9-beb9-73026be90c68",
+          key: "actual",
+          type: "STRING",
+        },
+        workflowContext,
+      })
+    );
+
+    const guardrailNode = guardrailNodeDataFactory({
+      inputs: [
+        {
+          id: "3f917af8-03a4-4ca4-8d40-fa662417fe9c",
+          key: "expected",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "a6ef8809-346e-469c-beed-2e5c4e9844c5",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "bed55ada-923e-46ef-8340-1a5b0b563dc1",
+          key: "actual",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "1472503c-1662-4da9-beb9-73026be90c68",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+    }).build();
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: guardrailNode,
+    });
+
+    // Create a custom conditional node with numeric comparison value
+    const conditionalNode = conditionalNodeFactory({
+      inputReferenceId: "score-output-id",
+      inputReferenceNodeId: guardrailNode.id,
+      inputs: [
+        {
+          id: "2cb6582e-c329-4952-8598-097830b766c7",
+          key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+          value: {
+            rules: [
+              {
+                type: "NODE_OUTPUT",
+                data: {
+                  nodeId: guardrailNode.id,
+                  outputId: "score-output-id",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+          key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "1",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
     }).build();
 
     const conditionalNodeContext = (await createNodeContext({
