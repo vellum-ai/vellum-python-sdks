@@ -1,6 +1,7 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { DictionaryWorkflowReference } from "./dictionary-workflow-reference";
 import { WorkflowStateReference } from "./workflow-state-reference";
 
 import { WorkflowContext } from "src/context";
@@ -102,6 +103,11 @@ export class WorkflowValueDescriptorReference extends AstNode {
         });
       case "EXECUTION_COUNTER":
         return new ExecutionCounterWorkflowReference({
+          workflowContext: this.workflowContext,
+          nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
+        });
+      case "DICTIONARY":
+        return new DictionaryWorkflowReference({
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });

@@ -1,8 +1,8 @@
 import {
   OperatorMapping,
   WorkflowExpression as WorkflowExpressionType,
-  WorkflowValueDescriptor as WorkflowValueDescriptorType,
   WorkflowValueDescriptorReference as WorkflowValueDescriptorReferenceType,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
 
 export function convertOperatorType(
@@ -63,6 +63,7 @@ export function isReference(
     workflowValueDescriptor.type === "WORKFLOW_STATE" ||
     workflowValueDescriptor.type === "CONSTANT_VALUE" ||
     workflowValueDescriptor.type === "VELLUM_SECRET" ||
-    workflowValueDescriptor.type === "EXECUTION_COUNTER"
+    workflowValueDescriptor.type === "EXECUTION_COUNTER" ||
+    workflowValueDescriptor.type === "DICTIONARY"
   );
 }
