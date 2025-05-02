@@ -23,7 +23,6 @@ from vellum.client.types.image_prompt_block import ImagePromptBlock
 from vellum.client.types.image_vellum_value import ImageVellumValue
 from vellum.client.types.jinja_prompt_block import JinjaPromptBlock
 from vellum.client.types.number_input import NumberInput
-from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_audio import VellumAudio
 from vellum.client.types.vellum_image import VellumImage
