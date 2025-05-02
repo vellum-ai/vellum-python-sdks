@@ -473,3 +473,90 @@ def test_inline_prompt_node__json_output_with_streaming_disabled(vellum_adhoc_pr
         request_options=mock.ANY,
         settings=PromptSettings(stream_enabled=False),
     )
+
+
+def test_inline_prompt_node__dict_blocks(vellum_adhoc_prompt_client):
+    # GIVEN a node that subclasses InlinePromptNode
+    class MyInlinePromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [
+            {
+                "state": None,
+                "blocks": [
+                    {
+                        "state": None,
+                        "blocks": [
+                            {
+                                "text": "You are a weather expert",
+                                "state": None,
+                                "block_type": "PLAIN_TEXT",
+                                "cache_config": None,
+                            }
+                        ],
+                        "block_type": "RICH_TEXT",
+                        "cache_config": None,
+                    }
+                ],
+                "chat_role": "SYSTEM",
+                "block_type": "CHAT_MESSAGE",
+                "chat_source": None,
+                "cache_config": None,
+                "chat_message_unterminated": None,
+            },
+            {
+                "state": None,
+                "blocks": [
+                    {
+                        "state": None,
+                        "blocks": [
+                            {
+                                "state": None,
+                                "block_type": "VARIABLE",
+                                "cache_config": None,
+                                "input_variable": "question",
+                            }
+                        ],
+                        "block_type": "RICH_TEXT",
+                        "cache_config": None,
+                    }
+                ],
+                "chat_role": "USER",
+                "block_type": "CHAT_MESSAGE",
+                "chat_source": None,
+                "cache_config": None,
+                "chat_message_unterminated": None,
+            },
+            VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
+        ]
+        prompt_inputs = {
+            "question": "What is the weather in Tokyo?",
+            "chat_history": "You are a weather expert",
+        }
+        settings = PromptSettings(stream_enabled=False)
+
+    # AND a known JSON response from invoking an inline prompt
+    expected_json = {"result": "Hello, world!"}
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value=json.dumps(expected_json)),
+    ]
+
+    def generate_prompt_event(*args: Any, **kwargs: Any) -> AdHocExecutePromptEvent:
+        execution_id = str(uuid4())
+        return FulfilledAdHocExecutePromptEvent(
+            execution_id=execution_id,
+            outputs=expected_outputs,
+        )
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.side_effect = generate_prompt_event
+
+    # WHEN the node is run
+    node = MyInlinePromptNode()
+    outputs = [o for o in node.run()]
+
+    results_output = outputs[0]
+    assert results_output.name == "results"
+    assert results_output.value == expected_outputs
+
+    text_output = outputs[1]
+    assert text_output.name == "text"
+    assert text_output.value == '{"result": "Hello, world!"}'
