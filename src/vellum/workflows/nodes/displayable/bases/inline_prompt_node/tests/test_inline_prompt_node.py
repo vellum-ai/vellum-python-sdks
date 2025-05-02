@@ -476,7 +476,7 @@ def test_inline_prompt_node__json_output_with_streaming_disabled(vellum_adhoc_pr
 
 
 def test_inline_prompt_node__dict_blocks(vellum_adhoc_prompt_client):
-    # GIVEN a node that subclasses InlinePromptNode
+    # GIVEN a node that has dict blocks
     class MyInlinePromptNode(InlinePromptNode):
         ml_model = "gpt-4o"
         blocks = [
