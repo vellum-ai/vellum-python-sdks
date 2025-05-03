@@ -617,9 +617,11 @@ export function inlinePromptNodeDataLegacyVariantFactory({
 export function promptDeploymentNodeDataFactory({
   errorOutputId = undefined,
   mlModelFallbacks,
+  inputs,
 }: {
   errorOutputId?: string;
   mlModelFallbacks?: string[];
+  inputs?: NodeInput[];
 } = {}): NodeDataFactoryBuilder<PromptNode> {
   const nodeData: PromptNode = {
     id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
@@ -636,7 +638,7 @@ export function promptDeploymentNodeDataFactory({
       releaseTag: "LATEST",
       mlModelFallbacks,
     },
-    inputs: [
+    inputs: inputs ?? [
       {
         id: "3911bd2e-eaaf-4805-9ffc-e5d6a71c91a7",
         key: "my_var_1",

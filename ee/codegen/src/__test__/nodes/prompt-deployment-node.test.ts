@@ -1,16 +1,20 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { v4 as uuidv4 } from "uuid";
 import { ReleaseReviews as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
 import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
-import { promptDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  nodeInputFactory,
+  promptDeploymentNodeDataFactory,
+} from "src/__test__/helpers/node-data-factories";
+import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
-
 describe("PromptDeploymentNode", () => {
   let workflowContext: WorkflowContext;
   let node: PromptDeploymentNode;
@@ -247,6 +251,72 @@ describe("PromptDeploymentNode", () => {
 
     it(`getNodeDisplayFile`, async () => {
       node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with node inputs and the prompt_inputs attribute defined", () => {
+    it("should generate node file prioritizing the latter", async () => {
+      const workflowContext = workflowContextFactory();
+      const writer = new Writer();
+
+      const textStateVariableId = uuidv4();
+      workflowContext.addStateVariableContext(
+        stateVariableContextFactory({
+          stateVariableData: {
+            id: textStateVariableId,
+            key: "text",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      const nodeData = promptDeploymentNodeDataFactory({
+        inputs: [
+          nodeInputFactory({
+            id: uuidv4(),
+            key: "foo",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "bar",
+              },
+            },
+          }),
+        ],
+      })
+        .withAttributes([
+          {
+            id: uuidv4(),
+            name: "prompt_inputs",
+            value: {
+              type: "DICTIONARY_REFERENCE",
+              entries: [
+                {
+                  key: "text",
+                  value: {
+                    type: "WORKFLOW_STATE",
+                    stateVariableId: textStateVariableId,
+                  },
+                },
+              ],
+            },
+          },
+        ])
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as PromptDeploymentNodeContext;
+
+      const node = new PromptDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });

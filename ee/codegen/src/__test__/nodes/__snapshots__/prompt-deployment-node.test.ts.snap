@@ -52,6 +52,23 @@ class PromptDeploymentNode(BasePromptDeploymentNode):
 "
 `;
 
+exports[`PromptDeploymentNode > basic with node inputs and the prompt_inputs attribute defined > should generate node file prioritizing the latter 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    PromptDeploymentNode as BasePromptDeploymentNode,
+)
+
+from ..state import State
+
+
+class PromptDeploymentNode(BasePromptDeploymentNode):
+    deployment = "some-unique-deployment-name"
+    release_tag = "LATEST"
+    prompt_inputs = {
+        "text": State.text,
+    }
+"
+`;
+
 exports[`PromptDeploymentNode > fallback models > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import (
     PromptDeploymentNode as BasePromptDeploymentNode,

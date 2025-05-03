@@ -5,6 +5,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { DeploymentPromptNodeData, PromptNode } from "src/types/vellum";
 
 const INPUTS_PREFIX = "prompt_inputs";
@@ -70,7 +71,21 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
       })
     );
 
-    if (this.nodeInputsByKey.size > 0) {
+    const promptInputsAttribute = this.nodeData.attributes?.find(
+      (attribute) => attribute.name === INPUTS_PREFIX
+    );
+    if (promptInputsAttribute) {
+      statements.push(
+        python.field({
+          name: INPUTS_PREFIX,
+          initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+            workflowValueDescriptor: promptInputsAttribute.value,
+          }),
+        })
+      );
+    } else if (this.nodeInputsByKey.size > 0) {
       statements.push(
         python.field({
           name: INPUTS_PREFIX,

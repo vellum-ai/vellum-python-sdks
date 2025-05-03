@@ -1164,7 +1164,7 @@ class PromptNode(InlinePromptNode):
 "
 `;
 
-exports[`InlinePromptNode > basic with node inputs and the prompt_inputs attribute defined > should generate node file prioritizing the former 1`] = `
+exports[`InlinePromptNode > basic with node inputs and the prompt_inputs attribute defined > should generate node file prioritizing the latter 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
 
