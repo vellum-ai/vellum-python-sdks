@@ -198,7 +198,7 @@ def test_serialize_node__prompt_inputs__state_reference():
                 {
                     "key": "foo",
                     "value": {
-                        "type": "STATE_VALUE",
+                        "type": "WORKFLOW_STATE",
                         "state_variable_id": "45649791-c642-4405-aff9-a1fafd780ea1",
                     },
                 },
