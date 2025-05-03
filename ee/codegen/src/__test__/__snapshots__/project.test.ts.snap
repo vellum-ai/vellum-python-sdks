@@ -180,7 +180,6 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
-    prompt_inputs = {}
     parameters = PromptParameters(
         stop=[],
         temperature=None,
@@ -206,7 +205,6 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
-    prompt_inputs = {}
     parameters = PromptParameters(
         stop=[],
         temperature=None,
@@ -232,7 +230,6 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
-    prompt_inputs = {}
     parameters = PromptParameters(
         stop=[],
         temperature=None,

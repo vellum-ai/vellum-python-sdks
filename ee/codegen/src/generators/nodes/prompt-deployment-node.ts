@@ -70,20 +70,22 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
       })
     );
 
-    statements.push(
-      python.field({
-        name: INPUTS_PREFIX,
-        initializer: python.TypeInstantiation.dict(
-          Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-            key: python.TypeInstantiation.str(key),
-            value: value,
-          })),
-          {
-            endWithComma: true,
-          }
-        ),
-      })
-    );
+    if (this.nodeInputsByKey.size > 0) {
+      statements.push(
+        python.field({
+          name: INPUTS_PREFIX,
+          initializer: python.TypeInstantiation.dict(
+            Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
+              key: python.TypeInstantiation.str(key),
+              value: value,
+            })),
+            {
+              endWithComma: true,
+            }
+          ),
+        })
+      );
+    }
 
     return statements;
   }
