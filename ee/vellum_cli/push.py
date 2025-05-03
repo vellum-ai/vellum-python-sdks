@@ -211,14 +211,14 @@ def push_command(
             )
 
             reported_diffs = f"""\
-    {e.body.get("detail")}
+{e.body.get("detail")}
 
-    {generated_only_str}
+{generated_only_str}
 
-    {original_only_str}
+{original_only_str}
 
-    {modified_str}
-    """
+{modified_str}
+"""
             logger.error(reported_diffs)
             return
 
