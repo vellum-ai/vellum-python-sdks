@@ -483,7 +483,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
   settings?: PromptSettings;
   inputs?: NodeInput[];
   attributes?: NodeAttribute[];
-}): NodeDataFactoryBuilder<PromptNode> {
+} = {}): NodeDataFactoryBuilder<PromptNode> {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
     id: "7e09927b-6d6f-4829-92c9-54e66bdcaf80",

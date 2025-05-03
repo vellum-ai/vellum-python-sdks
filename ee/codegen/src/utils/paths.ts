@@ -110,3 +110,14 @@ export function getGeneratedNodeDisplayModulePath(
     ];
   }
 }
+
+export function doesModulePathStartWith(
+  modulePath?: readonly string[],
+  prefix?: readonly string[]
+): modulePath is string[] {
+  if (!modulePath || !prefix) {
+    return false;
+  }
+
+  return modulePath.join(".").startsWith(prefix.join("."));
+}

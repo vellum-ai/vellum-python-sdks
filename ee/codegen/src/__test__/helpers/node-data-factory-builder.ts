@@ -1,5 +1,6 @@
 import {
   AdornmentNode,
+  CodeResourceDefinition,
   NodeAttribute,
   NodeOutput,
   NodePort,
@@ -41,6 +42,14 @@ export class NodeDataFactoryBuilder<T extends WorkflowDataNodeType> {
     this.nodeData = {
       ...this.nodeData,
       outputs,
+    };
+    return this;
+  }
+
+  withBase(base: CodeResourceDefinition): NodeDataFactoryBuilder<T> {
+    this.nodeData = {
+      ...this.nodeData,
+      base,
     };
     return this;
   }

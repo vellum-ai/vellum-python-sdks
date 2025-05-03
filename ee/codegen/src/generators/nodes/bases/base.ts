@@ -3,7 +3,11 @@ import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
-import { PORTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import {
+  PORTS_CLASS_NAME,
+  VELLUM_CLIENT_MODULE_PATH,
+  VELLUM_WORKFLOW_NODES_MODULE_PATH,
+} from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import {
@@ -24,6 +28,7 @@ import {
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
 } from "src/types/vellum";
+import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace BaseNode {
@@ -80,15 +85,25 @@ export abstract class BaseNode<
   }
 
   protected getNodeBaseClass(): python.Reference {
+    const isVellumNode = doesModulePathStartWith(
+      this.nodeContext.baseNodeClassModulePath,
+      VELLUM_WORKFLOW_NODES_MODULE_PATH
+    );
+
+    const baseNodeClassName = isVellumNode
+      ? this.nodeContext.baseNodeClassName
+      : this.nodeContext.nodeData.base?.name ??
+        this.nodeContext.baseNodeClassName;
+
     const baseNodeClassNameAlias =
-      this.nodeContext.baseNodeClassName === this.nodeContext.nodeClassName
-        ? `Base${this.nodeContext.baseNodeClassName}`
+      baseNodeClassName === this.nodeContext.nodeClassName
+        ? `Base${baseNodeClassName}`
         : undefined;
 
     const baseNodeGenericTypes = this.getNodeBaseGenericTypes();
 
     return python.reference({
-      name: this.nodeContext.baseNodeClassName,
+      name: baseNodeClassName,
       modulePath: this.nodeContext.baseNodeClassModulePath,
       genericTypes: baseNodeGenericTypes,
       alias: baseNodeClassNameAlias,
