@@ -103,20 +103,37 @@ export class InlinePromptNode extends BaseSingleFileNode<
       })
     );
 
-    statements.push(
-      python.field({
-        name: INPUTS_PREFIX,
-        initializer: python.TypeInstantiation.dict(
-          Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-            key: python.TypeInstantiation.str(key),
-            value: value,
-          })),
-          {
-            endWithComma: true,
-          }
-        ),
-      })
+    const promptInputsAttribute = this.nodeData.attributes?.find(
+      (attr) => attr.name === INPUTS_PREFIX
     );
+
+    if (promptInputsAttribute) {
+      statements.push(
+        python.field({
+          name: INPUTS_PREFIX,
+          initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+            workflowValueDescriptor: promptInputsAttribute.value,
+          }),
+        })
+      );
+    } else {
+      statements.push(
+        python.field({
+          name: INPUTS_PREFIX,
+          initializer: python.TypeInstantiation.dict(
+            Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
+              key: python.TypeInstantiation.str(key),
+              value: value,
+            })),
+            {
+              endWithComma: true,
+            }
+          ),
+        })
+      );
+    }
 
     if (functionDefinitions.length > 0) {
       statements.push(

@@ -8,7 +8,9 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   inlinePromptNodeDataInlineVariantFactory,
   inlinePromptNodeDataLegacyVariantFactory,
+  nodeInputFactory,
 } from "src/__test__/helpers/node-data-factories";
+import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
@@ -312,6 +314,70 @@ describe("InlinePromptNode", () => {
           id: uuidv4(),
           state: "DISABLED",
         },
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with node inputs and the prompt_inputs attribute defined", () => {
+    it("should generate node file prioritizing the former", async () => {
+      const workflowContext = workflowContextFactory();
+
+      const textStateVariableId = uuidv4();
+      workflowContext.addStateVariableContext(
+        stateVariableContextFactory({
+          stateVariableData: {
+            id: textStateVariableId,
+            key: "text",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        inputs: [
+          nodeInputFactory({
+            id: uuidv4(),
+            key: "foo",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: "bar",
+              },
+            },
+          }),
+        ],
+        attributes: [
+          {
+            id: uuidv4(),
+            name: "prompt_inputs",
+            value: {
+              type: "DICTIONARY_REFERENCE",
+              entries: [
+                {
+                  key: "text",
+                  value: {
+                    type: "WORKFLOW_STATE",
+                    stateVariableId: textStateVariableId,
+                  },
+                },
+              ],
+            },
+          },
+        ],
       }).build();
 
       const nodeContext = (await createNodeContext({

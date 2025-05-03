@@ -473,12 +473,16 @@ export function inlinePromptNodeDataInlineVariantFactory({
   parameters,
   defaultBlock,
   settings,
+  inputs,
+  attributes,
 }: {
   blockType?: string;
   errorOutputId?: string;
   parameters?: PromptParameters;
   defaultBlock?: PromptTemplateBlock;
   settings?: PromptSettings;
+  inputs?: NodeInput[];
+  attributes?: NodeAttribute[];
 }): NodeDataFactoryBuilder<PromptNode> {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
@@ -518,7 +522,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
       },
       mlModelName: "gpt-4o-mini",
     },
-    inputs: [
+    inputs: inputs ?? [
       {
         id: "7b8af68b-cf60-4fca-9c57-868042b5b616",
         key: "text",
@@ -535,6 +539,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
         },
       },
     ],
+    attributes,
   };
   return new NodeDataFactoryBuilder<PromptNode>(nodeData);
 }

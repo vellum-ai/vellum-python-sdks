@@ -804,7 +804,7 @@ export interface DictionaryWorkflowReferenceEntry {
 }
 
 export interface DictionaryWorkflowReference {
-  type: "DICTIONARY";
+  type: "DICTIONARY_REFERENCE";
   entries: DictionaryWorkflowReferenceEntry[];
 }
 

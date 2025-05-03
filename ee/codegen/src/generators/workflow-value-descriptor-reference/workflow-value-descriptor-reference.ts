@@ -106,7 +106,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
-      case "DICTIONARY":
+      case "DICTIONARY_REFERENCE":
         return new DictionaryWorkflowReference({
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
