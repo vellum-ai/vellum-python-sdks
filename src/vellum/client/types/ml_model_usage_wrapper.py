@@ -8,8 +8,8 @@ import pydantic
 
 
 class MlModelUsageWrapper(UniversalBaseModel):
-    ml_model_usage: MlModelUsage
     ml_model_name: str
+    ml_model_usage: MlModelUsage
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
