@@ -11,6 +11,7 @@ import { NodePort as NodePortType, WorkflowDataNode } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getNodeLabel } from "src/utils/nodes";
 import {
+  doesModulePathStartWith,
   getGeneratedNodeDisplayModulePath,
   getGeneratedNodeModuleInfo,
 } from "src/utils/paths";
@@ -57,15 +58,24 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
 
     if (args.nodeData.type === "GENERIC") {
       if (
-        args.nodeData.base &&
-        !args.nodeData.base.module
-          .join(".")
-          .startsWith(VELLUM_WORKFLOW_BASE_NODES_MODULE_PATH.join("."))
+        !doesModulePathStartWith(
+          args.nodeData.base?.module,
+          VELLUM_WORKFLOW_BASE_NODES_MODULE_PATH
+        )
       ) {
         this.baseNodeClassModulePath = args.nodeData.base.module;
       } else {
         this.baseNodeClassModulePath = VELLUM_WORKFLOW_NODES_MODULE_PATH;
       }
+    } else if (
+      !doesModulePathStartWith(
+        args.nodeData.base?.module,
+        VELLUM_WORKFLOW_NODES_MODULE_PATH
+      )
+    ) {
+      this.baseNodeClassModulePath =
+        args.nodeData.base?.module ??
+        this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;
     } else {
       this.baseNodeClassModulePath =
         this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;

@@ -394,4 +394,31 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("basic with custom, same module, base", () => {
+    it("getNodeFile", async () => {
+      workflowContext = workflowContextFactory({
+        moduleName: "my.custom.path",
+      });
+
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({ inputs: [] })
+        .withBase({
+          name: "MyInlinePrompt",
+          module: ["my", "custom", "path", "nodes", "my_inline_prompt"],
+        })
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
