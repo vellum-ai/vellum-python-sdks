@@ -78,7 +78,7 @@ class WorkflowSandboxesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-sandboxes/{jsonable_encoder(id)}/workflows/{jsonable_encoder(workflow_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "workflow_deployment_id": workflow_deployment_id,
@@ -151,7 +151,7 @@ class WorkflowSandboxesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/workflow-sandboxes/examples",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -246,7 +246,7 @@ class AsyncWorkflowSandboxesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-sandboxes/{jsonable_encoder(id)}/workflows/{jsonable_encoder(workflow_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "workflow_deployment_id": workflow_deployment_id,
@@ -327,7 +327,7 @@ class AsyncWorkflowSandboxesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/workflow-sandboxes/examples",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,

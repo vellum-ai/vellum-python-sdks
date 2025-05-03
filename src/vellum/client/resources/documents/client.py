@@ -74,7 +74,7 @@ class DocumentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/documents",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "document_index_id": document_index_id,
@@ -128,7 +128,7 @@ class DocumentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -234,7 +234,7 @@ class DocumentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "label": label,
@@ -439,7 +439,7 @@ class AsyncDocumentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/documents",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "document_index_id": document_index_id,
@@ -501,7 +501,7 @@ class AsyncDocumentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -623,7 +623,7 @@ class AsyncDocumentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "label": label,

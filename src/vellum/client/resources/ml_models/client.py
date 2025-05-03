@@ -45,7 +45,7 @@ class MlModelsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/ml-models/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -106,7 +106,7 @@ class AsyncMlModelsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/ml-models/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )

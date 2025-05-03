@@ -107,7 +107,7 @@ class AdHocClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/ad-hoc/execute-prompt",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "ml_model": ml_model,
@@ -438,7 +438,7 @@ class AsyncAdHocClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/ad-hoc/execute-prompt",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "ml_model": ml_model,

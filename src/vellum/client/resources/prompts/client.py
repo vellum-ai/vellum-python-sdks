@@ -61,7 +61,7 @@ class PromptsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/prompts/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "prompt_variant_id": prompt_variant_id,
@@ -166,7 +166,7 @@ class PromptsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/prompts/push",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "exec_config": convert_and_respect_annotation_metadata(
@@ -267,7 +267,7 @@ class AsyncPromptsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/prompts/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "prompt_variant_id": prompt_variant_id,
@@ -380,7 +380,7 @@ class AsyncPromptsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/prompts/push",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "exec_config": convert_and_respect_annotation_metadata(

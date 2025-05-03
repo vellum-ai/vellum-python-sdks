@@ -72,7 +72,7 @@ class TestSuiteRunsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/test-suite-runs",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "test_suite_id": test_suite_id,
@@ -131,7 +131,7 @@ class TestSuiteRunsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/test-suite-runs/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -197,7 +197,7 @@ class TestSuiteRunsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/test-suite-runs/{jsonable_encoder(id)}/executions",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "expand": expand,
@@ -284,7 +284,7 @@ class AsyncTestSuiteRunsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/test-suite-runs",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "test_suite_id": test_suite_id,
@@ -351,7 +351,7 @@ class AsyncTestSuiteRunsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/test-suite-runs/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -425,7 +425,7 @@ class AsyncTestSuiteRunsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/test-suite-runs/{jsonable_encoder(id)}/executions",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "expand": expand,

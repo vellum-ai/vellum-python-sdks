@@ -79,7 +79,7 @@ class SandboxesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/sandboxes/{jsonable_encoder(id)}/prompts/{jsonable_encoder(prompt_variant_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "prompt_deployment_id": prompt_deployment_id,
@@ -171,7 +171,7 @@ class SandboxesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/sandboxes/{jsonable_encoder(id)}/scenarios",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "label": label,
@@ -235,7 +235,7 @@ class SandboxesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/sandboxes/{jsonable_encoder(id)}/scenarios/{jsonable_encoder(scenario_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="DELETE",
             request_options=request_options,
         )
@@ -318,7 +318,7 @@ class AsyncSandboxesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/sandboxes/{jsonable_encoder(id)}/prompts/{jsonable_encoder(prompt_variant_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "prompt_deployment_id": prompt_deployment_id,
@@ -418,7 +418,7 @@ class AsyncSandboxesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/sandboxes/{jsonable_encoder(id)}/scenarios",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "label": label,
@@ -490,7 +490,7 @@ class AsyncSandboxesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/sandboxes/{jsonable_encoder(id)}/scenarios/{jsonable_encoder(scenario_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="DELETE",
             request_options=request_options,
         )

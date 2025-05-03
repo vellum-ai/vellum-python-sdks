@@ -52,7 +52,7 @@ class ReleaseReviewsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -106,7 +106,7 @@ class ReleaseReviewsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -173,7 +173,7 @@ class AsyncReleaseReviewsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -235,7 +235,7 @@ class AsyncReleaseReviewsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )

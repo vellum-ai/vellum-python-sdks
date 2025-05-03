@@ -128,7 +128,7 @@ class MetricDefinitionsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/metric-definitions/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -274,7 +274,7 @@ class AsyncMetricDefinitionsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/metric-definitions/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )

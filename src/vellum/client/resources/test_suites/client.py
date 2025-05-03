@@ -67,7 +67,7 @@ class TestSuitesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -178,7 +178,7 @@ class TestSuitesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/test-suites/{jsonable_encoder(id_)}/test-cases",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "id": id,
@@ -274,7 +274,7 @@ class TestSuitesClient:
         """
         with self._client_wrapper.httpx_client.stream(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json=convert_and_respect_annotation_metadata(
                 object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
@@ -339,7 +339,7 @@ class TestSuitesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases/{jsonable_encoder(test_case_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="DELETE",
             request_options=request_options,
         )
@@ -407,7 +407,7 @@ class AsyncTestSuitesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -526,7 +526,7 @@ class AsyncTestSuitesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/test-suites/{jsonable_encoder(id_)}/test-cases",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "id": id,
@@ -630,7 +630,7 @@ class AsyncTestSuitesClient:
         """
         async with self._client_wrapper.httpx_client.stream(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json=convert_and_respect_annotation_metadata(
                 object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
@@ -703,7 +703,7 @@ class AsyncTestSuitesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases/{jsonable_encoder(test_case_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="DELETE",
             request_options=request_options,
         )

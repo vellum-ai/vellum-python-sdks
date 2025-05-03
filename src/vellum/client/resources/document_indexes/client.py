@@ -75,7 +75,7 @@ class DocumentIndexesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -176,7 +176,7 @@ class DocumentIndexesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "label": label,
@@ -237,7 +237,7 @@ class DocumentIndexesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -302,7 +302,7 @@ class DocumentIndexesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PUT",
             json={
                 "label": label,
@@ -415,7 +415,7 @@ class DocumentIndexesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "label": label,
@@ -476,7 +476,7 @@ class DocumentIndexesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}/documents/{jsonable_encoder(document_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             request_options=request_options,
         )
@@ -600,7 +600,7 @@ class AsyncDocumentIndexesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -709,7 +709,7 @@ class AsyncDocumentIndexesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "label": label,
@@ -778,7 +778,7 @@ class AsyncDocumentIndexesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -851,7 +851,7 @@ class AsyncDocumentIndexesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PUT",
             json={
                 "label": label,
@@ -980,7 +980,7 @@ class AsyncDocumentIndexesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "label": label,
@@ -1049,7 +1049,7 @@ class AsyncDocumentIndexesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/document-indexes/{jsonable_encoder(id)}/documents/{jsonable_encoder(document_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             request_options=request_options,
         )

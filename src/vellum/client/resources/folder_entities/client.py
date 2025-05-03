@@ -80,7 +80,7 @@ class FolderEntitiesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/folder-entities",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "entity_status": entity_status,
@@ -147,7 +147,7 @@ class FolderEntitiesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/folders/{jsonable_encoder(folder_id)}/add-entity",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "entity_id": entity_id,
@@ -240,7 +240,7 @@ class AsyncFolderEntitiesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/folder-entities",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "entity_status": entity_status,
@@ -315,7 +315,7 @@ class AsyncFolderEntitiesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/folders/{jsonable_encoder(folder_id)}/add-entity",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "entity_id": entity_id,

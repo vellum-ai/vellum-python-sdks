@@ -71,7 +71,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/workflow-deployments",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -125,7 +125,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -186,7 +186,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "filters": filters,
@@ -241,7 +241,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events/{jsonable_encoder(execution_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -295,7 +295,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -363,7 +363,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -423,7 +423,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -485,7 +485,7 @@ class WorkflowDeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "history_item_id": history_item_id,
@@ -568,7 +568,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/workflow-deployments",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -632,7 +632,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -701,7 +701,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "filters": filters,
@@ -764,7 +764,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events/{jsonable_encoder(execution_id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -826,7 +826,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -902,7 +902,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -970,7 +970,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -1040,7 +1040,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "history_item_id": history_item_id,

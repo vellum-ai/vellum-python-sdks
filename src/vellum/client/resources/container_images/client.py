@@ -61,7 +61,7 @@ class ContainerImagesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/container-images",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -114,7 +114,7 @@ class ContainerImagesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/container-images/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -155,7 +155,7 @@ class ContainerImagesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/container-images/docker-service-token",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -213,7 +213,7 @@ class ContainerImagesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/container-images/push",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "name": name,
@@ -294,7 +294,7 @@ class AsyncContainerImagesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/container-images",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -355,7 +355,7 @@ class AsyncContainerImagesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/container-images/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -406,7 +406,7 @@ class AsyncContainerImagesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/container-images/docker-service-token",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -472,7 +472,7 @@ class AsyncContainerImagesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/container-images/push",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "name": name,

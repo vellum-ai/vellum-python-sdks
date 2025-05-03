@@ -56,7 +56,7 @@ class WorkflowsClient:
         """
         with self._client_wrapper.httpx_client.stream(
             f"v1/workflows/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "exclude_code": exclude_code,
@@ -69,8 +69,7 @@ class WorkflowsClient:
             try:
                 if 200 <= _response.status_code < 300:
                     _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    for _chunk in _response.iter_bytes(chunk_size=_chunk_size):
-                        yield _chunk
+                    yield from _response.iter_bytes(chunk_size=_chunk_size)
                     return
                 _response.read()
                 if _response.status_code == 400:
@@ -137,7 +136,7 @@ class WorkflowsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/workflows/push",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             data={
                 "exec_config": exec_config,
@@ -205,7 +204,7 @@ class AsyncWorkflowsClient:
         """
         async with self._client_wrapper.httpx_client.stream(
             f"v1/workflows/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "exclude_code": exclude_code,
@@ -294,7 +293,7 @@ class AsyncWorkflowsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/workflows/push",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             data={
                 "exec_config": exec_config,

@@ -77,7 +77,7 @@ class DeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/deployments",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -131,7 +131,7 @@ class DeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -185,7 +185,7 @@ class DeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -253,7 +253,7 @@ class DeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -313,7 +313,7 @@ class DeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -375,7 +375,7 @@ class DeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "history_item_id": history_item_id,
@@ -464,7 +464,7 @@ class DeploymentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/deployments/provider-payload",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -595,7 +595,7 @@ class AsyncDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/deployments",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -657,7 +657,7 @@ class AsyncDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -719,7 +719,7 @@ class AsyncDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -795,7 +795,7 @@ class AsyncDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
                 "limit": limit,
@@ -863,7 +863,7 @@ class AsyncDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -933,7 +933,7 @@ class AsyncDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "history_item_id": history_item_id,
@@ -1030,7 +1030,7 @@ class AsyncDeploymentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/deployments/provider-payload",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "deployment_id": deployment_id,

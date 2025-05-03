@@ -48,7 +48,7 @@ class WorkspaceSecretsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -107,7 +107,7 @@ class WorkspaceSecretsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "label": label,
@@ -178,7 +178,7 @@ class AsyncWorkspaceSecretsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -245,7 +245,7 @@ class AsyncWorkspaceSecretsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="PATCH",
             json={
                 "label": label,

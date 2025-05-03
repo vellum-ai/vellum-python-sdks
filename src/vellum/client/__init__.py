@@ -97,7 +97,7 @@ class Vellum:
 
 
 
-        Defaults to VellumEnvironment.DEFAULT
+        Defaults to VellumEnvironment.PRODUCTION
 
 
 
@@ -123,7 +123,7 @@ class Vellum:
     def __init__(
         self,
         *,
-        environment: VellumEnvironment = VellumEnvironment.DEFAULT,
+        environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -133,11 +133,15 @@ class Vellum:
         self._client_wrapper = SyncClientWrapper(
             environment=environment,
             api_key=api_key,
-            httpx_client=httpx_client
-            if httpx_client is not None
-            else httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-            if follow_redirects is not None
-            else httpx.Client(timeout=_defaulted_timeout),
+            httpx_client=(
+                httpx_client
+                if httpx_client is not None
+                else (
+                    httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+                    if follow_redirects is not None
+                    else httpx.Client(timeout=_defaulted_timeout)
+                )
+            ),
             timeout=_defaulted_timeout,
         )
         self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
@@ -204,7 +208,7 @@ class Vellum:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "url": url,
@@ -1442,7 +1446,9 @@ class Vellum:
             method="POST",
             json={
                 "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
+                    object_=actuals,
+                    annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest],
+                    direction="write",
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,
@@ -1473,7 +1479,7 @@ class AsyncVellum:
 
 
 
-        Defaults to VellumEnvironment.DEFAULT
+        Defaults to VellumEnvironment.PRODUCTION
 
 
 
@@ -1499,7 +1505,7 @@ class AsyncVellum:
     def __init__(
         self,
         *,
-        environment: VellumEnvironment = VellumEnvironment.DEFAULT,
+        environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -1509,11 +1515,15 @@ class AsyncVellum:
         self._client_wrapper = AsyncClientWrapper(
             environment=environment,
             api_key=api_key,
-            httpx_client=httpx_client
-            if httpx_client is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-            if follow_redirects is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout),
+            httpx_client=(
+                httpx_client
+                if httpx_client is not None
+                else (
+                    httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+                    if follow_redirects is not None
+                    else httpx.AsyncClient(timeout=_defaulted_timeout)
+                )
+            ),
             timeout=_defaulted_timeout,
         )
         self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
@@ -1588,7 +1598,7 @@ class AsyncVellum:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "url": url,
@@ -2906,7 +2916,9 @@ class AsyncVellum:
             method="POST",
             json={
                 "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
+                    object_=actuals,
+                    annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest],
+                    direction="write",
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,

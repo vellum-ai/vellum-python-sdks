@@ -39,7 +39,7 @@ class OrganizationsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/organizations/identity",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
@@ -97,7 +97,7 @@ class AsyncOrganizationsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/organizations/identity",
-            base_url=self._client_wrapper.get_environment().base,
+            base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
         )
