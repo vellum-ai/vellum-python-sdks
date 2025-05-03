@@ -14,4 +14,4 @@ def test_workflow__happy_path():
 
     # THEN the Workflow completes successfully
     assert final_event.name == "workflow.execution.fulfilled"
-    assert final_event.outputs.final_value == 2
+    assert final_event.outputs.final_value == 3

@@ -431,7 +431,7 @@ class WorkflowRunner(Generic[StateType]):
                     return
 
             all_deps = self._dependencies[node_class]
-            node_span_id = state.meta.node_execution_cache.queue_node_execution(node_class, all_deps, invoked_by)
+            node_span_id = node_class.Trigger._queue_node_execution(state, all_deps, invoked_by)
             if not node_class.Trigger.should_initiate(state, all_deps, node_span_id):
                 return
 
