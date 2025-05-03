@@ -15,7 +15,7 @@ from vellum.types import WorkflowPushDeploymentConfigRequest
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
-from vellum_cli.logger import load_cli_logger
+from vellum_cli.logger import handle_cli_error, load_cli_logger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -178,51 +178,55 @@ def push_command(
             strict=strict,
         )
     except ApiError as e:
-        if e.status_code != 400 or not isinstance(e.body, dict) or "diffs" not in e.body:
-            raise e
-
-        diffs: dict = e.body["diffs"]
-        generated_only = diffs.get("generated_only", [])
-        generated_only_str = (
-            "\n".join(
-                ["Files that were generated but not found in the original project:"]
-                + [f"- {file}" for file in generated_only]
+        if e.status_code == 400 and isinstance(e.body, dict) and "diffs" in e.body:
+            diffs: dict = e.body["diffs"]
+            generated_only = diffs.get("generated_only", [])
+            generated_only_str = (
+                "\n".join(
+                    ["Files that were generated but not found in the original project:"]
+                    + [f"- {file}" for file in generated_only]
+                )
+                if generated_only
+                else ""
             )
-            if generated_only
-            else ""
-        )
 
-        original_only = diffs.get("original_only", [])
-        original_only_str = (
-            "\n".join(
-                ["Files that were found in the original project but not generated:"]
-                + [f"- {file}" for file in original_only]
+            original_only = diffs.get("original_only", [])
+            original_only_str = (
+                "\n".join(
+                    ["Files that were found in the original project but not generated:"]
+                    + [f"- {file}" for file in original_only]
+                )
+                if original_only
+                else ""
             )
-            if original_only
-            else ""
-        )
 
-        modified = diffs.get("modified", {})
-        modified_str = (
-            "\n\n".join(
-                ["Files that were different between the original project and the generated artifact:"]
-                + ["\n".join(line.strip() for line in lines) for lines in modified.values()]
+            modified = diffs.get("modified", {})
+            modified_str = (
+                "\n\n".join(
+                    ["Files that were different between the original project and the generated artifact:"]
+                    + ["\n".join(line.strip() for line in lines) for lines in modified.values()]
+                )
+                if modified
+                else ""
             )
-            if modified
-            else ""
-        )
 
-        reported_diffs = f"""\
-{e.body.get("detail")}
+            reported_diffs = f"""\
+    {e.body.get("detail")}
 
-{generated_only_str}
+    {generated_only_str}
 
-{original_only_str}
+    {original_only_str}
 
-{modified_str}
-"""
-        logger.error(reported_diffs)
-        return
+    {modified_str}
+    """
+            logger.error(reported_diffs)
+            return
+
+        if e.status_code == 400 and isinstance(e.body, dict) and "detail" in e.body:
+            handle_cli_error(logger, title="API request to /workflows/push failed.", message=e.body["detail"])
+            return
+
+        raise e
 
     if dry_run:
         error_messages = [str(e) for e in workflow_display.errors]
