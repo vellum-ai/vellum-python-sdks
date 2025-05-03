@@ -118,7 +118,7 @@ export class InlinePromptNode extends BaseSingleFileNode<
           }),
         })
       );
-    } else {
+    } else if (this.nodeInputsByKey.size > 0) {
       statements.push(
         python.field({
           name: INPUTS_PREFIX,
