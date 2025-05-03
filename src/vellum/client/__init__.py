@@ -133,15 +133,11 @@ class Vellum:
         self._client_wrapper = SyncClientWrapper(
             environment=environment,
             api_key=api_key,
-            httpx_client=(
-                httpx_client
-                if httpx_client is not None
-                else (
-                    httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-                    if follow_redirects is not None
-                    else httpx.Client(timeout=_defaulted_timeout)
-                )
-            ),
+            httpx_client=httpx_client
+            if httpx_client is not None
+            else httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+            if follow_redirects is not None
+            else httpx.Client(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
         self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
@@ -1446,9 +1442,7 @@ class Vellum:
             method="POST",
             json={
                 "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals,
-                    annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest],
-                    direction="write",
+                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,
@@ -1515,15 +1509,11 @@ class AsyncVellum:
         self._client_wrapper = AsyncClientWrapper(
             environment=environment,
             api_key=api_key,
-            httpx_client=(
-                httpx_client
-                if httpx_client is not None
-                else (
-                    httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-                    if follow_redirects is not None
-                    else httpx.AsyncClient(timeout=_defaulted_timeout)
-                )
-            ),
+            httpx_client=httpx_client
+            if httpx_client is not None
+            else httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+            if follow_redirects is not None
+            else httpx.AsyncClient(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
         self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
@@ -2916,9 +2906,7 @@ class AsyncVellum:
             method="POST",
             json={
                 "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals,
-                    annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest],
-                    direction="write",
+                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,
