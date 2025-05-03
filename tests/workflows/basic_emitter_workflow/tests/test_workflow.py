@@ -25,8 +25,9 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     state_id_generator = mock_uuid4_generator("vellum.workflows.state.base.uuid4")
     state_id = state_id_generator()
     workflow_span_id = state_id_generator()
-    start_node_span_id = state_id_generator()
-    next_node_span_id = state_id_generator()
+    base_node_id_generator = mock_uuid4_generator("vellum.workflows.nodes.bases.base.uuid4")
+    start_node_span_id = base_node_id_generator()
+    next_node_span_id = base_node_id_generator()
 
     # AND a workflow that uses a custom event emitter
     trace_id = uuid4()
@@ -120,12 +121,8 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                     serialized_start_node_id: [str(start_node_span_id)],
                     serialized_next_node_id: [str(next_node_span_id)],
                 },
-                "node_executions_queued": {
-                    serialized_next_node_id: [],
-                },
-                "dependencies_invoked": {
-                    str(next_node_span_id): [serialized_start_node_id],
-                },
+                "node_executions_queued": {},
+                "dependencies_invoked": {},
             },
             "workflow_definition": {
                 "name": "BasicEmitterWorkflow",
@@ -157,12 +154,8 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                     serialized_start_node_id: [str(start_node_span_id)],
                     serialized_next_node_id: [str(next_node_span_id)],
                 },
-                "node_executions_queued": {
-                    serialized_next_node_id: [],
-                },
-                "dependencies_invoked": {
-                    str(next_node_span_id): [serialized_start_node_id],
-                },
+                "node_executions_queued": {},
+                "dependencies_invoked": {},
             },
             "parent": None,
             "workflow_definition": {

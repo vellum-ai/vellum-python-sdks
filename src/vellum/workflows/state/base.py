@@ -16,7 +16,6 @@ from pydantic_core import core_schema
 from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
-from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
 from vellum.workflows.types.definition import CodeResourceDefinition, serialize_type_encoder_with_id
@@ -173,23 +172,6 @@ class NodeExecutionCache:
         self._dependencies_invoked[execution_id].add(dependency)
         if all(dep in self._dependencies_invoked[execution_id] for dep in dependencies):
             self._node_executions_queued[node].remove(execution_id)
-
-    def queue_node_execution(
-        self, node: Type["BaseNode"], dependencies: Set["Type[BaseNode]"], invoked_by: Optional[Edge] = None
-    ) -> UUID:
-        execution_id = uuid4()
-        if not invoked_by:
-            return execution_id
-
-        source_node = invoked_by.from_port.node_class
-        for queued_node_execution_id in self._node_executions_queued[node]:
-            if source_node not in self._dependencies_invoked[queued_node_execution_id]:
-                self._invoke_dependency(queued_node_execution_id, node, source_node, dependencies)
-                return queued_node_execution_id
-
-        self._node_executions_queued[node].append(execution_id)
-        self._invoke_dependency(execution_id, node, source_node, dependencies)
-        return execution_id
 
     def is_node_execution_initiated(self, node: Type["BaseNode"], execution_id: UUID) -> bool:
         return execution_id in self._node_executions_initiated[node]

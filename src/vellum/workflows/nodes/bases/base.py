@@ -2,12 +2,13 @@ from dataclasses import field
 from functools import cached_property, reduce
 import inspect
 from types import MappingProxyType
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
+from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph import Graph
@@ -324,6 +325,36 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 message="Invalid Trigger Node Specification",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
+
+        @classmethod
+        def _queue_node_execution(
+            cls, state: StateType, dependencies: Set["Type[BaseNode]"], invoked_by: Optional[Edge] = None
+        ) -> UUID:
+            """
+            Queues a future execution of a node, returning the span id of the execution.
+
+            We may combine this into the should_initiate method, but we'll keep it separate for now to avoid
+            breaking changes until the 0.15.0 release.
+            """
+
+            execution_id = uuid4()
+            if not invoked_by:
+                return execution_id
+
+            if cls.merge_behavior not in {MergeBehavior.AWAIT_ANY, MergeBehavior.AWAIT_ALL}:
+                return execution_id
+
+            source_node = invoked_by.from_port.node_class
+            for queued_node_execution_id in state.meta.node_execution_cache._node_executions_queued[cls.node_class]:
+                if source_node not in state.meta.node_execution_cache._dependencies_invoked[queued_node_execution_id]:
+                    state.meta.node_execution_cache._invoke_dependency(
+                        queued_node_execution_id, cls.node_class, source_node, dependencies
+                    )
+                    return queued_node_execution_id
+
+            state.meta.node_execution_cache._node_executions_queued[cls.node_class].append(execution_id)
+            state.meta.node_execution_cache._invoke_dependency(execution_id, cls.node_class, source_node, dependencies)
+            return execution_id
 
     class Execution(metaclass=_BaseNodeExecutionMeta):
         node_class: Type["BaseNode"]

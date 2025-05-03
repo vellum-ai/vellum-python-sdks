@@ -2,6 +2,7 @@ import time
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -24,6 +25,9 @@ class BottomNode(BaseNode):
 
 class AwaitAnyNode(BaseNode[BaseState]):
     top = TopNode.Outputs.total
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseNode.Outputs):
         total: int

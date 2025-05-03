@@ -5,6 +5,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.core import MergeBehavior
 
 
 class State(BaseState):
@@ -48,6 +49,9 @@ class LoopNode(BaseNode[State]):
 
     class Outputs(BaseNode.Outputs):
         value = TopNode.Outputs.value.coalesce(BottomNode.Outputs.value)
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
     def run(self) -> BaseNode.Outputs:
         self.state.counter += 1
