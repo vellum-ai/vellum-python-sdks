@@ -798,6 +798,16 @@ export interface ExecutionCounterWorkflowReference {
   nodeId: string;
 }
 
+export interface DictionaryWorkflowReferenceEntry {
+  key: string;
+  value: WorkflowValueDescriptor;
+}
+
+export interface DictionaryWorkflowReference {
+  type: "DICTIONARY";
+  entries: DictionaryWorkflowReferenceEntry[];
+}
+
 export type WorkflowExpression =
   | UnaryWorkflowExpression
   | BinaryWorkflowExpression
@@ -809,7 +819,8 @@ export type WorkflowValueDescriptorReference =
   | WorkflowStateVariableWorkflowReference
   | ConstantValueWorkflowReference
   | VellumSecretWorkflowReference
-  | ExecutionCounterWorkflowReference;
+  | ExecutionCounterWorkflowReference
+  | DictionaryWorkflowReference;
 
 export type WorkflowValueDescriptor =
   | WorkflowExpression

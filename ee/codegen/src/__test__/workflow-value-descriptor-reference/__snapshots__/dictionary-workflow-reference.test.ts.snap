@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DictionaryWorkflowReference > should generate correct AST for dictionary with constant values 1`] = `
+"{
+    "string_value": "Hello, World!",
+    "number_value": 42,
+}
+"
+`;
+
+exports[`DictionaryWorkflowReference > should generate correct AST for dictionary with expression values 1`] = `
+"{
+    "unary_expression": ConstantValueReference("check if null").is_null(),
+    "binary_expression": ConstantValueReference(10).equals(10),
+}
+"
+`;
+
+exports[`DictionaryWorkflowReference > should generate correct AST for empty dictionary 1`] = `
+"{}
+"
+`;
+
+exports[`DictionaryWorkflowReference > should generate correct AST for nested dictionaries 1`] = `
+"{
+    "nested_dict": {
+        "inner_key": "Inner value",
+        "another_inner_key": 100,
+    },
+    "outer_key": "Outer value",
+}
+"
+`;

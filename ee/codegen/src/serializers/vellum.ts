@@ -1,36 +1,39 @@
 import { ChatMessageRole, PromptBlockState } from "vellum-ai/api";
 import {
-  object as objectSchema,
-  list as listSchema,
-  undiscriminatedUnion as undiscriminatedUnionSchema,
-  string as stringSchema,
-  stringLiteral as stringLiteralSchema,
-  number as numberSchema,
   any as anySchema,
-  boolean as booleanSchema,
-  ObjectSchema,
-  lazy as lazySchema,
-  property as propertySchema,
-  Schema,
-  record as recordSchema,
-  unknown as unknownSchema,
-  union as unionSchema,
   boolean,
+  boolean as booleanSchema,
+  lazy as lazySchema,
+  list as listSchema,
+  number as numberSchema,
+  object as objectSchema,
+  ObjectSchema,
+  property as propertySchema,
+  record as recordSchema,
+  Schema,
+  stringLiteral as stringLiteralSchema,
+  string as stringSchema,
+  undiscriminatedUnion as undiscriminatedUnionSchema,
+  union as unionSchema,
+  unknown as unknownSchema,
 } from "vellum-ai/core/schemas";
 import {
   ChatMessageRole as ChatMessageRoleSerializer,
   LogicalOperator as LogicalOperatorSerializer,
-  VellumVariable as VellumVariableSerializer,
-  VellumVariableType as VellumVariableTypeSerializer,
   PromptBlockState as PromptBlockStateSerializer,
   PromptParameters as PromptParametersSerializer,
   VellumValue as VellumValueSerializer,
+  VellumVariable as VellumVariableSerializer,
+  VellumVariableType as VellumVariableTypeSerializer,
 } from "vellum-ai/serialization";
 import { ConditionCombinator as ConditionCombinatorSerializer } from "vellum-ai/serialization/types/ConditionCombinator";
 
 import {
+  AdornmentNode,
   ApiNode,
   ApiNodeAdditionalHeaderData,
+  BinaryWorkflowExpression,
+  ChatMessagePromptTemplateBlock,
   CodeExecutionNode,
   CodeExecutionNodeData,
   CodeExecutionPackage,
@@ -40,82 +43,81 @@ import {
   ConditionalNodeData,
   ConditionalRuleData,
   ConstantValuePointer,
+  ConstantValueWorkflowReference,
+  DefaultNodePort,
   DeploymentMapNodeData,
   DeploymentPromptNodeData,
   DeploymentSubworkflowNodeData,
+  DictionaryWorkflowReference,
+  DictionaryWorkflowReferenceEntry,
+  ElifConditionNodePort,
+  ElseConditionNodePort,
   EntrypointNode,
+  ErrorNode,
+  ExecutionCounterPointer,
+  ExecutionCounterWorkflowReference,
+  FinalOutputNode,
+  FunctionDefinitionPromptTemplateBlock,
+  GenericNode,
+  GenericNodeDisplayData,
   GuardrailNode,
+  IfConditionNodePort,
   InlineMapNodeData,
   InlinePromptNodeData,
   InlineSubworkflowNodeData,
   InputVariablePointer,
+  JinjaPromptTemplateBlock,
+  LegacyPromptNodeData,
   MapNode,
   MapNodeData,
+  MergeNode,
+  MergeNodeTargetHandle,
+  NodeAttribute,
   NodeDisplayComment,
   NodeDisplayData,
   NodeDisplayPosition,
   NodeInput,
   NodeInputValuePointerRule,
+  NodeOutput,
   NodeOutputPointer,
+  NodeOutputWorkflowReference,
+  NodeTrigger,
+  NoteNode,
+  PlainTextPromptTemplateBlock,
   PromptNode,
   PromptNodeData,
+  PromptNodeDeployment,
+  PromptNodeSourceSandbox,
   PromptSettings,
+  PromptTemplateBlock,
+  PromptTemplateBlockData,
+  PromptVersionData,
   PromptVersionExecConfig,
+  RichTextChildPromptTemplateBlock,
+  RichTextPromptTemplateBlock,
   SearchNode,
   SearchNodeData,
   SubworkflowNode,
   TemplatingNode,
-  FinalOutputNode,
+  TernaryWorkflowExpression,
+  UnaryWorkflowExpression,
+  VariablePromptTemplateBlock,
+  VellumLogicalCondition,
+  VellumLogicalConditionGroup,
+  VellumLogicalExpression,
+  VellumSecretWorkflowReference,
   WorkflowDisplayData,
   WorkflowDisplayDataViewport,
   WorkflowEdge,
+  WorkflowInputWorkflowReference,
   WorkflowNode,
+  WorkflowOutputValue,
   WorkflowRawData,
+  WorkflowSandboxRoutingConfig,
+  WorkflowStateVariableWorkflowReference,
+  WorkflowValueDescriptor,
   WorkflowVersionExecConfig,
   WorkspaceSecretPointer,
-  MergeNode,
-  MergeNodeTargetHandle,
-  NoteNode,
-  ErrorNode,
-  PromptNodeSourceSandbox,
-  WorkflowSandboxRoutingConfig,
-  PromptNodeDeployment,
-  PromptVersionData,
-  LegacyPromptNodeData,
-  GenericNode,
-  ExecutionCounterPointer,
-  GenericNodeDisplayData,
-  JinjaPromptTemplateBlock,
-  VariablePromptTemplateBlock,
-  ChatMessagePromptTemplateBlock,
-  RichTextPromptTemplateBlock,
-  PlainTextPromptTemplateBlock,
-  FunctionDefinitionPromptTemplateBlock,
-  PromptTemplateBlock,
-  RichTextChildPromptTemplateBlock,
-  PromptTemplateBlockData,
-  VellumLogicalExpression,
-  VellumLogicalCondition,
-  VellumLogicalConditionGroup,
-  NodeTrigger,
-  DefaultNodePort,
-  IfConditionNodePort,
-  BinaryWorkflowExpression,
-  TernaryWorkflowExpression,
-  UnaryWorkflowExpression,
-  ElifConditionNodePort,
-  ElseConditionNodePort,
-  WorkflowValueDescriptor,
-  NodeAttribute,
-  AdornmentNode,
-  NodeOutput,
-  ConstantValueWorkflowReference,
-  WorkflowInputWorkflowReference,
-  NodeOutputWorkflowReference,
-  VellumSecretWorkflowReference,
-  ExecutionCounterWorkflowReference,
-  WorkflowStateVariableWorkflowReference,
-  WorkflowOutputValue,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -771,6 +773,34 @@ export declare namespace ExecutionCounterWorkflowReferenceSerializer {
   }
 }
 
+export const DictionaryWorkflowReferenceEntrySerializer: ObjectSchema<
+  DictionaryWorkflowReferenceEntrySerializer.Raw,
+  Omit<DictionaryWorkflowReferenceEntry, "type">
+> = objectSchema({
+  key: stringSchema(),
+  value: lazySchema(() => WorkflowValueDescriptorSerializer),
+});
+
+export declare namespace DictionaryWorkflowReferenceEntrySerializer {
+  interface Raw {
+    key: string;
+    value: WorkflowValueDescriptorSerializer.Raw;
+  }
+}
+
+export const DictionaryWorkflowReferenceSerializer: ObjectSchema<
+  DictionaryWorkflowReferenceSerializer.Raw,
+  Omit<DictionaryWorkflowReference, "type">
+> = objectSchema({
+  entries: listSchema(DictionaryWorkflowReferenceEntrySerializer),
+});
+
+export declare namespace DictionaryWorkflowReferenceSerializer {
+  interface Raw {
+    entries: DictionaryWorkflowReferenceEntrySerializer.Raw[];
+  }
+}
+
 export const WorkflowValueDescriptorSerializer: Schema<
   WorkflowValueDescriptorSerializer.Raw,
   WorkflowValueDescriptor
@@ -784,6 +814,7 @@ export const WorkflowValueDescriptorSerializer: Schema<
   CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
   VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
   EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
+  DICTIONARY: DictionaryWorkflowReferenceSerializer,
 });
 
 export declare namespace WorkflowValueDescriptorSerializer {
@@ -796,7 +827,8 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | WorkflowStateVariableWorkflowReferenceSerializer.Raw
     | ConstantValueWorkflowReferenceSerializer.Raw
     | VellumSecretWorkflowReferenceSerializer.Raw
-    | ExecutionCounterWorkflowReferenceSerializer.Raw;
+    | ExecutionCounterWorkflowReferenceSerializer.Raw
+    | DictionaryWorkflowReferenceSerializer.Raw;
 }
 
 export const NodeOutputSerializer: ObjectSchema<
