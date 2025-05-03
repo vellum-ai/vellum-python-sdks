@@ -207,7 +207,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
     if isinstance(value, StateValueReference):
         state_value_display = display_context.global_state_value_displays[value]
         return {
-            "type": "STATE_VALUE",
+            "type": "WORKFLOW_STATE",
             "state_variable_id": str(state_value_display.id),
         }
 
