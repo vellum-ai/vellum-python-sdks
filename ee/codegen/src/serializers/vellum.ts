@@ -814,7 +814,7 @@ export const WorkflowValueDescriptorSerializer: Schema<
   CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
   VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
   EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
-  DICTIONARY: DictionaryWorkflowReferenceSerializer,
+  DICTIONARY_REFERENCE: DictionaryWorkflowReferenceSerializer,
 });
 
 export declare namespace WorkflowValueDescriptorSerializer {

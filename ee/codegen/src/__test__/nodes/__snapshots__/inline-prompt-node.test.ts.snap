@@ -1164,6 +1164,35 @@ class PromptNode(InlinePromptNode):
 "
 `;
 
+exports[`InlinePromptNode > basic with node inputs and the prompt_inputs attribute defined > should generate node file prioritizing the former 1`] = `
+"from vellum import JinjaPromptBlock, PromptParameters
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+from ..state import State
+
+
+class PromptNode(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
+    ]
+    prompt_inputs = {
+        "text": State.text,
+    }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0,
+        max_tokens=1000,
+        top_p=1,
+        top_k=0,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logit_bias={},
+        custom_parameters={},
+    )
+"
+`;
+
 exports[`InlinePromptNode > basic with stream setting false > getNodeFile 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters, PromptSettings
 from vellum.workflows.nodes.displayable import InlinePromptNode

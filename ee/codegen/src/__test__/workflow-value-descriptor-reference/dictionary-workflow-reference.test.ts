@@ -19,7 +19,7 @@ describe("DictionaryWorkflowReference", () => {
 
   it("should generate correct AST for empty dictionary", async () => {
     const emptyDictReference: DictionaryWorkflowReferenceType = {
-      type: "DICTIONARY",
+      type: "DICTIONARY_REFERENCE",
       entries: [],
     };
 
@@ -36,7 +36,7 @@ describe("DictionaryWorkflowReference", () => {
 
   it("should generate correct AST for dictionary with constant values", async () => {
     const dictReference: DictionaryWorkflowReferenceType = {
-      type: "DICTIONARY",
+      type: "DICTIONARY_REFERENCE",
       entries: [
         {
           key: "string_value",
@@ -74,12 +74,12 @@ describe("DictionaryWorkflowReference", () => {
 
   it("should generate correct AST for nested dictionaries", async () => {
     const nestedDictReference: DictionaryWorkflowReferenceType = {
-      type: "DICTIONARY",
+      type: "DICTIONARY_REFERENCE",
       entries: [
         {
           key: "nested_dict",
           value: {
-            type: "DICTIONARY",
+            type: "DICTIONARY_REFERENCE",
             entries: [
               {
                 key: "inner_key",
@@ -130,7 +130,7 @@ describe("DictionaryWorkflowReference", () => {
 
   it("should generate correct AST for dictionary with expression values", async () => {
     const exprDictReference: DictionaryWorkflowReferenceType = {
-      type: "DICTIONARY",
+      type: "DICTIONARY_REFERENCE",
       entries: [
         {
           key: "unary_expression",
