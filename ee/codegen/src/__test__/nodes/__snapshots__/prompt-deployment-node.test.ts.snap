@@ -52,6 +52,64 @@ class PromptDeploymentNode(BasePromptDeploymentNode):
 "
 `;
 
+exports[`PromptDeploymentNode > basic with node inputs and the prompt_inputs attribute defined > should generate node file prioritizing the latter 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BasePromptDeploymentNodeDisplay
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
+
+from ...nodes.prompt_deployment_node import PromptDeploymentNode
+
+
+class PromptDeploymentNodeDisplay(
+    BasePromptDeploymentNodeDisplay[PromptDeploymentNode]
+):
+    label = "Prompt Deployment Node"
+    node_id = UUID("947cc337-9a53-4c12-9a38-4f65c04c6317")
+    target_handle_id = UUID("e1f8a351-ab12-4167-93ee-d2dd72c8d15c")
+    output_display = {
+        PromptDeploymentNode.Outputs.text: NodeOutputDisplay(
+            id=UUID("fa015382-7e5b-404e-b073-1c5f01832169"), name="text"
+        ),
+        PromptDeploymentNode.Outputs.results: NodeOutputDisplay(
+            id=UUID("4d257095-e908-4fc3-8159-a6ac0018e1f1"), name="results"
+        ),
+        PromptDeploymentNode.Outputs.json: NodeOutputDisplay(
+            id=UUID("82c3d131-fe28-4f48-93c0-34ecf5a2a703"), name="json"
+        ),
+    }
+    port_displays = {
+        PromptDeploymentNode.Ports.default: PortDisplayOverrides(
+            id=UUID("1539a6ed-6bf9-43a5-9e4a-f82ec5615ee3")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=2470.8372576177285, y=219.71887984764544),
+        width=480,
+        height=170,
+    )
+
+
+from vellum.workflows.nodes.displayable import (
+    PromptDeploymentNode as BasePromptDeploymentNode,
+)
+
+from ..state import State
+
+
+class PromptDeploymentNode(BasePromptDeploymentNode):
+    deployment = "some-unique-deployment-name"
+    release_tag = "LATEST"
+    prompt_inputs = {
+        "text": State.text,
+    }
+"
+`;
+
 exports[`PromptDeploymentNode > fallback models > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import (
     PromptDeploymentNode as BasePromptDeploymentNode,

@@ -331,7 +331,7 @@ describe("InlinePromptNode", () => {
   });
 
   describe("basic with node inputs and the prompt_inputs attribute defined", () => {
-    it("should generate node file prioritizing the former", async () => {
+    it("should generate node file prioritizing the latter", async () => {
       const workflowContext = workflowContextFactory();
 
       const textStateVariableId = uuidv4();
@@ -360,7 +360,8 @@ describe("InlinePromptNode", () => {
             },
           }),
         ],
-        attributes: [
+      })
+        .withAttributes([
           {
             id: uuidv4(),
             name: "prompt_inputs",
@@ -377,8 +378,8 @@ describe("InlinePromptNode", () => {
               ],
             },
           },
-        ],
-      }).build();
+        ])
+        .build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
