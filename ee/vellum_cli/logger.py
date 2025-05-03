@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Optional
 
 
 class CLIFormatter(logging.Formatter):
@@ -34,3 +35,14 @@ def load_cli_logger() -> logging.Logger:
     logger.addHandler(handler)
 
     return logger
+
+
+def handle_cli_error(logger: logging.Logger, title: str, message: str, suggestion: Optional[str] = None):
+    logger.error("\n\033[1;31m✖ {}\033[0m".format(title))  # Bold red X and title
+    logger.error("\n\033[1m{}\033[0m".format(message))  # Bold message
+    if suggestion:
+        logger.error("\n\033[1;34mNext steps:\033[0m")  # Bold blue
+        logger.error(suggestion)
+
+    logger.error(f"{title}: {message}")
+    exit(1)

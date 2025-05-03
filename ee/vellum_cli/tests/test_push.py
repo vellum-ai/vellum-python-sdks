@@ -525,6 +525,37 @@ Files that were different between the original project and the generated artifac
     )
 
 
+def test_push__push_fails_due_to_400_error(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns a 4xx response
+    vellum_client.workflows.push.side_effect = ApiError(
+        status_code=400,
+        body={
+            "detail": "Pushing the Workflow failed because you did something wrong",
+        },
+    )
+
+    # WHEN calling `vellum push` on strict mode
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module])
+
+    # THEN it should fail with a user error code
+    assert result.exit_code == 1
+
+    # AND the error message should be in the error message
+    assert "API request to /workflows/push failed." in result.output
+    assert "Pushing the Workflow failed because you did something wrong" in result.output
+
+    # AND the stack trace should not be
+    assert "Traceback" not in result.output
+
+
 @pytest.mark.parametrize(
     "file_data",
     [
