@@ -161,17 +161,12 @@ def test_serialize_workflow():
             },
         ],
         "outputs": [
-            {
-                "id": "e62bc785-a914-4066-b79e-8c89a5d0ec6c",
-                "name": "text",
-                "type": "STRING",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": ""}},
-            },
+            {"id": "e62bc785-a914-4066-b79e-8c89a5d0ec6c", "name": "text", "type": "STRING", "value": None},
             {
                 "id": "4674f1d9-e3af-411f-8a55-40a3a3ab5394",
                 "name": "chat_history",
                 "type": "CHAT_HISTORY",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": []}},
+                "value": None,
             },
         ],
     }

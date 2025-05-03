@@ -43,8 +43,8 @@ class ToolCallingNode(BaseNode):
         chat_history: The complete chat history including tool calls
         """
 
-        text: str = ""
-        chat_history: List[ChatMessage] = []
+        text: str
+        chat_history: List[ChatMessage]
 
     def run(self) -> Outputs:
         """
