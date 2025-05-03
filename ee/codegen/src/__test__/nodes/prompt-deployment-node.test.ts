@@ -258,6 +258,7 @@ describe("PromptDeploymentNode", () => {
   describe("basic with node inputs and the prompt_inputs attribute defined", () => {
     it("should generate node file prioritizing the latter", async () => {
       const workflowContext = workflowContextFactory();
+      const writer = new Writer();
 
       const textStateVariableId = uuidv4();
       workflowContext.addStateVariableContext(
