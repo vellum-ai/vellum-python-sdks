@@ -22,14 +22,18 @@ class BaseClientWrapper:
         self._environment = environment
         self._timeout = timeout
 
-    def get_headers(self) -> typing.Dict[str, str]:
+    def get_headers(
+        self, scheme: typing.Literal["environmentApiKeyAuth", "workspaceApiKeyAuth"]
+    ) -> typing.Dict[str, str]:
         headers: typing.Dict[str, str] = {
             "X-Fern-Language": "Python",
             "X-Fern-SDK-Name": "vellum-ai",
             "X-Fern-SDK-Version": "0.14.53",
         }
-        headers["X-API-KEY"] = self._workspace_api_key
-        headers["X-API-KEY"] = self.environment_api_key
+        if scheme == "workspaceApiKeyAuth":
+            headers["X-API-KEY"] = self._workspace_api_key
+        elif scheme == "environmentApiKeyAuth":
+            headers["X-API-KEY"] = self.environment_api_key
         return headers
 
     def get_environment(self) -> VellumEnvironment:
@@ -48,6 +52,7 @@ class SyncClientWrapper(BaseClientWrapper):
         environment: VellumEnvironment,
         timeout: typing.Optional[float] = None,
         httpx_client: httpx.Client,
+        scheme: typing.Literal["workspaceApiKeyAuth", "environmentApiKeyAuth"],
     ):
         super().__init__(
             workspace_api_key=workspace_api_key,
@@ -56,7 +61,7 @@ class SyncClientWrapper(BaseClientWrapper):
             timeout=timeout,
         )
         self.httpx_client = HttpClient(
-            httpx_client=httpx_client, base_headers=self.get_headers, base_timeout=self.get_timeout
+            httpx_client=httpx_client, base_headers=lambda: self.get_headers(scheme), base_timeout=self.get_timeout
         )
 
 

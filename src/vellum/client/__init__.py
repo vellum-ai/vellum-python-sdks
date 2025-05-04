@@ -142,36 +142,57 @@ class Vellum:
             raise ApiError(
                 body="The client must be instantiated be either passing in environment_api_key or setting VELLUM_API_KEY"
             )
-        self._client_wrapper = SyncClientWrapper(
+        self._environment_client_wrapper = SyncClientWrapper(
             environment=environment,
             workspace_api_key=workspace_api_key,
             environment_api_key=environment_api_key,
-            httpx_client=httpx_client
-            if httpx_client is not None
-            else httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-            if follow_redirects is not None
-            else httpx.Client(timeout=_defaulted_timeout),
+            httpx_client=(
+                httpx_client
+                if httpx_client is not None
+                else (
+                    httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+                    if follow_redirects is not None
+                    else httpx.Client(timeout=_defaulted_timeout)
+                )
+            ),
             timeout=_defaulted_timeout,
+            scheme="environmentApiKeyAuth",
         )
-        self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
-        self.container_images = ContainerImagesClient(client_wrapper=self._client_wrapper)
-        self.deployments = DeploymentsClient(client_wrapper=self._client_wrapper)
-        self.release_reviews = ReleaseReviewsClient(client_wrapper=self._client_wrapper)
-        self.document_indexes = DocumentIndexesClient(client_wrapper=self._client_wrapper)
-        self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
-        self.folder_entities = FolderEntitiesClient(client_wrapper=self._client_wrapper)
-        self.metric_definitions = MetricDefinitionsClient(client_wrapper=self._client_wrapper)
-        self.ml_models = MlModelsClient(client_wrapper=self._client_wrapper)
-        self.organizations = OrganizationsClient(client_wrapper=self._client_wrapper)
-        self.prompts = PromptsClient(client_wrapper=self._client_wrapper)
-        self.sandboxes = SandboxesClient(client_wrapper=self._client_wrapper)
-        self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._client_wrapper)
-        self.test_suites = TestSuitesClient(client_wrapper=self._client_wrapper)
-        self.workflow_deployments = WorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
-        self.workflow_sandboxes = WorkflowSandboxesClient(client_wrapper=self._client_wrapper)
-        self.workflows = WorkflowsClient(client_wrapper=self._client_wrapper)
-        self.workspace_secrets = WorkspaceSecretsClient(client_wrapper=self._client_wrapper)
-        self.workspaces = WorkspacesClient(client_wrapper=self._client_wrapper)
+        self._workspace_client_wrapper = SyncClientWrapper(
+            environment=environment,
+            workspace_api_key=workspace_api_key,
+            environment_api_key=environment_api_key,
+            httpx_client=(
+                httpx_client
+                if httpx_client is not None
+                else (
+                    httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+                    if follow_redirects is not None
+                    else httpx.Client(timeout=_defaulted_timeout)
+                )
+            ),
+            timeout=_defaulted_timeout,
+            scheme="workspaceApiKeyAuth",
+        )
+        self.ad_hoc = AdHocClient(client_wrapper=self._environment_client_wrapper)
+        self.container_images = ContainerImagesClient(client_wrapper=self._workspace_client_wrapper)
+        self.deployments = DeploymentsClient(client_wrapper=self._workspace_client_wrapper)
+        self.release_reviews = ReleaseReviewsClient(client_wrapper=self._workspace_client_wrapper)
+        self.document_indexes = DocumentIndexesClient(client_wrapper=self._workspace_client_wrapper)
+        self.documents = DocumentsClient(client_wrapper=self._environment_client_wrapper)
+        self.folder_entities = FolderEntitiesClient(client_wrapper=self._workspace_client_wrapper)
+        self.metric_definitions = MetricDefinitionsClient(client_wrapper=self._workspace_client_wrapper)
+        self.ml_models = MlModelsClient(client_wrapper=self._workspace_client_wrapper)
+        self.organizations = OrganizationsClient(client_wrapper=self._workspace_client_wrapper)
+        self.prompts = PromptsClient(client_wrapper=self._environment_client_wrapper)
+        self.sandboxes = SandboxesClient(client_wrapper=self._environment_client_wrapper)
+        self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._environment_client_wrapper)
+        self.test_suites = TestSuitesClient(client_wrapper=self._environment_client_wrapper)
+        self.workflow_deployments = WorkflowDeploymentsClient(client_wrapper=self._environment_client_wrapper)
+        self.workflow_sandboxes = WorkflowSandboxesClient(client_wrapper=self._workspace_client_wrapper)
+        self.workflows = WorkflowsClient(client_wrapper=self._environment_client_wrapper)
+        self.workspace_secrets = WorkspaceSecretsClient(client_wrapper=self._workspace_client_wrapper)
+        self.workspaces = WorkspacesClient(client_wrapper=self._workspace_client_wrapper)
 
     def execute_api(
         self,
@@ -216,9 +237,9 @@ class Vellum:
             url="url",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._environment_client_wrapper.get_environment().default,
             method="POST",
             json={
                 "url": url,
@@ -310,9 +331,9 @@ class Vellum:
             output_type="STRING",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/execute-code",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "code": code,
@@ -426,9 +447,9 @@ class Vellum:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/execute-prompt",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -580,9 +601,9 @@ class Vellum:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._environment_client_wrapper.httpx_client.stream(
             "v1/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -732,9 +753,9 @@ class Vellum:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/execute-workflow",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -868,9 +889,9 @@ class Vellum:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._environment_client_wrapper.httpx_client.stream(
             "v1/execute-workflow-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -997,9 +1018,9 @@ class Vellum:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/generate",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -1126,9 +1147,9 @@ class Vellum:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._environment_client_wrapper.httpx_client.stream(
             "v1/generate-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -1258,9 +1279,9 @@ class Vellum:
             query="query",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/search",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "index_id": index_id,
@@ -1362,9 +1383,9 @@ class Vellum:
             actuals=[SubmitCompletionActualRequest()],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/submit-completion-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -1460,13 +1481,15 @@ class Vellum:
             actuals=[WorkflowExecutionActualStringRequest()],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._environment_client_wrapper.httpx_client.request(
             "v1/submit-workflow-execution-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
+                    object_=actuals,
+                    annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest],
+                    direction="write",
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,
@@ -1541,36 +1564,40 @@ class AsyncVellum:
             raise ApiError(
                 body="The client must be instantiated be either passing in environment_api_key or setting VELLUM_API_KEY"
             )
-        self._client_wrapper = AsyncClientWrapper(
+        self._environment_client_wrapper = AsyncClientWrapper(
             environment=environment,
             workspace_api_key=workspace_api_key,
             environment_api_key=environment_api_key,
-            httpx_client=httpx_client
-            if httpx_client is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-            if follow_redirects is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout),
+            httpx_client=(
+                httpx_client
+                if httpx_client is not None
+                else (
+                    httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+                    if follow_redirects is not None
+                    else httpx.AsyncClient(timeout=_defaulted_timeout)
+                )
+            ),
             timeout=_defaulted_timeout,
         )
-        self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
-        self.container_images = AsyncContainerImagesClient(client_wrapper=self._client_wrapper)
-        self.deployments = AsyncDeploymentsClient(client_wrapper=self._client_wrapper)
-        self.release_reviews = AsyncReleaseReviewsClient(client_wrapper=self._client_wrapper)
-        self.document_indexes = AsyncDocumentIndexesClient(client_wrapper=self._client_wrapper)
-        self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
-        self.folder_entities = AsyncFolderEntitiesClient(client_wrapper=self._client_wrapper)
-        self.metric_definitions = AsyncMetricDefinitionsClient(client_wrapper=self._client_wrapper)
-        self.ml_models = AsyncMlModelsClient(client_wrapper=self._client_wrapper)
-        self.organizations = AsyncOrganizationsClient(client_wrapper=self._client_wrapper)
-        self.prompts = AsyncPromptsClient(client_wrapper=self._client_wrapper)
-        self.sandboxes = AsyncSandboxesClient(client_wrapper=self._client_wrapper)
-        self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._client_wrapper)
-        self.test_suites = AsyncTestSuitesClient(client_wrapper=self._client_wrapper)
-        self.workflow_deployments = AsyncWorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
-        self.workflow_sandboxes = AsyncWorkflowSandboxesClient(client_wrapper=self._client_wrapper)
-        self.workflows = AsyncWorkflowsClient(client_wrapper=self._client_wrapper)
-        self.workspace_secrets = AsyncWorkspaceSecretsClient(client_wrapper=self._client_wrapper)
-        self.workspaces = AsyncWorkspacesClient(client_wrapper=self._client_wrapper)
+        self.ad_hoc = AsyncAdHocClient(client_wrapper=self._environment_client_wrapper)
+        self.container_images = AsyncContainerImagesClient(client_wrapper=self._environment_client_wrapper)
+        self.deployments = AsyncDeploymentsClient(client_wrapper=self._environment_client_wrapper)
+        self.release_reviews = AsyncReleaseReviewsClient(client_wrapper=self._environment_client_wrapper)
+        self.document_indexes = AsyncDocumentIndexesClient(client_wrapper=self._environment_client_wrapper)
+        self.documents = AsyncDocumentsClient(client_wrapper=self._environment_client_wrapper)
+        self.folder_entities = AsyncFolderEntitiesClient(client_wrapper=self._environment_client_wrapper)
+        self.metric_definitions = AsyncMetricDefinitionsClient(client_wrapper=self._environment_client_wrapper)
+        self.ml_models = AsyncMlModelsClient(client_wrapper=self._environment_client_wrapper)
+        self.organizations = AsyncOrganizationsClient(client_wrapper=self._environment_client_wrapper)
+        self.prompts = AsyncPromptsClient(client_wrapper=self._environment_client_wrapper)
+        self.sandboxes = AsyncSandboxesClient(client_wrapper=self._environment_client_wrapper)
+        self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._environment_client_wrapper)
+        self.test_suites = AsyncTestSuitesClient(client_wrapper=self._environment_client_wrapper)
+        self.workflow_deployments = AsyncWorkflowDeploymentsClient(client_wrapper=self._environment_client_wrapper)
+        self.workflow_sandboxes = AsyncWorkflowSandboxesClient(client_wrapper=self._environment_client_wrapper)
+        self.workflows = AsyncWorkflowsClient(client_wrapper=self._environment_client_wrapper)
+        self.workspace_secrets = AsyncWorkspaceSecretsClient(client_wrapper=self._environment_client_wrapper)
+        self.workspaces = AsyncWorkspacesClient(client_wrapper=self._environment_client_wrapper)
 
     async def execute_api(
         self,
@@ -1623,9 +1650,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._environment_client_wrapper.get_environment().default,
             method="POST",
             json={
                 "url": url,
@@ -1725,9 +1752,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/execute-code",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "code": code,
@@ -1849,9 +1876,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/execute-prompt",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -2011,9 +2038,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._environment_client_wrapper.httpx_client.stream(
             "v1/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -2171,9 +2198,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/execute-workflow",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -2315,9 +2342,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._environment_client_wrapper.httpx_client.stream(
             "v1/execute-workflow-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -2452,9 +2479,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/generate",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -2589,9 +2616,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._environment_client_wrapper.httpx_client.stream(
             "v1/generate-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -2729,9 +2756,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/search",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "index_id": index_id,
@@ -2841,9 +2868,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/submit-completion-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -2947,13 +2974,15 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._environment_client_wrapper.httpx_client.request(
             "v1/submit-workflow-execution-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._environment_client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
+                    object_=actuals,
+                    annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest],
+                    direction="write",
                 ),
                 "execution_id": execution_id,
                 "external_id": external_id,
