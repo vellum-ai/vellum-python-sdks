@@ -11,7 +11,7 @@ from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePro
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
-from vellum.workflows.types.core import EntityInputsInterface
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 
 
 class FunctionNode(BaseNode):
@@ -21,6 +21,9 @@ class FunctionNode(BaseNode):
 
 
 class ToolRouterNode(InlinePromptNode):
+    class Trigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+
     def run(self) -> Iterator[BaseOutput]:
         self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}  # type: ignore
         generator = super().run()
