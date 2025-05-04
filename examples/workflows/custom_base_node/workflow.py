@@ -1,5 +1,4 @@
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
 from .nodes.conditional_router import ConditionalRouter
@@ -12,7 +11,7 @@ from .nodes.my_prompt import MyPrompt
 from .state import State
 
 
-class IndeedWorkflow(BaseWorkflow[Inputs, State]):
+class CustomBaseNodeWorkflow(BaseWorkflow[Inputs, State]):
     graph = MyPrompt >> {
         ConditionalRouter.Ports.exit >> ExitNode,
         ConditionalRouter.Ports.unknown >> ErrorNode,

@@ -9,7 +9,7 @@ from .nodes.detect_tone_prompt import DetectTonePrompt
 from .nodes.settle_down import SettleDownPrompt
 
 
-class Workflow(BaseWorkflow[Inputs, BaseState]):
+class CustomPromptNodeWorkflow(BaseWorkflow[Inputs, BaseState]):
     graph = {
         DetectTonePrompt.Ports.happy >> BeHappyPrompt,
         DetectTonePrompt.Ports.sad >> CheerUpPrompt,

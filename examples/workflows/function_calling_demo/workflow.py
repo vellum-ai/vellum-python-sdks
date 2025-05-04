@@ -14,7 +14,7 @@ from .nodes.parse_function_call import ParseFunctionCall
 from .nodes.prompt_node import PromptNode
 
 
-class Workflow(BaseWorkflow[Inputs, BaseState]):
+class FunctionCallingDemoWorkflow(BaseWorkflow[Inputs, BaseState]):
     graph = (
         PromptNode
         >> OutputType
