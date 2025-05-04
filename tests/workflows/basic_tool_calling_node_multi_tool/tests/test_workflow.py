@@ -84,6 +84,8 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     first_call_input_id_2 = uuid4_generator()
     second_call_input_id = uuid4_generator()
     second_call_input_id_2 = uuid4_generator()
+    third_call_input_id = uuid4_generator()
+    third_call_input_id_2 = uuid4_generator()
 
     # GIVEN a get current weather workflow
     workflow = BasicToolCallingNodeMultiToolWorkflow()
@@ -287,6 +289,149 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             ),
             VellumVariable(
                 id=str(second_call_input_id_2),
+                key="chat_history",
+                type="CHAT_HISTORY",
+                required=None,
+                default=None,
+                extensions=None,
+            ),
+        ],
+        "parameters": DEFAULT_PROMPT_PARAMETERS,
+        "blocks": [
+            ChatMessagePromptBlock(
+                block_type="CHAT_MESSAGE",
+                state=None,
+                cache_config=None,
+                chat_role="SYSTEM",
+                chat_source=None,
+                chat_message_unterminated=None,
+                blocks=[
+                    RichTextPromptBlock(
+                        block_type="RICH_TEXT",
+                        state=None,
+                        cache_config=None,
+                        blocks=[
+                            PlainTextPromptBlock(
+                                block_type="PLAIN_TEXT", state=None, cache_config=None, text="You are a weather expert"
+                            )
+                        ],
+                    )
+                ],
+            ),
+            ChatMessagePromptBlock(
+                block_type="CHAT_MESSAGE",
+                state=None,
+                cache_config=None,
+                chat_role="USER",
+                chat_source=None,
+                chat_message_unterminated=None,
+                blocks=[
+                    RichTextPromptBlock(
+                        block_type="RICH_TEXT",
+                        state=None,
+                        cache_config=None,
+                        blocks=[
+                            VariablePromptBlock(
+                                block_type="VARIABLE", state=None, cache_config=None, input_variable="question"
+                            )
+                        ],
+                    )
+                ],
+            ),
+            VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
+        ],
+        "settings": None,
+        "functions": [
+            FunctionDefinition(
+                state=None,
+                cache_config=None,
+                name="get_current_weather",
+                description=None,
+                parameters={
+                    "type": "object",
+                    "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
+                    "required": ["location", "unit"],
+                },
+                forced=None,
+                strict=None,
+            ),
+            FunctionDefinition(
+                state=None,
+                cache_config=None,
+                name="format_answer",
+                description=None,
+                parameters={"type": "object", "properties": {"answer": {"type": "string"}}, "required": ["answer"]},
+                forced=None,
+                strict=None,
+            ),
+        ],
+        "expand_meta": None,
+        "request_options": mock.ANY,
+    }
+
+    third_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[2]
+    assert third_call.kwargs == {
+        "ml_model": "gpt-4o-mini",
+        "input_values": [
+            PromptRequestStringInput(key="question", type="STRING", value="What's the weather like in San Francisco?"),
+            PromptRequestChatHistoryInput(
+                key="chat_history",
+                type="CHAT_HISTORY",
+                value=[
+                    ChatMessage(
+                        text=None,
+                        role="ASSISTANT",
+                        content=FunctionCallChatMessageContent(
+                            type="FUNCTION_CALL",
+                            value=FunctionCallChatMessageContentValue(
+                                name="get_current_weather",
+                                arguments={"location": "Miami", "unit": "celsius"},
+                                id="call_7115tNTmEACTsQRGwKpJipJK",
+                            ),
+                        ),
+                        source=None,
+                    ),
+                    ChatMessage(
+                        text="The current weather in Miami is sunny with a temperature of 70 degrees celsius.",
+                        role="FUNCTION",
+                        content=None,
+                        source=None,
+                    ),
+                    ChatMessage(
+                        text=None,
+                        role="ASSISTANT",
+                        content=FunctionCallChatMessageContent(
+                            type="FUNCTION_CALL",
+                            value=FunctionCallChatMessageContentValue(
+                                name="format_answer",
+                                arguments={
+                                    "answer": "The current weather in Miami is sunny with a temperature of 70 degrees celsius."  # noqa: E501
+                                },
+                                id="call_7115tNTmEACTsQRGwKpJipJK",
+                            ),
+                        ),
+                        source=None,
+                    ),
+                    ChatMessage(
+                        text="Formatted answer: The current weather in Miami is sunny with a temperature of 70 degrees celsius.",  # noqa: E501
+                        role="FUNCTION",
+                        content=None,
+                        source=None,
+                    ),
+                ],
+            ),
+        ],
+        "input_variables": [
+            VellumVariable(
+                id=str(third_call_input_id),
+                key="question",
+                type="STRING",
+                required=None,
+                default=None,
+                extensions=None,
+            ),
+            VellumVariable(
+                id=str(third_call_input_id_2),
                 key="chat_history",
                 type="CHAT_HISTORY",
                 required=None,
