@@ -19,10 +19,10 @@ from ..nodes.exit_node import ExitNode
 from ..nodes.fibonacci import Fibonacci
 from ..nodes.get_temperature import GetTemperature
 from ..nodes.my_prompt import MyPrompt
-from ..workflow import IndeedWorkflow
+from ..workflow import CustomBaseNodeWorkflow
 
 
-class IndeedWorkflowDisplay(BaseWorkflowDisplay[IndeedWorkflow]):
+class CustomBaseNodeWorkflowDisplay(BaseWorkflowDisplay[CustomBaseNodeWorkflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("5aa611bd-83d6-4a34-b2f4-3b3511c56998"),
         entrypoint_node_source_handle_id=UUID("213ccd7a-bd48-45a3-8387-af9afa946e0e"),
@@ -54,7 +54,7 @@ class IndeedWorkflowDisplay(BaseWorkflowDisplay[IndeedWorkflow]):
         (ConditionalRouter.Ports.unknown, ErrorNode): EdgeDisplay(id=UUID("414653b1-f3a6-40da-9973-5a5bda741c85")),
     }
     output_displays = {
-        IndeedWorkflow.Outputs.answer: WorkflowOutputDisplay(
+        CustomBaseNodeWorkflow.Outputs.answer: WorkflowOutputDisplay(
             id=UUID("708005f3-81e0-4886-95e9-ccb0d6c029d3"), name="answer"
         )
     }
