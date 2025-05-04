@@ -7,7 +7,7 @@
       "ignore": null,
       "deployments": [],
       "container_image_name": "sdk-examples-utils",
-      "container_image_tag": "1.0.0",
+      "container_image_tag": "1.0.2",
       "workspace": "default",
       "target_directory": null
     },
@@ -16,8 +16,8 @@
       "workflow_sandbox_id": "a8e57295-afb9-4b8c-8182-936000c5b0e2",
       "ignore": null,
       "deployments": [],
-      "container_image_name": null,
-      "container_image_tag": null,
+      "container_image_name": "sdk-examples-utils",
+      "container_image_tag": "1.0.2",
       "workspace": "default",
       "target_directory": null
     },
