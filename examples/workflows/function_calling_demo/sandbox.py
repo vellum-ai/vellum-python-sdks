@@ -1,13 +1,13 @@
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import ChatMessage, Inputs
-from .workflow import Workflow
+from .workflow import FunctionCallingDemoWorkflow
 
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-workflow = Workflow()
+workflow = FunctionCallingDemoWorkflow()
 runner = WorkflowSandboxRunner(
     workflow,
     inputs=[

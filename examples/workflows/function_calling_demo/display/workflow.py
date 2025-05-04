@@ -22,10 +22,10 @@ from ..nodes.get_current_weather import GetCurrentWeather
 from ..nodes.output_type import OutputType
 from ..nodes.parse_function_call import ParseFunctionCall
 from ..nodes.prompt_node import PromptNode
-from ..workflow import Workflow
+from ..workflow import FunctionCallingDemoWorkflow
 
 
-class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
+class FunctionCallingDemoWorkflowDisplay(BaseWorkflowDisplay[FunctionCallingDemoWorkflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("8d9848b6-37f1-433d-9eb9-d85788007e8b"),
         entrypoint_node_source_handle_id=UUID("39eb234b-7594-4855-9cb8-dfcaff48963c"),
@@ -68,7 +68,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         ),
     }
     output_displays = {
-        Workflow.Outputs.final_output: WorkflowOutputDisplay(
+        FunctionCallingDemoWorkflow.Outputs.final_output: WorkflowOutputDisplay(
             id=UUID("e869f551-b02c-465f-90b3-ad2021b3c618"), name="final-output"
         )
     }

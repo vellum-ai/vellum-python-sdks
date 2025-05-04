@@ -3,15 +3,15 @@ from dotenv import load_dotenv
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 from .inputs import Inputs
-from .workflow import IndeedWorkflow
+from .workflow import CustomBaseNodeWorkflow
 
 
 def main():
     load_dotenv()
-    workflow = IndeedWorkflow()
+    workflow = CustomBaseNodeWorkflow()
 
     while True:
-        query = input("Hi! I'm an Indeed Chatbot. What can I do for you today? ")
+        query = input("Hi! I'm a multi tool Chatbot. What can I do for you today? ")
         inputs = Inputs(query=query)
 
         stream = workflow.stream(inputs=inputs, event_filter=root_workflow_event_filter)
