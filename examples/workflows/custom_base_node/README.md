@@ -1,5 +1,7 @@
 # Custom Base Node
 
+_NOTE: This Workflow is still under development and is not yet ready for reuse_
+
 This Workflow is an example of having multiple nodes extending from a Custom Node that the user defines, called `MockNetworkingClient`. This node simulates a client that makes a network call, whether that is HTTP, GraphQL, etc.
 
 The node also imports logic from a module outside of the node, motivating the need for a [Custom Docker Image](https://docs.vellum.ai/developers/workflows-sdk/custom-container-images). The definition for this Docker image is found at `./utils/Dockerfile`. To rebuild locally, run:

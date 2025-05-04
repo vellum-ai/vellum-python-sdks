@@ -1,5 +1,7 @@
 # Custom Prompt Node
 
+_NOTE: This Workflow is still under development and is not yet ready for reuse_
+
 This Workflow is an example of implementing your _own_ Prompt node that avoids making the round trip to Vellum by invoking the LLM directly. The node, `LocalBedrockNode`, assumes that you have your AWS credentials stored locally in a `.env` file in order to run locally:
 
 ```bash
