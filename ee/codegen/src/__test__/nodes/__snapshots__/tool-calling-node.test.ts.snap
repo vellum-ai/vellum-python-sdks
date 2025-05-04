@@ -114,9 +114,5 @@ class ToolCallingNode(BaseToolCallingNode):
         "question": "What's the weather like in San Francisco?",
     }
     max_tool_calls = 1
-
-    class Outputs(BaseToolCallingNode.Outputs):
-        text = ""
-        chat_history = []
 "
 `;
