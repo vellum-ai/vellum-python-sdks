@@ -44,5 +44,4 @@ def handle_cli_error(logger: logging.Logger, title: str, message: str, suggestio
         logger.error("\n\033[1;34mNext steps:\033[0m")  # Bold blue
         logger.error(suggestion)
 
-    logger.error(f"{title}: {message}")
     exit(1)
