@@ -43,8 +43,8 @@ class ToolCallingNode(BaseNode):
         chat_history: The complete chat history including tool calls
         """
 
-        text: str = ""
-        chat_history: List[ChatMessage] = []
+        text: str
+        chat_history: List[ChatMessage]
 
     def run(self) -> Outputs:
         """
@@ -81,7 +81,7 @@ class ToolCallingNode(BaseNode):
                     message="Subworkflow unexpectedly paused",
                 )
             elif terminal_event.name == "workflow.execution.fulfilled":
-                node_outputs = self.Outputs()
+                node_outputs = self.Outputs(text="", chat_history=[])
 
                 for output_descriptor, output_value in terminal_event.outputs:
                     setattr(node_outputs, output_descriptor.name, output_value)
