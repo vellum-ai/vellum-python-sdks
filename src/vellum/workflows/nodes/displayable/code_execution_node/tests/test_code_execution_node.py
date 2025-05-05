@@ -965,12 +965,12 @@ def main(input: str) -> str:
 @pytest.mark.parametrize(
     "code_snippet",
     [
-"""
+        """
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> FunctionCall:
     return input.value
 """,
-"""
+        """
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> FunctionCall:
     return input["value"]
@@ -1007,12 +1007,12 @@ def test_run_node__function_call_wrapper_value(code_snippet):
 @pytest.mark.parametrize(
     "code_snippet",
     [
-"""
+        """
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> str:
     return input.type
 """,
-"""
+        """
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> str:
     return input["type"]
