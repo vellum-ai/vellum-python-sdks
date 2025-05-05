@@ -4,7 +4,7 @@ from typing import Any, List, Union
 from pydantic import BaseModel
 
 from vellum.client.types.chat_message import ChatMessage
-from vellum.client.types.function_call import FunctionCall as FunctionCallType
+from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.vellum_value import VellumValue
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -130,7 +130,7 @@ def test_parse_type_from_str_error_cases(input_str, output_type, expected_except
         (int, 0),  # Number
         (float, 0.0),  # Number
         (Any, None),  # Json
-        (FunctionCallType, FunctionCallType(name="", arguments={})),  # FunctionCall
+        (FunctionCall, FunctionCall(name="", arguments={})),  # FunctionCall
         (List[ChatMessage], []),  # Chat History
         (List[VellumValue], []),  # Array
         (Union[float, int], 0.0),  # Union
