@@ -230,7 +230,10 @@ def _get_default_value(output_type: Any) -> Any:
     elif origin is list:
         return []
     elif output_type is FunctionCall:
-        return {}
+        return FunctionCall(
+            name="",
+            arguments={},
+        )
     elif origin is Union:
         # Always use the first argument type's default value
         if args:
