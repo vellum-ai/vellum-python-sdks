@@ -66,14 +66,16 @@ def test_parse_type_from_str_pydantic_models():
 
 
 def test_parse_type_from_str_list_of_models():
-    person_list_json = '[{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}]'
+    person_list_json = '[{"name": "Alice", "age": 30, "colors": ["red", "blue"]}, {"name": "Bob", "age": 25, "colors": ["green", "yellow"]}]'
     persons = parse_type_from_str(person_list_json, List[Person])
     assert len(persons) == 2
     assert all(isinstance(p, Person) for p in persons)
     assert persons[0].name == "Alice"
     assert persons[0].age == 30
+    assert persons[0].colors == ["red", "blue"]
     assert persons[1].name == "Bob"
     assert persons[1].age == 25
+    assert persons[1].colors == ["green", "yellow"]
 
 
 @pytest.mark.parametrize(
