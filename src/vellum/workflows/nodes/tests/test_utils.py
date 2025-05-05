@@ -143,7 +143,7 @@ def test_parse_type_from_str_error_cases(input_str, output_type, expected_except
         (int, 0),  # Number
         (float, 0.0),  # Number
         (Any, None),  # Json
-        (FunctionCallType, {}),  # FunctionCall
+        (FunctionCallType, FunctionCallType(name="", arguments={})),  # FunctionCall
         (List[ChatMessage], []),  # Chat History
         (List[VellumValue], []),  # Array
         (Union[float, int], 0.0),  # Union
