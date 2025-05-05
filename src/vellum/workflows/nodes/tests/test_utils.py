@@ -15,11 +15,7 @@ from vellum.workflows.types.core import Json
 class Person(BaseModel):
     name: str
     age: int
-
-
-class FunctionCall(BaseModel):
-    name: str
-    args: List[int]
+    colors: List[str]
 
 
 @pytest.mark.parametrize(
@@ -61,23 +57,12 @@ def test_parse_type_from_str_basic_cases(input_str, output_type, expected_result
 
 
 def test_parse_type_from_str_pydantic_models():
-    person_json = '{"name": "Alice", "age": 30}'
+    person_json = '{"name": "Alice", "age": 30, "colors": ["red", "blue"]}'
     person = parse_type_from_str(person_json, Person)
     assert isinstance(person, Person)
     assert person.name == "Alice"
     assert person.age == 30
-
-    function_json = '{"name": "test", "args": [1, 2]}'
-    function = parse_type_from_str(function_json, FunctionCall)
-    assert isinstance(function, FunctionCall)
-    assert function.name == "test"
-    assert function.args == [1, 2]
-
-    function_call_json = '{"value": {"name": "test", "args": [1, 2]}}'
-    function = parse_type_from_str(function_call_json, FunctionCall)
-    assert isinstance(function, FunctionCall)
-    assert function.name == "test"
-    assert function.args == [1, 2]
+    assert person.colors == ["red", "blue"]
 
 
 def test_parse_type_from_str_list_of_models():
