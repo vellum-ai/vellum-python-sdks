@@ -81,10 +81,10 @@ class ToolCallingNode(BaseNode):
                     message="Subworkflow unexpectedly paused",
                 )
             elif terminal_event.name == "workflow.execution.fulfilled":
-                node_outputs = self.Outputs(text="", chat_history=[])
-
-                for output_descriptor, output_value in terminal_event.outputs:
-                    setattr(node_outputs, output_descriptor.name, output_value)
+                node_outputs = self.Outputs(
+                    text=terminal_event.outputs.text,
+                    chat_history=terminal_event.outputs.chat_history,
+                )
 
                 return node_outputs
             elif terminal_event.name == "workflow.execution.rejected":
