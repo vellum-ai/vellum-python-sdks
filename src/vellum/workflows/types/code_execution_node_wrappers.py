@@ -2,11 +2,15 @@ class StringValueWrapper(str):
     def __getitem__(self, key):
         if key == "value":
             return self
+        if key == "type":
+            return "STRING"
         return super().__getitem__(key)
 
     def __getattr__(self, attr):
         if attr == "value":
             return self
+        if attr == "type":
+            return "STRING"
         raise AttributeError(f"'str' object has no attribute '{attr}'")
 
 

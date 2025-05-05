@@ -882,44 +882,80 @@ def main(arg1: list) -> str:
     assert outputs == {"result": "bar", "log": ""}
 
 
-def test_run_node__string_value_wrapper__get_attr():
-    # GIVEN a node that accesses the 'value' property of a string input
-    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
-        code = """\
+@pytest.mark.parametrize(
+    "access_method,code_snippet",
+    [
+        (
+            "attribute",
+            """
 def main(text: str) -> str:
     return text.value
-"""
-        code_inputs = {
-            "text": "hello",
-        }
-        runtime = "PYTHON_3_11_6"
-
-    # WHEN we run the node
-    node = ExampleCodeExecutionNode()
-    outputs = node.run()
-
-    # THEN the node should successfully access the string value through the .value property
-    assert outputs == {"result": "hello", "log": ""}
-
-
-def test_run_node__string_value_wrapper__get_item():
-    # GIVEN a node that accesses the 'value' property of a string input
-    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
-        code = """\
+""",
+        ),
+        (
+            "item",
+            """
 def main(text: str) -> str:
     return text["value"]
-"""
+""",
+        ),
+    ],
+)
+def test_run_node__string_value_wrapper_value(access_method, code_snippet):
+    """Test string value wrapper value access using different patterns"""
+
+    # GIVEN a node that accesses the 'value' property of a string input
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = code_snippet
+        runtime = "PYTHON_3_11_6"
         code_inputs = {
             "text": "hello",
         }
-        runtime = "PYTHON_3_11_6"
 
     # WHEN we run the node
     node = ExampleCodeExecutionNode()
     outputs = node.run()
 
-    # THEN the node should successfully access the string value through the .value property
+    # THEN the node should successfully access the string value
     assert outputs == {"result": "hello", "log": ""}
+
+
+@pytest.mark.parametrize(
+    "access_method,code_snippet",
+    [
+        (
+            "attribute",
+            """
+def main(text: str) -> str:
+    return text.type
+""",
+        ),
+        (
+            "item",
+            """
+def main(text: str) -> str:
+    return text["type"]
+""",
+        ),
+    ],
+)
+def test_run_node__string_value_wrapper_type(access_method, code_snippet):
+    """Test string value wrapper type access using different patterns"""
+
+    # GIVEN a node that will return the string type
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = code_snippet
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "text": "hello",
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully return the string type
+    assert outputs == {"result": "STRING", "log": ""}
 
 
 def test_run_node__string_value_wrapper__list_of_dicts():
