@@ -885,11 +885,11 @@ def main(arg1: list) -> str:
 @pytest.mark.parametrize(
     "code_snippet",
     [
-"""
+        """
 def main(text: str) -> str:
     return text.value
 """,
-"""
+        """
 def main(text: str) -> str:
     return text["value"]
 """,
@@ -917,11 +917,11 @@ def test_run_node__string_value_wrapper_value(code_snippet):
 @pytest.mark.parametrize(
     "code_snippet",
     [
-"""
+        """
 def main(text: str) -> str:
     return text.type
 """,
-"""
+        """
 def main(text: str) -> str:
     return text["type"]
 """,
