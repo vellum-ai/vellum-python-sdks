@@ -54,3 +54,51 @@ def test_base_class_dynamic_import(files):
     }
     assert display_meta
     assert display_meta.model_dump(mode="json") == expected_result
+
+
+def test_gather_event_display_context__custom_workflow_name():
+    # GIVEN a workflow module with a custom workflow name
+    workflow_output_id = uuid4()
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+
+class MyCustomWorkflow(BaseWorkflow):
+    class Outputs(BaseWorkflow.Outputs):
+        answer = "foo"
+""",
+        "display/__init__.py": """\
+# flake8: noqa: F401, F403
+
+from .workflow import *
+""",
+        "display/workflow.py": f"""\
+from uuid import UUID
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+from vellum_ee.workflows.display.base import WorkflowOutputDisplay
+from ..workflow import MyCustomWorkflow
+
+class MyCustomWorkflowDisplay(BaseWorkflowDisplay[MyCustomWorkflow]):
+    output_displays = {{
+        MyCustomWorkflow.Outputs.answer: WorkflowOutputDisplay(
+            id=UUID("{workflow_output_id}"), name="answer"
+        )
+    }}
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    # WHEN the workflow display context is gathered
+    Workflow = BaseWorkflow.load_from_module(namespace)
+    display_meta = BaseWorkflowDisplay.gather_event_display_context(namespace, Workflow)
+
+    # THEN the workflow display context is successfully gathered
+    assert display_meta
+    assert display_meta.workflow_outputs == {
+        "answer": workflow_output_id,
+    }
