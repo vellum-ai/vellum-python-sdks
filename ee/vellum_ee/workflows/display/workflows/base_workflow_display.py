@@ -583,14 +583,30 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # DEPRECATED: This will be removed in the 0.15.0 release
         workflow_class: Optional[Type[BaseWorkflow]] = None,
     ) -> Union[WorkflowEventDisplayContext, None]:
-        workflow_display_module = f"{module_path}.display.workflow"
+        full_workflow_display_module_path = f"{module_path}.display.workflow"
         try:
-            display_class = importlib.import_module(workflow_display_module)
+            display_module = importlib.import_module(full_workflow_display_module_path)
         except ModuleNotFoundError:
+            logger.exception("Failed to import workflow display module: %s", full_workflow_display_module_path)
             return None
 
-        WorkflowDisplayClass = display_class.WorkflowDisplay
-        if not isinstance(WorkflowDisplayClass, type) or not issubclass(WorkflowDisplayClass, BaseWorkflowDisplay):
+        WorkflowDisplayClass: Optional[Type[BaseWorkflowDisplay]] = None
+        for name, definition in display_module.__dict__.items():
+            if name.startswith("_"):
+                continue
+
+            if (
+                not isinstance(definition, type)
+                or not issubclass(definition, BaseWorkflowDisplay)
+                or definition == BaseWorkflowDisplay
+            ):
+                continue
+
+            WorkflowDisplayClass = definition
+            break
+
+        if not WorkflowDisplayClass:
+            logger.exception("No workflow display class found in module: %s", full_workflow_display_module_path)
             return None
 
         return WorkflowDisplayClass().get_event_display_context()
