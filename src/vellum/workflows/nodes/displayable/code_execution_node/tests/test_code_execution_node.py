@@ -883,17 +883,15 @@ def main(arg1: list) -> str:
 
 
 @pytest.mark.parametrize(
-    "access_method,code_snippet",
+    "code_snippet",
     [
         (
-            "attribute",
             """
 def main(text: str) -> str:
     return text.value
 """,
         ),
         (
-            "item",
             """
 def main(text: str) -> str:
     return text["value"]
@@ -901,7 +899,7 @@ def main(text: str) -> str:
         ),
     ],
 )
-def test_run_node__string_value_wrapper_value(access_method, code_snippet):
+def test_run_node__string_value_wrapper_value(code_snippet):
     """Test string value wrapper value access using different patterns"""
 
     # GIVEN a node that accesses the 'value' property of a string input
