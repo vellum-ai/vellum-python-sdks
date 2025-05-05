@@ -962,6 +962,108 @@ def main(input: str) -> str:
     assert outputs == {"result": "h", "log": ""}
 
 
+def test_run_node__function_call_wrapper_value__get_attr():
+    # GIVEN a node that will return the function call value by .value
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, FunctionCall]):
+        code = """\
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> FunctionCall:
+    return input.value
+"""
+        code_inputs = {
+            "input": FunctionCall(
+                name="",
+                arguments={},
+            )
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully return the function call value
+    assert isinstance(outputs.result, FunctionCall)
+    assert outputs.result.name == ""
+    assert outputs.result.arguments == {}
+    assert outputs.result.id is None
+    assert outputs.log == ""
+
+
+def test_run_node__function_call_wrapper_value__get_item():
+    # GIVEN a node that will return the function call value by ["value"]
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, FunctionCall]):
+        code = """\
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> FunctionCall:
+    return input["value"]
+"""
+        code_inputs = {
+            "input": FunctionCall(
+                name="",
+                arguments={},
+            )
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully return the function call value
+    assert isinstance(outputs.result, FunctionCall)
+    assert outputs.result.name == ""
+    assert outputs.result.arguments == {}
+    assert outputs.result.id is None
+    assert outputs.log == ""
+
+
+def test_run_node__function_call_wrapper_type__get_attr():
+    # GIVEN a node that will return the function call type by .type
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> str:
+    return input.type
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "input": FunctionCall(
+                name="",
+                arguments={},
+            )
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully return the function call value
+    assert outputs == {"result": "FUNCTION_CALL", "log": ""}
+
+
+def test_run_node__function_call_wrapper_type__get_item():
+    # GIVEN a node that will return the function call type by ["type"]
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = """\
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> str:
+    return input["type"]
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "input": FunctionCall(
+                name="",
+                arguments={},
+            )
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully return the function call type
+    assert outputs == {"result": "FUNCTION_CALL", "log": ""}
+
+
 def test_run_node__iter_list():
     # GIVEN a node that will return the first string in a list
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):

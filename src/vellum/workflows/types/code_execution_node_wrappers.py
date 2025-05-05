@@ -1,3 +1,6 @@
+from vellum.client.types.function_call import FunctionCall
+
+
 class StringValueWrapper(str):
     def __getitem__(self, key):
         if key == "value":
@@ -8,6 +11,25 @@ class StringValueWrapper(str):
         if attr == "value":
             return self
         raise AttributeError(f"'str' object has no attribute '{attr}'")
+
+
+class FunctionCallWrapper(FunctionCall):
+    def __init__(self, obj):
+        super().__init__(arguments=obj.arguments, name=obj.name, id=obj.id)
+
+    def __getitem__(self, key):
+        if key == "value":
+            return self
+        if key == "type":
+            return "FUNCTION_CALL"
+        raise KeyError(key)
+
+    def __getattr__(self, attr):
+        if attr == "value":
+            return self
+        if attr == "type":
+            return "FUNCTION_CALL"
+        raise AttributeError(f"'FunctionCall' object has no attribute '{attr}'")
 
 
 class ListWrapper(list):
@@ -73,5 +95,7 @@ def clean_for_dict_wrapper(obj):
         return ListWrapper(map(lambda item: clean_for_dict_wrapper(item), obj))
     elif isinstance(obj, str):
         return StringValueWrapper(obj)
+    elif isinstance(obj, FunctionCall):
+        return FunctionCallWrapper(obj)
 
     return obj
