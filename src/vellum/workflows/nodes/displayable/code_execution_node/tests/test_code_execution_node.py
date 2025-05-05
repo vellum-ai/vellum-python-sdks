@@ -1044,3 +1044,21 @@ Traceback (most recent call last):
 IndexError: list index out of range
 """
     )
+
+
+def test_run_node__default_function_call_type():
+    # GIVEN a node that will return a FunctionCall
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, FunctionCall]):
+        code = """\
+def main(input: str) -> str:
+    return None
+"""
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {"input": "foo"}
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should return default function call
+    assert outputs == {"result": FunctionCall(name="", arguments={}), "log": ""}
