@@ -33,6 +33,9 @@ class MockNetworkingClient(BaseNode[State]):
         response: dict
 
     def run(self) -> BaseNode.Outputs:
+        if not self.state.chat_history:
+            self.state.chat_history = []
+
         self.state.chat_history.append(
             ChatMessage(
                 role="ASSISTANT",
