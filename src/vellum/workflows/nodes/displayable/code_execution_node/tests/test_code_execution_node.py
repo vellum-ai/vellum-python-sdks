@@ -963,27 +963,21 @@ def main(input: str) -> str:
 
 
 @pytest.mark.parametrize(
-    "access_method,code_snippet",
+    "code_snippet",
     [
-        (
-            "attribute",
-            """
+"""
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> FunctionCall:
     return input.value
 """,
-        ),
-        (
-            "item",
-            """
+"""
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> FunctionCall:
     return input["value"]
 """,
-        ),
     ],
 )
-def test_run_node__function_call_wrapper_value(access_method, code_snippet):
+def test_run_node__function_call_wrapper_value(code_snippet):
     """Test function call wrapper value access using different patterns"""
 
     # GIVEN a node that accesses the function call value
@@ -1011,27 +1005,21 @@ def test_run_node__function_call_wrapper_value(access_method, code_snippet):
 
 
 @pytest.mark.parametrize(
-    "access_method,code_snippet",
+    "code_snippet",
     [
-        (
-            "attribute",
-            """
+"""
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> str:
     return input.type
 """,
-        ),
-        (
-            "item",
-            """
+"""
 from vellum.client.types.function_call import FunctionCall
 def main(input: FunctionCall) -> str:
     return input["type"]
 """,
-        ),
     ],
 )
-def test_run_node__function_call_wrapper_type(access_method, code_snippet):
+def test_run_node__function_call_wrapper_type(code_snippet):
     """Test function call wrapper type access using different patterns"""
 
     # GIVEN a node that accesses the function call type
