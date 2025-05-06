@@ -7,9 +7,10 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.10,<4.0"
 vellum-ai = "0.14.54"
 boto3 = "^1.38.4"
+mcp = "1.1.1"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
