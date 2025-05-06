@@ -1,6 +1,7 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { ArrayWorkflowReference } from "./array-workflow-reference";
 import { DictionaryWorkflowReference } from "./dictionary-workflow-reference";
 import { WorkflowStateReference } from "./workflow-state-reference";
 
@@ -108,6 +109,12 @@ export class WorkflowValueDescriptorReference extends AstNode {
         });
       case "DICTIONARY_REFERENCE":
         return new DictionaryWorkflowReference({
+          workflowContext: this.workflowContext,
+          nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
+        });
+      case "ARRAY_REFERENCE":
+        return new ArrayWorkflowReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });

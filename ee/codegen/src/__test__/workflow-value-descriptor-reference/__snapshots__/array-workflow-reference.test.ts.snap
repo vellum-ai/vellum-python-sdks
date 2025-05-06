@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ArrayWorkflowReference > should generate correct AST for array with constant values 1`] = `
+"[
+    "Hello, World!",
+    42,
+]
+"
+`;
+
+exports[`ArrayWorkflowReference > should generate correct AST for array with expression values 1`] = `
+"[
+    ConstantValueReference("check if null").is_null(),
+    ConstantValueReference(10).equals(10),
+]
+"
+`;
+
+exports[`ArrayWorkflowReference > should generate correct AST for empty array 1`] = `
+"[]
+"
+`;
+
+exports[`ArrayWorkflowReference > should generate correct AST for nested arrays 1`] = `
+"[
+    [
+        "Inner value",
+        100,
+    ],
+    "Outer value",
+]
+"
+`;
