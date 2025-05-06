@@ -130,17 +130,20 @@ def test_serialize_workflow():
                         "type": "JSON",
                         "value": [
                             {
-                                "state": None,
-                                "cache_config": None,
-                                "name": "get_current_weather",
-                                "description": None,
-                                "parameters": {
-                                    "type": "object",
-                                    "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
-                                    "required": ["location", "unit"],
+                                "function_definition": {
+                                    "state": None,
+                                    "cache_config": None,
+                                    "name": "get_current_weather",
+                                    "description": None,
+                                    "parameters": {
+                                        "type": "object",
+                                        "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
+                                        "required": ["location", "unit"],
+                                    },
+                                    "forced": None,
+                                    "strict": None,
                                 },
-                                "forced": None,
-                                "strict": None,
+                                "src": 'def get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',
                             }
                         ],
                     },
