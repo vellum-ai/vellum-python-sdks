@@ -962,6 +962,87 @@ def main(input: str) -> str:
     assert outputs == {"result": "h", "log": ""}
 
 
+@pytest.mark.parametrize(
+    "code_snippet",
+    [
+        """
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> FunctionCall:
+    return input.value
+""",
+        """
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> FunctionCall:
+    return input["value"]
+""",
+    ],
+)
+def test_run_node__function_call_wrapper_value(code_snippet):
+    """Test function call wrapper value access using different patterns"""
+
+    # GIVEN a node that accesses the function call value
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, FunctionCall]):
+        code = code_snippet
+        code_inputs = {
+            "input": FunctionCall(
+                name="test-name",
+                arguments={
+                    "test-key": "test-value",
+                },
+            )
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully return the function call value
+    assert isinstance(outputs.result, FunctionCall)
+    assert outputs.result.name == "test-name"
+    assert outputs.result.arguments == {"test-key": "test-value"}
+    assert outputs.result.id is None
+    assert outputs.log == ""
+
+
+@pytest.mark.parametrize(
+    "code_snippet",
+    [
+        """
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> str:
+    return input.type
+""",
+        """
+from vellum.client.types.function_call import FunctionCall
+def main(input: FunctionCall) -> str:
+    return input["type"]
+""",
+    ],
+)
+def test_run_node__function_call_wrapper_type(code_snippet):
+    """Test function call wrapper type access using different patterns"""
+
+    # GIVEN a node that accesses the function call type
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = code_snippet
+        runtime = "PYTHON_3_11_6"
+        code_inputs = {
+            "input": FunctionCall(
+                name="test-name",
+                arguments={
+                    "test-key": "test-value",
+                },
+            )
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
+
+    # THEN the node should successfully return the function call type
+    assert outputs == {"result": "FUNCTION_CALL", "log": ""}
+
+
 def test_run_node__iter_list():
     # GIVEN a node that will return the first string in a list
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
