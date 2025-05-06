@@ -32,6 +32,7 @@ import {
   AdornmentNode,
   ApiNode,
   ApiNodeAdditionalHeaderData,
+  ArrayWorkflowReference,
   BinaryWorkflowExpression,
   ChatMessagePromptTemplateBlock,
   CodeExecutionNode,
@@ -801,6 +802,19 @@ export declare namespace DictionaryWorkflowReferenceSerializer {
   }
 }
 
+export const ArrayWorkflowReferenceSerializer: ObjectSchema<
+  ArrayWorkflowReferenceSerializer.Raw,
+  Omit<ArrayWorkflowReference, "type">
+> = objectSchema({
+  items: listSchema(lazySchema(() => WorkflowValueDescriptorSerializer)),
+});
+
+export declare namespace ArrayWorkflowReferenceSerializer {
+  interface Raw {
+    items: WorkflowValueDescriptorSerializer.Raw[];
+  }
+}
+
 export const WorkflowValueDescriptorSerializer: Schema<
   WorkflowValueDescriptorSerializer.Raw,
   WorkflowValueDescriptor
@@ -815,6 +829,7 @@ export const WorkflowValueDescriptorSerializer: Schema<
   VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
   EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
   DICTIONARY_REFERENCE: DictionaryWorkflowReferenceSerializer,
+  ARRAY_REFERENCE: ArrayWorkflowReferenceSerializer,
 });
 
 export declare namespace WorkflowValueDescriptorSerializer {
@@ -828,7 +843,8 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | ConstantValueWorkflowReferenceSerializer.Raw
     | VellumSecretWorkflowReferenceSerializer.Raw
     | ExecutionCounterWorkflowReferenceSerializer.Raw
-    | DictionaryWorkflowReferenceSerializer.Raw;
+    | DictionaryWorkflowReferenceSerializer.Raw
+    | ArrayWorkflowReferenceSerializer.Raw;
 }
 
 export const NodeOutputSerializer: ObjectSchema<

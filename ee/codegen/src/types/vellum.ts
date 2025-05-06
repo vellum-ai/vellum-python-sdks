@@ -808,6 +808,11 @@ export interface DictionaryWorkflowReference {
   entries: DictionaryWorkflowReferenceEntry[];
 }
 
+export interface ArrayWorkflowReference {
+  type: "ARRAY_REFERENCE";
+  items: WorkflowValueDescriptor[];
+}
+
 export type WorkflowExpression =
   | UnaryWorkflowExpression
   | BinaryWorkflowExpression
@@ -820,7 +825,8 @@ export type WorkflowValueDescriptorReference =
   | ConstantValueWorkflowReference
   | VellumSecretWorkflowReference
   | ExecutionCounterWorkflowReference
-  | DictionaryWorkflowReference;
+  | DictionaryWorkflowReference
+  | ArrayWorkflowReference;
 
 export type WorkflowValueDescriptor =
   | WorkflowExpression
