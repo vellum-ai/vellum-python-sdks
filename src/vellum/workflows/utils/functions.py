@@ -63,8 +63,7 @@ def _compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
 
         return {"$ref": f"#/$defs/{annotation.__name__}"}
-    print("type_map", type_map)
-    print("annotation", annotation)
+
     return {"type": type_map[annotation]}
 
 
