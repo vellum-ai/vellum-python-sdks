@@ -324,6 +324,10 @@ from .prompt_request_input import PromptRequestInput
 from .prompt_request_json_input import PromptRequestJsonInput
 from .prompt_request_string_input import PromptRequestStringInput
 from .prompt_settings import PromptSettings
+from .prompt_version_build_config import PromptVersionBuildConfig
+from .prompt_version_build_config_prompt_node import PromptVersionBuildConfigPromptNode
+from .prompt_version_build_config_sandbox import PromptVersionBuildConfigSandbox
+from .prompt_version_build_config_unknown_response import PromptVersionBuildConfigUnknownResponse
 from .raw_prompt_execution_overrides_request import RawPromptExecutionOverridesRequest
 from .reducto_chunker_config import ReductoChunkerConfig
 from .reducto_chunker_config_request import ReductoChunkerConfigRequest
@@ -928,6 +932,10 @@ __all__ = [
     "PromptRequestJsonInput",
     "PromptRequestStringInput",
     "PromptSettings",
+    "PromptVersionBuildConfig",
+    "PromptVersionBuildConfigPromptNode",
+    "PromptVersionBuildConfigSandbox",
+    "PromptVersionBuildConfigUnknownResponse",
     "RawPromptExecutionOverridesRequest",
     "ReductoChunkerConfig",
     "ReductoChunkerConfigRequest",

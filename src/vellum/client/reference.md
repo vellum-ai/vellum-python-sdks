@@ -1932,7 +1932,8 @@ client.deployments.retrieve(
 <dl>
 <dd>
 
-Retrieve a specific Deployment History Item by either its UUID or the name of a Release Tag that points to it.
+DEPRECATED: This endpoint is deprecated and will be removed in a future release. Please use the
+`retrieve_prompt_deployment_release` xendpoint instead.
 </dd>
 </dl>
 </dd>
@@ -2267,6 +2268,85 @@ client.deployments.update_deployment_release_tag(
 </dl>
 </details>
 
+<details><summary><code>client.deployments.<a href="src/vellum/resources/deployments/client.py">retrieve_prompt_deployment_release</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a specific Prompt Deployment Release by either its UUID or the name of a Release Tag that points to it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.deployments.retrieve_prompt_deployment_release(
+    id="id",
+    release_id_or_release_tag="release_id_or_release_tag",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — A UUID string identifying this deployment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_id_or_release_tag:** `str` — Either the UUID of Prompt Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Prompt Deployment Release you'd like to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.deployments.<a href="src/vellum/resources/deployments/client.py">retrieve_provider_payload</a>(...)</code></summary>
 <dl>
 <dd>
@@ -2364,165 +2444,6 @@ client.deployments.retrieve_provider_payload(
 <dd>
 
 **expand_meta:** `typing.Optional[CompilePromptDeploymentExpandMetaRequest]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-## ReleaseReviews
-<details><summary><code>client.release_reviews.<a href="src/vellum/resources/release_reviews/client.py">retrieve_prompt_deployment_release</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieve a specific Prompt Deployment Release by either its UUID or the name of a Release Tag that points to it.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from vellum import Vellum
-
-client = Vellum(
-    api_key="YOUR_API_KEY",
-)
-client.release_reviews.retrieve_prompt_deployment_release(
-    id="id",
-    release_id_or_release_tag="release_id_or_release_tag",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — A UUID string identifying this deployment.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**release_id_or_release_tag:** `str` — Either the UUID of Prompt Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Prompt Deployment Release you'd like to retrieve.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.release_reviews.<a href="src/vellum/resources/release_reviews/client.py">retrieve_workflow_deployment_release</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieve a specific Workflow Deployment Release by either its UUID or the name of a Release Tag that points to it.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from vellum import Vellum
-
-client = Vellum(
-    api_key="YOUR_API_KEY",
-)
-client.release_reviews.retrieve_workflow_deployment_release(
-    id="id",
-    release_id_or_release_tag="release_id_or_release_tag",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — A UUID string identifying this workflow deployment.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**release_id_or_release_tag:** `str` — Either the UUID of Workflow Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment Release you'd like to retrieve.
     
 </dd>
 </dl>
@@ -5664,7 +5585,8 @@ client.workflow_deployments.workflow_deployment_event_execution(
 <dl>
 <dd>
 
-Retrieve a specific Workflow Deployment History Item by either its UUID or the name of a Release Tag that points to it.
+DEPRECATED: This endpoint is deprecated and will be removed in a future release. Please use the
+`retrieve_workflow_deployment_release` endpoint instead.
 </dd>
 </dl>
 </dd>
@@ -5980,6 +5902,86 @@ client.workflow_deployments.update_workflow_release_tag(
 <dd>
 
 **history_item_id:** `typing.Optional[str]` — The ID of the Workflow Deployment History Item to tag
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## ReleaseReviews
+<details><summary><code>client.release_reviews.<a href="src/vellum/resources/release_reviews/client.py">retrieve_workflow_deployment_release</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a specific Workflow Deployment Release by either its UUID or the name of a Release Tag that points to it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_key="YOUR_API_KEY",
+)
+client.release_reviews.retrieve_workflow_deployment_release(
+    id="id",
+    release_id_or_release_tag="release_id_or_release_tag",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — A UUID string identifying this workflow deployment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_id_or_release_tag:** `str` — Either the UUID of Workflow Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment Release you'd like to retrieve.
     
 </dd>
 </dl>

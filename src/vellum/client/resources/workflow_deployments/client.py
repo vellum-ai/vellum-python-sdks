@@ -263,7 +263,8 @@ class WorkflowDeploymentsClient:
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> WorkflowDeploymentHistoryItem:
         """
-        Retrieve a specific Workflow Deployment History Item by either its UUID or the name of a Release Tag that points to it.
+        DEPRECATED: This endpoint is deprecated and will be removed in a future release. Please use the
+        `retrieve_workflow_deployment_release` endpoint instead.
 
         Parameters
         ----------
@@ -786,7 +787,8 @@ class AsyncWorkflowDeploymentsClient:
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> WorkflowDeploymentHistoryItem:
         """
-        Retrieve a specific Workflow Deployment History Item by either its UUID or the name of a Release Tag that points to it.
+        DEPRECATED: This endpoint is deprecated and will be removed in a future release. Please use the
+        `retrieve_workflow_deployment_release` endpoint instead.
 
         Parameters
         ----------
