@@ -66,7 +66,11 @@ class DefaultStateEncoder(JSONEncoder):
             except Exception:
                 source_code = f"<source code not available for {obj.__name__}>"
 
-            return {"function_definition": function_definition, "src": source_code}
+            # block string for source code
+            return {
+                "definition": function_definition,
+                "src": f'"""{source_code}"""',
+            }
 
         if obj.__class__ in self.encoders:
             return self.encoders[obj.__class__](obj)
