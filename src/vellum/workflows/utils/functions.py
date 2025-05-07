@@ -16,6 +16,7 @@ type_map = {
     dict: "object",
     None: "null",
     type(None): "null",
+    inspect._empty: "null",
 }
 
 
