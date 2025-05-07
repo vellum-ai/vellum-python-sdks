@@ -266,7 +266,7 @@ def test_compile_function_definition__default_pydantic():
 
 def test_compile_function_definition__lambda():
     # GIVEN a lambda
-    lambda_function = lambda x: x + 1
+    lambda_function = lambda x: x + 1  # noqa: E731
 
     # WHEN compiling the function
     compiled_function = compile_function_definition(lambda_function)
