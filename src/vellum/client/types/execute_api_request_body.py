@@ -2,4 +2,6 @@
 
 import typing
 
-ExecuteApiRequestBody = typing.Union[str, typing.Dict[str, typing.Optional[typing.Any]]]
+ExecuteApiRequestBody = typing.Union[
+    str, typing.List[typing.Optional[typing.Any]], typing.Dict[str, typing.Optional[typing.Any]]
+]

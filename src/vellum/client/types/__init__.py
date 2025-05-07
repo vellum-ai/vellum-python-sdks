@@ -69,6 +69,7 @@ from .compile_prompt_deployment_expand_meta_request import CompilePromptDeployme
 from .compile_prompt_meta import CompilePromptMeta
 from .components_schemas_pdf_search_result_meta_source import ComponentsSchemasPdfSearchResultMetaSource
 from .components_schemas_pdf_search_result_meta_source_request import ComponentsSchemasPdfSearchResultMetaSourceRequest
+from .components_schemas_prompt_version_build_config_sandbox import ComponentsSchemasPromptVersionBuildConfigSandbox
 from .condition_combinator import ConditionCombinator
 from .conditional_node_result import ConditionalNodeResult
 from .conditional_node_result_data import ConditionalNodeResultData
@@ -324,6 +325,7 @@ from .prompt_request_input import PromptRequestInput
 from .prompt_request_json_input import PromptRequestJsonInput
 from .prompt_request_string_input import PromptRequestStringInput
 from .prompt_settings import PromptSettings
+from .prompt_version_build_config_sandbox import PromptVersionBuildConfigSandbox
 from .raw_prompt_execution_overrides_request import RawPromptExecutionOverridesRequest
 from .reducto_chunker_config import ReductoChunkerConfig
 from .reducto_chunker_config_request import ReductoChunkerConfigRequest
@@ -677,6 +679,7 @@ __all__ = [
     "CompilePromptMeta",
     "ComponentsSchemasPdfSearchResultMetaSource",
     "ComponentsSchemasPdfSearchResultMetaSourceRequest",
+    "ComponentsSchemasPromptVersionBuildConfigSandbox",
     "ConditionCombinator",
     "ConditionalNodeResult",
     "ConditionalNodeResultData",
@@ -928,6 +931,7 @@ __all__ = [
     "PromptRequestJsonInput",
     "PromptRequestStringInput",
     "PromptSettings",
+    "PromptVersionBuildConfigSandbox",
     "RawPromptExecutionOverridesRequest",
     "ReductoChunkerConfig",
     "ReductoChunkerConfigRequest",

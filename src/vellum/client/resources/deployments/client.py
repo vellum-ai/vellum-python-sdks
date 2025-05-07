@@ -14,6 +14,7 @@ from ...types.deployment_history_item import DeploymentHistoryItem
 from .types.list_deployment_release_tags_request_source import ListDeploymentReleaseTagsRequestSource
 from ...types.paginated_deployment_release_tag_read_list import PaginatedDeploymentReleaseTagReadList
 from ...types.deployment_release_tag_read import DeploymentReleaseTagRead
+from ...types.prompt_deployment_release import PromptDeploymentRelease
 from ...types.prompt_deployment_input_request import PromptDeploymentInputRequest
 from ...types.compile_prompt_deployment_expand_meta_request import CompilePromptDeploymentExpandMetaRequest
 from ...types.deployment_provider_payload_response import DeploymentProviderPayloadResponse
@@ -153,7 +154,8 @@ class DeploymentsClient:
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> DeploymentHistoryItem:
         """
-        Retrieve a specific Deployment History Item by either its UUID or the name of a Release Tag that points to it.
+        DEPRECATED: This endpoint is deprecated and will be removed in a future release. Please use the
+        `retrieve_prompt_deployment_release` xendpoint instead.
 
         Parameters
         ----------
@@ -392,6 +394,60 @@ class DeploymentsClient:
                     DeploymentReleaseTagRead,
                     parse_obj_as(
                         type_=DeploymentReleaseTagRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def retrieve_prompt_deployment_release(
+        self, id: str, release_id_or_release_tag: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> PromptDeploymentRelease:
+        """
+        Retrieve a specific Prompt Deployment Release by either its UUID or the name of a Release Tag that points to it.
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this deployment.
+
+        release_id_or_release_tag : str
+            Either the UUID of Prompt Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Prompt Deployment Release you'd like to retrieve.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptDeploymentRelease
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_key="YOUR_API_KEY",
+        )
+        client.deployments.retrieve_prompt_deployment_release(
+            id="id",
+            release_id_or_release_tag="release_id_or_release_tag",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PromptDeploymentRelease,
+                    parse_obj_as(
+                        type_=PromptDeploymentRelease,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -679,7 +735,8 @@ class AsyncDeploymentsClient:
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> DeploymentHistoryItem:
         """
-        Retrieve a specific Deployment History Item by either its UUID or the name of a Release Tag that points to it.
+        DEPRECATED: This endpoint is deprecated and will be removed in a future release. Please use the
+        `retrieve_prompt_deployment_release` xendpoint instead.
 
         Parameters
         ----------
@@ -950,6 +1007,68 @@ class AsyncDeploymentsClient:
                     DeploymentReleaseTagRead,
                     parse_obj_as(
                         type_=DeploymentReleaseTagRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def retrieve_prompt_deployment_release(
+        self, id: str, release_id_or_release_tag: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> PromptDeploymentRelease:
+        """
+        Retrieve a specific Prompt Deployment Release by either its UUID or the name of a Release Tag that points to it.
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this deployment.
+
+        release_id_or_release_tag : str
+            Either the UUID of Prompt Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Prompt Deployment Release you'd like to retrieve.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptDeploymentRelease
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.deployments.retrieve_prompt_deployment_release(
+                id="id",
+                release_id_or_release_tag="release_id_or_release_tag",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PromptDeploymentRelease,
+                    parse_obj_as(
+                        type_=PromptDeploymentRelease,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
