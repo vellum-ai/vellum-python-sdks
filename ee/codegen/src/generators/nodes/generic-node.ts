@@ -6,6 +6,8 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { FunctionDefinition } from "vellum-ai/api";
 
+import { AdornmentAttributeConfig, NODE_DEFAULT_ATTRIBUTES } from "./constants";
+
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
@@ -57,54 +59,62 @@ export class GenericNode extends BaseSingleFileNode<
 
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
+    const nodeAttributes = NODE_DEFAULT_ATTRIBUTES["GenericNode"] as Record<
+      string,
+      AdornmentAttributeConfig
+    >;
+
     this.nodeData.attributes.forEach((attribute) => {
-      if (attribute.name === "functions") {
-        const value = attribute.value;
+      switch (attribute.name) {
+        case nodeAttributes.functions?.name: {
+          const value = attribute.value;
 
-        if (
-          value?.type === "CONSTANT_VALUE" &&
-          value.value?.type === "JSON" &&
-          Array.isArray(value.value.value)
-        ) {
-          const functions: Array<FunctionArgs> = value.value.value;
-          this.generateFunctionFile(functions);
+          if (
+            value?.type === "CONSTANT_VALUE" &&
+            value.value?.type === "JSON" &&
+            Array.isArray(value.value.value)
+          ) {
+            const functions: Array<FunctionArgs> = value.value.value;
+            this.generateFunctionFile(functions);
 
-          const functionNames: string[] = [];
-          functions.forEach((f) => {
-            if (f.definition && f.definition.name) {
-              functionNames.push(f.definition.name);
-            }
-          });
-          const nodeName = this.nodeContext.getNodeLabel();
+            const functionNames: string[] = [];
+            functions.forEach((f) => {
+              if (f.definition && f.definition.name) {
+                functionNames.push(f.definition.name);
+              }
+            });
+            const nodeName = this.nodeContext.getNodeLabel();
 
+            statements.push(
+              python.field({
+                name: "functions",
+                initializer: python.TypeInstantiation.list(
+                  functionNames.map((name) => {
+                    const snakeName = toPythonSafeSnakeCase(name);
+                    return python.reference({
+                      name: snakeName,
+                      modulePath: [
+                        `.${toPythonSafeSnakeCase(nodeName)}.${snakeName}`,
+                      ],
+                    });
+                  })
+                ),
+              })
+            );
+          }
+          break;
+        }
+        default:
           statements.push(
             python.field({
-              name: "functions",
-              initializer: python.TypeInstantiation.list(
-                functionNames.map((name) => {
-                  const snakeName = toPythonSafeSnakeCase(name);
-                  return python.reference({
-                    name: snakeName,
-                    modulePath: [
-                      `.${toPythonSafeSnakeCase(nodeName)}.${snakeName}`,
-                    ],
-                  });
-                })
-              ),
+              name: toPythonSafeSnakeCase(attribute.name),
+              initializer: new WorkflowValueDescriptor({
+                nodeContext: this.nodeContext,
+                workflowValueDescriptor: attribute.value,
+                workflowContext: this.workflowContext,
+              }),
             })
           );
-        }
-      } else {
-        statements.push(
-          python.field({
-            name: toPythonSafeSnakeCase(attribute.name),
-            initializer: new WorkflowValueDescriptor({
-              nodeContext: this.nodeContext,
-              workflowValueDescriptor: attribute.value,
-              workflowContext: this.workflowContext,
-            }),
-          })
-        );
       }
     });
 
