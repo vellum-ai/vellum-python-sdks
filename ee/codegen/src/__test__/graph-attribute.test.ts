@@ -988,5 +988,64 @@ describe("Workflow", () => {
         [[FirstNode, "else_port"], SecondNode],
       ]);
     });
+
+    it("should generate correct graph for expression reference own output", async () => {
+      const EntrypointNode = entrypointNodeDataFactory();
+
+      const ifPortId = "583edca2-29ff-4462-8859-72c07159b777";
+      const elsePortId = "09e71028-e2b1-4a63-a929-f72414351ac6";
+
+      const PromptNode = genericNodeFactory({
+        id: "inline-prompt-node",
+        label: "Prompt",
+        nodePorts: [
+          nodePortFactory({
+            type: "IF",
+            id: ifPortId,
+            name: "group_1_if_port",
+            expression: {
+              type: "BINARY_EXPRESSION",
+              operator: "=",
+              lhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "Hi",
+                },
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "Some value",
+                },
+              },
+            },
+          }),
+          nodePortFactory({
+            type: "ELSE",
+            id: elsePortId,
+            name: "group_1_else_port",
+          }),
+        ],
+      });
+
+      const SecondNode = genericNodeFactory({
+        id: "second-node",
+        label: "SecondNode",
+      });
+
+      const FinalOutput = finalOutputNodeFactory({
+        id: "final-output-node",
+        label: "FinalOutput",
+      }).build();
+
+      await runGraphTest([
+        [EntrypointNode, PromptNode],
+        [[PromptNode, "group_1_if_port"], FinalOutput],
+        [[PromptNode, "group_1_else_port"], SecondNode],
+        [SecondNode, PromptNode],
+      ]);
+    });
   });
 });
