@@ -923,7 +923,7 @@ export class GraphAttribute extends AstNode {
       );
     }
     if (mutableAst.type === "port_reference") {
-      return mutableAst.reference.nodeContext === targetNode && !isRoot;
+      return false;
     }
     return false;
   }

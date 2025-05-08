@@ -1,19 +1,15 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Workflow > graph > Should handle an a conditional pointing both ports to the same conditional node 1`] = `
-"(
-    {
-        FirstCheckNode.Ports.if_port,
-        FirstCheckNode.Ports.else_port >> FirstOutputNode,
+"{
+    FirstCheckNode.Ports.if_port
+    >> {
+        SecondCheckNode.Ports.if_port >> SecondOutputNode,
+        SecondCheckNode.Ports.else_port >> ThirdOutputNode,
     }
-    >> Graph.from_set(
-        {
-            SecondCheckNode.Ports.if_port >> SecondOutputNode,
-            SecondCheckNode.Ports.else_port >> ThirdOutputNode,
-        }
-    )
-    >> FourthOutputNode
-)
+    >> FourthOutputNode,
+    FirstCheckNode.Ports.else_port >> FirstOutputNode >> SecondCheckNode,
+}
 "
 `;
 
@@ -252,14 +248,16 @@ exports[`Workflow > graph > should be correct for two branches merging from sets
 
 exports[`Workflow > graph > should be pointing to the correct terminal nodes from a nested set of conditionals 1`] = `
 "{
-    FirstCheckNode.Ports.if_port >> FirstInnerCheckNode >> SecondInnerCheckNode,
-    FirstCheckNode.Ports.else_port,
-} >> Graph.from_set(
-    {
+    FirstCheckNode.Ports.if_port
+    >> FirstInnerCheckNode
+    >> SecondInnerCheckNode
+    >> FinalCheckNode,
+    FirstCheckNode.Ports.else_port
+    >> {
         FinalCheckNode.Ports.if_port >> InnerTerminalNode,
         FinalCheckNode.Ports.else_port >> OuterOutputNode,
-    }
-)
+    },
+}
 "
 `;
 
