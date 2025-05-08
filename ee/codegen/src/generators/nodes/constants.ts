@@ -30,5 +30,3 @@ export const NODE_DEFAULT_ATTRIBUTES: Record<
     blocks: { name: "blocks", defaultValue: null },
   },
 };
-
-export type NodeType = keyof typeof NODE_DEFAULT_ATTRIBUTES;
