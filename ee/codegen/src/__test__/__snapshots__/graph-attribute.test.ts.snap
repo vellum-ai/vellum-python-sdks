@@ -278,6 +278,14 @@ exports[`Workflow > graph > should generate correct graph for a loop with ports 
 "
 `;
 
+exports[`Workflow > graph > should generate correct graph for expression reference own output 1`] = `
+"{
+    Prompt.Ports.group_1_if_port >> FinalOutput,
+    Prompt.Ports.group_1_else_port >> SecondNode >> Prompt,
+}
+"
+`;
+
 exports[`Workflow > graph > should handle a simple edge of generic nodes 1`] = `
 "StartNode >> EndNode
 "

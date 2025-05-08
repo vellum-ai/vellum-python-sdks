@@ -364,26 +364,6 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
 "
 `;
 
-exports[`WorkflowProjectGenerator > port > should generate correct port references 1`] = `
-"from vellum.workflows import BaseWorkflow
-
-from .nodes.api_node import APINode
-from .nodes.code_execution_node import CodeExecutionNode
-from .nodes.final_output import FinalOutput
-from .nodes.prompt import Prompt
-
-
-class Workflow(BaseWorkflow):
-    graph = {
-        Prompt.Ports.group_1_if_port >> FinalOutput,
-        Prompt.Ports.group_1_else_port >> APINode >> CodeExecutionNode >> Prompt,
-    }
-
-    class Outputs(BaseWorkflow.Outputs):
-        final_output = FinalOutput.Outputs.value
-"
-`;
-
 exports[`WorkflowProjectGenerator > runner config with no container image > should handle a runner config with no container image 1`] = `
 "from vellum.workflows import BaseWorkflow
 
