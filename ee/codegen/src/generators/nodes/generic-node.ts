@@ -174,32 +174,6 @@ export class GenericNode extends BaseSingleFileNode<
         functionName: "__init__",
         content: "# Generated __init__.py\n",
       });
-
-      const absolutePath = this.workflowContext.absolutePathToOutputDirectory;
-      const nodeName = this.nodeContext.getNodeLabel();
-
-      const baseModule = this.workflowContext.moduleName;
-      const basePath = `${baseModule}/nodes/${toPythonSafeSnakeCase(nodeName)}`;
-
-      const nodeDir = join(absolutePath, basePath);
-      await mkdir(nodeDir, { recursive: true });
-
-      await Promise.all(
-        this.functionsToGenerate.map(async (funcFile) => {
-          let filepath: string;
-
-          if (funcFile.functionName === "__init__") {
-            filepath = join(nodeDir, "__init__.py");
-          } else {
-            const fileName = `${toPythonSafeSnakeCase(
-              funcFile.functionName
-            )}.py`;
-            filepath = join(nodeDir, fileName);
-          }
-
-          await writeFile(filepath, funcFile.content);
-        })
-      );
     }
   }
 
@@ -226,5 +200,30 @@ export class GenericNode extends BaseSingleFileNode<
     }
 
     await super.persist();
+
+    // Generate function files
+    const absolutePath = this.workflowContext.absolutePathToOutputDirectory;
+    const nodeName = this.nodeContext.getNodeLabel();
+
+    const baseModule = this.workflowContext.moduleName;
+    const basePath = `${baseModule}/nodes/${toPythonSafeSnakeCase(nodeName)}`;
+
+    const nodeDir = join(absolutePath, basePath);
+    await mkdir(nodeDir, { recursive: true });
+
+    await Promise.all(
+      this.functionsToGenerate.map(async (funcFile) => {
+        let filepath: string;
+
+        if (funcFile.functionName === "__init__") {
+          filepath = join(nodeDir, "__init__.py");
+        } else {
+          const fileName = `${toPythonSafeSnakeCase(funcFile.functionName)}.py`;
+          filepath = join(nodeDir, fileName);
+        }
+
+        await writeFile(filepath, funcFile.content);
+      })
+    );
   }
 }
