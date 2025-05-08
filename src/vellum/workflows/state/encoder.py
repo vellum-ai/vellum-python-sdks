@@ -1,6 +1,7 @@
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 import enum
+import inspect
 from json import JSONEncoder
 from queue import Queue
 from uuid import UUID
@@ -59,7 +60,13 @@ class DefaultStateEncoder(JSONEncoder):
             return str(obj)
 
         if callable(obj):
-            return compile_function_definition(obj)
+            function_definition = compile_function_definition(obj)
+            try:
+                source_code = inspect.getsource(obj)
+            except Exception:
+                source_code = f"<source code not available for {obj.__name__}>"
+
+            return {"definition": function_definition, "src": source_code}
 
         if obj.__class__ in self.encoders:
             return self.encoders[obj.__class__](obj)
