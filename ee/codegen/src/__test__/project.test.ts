@@ -3460,4 +3460,425 @@ baz = foo + bar
       expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
     });
   });
+  describe("function", () => {
+    it("should generate <function_name>.py file", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "entrypoint",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "d8144c82-8b1a-4181-b068-6aaf69d21b73",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+            },
+            {
+              id: "tool-calling-node",
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "experimental",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              type: "GENERIC",
+              label: "GetCurrentWeatherNode",
+              ports: [
+                {
+                  id: "7b97f998-4be5-478d-94c4-9423db5f6392",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              outputs: [
+                {
+                  id: "73a3c1e6-b632-45c5-a837-50922ccf0d47",
+                  name: "text",
+                  type: "STRING",
+                  value: null,
+                },
+                {
+                  id: "7dfce73d-3d56-4bb6-8a7e-cc1b3e38746e",
+                  name: "chat_history",
+                  type: "CHAT_HISTORY",
+                  value: null,
+                },
+              ],
+              trigger: {
+                id: "d8d60185-e88a-467b-84f4-e5fddd8b3209",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              adornments: null,
+              attributes: [
+                {
+                  id: "75bd1347-dca2-4cba-b0b0-a20a2923ebcc",
+                  name: "ml_model",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "gpt-4o-mini" },
+                  },
+                },
+                {
+                  id: "723f614a-be30-4f27-90d0-896c740e58d3",
+                  name: "max_tool_calls",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "NUMBER", value: 3.0 },
+                  },
+                },
+                {
+                  id: "beec5344-2eff-47d2-b920-b90367370d79",
+                  name: "blocks",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          state: null,
+                          blocks: [
+                            {
+                              state: null,
+                              blocks: [
+                                {
+                                  text: "You are a weather expert",
+                                  state: null,
+                                  block_type: "PLAIN_TEXT",
+                                  cache_config: null,
+                                },
+                              ],
+                              block_type: "RICH_TEXT",
+                              cache_config: null,
+                            },
+                          ],
+                          chat_role: "SYSTEM",
+                          block_type: "CHAT_MESSAGE",
+                          chat_source: null,
+                          cache_config: null,
+                          chat_message_unterminated: null,
+                        },
+                        {
+                          state: null,
+                          blocks: [
+                            {
+                              state: null,
+                              blocks: [
+                                {
+                                  state: null,
+                                  block_type: "VARIABLE",
+                                  cache_config: null,
+                                  input_variable: "question",
+                                },
+                              ],
+                              block_type: "RICH_TEXT",
+                              cache_config: null,
+                            },
+                          ],
+                          chat_role: "USER",
+                          block_type: "CHAT_MESSAGE",
+                          chat_source: null,
+                          cache_config: null,
+                          chat_message_unterminated: null,
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  id: "7b1ab802-3228-43b3-a493-734c94794710",
+                  name: "functions",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          src: 'def get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',
+                          definition: {
+                            name: "get_current_weather",
+                            state: null,
+                            forced: null,
+                            strict: null,
+                            parameters: {
+                              type: "object",
+                              required: ["location", "unit"],
+                              properties: {
+                                unit: { type: "string" },
+                                location: { type: "string" },
+                              },
+                            },
+                            description: null,
+                            cache_config: null,
+                          },
+                        },
+                        {
+                          src: `def format_answer(answer: str) -> str:\n    """\n    Format the answer and request the LLM to provide a final text summary.\n    """\n    formatted = f"The answer to the question is: {answer}"\n    return (\n        f"{formatted}\\n\\nNow please provide a final summary with any temperature conversions or additional information."\n    )\n`,
+                          definition: {
+                            name: "format_answer",
+                            state: null,
+                            forced: null,
+                            strict: null,
+                            parameters: {
+                              type: "object",
+                              required: ["answer"],
+                              properties: { answer: { type: "string" } },
+                            },
+                            description: null,
+                            cache_config: null,
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  id: "38cf126e-a186-4a63-8e30-47c4507413cd",
+                  name: "prompt_inputs",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: {
+                        question: "What's the weather like in San Francisco?",
+                      },
+                    },
+                  },
+                },
+              ],
+              definition: {
+                name: "GetCurrentWeatherNode",
+                module: ["testing", "nodes", "tool_call"],
+              },
+            },
+          ],
+
+          output_values: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "get_current_weather_node",
+        "__init__.py",
+      ]);
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "get_current_weather_node",
+        "get_current_weather.py",
+      ]);
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "get_current_weather_node",
+        "format_answer.py",
+      ]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "tool_call.py"]);
+    });
+    it("should generate empty function array if no functions are defined", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "entrypoint",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "d8144c82-8b1a-4181-b068-6aaf69d21b73",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+            },
+            {
+              id: "tool-calling-node",
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "experimental",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              type: "GENERIC",
+              label: "GetCurrentWeatherNode",
+              ports: [
+                {
+                  id: "7b97f998-4be5-478d-94c4-9423db5f6392",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              outputs: [
+                {
+                  id: "73a3c1e6-b632-45c5-a837-50922ccf0d47",
+                  name: "text",
+                  type: "STRING",
+                  value: null,
+                },
+                {
+                  id: "7dfce73d-3d56-4bb6-8a7e-cc1b3e38746e",
+                  name: "chat_history",
+                  type: "CHAT_HISTORY",
+                  value: null,
+                },
+              ],
+              trigger: {
+                id: "d8d60185-e88a-467b-84f4-e5fddd8b3209",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              adornments: null,
+              attributes: [
+                {
+                  id: "75bd1347-dca2-4cba-b0b0-a20a2923ebcc",
+                  name: "ml_model",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "gpt-4o-mini" },
+                  },
+                },
+                {
+                  id: "723f614a-be30-4f27-90d0-896c740e58d3",
+                  name: "max_tool_calls",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "NUMBER", value: 3.0 },
+                  },
+                },
+                {
+                  id: "beec5344-2eff-47d2-b920-b90367370d79",
+                  name: "blocks",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          state: null,
+                          blocks: [
+                            {
+                              state: null,
+                              blocks: [
+                                {
+                                  text: "You are a weather expert",
+                                  state: null,
+                                  block_type: "PLAIN_TEXT",
+                                  cache_config: null,
+                                },
+                              ],
+                              block_type: "RICH_TEXT",
+                              cache_config: null,
+                            },
+                          ],
+                          chat_role: "SYSTEM",
+                          block_type: "CHAT_MESSAGE",
+                          chat_source: null,
+                          cache_config: null,
+                          chat_message_unterminated: null,
+                        },
+                        {
+                          state: null,
+                          blocks: [
+                            {
+                              state: null,
+                              blocks: [
+                                {
+                                  state: null,
+                                  block_type: "VARIABLE",
+                                  cache_config: null,
+                                  input_variable: "question",
+                                },
+                              ],
+                              block_type: "RICH_TEXT",
+                              cache_config: null,
+                            },
+                          ],
+                          chat_role: "USER",
+                          block_type: "CHAT_MESSAGE",
+                          chat_source: null,
+                          cache_config: null,
+                          chat_message_unterminated: null,
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  id: "7b1ab802-3228-43b3-a493-734c94794710",
+                  name: "functions",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [],
+                    },
+                  },
+                },
+                {
+                  id: "38cf126e-a186-4a63-8e30-47c4507413cd",
+                  name: "prompt_inputs",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: {
+                        question: "What's the weather like in San Francisco?",
+                      },
+                    },
+                  },
+                },
+              ],
+              definition: {
+                name: "GetCurrentWeatherNode",
+                module: ["testing", "nodes", "tool_call"],
+              },
+            },
+          ],
+
+          output_values: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+      expectProjectFileToMatchSnapshot(["code", "nodes", "tool_call.py"]);
+    });
+  });
 });

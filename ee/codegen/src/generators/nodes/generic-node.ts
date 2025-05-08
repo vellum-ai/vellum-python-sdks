@@ -1,6 +1,10 @@
+import { mkdir, writeFile } from "fs/promises";
+import { join } from "path";
+
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { FunctionDefinition } from "vellum-ai/api";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { NodeOutputs } from "src/generators/node-outputs";
@@ -10,10 +14,19 @@ import { WorkflowValueDescriptor } from "src/generators/workflow-value-descripto
 import { GenericNode as GenericNodeType } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
 
+interface FunctionArgs {
+  src: string;
+  definition: FunctionDefinition;
+}
+
 export class GenericNode extends BaseSingleFileNode<
   GenericNodeType,
   GenericNodeContext
 > {
+  private functionsToGenerate: Array<{
+    functionName: string;
+    content: string;
+  }> = [];
   getNodeDecorators(): python.Decorator[] | undefined {
     if (!this.nodeData.adornments) {
       return [];
@@ -45,16 +58,54 @@ export class GenericNode extends BaseSingleFileNode<
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
     this.nodeData.attributes.forEach((attribute) => {
-      statements.push(
-        python.field({
-          name: toPythonSafeSnakeCase(attribute.name),
-          initializer: new WorkflowValueDescriptor({
-            nodeContext: this.nodeContext,
-            workflowValueDescriptor: attribute.value,
-            workflowContext: this.workflowContext,
-          }),
-        })
-      );
+      if (attribute.name === "functions") {
+        const value = attribute.value;
+
+        if (
+          value?.type === "CONSTANT_VALUE" &&
+          value.value?.type === "JSON" &&
+          Array.isArray(value.value.value)
+        ) {
+          const functions: Array<FunctionArgs> = value.value.value;
+          this.generateFunctionFile(functions);
+
+          const functionNames: string[] = [];
+          functions.forEach((f) => {
+            if (f.definition && f.definition.name) {
+              functionNames.push(f.definition.name);
+            }
+          });
+          const nodeName = this.nodeContext.getNodeLabel();
+
+          statements.push(
+            python.field({
+              name: "functions",
+              initializer: python.TypeInstantiation.list(
+                functionNames.map((name) => {
+                  const snakeName = toPythonSafeSnakeCase(name);
+                  return python.reference({
+                    name: snakeName,
+                    modulePath: [
+                      `.${toPythonSafeSnakeCase(nodeName)}.${snakeName}`,
+                    ],
+                  });
+                })
+              ),
+            })
+          );
+        }
+      } else {
+        statements.push(
+          python.field({
+            name: toPythonSafeSnakeCase(attribute.name),
+            initializer: new WorkflowValueDescriptor({
+              nodeContext: this.nodeContext,
+              workflowValueDescriptor: attribute.value,
+              workflowContext: this.workflowContext,
+            }),
+          })
+        );
+      }
     });
 
     if (this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES") {
@@ -94,6 +145,52 @@ export class GenericNode extends BaseSingleFileNode<
 
   private getModulePath(): string[] {
     return this.nodeContext.nodeModulePath;
+  }
+
+  private async generateFunctionFile(
+    functions: Array<FunctionArgs>
+  ): Promise<void> {
+    functions.forEach((f) => {
+      if (f.definition?.name) {
+        this.functionsToGenerate.push({
+          functionName: f.definition.name,
+          content: f.src,
+        });
+      }
+    });
+
+    if (this.functionsToGenerate.length > 0) {
+      this.functionsToGenerate.push({
+        functionName: "__init__",
+        content: "# Generated __init__.py\n",
+      });
+
+      const absolutePath = this.workflowContext.absolutePathToOutputDirectory;
+      const nodeName = this.nodeContext.getNodeLabel();
+
+      const baseModule = this.workflowContext.moduleName;
+      const basePath = `${baseModule}/nodes/${toPythonSafeSnakeCase(nodeName)}`;
+
+      const nodeDir = join(absolutePath, basePath);
+      await mkdir(nodeDir, { recursive: true });
+
+      await Promise.all(
+        this.functionsToGenerate.map(async (funcFile) => {
+          let filepath: string;
+
+          if (funcFile.functionName === "__init__") {
+            filepath = join(nodeDir, "__init__.py");
+          } else {
+            const fileName = `${toPythonSafeSnakeCase(
+              funcFile.functionName
+            )}.py`;
+            filepath = join(nodeDir, fileName);
+          }
+
+          await writeFile(filepath, funcFile.content);
+        })
+      );
+    }
   }
 
   public async persist(): Promise<void> {

@@ -30,7 +30,9 @@ class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
 `;
 
 exports[`ToolCallingNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes.experimental.tool_calling_node import (
+"from .tool_calling_node.get_current_weather import get_current_weather
+
+from vellum.workflows.nodes.experimental.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 
@@ -85,31 +87,7 @@ class ToolCallingNode(BaseToolCallingNode):
             "chat_message_unterminated": None,
         },
     ]
-    functions = [
-        {
-            "name": "get_current_weather",
-            "state": None,
-            "forced": None,
-            "strict": None,
-            "parameters": {
-                "type": "object",
-                "required": [
-                    "location",
-                    "unit",
-                ],
-                "properties": {
-                    "unit": {
-                        "type": "string",
-                    },
-                    "location": {
-                        "type": "string",
-                    },
-                },
-            },
-            "description": None,
-            "cache_config": None,
-        },
-    ]
+    functions = [get_current_weather]
     prompt_inputs = {
         "question": "What's the weather like in San Francisco?",
     }
