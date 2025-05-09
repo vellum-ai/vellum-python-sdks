@@ -131,7 +131,6 @@ export class GenericNode extends BaseSingleFileNode<
                     return new PromptBlock({
                       workflowContext: this.workflowContext,
                       promptBlock: block,
-                      inputVariableNameById: {},
                     });
                   }),
                   {

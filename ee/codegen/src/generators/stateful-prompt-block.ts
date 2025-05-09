@@ -172,7 +172,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
       ...this.constructCommonClassArguments(promptBlock),
     ];
     const inputVariableName =
-      this.inputVariableNameById[promptBlock.inputVariableId] ??
+      this.inputVariableNameById?.[promptBlock.inputVariableId] ??
       promptBlock.inputVariableId;
 
     classArgs.push(

@@ -37,7 +37,7 @@ export declare namespace BasePromptBlock {
   > {
     workflowContext: WorkflowContext;
     promptBlock: T;
-    inputVariableNameById: Record<string, string>;
+    inputVariableNameById?: Record<string, string>;
   }
 }
 
@@ -46,7 +46,7 @@ export abstract class BasePromptBlock<
 > extends AstNode {
   protected workflowContext: WorkflowContext;
   private astNode: python.ClassInstantiation;
-  protected inputVariableNameById: Record<string, string>;
+  protected inputVariableNameById: Record<string, string> | undefined;
 
   public constructor({
     workflowContext,
