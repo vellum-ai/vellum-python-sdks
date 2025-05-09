@@ -63,6 +63,9 @@ def create_tool_router_node(
         for function in functions:
             function_name = function.__name__
 
+            # Avoid using lambda to capture function_name
+            # lambda will capture the function_name by reference,
+            # and if the function_name is changed, the port_condition will also change.
             def create_port_condition(fn_name):
                 return LazyReference(
                     lambda: (
