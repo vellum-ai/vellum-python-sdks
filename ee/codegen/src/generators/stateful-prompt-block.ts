@@ -11,14 +11,14 @@ import {
 import {
   ChatMessagePromptTemplateBlock,
   JinjaPromptTemplateBlock,
+  PlainTextPromptTemplateBlock,
   RichTextPromptTemplateBlock,
   VariablePromptTemplateBlock,
-  PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
 
 // Flesh out unit tests for various prompt configurations
 // https://app.shortcut.com/vellum/story/5249
-export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFunctionDefinition> {
+export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFunctionDefinition> {
   protected generateAstNode(
     promptBlock: PromptTemplateBlockExcludingFunctionDefinition
   ): ClassInstantiation {

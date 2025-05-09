@@ -8,13 +8,13 @@ import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/b
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { FunctionDefinition } from "src/generators/function-definition";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
-import { PromptBlock } from "src/generators/prompt-block";
 import { PromptParameters } from "src/generators/prompt-parameters-request";
+import { StatefulPromptBlock } from "src/generators/stateful-prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
-  InlinePromptNode as InlinePromptNodeType,
   FunctionDefinitionPromptTemplateBlock,
   InlinePromptNodeData,
+  InlinePromptNode as InlinePromptNodeType,
   PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -86,7 +86,7 @@ export class InlinePromptNode extends BaseSingleFileNode<
         name: "blocks",
         initializer: python.TypeInstantiation.list(
           blocksExcludingFunctionDefinition.map((block) => {
-            return new PromptBlock({
+            return new StatefulPromptBlock({
               workflowContext: this.workflowContext,
               promptBlock: block,
               inputVariableNameById: Object.fromEntries(
