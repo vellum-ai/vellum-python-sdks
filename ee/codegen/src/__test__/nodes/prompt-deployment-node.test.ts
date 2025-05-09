@@ -1,6 +1,6 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
-import { ReleaseReviews as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { Deployments as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/deployments/client/Client";
 import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
