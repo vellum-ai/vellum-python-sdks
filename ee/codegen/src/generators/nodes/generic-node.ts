@@ -87,7 +87,7 @@ export class GenericNode extends BaseSingleFileNode<
 
             statements.push(
               python.field({
-                name: "functions",
+                name: attribute.name,
                 initializer: python.TypeInstantiation.list(
                   functionNames.map((name) => {
                     const snakeName = toPythonSafeSnakeCase(name);
