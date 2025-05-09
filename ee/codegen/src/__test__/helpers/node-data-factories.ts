@@ -1860,20 +1860,23 @@ export function toolCallingNodeFactory({
             type: "JSON",
             value: [
               {
-                name: "get_current_weather",
-                state: null,
-                forced: null,
-                strict: null,
-                parameters: {
-                  type: "object",
-                  required: ["location", "unit"],
-                  properties: {
-                    unit: { type: "string" },
-                    location: { type: "string" },
+                src: 'def get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',
+                definition: {
+                  name: "get_current_weather",
+                  state: null,
+                  forced: null,
+                  strict: null,
+                  parameters: {
+                    type: "object",
+                    required: ["location", "unit"],
+                    properties: {
+                      unit: { type: "string" },
+                      location: { type: "string" },
+                    },
                   },
+                  description: null,
+                  cache_config: null,
                 },
-                description: null,
-                cache_config: null,
               },
             ],
           },
