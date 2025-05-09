@@ -5,8 +5,10 @@ import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { FunctionDefinition } from "vellum-ai/api";
+import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
@@ -14,6 +16,7 @@ import {
   AttributeConfig,
   NODE_ATTRIBUTES,
 } from "src/generators/nodes/constants";
+import { PromptBlock } from "src/generators/prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { GenericNode as GenericNodeType } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
@@ -100,6 +103,40 @@ export class GenericNode extends BaseSingleFileNode<
                       ],
                     });
                   })
+                ),
+              })
+            );
+          }
+          break;
+        }
+        case nodeAttributes.blocks?.name: {
+          const blocks = attribute.value;
+
+          if (
+            blocks &&
+            blocks.type === "CONSTANT_VALUE" &&
+            blocks.value?.type === "JSON"
+          ) {
+            const rawBlocks = blocks.value.value as PromptBlockSerializer.Raw[];
+            const deserializedBlocks: PromptBlockType[] = rawBlocks.map(
+              // @ts-ignore
+              (block) => PromptBlockSerializer.parse(block).value
+            );
+
+            statements.push(
+              python.field({
+                name: "blocks",
+                initializer: python.TypeInstantiation.list(
+                  deserializedBlocks.map((block) => {
+                    return new PromptBlock({
+                      workflowContext: this.workflowContext,
+                      promptBlock: block,
+                      inputVariableNameById: {},
+                    });
+                  }),
+                  {
+                    endWithComma: true,
+                  }
                 ),
               })
             );
