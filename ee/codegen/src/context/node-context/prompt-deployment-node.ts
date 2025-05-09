@@ -1,5 +1,5 @@
 import { PromptDeploymentRelease, VellumVariableType } from "vellum-ai/api";
-import { ReleaseReviews as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { Deployments as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/deployments/client/Client";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";

@@ -558,8 +558,11 @@ const PromptSettingsSerializer: ObjectSchema<
   PromptSettingsSerializer.Raw,
   PromptSettings
 > = objectSchema({
-  timeout: numberSchema().optional(),
-  streamEnabled: propertySchema("stream_enabled", booleanSchema().optional()),
+  timeout: numberSchema().nullable().optional(),
+  streamEnabled: propertySchema(
+    "stream_enabled",
+    booleanSchema().nullable().optional()
+  ),
 });
 
 export declare namespace PromptSettingsSerializer {

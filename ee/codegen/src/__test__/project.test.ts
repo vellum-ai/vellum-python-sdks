@@ -76,6 +76,7 @@ describe("WorkflowProjectGenerator", () => {
         SpyMocks.createWorkflowDeploymentsMock(),
     };
     vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
+      // @ts-ignore
       async (idOrName: string) => {
         return {
           id: idOrName,

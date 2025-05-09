@@ -7,10 +7,10 @@ import {
   FunctionCall,
   SearchResult,
   VellumAudio,
+  VellumDocument,
   VellumError,
   VellumImage,
   VellumValue as VellumVariableValueType,
-  VellumDocument,
 } from "vellum-ai/api";
 
 import { ChatMessageContent } from "./chat-message-content";
@@ -124,7 +124,7 @@ class ChatHistoryVellumValue extends AstNode {
         );
       }
 
-      if (chatMessage.content !== undefined) {
+      if (!isNil(chatMessage.content)) {
         const content = new ChatMessageContent({
           chatMessageContent: chatMessage.content,
           isRequestType,
@@ -505,7 +505,7 @@ export class VellumValue extends AstNode {
     super();
     this.astNode = null;
 
-    if (vellumValue.value === undefined) {
+    if (isNil(vellumValue.value)) {
       return;
     }
     switch (vellumValue.type) {

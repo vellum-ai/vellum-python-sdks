@@ -329,8 +329,8 @@ export interface PromptTemplateBlockData {
 }
 
 export interface PromptSettings {
-  timeout?: number;
-  streamEnabled?: boolean;
+  timeout?: number | null;
+  streamEnabled?: boolean | null;
 }
 
 export interface PromptVersionExecConfig {
