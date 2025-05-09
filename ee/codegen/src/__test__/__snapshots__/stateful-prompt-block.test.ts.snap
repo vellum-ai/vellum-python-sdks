@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`StatefulPromptBlock > JINJA > should generate a basic jinja block 1`] = `
+"JinjaPromptBlock(template="""Hello, {{ name }}!""")
+"
+`;
+
+exports[`StatefulPromptBlock > JINJA > should generate a jinja block with a cache config 1`] = `
+"JinjaPromptBlock(
+    cache_config=EphemeralPromptCacheConfig(type="EPHEMERAL"),
+    template="""Hello, {{ name }}!""",
+)
+"
+`;
+
+exports[`StatefulPromptBlock > JINJA > should handle double quotes in jinja template 1`] = `
+"JinjaPromptBlock(template="""\\"Hello\\" \\"World\\"""")
+"
+`;

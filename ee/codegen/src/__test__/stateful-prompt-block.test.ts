@@ -3,9 +3,9 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { workflowContextFactory } from "./helpers";
 
 import { WorkflowContext } from "src/context/workflow-context";
-import { PromptBlock } from "src/generators/prompt-block";
+import { StatefulPromptBlock } from "src/generators/stateful-prompt-block";
 
-describe("PromptBlock", () => {
+describe("StatefulPromptBlock", () => {
   let workflowContext: WorkflowContext;
   let writer: Writer;
 
@@ -16,7 +16,7 @@ describe("PromptBlock", () => {
 
   describe("JINJA", () => {
     it("should generate a basic jinja block", async () => {
-      const block = new PromptBlock({
+      const block = new StatefulPromptBlock({
         workflowContext,
         promptBlock: {
           id: "1",
@@ -34,7 +34,7 @@ describe("PromptBlock", () => {
     });
 
     it("should generate a jinja block with a cache config", async () => {
-      const block = new PromptBlock({
+      const block = new StatefulPromptBlock({
         workflowContext,
         promptBlock: {
           id: "1",
@@ -54,7 +54,7 @@ describe("PromptBlock", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
     it("should handle double quotes in jinja template", async () => {
-      const block = new PromptBlock({
+      const block = new StatefulPromptBlock({
         workflowContext,
         promptBlock: {
           id: "1",
