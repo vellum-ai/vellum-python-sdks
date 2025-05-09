@@ -309,6 +309,7 @@ describe("CodeExecutionNode", () => {
 
     it("should be resilient to invalid secret ids", async () => {
       vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(() =>
+        // @ts-ignore
         Promise.reject(
           new VellumError({ message: "not found", statusCode: 404 })
         )

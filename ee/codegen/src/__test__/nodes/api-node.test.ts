@@ -72,6 +72,7 @@ describe("ApiNode", () => {
       workspaceSecrets.map(({ id, name }) => [id, name])
     );
     vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
+      // @ts-ignore
       async (idOrName) => {
         const id = workspaceSecretIdByName[idOrName];
         if (id) {
@@ -307,6 +308,7 @@ describe("ApiNode", () => {
   describe("skip bearer token if secret not found", () => {
     it("getNodeFile", async () => {
       vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
+        // @ts-ignore
         async (idOrName) => {
           throw new VellumError({
             message: `Workspace secret '${idOrName}' not found`,
