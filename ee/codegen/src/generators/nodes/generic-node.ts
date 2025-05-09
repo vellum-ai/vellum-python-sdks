@@ -59,7 +59,7 @@ export class GenericNode extends BaseSingleFileNode<
 
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
-    const nodeAttributes = NODE_DEFAULT_ATTRIBUTES["GenericNode"] as Record<
+    const nodeAttributes = NODE_DEFAULT_ATTRIBUTES["ToolCallingNode"] as Record<
       string,
       AdornmentAttributeConfig
     >;

@@ -25,7 +25,7 @@ export const NODE_DEFAULT_ATTRIBUTES: Record<
       type: "WorkflowErrorCode",
     },
   },
-  GenericNode: {
+  ToolCallingNode: {
     functions: { name: "functions", defaultValue: null },
     blocks: { name: "blocks", defaultValue: null },
   },
