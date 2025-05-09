@@ -1,12 +1,12 @@
-export interface AdornmentAttributeConfig {
+export interface AttributeConfig {
   defaultValue: unknown;
   type?: "WorkflowErrorCode" | string;
   name: string;
 }
 
-export const NODE_DEFAULT_ATTRIBUTES: Record<
+export const NODE_ATTRIBUTES: Record<
   string,
-  Record<string, AdornmentAttributeConfig>
+  Record<string, AttributeConfig>
 > = {
   // From src/vellum/workflows/nodes/core/retry_node/node.py
   RetryNode: {

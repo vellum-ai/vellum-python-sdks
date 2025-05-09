@@ -17,16 +17,16 @@ import {
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
-import { NODE_DEFAULT_ATTRIBUTES } from "src/generators/nodes/constants";
+import { NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import {
-  WorkflowValueDescriptor as WorkflowValueDescriptorType,
   AdornmentNode,
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -399,7 +399,7 @@ export abstract class BaseNode<
                 modulePath: adornment.base.module,
               }),
               arguments_: filteredAttributes.map((attr) => {
-                const nodeConfig = NODE_DEFAULT_ATTRIBUTES[adornment.base.name];
+                const nodeConfig = NODE_ATTRIBUTES[adornment.base.name];
                 const attrConfig = nodeConfig?.[attr.name];
 
                 const attributeConfig =
@@ -688,7 +688,7 @@ export abstract class BaseNode<
       return true;
     }
 
-    const nodeConfig = NODE_DEFAULT_ATTRIBUTES[nodeName];
+    const nodeConfig = NODE_ATTRIBUTES[nodeName];
     const attrConfig = nodeConfig?.[attributeName];
     if (!attrConfig) {
       return true;
