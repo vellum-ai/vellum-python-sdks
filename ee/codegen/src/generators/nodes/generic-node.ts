@@ -6,12 +6,14 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { FunctionDefinition } from "vellum-ai/api";
 
-import { AdornmentAttributeConfig, NODE_DEFAULT_ATTRIBUTES } from "./constants";
-
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import {
+  AttributeConfig,
+  NODE_ATTRIBUTES,
+} from "src/generators/nodes/constants";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { GenericNode as GenericNodeType } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
@@ -59,9 +61,9 @@ export class GenericNode extends BaseSingleFileNode<
 
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
-    const nodeAttributes = NODE_DEFAULT_ATTRIBUTES["ToolCallingNode"] as Record<
+    const nodeAttributes = NODE_ATTRIBUTES["ToolCallingNode"] as Record<
       string,
-      AdornmentAttributeConfig
+      AttributeConfig
     >;
 
     this.nodeData.attributes.forEach((attribute) => {
