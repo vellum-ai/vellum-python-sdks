@@ -46,7 +46,7 @@ export abstract class BasePromptBlock<
 > extends AstNode {
   protected workflowContext: WorkflowContext;
   private astNode: python.ClassInstantiation;
-  protected inputVariableNameById: Record<string, string> | undefined;
+  protected inputVariableNameById: Record<string, string> | undefined; // Stateful prompt blocks have an input variable name by id, prompt blocks do not
 
   public constructor({
     workflowContext,
