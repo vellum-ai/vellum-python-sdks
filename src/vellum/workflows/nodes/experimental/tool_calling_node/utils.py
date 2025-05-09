@@ -57,26 +57,29 @@ def create_tool_router_node(
     functions: List[Callable[..., Any]],
     prompt_inputs: Optional[EntityInputsInterface],
 ) -> Type[ToolRouterNode]:
-    Ports = type("Ports", (), {})
-    for function in functions:
-        function_name = function.__name__
+    if functions and len(functions) > 0:
+        # If we have functions, create dynamic ports for each function
+        Ports = type("Ports", (), {})
+        for function in functions:
+            function_name = function.__name__
 
-        # Avoid using lambda to capture function_name
-        # lambda will capture the function_name by reference,
-        # and if the function_name is changed, the port_condition will also change.
-        def create_port_condition(fn_name):
-            return LazyReference(
-                lambda: (
-                    node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
-                    & node.Outputs.results[0]["value"]["name"].equals(fn_name)
+            def create_port_condition(fn_name):
+                return LazyReference(
+                    lambda: (
+                        node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
+                        & node.Outputs.results[0]["value"]["name"].equals(fn_name)
+                    )
                 )
-            )
 
-        port_condition = create_port_condition(function_name)
-        port = Port.on_if(port_condition)
-        setattr(Ports, function_name, port)
+            port_condition = create_port_condition(function_name)
+            port = Port.on_if(port_condition)
+            setattr(Ports, function_name, port)
 
-    setattr(Ports, "default", Port.on_else())
+        # Add the else port for when no function conditions match
+        setattr(Ports, "default", Port.on_else())
+    else:
+        # If no functions exist, create a simple Ports class with just a default port
+        Ports = type("Ports", (), {"default": Port(default=True)})
 
     # Add a chat history block to blocks
     blocks.append(
