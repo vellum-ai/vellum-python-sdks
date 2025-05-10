@@ -17,7 +17,7 @@ import {
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
-import { NODE_ATTRIBUTES } from "src/generators/nodes/constants";
+import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
@@ -403,10 +403,10 @@ export abstract class BaseNode<
                 const attrConfig = nodeConfig?.[attr.name];
 
                 const attributeConfig =
-                  attrConfig?.type === "WorkflowErrorCode"
+                  attrConfig?.type === AttributeType.WorkflowErrorCode
                     ? {
                         lhs: python.reference({
-                          name: "WorkflowErrorCode",
+                          name: AttributeType.WorkflowErrorCode,
                           modulePath: [
                             ...VELLUM_CLIENT_MODULE_PATH,
                             "workflows",
