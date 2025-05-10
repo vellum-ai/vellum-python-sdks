@@ -7,13 +7,16 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { FunctionDefinition } from "vellum-ai/api";
 import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 
-import { AttributeConfig, AttributeType, NODE_ATTRIBUTES } from "./constants";
-
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import {
+  AttributeConfig,
+  AttributeType,
+  NODE_ATTRIBUTES,
+} from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { GenericNode as GenericNodeType } from "src/types/vellum";
