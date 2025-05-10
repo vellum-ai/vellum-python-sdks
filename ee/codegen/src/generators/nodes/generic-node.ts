@@ -7,15 +7,13 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { FunctionDefinition } from "vellum-ai/api";
 import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 
+import { AttributeConfig, AttributeType, NODE_ATTRIBUTES } from "./constants";
+
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
-import {
-  AttributeConfig,
-  NODE_ATTRIBUTES,
-} from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { GenericNode as GenericNodeType } from "src/types/vellum";
@@ -72,7 +70,7 @@ export class GenericNode extends BaseSingleFileNode<
     this.nodeData.attributes.forEach((attribute) => {
       const attributeConfig = nodeAttributes[attribute.name];
       switch (attributeConfig?.type) {
-        case "functions": {
+        case AttributeType.Functions: {
           const value = attribute.value;
 
           if (
@@ -110,7 +108,7 @@ export class GenericNode extends BaseSingleFileNode<
           }
           break;
         }
-        case "blocks": {
+        case AttributeType.PromptBlocks: {
           const blocks = attribute.value;
 
           if (
@@ -137,7 +135,7 @@ export class GenericNode extends BaseSingleFileNode<
 
             statements.push(
               python.field({
-                name: "blocks",
+                name: attribute.name,
                 initializer: python.TypeInstantiation.list(
                   deserializedBlocks.map((block) => {
                     return new PromptBlock({
