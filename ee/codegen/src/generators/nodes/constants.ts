@@ -26,7 +26,15 @@ export const NODE_ATTRIBUTES: Record<
     },
   },
   ToolCallingNode: {
-    functions: { name: "functions", defaultValue: null },
-    blocks: { name: "blocks", defaultValue: null },
+    blocks: {
+      name: "blocks",
+      defaultValue: null,
+      type: "blocks",
+    },
+    functions: {
+      name: "functions",
+      defaultValue: null,
+      type: "functions",
+    },
   },
 };
