@@ -314,7 +314,7 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 from .get_current_weather_node.get_current_weather import get_current_weather
 from typing import List
 
-from vellum import ChatMessage
+from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
 
 
@@ -322,52 +322,13 @@ class GetCurrentWeatherNode(ToolCallingNode):
     ml_model = "gpt-4o-mini"
     max_tool_calls = 3
     blocks = [
-        {
-            "state": None,
-            "blocks": [
-                {
-                    "state": None,
-                    "blocks": [
-                        {
-                            "text": "You are a weather expert",
-                            "state": None,
-                            "block_type": "PLAIN_TEXT",
-                            "cache_config": None,
-                        },
-                    ],
-                    "block_type": "RICH_TEXT",
-                    "cache_config": None,
-                },
-            ],
-            "chat_role": "SYSTEM",
-            "block_type": "CHAT_MESSAGE",
-            "chat_source": None,
-            "cache_config": None,
-            "chat_message_unterminated": None,
-        },
-        {
-            "state": None,
-            "blocks": [
-                {
-                    "state": None,
-                    "blocks": [
-                        {
-                            "state": None,
-                            "block_type": "VARIABLE",
-                            "cache_config": None,
-                            "input_variable": "question",
-                        },
-                    ],
-                    "block_type": "RICH_TEXT",
-                    "cache_config": None,
-                },
-            ],
-            "chat_role": "USER",
-            "block_type": "CHAT_MESSAGE",
-            "chat_source": None,
-            "cache_config": None,
-            "chat_message_unterminated": None,
-        },
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""You are a weather expert""")])],
+        ),
+        ChatMessagePromptBlock(
+            chat_role="USER", blocks=[RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="question")])]
+        ),
     ]
     functions = [get_current_weather, format_answer]
     prompt_inputs = {
@@ -383,7 +344,7 @@ class GetCurrentWeatherNode(ToolCallingNode):
 exports[`WorkflowProjectGenerator > function > should generate empty function array if no functions are defined 1`] = `
 "from typing import List
 
-from vellum import ChatMessage
+from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
 
 
@@ -391,52 +352,13 @@ class GetCurrentWeatherNode(ToolCallingNode):
     ml_model = "gpt-4o-mini"
     max_tool_calls = 3
     blocks = [
-        {
-            "state": None,
-            "blocks": [
-                {
-                    "state": None,
-                    "blocks": [
-                        {
-                            "text": "You are a weather expert",
-                            "state": None,
-                            "block_type": "PLAIN_TEXT",
-                            "cache_config": None,
-                        },
-                    ],
-                    "block_type": "RICH_TEXT",
-                    "cache_config": None,
-                },
-            ],
-            "chat_role": "SYSTEM",
-            "block_type": "CHAT_MESSAGE",
-            "chat_source": None,
-            "cache_config": None,
-            "chat_message_unterminated": None,
-        },
-        {
-            "state": None,
-            "blocks": [
-                {
-                    "state": None,
-                    "blocks": [
-                        {
-                            "state": None,
-                            "block_type": "VARIABLE",
-                            "cache_config": None,
-                            "input_variable": "question",
-                        },
-                    ],
-                    "block_type": "RICH_TEXT",
-                    "cache_config": None,
-                },
-            ],
-            "chat_role": "USER",
-            "block_type": "CHAT_MESSAGE",
-            "chat_source": None,
-            "cache_config": None,
-            "chat_message_unterminated": None,
-        },
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""You are a weather expert""")])],
+        ),
+        ChatMessagePromptBlock(
+            chat_role="USER", blocks=[RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="question")])]
+        ),
     ]
     functions = []
     prompt_inputs = {

@@ -4,33 +4,49 @@ import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
+import {
+  ChatMessagePromptBlock,
+  JinjaPromptBlock,
+  PlainTextPromptBlock,
+  RichTextPromptBlock,
+  VariablePromptBlock,
+} from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context";
 import {
   FunctionDefinitionPromptTemplateBlock,
-  PromptTemplateBlock,
   PlainTextPromptTemplateBlock,
+  PromptTemplateBlock,
 } from "src/types/vellum";
 
 export type PromptTemplateBlockExcludingFunctionDefinition =
   | Exclude<PromptTemplateBlock, FunctionDefinitionPromptTemplateBlock>
   | PlainTextPromptTemplateBlock;
 
+export type PromptBlock =
+  | JinjaPromptBlock
+  | ChatMessagePromptBlock
+  | VariablePromptBlock
+  | PlainTextPromptBlock
+  | RichTextPromptBlock;
+
 export declare namespace BasePromptBlock {
-  interface Args<T extends PromptTemplateBlockExcludingFunctionDefinition> {
+  interface Args<
+    T extends PromptTemplateBlockExcludingFunctionDefinition | PromptBlock
+  > {
     workflowContext: WorkflowContext;
     promptBlock: T;
-    inputVariableNameById: Record<string, string>;
+    inputVariableNameById?: Record<string, string>;
   }
 }
 
 export abstract class BasePromptBlock<
-  T extends PromptTemplateBlockExcludingFunctionDefinition
+  T extends PromptTemplateBlockExcludingFunctionDefinition | PromptBlock
 > extends AstNode {
   protected workflowContext: WorkflowContext;
   private astNode: python.ClassInstantiation;
-  protected inputVariableNameById: Record<string, string>;
+  protected inputVariableNameById: Record<string, string> | undefined; // Stateful prompt blocks have an input variable name by id, prompt blocks do not
 
   public constructor({
     workflowContext,

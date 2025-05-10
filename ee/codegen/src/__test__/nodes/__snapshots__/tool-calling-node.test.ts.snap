@@ -32,6 +32,12 @@ class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
 exports[`ToolCallingNode > basic > getNodeFile 1`] = `
 "from .tool_calling_node.get_current_weather import get_current_weather
 
+from vellum import (
+    ChatMessagePromptBlock,
+    PlainTextPromptBlock,
+    RichTextPromptBlock,
+    VariablePromptBlock,
+)
 from vellum.workflows.nodes.experimental.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
@@ -40,52 +46,22 @@ from vellum.workflows.nodes.experimental.tool_calling_node import (
 class ToolCallingNode(BaseToolCallingNode):
     ml_model = "gpt-4o-mini"
     blocks = [
-        {
-            "state": None,
-            "blocks": [
-                {
-                    "state": None,
-                    "blocks": [
-                        {
-                            "text": "You are a weather expert",
-                            "state": None,
-                            "block_type": "PLAIN_TEXT",
-                            "cache_config": None,
-                        },
-                    ],
-                    "block_type": "RICH_TEXT",
-                    "cache_config": None,
-                },
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[
+                RichTextPromptBlock(
+                    blocks=[PlainTextPromptBlock(text="""You are a weather expert""")]
+                )
             ],
-            "chat_role": "SYSTEM",
-            "block_type": "CHAT_MESSAGE",
-            "chat_source": None,
-            "cache_config": None,
-            "chat_message_unterminated": None,
-        },
-        {
-            "state": None,
-            "blocks": [
-                {
-                    "state": None,
-                    "blocks": [
-                        {
-                            "state": None,
-                            "block_type": "VARIABLE",
-                            "cache_config": None,
-                            "input_variable": "question",
-                        },
-                    ],
-                    "block_type": "RICH_TEXT",
-                    "cache_config": None,
-                },
+        ),
+        ChatMessagePromptBlock(
+            chat_role="USER",
+            blocks=[
+                RichTextPromptBlock(
+                    blocks=[VariablePromptBlock(input_variable="question")]
+                )
             ],
-            "chat_role": "USER",
-            "block_type": "CHAT_MESSAGE",
-            "chat_source": None,
-            "cache_config": None,
-            "chat_message_unterminated": None,
-        },
+        ),
     ]
     functions = [get_current_weather]
     prompt_inputs = {
