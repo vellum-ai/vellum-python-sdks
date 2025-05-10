@@ -14,6 +14,7 @@ import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import {
   AttributeConfig,
+  AttributeType,
   NODE_ATTRIBUTES,
 } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
@@ -70,8 +71,9 @@ export class GenericNode extends BaseSingleFileNode<
     >;
 
     this.nodeData.attributes.forEach((attribute) => {
-      switch (attribute.name) {
-        case nodeAttributes.functions?.name: {
+      const attributeConfig = nodeAttributes[attribute.name];
+      switch (attributeConfig?.type) {
+        case AttributeType.Functions: {
           const value = attribute.value;
 
           if (
@@ -109,7 +111,7 @@ export class GenericNode extends BaseSingleFileNode<
           }
           break;
         }
-        case nodeAttributes.blocks?.name: {
+        case AttributeType.PromptBlocks: {
           const blocks = attribute.value;
 
           if (
@@ -136,7 +138,7 @@ export class GenericNode extends BaseSingleFileNode<
 
             statements.push(
               python.field({
-                name: "blocks",
+                name: attribute.name,
                 initializer: python.TypeInstantiation.list(
                   deserializedBlocks.map((block) => {
                     return new PromptBlock({

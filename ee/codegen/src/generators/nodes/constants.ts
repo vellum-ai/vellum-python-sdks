@@ -1,6 +1,12 @@
+export enum AttributeType {
+  WorkflowErrorCode = "WorkflowErrorCode",
+  PromptBlocks = "PromptBlocks",
+  Functions = "Functions",
+}
+
 export interface AttributeConfig {
   defaultValue: unknown;
-  type?: "WorkflowErrorCode" | string;
+  type?: AttributeType;
   name: string;
 }
 
@@ -13,7 +19,7 @@ export const NODE_ATTRIBUTES: Record<
     retry_on_error_code: {
       name: "retry_on_error_code",
       defaultValue: null,
-      type: "WorkflowErrorCode",
+      type: AttributeType.WorkflowErrorCode,
     },
     retry_on_condition: { name: "retry_on_condition", defaultValue: null },
     delay: { name: "delay", defaultValue: null },
@@ -22,11 +28,19 @@ export const NODE_ATTRIBUTES: Record<
     on_error_code: {
       name: "on_error_code",
       defaultValue: null,
-      type: "WorkflowErrorCode",
+      type: AttributeType.WorkflowErrorCode,
     },
   },
   ToolCallingNode: {
-    functions: { name: "functions", defaultValue: null },
-    blocks: { name: "blocks", defaultValue: null },
+    blocks: {
+      name: "blocks",
+      defaultValue: null,
+      type: AttributeType.PromptBlocks,
+    },
+    functions: {
+      name: "functions",
+      defaultValue: null,
+      type: AttributeType.Functions,
+    },
   },
 };
