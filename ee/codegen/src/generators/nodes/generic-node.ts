@@ -119,8 +119,19 @@ export class GenericNode extends BaseSingleFileNode<
           ) {
             const rawBlocks = blocks.value.value as PromptBlockSerializer.Raw[];
             const deserializedBlocks: PromptBlockType[] = rawBlocks.map(
-              // @ts-ignore
-              (block) => PromptBlockSerializer.parse(block).value
+              (block) => {
+                const parseResult = PromptBlockSerializer.parse(block);
+                if (parseResult.ok) {
+                  // TODO: Remove `as` once other types of blocks are supported
+                  return parseResult.value as PromptBlockType;
+                } else {
+                  throw new Error(
+                    `Failed to parse block ${JSON.stringify(
+                      parseResult.errors
+                    )}`
+                  );
+                }
+              }
             );
 
             statements.push(
