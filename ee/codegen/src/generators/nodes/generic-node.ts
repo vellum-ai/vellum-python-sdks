@@ -70,8 +70,9 @@ export class GenericNode extends BaseSingleFileNode<
     >;
 
     this.nodeData.attributes.forEach((attribute) => {
-      switch (attribute.name) {
-        case nodeAttributes.functions?.name: {
+      const attributeConfig = nodeAttributes[attribute.name];
+      switch (attributeConfig?.type) {
+        case "functions": {
           const value = attribute.value;
 
           if (
@@ -109,7 +110,7 @@ export class GenericNode extends BaseSingleFileNode<
           }
           break;
         }
-        case nodeAttributes.blocks?.name: {
+        case "blocks": {
           const blocks = attribute.value;
 
           if (
