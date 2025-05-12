@@ -22,6 +22,23 @@ def test_compile_function_definition__just_name():
     )
 
 
+def test_compile_function_definition__docstring():
+    # GIVEN a function with a docstring
+    def my_function():
+        """This is a test function"""
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        description="This is a test function",
+        parameters={"type": "object", "properties": {}, "required": []},
+    )
+
+
 def test_compile_function_definition__all_args():
     # GIVEN a function with args of all base types
     def my_function(a: str, b: int, c: float, d: bool, e: list, f: dict):
