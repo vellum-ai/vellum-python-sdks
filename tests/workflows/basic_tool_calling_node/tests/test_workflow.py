@@ -186,7 +186,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 state=None,
                 cache_config=None,
                 name="get_current_weather",
-                description=None,
+                description="\n    Get the current weather in a given location.\n    ",
                 parameters={
                     "type": "object",
                     "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
@@ -296,7 +296,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 state=None,
                 cache_config=None,
                 name="get_current_weather",
-                description=None,
+                description="\n    Get the current weather in a given location.\n    ",
                 parameters={
                     "type": "object",
                     "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},

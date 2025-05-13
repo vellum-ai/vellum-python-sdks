@@ -108,5 +108,6 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
 
     return FunctionDefinition(
         name=function.__name__,
+        description=function.__doc__,
         parameters=parameters,
     )
