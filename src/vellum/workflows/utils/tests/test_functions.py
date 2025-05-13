@@ -318,6 +318,30 @@ def test_compile_workflow_function_definition():
     )
 
 
+def test_compile_workflow_function_definition__docstring():
+    class MyNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow):
+        """
+        This is a test workflow
+        """
+
+        graph = MyNode
+
+    workflow = MyWorkflow()
+
+    # WHEN compiling the function
+    compiled_function = compile_workflow_function_definition(workflow)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_workflow",
+        description="\n        This is a test workflow\n        ",
+        parameters={"type": "object", "properties": {}, "required": []},
+    )
+
+
 def test_compile_workflow_function_definition__all_args():
     class MyInputs(BaseInputs):
         a: str
