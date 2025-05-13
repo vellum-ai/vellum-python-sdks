@@ -1,6 +1,6 @@
 import dataclasses
 import inspect
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union, get_args, get_origin
+from typing import TYPE_CHECKING, Any, Callable, Optional, Type, Union, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -117,12 +117,10 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     )
 
 
-def compile_workflow_function_definition(workflow: "BaseWorkflow") -> FunctionDefinition:
+def compile_workflow_function_definition(workflow_class: Type["BaseWorkflow"]) -> FunctionDefinition:
     """
-    Converts a base workflow into our Vellum-native FunctionDefinition type.
+    Converts a base workflow class into our Vellum-native FunctionDefinition type.
     """
-    workflow_class = workflow.__class__
-
     # Get the inputs class for the workflow
     inputs_class = workflow_class.get_inputs_class()
     vars_inputs_class = vars(inputs_class)

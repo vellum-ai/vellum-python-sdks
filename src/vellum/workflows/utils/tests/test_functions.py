@@ -306,10 +306,8 @@ def test_compile_workflow_function_definition():
     class MyWorkflow(BaseWorkflow):
         graph = MyNode
 
-    workflow = MyWorkflow()
-
     # WHEN compiling the function
-    compiled_function = compile_workflow_function_definition(workflow)
+    compiled_function = compile_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -329,10 +327,8 @@ def test_compile_workflow_function_definition__docstring():
 
         graph = MyNode
 
-    workflow = MyWorkflow()
-
     # WHEN compiling the function
-    compiled_function = compile_workflow_function_definition(workflow)
+    compiled_function = compile_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -357,11 +353,8 @@ def test_compile_workflow_function_definition__all_args():
     class MyWorkflow(BaseWorkflow[MyInputs, BaseState]):
         graph = MyNode
 
-    # GIVEN a workflow
-    workflow = MyWorkflow()
-
     # WHEN compiling the workflow
-    compiled_function = compile_workflow_function_definition(workflow)
+    compiled_function = compile_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -392,10 +385,8 @@ def test_compile_workflow_function_definition__unions():
     class MyWorkflow(BaseWorkflow[MyInputs, BaseState]):
         graph = MyNode
 
-    workflow = MyWorkflow()
-
     # WHEN compiling the workflow
-    compiled_function = compile_workflow_function_definition(workflow)
+    compiled_function = compile_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -422,10 +413,8 @@ def test_compile_workflow_function_definition__optionals():
     class MyWorkflow(BaseWorkflow[MyInputs, BaseState]):
         graph = MyNode
 
-    workflow = MyWorkflow()
-
     # WHEN compiling the workflow
-    compiled_function = compile_workflow_function_definition(workflow)
+    compiled_function = compile_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
