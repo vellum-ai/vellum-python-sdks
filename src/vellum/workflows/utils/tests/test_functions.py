@@ -5,7 +5,9 @@ from pydantic import BaseModel
 
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.utils.functions import compile_function_definition, compile_workflow_function_definition
 
 
@@ -313,4 +315,43 @@ def test_basic_compile_workflow_function_definition():
     assert compiled_function == FunctionDefinition(
         name="my_workflow",
         parameters={"type": "object", "properties": {}, "required": []},
+    )
+
+
+def test_basic_compile_workflow_function__all_args():
+    class MyInputs(BaseInputs):
+        a: str
+        b: int
+        c: float
+        d: bool
+        e: list
+        f: dict
+
+    class MyNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow[MyInputs, BaseState]):
+        graph = MyNode
+
+    # GIVEN a workflow
+    workflow = MyWorkflow()
+
+    # WHEN compiling the workflow
+    compiled_function = compile_workflow_function_definition(workflow)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_workflow",
+        parameters={
+            "type": "object",
+            "properties": {
+                "a": {"type": "string"},
+                "b": {"type": "integer"},
+                "c": {"type": "number"},
+                "d": {"type": "boolean"},
+                "e": {"type": "array"},
+                "f": {"type": "object"},
+            },
+            "required": ["a", "b", "c", "d", "e", "f"],
+        },
     )
