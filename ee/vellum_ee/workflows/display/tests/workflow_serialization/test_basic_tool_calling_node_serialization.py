@@ -130,6 +130,7 @@ def test_serialize_workflow():
                         "type": "JSON",
                         "value": [
                             {
+                                "type": "CODE_EXECUTION",
                                 "definition": {
                                     "state": None,
                                     "cache_config": None,
