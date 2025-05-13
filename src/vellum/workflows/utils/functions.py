@@ -125,6 +125,7 @@ def compile_workflow_function_definition(workflow: "BaseWorkflow") -> FunctionDe
 
     # Get the inputs class for the workflow
     inputs_class = workflow_class.get_inputs_class()
+    vars_inputs_class = vars(inputs_class)
 
     properties = {}
     required = []
@@ -137,16 +138,11 @@ def compile_workflow_function_definition(workflow: "BaseWorkflow") -> FunctionDe
         properties[name] = _compile_annotation(field_type, defs)
 
         # Check if the field has a default value
-        if name not in vars(inputs_class):
-            # Check if field_type allows None (is Optional)
-            origin = get_origin(field_type)
-            args = get_args(field_type)
-            if not (origin is Union and type(None) in args):
-                required.append(name)
+        if name not in vars_inputs_class:
+            required.append(name)
         else:
             # Field has a default value
-            default_value = getattr(inputs_class, name)
-            properties[name]["default"] = _compile_default_value(default_value)
+            properties[name]["default"] = vars_inputs_class[name]
 
     parameters = {"type": "object", "properties": properties, "required": required}
     if defs:

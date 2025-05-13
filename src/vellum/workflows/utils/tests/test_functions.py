@@ -379,3 +379,66 @@ def test_compile_workflow_function_definition__all_args():
             "required": ["a", "b", "c", "d", "e", "f"],
         },
     )
+
+
+def test_compile_workflow_function_definition__unions():
+    # GIVEN a workflow with a union
+    class MyInputs(BaseInputs):
+        a: Union[str, int]
+
+    class MyNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow[MyInputs, BaseState]):
+        graph = MyNode
+
+    workflow = MyWorkflow()
+
+    # WHEN compiling the workflow
+    compiled_function = compile_workflow_function_definition(workflow)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_workflow",
+        parameters={
+            "type": "object",
+            "properties": {"a": {"anyOf": [{"type": "string"}, {"type": "integer"}]}},
+            "required": ["a"],
+        },
+    )
+
+
+def test_compile_workflow_function_definition__optionals():
+    class MyInputs(BaseInputs):
+        a: str
+        b: Optional[str]
+        c: None
+        d: str = "hello"
+        e: Optional[str] = None
+
+    class MyNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow[MyInputs, BaseState]):
+        graph = MyNode
+
+    workflow = MyWorkflow()
+
+    # WHEN compiling the workflow
+    compiled_function = compile_workflow_function_definition(workflow)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_workflow",
+        parameters={
+            "type": "object",
+            "properties": {
+                "a": {"type": "string"},
+                "b": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+                "c": {"type": "null"},
+                "d": {"type": "string", "default": "hello"},
+                "e": {"anyOf": [{"type": "string"}, {"type": "null"}], "default": None},
+            },
+            "required": ["a", "b", "c"],
+        },
+    )
