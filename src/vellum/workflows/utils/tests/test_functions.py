@@ -299,7 +299,7 @@ def test_compile_function_definition__lambda():
     )
 
 
-def test_basic_compile_workflow_function_definition():
+def test_compile_workflow_function_definition():
     class MyNode(BaseNode):
         pass
 
@@ -318,7 +318,7 @@ def test_basic_compile_workflow_function_definition():
     )
 
 
-def test_basic_compile_workflow_function__all_args():
+def test_compile_workflow_function_definition__all_args():
     class MyInputs(BaseInputs):
         a: str
         b: int
