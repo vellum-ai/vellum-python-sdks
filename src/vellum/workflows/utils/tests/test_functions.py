@@ -4,7 +4,9 @@ from typing import Dict, List, Optional, Union
 from pydantic import BaseModel
 
 from vellum.client.types.function_definition import FunctionDefinition
-from vellum.workflows.utils.functions import compile_function_definition
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.utils.functions import compile_function_definition, compile_workflow_function_definition
 
 
 def test_compile_function_definition__just_name():
@@ -292,4 +294,23 @@ def test_compile_function_definition__lambda():
     assert compiled_function == FunctionDefinition(
         name="<lambda>",
         parameters={"type": "object", "properties": {"x": {"type": "null"}}, "required": ["x"]},
+    )
+
+
+def test_basic_compile_workflow_function_definition():
+    class MyNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow):
+        graph = MyNode
+
+    workflow = MyWorkflow()
+
+    # WHEN compiling the function
+    compiled_function = compile_workflow_function_definition(workflow)
+
+    # THEN it should return the compiled function definition
+    assert compiled_function == FunctionDefinition(
+        name="my_workflow",
+        parameters={"type": "object", "properties": {}, "required": []},
     )
