@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, List, Optional
+from typing import Any, ClassVar, List, Optional, Type, Union
 
 from vellum import ChatMessage, PromptBlock
 from vellum.workflows.context import execution_context, get_parent_context
@@ -23,14 +23,13 @@ class ToolCallingNode(BaseNode):
     Attributes:
         ml_model: str - The model to use for tool calling (e.g., "gpt-4o-mini")
         blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)
-        functions: List[FunctionDefinition] - The functions that can be called
-        function_callables: List[Callable] - The callables that can be called
+        functions: List[Union[Callable, Type[BaseWorkflow]]] - The functions or workflows that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
     """
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
-    functions: ClassVar[List[Callable[..., Any]]] = []
+    functions: ClassVar[List[Union[Callable[..., Any], Type[BaseWorkflow]]]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     # TODO: https://linear.app/vellum/issue/APO-342/support-tool-call-max-retries
     max_tool_calls: ClassVar[int] = 1

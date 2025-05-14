@@ -1,6 +1,7 @@
+import inspect
 import json
 from uuid import uuid4
-from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -31,7 +32,7 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants impor
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
-from vellum.workflows.utils.functions import compile_function_definition
+from vellum.workflows.utils.functions import compile_function_definition, compile_workflow_function_definition
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -99,7 +100,15 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         }
         normalized_functions = (
             [
-                function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
+                (
+                    function
+                    if isinstance(function, FunctionDefinition)
+                    else (
+                        compile_workflow_function_definition(function)
+                        if self._is_workflow_class(function)
+                        else compile_function_definition(function)
+                    )
+                )
                 for function in self.functions
             ]
             if self.functions
@@ -259,3 +268,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 )
 
         return input_variables, input_values
+
+    def _is_workflow_class(self, obj: Any) -> bool:
+        from vellum.workflows.workflows.base import BaseWorkflow
+
+        return inspect.isclass(obj) and issubclass(obj, BaseWorkflow)

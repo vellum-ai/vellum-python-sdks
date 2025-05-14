@@ -1,8 +1,9 @@
 from collections.abc import Callable
+import inspect
 import json
-from typing import Any, Iterator, List, Optional, Type, cast
+from typing import Any, Iterator, List, Optional, Type, Union, cast
 
-from vellum import ChatMessage, FunctionDefinition, PromptBlock
+from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
@@ -12,12 +13,13 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class FunctionNode(BaseNode):
     """Node that executes a specific function."""
 
-    function: FunctionDefinition
+    function: Union[Callable[..., Any], Type[BaseWorkflow]]
 
 
 class ToolRouterNode(InlinePromptNode):
@@ -54,7 +56,7 @@ class ToolRouterNode(InlinePromptNode):
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
-    functions: List[Callable[..., Any]],
+    functions: List[Union[Callable[..., Any], Type[BaseWorkflow]]],
     prompt_inputs: Optional[EntityInputsInterface],
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
@@ -113,11 +115,11 @@ def create_tool_router_node(
     return node
 
 
-def create_function_node(function: Callable[..., Any], tool_router_node: Type[ToolRouterNode]) -> Type[FunctionNode]:
+def create_function_node(
+    function: Union[Callable[..., Any], Type[BaseWorkflow]], tool_router_node: Type[ToolRouterNode]
+) -> Type[FunctionNode]:
     """
-    Create a FunctionNode class for a given function.
-
-    This ensures the callable is properly registered and can be called with the expected arguments.
+    Create a FunctionNode class for a given function or workflow.
     """
 
     # Create a class-level wrapper that calls the original function
@@ -127,8 +129,18 @@ def create_function_node(function: Callable[..., Any], tool_router_node: Type[To
         outputs = json.loads(outputs)
         arguments = outputs["arguments"]
 
-        # Call the original function directly with the arguments
-        result = function(**arguments)
+        # Call the function based on its type
+        if inspect.isclass(function) and issubclass(function, BaseWorkflow):
+            # If it's a workflow, instantiate and run it
+            workflow_instance = function(**arguments)
+            terminal_event = workflow_instance.run()
+            if terminal_event.name == "workflow.execution.fulfilled":
+                result = str(terminal_event.outputs)
+            else:
+                result = f"Workflow execution failed with event: {terminal_event.name}"
+        else:
+            # If it's a regular callable, call it directly
+            result = function(**arguments)
 
         self.state.chat_history.append(ChatMessage(role="FUNCTION", text=result))
 
