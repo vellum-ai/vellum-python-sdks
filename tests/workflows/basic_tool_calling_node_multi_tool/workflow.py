@@ -14,7 +14,7 @@ def get_current_weather(location: str, unit: str) -> str:
 
 
 def format_answer(answer: str) -> str:
-    return f"Formatted answer: {answer}"
+    return 1 + 1
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
