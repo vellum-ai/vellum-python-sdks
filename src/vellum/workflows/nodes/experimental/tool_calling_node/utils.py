@@ -2,7 +2,7 @@ from collections.abc import Callable
 import json
 from typing import Any, Iterator, List, Optional, Type, cast
 
-from vellum import ChatMessage, FunctionDefinition, PromptBlock
+from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -18,7 +18,7 @@ from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 class FunctionNode(BaseNode):
     """Node that executes a specific function."""
 
-    function: FunctionDefinition
+    pass
 
 
 class ToolRouterNode(InlinePromptNode):
@@ -144,7 +144,6 @@ def create_function_node(function: Callable[..., Any], tool_router_node: Type[To
         f"FunctionNode_{function.__name__}",
         (FunctionNode,),
         {
-            "function": function,
             "run": execute_function,
             "__module__": __name__,
         },
