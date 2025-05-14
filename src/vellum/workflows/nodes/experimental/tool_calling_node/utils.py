@@ -2,17 +2,24 @@ from collections.abc import Callable
 import json
 from typing import Any, Iterator, List, Optional, Type, cast
 
+from pydash import snake_case
+
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
+from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
+from vellum.workflows.types.generics import is_workflow_class
 
 
 class FunctionNode(BaseNode):
@@ -62,7 +69,7 @@ def create_tool_router_node(
         # If we have functions, create dynamic ports for each function
         Ports = type("Ports", (), {})
         for function in functions:
-            function_name = function.__name__
+            function_name = snake_case(function.__name__)
 
             # Avoid using lambda to capture function_name
             # lambda will capture the function_name by reference,
@@ -128,13 +135,39 @@ def create_function_node(function: Callable[..., Any], tool_router_node: Type[To
         outputs = json.loads(outputs)
         arguments = outputs["arguments"]
 
-        # Call the original function directly with the arguments
-        result = function(**arguments)
+        # Call the function based on its type
+        if is_workflow_class(function):
+            # Dynamically define an Inputs subclass of BaseInputs
+            Inputs = type(
+                "Inputs",
+                (BaseInputs,),
+                {"__annotations__": {k: type(v) for k, v in arguments.items()}},
+            )
+
+            # Create an instance with arguments
+            inputs_instance = Inputs(**arguments)
+
+            workflow = function()
+            terminal_event = workflow.run(
+                inputs=inputs_instance,
+            )
+            if terminal_event.name == "workflow.execution.paused":
+                raise NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message="Subworkflow unexpectedly paused",
+                )
+            elif terminal_event.name == "workflow.execution.fulfilled":
+                result = terminal_event.outputs
+            elif terminal_event.name == "workflow.execution.rejected":
+                raise Exception(f"Workflow execution rejected: {terminal_event.error}")
+        else:
+            # If it's a regular callable, call it directly
+            result = function(**arguments)
 
         self.state.chat_history.append(
             ChatMessage(
                 role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(result)),
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
             )
         )
 

@@ -30,8 +30,8 @@ from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePrompt
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
-from vellum.workflows.types.generics import StateType
-from vellum.workflows.utils.functions import compile_function_definition
+from vellum.workflows.types.generics import StateType, is_workflow_class
+from vellum.workflows.utils.functions import compile_function_definition, compile_workflow_function_definition
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -97,14 +97,18 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             "execution_context": execution_context.model_dump(mode="json"),
             **request_options.get("additional_body_parameters", {}),
         }
-        normalized_functions = (
-            [
-                function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
-                for function in self.functions
-            ]
-            if self.functions
-            else None
-        )
+
+        normalized_functions: Optional[List[FunctionDefinition]] = None
+
+        if self.functions:
+            normalized_functions = []
+            for function in self.functions:
+                if isinstance(function, FunctionDefinition):
+                    normalized_functions.append(function)
+                elif is_workflow_class(function):
+                    normalized_functions.append(compile_workflow_function_definition(function))
+                else:
+                    normalized_functions.append(compile_function_definition(function))
 
         if self.settings and not self.settings.stream_enabled:
             # This endpoint is returning a single event, so we need to wrap it in a generator

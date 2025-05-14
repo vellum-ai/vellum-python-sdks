@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from typing import Any, ClassVar, List, Optional
 
+from pydash import snake_case
+
 from vellum import ChatMessage, PromptBlock
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -101,7 +103,7 @@ class ToolCallingNode(BaseNode):
         )
 
         self._function_nodes = {
-            function.__name__: create_function_node(
+            snake_case(function.__name__): create_function_node(
                 function=function,
                 tool_router_node=self.tool_router_node,
             )
