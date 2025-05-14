@@ -1,11 +1,15 @@
 import dataclasses
 import inspect
-from typing import Any, Callable, Optional, Union, get_args, get_origin
+from typing import TYPE_CHECKING, Any, Callable, Optional, Type, Union, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
+from pydash import snake_case
 
 from vellum.client.types.function_definition import FunctionDefinition
+
+if TYPE_CHECKING:
+    from vellum.workflows.workflows.base import BaseWorkflow
 
 type_map = {
     str: "string",
@@ -109,5 +113,41 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     return FunctionDefinition(
         name=function.__name__,
         description=function.__doc__,
+        parameters=parameters,
+    )
+
+
+def compile_workflow_function_definition(workflow_class: Type["BaseWorkflow"]) -> FunctionDefinition:
+    """
+    Converts a base workflow class into our Vellum-native FunctionDefinition type.
+    """
+    # Get the inputs class for the workflow
+    inputs_class = workflow_class.get_inputs_class()
+    vars_inputs_class = vars(inputs_class)
+
+    properties = {}
+    required = []
+    defs: dict[str, Any] = {}
+
+    for name, field_type in inputs_class.__annotations__.items():
+        if name.startswith("__"):
+            continue
+
+        properties[name] = _compile_annotation(field_type, defs)
+
+        # Check if the field has a default value
+        if name not in vars_inputs_class:
+            required.append(name)
+        else:
+            # Field has a default value
+            properties[name]["default"] = vars_inputs_class[name]
+
+    parameters = {"type": "object", "properties": properties, "required": required}
+    if defs:
+        parameters["$defs"] = defs
+
+    return FunctionDefinition(
+        name=snake_case(workflow_class.__name__),
+        description=workflow_class.__doc__,
         parameters=parameters,
     )
