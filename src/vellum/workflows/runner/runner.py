@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Option
 from vellum.workflows.constants import undefined
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events import (
     NodeExecutionFulfilledEvent,
@@ -143,7 +142,7 @@ class WorkflowRunner(Generic[StateType]):
         self._workflow_event_inner_queue: Queue[WorkflowEvent] = Queue()
 
         self._max_concurrency = max_concurrency
-        self._concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[Edge]]] = Queue()
+        self._concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[UUID]]] = Queue()
 
         # This queue is responsible for sending events from WorkflowRunner to the background thread
         # for user defined emitters
@@ -389,7 +388,12 @@ class WorkflowRunner(Generic[StateType]):
         ):
             self._run_work_item(node, span_id)
 
-    def _handle_invoked_ports(self, state: StateType, ports: Optional[Iterable[Port]]) -> None:
+    def _handle_invoked_ports(
+        self,
+        state: StateType,
+        ports: Optional[Iterable[Port]],
+        invoked_by: Optional[UUID],
+    ) -> None:
         if not ports:
             return
 
@@ -402,9 +406,9 @@ class WorkflowRunner(Generic[StateType]):
                     next_state = state
 
                 if self._max_concurrency:
-                    self._concurrency_queue.put((next_state, edge.to_node, edge))
+                    self._concurrency_queue.put((next_state, edge.to_node, invoked_by))
                 else:
-                    self._run_node_if_ready(next_state, edge.to_node, edge)
+                    self._run_node_if_ready(next_state, edge.to_node, invoked_by)
 
         if self._max_concurrency:
             num_nodes_to_run = self._max_concurrency - len(self._active_nodes_by_execution_id)
@@ -412,14 +416,14 @@ class WorkflowRunner(Generic[StateType]):
                 if self._concurrency_queue.empty():
                     break
 
-                next_state, node_class, invoked_edge = self._concurrency_queue.get()
-                self._run_node_if_ready(next_state, node_class, invoked_edge)
+                next_state, node_class, invoked_by = self._concurrency_queue.get()
+                self._run_node_if_ready(next_state, node_class, invoked_by)
 
     def _run_node_if_ready(
         self,
         state: StateType,
         node_class: Type[BaseNode],
-        invoked_by: Optional[Edge] = None,
+        invoked_by: Optional[UUID] = None,
     ) -> None:
         with state.__lock__:
             for descriptor in node_class.ExternalInputs:
@@ -482,7 +486,7 @@ class WorkflowRunner(Generic[StateType]):
                     )
                 )
 
-            self._handle_invoked_ports(node.state, event.invoked_ports)
+            self._handle_invoked_ports(node.state, event.invoked_ports, event.span_id)
 
             return None
 
@@ -508,7 +512,7 @@ class WorkflowRunner(Generic[StateType]):
                             )
                         )
 
-            self._handle_invoked_ports(node.state, event.invoked_ports)
+            self._handle_invoked_ports(node.state, event.invoked_ports, event.span_id)
 
             return None
 

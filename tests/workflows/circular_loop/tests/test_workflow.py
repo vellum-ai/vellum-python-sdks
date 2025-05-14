@@ -2,8 +2,7 @@ import pytest
 
 from vellum.workflows.types.core import MergeBehavior
 
-from tests.workflows.await_any_conditional_loops.workflow import TopNode
-from tests.workflows.circular_loop.workflow import CircularLoopWorkflow
+from tests.workflows.circular_loop.workflow import CircularLoopWorkflow, TopNode
 
 
 def test_workflow__happy_path():

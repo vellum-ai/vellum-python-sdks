@@ -93,7 +93,8 @@ def _make_snapshottable(value: Any, snapshot_callback: Callable[[], None]) -> An
 NodeExecutionsFulfilled = Dict[Type["BaseNode"], Stack[UUID]]
 NodeExecutionsInitiated = Dict[Type["BaseNode"], Set[UUID]]
 NodeExecutionsQueued = Dict[Type["BaseNode"], List[UUID]]
-DependenciesInvoked = Dict[UUID, Set[Type["BaseNode"]]]
+NodeExecutionLookup = Dict[UUID, Type["BaseNode"]]
+DependenciesInvoked = Dict[UUID, Set[UUID]]
 
 
 class NodeExecutionCache:
@@ -102,11 +103,15 @@ class NodeExecutionCache:
     _node_executions_queued: NodeExecutionsQueued
     _dependencies_invoked: DependenciesInvoked
 
+    # Derived fields - no need to serialize
+    __node_execution_lookup__: NodeExecutionLookup
+
     def __init__(self) -> None:
         self._dependencies_invoked = defaultdict(set)
         self._node_executions_fulfilled = defaultdict(Stack[UUID])
         self._node_executions_initiated = defaultdict(set)
         self._node_executions_queued = defaultdict(list)
+        self.__node_execution_lookup__ = {}
 
     @classmethod
     def deserialize(cls, raw_data: dict, nodes: Dict[Union[str, UUID], Type["BaseNode"]]):
@@ -124,10 +129,8 @@ class NodeExecutionCache:
         dependencies_invoked = raw_data.get("dependencies_invoked")
         if isinstance(dependencies_invoked, dict):
             for execution_id, dependencies in dependencies_invoked.items():
-                dependency_classes = {get_node_class(dep) for dep in dependencies}
-                cache._dependencies_invoked[UUID(execution_id)] = {
-                    dep_class for dep_class in dependency_classes if dep_class is not None
-                }
+                dependency_execution_ids = {UUID(dep) for dep in dependencies if is_valid_uuid(dep)}
+                cache._dependencies_invoked[UUID(execution_id)] = dependency_execution_ids
 
         node_executions_fulfilled = raw_data.get("node_executions_fulfilled")
         if isinstance(node_executions_fulfilled, dict):
@@ -151,6 +154,10 @@ class NodeExecutionCache:
                     {UUID(execution_id) for execution_id in execution_ids}
                 )
 
+            for node_class, execution_ids in cache._node_executions_initiated.items():
+                for execution_id in execution_ids:
+                    cache.__node_execution_lookup__[execution_id] = node_class
+
         node_executions_queued = raw_data.get("node_executions_queued")
         if isinstance(node_executions_queued, dict):
             for node, execution_ids in node_executions_queued.items():
@@ -166,18 +173,29 @@ class NodeExecutionCache:
         self,
         execution_id: UUID,
         node: Type["BaseNode"],
-        dependency: Type["BaseNode"],
+        invoked_by: UUID,
         dependencies: Set["Type[BaseNode]"],
     ) -> None:
-        self._dependencies_invoked[execution_id].add(dependency)
-        if all(dep in self._dependencies_invoked[execution_id] for dep in dependencies):
-            self._node_executions_queued[node].remove(execution_id)
+        self._dependencies_invoked[execution_id].add(invoked_by)
+        invoked_node_classes = {
+            self.__node_execution_lookup__[dep]
+            for dep in self._dependencies_invoked[execution_id]
+            if dep in self.__node_execution_lookup__
+        }
+        if len(invoked_node_classes) != len(dependencies):
+            return
+
+        if any(dep not in invoked_node_classes for dep in dependencies):
+            return
+
+        self._node_executions_queued[node].remove(execution_id)
 
     def is_node_execution_initiated(self, node: Type["BaseNode"], execution_id: UUID) -> bool:
         return execution_id in self._node_executions_initiated[node]
 
     def initiate_node_execution(self, node: Type["BaseNode"], execution_id: UUID) -> None:
         self._node_executions_initiated[node].add(execution_id)
+        self.__node_execution_lookup__[execution_id] = node
 
     def fulfill_node_execution(self, node: Type["BaseNode"], execution_id: UUID) -> None:
         self._node_executions_fulfilled[node].push(execution_id)
@@ -188,7 +206,7 @@ class NodeExecutionCache:
     def dump(self) -> Dict[str, Any]:
         return {
             "dependencies_invoked": {
-                str(execution_id): [str(dep.__id__) for dep in dependencies]
+                str(execution_id): [str(dep) for dep in dependencies]
                 for execution_id, dependencies in self._dependencies_invoked.items()
             },
             "node_executions_initiated": {

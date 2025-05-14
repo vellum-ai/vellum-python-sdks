@@ -368,7 +368,7 @@ def test_base_workflow__deserialize_state():
                 },
                 "node_execution_cache": {
                     "dependencies_invoked": {
-                        last_span_id: [str(node_a_id)],
+                        last_span_id: [],
                     },
                     "node_executions_initiated": {
                         str(node_a_id): [last_span_id],
@@ -396,7 +396,7 @@ def test_base_workflow__deserialize_state():
     assert state.meta.node_execution_cache._node_executions_initiated == {NodeA: {UUID(last_span_id)}}
     assert state.meta.node_execution_cache._node_executions_fulfilled == {NodeA: Stack.from_list([UUID(last_span_id)])}
     assert state.meta.node_execution_cache._node_executions_queued == {NodeA: []}
-    assert state.meta.node_execution_cache._dependencies_invoked == {UUID(last_span_id): {NodeA}}
+    assert state.meta.node_execution_cache._dependencies_invoked == {UUID(last_span_id): set()}
 
 
 def test_base_workflow__deserialize_legacy_node_execution_cache():
@@ -422,7 +422,7 @@ def test_base_workflow__deserialize_legacy_node_execution_cache():
             "meta": {
                 "node_execution_cache": {
                     "dependencies_invoked": {
-                        last_span_id: [node_a_full_name],
+                        last_span_id: [],
                     },
                     "node_executions_initiated": {
                         node_a_full_name: [last_span_id],
@@ -442,7 +442,7 @@ def test_base_workflow__deserialize_legacy_node_execution_cache():
     assert state.meta.node_execution_cache._node_executions_initiated == {NodeA: {UUID(last_span_id)}}
     assert state.meta.node_execution_cache._node_executions_fulfilled == {NodeA: Stack.from_list([UUID(last_span_id)])}
     assert state.meta.node_execution_cache._node_executions_queued == {NodeA: []}
-    assert state.meta.node_execution_cache._dependencies_invoked == {UUID(last_span_id): {NodeA}}
+    assert state.meta.node_execution_cache._dependencies_invoked == {UUID(last_span_id): set()}
 
 
 def test_base_workflow__deserialize_legacy_node_outputs():
