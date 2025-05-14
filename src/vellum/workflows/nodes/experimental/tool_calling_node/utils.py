@@ -5,6 +5,7 @@ from typing import Any, Iterator, List, Optional, Type, cast
 from vellum import ChatMessage, FunctionDefinition, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
+from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
@@ -130,7 +131,12 @@ def create_function_node(function: Callable[..., Any], tool_router_node: Type[To
         # Call the original function directly with the arguments
         result = function(**arguments)
 
-        self.state.chat_history.append(ChatMessage(role="FUNCTION", text=result))
+        self.state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result)),
+            )
+        )
 
         return self.Outputs()
 

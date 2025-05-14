@@ -18,6 +18,7 @@ from vellum.client.types.prompt_request_chat_history_input import PromptRequestC
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
+from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
@@ -96,14 +97,21 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
             ),
+            source=None,
         ),
         ChatMessage(
-            text="The current weather in Miami is sunny with a temperature of 70 degrees celsius.",
+            text=None,
             role="FUNCTION",
+            content=StringChatMessageContent(
+                type="STRING", value='"The current weather in Miami is sunny with a temperature of 70 degrees celsius."'
+            ),
+            source=None,
         ),
         ChatMessage(
             text="Based on the function call, the current temperature in Miami is 70 degrees celsius.",
             role="ASSISTANT",
+            content=None,
+            source=None,
         ),
     ]
 
@@ -220,10 +228,16 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
+                        source=None,
                     ),
                     ChatMessage(
-                        text="The current weather in Miami is sunny with a temperature of 70 degrees celsius.",
+                        text=None,
                         role="FUNCTION",
+                        content=StringChatMessageContent(
+                            type="STRING",
+                            value='"The current weather in Miami is sunny with a temperature of 70 degrees celsius."',
+                        ),
+                        source=None,
                     ),
                 ],
             ),
