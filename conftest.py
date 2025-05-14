@@ -11,6 +11,7 @@ from dotenv import dotenv_values
 from pytest_mock import MockerFixture
 import requests_mock
 
+from vellum.client.environment import VellumEnvironment
 from vellum.workflows.logging import load_logger
 
 
@@ -61,6 +62,8 @@ def vellum_client_class(mocker: MockerFixture) -> Any:
 @pytest.fixture
 def vellum_client(vellum_client_class) -> Any:
     vellum_client = vellum_client_class.return_value
+    vellum_client._client_wrapper._environment = VellumEnvironment.PRODUCTION
+    vellum_client._client_wrapper.api_key = ""
     return vellum_client
 
 

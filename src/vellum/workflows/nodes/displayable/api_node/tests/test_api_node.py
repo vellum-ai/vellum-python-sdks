@@ -19,7 +19,7 @@ def test_run_workflow__secrets(vellum_client):
     class SimpleBaseAPINode(APINode):
         method = APIRequestMethod.POST
         authorization_type = AuthorizationType.BEARER_TOKEN
-        url = "https://api.vellum.ai"
+        url = "https://example.vellum.ai"
         json = {
             "key": "value",
         }
@@ -32,7 +32,9 @@ def test_run_workflow__secrets(vellum_client):
     terminal = node.run()
 
     assert vellum_client.execute_api.call_count == 1
+    assert vellum_client.execute_api.call_args.kwargs["url"] == "https://example.vellum.ai"
     assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
+    assert vellum_client.execute_api.call_args.kwargs["headers"] == {"X-Test-Header": "foo"}
     bearer_token = vellum_client.execute_api.call_args.kwargs["bearer_token"]
     assert bearer_token == ClientVellumSecret(name="secret")
     assert terminal.headers == {"X-Response-Header": "bar"}
@@ -45,7 +47,7 @@ def test_api_node_raises_error_when_api_call_fails(vellum_client):
     class SimpleAPINode(APINode):
         method = APIRequestMethod.GET
         authorization_type = AuthorizationType.BEARER_TOKEN
-        url = "https://api.vellum.ai"
+        url = "https://example.vellum.ai"
         json = {
             "key": "value",
         }
@@ -65,7 +67,9 @@ def test_api_node_raises_error_when_api_call_fails(vellum_client):
 
     # AND the API call should have been made
     assert vellum_client.execute_api.call_count == 1
+    assert vellum_client.execute_api.call_args.kwargs["url"] == "https://example.vellum.ai"
     assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
+    assert vellum_client.execute_api.call_args.kwargs["headers"] == {"X-Test-Header": "foo"}
 
 
 def test_api_node_defaults_to_get_method(vellum_client):
@@ -80,7 +84,7 @@ def test_api_node_defaults_to_get_method(vellum_client):
     # AND an API node without a method specified
     class SimpleAPINodeWithoutMethod(APINode):
         authorization_type = AuthorizationType.BEARER_TOKEN
-        url = "https://api.vellum.ai"
+        url = "https://example.vellum.ai"
         headers = {
             "X-Test-Header": "foo",
         }
@@ -95,3 +99,62 @@ def test_api_node_defaults_to_get_method(vellum_client):
     assert vellum_client.execute_api.call_count == 1
     method = vellum_client.execute_api.call_args.kwargs["method"]
     assert method == APIRequestMethod.GET.value
+
+
+def test_api_node__detects_client_environment_urls__adds_token(mock_httpx_transport, mock_requests, monkeypatch):
+    # GIVEN an API node with a URL pointing back to Vellum
+    class SimpleAPINodeToVellum(APINode):
+        url = "https://api.vellum.ai"
+
+    # AND a mock request sent to the Vellum API would return a 200
+    mock_response = mock_requests.get(
+        "https://api.vellum.ai",
+        status_code=200,
+        json={"data": [1, 2, 3]},
+    )
+
+    # AND an api key is set
+    monkeypatch.setenv("VELLUM_API_KEY", "vellum-api-key-1234")
+
+    # WHEN we run the node
+    node = SimpleAPINodeToVellum()
+    node.run()
+
+    # THEN the execute_api method should not have been called
+    mock_httpx_transport.handle_request.assert_not_called()
+
+    # AND the vellum API should have been called with the correct headers
+    assert mock_response.last_request
+    assert mock_response.last_request.headers["X-API-Key"] == "vellum-api-key-1234"
+
+
+def test_api_node__detects_client_environment_urls__does_not_override_headers(
+    mock_httpx_transport, mock_requests, monkeypatch
+):
+    # GIVEN an API node with a URL pointing back to Vellum
+    class SimpleAPINodeToVellum(APINode):
+        url = "https://api.vellum.ai"
+        headers = {
+            "X-API-Key": "vellum-api-key-5678",
+        }
+
+    # AND a mock request sent to the Vellum API would return a 200
+    mock_response = mock_requests.get(
+        "https://api.vellum.ai",
+        status_code=200,
+        json={"data": [1, 2, 3]},
+    )
+
+    # AND an api key is set
+    monkeypatch.setenv("VELLUM_API_KEY", "vellum-api-key-1234")
+
+    # WHEN we run the node
+    node = SimpleAPINodeToVellum()
+    node.run()
+
+    # THEN the execute_api method should not have been called
+    mock_httpx_transport.handle_request.assert_not_called()
+
+    # AND the vellum API should have been called with the correct headers
+    assert mock_response.last_request
+    assert mock_response.last_request.headers["X-API-Key"] == "vellum-api-key-5678"
