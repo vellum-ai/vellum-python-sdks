@@ -8,7 +8,6 @@ from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, Typ
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
-from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph import Graph
@@ -317,8 +316,15 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 """
                 # Check if all dependencies have invoked this node
                 dependencies_invoked = state.meta.node_execution_cache._dependencies_invoked.get(node_span_id, set())
-                all_deps_invoked = all(dep in dependencies_invoked for dep in dependencies)
+                node_classes_invoked = {
+                    state.meta.node_execution_cache.__node_execution_lookup__[dep]
+                    for dep in dependencies_invoked
+                    if dep in state.meta.node_execution_cache.__node_execution_lookup__
+                }
+                if len(node_classes_invoked) != len(dependencies):
+                    return False
 
+                all_deps_invoked = all(dep in node_classes_invoked for dep in dependencies)
                 return all_deps_invoked
 
             raise NodeException(
@@ -328,7 +334,7 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
 
         @classmethod
         def _queue_node_execution(
-            cls, state: StateType, dependencies: Set["Type[BaseNode]"], invoked_by: Optional[Edge] = None
+            cls, state: StateType, dependencies: Set["Type[BaseNode]"], invoked_by: Optional[UUID] = None
         ) -> UUID:
             """
             Queues a future execution of a node, returning the span id of the execution.
@@ -341,19 +347,21 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
             if not invoked_by:
                 return execution_id
 
+            if invoked_by not in state.meta.node_execution_cache.__node_execution_lookup__:
+                return execution_id
+
             if cls.merge_behavior not in {MergeBehavior.AWAIT_ANY, MergeBehavior.AWAIT_ALL}:
                 return execution_id
 
-            source_node = invoked_by.from_port.node_class
             for queued_node_execution_id in state.meta.node_execution_cache._node_executions_queued[cls.node_class]:
-                if source_node not in state.meta.node_execution_cache._dependencies_invoked[queued_node_execution_id]:
+                if invoked_by not in state.meta.node_execution_cache._dependencies_invoked[queued_node_execution_id]:
                     state.meta.node_execution_cache._invoke_dependency(
-                        queued_node_execution_id, cls.node_class, source_node, dependencies
+                        queued_node_execution_id, cls.node_class, invoked_by, dependencies
                     )
                     return queued_node_execution_id
 
             state.meta.node_execution_cache._node_executions_queued[cls.node_class].append(execution_id)
-            state.meta.node_execution_cache._invoke_dependency(execution_id, cls.node_class, source_node, dependencies)
+            state.meta.node_execution_cache._invoke_dependency(execution_id, cls.node_class, invoked_by, dependencies)
             return execution_id
 
     class Execution(metaclass=_BaseNodeExecutionMeta):
