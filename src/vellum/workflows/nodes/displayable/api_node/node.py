@@ -47,11 +47,18 @@ class APINode(BaseAPINode):
             self.bearer_token_value, VellumSecret
         ):
             bearer_token = self.bearer_token_value
+
+        final_headers = {**headers, **header_overrides}
+
+        vellum_client_wrapper = self._context.vellum_client._client_wrapper
+        if self.url.startswith(vellum_client_wrapper._environment.default) and "X-API-Key" not in final_headers:
+            final_headers["X-API-Key"] = vellum_client_wrapper.api_key
+
         return self._run(
             method=self.method,
             url=self.url,
             data=self.data,
             json=self.json,
-            headers={**headers, **header_overrides},
+            headers=final_headers,
             bearer_token=bearer_token,
         )
