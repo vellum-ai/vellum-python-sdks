@@ -2,8 +2,14 @@ from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.experimental.tool_calling_node import ToolCallingNode
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
+
+
+class Inputs(BaseInputs):
+    question: str
 
 
 def get_current_weather(location: str, unit: str) -> str:
@@ -47,11 +53,11 @@ class GetCurrentWeatherNode(ToolCallingNode):
     ]
     functions = [get_current_weather]
     prompt_inputs = {
-        "question": "What's the weather like in San Francisco?",
+        "question": Inputs.question,
     }
 
 
-class BasicToolCallingNodeWorkflow(BaseWorkflow):
+class BasicToolCallingNodeWorkflow(BaseWorkflow[Inputs, BaseState]):
     """
     A workflow that uses the GetCurrentWeatherNode.
     """

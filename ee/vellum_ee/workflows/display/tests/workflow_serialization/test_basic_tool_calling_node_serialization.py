@@ -21,7 +21,7 @@ def test_serialize_workflow():
 
     # AND its input variables should be what we expect
     input_variables = serialized_workflow["input_variables"]
-    assert len(input_variables) == 0
+    assert len(input_variables) == 1
 
     # AND its output variables should be what we expect
     output_variables = serialized_workflow["output_variables"]
@@ -114,7 +114,7 @@ def test_serialize_workflow():
                                                 "input_variable": "question",
                                             }
                                         ],
-                                    }
+                                    },
                                 ],
                             },
                         ],
@@ -154,14 +154,37 @@ def test_serialize_workflow():
                 "id": "0f6dc102-3460-4963-91fa-7ba85d65ef7a",
                 "name": "prompt_inputs",
                 "value": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {"type": "JSON", "value": {"question": "What's the weather like in San Francisco?"}},
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "key": "question",
+                            "value": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": "45a34bc1-968a-43c0-a3b3-f20e3e4e9952",
+                            },
+                        },
+                    ],
                 },
             },
             {
                 "id": "5c041b7d-732c-4773-a93a-32211f2af0b3",
                 "name": "max_tool_calls",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1.0}},
+            },
+        ],
+        "inputs": [
+            {
+                "id": "8eb8b551-9b48-43b3-861f-52adb5c585a8",
+                "key": "question",
+                "value": {
+                    "rules": [
+                        {
+                            "type": "INPUT_VARIABLE",
+                            "data": {"input_variable_id": "45a34bc1-968a-43c0-a3b3-f20e3e4e9952"},
+                        }
+                    ],
+                    "combinator": "OR",
+                },
             },
         ],
         "outputs": [
