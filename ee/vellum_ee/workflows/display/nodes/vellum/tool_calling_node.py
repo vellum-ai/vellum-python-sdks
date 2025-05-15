@@ -20,16 +20,17 @@ class BaseToolCallingNodeDisplay(BaseNodeDisplay[_ToolCallingNodeType], Generic[
 
         value = raise_if_descriptor(node.prompt_inputs)
         node_inputs: List[NodeInput] = []
-        for variable_name, variable_value in value.items():
-            node_input = create_node_input(
-                node_id=node_id,
-                input_name=variable_name,
-                value=variable_value,
-                display_context=display_context,
-                input_id=self.node_input_ids_by_name.get(f"{node.prompt_inputs.name}.{variable_name}")
-                or self.node_input_ids_by_name.get(variable_name),
-            )
-            node_inputs.append(node_input)
+        if value:
+            for variable_name, variable_value in value.items():
+                node_input = create_node_input(
+                    node_id=node_id,
+                    input_name=variable_name,
+                    value=variable_value,
+                    display_context=display_context,
+                    input_id=self.node_input_ids_by_name.get(f"{ToolCallingNode.prompt_inputs.name}.{variable_name}")
+                    or self.node_input_ids_by_name.get(variable_name),
+                )
+                node_inputs.append(node_input)
 
         return {
             "inputs": [node_input.dict() for node_input in node_inputs],
