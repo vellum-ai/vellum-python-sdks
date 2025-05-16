@@ -29,7 +29,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
 
         expected_outputs = [
             StringVellumValue(
-                value="Based on the function call, the current temperature in Miami is 70 degrees celsius."
+                value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
             )
         ]
 
@@ -59,11 +59,11 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert (
         terminal_event.outputs.text
-        == "Based on the function call, the current temperature in Miami is 70 degrees celsius."
+        == "Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
     )
     assert terminal_event.outputs.chat_history == [
         ChatMessage(
-            text="Based on the function call, the current temperature in Miami is 70 degrees celsius.",
+            text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
             role="ASSISTANT",
             content=None,
             source=None,
