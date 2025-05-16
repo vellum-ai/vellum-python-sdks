@@ -70,6 +70,12 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
 
                     for output_descriptor, output_value in event.outputs:
                         setattr(node_outputs, output_descriptor.name, output_value)
+
+                        if self.__wrapped_node__:
+                            inner_desc = getattr(self.__wrapped_node__.Outputs, output_descriptor.name, None)
+                            if inner_desc:
+                                self.state.meta.node_outputs[inner_desc] = output_value
+
                 elif event.name == "workflow.execution.paused":
                     exception = NodeException(
                         code=WorkflowErrorCode.INVALID_OUTPUTS,
