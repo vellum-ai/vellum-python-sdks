@@ -46,6 +46,7 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
 
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
+        is_streamable = True
 
     class Outputs(BaseNode.Outputs):
         # We use our mypy plugin to override the _OutputType with the actual output type
