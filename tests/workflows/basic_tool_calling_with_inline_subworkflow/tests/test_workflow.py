@@ -40,7 +40,7 @@ def test_tool_calling_with_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
             expected_outputs = [
                 FunctionCallVellumValue(
                     value=FunctionCall(
-                        arguments={"city": "Miami", "date": "2025-01-01"},
+                        arguments={"city": "San Francisco", "date": "2025-01-01"},
                         id="call_7115tNTmEACTsQRGwKpJipJK",
                         name="basic_inline_subworkflow_workflow",
                         state="FULFILLED",
@@ -50,7 +50,7 @@ def test_tool_calling_with_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
         else:
             expected_outputs = [
                 StringVellumValue(
-                    value="Based on the function call, the current temperature in Miami is 70 degrees celsius."
+                    value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
                 )
             ]
 
@@ -88,7 +88,7 @@ def test_tool_calling_with_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
 
     assert (
         terminal_event.outputs.text
-        == "Based on the function call, the current temperature in Miami is 70 degrees celsius."
+        == "Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
     )
     assert terminal_event.outputs.chat_history == [
         ChatMessage(
@@ -98,7 +98,7 @@ def test_tool_calling_with_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                 type="FUNCTION_CALL",
                 value=FunctionCallChatMessageContentValue(
                     name="basic_inline_subworkflow_workflow",
-                    arguments={"city": "Miami", "date": "2025-01-01"},
+                    arguments={"city": "San Francisco", "date": "2025-01-01"},
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
             ),
@@ -108,12 +108,13 @@ def test_tool_calling_with_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
             text=None,
             role="FUNCTION",
             content=StringChatMessageContent(
-                type="STRING", value='{"temperature": 70, "reasoning": "The weather in Miami on 2025-01-01 was hot"}'
+                type="STRING",
+                value='{"temperature": 70, "reasoning": "The weather in San Francisco on 2025-01-01 was hot"}',
             ),
             source=None,
         ),
         ChatMessage(
-            text="Based on the function call, the current temperature in Miami is 70 degrees celsius.",
+            text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
             role="ASSISTANT",
             content=None,
             source=None,
@@ -226,7 +227,7 @@ def test_tool_calling_with_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                             type="FUNCTION_CALL",
                             value=FunctionCallChatMessageContentValue(
                                 name="basic_inline_subworkflow_workflow",
-                                arguments={"city": "Miami", "date": "2025-01-01"},
+                                arguments={"city": "San Francisco", "date": "2025-01-01"},
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
@@ -237,7 +238,7 @@ def test_tool_calling_with_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                         role="FUNCTION",
                         content=StringChatMessageContent(
                             type="STRING",
-                            value='{"temperature": 70, "reasoning": "The weather in Miami on 2025-01-01 was hot"}',
+                            value='{"temperature": 70, "reasoning": "The weather in San Francisco on 2025-01-01 was hot"}',  # noqa: E501
                         ),
                         source=None,
                     ),

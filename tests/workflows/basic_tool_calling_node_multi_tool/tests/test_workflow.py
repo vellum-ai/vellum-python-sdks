@@ -41,7 +41,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             expected_outputs = [
                 FunctionCallVellumValue(
                     value=FunctionCall(
-                        arguments={"location": "Miami", "unit": "celsius"},
+                        arguments={"location": "San Francisco", "unit": "celsius"},
                         id="call_7115tNTmEACTsQRGwKpJipJK",
                         name="get_current_weather",
                         state="FULFILLED",
@@ -53,7 +53,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 FunctionCallVellumValue(
                     value=FunctionCall(
                         arguments={
-                            "answer": "The current weather in Miami is sunny with a temperature of 70 degrees celsius."
+                            "answer": "The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."  # noqa: E501
                         },
                         id="call_7115tNTmEACTsQRGwKpJipJK",
                         name="format_answer",
@@ -64,7 +64,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         else:
             expected_outputs = [
                 StringVellumValue(
-                    value="Based on the function call, the current temperature in Miami is 70 degrees celsius."
+                    value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
                 )
             ]
 
@@ -98,7 +98,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert (
         terminal_event.outputs.text
-        == "Based on the function call, the current temperature in Miami is 70 degrees celsius."
+        == "Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
     )
     assert terminal_event.outputs.chat_history == [
         ChatMessage(
@@ -108,7 +108,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 type="FUNCTION_CALL",
                 value=FunctionCallChatMessageContentValue(
                     name="get_current_weather",
-                    arguments={"location": "Miami", "unit": "celsius"},
+                    arguments={"location": "San Francisco", "unit": "celsius"},
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
             ),
@@ -118,7 +118,8 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             text=None,
             role="FUNCTION",
             content=StringChatMessageContent(
-                type="STRING", value='"The current weather in Miami is sunny with a temperature of 70 degrees celsius."'
+                type="STRING",
+                value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',
             ),
             source=None,
         ),
@@ -130,7 +131,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                 value=FunctionCallChatMessageContentValue(
                     name="format_answer",
                     arguments={
-                        "answer": "The current weather in Miami is sunny with a temperature of 70 degrees celsius."
+                        "answer": "The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."  # noqa: E501
                     },
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
@@ -141,7 +142,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             text=None, role="FUNCTION", content=StringChatMessageContent(type="STRING", value="2"), source=None
         ),
         ChatMessage(
-            text="Based on the function call, the current temperature in Miami is 70 degrees celsius.",
+            text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
             role="ASSISTANT",
             content=None,
             source=None,
@@ -266,7 +267,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                             type="FUNCTION_CALL",
                             value=FunctionCallChatMessageContentValue(
                                 name="get_current_weather",
-                                arguments={"location": "Miami", "unit": "celsius"},
+                                arguments={"location": "San Francisco", "unit": "celsius"},
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
@@ -276,7 +277,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                         role="FUNCTION",
                         content=StringChatMessageContent(
                             type="STRING",
-                            value='"The current weather in Miami is sunny with a temperature of 70 degrees celsius."',
+                            value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',  # noqa: E501
                         ),
                         source=None,
                     ),
@@ -390,7 +391,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                             type="FUNCTION_CALL",
                             value=FunctionCallChatMessageContentValue(
                                 name="get_current_weather",
-                                arguments={"location": "Miami", "unit": "celsius"},
+                                arguments={"location": "San Francisco", "unit": "celsius"},
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
@@ -401,7 +402,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                         role="FUNCTION",
                         content=StringChatMessageContent(
                             type="STRING",
-                            value='"The current weather in Miami is sunny with a temperature of 70 degrees celsius."',
+                            value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',  # noqa: E501
                         ),
                         source=None,
                     ),
@@ -413,7 +414,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                             value=FunctionCallChatMessageContentValue(
                                 name="format_answer",
                                 arguments={
-                                    "answer": "The current weather in Miami is sunny with a temperature of 70 degrees celsius."  # noqa: E501
+                                    "answer": "The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."  # noqa: E501
                                 },
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
