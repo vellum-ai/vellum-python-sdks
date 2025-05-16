@@ -142,7 +142,7 @@ def test_workflow_stream__happy_path():
 
     # workflow snapshotted events
     workflow_snapshotted_events = [e for e in events if e.name == "workflow.execution.snapshotted"]
-    assert len(workflow_snapshotted_events) == 2
+    assert len(workflow_snapshotted_events) == 3
 
     # AND the total number of events is correct
-    assert len(events) == 21
+    assert len(events) == 22
