@@ -29,7 +29,7 @@ def test_serialize_node__prompt_inputs__constant_value():
     )
 
     assert prompt_inputs_attribute == {
-        "id": "e8e1d3a1-bda7-4f6b-a329-127e3ba86149",
+        "id": "3d9a4d2e-c9bd-4417-8a0c-52f15efdbe30",
         "name": "prompt_inputs",
         "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {"foo": "bar"}}},
     }
