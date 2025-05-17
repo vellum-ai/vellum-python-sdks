@@ -8,6 +8,7 @@ import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base"
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
 const INPUTS_PREFIX = "metric_inputs";
+const STANDARD_METRIC_OUTPUT_KEYS = ["score", "normalized_score", "log"];
 
 export class GuardrailNode extends BaseSingleFileNode<
   GuardrailNodeType,
@@ -103,37 +104,77 @@ export class GuardrailNode extends BaseSingleFileNode<
           this.nodeContext.metricDefinitionsHistoryItem?.outputVariables ?? []
         ).map((output) => {
           const name = this.nodeContext.getNodeOutputNameById(output.id);
+          const isStandardOutput = STANDARD_METRIC_OUTPUT_KEYS.includes(
+            output.key
+          );
 
-          if (!name) {
-            throw new NodeAttributeGenerationError(
-              `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
-            );
-          }
-          return {
-            key: python.reference({
-              name: this.nodeContext.nodeClassName,
-              modulePath: this.nodeContext.nodeModulePath,
-              attribute: [OUTPUTS_CLASS_NAME, name],
-            }),
-            value: python.instantiateClass({
-              classReference: python.reference({
-                name: "NodeOutputDisplay",
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .NODE_DISPLAY_TYPES_MODULE_PATH,
+          if (isStandardOutput && name) {
+            // For standard outputs, use class reference
+            return {
+              key: python.reference({
+                name: this.nodeContext.nodeClassName,
+                modulePath: this.nodeContext.nodeModulePath,
+                attribute: [OUTPUTS_CLASS_NAME, name],
               }),
-              arguments_: [
-                python.methodArgument({
-                  name: "id",
-                  value: python.TypeInstantiation.uuid(output.id),
+              value: python.instantiateClass({
+                classReference: python.reference({
+                  name: "NodeOutputDisplay",
+                  modulePath:
+                    this.workflowContext.sdkModulePathNames
+                      .NODE_DISPLAY_TYPES_MODULE_PATH,
                 }),
-                python.methodArgument({
-                  name: "name",
-                  value: python.TypeInstantiation.str(output.key),
+                arguments_: [
+                  python.methodArgument({
+                    name: "id",
+                    value: python.TypeInstantiation.uuid(output.id),
+                  }),
+                  python.methodArgument({
+                    name: "name",
+                    value: python.TypeInstantiation.str(output.key),
+                  }),
+                ],
+              }),
+            };
+          } else {
+            // For non standard outputs, use a LazyReference
+            return {
+              key: python.instantiateClass({
+                classReference: python.reference({
+                  name: "LazyReference",
+                  modulePath: [
+                    ...this.workflowContext.sdkModulePathNames
+                      .WORKFLOWS_MODULE_PATH,
+                    "references",
+                  ],
                 }),
-              ],
-            }),
-          };
+                arguments_: [
+                  python.methodArgument({
+                    value: python.TypeInstantiation.str(
+                      `${this.nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${output.key}`
+                    ),
+                  }),
+                ],
+              }),
+              value: python.instantiateClass({
+                classReference: python.reference({
+                  name: "NodeOutputDisplay",
+                  modulePath:
+                    this.workflowContext.sdkModulePathNames
+                      .NODE_DISPLAY_TYPES_MODULE_PATH,
+                }),
+                arguments_: [
+                  python.methodArgument({
+                    name: "id",
+                    value: python.TypeInstantiation.uuid(output.id),
+                  }),
+                  python.methodArgument({
+                    name: "name",
+                    value: python.TypeInstantiation.str(output.key),
+                  }),
+                ],
+              }),
+            };
+          }
         })
       ),
     });
