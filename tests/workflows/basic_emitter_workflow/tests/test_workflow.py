@@ -122,7 +122,9 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                     serialized_next_node_id: [str(next_node_span_id)],
                 },
                 "node_executions_queued": {},
-                "dependencies_invoked": {},
+                "dependencies_invoked": {
+                    str(next_node_span_id): [str(start_node_span_id)],
+                },
             },
             "workflow_definition": {
                 "name": "BasicEmitterWorkflow",
@@ -155,7 +157,9 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                     serialized_next_node_id: [str(next_node_span_id)],
                 },
                 "node_executions_queued": {},
-                "dependencies_invoked": {},
+                "dependencies_invoked": {
+                    str(next_node_span_id): [str(start_node_span_id)],
+                },
             },
             "parent": None,
             "workflow_definition": {
