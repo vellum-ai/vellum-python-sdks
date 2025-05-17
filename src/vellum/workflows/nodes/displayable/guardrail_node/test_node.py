@@ -102,6 +102,35 @@ def test_run_guardrail_node__normalized_score_null(vellum_client):
     assert exc_info.value.code == WorkflowErrorCode.INVALID_OUTPUTS
 
 
+def test_run_guardrail_node__reason(vellum_client):
+    # GIVEN a Guardrail Node
+    class MyGuard(GuardrailNode):
+        metric_definition = "example_metric_definition"
+        metric_inputs = {}
+
+    # AND we know that the guardrail node will return a reason
+    mock_metric_execution = MetricDefinitionExecution(
+        outputs=[
+            TestSuiteRunMetricNumberOutput(
+                name="score",
+                value=0.6,
+            ),
+            TestSuiteRunMetricStringOutput(
+                name="reason",
+                value="foo",
+            ),
+        ],
+    )
+    vellum_client.metric_definitions.execute_metric_definition.return_value = mock_metric_execution
+
+    # WHEN we run the Guardrail Node
+    outputs = MyGuard().run()
+
+    # THEN the workflow should have completed successfully
+    assert outputs.score == 0.6
+    assert outputs.reason == "foo"
+
+
 def test_run_guardrail_node__api_error(vellum_client):
     # GIVEN a Guardrail Node
     class MyGuard(GuardrailNode):
