@@ -1,5 +1,3 @@
-import pytest
-
 from vellum.workflows.types.core import MergeBehavior
 
 from tests.workflows.circular_loop.workflow import CircularLoopWorkflow, TopNode
