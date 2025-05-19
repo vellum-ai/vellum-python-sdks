@@ -37,6 +37,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
         score: float
         normalized_score: Optional[float]
         log: Optional[str]
+        reason: Optional[str]
 
     def run(self) -> Outputs:
         try:
@@ -54,10 +55,10 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
             )
 
         metric_outputs = {output.name: output.value for output in metric_execution.outputs}
-
         SCORE_KEY = "score"
         NORMALIZED_SCORE_KEY = "normalized_score"
         LOG_KEY = "log"
+        REASON_KEY = "reason"
 
         score = metric_outputs.get(SCORE_KEY)
         if not isinstance(score, float):
@@ -87,7 +88,17 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
         else:
             log = None
 
-        return self.Outputs(score=score, normalized_score=normalized_score, log=log, **metric_outputs)
+        if REASON_KEY in metric_outputs:
+            reason = metric_outputs.pop(REASON_KEY) or ""
+            if not isinstance(reason, str):
+                raise NodeException(
+                    message="Metric execution reason output must be of type 'str'",
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                )
+        else:
+            reason = None
+
+        return self.Outputs(score=score, normalized_score=normalized_score, log=log, reason=reason, **metric_outputs)
 
     def _compile_metric_inputs(self) -> List[MetricDefinitionInput]:
         # TODO: We may want to consolidate with prompt deployment input compilation
