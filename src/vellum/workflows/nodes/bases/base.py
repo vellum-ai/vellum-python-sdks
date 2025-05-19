@@ -351,6 +351,9 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 return execution_id
 
             if cls.merge_behavior not in {MergeBehavior.AWAIT_ANY, MergeBehavior.AWAIT_ALL}:
+                # Keep track of the dependencies that have invoked this node
+                # This would be needed while climbing the history in the loop
+                state.meta.node_execution_cache._dependencies_invoked[execution_id].add(invoked_by)
                 return execution_id
 
             for queued_node_execution_id in state.meta.node_execution_cache._node_executions_queued[cls.node_class]:
