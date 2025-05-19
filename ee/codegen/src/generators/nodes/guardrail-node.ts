@@ -108,7 +108,13 @@ export class GuardrailNode extends BaseSingleFileNode<
             output.key
           );
 
-          if (isStandardOutput && name) {
+          if (!name) {
+            throw new NodeAttributeGenerationError(
+              `Could not find output name for ${this.nodeContext.nodeClassName}.Outputs.${output.key} given output id ${output.id}`
+            );
+          }
+
+          if (isStandardOutput) {
             // For standard outputs, use class reference
             return {
               key: python.reference({
