@@ -369,23 +369,24 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 invoked_by_node = state.meta.node_execution_cache.__node_execution_lookup__.get(invoked_by)
 
                 # Check if invoked by node is a forked node
-                fork_id = state.meta.node_execution_cache.__node_to_fork_id__.get(invoked_by_node, None)
-                if fork_id:
-                    # If the invoked by node has a fork id and that fork id is in __all_fork_ids__
-                    #   We will
-                    #   1. remove the fork id from __all_fork_ids__
-                    #   2. remove the fork id from the __node_to_fork_id__ mapping
-                    # else (this mean the fork has already been triggered)
-                    #   remove the id from the node_to_fork_id mapping and not retrigger again
-                    all_fork_ids = state.meta.node_execution_cache.__all_fork_ids__
-                    if fork_id in all_fork_ids:
-                        # When the next forked node merge, it will not trigger the node again
-                        # We should consider adding a lock here to prevent race condition
-                        all_fork_ids.remove(fork_id)
-                        del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
-                    else:
-                        should_retrigger = False
-                        del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
+                if invoked_by_node is not None:
+                    fork_id = state.meta.node_execution_cache.__node_to_fork_id__.get(invoked_by_node, None)
+                    if fork_id:
+                        # If the invoked by node has a fork id and that fork id is in __all_fork_ids__
+                        #   We will
+                        #   1. remove the fork id from __all_fork_ids__
+                        #   2. remove the fork id from the __node_to_fork_id__ mapping
+                        # else (this mean the fork has already been triggered)
+                        #   remove the id from the node_to_fork_id mapping and not retrigger again
+                        all_fork_ids = state.meta.node_execution_cache.__all_fork_ids__
+                        if fork_id in all_fork_ids:
+                            # When the next forked node merge, it will not trigger the node again
+                            # We should consider adding a lock here to prevent race condition
+                            all_fork_ids.remove(fork_id)
+                            del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
+                        else:
+                            should_retrigger = False
+                            del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
 
                 # If should_retrigger is false, then we will not trigger the node already
                 # So we don't need to check loop behavior
