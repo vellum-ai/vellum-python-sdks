@@ -356,8 +356,77 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                 state.meta.node_execution_cache._dependencies_invoked[execution_id].add(invoked_by)
                 return execution_id
 
+            # For AWAIT_ANY in workflows, we have two cases:
+            # 1. The node is being re-executed because of a fork
+            # 2. The node is being re-executed because of a loop
+            # For case 1, we need to remove the fork id from the node_to_fork_id mapping
+            # For case 2, we need to check if the node is in a loop
+            in_loop = False
+            # Default to true, will be set to false if the merged node has already been triggered
+            should_retrigger = True
+            if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
+                # Get the node that triggered the current execution
+                invoked_by_node = state.meta.node_execution_cache.__node_execution_lookup__.get(invoked_by)
+
+                # Check if invoked by node is a forked node
+                fork_id = state.meta.node_execution_cache.__node_to_fork_id__.get(invoked_by_node, None)
+                if fork_id:
+                    # If the invoked by node has a fork id and that fork id is in __all_fork_ids__
+                    #   We will
+                    #   1. remove the fork id from __all_fork_ids__
+                    #   2. remove the fork id from the __node_to_fork_id__ mapping
+                    # else (this mean the fork has already been triggered)
+                    #   remove the id from the node_to_fork_id mapping and not retrigger again
+                    all_fork_ids = state.meta.node_execution_cache.__all_fork_ids__
+                    if fork_id in all_fork_ids:
+                        # When the next forked node merge, it will not trigger the node again
+                        # We should consider adding a lock here to prevent race condition
+                        all_fork_ids.remove(fork_id)
+                        del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
+                    else:
+                        should_retrigger = False
+                        del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
+
+                # If should_retrigger is false, then we will not trigger the node already
+                # So we don't need to check loop behavior
+                if should_retrigger:
+                    # Trace back through the dependency chain to detect if this node triggers itself
+                    visited = set()
+                    current_execution_id = invoked_by
+
+                    # Walk backwards through the dependency chain
+                    while current_execution_id and current_execution_id not in visited:
+                        visited.add(current_execution_id)
+
+                        # Get the dependencies that triggered this execution
+                        dependencies_for_current = state.meta.node_execution_cache._dependencies_invoked.get(
+                            current_execution_id, set()
+                        )
+
+                        # If we've reached the end of the chain, it means the node is not in a loop
+                        # we can break out of the loop
+                        if not dependencies_for_current:
+                            break
+
+                        # Move to the previous node in the dependency chain
+                        current_execution_id = next(iter(dependencies_for_current))
+
+                        current_node_class = state.meta.node_execution_cache.__node_execution_lookup__.get(
+                            current_execution_id
+                        )
+
+                        # If we've found our target node class in the chain, we're in a loop
+                        if current_node_class == cls.node_class:
+                            in_loop = True
+                            break
+
             for queued_node_execution_id in state.meta.node_execution_cache._node_executions_queued[cls.node_class]:
-                if invoked_by not in state.meta.node_execution_cache._dependencies_invoked[queued_node_execution_id]:
+                # When should_retrigger is false, it means the merged node has already been triggered
+                # So we don't need to trigger the node again
+                if not should_retrigger or (
+                    invoked_by not in state.meta.node_execution_cache._dependencies_invoked[queued_node_execution_id]
+                    and not in_loop
+                ):
                     state.meta.node_execution_cache._invoke_dependency(
                         queued_node_execution_id, cls.node_class, invoked_by, dependencies
                     )
