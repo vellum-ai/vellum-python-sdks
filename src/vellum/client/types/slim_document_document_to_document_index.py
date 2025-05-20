@@ -17,6 +17,11 @@ class SlimDocumentDocumentToDocumentIndex(UniversalBaseModel):
     Vellum-generated ID that uniquely identifies this link.
     """
 
+    environment_document_index_id: str = pydantic.Field()
+    """
+    Vellum-generated ID that uniquely identifies the environment index this document is included in.
+    """
+
     document_index_id: str = pydantic.Field()
     """
     Vellum-generated ID that uniquely identifies the index this document is included in.

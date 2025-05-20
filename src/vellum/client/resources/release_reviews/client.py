@@ -24,7 +24,7 @@ class ReleaseReviewsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         release_id_or_release_tag : str
             Either the UUID of Workflow Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment Release you'd like to retrieve.
@@ -83,7 +83,7 @@ class AsyncReleaseReviewsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         release_id_or_release_tag : str
             Either the UUID of Workflow Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment Release you'd like to retrieve.

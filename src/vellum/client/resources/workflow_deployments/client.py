@@ -272,7 +272,7 @@ class WorkflowDeploymentsClient:
             Either the UUID of Workflow Deployment History Item you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment History Item you'd like to retrieve.
 
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -397,7 +397,7 @@ class WorkflowDeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Workflow Deployment that you'd like to retrieve.
@@ -456,7 +456,7 @@ class WorkflowDeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Workflow Deployment that you'd like to update.
@@ -796,7 +796,7 @@ class AsyncWorkflowDeploymentsClient:
             Either the UUID of Workflow Deployment History Item you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment History Item you'd like to retrieve.
 
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -937,7 +937,7 @@ class AsyncWorkflowDeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Workflow Deployment that you'd like to retrieve.
@@ -1004,7 +1004,7 @@ class AsyncWorkflowDeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this workflow deployment.
+            Either the Workflow Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Workflow Deployment that you'd like to update.

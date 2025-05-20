@@ -109,7 +109,7 @@ class DeploymentsClient:
         Parameters
         ----------
         id : str
-            Either the Deployment's ID or its unique name
+            Either the Prompt Deployment's ID or its unique name
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -163,7 +163,7 @@ class DeploymentsClient:
             Either the UUID of Deployment History Item you'd like to retrieve, or the name of a Release Tag that's pointing to the Deployment History Item you'd like to retrieve.
 
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -288,7 +288,7 @@ class DeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Deployment that you'd like to retrieve.
@@ -347,7 +347,7 @@ class DeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Deployment that you'd like to update.
@@ -411,7 +411,7 @@ class DeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         release_id_or_release_tag : str
             Either the UUID of Prompt Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Prompt Deployment Release you'd like to retrieve.
@@ -682,7 +682,7 @@ class AsyncDeploymentsClient:
         Parameters
         ----------
         id : str
-            Either the Deployment's ID or its unique name
+            Either the Prompt Deployment's ID or its unique name
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -744,7 +744,7 @@ class AsyncDeploymentsClient:
             Either the UUID of Deployment History Item you'd like to retrieve, or the name of a Release Tag that's pointing to the Deployment History Item you'd like to retrieve.
 
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -885,7 +885,7 @@ class AsyncDeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Deployment that you'd like to retrieve.
@@ -952,7 +952,7 @@ class AsyncDeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         name : str
             The name of the Release Tag associated with this Deployment that you'd like to update.
@@ -1024,7 +1024,7 @@ class AsyncDeploymentsClient:
         Parameters
         ----------
         id : str
-            A UUID string identifying this deployment.
+            Either the Prompt Deployment's ID or its unique name
 
         release_id_or_release_tag : str
             Either the UUID of Prompt Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Prompt Deployment Release you'd like to retrieve.
