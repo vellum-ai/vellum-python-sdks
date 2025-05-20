@@ -1,5 +1,3 @@
-import pytest
-
 from vellum.workflows.types.core import MergeBehavior
 
 from tests.workflows.circular_loop.workflow import CircularLoopWorkflow, TopNode
@@ -24,9 +22,6 @@ def test_workflow__happy_path():
     assert terminal_event.outputs.completed is True
 
 
-@pytest.mark.skip(
-    reason="https://linear.app/vellum/issue/APO-390/workflow-erronously-terminates-in-looping-edge-case-with-prefixed-node"  # noqa: E501
-)
 def test_workflow__top_node_awaits_any():
     """
     This test solves the same problem as the previous test, but considers the case where the TopNode
