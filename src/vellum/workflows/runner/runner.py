@@ -418,7 +418,7 @@ class WorkflowRunner(Generic[StateType]):
                         if previous_node_fork_id:
                             state.meta.node_execution_cache.__node_to_fork_id__[edge.to_node] = previous_node_fork_id
                             # Remove previous node fork in __node_to_fork_id__
-                            del state.meta.node_execution_cache.__node_to_fork_id__[previous_node]
+                            state.meta.node_execution_cache.__node_to_fork_id__.pop(previous_node, None)
 
             # If there are multiple edges, we need to create a fork ID
             if len(nodes_to_fork) > 1:

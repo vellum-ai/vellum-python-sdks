@@ -383,10 +383,10 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                             # When the next forked node merge, it will not trigger the node again
                             # We should consider adding a lock here to prevent race condition
                             all_fork_ids.remove(fork_id)
-                            del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
+                            state.meta.node_execution_cache.__node_to_fork_id__.pop(invoked_by_node, None)
                         else:
                             should_retrigger = False
-                            del state.meta.node_execution_cache.__node_to_fork_id__[invoked_by_node]
+                            state.meta.node_execution_cache.__node_to_fork_id__.pop(invoked_by_node, None)
 
                 # If should_retrigger is false, then we will not trigger the node already
                 # So we don't need to check loop behavior
