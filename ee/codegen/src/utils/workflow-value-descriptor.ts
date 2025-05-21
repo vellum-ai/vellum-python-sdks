@@ -39,6 +39,8 @@ export function convertOperatorType(
     parseJson: "parse_json",
     coalesce: "coalesce",
     accessField: "access_field",
+    or: "or",
+    and: "and",
   };
 
   return operatorMappings[operator] || "equals"; // return default operator if not found

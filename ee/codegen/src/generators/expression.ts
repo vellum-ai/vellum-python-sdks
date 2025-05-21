@@ -116,6 +116,12 @@ export class Expression extends AstNode {
     }
 
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
+
+    if (operator === "or") {
+      return `${rawLhs.toString()} | ${rhsExpression}`;
+    } else if (operator === "and") {
+      return `${rawLhs.toString()} & ${rhsExpression}`;
+    }
     return `${rawLhs.toString()}.${operator}${rhsExpression}`;
   }
 
