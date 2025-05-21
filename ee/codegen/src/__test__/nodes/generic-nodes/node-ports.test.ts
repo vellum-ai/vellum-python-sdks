@@ -139,6 +139,7 @@ describe("NodePorts", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
   describe("basic duplicate port names", () => {
     beforeEach(async () => {
       // GIVEN a node with duplicate port names
@@ -237,6 +238,143 @@ describe("NodePorts", () => {
         "Expected IF / ELIF Ports to contain an expression"
       );
       expect(errors[0]?.severity).toBe("WARNING");
+    });
+  });
+
+  describe("nested binary expression with OR operator", () => {
+    beforeEach(async () => {
+      const nodePortsData: NodePort[] = [
+        nodePortFactory({
+          type: "IF",
+          expression: {
+            type: "BINARY_EXPRESSION",
+            operator: "or",
+            lhs: {
+              type: "BINARY_EXPRESSION",
+              operator: "=",
+              lhs: {
+                type: "NODE_OUTPUT",
+                nodeId: "node-1",
+                nodeOutputId: "output-1",
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "first-value",
+                },
+              },
+            },
+            rhs: {
+              type: "BINARY_EXPRESSION",
+              operator: "=",
+              lhs: {
+                type: "WORKFLOW_INPUT",
+                inputVariableId: "input-1",
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 42,
+                },
+              },
+            },
+          },
+        }),
+        nodePortFactory({
+          type: "ELSE",
+        }),
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "NestedOrOperatorNode",
+        nodePorts: nodePortsData,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      nodePorts = new NodePorts({
+        nodePorts: nodePortsData,
+        nodeContext,
+        workflowContext,
+      });
+    });
+
+    it("generates correct ports class with nested OR operator", async () => {
+      nodePorts.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("nested binary expression with AND operator", () => {
+    beforeEach(async () => {
+      const nodePortsData: NodePort[] = [
+        nodePortFactory({
+          type: "IF",
+          expression: {
+            type: "BINARY_EXPRESSION",
+            operator: "and",
+            lhs: {
+              type: "BINARY_EXPRESSION",
+              operator: ">",
+              lhs: {
+                type: "WORKFLOW_INPUT",
+                inputVariableId: "input-1",
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 10,
+                },
+              },
+            },
+            rhs: {
+              type: "BINARY_EXPRESSION",
+              operator: "<",
+              lhs: {
+                type: "WORKFLOW_INPUT",
+                inputVariableId: "input-1",
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "NUMBER",
+                  value: 100,
+                },
+              },
+            },
+          },
+        }),
+        nodePortFactory({
+          type: "ELSE",
+        }),
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "NestedAndOperatorNode",
+        nodePorts: nodePortsData,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      nodePorts = new NodePorts({
+        nodePorts: nodePortsData,
+        nodeContext,
+        workflowContext,
+      });
+    });
+
+    it("generates correct ports class with nested AND operator", async () => {
+      nodePorts.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 });
