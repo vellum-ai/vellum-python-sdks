@@ -21,7 +21,7 @@ def test_serialize_workflow():
 
     # AND its input variables should be what we expect
     input_variables = serialized_workflow["input_variables"]
-    assert len(input_variables) == 0
+    assert len(input_variables) == 1
 
     # AND its output variables should be what we expect
     output_variables = serialized_workflow["output_variables"]
@@ -154,8 +154,16 @@ def test_serialize_workflow():
                 "id": "0f6dc102-3460-4963-91fa-7ba85d65ef7a",
                 "name": "prompt_inputs",
                 "value": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {"type": "JSON", "value": {"question": "What's the weather like in San Francisco?"}},
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "key": "question",
+                            "value": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": "a70e0597-0076-4a17-a8d2-c8d6b4a05bac",
+                            },
+                        }
+                    ],
                 },
             },
             {

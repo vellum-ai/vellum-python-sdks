@@ -24,7 +24,7 @@ from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
-from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow
+from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
 
 
 def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_generator):
@@ -77,7 +77,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     workflow = BasicToolCallingNodeWorkflow()
 
     # WHEN the workflow is executed
-    terminal_event = workflow.run()
+    terminal_event = workflow.run(Inputs(query="What's the weather like in San Francisco?"))
 
     # THEN the workflow is executed successfully
     assert terminal_event.name == "workflow.execution.fulfilled"
