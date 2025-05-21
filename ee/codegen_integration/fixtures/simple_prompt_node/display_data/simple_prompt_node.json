@@ -186,6 +186,7 @@
               "type": "DICTIONARY_REFERENCE",
               "entries": [
                 {
+                  "id": "25cad17f-83c9-47bf-ba11-37ce744275f4",
                   "key": "text",
                   "value": {
                     "type": "WORKFLOW_INPUT",

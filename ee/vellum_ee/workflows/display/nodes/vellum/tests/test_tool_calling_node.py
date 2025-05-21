@@ -68,6 +68,7 @@ def test_serialize_node__prompt_inputs__input_reference():
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
+                    "id": "ab7902ef-de14-4edc-835c-366d3ef6a70e",
                     "key": "foo",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e3657390-fd3c-4fea-8cdd-fc5ea79f3278"},
                 }
@@ -108,8 +109,13 @@ def test_serialize_node__prompt_inputs__mixed_values():
         "value": {
             "type": "DICTIONARY_REFERENCE",
             "entries": [
-                {"key": "foo", "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}}},
                 {
+                    "id": "0fc7e25e-075c-4849-b89b-9729d1aeada1",
+                    "key": "foo",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
+                },
+                {
+                    "id": "bba42c89-fa7b-4cb7-bc16-0d21ce060a4b",
                     "key": "baz",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
                 },
