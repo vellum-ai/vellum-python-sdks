@@ -3283,6 +3283,86 @@ baz = foo + bar
     });
   });
 
+  describe("dictionary reference", () => {
+    it("should generate null value for dictionary reference", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "751fd11d-ca43-4d91-832b-2ff3eecb0473",
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "experimental",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              type: "GENERIC",
+              label: "Tool Calling Node",
+              ports: [],
+              outputs: [],
+              trigger: {
+                id: "fff85676-6030-4235-bd9c-00e002ab28c5",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              adornments: null,
+              attributes: [
+                {
+                  id: "8d7c3554-9783-42d8-b57c-b13271cb8ec5",
+                  name: "prompt_inputs",
+                  value: {
+                    type: "DICTIONARY_REFERENCE",
+                    entries: [{ key: "text", value: null }],
+                  },
+                },
+              ],
+            },
+            {
+              id: "98f0b71f-7af9-4abb-b681-8e88b05ab617",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "a53e6ce0-1d53-4932-adbf-01728540b329",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+              definition: null,
+              display_data: {
+                width: 124.0,
+                height: 48.0,
+                comment: null,
+                position: { x: 1545.0, y: 330.0 },
+              },
+            },
+          ],
+          output_values: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "tool_calling_node.py",
+      ]);
+    });
+  });
+
   describe("modules", () => {
     it("should generate code in the same module as the project", async () => {
       const displayData = {

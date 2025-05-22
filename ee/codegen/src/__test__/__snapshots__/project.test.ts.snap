@@ -261,6 +261,17 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
 "
 `;
 
+exports[`WorkflowProjectGenerator > dictionary reference > should generate null value for dictionary reference 1`] = `
+"from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode as BaseToolCallingNode
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    prompt_inputs = {
+        "text": None,
+    }
+"
+`;
+
 exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to find invalid ports and target nodes 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode
 from vellum.workflows.state import BaseState
