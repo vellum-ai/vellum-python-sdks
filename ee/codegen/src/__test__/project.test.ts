@@ -3682,19 +3682,19 @@ baz = foo + bar
       expectProjectFileToMatchSnapshot([
         "code",
         "nodes",
-        "get_current_weather_node",
+        "get_current_weather_node_functions",
         "__init__.py",
       ]);
       expectProjectFileToMatchSnapshot([
         "code",
         "nodes",
-        "get_current_weather_node",
+        "get_current_weather_node_functions",
         "get_current_weather.py",
       ]);
       expectProjectFileToMatchSnapshot([
         "code",
         "nodes",
-        "get_current_weather_node",
+        "get_current_weather_node_functions",
         "format_answer.py",
       ]);
       expectProjectFileToMatchSnapshot(["code", "nodes", "tool_call.py"]);

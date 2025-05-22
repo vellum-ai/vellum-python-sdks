@@ -310,8 +310,8 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 4`] = `
-"from .get_current_weather_node.format_answer import format_answer
-from .get_current_weather_node.get_current_weather import get_current_weather
+"from .get_current_weather_node_functions.format_answer import format_answer
+from .get_current_weather_node_functions.get_current_weather import get_current_weather
 from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock

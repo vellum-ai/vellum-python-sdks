@@ -101,7 +101,9 @@ export class GenericNode extends BaseSingleFileNode<
                     return python.reference({
                       name: snakeName,
                       modulePath: [
-                        `.${toPythonSafeSnakeCase(nodeName)}.${snakeName}`,
+                        `.${toPythonSafeSnakeCase(
+                          nodeName
+                        )}_functions.${snakeName}`,
                       ],
                     });
                   })
@@ -257,7 +259,9 @@ export class GenericNode extends BaseSingleFileNode<
     const nodeName = this.nodeContext.getNodeLabel();
 
     const baseModule = this.workflowContext.moduleName;
-    const basePath = `${baseModule}/nodes/${toPythonSafeSnakeCase(nodeName)}`;
+    const basePath = `${baseModule}/nodes/${toPythonSafeSnakeCase(
+      nodeName
+    )}_functions`;
 
     const nodeDir = join(absolutePath, basePath);
     await mkdir(nodeDir, { recursive: true });
