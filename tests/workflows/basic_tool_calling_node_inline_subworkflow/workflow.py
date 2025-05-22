@@ -93,7 +93,7 @@ class GetCurrentWeatherNode(ToolCallingNode):
     }
 
 
-class BasicToolCallingWithInlineSubworkflowWorkflow(BaseWorkflow):
+class BasicToolCallingNodeInlineSubworkflowWorkflow(BaseWorkflow):
     """
     A workflow that uses the GetCurrentWeatherNode.
     """
