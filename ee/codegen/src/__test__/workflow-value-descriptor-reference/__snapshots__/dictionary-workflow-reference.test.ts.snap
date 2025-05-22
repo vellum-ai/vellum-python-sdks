@@ -1,5 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`DictionaryWorkflowReference > should allow null value 1`] = `
+"{
+    "text": None,
+}
+"
+`;
+
 exports[`DictionaryWorkflowReference > should generate correct AST for dictionary with constant values 1`] = `
 "{
     "string_value": "Hello, World!",

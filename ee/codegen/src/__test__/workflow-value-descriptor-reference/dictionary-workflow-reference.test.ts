@@ -17,6 +17,23 @@ describe("DictionaryWorkflowReference", () => {
     vi.restoreAllMocks();
   });
 
+  it("should allow null value", async () => {
+    const emptyDictReference: DictionaryWorkflowReferenceType = {
+      type: "DICTIONARY_REFERENCE",
+      entries: [{ key: "text", value: null }],
+    };
+
+    const reference = new DictionaryWorkflowReference({
+      workflowContext,
+      nodeInputWorkflowReferencePointer: emptyDictReference,
+    });
+
+    const writer = new Writer();
+    reference.write(writer);
+
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
   it("should generate correct AST for empty dictionary", async () => {
     const emptyDictReference: DictionaryWorkflowReferenceType = {
       type: "DICTIONARY_REFERENCE",

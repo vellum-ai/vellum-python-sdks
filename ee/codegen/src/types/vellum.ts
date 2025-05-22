@@ -800,7 +800,7 @@ export interface ExecutionCounterWorkflowReference {
 
 export interface DictionaryWorkflowReferenceEntry {
   key: string;
-  value: WorkflowValueDescriptor;
+  value: WorkflowValueDescriptor | null;
 }
 
 export interface DictionaryWorkflowReference {
