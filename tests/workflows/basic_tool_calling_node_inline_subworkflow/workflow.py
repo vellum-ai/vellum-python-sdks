@@ -54,6 +54,7 @@ class BasicInlineSubworkflowWorkflow(BaseWorkflow[Inputs, BaseState]):
         temperature = ExampleInlineSubworkflowNode.Outputs.temperature
         reasoning = ExampleInlineSubworkflowNode.Outputs.reasoning
 
+
 class WorkflowInputs(BaseInputs):
     query: str
 
