@@ -147,7 +147,9 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": ["classification"],
+                    "required": [
+                      "classification"
+                    ],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -244,7 +246,10 @@
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "STRING", "value": "gpt-4o" }
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o"
+              }
             }
           },
           {
@@ -254,6 +259,7 @@
               "type": "DICTIONARY_REFERENCE",
               "entries": [
                 {
+                  "id": "0e607ac6-a619-444f-bb43-710e0776b579",
                   "key": "var_1",
                   "value": {
                     "type": "NODE_OUTPUT",
@@ -1108,7 +1114,10 @@
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "STRING", "value": "gpt-4o-mini" }
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o-mini"
+              }
             }
           },
           {
@@ -1118,6 +1127,7 @@
               "type": "DICTIONARY_REFERENCE",
               "entries": [
                 {
+                  "id": "f46ecf3a-9fa6-491e-9419-550888e30546",
                   "key": "question",
                   "value": {
                     "type": "NODE_OUTPUT",
@@ -1126,6 +1136,7 @@
                   }
                 },
                 {
+                  "id": "54c7a00e-d971-422e-80ea-ad1de01d6328",
                   "key": "context",
                   "value": {
                     "type": "NODE_OUTPUT",
@@ -1292,7 +1303,10 @@
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "STRING", "value": "gpt-4o" }
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o"
+              }
             }
           },
           {
@@ -1302,6 +1316,7 @@
               "type": "DICTIONARY_REFERENCE",
               "entries": [
                 {
+                  "id": "515e68f0-32b1-4af4-a3d6-c39cdd76b572",
                   "key": "most_recent_message",
                   "value": {
                     "type": "NODE_OUTPUT",
@@ -1833,6 +1848,7 @@
               "type": "DICTIONARY_REFERENCE",
               "entries": [
                 {
+                  "id": "a4e23d55-d5bb-4ca5-b66d-f163ad44d871",
                   "key": "text",
                   "value": {
                     "type": "NODE_OUTPUT",
@@ -1961,7 +1977,10 @@
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "STRING", "value": "gpt-4o-2024-05-13" }
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o-2024-05-13"
+              }
             }
           },
           {
@@ -1969,7 +1988,10 @@
             "name": "prompt_inputs",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "JSON", "value": {} }
+              "value": {
+                "type": "JSON",
+                "value": {}
+              }
             }
           }
         ],
@@ -2195,7 +2217,10 @@
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "STRING", "value": "gpt-4o-mini" }
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o-mini"
+              }
             }
           },
           {
@@ -2205,6 +2230,7 @@
               "type": "DICTIONARY_REFERENCE",
               "entries": [
                 {
+                  "id": "76c0751b-c84a-40c2-bd72-9263a03d4301",
                   "key": "chat_history",
                   "value": {
                     "type": "NODE_OUTPUT",

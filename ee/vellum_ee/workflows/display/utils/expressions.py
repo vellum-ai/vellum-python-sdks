@@ -38,6 +38,7 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 
 if TYPE_CHECKING:
@@ -264,7 +265,12 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     if isinstance(value, dict):
         serialized_entries = [
-            {"key": key, "value": serialize_value(display_context, val)} for key, val in value.items()
+            {
+                "id": str(uuid4_from_hash(f"{key}|{val}")),
+                "key": key,
+                "value": serialize_value(display_context, val),
+            }
+            for key, val in value.items()
         ]
 
         # Check if all entries have constant values

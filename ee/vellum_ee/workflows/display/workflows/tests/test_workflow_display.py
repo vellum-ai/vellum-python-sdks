@@ -700,8 +700,13 @@ def test_serialize_workflow__dict_reference():
     assert mixed_dict_output["value"] == {
         "type": "DICTIONARY_REFERENCE",
         "entries": [
-            {"key": "key1", "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}}},
             {
+                "id": "b528ce26-68ee-42ba-828d-199441810685",
+                "key": "key1",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
+            },
+            {
+                "id": "a7acccfe-2f80-42ee-a307-c1eb0b137c2b",
                 "key": "key2",
                 "value": {
                     "type": "NODE_OUTPUT",
@@ -709,8 +714,13 @@ def test_serialize_workflow__dict_reference():
                     "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
                 },
             },
-            {"key": "key3", "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}}},
             {
+                "id": "8f41013e-7a9f-4659-ac17-c25c6ec6fe99",
+                "key": "key3",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
+            },
+            {
+                "id": "609e84e8-573a-44ea-b3aa-82c3f3cc2c36",
                 "key": "key4",
                 "value": {
                     "type": "NODE_OUTPUT",
@@ -730,15 +740,18 @@ def test_serialize_workflow__dict_reference():
         "type": "DICTIONARY_REFERENCE",
         "entries": [
             {
+                "id": "02abe9d0-bf93-4eea-b34a-902dae7c2b90",
                 "key": "key1",
                 "value": {
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
+                            "id": "b528ce26-68ee-42ba-828d-199441810685",
                             "key": "key1",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
                         },
                         {
+                            "id": "a7acccfe-2f80-42ee-a307-c1eb0b137c2b",
                             "key": "key2",
                             "value": {
                                 "type": "NODE_OUTPUT",
@@ -750,15 +763,18 @@ def test_serialize_workflow__dict_reference():
                 },
             },
             {
+                "id": "c8640477-13cc-412e-82cc-35cbe9e78ff2",
                 "key": "key2",
                 "value": {
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
+                            "id": "86709f21-a811-4351-993e-a8e9f1c7774f",
                             "key": "key1",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
                         },
                         {
+                            "id": "a7acccfe-2f80-42ee-a307-c1eb0b137c2b",
                             "key": "key2",
                             "value": {
                                 "type": "NODE_OUTPUT",

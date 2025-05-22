@@ -196,6 +196,7 @@ def test_serialize_node__prompt_inputs__state_reference():
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
+                    "id": "feadab18-07c6-4790-adf0-28be20a5447a",
                     "key": "foo",
                     "value": {
                         "type": "WORKFLOW_STATE",
@@ -203,6 +204,7 @@ def test_serialize_node__prompt_inputs__state_reference():
                     },
                 },
                 {
+                    "id": "4f252277-d0a5-48ad-8cc5-be03bf0dbd19",
                     "key": "bar",
                     "value": {
                         "type": "CONSTANT_VALUE",
