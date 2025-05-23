@@ -210,6 +210,21 @@ export class GenericNode extends BaseSingleFileNode<
     return this.nodeContext.nodeModulePath;
   }
 
+  private isExcludedModulePath(): boolean {
+    const baseModulePath = this.nodeData.base?.module;
+    if (!baseModulePath) {
+      return false;
+    }
+
+    return [
+      this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH,
+      this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH,
+      this.workflowContext.sdkModulePathNames.EXPERIMENTAL_NODES_MODULE_PATH,
+    ].some((excludedPath) =>
+      excludedPath.every((part, index) => baseModulePath[index] === part)
+    );
+  }
+
   private async generateFunctionFile(
     functions: Array<FunctionArgs>
   ): Promise<void> {
@@ -232,24 +247,13 @@ export class GenericNode extends BaseSingleFileNode<
 
   public async persist(): Promise<void> {
     // Exclude nodes in the core, displayable, or experimental modules
-    const baseModulePath = this.nodeData.base?.module;
-    if (baseModulePath) {
-      const isExcludedPath = [
-        this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH,
-        this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH,
-        this.workflowContext.sdkModulePathNames.EXPERIMENTAL_NODES_MODULE_PATH,
-      ].some((excludedPath) =>
-        excludedPath.every((part, index) => baseModulePath[index] === part)
-      );
+    if (!this.isExcludedModulePath()) {
+      const modulePath = this.getModulePath();
+      const fileName = modulePath[modulePath.length - 1] + ".py";
 
-      if (!isExcludedPath) {
-        const modulePath = this.getModulePath();
-        const fileName = modulePath[modulePath.length - 1] + ".py";
+      const relativePath = `nodes/${fileName}`;
 
-        const relativePath = `nodes/${fileName}`;
-
-        this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
-      }
+      this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
     }
 
     await super.persist();
