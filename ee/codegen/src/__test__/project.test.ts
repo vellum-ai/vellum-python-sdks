@@ -3602,6 +3602,7 @@ baz = foo + bar
                       type: "JSON",
                       value: [
                         {
+                          type: "CODE_EXECUTION",
                           src: 'def get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',
                           definition: {
                             name: "get_current_weather",
@@ -3621,6 +3622,7 @@ baz = foo + bar
                           },
                         },
                         {
+                          type: "CODE_EXECUTION",
                           src: `def format_answer(answer: str) -> str:\n    """\n    Format the answer and request the LLM to provide a final text summary.\n    """\n    formatted = f"The answer to the question is: {answer}"\n    return (\n        f"{formatted}\\n\\nNow please provide a final summary with any temperature conversions or additional information."\n    )\n`,
                           definition: {
                             name: "format_answer",
