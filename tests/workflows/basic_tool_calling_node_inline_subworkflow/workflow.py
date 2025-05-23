@@ -55,6 +55,10 @@ class BasicInlineSubworkflowWorkflow(BaseWorkflow[Inputs, BaseState]):
         reasoning = ExampleInlineSubworkflowNode.Outputs.reasoning
 
 
+class WorkflowInputs(BaseInputs):
+    query: str
+
+
 class GetCurrentWeatherNode(ToolCallingNode):
     """
     A tool calling node that calls the get_current_weather function.
@@ -89,11 +93,11 @@ class GetCurrentWeatherNode(ToolCallingNode):
     ]
     functions = [BasicInlineSubworkflowWorkflow]
     prompt_inputs = {
-        "question": "What's the weather like in San Francisco?",
+        "question": WorkflowInputs.query,
     }
 
 
-class BasicToolCallingNodeInlineSubworkflowWorkflow(BaseWorkflow):
+class BasicToolCallingNodeInlineSubworkflowWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
     """
     A workflow that uses the GetCurrentWeatherNode.
     """
