@@ -1,2 +1,2 @@
-python-dotenv==1.0.1
-vellum-ai==0.14.25
+python-dotenv
+vellum-ai
