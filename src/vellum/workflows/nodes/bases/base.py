@@ -1,3 +1,4 @@
+from abc import ABC, ABCMeta
 from dataclasses import field
 from functools import cached_property, reduce
 import inspect
@@ -50,7 +51,7 @@ def _is_annotated(cls: Type, name: str) -> bool:
     return False
 
 
-class BaseNodeMeta(type):
+class BaseNodeMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         if "Outputs" in dct:
             outputs_class = dct["Outputs"]
@@ -258,7 +259,7 @@ class _BaseNodeExecutionMeta(type):
 NodeRunResponse = Union[BaseOutputs, Iterator[BaseOutput]]
 
 
-class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
+class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
     __output_ids__: Dict[str, UUID] = {}
     state: StateType
