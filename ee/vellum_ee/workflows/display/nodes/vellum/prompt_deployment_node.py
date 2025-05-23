@@ -1,8 +1,7 @@
 from uuid import UUID
-from typing import Generic, Optional, TypeVar, cast
+from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.prompt_deployment_node import PromptDeploymentNode
-from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -40,8 +39,9 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
             else []
         )
 
-        _, output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
-        _, array_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.results)]
+        output_display = self.output_display[node.Outputs.text]
+        array_display = self.output_display[node.Outputs.results]
+        json_display = self.output_display[node.Outputs.json]
 
         deployment = display_context.client.deployments.retrieve(
             id=str(raise_if_descriptor(node.deployment)),
@@ -68,4 +68,9 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
             "ports": self.serialize_ports(display_context),
+            "outputs": [
+                {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},
+                {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},
+                {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
+            ],
         }
