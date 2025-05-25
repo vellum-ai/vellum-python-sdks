@@ -26,7 +26,7 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants impor
 
 from tests.workflows.basic_tool_calling_node_inline_subworkflow.workflow import (
     BasicToolCallingNodeInlineSubworkflowWorkflow,
-    Inputs,
+    WorkflowInputs,
 )
 
 
@@ -77,9 +77,8 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
 
     # WHEN the workflow is executed
     terminal_event = workflow.run(
-        inputs=Inputs(
-            city="San Francisco",
-            date="2024-01-01",
+        inputs=WorkflowInputs(
+            query="What's the weather like in San Francisco?",
         )
     )
 
