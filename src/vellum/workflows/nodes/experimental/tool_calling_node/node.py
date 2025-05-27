@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from pydash import snake_case
 
