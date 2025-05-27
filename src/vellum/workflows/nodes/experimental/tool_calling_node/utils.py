@@ -135,7 +135,7 @@ def create_function_node(
     Create a FunctionNode class for a given function.
 
     For workflow functions: BaseNode
-    For regular functions: uses CodeExecutionNode with embedded function
+    For regular functions: CodeExecutionNode with embedded function
     Args:
         function: The function to create a node for
         tool_router_node: The tool router node class
