@@ -168,9 +168,14 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "5c041b7d-732c-4773-a93a-32211f2af0b3",
-                "name": "max_tool_calls",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1.0}},
+                "id": "b31575f0-633b-4bd0-ba6a-960532f3887a",
+                "name": "function_packages",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+            },
+            {
+                "id": "d316c45c-97ea-4f39-9a2d-5c43e2d355de",
+                "name": "runtime",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "PYTHON_3_11_6"}},
             },
         ],
         "outputs": [
