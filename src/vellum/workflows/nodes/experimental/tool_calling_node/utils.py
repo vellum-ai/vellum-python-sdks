@@ -209,15 +209,7 @@ def main(arguments):
         _tool_router_node = tool_router_node
         _runtime = runtime
 
-        def get_function_output_type() -> Type:
-            return function.__annotations__["return"]
-
-        output_type = get_function_output_type()
-
-        # Create the base class
-        base_class = CodeExecutionNode[BaseState, output_type]
-
-        def execute_function(self):
+        def execute_code_execution_function(self) -> BaseNode.Outputs:
             # Get the function call from the tool router output
             function_call_output = self.state.meta.node_outputs.get(_tool_router_node.Outputs.results)
             if function_call_output and len(function_call_output) > 0:
@@ -237,7 +229,21 @@ def main(arguments):
                 )
             )
 
-            return outputs
+            return self.Outputs()
+
+        # Create the properly typed base class with explicit type annotation
+        def get_function_output_type() -> Type:
+            return function.__annotations__.get("return", Any)
+
+        output_type = get_function_output_type()
+
+        base_class: Type[CodeExecutionNode]
+        if output_type != Any:
+            # If we have a specific output type, create a properly typed base class
+            base_class = CodeExecutionNode[BaseState, output_type]  # type: ignore[valid-type]
+        else:
+            # Fall back to Any if no return type annotation
+            base_class = CodeExecutionNode[BaseState, Any]
 
         # Create the class with basic attributes
         node = types.new_class(
@@ -248,7 +254,7 @@ def main(arguments):
                 {
                     "code": _code,
                     "code_inputs": {},  # No inputs needed since we handle function call extraction in run()
-                    "run": execute_function,
+                    "run": execute_code_execution_function,
                     "runtime": _runtime,
                     "packages": _packages,
                     "__module__": __name__,
