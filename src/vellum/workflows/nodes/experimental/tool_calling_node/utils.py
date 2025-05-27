@@ -134,9 +134,8 @@ def create_function_node(
     """
     Create a FunctionNode class for a given function.
 
-    For workflow functions: uses BaseNode (current approach)
+    For workflow functions: BaseNode
     For regular functions: uses CodeExecutionNode with embedded function
-
     Args:
         function: The function to create a node for
         tool_router_node: The tool router node class
@@ -145,7 +144,7 @@ def create_function_node(
     """
 
     if is_workflow_class(function):
-        # For workflow functions, use BaseNode approach (keep existing logic)
+
         def execute_function(self) -> BaseNode.Outputs:
             outputs = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
             # first parse into json
