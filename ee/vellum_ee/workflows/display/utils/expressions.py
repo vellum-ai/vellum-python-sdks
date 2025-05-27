@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, cast
+from typing import TYPE_CHECKING, Any, Dict, List, cast
 
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.workflows.descriptors.base import BaseDescriptor
