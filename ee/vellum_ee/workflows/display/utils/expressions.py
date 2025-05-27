@@ -274,7 +274,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             }
 
     if isinstance(value, dict):
-        serialized_entries = [
+        serialized_entries: List[Dict[str, Any]] = [
             {
                 "id": str(uuid4_from_hash(f"{key}|{val}")),
                 "key": serialize_key(key),
