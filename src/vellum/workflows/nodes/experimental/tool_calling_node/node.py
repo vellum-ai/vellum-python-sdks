@@ -111,7 +111,8 @@ class ToolCallingNode(BaseNode):
             # Get packages for this function if specified
             packages = None
             if self.function_packages and function in self.function_packages:
-                packages = self.function_packages[function]
+                # Cast to tell mypy this is a plain list, not a descriptor
+                packages = cast(List[CodeExecutionPackage], self.function_packages[function])
 
             self._function_nodes[function_name] = create_function_node(
                 function=function,
