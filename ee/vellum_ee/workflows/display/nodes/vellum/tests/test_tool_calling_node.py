@@ -130,8 +130,20 @@ def test_serialize_node__function_packages():
     def foo():
         pass
 
+    def bar():
+        pass
+
     class MyToolCallingNode(ToolCallingNode):
-        function_packages = {foo: [CodeExecutionPackage(name="bar", version="1.0.0")]}
+        functions = [foo, bar]
+        function_packages = {
+            foo: [
+                CodeExecutionPackage(name="first_package", version="1.0.0"),
+                CodeExecutionPackage(name="second_package", version="2.0.0"),
+            ],
+            bar: [
+                CodeExecutionPackage(name="third_package", version="3.0.0"),
+            ],
+        }
 
     # AND a workflow with the tool calling node
     class Workflow(BaseWorkflow):
@@ -157,6 +169,15 @@ def test_serialize_node__function_packages():
         "name": "function_packages",
         "value": {
             "type": "CONSTANT_VALUE",
-            "value": {"type": "JSON", "value": {"foo": [{"version": "1.0.0", "name": "bar"}]}},
+            "value": {
+                "type": "JSON",
+                "value": {
+                    "foo": [
+                        {"version": "1.0.0", "name": "first_package"},
+                        {"version": "2.0.0", "name": "second_package"},
+                    ],
+                    "bar": [{"version": "3.0.0", "name": "third_package"}],
+                },
+            },
         },
     }
