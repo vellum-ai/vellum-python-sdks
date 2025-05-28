@@ -468,3 +468,28 @@ def test_prompt_deployment_node__parent_context_serialization(mock_httpx_transpo
     request_execution_context = json.loads(call_request_args.read().decode("utf-8"))["execution_context"]
     assert request_execution_context["trace_id"] == str(trace_id)
     assert request_execution_context["parent_context"]
+
+
+def test_run_workflow__missing_required_input(vellum_client):
+    """Confirm that we get an error when a required input is not provided to a Subworkflow Deployment Node"""
+
+    # GIVEN a Subworkflow Deployment Node missing a required input
+    class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {}
+
+    # AND the Subworkflow Deployment API call fails due to missing required input
+    vellum_client.execute_workflow_stream.side_effect = ApiError(
+        status_code=400, body={"detail": "Missing required input for 'my_var_1'"}
+    )
+
+    # WHEN we run the node
+    node = ExampleSubworkflowDeploymentNode()
+
+    # THEN we should get a NodeException for invalid inputs
+    with pytest.raises(NodeException) as exc_info:
+        list(node.run())
+
+    # AND the error should indicate the missing required input
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert exc_info.value.message == "Missing required input for 'my_var_1'"
