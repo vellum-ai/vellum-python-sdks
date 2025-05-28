@@ -1,3 +1,4 @@
+from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
@@ -120,5 +121,42 @@ def test_serialize_node__prompt_inputs__mixed_values():
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
                 },
             ],
+        },
+    }
+
+
+def test_serialize_node__function_packages():
+    # GIVEN a tool calling node with function packages
+    def foo():
+        pass
+
+    class MyToolCallingNode(ToolCallingNode):
+        function_packages = {foo: [CodeExecutionPackage(name="bar", version="1.0.0")]}
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the function packages
+    my_tool_calling_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MyToolCallingNode.__id__)
+    )
+
+    function_packages_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_packages"
+    )
+
+    assert function_packages_attribute == {
+        "id": "c315228f-870a-4288-abf7-a217b5b8c253",
+        "name": "function_packages",
+        "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {"type": "JSON", "value": {"foo": [{"version": "1.0.0", "name": "bar"}]}},
         },
     }

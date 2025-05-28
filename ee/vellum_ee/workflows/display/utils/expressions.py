@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, cast
+from typing import TYPE_CHECKING, Any, Dict, List, cast
 
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -190,6 +190,16 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
     raise UnsupportedSerializationException(f"Unsupported condition type: {condition.__class__.__name__}")
 
 
+def serialize_key(key: Any) -> str:
+    """Serialize dictionary keys to strings, handling function objects properly."""
+    if callable(key):
+        return key.__name__
+    elif isinstance(key, str):
+        return key
+    else:
+        return str(key)
+
+
 def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
     if isinstance(value, ConstantValueReference):
         return serialize_value(display_context, value._value)
@@ -264,10 +274,10 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             }
 
     if isinstance(value, dict):
-        serialized_entries = [
+        serialized_entries: List[Dict[str, Any]] = [
             {
                 "id": str(uuid4_from_hash(f"{key}|{val}")),
-                "key": key,
+                "key": serialize_key(key),
                 "value": serialize_value(display_context, val),
             }
             for key, val in value.items()
