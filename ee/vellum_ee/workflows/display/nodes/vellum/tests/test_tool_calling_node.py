@@ -125,7 +125,7 @@ def test_serialize_node__prompt_inputs__mixed_values():
     }
 
 
-def test_serialize_node__function_packages():
+def test_serialize_node__function_configs():
     # GIVEN a tool calling node with function packages
     def foo():
         pass
@@ -135,14 +135,18 @@ def test_serialize_node__function_packages():
 
     class MyToolCallingNode(ToolCallingNode):
         functions = [foo, bar]
-        function_packages = {
-            foo: [
-                CodeExecutionPackage(name="first_package", version="1.0.0"),
-                CodeExecutionPackage(name="second_package", version="2.0.0"),
-            ],
-            bar: [
-                CodeExecutionPackage(name="third_package", version="3.0.0"),
-            ],
+        function_configs = {
+            "foo": {
+                "runtime": "PYTHON_3_11_6",
+                "packages": [
+                    CodeExecutionPackage(name="first_package", version="1.0.0"),
+                    CodeExecutionPackage(name="second_package", version="2.0.0"),
+                ],
+            },
+            "bar": {
+                "runtime": "PYTHON_3_11_6",
+                "packages": [CodeExecutionPackage(name="third_package", version="3.0.0")],
+            },
         }
 
     # AND a workflow with the tool calling node
@@ -160,31 +164,34 @@ def test_serialize_node__function_packages():
         if node["id"] == str(MyToolCallingNode.__id__)
     )
 
-    function_packages_attribute = next(
-        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_packages"
+    function_configs_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_configs"
     )
 
-    assert function_packages_attribute == {
-        "id": "c315228f-870a-4288-abf7-a217b5b8c253",
-        "name": "function_packages",
+    assert function_configs_attribute == {
+        "id": "90cc5fc7-9fb3-450f-be5a-e90e7412a601",
+        "name": "function_configs",
         "value": {
             "type": "CONSTANT_VALUE",
             "value": {
                 "type": "JSON",
                 "value": {
-                    "foo": [
-                        {"version": "1.0.0", "name": "first_package"},
-                        {"version": "2.0.0", "name": "second_package"},
-                    ],
-                    "bar": [{"version": "3.0.0", "name": "third_package"}],
+                    "foo": {
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [
+                            {"version": "1.0.0", "name": "first_package"},
+                            {"version": "2.0.0", "name": "second_package"},
+                        ],
+                    },
+                    "bar": {"runtime": "PYTHON_3_11_6", "packages": [{"version": "3.0.0", "name": "third_package"}]},
                 },
             },
         },
     }
 
 
-def test_serialize_node__none_function_packages():
-    # GIVEN a tool calling node with no function packages
+def test_serialize_node__function_configs__none():
+    # GIVEN a tool calling node with no function configs
     def foo():
         pass
 
@@ -206,12 +213,12 @@ def test_serialize_node__none_function_packages():
         if node["id"] == str(MyToolCallingNode.__id__)
     )
 
-    function_packages_attribute = next(
-        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_packages"
+    function_configs_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_configs"
     )
 
-    assert function_packages_attribute == {
-        "id": "05c86dea-ea4b-46c4-883b-7912a6680491",
-        "name": "function_packages",
+    assert function_configs_attribute == {
+        "id": "74f02e25-68fc-4801-8a37-dcaf90da4fe2",
+        "name": "function_configs",
         "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
     }

@@ -198,20 +198,17 @@ def create_function_node(
         function_source = inspect.getsource(function)
         function_name = function.__name__
 
-        _code = f'''
+        code = f'''
 {function_source}
 
 def main(arguments):
     """Main function that calls the original function with the provided arguments."""
     return {function_name}(**arguments)
 '''
-        _packages = packages
-        _tool_router_node = tool_router_node
-        _runtime = runtime
 
         def execute_code_execution_function(self) -> BaseNode.Outputs:
             # Get the function call from the tool router output
-            function_call_output = self.state.meta.node_outputs.get(_tool_router_node.Outputs.results)
+            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
             if function_call_output and len(function_call_output) > 0:
                 function_call = function_call_output[0]
                 arguments = function_call.value.arguments
@@ -246,11 +243,11 @@ def main(arguments):
             {},
             lambda ns: ns.update(
                 {
-                    "code": _code,
+                    "code": code,
                     "code_inputs": {},  # No inputs needed since we handle function call extraction in run()
                     "run": execute_code_execution_function,
-                    "runtime": _runtime,
-                    "packages": _packages,
+                    "runtime": runtime,
+                    "packages": packages,
                     "__module__": __name__,
                 }
             ),

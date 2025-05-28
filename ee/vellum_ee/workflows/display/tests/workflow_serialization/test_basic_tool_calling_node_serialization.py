@@ -151,6 +151,22 @@ def test_serialize_workflow():
                 },
             },
             {
+                "id": "a4e3bc9f-7112-4d2f-94fb-7362a85db27a",
+                "name": "function_configs",
+                "value": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "JSON",
+                        "value": {
+                            "get_current_weather": {
+                                "runtime": "PYTHON_3_11_6",
+                                "packages": [{"version": "2.26.0", "name": "requests"}],
+                            }
+                        },
+                    },
+                },
+            },
+            {
                 "id": "0f6dc102-3460-4963-91fa-7ba85d65ef7a",
                 "name": "prompt_inputs",
                 "value": {
@@ -166,16 +182,6 @@ def test_serialize_workflow():
                         }
                     ],
                 },
-            },
-            {
-                "id": "b31575f0-633b-4bd0-ba6a-960532f3887a",
-                "name": "function_packages",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
-            },
-            {
-                "id": "d316c45c-97ea-4f39-9a2d-5c43e2d355de",
-                "name": "runtime",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "PYTHON_3_11_6"}},
             },
         ],
         "outputs": [

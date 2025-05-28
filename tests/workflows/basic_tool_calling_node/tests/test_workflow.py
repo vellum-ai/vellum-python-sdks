@@ -4,6 +4,8 @@ from typing import Iterator, List
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
+from vellum.client.types.code_execution_package import CodeExecutionPackage
+from vellum.client.types.code_executor_response import CodeExecutorResponse
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
@@ -12,6 +14,7 @@ from vellum.client.types.function_call_chat_message_content_value import Functio
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+from vellum.client.types.json_input import JsonInput
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
@@ -27,7 +30,7 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants impor
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
 
 
-def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_generator):
+def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client, mock_uuid4_generator):
     """
     Test that the GetCurrentWeatherWorkflow returns the expected outputs.
     """
@@ -66,6 +69,13 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
 
     # Set up the mock to return our events
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+    mock_code_execution = CodeExecutorResponse(
+        log="Fetching URL content...",
+        output=StringVellumValue(
+            value="The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."
+        ),
+    )
+    vellum_client.execute_code.return_value = mock_code_execution
 
     uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
     first_call_input_id = uuid4_generator()
@@ -115,6 +125,19 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             source=None,
         ),
     ]
+
+    vellum_client.execute_code.assert_called_once()
+    call_args = vellum_client.execute_code.call_args
+    assert call_args.kwargs == {
+        "input_values": [
+            JsonInput(name="arguments", type="JSON", value={"location": "San Francisco", "unit": "celsius"})
+        ],
+        "code": '\ndef get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n\n\ndef main(arguments):\n    """Main function that calls the original function with the provided arguments."""\n    return get_current_weather(**arguments)\n',
+        "runtime": "PYTHON_3_11_6",
+        "output_type": "STRING",
+        "packages": [CodeExecutionPackage(version="2.26.0", name="requests")],
+        "request_options": None,
+    }
 
     first_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[0]
     assert first_call.kwargs == {
