@@ -193,6 +193,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             return input_variables, input_values
 
         for input_name, input_value in self.prompt_inputs.items():
+            if input_value is None:
+                continue
             if isinstance(input_value, str):
                 input_variables.append(
                     VellumVariable(

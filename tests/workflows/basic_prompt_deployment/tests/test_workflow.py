@@ -24,6 +24,10 @@ from tests.workflows.basic_prompt_deployment.workflow import (
     ExamplePromptDeploymentNode,
     Inputs,
 )
+from tests.workflows.basic_prompt_deployment.workflow_with_optional_inputs import (
+    InputsWithOptional,
+    WorkflowWithOptionalInputs,
+)
 
 
 def test_run_workflow__happy_path(vellum_client):
@@ -291,3 +295,62 @@ def test_stream_workflow__deployment_not_found(vellum_client):
     assert events.name == "workflow.execution.rejected"
     assert events.error.code == WorkflowErrorCode.INVALID_INPUTS
     assert events.error.message == "Deployment not found"
+
+
+def test_run_workflow__optional_inputs_excluded(vellum_client):
+    """Confirm that optional inputs with None values are excluded from the request"""
+
+    # GIVEN a workflow that's set up to hit a Prompt Deployment with optional inputs
+    workflow = WorkflowWithOptionalInputs()
+
+    # AND we know what the Prompt Deployment will respond with
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value="I'm looking up the weather for you now."),
+    ]
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_client.execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN we run the workflow without providing the optional field
+    terminal_event = workflow.run(
+        inputs=InputsWithOptional(
+            city="San Francisco",
+            date="2024-01-01",
+        )
+    )
+
+    # THEN the workflow should have completed successfully
+    assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND we should have invoked the Prompt Deployment with only the required inputs
+    vellum_client.execute_prompt_stream.assert_called_once_with(
+        inputs=[
+            StringInputRequest(name="city", type="STRING", value="San Francisco"),
+            StringInputRequest(name="date", type="STRING", value="2024-01-01"),
+        ],
+        prompt_deployment_id=None,
+        prompt_deployment_name="example_prompt_deployment_with_optional",
+        release_tag=LATEST_RELEASE_TAG,
+        external_id=None,
+        expand_meta=None,
+        raw_overrides=None,
+        expand_raw=None,
+        metadata=None,
+        request_options=ANY,
+    )
+
+    # AND the optional input should not be present in the request
+    call_kwargs = vellum_client.execute_prompt_stream.call_args.kwargs
+    input_names = [input_req.name for input_req in call_kwargs["inputs"]]
+    assert "optional_field" not in input_names
+    assert len(call_kwargs["inputs"]) == 2

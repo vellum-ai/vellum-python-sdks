@@ -171,6 +171,8 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
             return compiled_inputs
 
         for input_name, input_value in self.prompt_inputs.items():
+            if input_value is None:
+                continue
             if isinstance(input_value, str):
                 compiled_inputs.append(
                     StringInputRequest(
