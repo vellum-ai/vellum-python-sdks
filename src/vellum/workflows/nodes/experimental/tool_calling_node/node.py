@@ -1,9 +1,11 @@
-from collections.abc import Callable
-from typing import Any, ClassVar, Dict, List, Optional
+from collections.abc import Callable, Sequence
+from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
+from vellum.client.types.code_execution_package import CodeExecutionPackage
+from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -111,9 +113,12 @@ class ToolCallingNode(BaseNode):
             if self.function_configs and function.__name__ in self.function_configs:
                 config = self.function_configs[function.__name__]
 
-            # Extract packages and runtime from config
             packages = config.get("packages", None)
-            runtime = config.get("runtime", "PYTHON_3_11_6")
+            if packages is not None:
+                packages = cast(Sequence[CodeExecutionPackage], packages)
+
+            runtime_raw = config.get("runtime", "PYTHON_3_11_6")
+            runtime = cast(CodeExecutionRuntime, runtime_raw)
 
             self._function_nodes[function_name] = create_function_node(
                 function=function,

@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 import inspect
 import json
 import types
@@ -8,6 +8,7 @@ from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.code_execution_package import CodeExecutionPackage
+from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -128,8 +129,8 @@ def create_tool_router_node(
 def create_function_node(
     function: Callable[..., Any],
     tool_router_node: Type[ToolRouterNode],
-    packages: Optional[List[CodeExecutionPackage]] = None,
-    runtime: str = "PYTHON_3_11_6",
+    packages: Optional[Sequence[CodeExecutionPackage]] = None,
+    runtime: CodeExecutionRuntime = "PYTHON_3_11_6",
 ) -> Type[FunctionNode]:
     """
     Create a FunctionNode class for a given function.
