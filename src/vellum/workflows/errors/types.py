@@ -1,11 +1,14 @@
 from dataclasses import dataclass
 from enum import Enum
+import logging
 from typing import Any, Dict
 
 from vellum.client.types.vellum_error import VellumError
 from vellum.client.types.vellum_error_code_enum import VellumErrorCodeEnum
 from vellum.client.types.workflow_event_error import WorkflowEventError
 from vellum.client.types.workflow_execution_event_error_code import WorkflowExecutionEventErrorCode
+
+logger = logging.getLogger(__name__)
 
 
 class WorkflowErrorCode(Enum):
@@ -43,9 +46,15 @@ _VELLUM_ERROR_CODE_TO_WORKFLOW_ERROR_CODE: Dict[VellumErrorCodeEnum, WorkflowErr
 
 
 def vellum_error_to_workflow_error(error: VellumError) -> WorkflowError:
+    workflow_error_code = _VELLUM_ERROR_CODE_TO_WORKFLOW_ERROR_CODE.get(error.code)
+
+    if workflow_error_code is None:
+        logger.warning(f"Unknown Vellum error code '{error.code}' encountered. Falling back to INTERNAL_ERROR.")
+        workflow_error_code = WorkflowErrorCode.INTERNAL_ERROR
+
     return WorkflowError(
         message=error.message,
-        code=_VELLUM_ERROR_CODE_TO_WORKFLOW_ERROR_CODE.get(error.code, WorkflowErrorCode.INTERNAL_ERROR),
+        code=workflow_error_code,
     )
 
 
