@@ -1099,7 +1099,7 @@ def test_run_node__iter_dict():
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, list[str]]):
         code = """\
 def main(input_dict: dict) -> list[str]:
-    return [item.value for item in input_dict]
+    return [item.value for item in input_dict.values()]
 """
         runtime = "PYTHON_3_11_6"
         code_inputs = {
