@@ -10,7 +10,7 @@ from vellum.workflows.state import BaseState
 class InputsWithOptional(BaseInputs):
     city: str
     date: str
-    optional_field: Optional[str]
+    optional_field: Optional[str] = None
 
 
 class ExamplePromptDeploymentNodeWithOptional(PromptDeploymentNode):
