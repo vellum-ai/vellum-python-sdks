@@ -1,10 +1,9 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, Dict, List, Optional, cast
+from typing import Any, ClassVar, Dict, List, Optional
 
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
-from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
