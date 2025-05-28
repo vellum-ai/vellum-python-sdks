@@ -82,10 +82,6 @@ class DictWrapper(dict):
     def __setattr__(self, name, value):
         self[name] = value
 
-    def __iter__(self):
-        for key in super().keys():
-            yield self[key]
-
 
 def clean_for_dict_wrapper(obj):
     if isinstance(obj, dict):
