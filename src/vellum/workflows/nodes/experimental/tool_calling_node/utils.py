@@ -237,7 +237,7 @@ def main(arguments):
 
         output_type = get_function_output_type()
 
-        base_class:Type[CodeExecutionNode] = CodeExecutionNode[BaseState, output_type]  #type: ignore[valid-type]
+        base_class: Type[CodeExecutionNode] = CodeExecutionNode[BaseState, output_type]  # type: ignore[valid-type]
 
         # Create the class with basic attributes
         node = types.new_class(
