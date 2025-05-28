@@ -1,9 +1,10 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
+from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -28,14 +29,16 @@ class ToolCallingNode(BaseNode):
         functions: List[FunctionDefinition] - The functions that can be called
         function_callables: List[Callable] - The callables that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
+        function_packages: Optional[Dict[Callable, List[CodeExecutionPackage]]] - Mapping of functions to their packages
+        runtime: str - The runtime to use for code execution (default: "PYTHON_3_11_6")
     """
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
     functions: ClassVar[List[Callable[..., Any]]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
-    # TODO: https://linear.app/vellum/issue/APO-342/support-tool-call-max-retries
-    max_tool_calls: ClassVar[int] = 1
+    function_packages: ClassVar[Optional[Dict[Callable[..., Any], List[CodeExecutionPackage]]]] = None
+    runtime: ClassVar[str] = "PYTHON_3_11_6"
 
     class Outputs(BaseOutputs):
         """
@@ -102,13 +105,21 @@ class ToolCallingNode(BaseNode):
             prompt_inputs=self.prompt_inputs,
         )
 
-        self._function_nodes = {
-            snake_case(function.__name__): create_function_node(
+        self._function_nodes = {}
+        for function in self.functions:
+            function_name = snake_case(function.__name__)
+            # Get packages for this function if specified
+            packages = None
+            if self.function_packages and function in self.function_packages:
+                # Cast to tell mypy this is a plain list, not a descriptor
+                packages = cast(List[CodeExecutionPackage], self.function_packages[function])
+
+            self._function_nodes[function_name] = create_function_node(
                 function=function,
                 tool_router_node=self.tool_router_node,
+                packages=packages,
+                runtime=self.runtime,
             )
-            for function in self.functions
-        }
 
         graph_set = set()
 
