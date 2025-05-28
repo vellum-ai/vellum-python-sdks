@@ -181,3 +181,37 @@ def test_serialize_node__function_packages():
             },
         },
     }
+
+
+def test_serialize_node__none_function_packages():
+    # GIVEN a tool calling node with no function packages
+    def foo():
+        pass
+
+    class MyToolCallingNode(ToolCallingNode):
+        functions = [foo]
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the functions
+    my_tool_calling_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MyToolCallingNode.__id__)
+    )
+
+    function_packages_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_packages"
+    )
+
+    assert function_packages_attribute == {
+        "id": "05c86dea-ea4b-46c4-883b-7912a6680491",
+        "name": "function_packages",
+        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+    }
