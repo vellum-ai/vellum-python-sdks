@@ -237,13 +237,7 @@ def main(arguments):
 
         output_type = get_function_output_type()
 
-        base_class: Type[CodeExecutionNode]
-        if output_type != Any:
-            # If we have a specific output type, create a properly typed base class
-            base_class = CodeExecutionNode[BaseState, output_type]  # type: ignore[valid-type]
-        else:
-            # Fall back to Any if no return type annotation
-            base_class = CodeExecutionNode[BaseState, Any]
+        base_class:Type[CodeExecutionNode] = CodeExecutionNode[BaseState, output_type]  #type: ignore[valid-type]
 
         # Create the class with basic attributes
         node = types.new_class(
