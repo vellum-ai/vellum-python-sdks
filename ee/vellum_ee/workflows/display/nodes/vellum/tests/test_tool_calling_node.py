@@ -218,7 +218,7 @@ def test_serialize_node__function_configs__none():
     )
 
     assert function_configs_attribute == {
-        "id": "74f02e25-68fc-4801-8a37-dcaf90da4fe2",
+        "id": "5f63f2aa-72d7-47ad-a552-630753418b7d",
         "name": "function_configs",
         "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
     }
