@@ -5,7 +5,7 @@ from typing import Any, List, Union
 
 from pydantic import BaseModel
 
-from vellum import CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
+from vellum import ArrayInput, CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
 from vellum.client.errors.bad_request_error import BadRequestError
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.code_execution_package import CodeExecutionPackage
@@ -1167,3 +1167,69 @@ def main(input: str) -> str:
 
     # THEN the node should return default function call
     assert outputs == {"result": FunctionCall(name="", arguments={}), "log": ""}
+
+
+def test_run_node__array_input_with_primitive_values(vellum_client):
+    # GIVEN a node that subclasses CodeExecutionNode that processes an array of primitive values
+    class State(BaseState):
+        pass
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, str]):
+        code = """\
+from typing import List
+def main(numbers: List[str]) -> str:
+    return " ".join(numbers)
+"""
+        runtime = "PYTHON_3_11_6"
+        packages = [
+            CodeExecutionPackage(
+                name="openai",
+                version="1.0.0",
+            )
+        ]
+
+        code_inputs = {
+            "numbers": ["6", "4", "2"],
+        }
+
+    # AND we know what the Code Execution Node will respond with
+    mock_code_execution = CodeExecutorResponse(
+        log="",
+        output=StringVellumValue(value="6 4 2"),
+    )
+    vellum_client.execute_code.return_value = mock_code_execution
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+    outputs = node.run()
+
+    # THEN the node should have produced the outputs we expect
+    assert outputs == {"result": "6 4 2", "log": ""}
+
+    # AND we should have invoked the Code with the expected inputs
+    vellum_client.execute_code.assert_called_once_with(
+        input_values=[
+            ArrayInput(
+                name="numbers",
+                value=[
+                    StringVellumValue(value="6"),
+                    StringVellumValue(value="4"),
+                    StringVellumValue(value="2"),
+                ],
+            )
+        ],
+        code="""\
+from typing import List
+def main(numbers: List[str]) -> str:
+    return " ".join(numbers)
+""",
+        runtime="PYTHON_3_11_6",
+        output_type="STRING",
+        packages=[
+            CodeExecutionPackage(
+                name="openai",
+                version="1.0.0",
+            )
+        ],
+        request_options=None,
+    )

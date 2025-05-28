@@ -13,15 +13,26 @@ from vellum import (
     FunctionCall,
     FunctionCallInput,
     JsonInput,
+    JsonVellumValue,
     NumberInput,
+    NumberVellumValue,
     SearchResult,
     SearchResultsInput,
     StringInput,
+    StringVellumValue,
     VellumError,
     VellumValue,
 )
 from vellum.client.core.api_error import ApiError
+from vellum.client.types.array_vellum_value import ArrayVellumValue
+from vellum.client.types.audio_vellum_value import AudioVellumValue
+from vellum.client.types.chat_history_vellum_value import ChatHistoryVellumValue
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
+from vellum.client.types.document_vellum_value import DocumentVellumValue
+from vellum.client.types.error_vellum_value import ErrorVellumValue
+from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
+from vellum.client.types.image_vellum_value import ImageVellumValue
+from vellum.client.types.search_results_vellum_value import SearchResultsVellumValue
 from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -169,10 +180,41 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                         )
                     )
                 else:
+                    # Convert primitive values to VellumValue objects
+                    vellum_values: List[VellumValue] = []
+                    for item in input_value:
+                        if isinstance(item, str):
+                            vellum_values.append(StringVellumValue(value=item))
+                        elif isinstance(item, (int, float)):
+                            vellum_values.append(NumberVellumValue(value=float(item)))
+                        elif isinstance(item, dict):
+                            vellum_values.append(JsonVellumValue(value=item))
+                        elif isinstance(
+                            item,
+                            (
+                                StringVellumValue,
+                                NumberVellumValue,
+                                JsonVellumValue,
+                                ImageVellumValue,
+                                AudioVellumValue,
+                                DocumentVellumValue,
+                                FunctionCallVellumValue,
+                                ErrorVellumValue,
+                                ArrayVellumValue,
+                                ChatHistoryVellumValue,
+                                SearchResultsVellumValue,
+                            ),
+                        ):
+                            # If it's already a VellumValue (any type), keep it as is
+                            vellum_values.append(item)
+                        else:
+                            # For any other type, treat as JSON
+                            vellum_values.append(JsonVellumValue(value=item))
+
                     compiled_inputs.append(
                         ArrayInput(
                             name=input_name,
-                            value=cast(List[VellumValue], input_value),
+                            value=vellum_values,
                         )
                     )
             elif isinstance(input_value, dict):
