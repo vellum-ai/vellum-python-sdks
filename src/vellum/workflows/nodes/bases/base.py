@@ -490,7 +490,6 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
                         node_output_descriptor.name,
                         node_output_descriptor.instance.resolve(self.state),
                     )
-            delattr(self.Outputs, "_outputs_post_init")
 
         setattr(self.Outputs, "_outputs_post_init", _outputs_post_init)
 
