@@ -13,26 +13,15 @@ from vellum import (
     FunctionCall,
     FunctionCallInput,
     JsonInput,
-    JsonVellumValue,
     NumberInput,
-    NumberVellumValue,
     SearchResult,
     SearchResultsInput,
     StringInput,
-    StringVellumValue,
     VellumError,
     VellumValue,
 )
 from vellum.client.core.api_error import ApiError
-from vellum.client.types.array_vellum_value import ArrayVellumValue
-from vellum.client.types.audio_vellum_value import AudioVellumValue
-from vellum.client.types.chat_history_vellum_value import ChatHistoryVellumValue
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
-from vellum.client.types.document_vellum_value import DocumentVellumValue
-from vellum.client.types.error_vellum_value import ErrorVellumValue
-from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
-from vellum.client.types.image_vellum_value import ImageVellumValue
-from vellum.client.types.search_results_vellum_value import SearchResultsVellumValue
 from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
