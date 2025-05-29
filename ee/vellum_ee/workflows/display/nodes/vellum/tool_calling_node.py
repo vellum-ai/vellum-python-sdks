@@ -1,5 +1,6 @@
-from typing import Any, Generic, TypeVar
+from typing import Any, Dict, Generic, List, Sequence, TypeVar, cast
 
+from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -21,18 +22,18 @@ class BaseToolCallingNodeDisplay(BaseNodeDisplay[_ToolCallingNodeType], Generic[
         function_configs = raise_if_descriptor(node.function_configs) or {}
 
         # Find and enhance the functions attribute
-        functions_attr = next(attr for attr in serialized_node["attributes"] if attr["name"] == "functions")
-        functions_list = functions_attr["value"]["value"]["value"]
+        functions_attr = next(attr for attr in cast(List[Dict[str, Any]], serialized_node["attributes"]) if attr["name"] == "functions")
+        functions_list = cast(List[Dict[str, Any]], functions_attr["value"]["value"]["value"])
         for function_obj in functions_list:
             if function_obj.get("type") == "CODE_EXECUTION":
                 function_name = function_obj["definition"]["name"]
-                config = function_configs.get(function_name, {})
+                config: Dict[str, Any] = function_configs.get(function_name, {})
 
                 # Set runtime (from config or default)
                 function_obj["runtime"] = config.get("runtime", "PYTHON_3_11_6")
 
                 # Set packages (from config or empty list)
-                packages = config.get("packages")
-                function_obj["packages"] = [package.dict() for package in packages] if packages is not None else []
+                packages: Sequence[CodeExecutionPackage] = config.get("packages", [])
+                function_obj["packages"] = [package.dict() for package in packages]
 
         return serialized_node
