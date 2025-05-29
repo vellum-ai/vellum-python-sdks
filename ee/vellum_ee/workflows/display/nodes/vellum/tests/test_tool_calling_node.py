@@ -194,16 +194,6 @@ def test_serialize_node__function_configs():
             "type": "CONSTANT_VALUE",
             "value": {
                 "type": "JSON",
-                "value": {
-                    "foo": {
-                        "runtime": "PYTHON_3_11_6",
-                        "packages": [
-                            {"version": "1.0.0", "name": "first_package"},
-                            {"version": "2.0.0", "name": "second_package"},
-                        ],
-                    },
-                    "bar": {"runtime": "PYTHON_3_11_6", "packages": [{"version": "3.0.0", "name": "third_package"}]},
-                },
                 "value": [
                     {
                         "type": "CODE_EXECUTION",
