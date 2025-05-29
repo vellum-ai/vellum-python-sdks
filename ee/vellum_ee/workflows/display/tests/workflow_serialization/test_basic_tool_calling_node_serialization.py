@@ -145,24 +145,10 @@ def test_serialize_workflow():
                                     "strict": None,
                                 },
                                 "src": 'def get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',  # noqa: E501
-                            }
-                        ],
-                    },
-                },
-            },
-            {
-                "id": "a4e3bc9f-7112-4d2f-94fb-7362a85db27a",
-                "name": "function_configs",
-                "value": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "JSON",
-                        "value": {
-                            "get_current_weather": {
                                 "runtime": "PYTHON_3_11_6",
                                 "packages": [{"version": "2.26.0", "name": "requests"}],
                             }
-                        },
+                        ],
                     },
                 },
             },

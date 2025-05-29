@@ -127,16 +127,25 @@ def test_serialize_node__prompt_inputs__mixed_values():
 
 def test_serialize_node__function_configs():
     # GIVEN a tool calling node with function packages
-    def foo():
+    def two_packages():
         pass
 
-    def bar():
+    def one_package():
+        pass
+
+    def runtime_only():
+        pass
+
+    def packages_only():
+        pass
+
+    def no_config():
         pass
 
     class MyToolCallingNode(ToolCallingNode):
-        functions = [foo, bar]
+        functions = [two_packages, one_package, runtime_only, packages_only, no_config]
         function_configs = {
-            "foo": {
+            "two_packages": {
                 "runtime": "PYTHON_3_11_6",
                 "packages": [
                     CodeExecutionPackage(name="first_package", version="1.0.0"),
@@ -147,6 +156,17 @@ def test_serialize_node__function_configs():
                 "runtime": "PYTHON_3_11_6",
                 "packages": [CodeExecutionPackage(name="third_package", version="3.0.0")],
             },
+            "one_package": {
+                "runtime": "PYTHON_3_11_6",
+                "packages": [CodeExecutionPackage(name="third_package", version="3.0.0")],
+            },
+            "runtime_only": {
+                "runtime": "PYTHON_3_11_6",
+            },
+            "packages_only": {
+                "packages": [CodeExecutionPackage(name="third_package", version="3.0.0")],
+            },
+            # no_config does not specify config
         }
 
     # AND a workflow with the tool calling node
@@ -164,13 +184,12 @@ def test_serialize_node__function_configs():
         if node["id"] == str(MyToolCallingNode.__id__)
     )
 
-    function_configs_attribute = next(
-        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_configs"
+    functions_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
     )
-
-    assert function_configs_attribute == {
-        "id": "90cc5fc7-9fb3-450f-be5a-e90e7412a601",
-        "name": "function_configs",
+    assert functions_attribute == {
+        "id": "d1841455-4edd-4172-9e74-8bdebd3ea83a",
+        "name": "functions",
         "value": {
             "type": "CONSTANT_VALUE",
             "value": {
@@ -185,6 +204,86 @@ def test_serialize_node__function_configs():
                     },
                     "bar": {"runtime": "PYTHON_3_11_6", "packages": [{"version": "3.0.0", "name": "third_package"}]},
                 },
+                "value": [
+                    {
+                        "type": "CODE_EXECUTION",
+                        "definition": {
+                            "state": None,
+                            "cache_config": None,
+                            "name": "two_packages",
+                            "description": None,
+                            "parameters": {"type": "object", "properties": {}, "required": []},
+                            "forced": None,
+                            "strict": None,
+                        },
+                        "src": "    def two_packages():\n        pass\n",
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [
+                            {"version": "1.0.0", "name": "first_package"},
+                            {"version": "2.0.0", "name": "second_package"},
+                        ],
+                    },
+                    {
+                        "type": "CODE_EXECUTION",
+                        "definition": {
+                            "state": None,
+                            "cache_config": None,
+                            "name": "one_package",
+                            "description": None,
+                            "parameters": {"type": "object", "properties": {}, "required": []},
+                            "forced": None,
+                            "strict": None,
+                        },
+                        "src": "    def one_package():\n        pass\n",
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [{"version": "3.0.0", "name": "third_package"}],
+                    },
+                    {
+                        "type": "CODE_EXECUTION",
+                        "definition": {
+                            "state": None,
+                            "cache_config": None,
+                            "name": "runtime_only",
+                            "description": None,
+                            "parameters": {"type": "object", "properties": {}, "required": []},
+                            "forced": None,
+                            "strict": None,
+                        },
+                        "src": "    def runtime_only():\n        pass\n",
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [],
+                    },
+                    {
+                        "type": "CODE_EXECUTION",
+                        "definition": {
+                            "state": None,
+                            "cache_config": None,
+                            "name": "packages_only",
+                            "description": None,
+                            "parameters": {"type": "object", "properties": {}, "required": []},
+                            "forced": None,
+                            "strict": None,
+                        },
+                        "src": "    def packages_only():\n        pass\n",
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [{"version": "3.0.0", "name": "third_package"}],
+                    },
+                    {
+                        "type": "CODE_EXECUTION",
+                        "definition": {
+                            "state": None,
+                            "cache_config": None,
+                            "name": "no_config",
+                            "description": None,
+                            "parameters": {"type": "object", "properties": {}, "required": []},
+                            "forced": None,
+                            "strict": None,
+                        },
+                        "src": "    def no_config():\n        pass\n",
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [],
+                    },
+                ],
             },
         },
     }
@@ -213,12 +312,65 @@ def test_serialize_node__function_configs__none():
         if node["id"] == str(MyToolCallingNode.__id__)
     )
 
-    function_configs_attribute = next(
-        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "function_configs"
+    functions = next(attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions")
+    assert functions == {
+        "id": "99a0e63a-d1f6-45be-9ead-ff2e5f57ff42",
+        "name": "functions",
+        "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": [
+                    {
+                        "type": "CODE_EXECUTION",
+                        "definition": {
+                            "state": None,
+                            "cache_config": None,
+                            "name": "foo",
+                            "description": None,
+                            "parameters": {"type": "object", "properties": {}, "required": []},
+                            "forced": None,
+                            "strict": None,
+                        },
+                        "src": "    def foo():\n        pass\n",
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [],
+                    }
+                ],
+            },
+        },
+    }
+
+
+def test_serialize_node__no_functions():
+    # GIVEN a tool calling node with no functions
+    class MyToolCallingNode(ToolCallingNode):
+        pass
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the functions
+    my_tool_calling_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MyToolCallingNode.__id__)
     )
 
-    assert function_configs_attribute == {
-        "id": "5f63f2aa-72d7-47ad-a552-630753418b7d",
-        "name": "function_configs",
-        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+    functions = next(attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions")
+    assert functions == {
+        "id": "e8dc7c2b-d179-496e-ac55-682f87ab4d8b",
+        "name": "functions",
+        "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": [],
+            },
+        },
     }
