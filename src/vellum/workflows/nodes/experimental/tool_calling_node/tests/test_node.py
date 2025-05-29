@@ -62,7 +62,7 @@ def my_string_function() -> str:
     return "hello"
 
 
-def my_error_function() -> int: 
+def my_error_function() -> int:
     return "hello"  # type: ignore
 
 
