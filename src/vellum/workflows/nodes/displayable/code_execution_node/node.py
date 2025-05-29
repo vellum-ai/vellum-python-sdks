@@ -38,6 +38,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path, run_code_inline
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, VellumSecret
@@ -181,35 +182,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                     )
                 else:
                     # Convert primitive values to VellumValue objects
-                    vellum_values: List[VellumValue] = []
-                    for item in input_value:
-                        if isinstance(item, str):
-                            vellum_values.append(StringVellumValue(value=item))
-                        elif isinstance(item, (int, float)):
-                            vellum_values.append(NumberVellumValue(value=float(item)))
-                        elif isinstance(item, dict):
-                            vellum_values.append(JsonVellumValue(value=item))
-                        elif isinstance(
-                            item,
-                            (
-                                StringVellumValue,
-                                NumberVellumValue,
-                                JsonVellumValue,
-                                ImageVellumValue,
-                                AudioVellumValue,
-                                DocumentVellumValue,
-                                FunctionCallVellumValue,
-                                ErrorVellumValue,
-                                ArrayVellumValue,
-                                ChatHistoryVellumValue,
-                                SearchResultsVellumValue,
-                            ),
-                        ):
-                            # If it's already a VellumValue (any type), keep it as is
-                            vellum_values.append(item)
-                        else:
-                            # For any other type, treat as JSON
-                            vellum_values.append(JsonVellumValue(value=item))
+                    vellum_values: List[VellumValue] = [primitive_to_vellum_value(item) for item in input_value]
 
                     compiled_inputs.append(
                         ArrayInput(
