@@ -22,7 +22,9 @@ class BaseToolCallingNodeDisplay(BaseNodeDisplay[_ToolCallingNodeType], Generic[
         function_configs = raise_if_descriptor(node.function_configs) or {}
 
         # Find and enhance the functions attribute
-        functions_attr = next(attr for attr in cast(List[Dict[str, Any]], serialized_node["attributes"]) if attr["name"] == "functions")
+        functions_attr = next(
+            attr for attr in cast(List[Dict[str, Any]], serialized_node["attributes"]) if attr["name"] == "functions"
+        )
         functions_list = cast(List[Dict[str, Any]], functions_attr["value"]["value"]["value"])
         for function_obj in functions_list:
             if function_obj.get("type") == "CODE_EXECUTION":
