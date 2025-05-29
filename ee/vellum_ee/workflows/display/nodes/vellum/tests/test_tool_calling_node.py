@@ -148,23 +148,19 @@ def test_serialize_node__function_configs():
             "two_packages": {
                 "runtime": "PYTHON_3_11_6",
                 "packages": [
-                    CodeExecutionPackage(name="first_package", version="1.0.0"),
-                    CodeExecutionPackage(name="second_package", version="2.0.0"),
+                    CodeExecutionPackage(name="test_package_1", version="1.0.0"),
+                    CodeExecutionPackage(name="test_package_2", version="2.0.0"),
                 ],
-            },
-            "bar": {
-                "runtime": "PYTHON_3_11_6",
-                "packages": [CodeExecutionPackage(name="third_package", version="3.0.0")],
             },
             "one_package": {
                 "runtime": "PYTHON_3_11_6",
-                "packages": [CodeExecutionPackage(name="third_package", version="3.0.0")],
+                "packages": [CodeExecutionPackage(name="test_package_3", version="3.0.0")],
             },
             "runtime_only": {
                 "runtime": "PYTHON_3_11_6",
             },
             "packages_only": {
-                "packages": [CodeExecutionPackage(name="third_package", version="3.0.0")],
+                "packages": [CodeExecutionPackage(name="test_package_4", version="4.0.0")],
             },
             # no_config does not specify config
         }
@@ -209,8 +205,8 @@ def test_serialize_node__function_configs():
                         "src": "    def two_packages():\n        pass\n",
                         "runtime": "PYTHON_3_11_6",
                         "packages": [
-                            {"version": "1.0.0", "name": "first_package"},
-                            {"version": "2.0.0", "name": "second_package"},
+                            {"version": "1.0.0", "name": "test_package_1"},
+                            {"version": "2.0.0", "name": "test_package_2"},
                         ],
                     },
                     {
@@ -226,7 +222,7 @@ def test_serialize_node__function_configs():
                         },
                         "src": "    def one_package():\n        pass\n",
                         "runtime": "PYTHON_3_11_6",
-                        "packages": [{"version": "3.0.0", "name": "third_package"}],
+                        "packages": [{"version": "3.0.0", "name": "test_package_3"}],
                     },
                     {
                         "type": "CODE_EXECUTION",
@@ -241,7 +237,7 @@ def test_serialize_node__function_configs():
                         },
                         "src": "    def runtime_only():\n        pass\n",
                         "runtime": "PYTHON_3_11_6",
-                        "packages": [],
+                        "packages": [],  # no packages specified
                     },
                     {
                         "type": "CODE_EXECUTION",
@@ -255,8 +251,8 @@ def test_serialize_node__function_configs():
                             "strict": None,
                         },
                         "src": "    def packages_only():\n        pass\n",
-                        "runtime": "PYTHON_3_11_6",
-                        "packages": [{"version": "3.0.0", "name": "third_package"}],
+                        "runtime": "PYTHON_3_11_6",  # default runtime
+                        "packages": [{"version": "4.0.0", "name": "test_package_4"}],
                     },
                     {
                         "type": "CODE_EXECUTION",
@@ -270,8 +266,8 @@ def test_serialize_node__function_configs():
                             "strict": None,
                         },
                         "src": "    def no_config():\n        pass\n",
-                        "runtime": "PYTHON_3_11_6",
-                        "packages": [],
+                        "runtime": "PYTHON_3_11_6",  # default runtime
+                        "packages": [],  # no packages specified
                     },
                 ],
             },
