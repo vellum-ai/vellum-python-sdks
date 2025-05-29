@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 import inspect
 import json
 import types
@@ -8,6 +8,7 @@ from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.code_execution_package import CodeExecutionPackage
+from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -128,8 +129,8 @@ def create_tool_router_node(
 def create_function_node(
     function: Callable[..., Any],
     tool_router_node: Type[ToolRouterNode],
-    packages: Optional[List[CodeExecutionPackage]] = None,
-    runtime: str = "PYTHON_3_11_6",
+    packages: Optional[Sequence[CodeExecutionPackage]] = None,
+    runtime: CodeExecutionRuntime = "PYTHON_3_11_6",
 ) -> Type[FunctionNode]:
     """
     Create a FunctionNode class for a given function.
@@ -198,20 +199,17 @@ def create_function_node(
         function_source = inspect.getsource(function)
         function_name = function.__name__
 
-        _code = f'''
+        code = f'''
 {function_source}
 
 def main(arguments):
     """Main function that calls the original function with the provided arguments."""
     return {function_name}(**arguments)
 '''
-        _packages = packages
-        _tool_router_node = tool_router_node
-        _runtime = runtime
 
         def execute_code_execution_function(self) -> BaseNode.Outputs:
             # Get the function call from the tool router output
-            function_call_output = self.state.meta.node_outputs.get(_tool_router_node.Outputs.results)
+            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
             if function_call_output and len(function_call_output) > 0:
                 function_call = function_call_output[0]
                 arguments = function_call.value.arguments
@@ -246,11 +244,11 @@ def main(arguments):
             {},
             lambda ns: ns.update(
                 {
-                    "code": _code,
+                    "code": code,
                     "code_inputs": {},  # No inputs needed since we handle function call extraction in run()
                     "run": execute_code_execution_function,
-                    "runtime": _runtime,
-                    "packages": _packages,
+                    "runtime": runtime,
+                    "packages": packages,
                     "__module__": __name__,
                 }
             ),

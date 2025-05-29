@@ -1,10 +1,11 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.code_execution_package import CodeExecutionPackage
+from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -29,16 +30,14 @@ class ToolCallingNode(BaseNode):
         functions: List[FunctionDefinition] - The functions that can be called
         function_callables: List[Callable] - The callables that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
-        function_packages: Optional[Dict[Callable, List[CodeExecutionPackage]]] - Mapping of functions to their packages
-        runtime: str - The runtime to use for code execution (default: "PYTHON_3_11_6")
+        function_configs: Optional[Dict[str, Dict[str, Any]]] - Mapping of function names to their configuration
     """
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
     functions: ClassVar[List[Callable[..., Any]]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
-    function_packages: ClassVar[Optional[Dict[Callable[..., Any], List[CodeExecutionPackage]]]] = None
-    runtime: ClassVar[str] = "PYTHON_3_11_6"
+    function_configs: ClassVar[Optional[Dict[str, Dict[str, Any]]]] = None
 
     class Outputs(BaseOutputs):
         """
@@ -108,17 +107,24 @@ class ToolCallingNode(BaseNode):
         self._function_nodes = {}
         for function in self.functions:
             function_name = snake_case(function.__name__)
-            # Get packages for this function if specified
-            packages = None
-            if self.function_packages and function in self.function_packages:
-                # Cast to tell mypy this is a plain list, not a descriptor
-                packages = cast(List[CodeExecutionPackage], self.function_packages[function])
+
+            # Get configuration for this function
+            config = {}
+            if self.function_configs and function.__name__ in self.function_configs:
+                config = self.function_configs[function.__name__]
+
+            packages = config.get("packages", None)
+            if packages is not None:
+                packages = cast(Sequence[CodeExecutionPackage], packages)
+
+            runtime_raw = config.get("runtime", "PYTHON_3_11_6")
+            runtime = cast(CodeExecutionRuntime, runtime_raw)
 
             self._function_nodes[function_name] = create_function_node(
                 function=function,
                 tool_router_node=self.tool_router_node,
                 packages=packages,
-                runtime=self.runtime,
+                runtime=runtime,
             )
 
         graph_set = set()
