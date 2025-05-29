@@ -27,6 +27,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path, run_code_inline
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, VellumSecret
@@ -169,10 +170,13 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                         )
                     )
                 else:
+                    # Convert primitive values to VellumValue objects
+                    vellum_values: List[VellumValue] = [primitive_to_vellum_value(item) for item in input_value]
+
                     compiled_inputs.append(
                         ArrayInput(
                             name=input_name,
-                            value=cast(List[VellumValue], input_value),
+                            value=vellum_values,
                         )
                     )
             elif isinstance(input_value, dict):
