@@ -3,7 +3,7 @@ name = "vellum-ai"
 
 [tool.poetry]
 name = "vellum-ai"
-version = "0.14.64"
+version = "0.14.65"
 description = ""
 readme = "README.md"
 authors = []
@@ -46,6 +46,7 @@ publication = "0.0.3"
 pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
 pydash = ">=7.0.0,<8.0.0"
+python-dateutil = ">=2.8.0,<3.0.0"
 python-dotenv = ">=1.0.0,<2.0.0"
 pytz = ">=2022.0,<2026.0"
 pyyaml = ">=6.0.0,<7.0.0"
