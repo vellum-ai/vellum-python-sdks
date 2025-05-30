@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Tuple, Type
 
 from vellum.workflows.inputs.base import BaseInputs
@@ -67,6 +68,7 @@ class _BaseAdornmentNodeMeta(BaseNodeMeta):
 class BaseAdornmentNode(
     BaseNode[StateType],
     Generic[StateType],
+    ABC,
     metaclass=_BaseAdornmentNodeMeta,
 ):
     """
