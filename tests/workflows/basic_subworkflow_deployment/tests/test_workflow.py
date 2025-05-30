@@ -23,6 +23,10 @@ from tests.workflows.basic_subworkflow_deployment.workflow import (
     ExampleSubworkflowDeploymentNode,
     Inputs,
 )
+from tests.workflows.basic_subworkflow_deployment.workflow_with_optional_inputs import (
+    InputsWithOptional,
+    WorkflowWithOptionalInputsSubworkflow,
+)
 
 
 def test_run_workflow__happy_path(vellum_client):
@@ -305,3 +309,82 @@ def test_stream_workflow__happy_path(vellum_client):
             workflow_definition=workflow.__class__, span_id=uuid4()
         ).workflow_definition.model_dump()
     )
+
+
+def test_run_workflow__optional_inputs_excluded(vellum_client):
+    """Confirm that optional inputs with None values are excluded from the request"""
+
+    # GIVEN a workflow that's set up to hit a Subworkflow Deployment with optional inputs
+    workflow = WorkflowWithOptionalInputsSubworkflow()
+
+    # AND we know what the Workflow Deployment will respond with
+    expected_outputs: List[WorkflowOutput] = [
+        WorkflowOutputNumber(id=str(uuid4()), value=70, name="temperature"),
+        WorkflowOutputString(
+            id=str(uuid4()), value="I went to weather.com and looked at today's forecast.", name="reasoning"
+        ),
+    ]
+
+    execution_id = str(uuid4())
+    expected_events: List[WorkflowStreamEvent] = [
+        WorkflowExecutionWorkflowResultEvent(
+            execution_id=execution_id,
+            data=WorkflowResultEvent(
+                id=str(uuid4()),
+                state="INITIATED",
+                ts=datetime.now(),
+            ),
+        ),
+        WorkflowExecutionWorkflowResultEvent(
+            execution_id=execution_id,
+            data=WorkflowResultEvent(
+                id=str(uuid4()),
+                state="FULFILLED",
+                ts=datetime.now(),
+                outputs=expected_outputs,
+            ),
+        ),
+    ]
+
+    def generate_subworkflow_events(*args: Any, **kwargs: Any) -> Iterator[WorkflowStreamEvent]:
+        yield from expected_events
+
+    vellum_client.execute_workflow_stream.side_effect = generate_subworkflow_events
+
+    # WHEN we run the workflow without providing the optional field
+    terminal_event = workflow.run(
+        inputs=InputsWithOptional(
+            city="San Francisco",
+            date="2024-01-01",
+        )
+    )
+
+    # THEN the workflow should have completed successfully
+    assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND the outputs should be as expected
+    assert terminal_event.outputs == {
+        "temperature": 70,
+        "reasoning": "I went to weather.com and looked at today's forecast.",
+    }
+
+    # AND we should have invoked the Workflow Deployment with only the required inputs
+    vellum_client.execute_workflow_stream.assert_called_once_with(
+        inputs=[
+            WorkflowRequestStringInputRequest(name="city", type="STRING", value="San Francisco"),
+            WorkflowRequestStringInputRequest(name="date", type="STRING", value="2024-01-01"),
+        ],
+        workflow_deployment_id=None,
+        workflow_deployment_name="example_subworkflow_deployment_with_optional",
+        event_types=["WORKFLOW"],
+        release_tag=LATEST_RELEASE_TAG,
+        external_id=OMIT,
+        metadata=OMIT,
+        request_options=ANY,
+    )
+
+    # AND the optional input should not be present in the request
+    call_kwargs = vellum_client.execute_workflow_stream.call_args.kwargs
+    input_names = [input_req.name for input_req in call_kwargs["inputs"]]
+    assert "optional_field" not in input_names
+    assert len(call_kwargs["inputs"]) == 2

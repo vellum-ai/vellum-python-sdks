@@ -63,6 +63,10 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
         compiled_inputs: List[WorkflowRequestInputRequest] = []
 
         for input_name, input_value in self.subworkflow_inputs.items():
+            # Exclude inputs that resolved to be null. This ensure that we don't pass input values
+            # to optional subworkflow inputs whose values were unresolved.
+            if input_value is None:
+                continue
             if isinstance(input_value, str):
                 compiled_inputs.append(
                     WorkflowRequestStringInputRequest(
