@@ -76,6 +76,13 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
         ),
     )
     vellum_client.execute_code.return_value = mock_code_execution
+    mock_code_execution = CodeExecutorResponse(
+        log="Fetching URL content...",
+        output=StringVellumValue(
+            value="The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."
+        ),
+    )
+    vellum_client.execute_code.return_value = mock_code_execution
 
     uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
     first_call_input_id = uuid4_generator()
