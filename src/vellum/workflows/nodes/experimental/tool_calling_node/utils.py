@@ -143,24 +143,16 @@ def create_function_node(
         packages: Optional list of packages to install for code execution (only used for regular functions)
         runtime: The runtime to use for code execution (default: "PYTHON_3_11_6")
     """
-
     if is_workflow_class(function):
-
+        # Create a class-level wrapper that calls the original function
         def execute_function(self) -> BaseNode.Outputs:
             outputs = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
-            # first parse into json
+
             outputs = json.loads(outputs)
             arguments = outputs["arguments"]
 
-            # Dynamically define an Inputs subclass of BaseInputs
-            Inputs = type(
-                "Inputs",
-                (BaseInputs,),
-                {"__annotations__": {k: type(v) for k, v in arguments.items()}},
-            )
-
-            # Create an instance with arguments
-            inputs_instance = Inputs(**arguments)
+            # Call the function based on its type
+            inputs_instance = function.get_inputs_class()(**arguments)
 
             workflow = function()
             terminal_event = workflow.run(
