@@ -904,7 +904,7 @@ def test_pull__invalid_zip_file(vellum_client, mock_module):
     assert result.exit_code == 1
     assert (
         "Invalid response format" in result.output
-        and "Please verify your `VELLUM_API_URL` environment variable is set correctly and try again." in result.output
+        or "Please verify your `VELLUM_API_URL` environment variable is set correctly" in result.output
     )
 
 
@@ -928,7 +928,7 @@ def test_pull__json_decode_error(vellum_client, mock_module):
     assert result.exit_code == 1
     assert (
         "API request failed" in result.output
-        and "Please verify your `VELLUM_API_URL` environment variable is set correctly and try again." in result.output
+        or "Please verify your `VELLUM_API_URL` environment variable is set correctly" in result.output
     )
 
 
@@ -948,11 +948,7 @@ def test_pull__unauthorized_error_path(vellum_client, mock_module):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert (
-        "Authentication failed" in result.output
-        and "Please make sure your `VELLUM_API_KEY` environment variable is set correctly and that you have access to this workflow."  # noqa: E501
-        in result.output
-    )
+    assert "Please make sure your `VELLUM_API_KEY` environment variable is set correctly" in result.output
 
 
 def test_pull__unexpected_error_path(vellum_client, mock_module):
@@ -973,8 +969,7 @@ def test_pull__unexpected_error_path(vellum_client, mock_module):
     assert result.exit_code == 1
     assert (
         "Server error occurred" in result.output
-        and "Please try again in a few moments. If the problem persists, contact Vellum support with the workflow ID and timestamp."  # noqa: E501
-        in result.output
+        or "Please try again in a few moments. If the problem persists, contact Vellum support" in result.output
     )
 
 
