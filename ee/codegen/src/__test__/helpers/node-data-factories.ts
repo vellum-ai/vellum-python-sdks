@@ -663,7 +663,7 @@ export function promptDeploymentNodeDataFactory({
 
 export function templatingNodeFactory({
   id,
-    outputId,
+  outputId,
   label,
   sourceHandleId,
   targetHandleId,
