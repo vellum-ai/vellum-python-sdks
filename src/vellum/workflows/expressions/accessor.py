@@ -35,20 +35,37 @@ class AccessorExpression(BaseDescriptor[Any]):
             if isinstance(self._field, int):
                 raise InvalidExpressionException("Cannot access field by index on a dataclass")
 
-            return getattr(base, self._field)
+            try:
+                return getattr(base, self._field)
+            except AttributeError:
+                raise InvalidExpressionException(f"Field '{self._field}' not found on dataclass {type(base).__name__}")
 
         if isinstance(base, BaseModel):
             if isinstance(self._field, int):
                 raise InvalidExpressionException("Cannot access field by index on a BaseModel")
 
-            return getattr(base, self._field)
+            try:
+                return getattr(base, self._field)
+            except AttributeError:
+                raise InvalidExpressionException(f"Field '{self._field}' not found on BaseModel {type(base).__name__}")
 
         if isinstance(base, Mapping):
-            return base[self._field]
+            try:
+                return base[self._field]
+            except KeyError:
+                raise InvalidExpressionException(f"Key '{self._field}' not found in mapping")
 
         if isinstance(base, Sequence):
-            index = int(self._field)
-            return base[index]
+            try:
+                index = int(self._field)
+                return base[index]
+            except (IndexError, ValueError):
+                if isinstance(self._field, int) or (isinstance(self._field, str) and self._field.lstrip("-").isdigit()):
+                    raise InvalidExpressionException(
+                        f"Index {self._field} is out of bounds for sequence of length {len(base)}"
+                    )
+                else:
+                    raise InvalidExpressionException(f"Invalid index '{self._field}' for sequence access")
 
         raise InvalidExpressionException(f"Cannot get field {self._field} from {base}")
 
