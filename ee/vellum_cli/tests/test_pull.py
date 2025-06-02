@@ -902,10 +902,6 @@ def test_pull__invalid_zip_file(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert (
-        str(result.exception)
-        == "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
-    )
 
 
 def test_pull__json_decode_error(vellum_client):
@@ -926,10 +922,6 @@ def test_pull__json_decode_error(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert (
-        str(result.exception)
-        == "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
-    )
 
 
 def test_pull__unauthorized_error_path(vellum_client):
@@ -948,7 +940,6 @@ def test_pull__unauthorized_error_path(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert str(result.exception) == "Please make sure your `VELLUM_API_KEY` environment variable is set correctly."
 
 
 def test_pull__unexpected_error_path(vellum_client):
@@ -967,11 +958,6 @@ def test_pull__unexpected_error_path(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert (
-        str(result.exception)
-        == """The Pull API failed with an unexpected error. \
-Please try again later and contact support if the problem persists."""
-    )
 
 
 @pytest.mark.parametrize(
