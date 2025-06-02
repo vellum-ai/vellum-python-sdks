@@ -81,11 +81,13 @@ export class WorkflowValueDescriptorReference extends AstNode {
       }
       case "WORKFLOW_INPUT":
         return new WorkflowInputReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
       case "WORKFLOW_STATE":
         return new WorkflowStateReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
@@ -99,16 +101,19 @@ export class WorkflowValueDescriptorReference extends AstNode {
         });
       case "VELLUM_SECRET":
         return new VellumSecretWorkflowReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
       case "EXECUTION_COUNTER":
         return new ExecutionCounterWorkflowReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
       case "DICTIONARY_REFERENCE":
         return new DictionaryWorkflowReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });

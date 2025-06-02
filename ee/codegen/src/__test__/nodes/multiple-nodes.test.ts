@@ -25,8 +25,13 @@ import { ConditionalNodeContext } from "src/context/node-context/conditional-nod
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
+import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
-import { AdornmentNode, NodeOutput as NodeOutputType } from "src/types/vellum";
+import {
+  AdornmentNode,
+  NodeAttribute as NodeAttributeType,
+  NodeOutput as NodeOutputType,
+} from "src/types/vellum";
 
 describe("InlinePromptNode referenced by Conditional Node", () => {
   let workflowContext: WorkflowContext;
@@ -797,5 +802,94 @@ describe("GuardrailNode with score output as type STRING referenced by Condition
   it("getNodeFile", async () => {
     node.getNodeFile().write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
+describe("InlinePromptNode with prompt inputs generating lazy reference", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: InlinePromptNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "90c6afd3-06cc-430d-aed1-35937c062531",
+          key: "text",
+          type: "STRING",
+        },
+        workflowContext,
+      })
+    );
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "f656599c-b8be-4a1b-9935-3240018522bc",
+          key: "chat_history",
+          type: "CHAT_HISTORY",
+        },
+        workflowContext,
+      })
+    );
+
+    const templatingNodeId = uuidv4();
+    const templatingNodeOutputId = uuidv4();
+
+    const promptInputAttributes: NodeAttributeType[] = [
+      {
+        id: uuidv4(),
+        name: "prompt_inputs",
+        value: {
+          type: "DICTIONARY_REFERENCE",
+          entries: [
+            {
+              key: "text",
+              value: {
+                type: "NODE_OUTPUT",
+                nodeId: templatingNodeId,
+                nodeOutputId: templatingNodeOutputId,
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    const promptNode = inlinePromptNodeDataInlineVariantFactory({
+      blockType: "JINJA",
+    })
+      .withAttributes(promptInputAttributes)
+      .build();
+
+    const promptNodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData: promptNode,
+    })) as InlinePromptNodeContext;
+
+    const templatingNode = templatingNodeFactory({
+      id: templatingNodeId,
+      outputId: templatingNodeOutputId,
+    }).build();
+
+    await createNodeContext({
+      workflowContext,
+      nodeData: templatingNode,
+    });
+
+    node = new InlinePromptNode({
+      workflowContext,
+      nodeContext: promptNodeContext,
+    });
+  });
+
+  it("getNodeFile generates lazy reference", async () => {
+    node.getNodeFile().write(writer);
+    const output = await writer.toStringFormatted();
+    expect(output).toContain("LazyReference");
+    expect(output).toMatchSnapshot();
   });
 });
