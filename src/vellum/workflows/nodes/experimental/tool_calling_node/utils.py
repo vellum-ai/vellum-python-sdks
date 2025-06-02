@@ -15,7 +15,6 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
