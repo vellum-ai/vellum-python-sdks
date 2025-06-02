@@ -30,6 +30,8 @@ This section talks through the tooling you should be familiar with to contribute
 
 [Fern](https://buildwithfern.com/) is used to auto-generate the Vellum Python SDKs. It's a CLI tool that can generate SDKs in a variety of languages. All files not specified in the `.fernignore` file are assumed to be auto-generated and should not be modified manually. All files and directories specified there explicitly are assumed to be manually maintained and are open to direct contribution from this repository.
 
+**IMPORTANT: The `src/vellum/client` directory is auto-generated and should NEVER be manually updated.** Any changes made to files in this directory will be overwritten during the next generation run. If you need to make changes that would affect the generated client code, these changes should be backported to the [generator repository](https://github.com/vellum-ai/vellum-client-generator) instead.
+
 ### Poetry
 
 [Poetry](https://python-poetry.org/) is used to manage dependencies, build, and publish the Vellum Python SDKs. It manages a virtual environment in the `.venv` directory and allows you to install dependencies in an isolated environment. It additionally supports building and publishing to PyPI.

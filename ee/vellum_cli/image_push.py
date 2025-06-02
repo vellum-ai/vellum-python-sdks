@@ -9,9 +9,10 @@ import docker
 from docker import DockerClient
 from dotenv import load_dotenv
 
+from vellum.client.core.api_error import ApiError
 from vellum.workflows.vellum_client import create_vellum_client, create_vellum_environment
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, load_vellum_cli_config
-from vellum_cli.logger import load_cli_logger
+from vellum_cli.logger import handle_cli_error, load_cli_logger
 
 _SUPPORTED_ARCHITECTURE = "amd64"
 
@@ -82,7 +83,34 @@ def image_push_command(image: str, tags: Optional[List[str]] = None, workspace: 
             exit(1)
     else:
         logger.info("Authenticating...")
-        auth = vellum_client.container_images.docker_service_token()
+        try:
+            auth = vellum_client.container_images.docker_service_token()
+        except ApiError as e:
+            if e.status_code == 401 or e.status_code == 403:
+                handle_cli_error(
+                    logger,
+                    title="Authentication failed",
+                    message="Unable to authenticate with Vellum API. Please check your API key.",
+                    suggestion="Make sure your VELLUM_API_KEY environment variable is set correctly.",
+                )
+                return
+            elif e.status_code == 500:
+                handle_cli_error(
+                    logger,
+                    title="Server error",
+                    message="The Vellum API failed with an unexpected server error.",
+                    suggestion="Please try again later and contact support if the problem persists.",
+                )
+                return
+            else:
+                handle_cli_error(
+                    logger,
+                    title="API request failed",
+                    message=f"Failed to get Docker service token from Vellum API (HTTP {e.status_code}).",
+                    suggestion="Please check your configuration and try again. If the problem persists, "
+                    "contact support.",
+                )
+                return
 
         docker_client.login(
             username="oauth2accesstoken",
@@ -143,11 +171,38 @@ def image_push_command(image: str, tags: Optional[List[str]] = None, workspace: 
 
     logger.info(f"Updating Vellum metadata and validating image works in our system with image digest: {sha}...")
 
-    vellum_client.container_images.push_container_image(
-        name=image_name,
-        sha=sha,
-        tags=all_tags,
-    )
+    try:
+        vellum_client.container_images.push_container_image(
+            name=image_name,
+            sha=sha,
+            tags=all_tags,
+        )
+    except ApiError as e:
+        if e.status_code == 401 or e.status_code == 403:
+            handle_cli_error(
+                logger,
+                title="Authentication failed",
+                message="Unable to push container image metadata to Vellum API. Please check your API key.",
+                suggestion="Make sure your VELLUM_API_KEY environment variable is set correctly.",
+            )
+            return
+        elif e.status_code == 500:
+            handle_cli_error(
+                logger,
+                title="Server error",
+                message="The Vellum API failed with an unexpected server error while pushing container image metadata.",
+                suggestion="Please try again later and contact support if the problem persists.",
+            )
+            return
+        else:
+            handle_cli_error(
+                logger,
+                title="API request failed",
+                message=f"Failed to push container image metadata to Vellum API (HTTP {e.status_code}).",
+                suggestion="Please check your configuration and try again. If the problem persists, contact support.",
+            )
+            return
+
     logger.info(f"Image successfully pushed as {image_name} to vellum with tags: {all_tags}.")
 
 
