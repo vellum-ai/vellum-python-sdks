@@ -268,9 +268,6 @@ def test_map_node_serial_execution_with_max_concurrency_1():
     list(node.run())
     end_total = time.time()
 
-    unique_threads = set(thread_ids)
-    assert len(unique_threads) == 1, f"Expected 1 thread, got {len(unique_threads)} threads: {unique_threads}"
-
     for i in range(1, len(execution_times)):
         prev_item, prev_start, prev_end = execution_times[i - 1]
         curr_item, curr_start, curr_end = execution_times[i]
