@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any, Dict, Iterator, Type, Union
 
 from vellum.workflows.constants import undefined
@@ -8,6 +9,15 @@ from vellum.workflows.nodes.displayable.bases import BaseInlinePromptNode as Bas
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
+
+
+def strip_json_code_fences(text: str) -> str:
+    """Strip JSON code fences from text if present."""
+    pattern = r"^```(?:json)?\s*([\\s\\S]*?)```\s*$"
+    match = re.match(pattern, text.strip())
+    if match:
+        return match.group(1).strip()
+    return text
 
 
 class InlinePromptNode(BaseInlinePromptNode[StateType]):
@@ -48,26 +58,17 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
         string_outputs = []
         json_output = None
 
-        should_parse_json = False
-        if hasattr(self, "parameters"):
-            custom_params = self.parameters.custom_parameters
-            if custom_params and isinstance(custom_params, dict):
-                json_schema = custom_params.get("json_schema", {})
-                if (isinstance(json_schema, dict) and "schema" in json_schema) or custom_params.get("json_mode", {}):
-                    should_parse_json = True
-
         for output in outputs:
             if output.value is None:
                 continue
 
             if output.type == "STRING":
                 string_outputs.append(output.value)
-                if should_parse_json:
-                    try:
-                        parsed_json = json.loads(output.value)
-                        json_output = parsed_json
-                    except (json.JSONDecodeError, TypeError):
-                        pass
+                try:
+                    value_to_parse = strip_json_code_fences(output.value)
+                    json_output = json.loads(value_to_parse)
+                except (json.JSONDecodeError, TypeError):
+                    pass
             elif output.type == "JSON":
                 string_outputs.append(json.dumps(output.value, indent=4))
                 json_output = output.value

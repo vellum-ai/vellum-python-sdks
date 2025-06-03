@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any, Dict, Iterator, Type, Union
 
 from vellum.workflows.constants import undefined
@@ -8,6 +9,15 @@ from vellum.workflows.nodes.displayable.bases import BasePromptDeploymentNode as
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
+
+
+def strip_json_code_fences(text: str) -> str:
+    """Strip JSON code fences from text if present."""
+    pattern = r"^```(?:json)?\s*([\\s\\S]*?)```\s*$"
+    match = re.match(pattern, text.strip())
+    if match:
+        return match.group(1).strip()
+    return text
 
 
 class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
@@ -58,7 +68,8 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
             if output.type == "STRING":
                 string_outputs.append(output.value)
                 try:
-                    json_output = json.loads(output.value)
+                    value_to_parse = strip_json_code_fences(output.value)
+                    json_output = json.loads(value_to_parse)
                 except (json.JSONDecodeError, TypeError):
                     pass
             elif output.type == "JSON":
