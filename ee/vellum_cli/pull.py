@@ -20,7 +20,7 @@ from vellum_cli.config import (
     WorkflowDeploymentConfig,
     load_vellum_cli_config,
 )
-from vellum_cli.logger import load_cli_logger
+from vellum_cli.logger import handle_cli_error, load_cli_logger
 
 ERROR_LOG_FILE_NAME = "error.log"
 METADATA_FILE_NAME = "metadata.json"
@@ -201,16 +201,42 @@ def pull_command(
         zip_bytes = b"".join(response)
     except ApiError as e:
         if e.status_code == 401 or e.status_code == 403:
-            raise Exception("Please make sure your `VELLUM_API_KEY` environment variable is set correctly.")
-
-        if e.status_code == 500:
-            raise Exception(
-                "The Pull API failed with an unexpected error. Please try again later and contact support if the problem persists."  # noqa: E501
+            handle_cli_error(
+                logger,
+                title="Authentication failed",
+                message="Unable to authenticate with the Vellum API.",
+                suggestion="Please make sure your `VELLUM_API_KEY` environment variable is set correctly and that you have access to this workflow.",  # noqa: E501
             )
 
-        # TODO: We should return an Origin header in to validate this case
-        raise Exception(
-            "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        if e.status_code == 404:
+            handle_cli_error(
+                logger,
+                title="Workflow not found",
+                message=f"The workflow with ID '{pk}' could not be found.",
+                suggestion="Please verify the workflow ID is correct and that you have access to it in your workspace.",
+            )
+
+        if e.status_code == 500:
+            handle_cli_error(
+                logger,
+                title="Server error occurred",
+                message="The Vellum API encountered an internal server error while processing your request.",
+                suggestion="Please try again in a few moments. If the problem persists, contact Vellum support with the workflow ID and timestamp.",  # noqa: E501
+            )
+
+        if e.status_code == 502 or e.status_code == 503 or e.status_code == 504:
+            handle_cli_error(
+                logger,
+                title="Service temporarily unavailable",
+                message="The Vellum API is temporarily unavailable or experiencing high load.",
+                suggestion="Please wait a moment and try again. If the issue continues, check the Vellum status page or contact support.",  # noqa: E501
+            )
+
+        handle_cli_error(
+            logger,
+            title="API request failed",
+            message=f"The API request failed with status code {e.status_code}.",
+            suggestion="Please verify your `VELLUM_API_URL` environment variable is set correctly and try again.",
         )
 
     zip_buffer = io.BytesIO(zip_bytes)
@@ -299,8 +325,11 @@ def pull_command(
                         logger.info(f"Writing to {target_file}...")
                         target.write(content)
     except zipfile.BadZipFile:
-        raise Exception(
-            "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        handle_cli_error(
+            logger,
+            title="Invalid response format",
+            message="The API returned an invalid zip file format.",
+            suggestion="Please verify your `VELLUM_API_URL` environment variable is set correctly and try again.",
         )
 
     if include_json:

@@ -890,6 +890,7 @@ def test_pull__module_name_from_deployment_name(vellum_client):
         assert f.read() == "print('hello')"
 
 
+@pytest.mark.usefixtures("mock_module")
 def test_pull__invalid_zip_file(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
@@ -903,11 +904,12 @@ def test_pull__invalid_zip_file(vellum_client):
     # THEN the command returns an error
     assert result.exit_code == 1
     assert (
-        str(result.exception)
-        == "The API we tried to pull from returned an invalid zip file. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        "Invalid response format" in result.output
+        or "Please verify your `VELLUM_API_URL` environment variable is set correctly" in result.output
     )
 
 
+@pytest.mark.usefixtures("mock_module")
 def test_pull__json_decode_error(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
@@ -927,11 +929,12 @@ def test_pull__json_decode_error(vellum_client):
     # THEN the command returns an error
     assert result.exit_code == 1
     assert (
-        str(result.exception)
-        == "The API we tried to pull is invalid. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
+        "API request failed" in result.output
+        or "Please verify your `VELLUM_API_URL` environment variable is set correctly" in result.output
     )
 
 
+@pytest.mark.usefixtures("mock_module")
 def test_pull__unauthorized_error_path(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
@@ -948,9 +951,10 @@ def test_pull__unauthorized_error_path(vellum_client):
 
     # THEN the command returns an error
     assert result.exit_code == 1
-    assert str(result.exception) == "Please make sure your `VELLUM_API_KEY` environment variable is set correctly."
+    assert "Please make sure your `VELLUM_API_KEY` environment variable is set correctly" in result.output
 
 
+@pytest.mark.usefixtures("mock_module")
 def test_pull__unexpected_error_path(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
@@ -968,9 +972,8 @@ def test_pull__unexpected_error_path(vellum_client):
     # THEN the command returns an error
     assert result.exit_code == 1
     assert (
-        str(result.exception)
-        == """The Pull API failed with an unexpected error. \
-Please try again later and contact support if the problem persists."""
+        "Server error occurred" in result.output
+        or "Please try again in a few moments. If the problem persists, contact Vellum support" in result.output
     )
 
 
