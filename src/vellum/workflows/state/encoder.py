@@ -14,6 +14,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
+from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
 
 
@@ -55,6 +56,16 @@ class DefaultStateEncoder(JSONEncoder):
             # Technically, obj is DataclassInstance | type[DataclassInstance], but asdict expects a DataclassInstance
             # in practice, we only ever pass the former
             return asdict(obj)  # type: ignore[call-overload]
+
+        if is_workflow_class(obj):
+            from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+            workflow_display = get_workflow_display(workflow_class=obj)
+            exec_config = workflow_display.serialize()
+            return {
+                "type": "INLINE_WORKFLOW",
+                "exec_config": exec_config,
+            }
 
         if isinstance(obj, type):
             return str(obj)
