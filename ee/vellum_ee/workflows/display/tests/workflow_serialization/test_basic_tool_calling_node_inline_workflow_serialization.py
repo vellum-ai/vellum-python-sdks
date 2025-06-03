@@ -158,7 +158,7 @@ def test_serialize_workflow():
                                                                 {
                                                                     "type": "INPUT_VARIABLE",
                                                                     "data": {
-                                                                        "input_variable_id": "fa73da37-34c3-47a9-be58-69cc6cdbfca5"
+                                                                        "input_variable_id": "fa73da37-34c3-47a9-be58-69cc6cdbfca5"  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
@@ -180,7 +180,7 @@ def test_serialize_workflow():
                                                                 "inputs": [],
                                                                 "data": {
                                                                     "label": "Entrypoint Node",
-                                                                    "source_handle_id": "9914a6a0-9a99-430d-8ddd-f7c13847fe1a",
+                                                                    "source_handle_id": "9914a6a0-9a99-430d-8ddd-f7c13847fe1a",  # noqa: E501
                                                                 },
                                                                 "display_data": {"position": {"x": 0.0, "y": 0.0}},
                                                                 "base": None,
@@ -228,7 +228,7 @@ def test_serialize_workflow():
                                                                         "name": "metro",
                                                                         "value": {
                                                                             "type": "WORKFLOW_INPUT",
-                                                                            "input_variable_id": "f2f5da15-026d-4905-bfe7-7d16bda20eed",
+                                                                            "input_variable_id": "f2f5da15-026d-4905-bfe7-7d16bda20eed",  # noqa: E501
                                                                         },
                                                                     },
                                                                     {
@@ -236,7 +236,7 @@ def test_serialize_workflow():
                                                                         "name": "date",
                                                                         "value": {
                                                                             "type": "WORKFLOW_INPUT",
-                                                                            "input_variable_id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
+                                                                            "input_variable_id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",  # noqa: E501
                                                                         },
                                                                     },
                                                                 ],
@@ -261,10 +261,10 @@ def test_serialize_workflow():
                                                                 "data": {
                                                                     "label": "Final Output",
                                                                     "name": "temperature",
-                                                                    "target_handle_id": "804bb543-9cf4-457f-acf1-fb4b8b7d9259",
+                                                                    "target_handle_id": "804bb543-9cf4-457f-acf1-fb4b8b7d9259",  # noqa: E501
                                                                     "output_id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622",
                                                                     "output_type": "NUMBER",
-                                                                    "node_input_id": "712eaeec-9e1e-41bd-9217-9caec8b6ade7",
+                                                                    "node_input_id": "712eaeec-9e1e-41bd-9217-9caec8b6ade7",  # noqa: E501
                                                                 },
                                                                 "inputs": [
                                                                     {
@@ -275,8 +275,8 @@ def test_serialize_workflow():
                                                                                 {
                                                                                     "type": "NODE_OUTPUT",
                                                                                     "data": {
-                                                                                        "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                                                        "output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
+                                                                                        "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
+                                                                                        "output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",  # noqa: E501
                                                                                     },
                                                                                 }
                                                                             ],
@@ -304,10 +304,10 @@ def test_serialize_workflow():
                                                                 "data": {
                                                                     "label": "Final Output",
                                                                     "name": "reasoning",
-                                                                    "target_handle_id": "6d4c4a14-c388-4c7a-b223-eb39baf5c080",
+                                                                    "target_handle_id": "6d4c4a14-c388-4c7a-b223-eb39baf5c080",  # noqa: E501
                                                                     "output_id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82",
                                                                     "output_type": "STRING",
-                                                                    "node_input_id": "8fd4279a-4f13-4257-9577-1b55e964cdf1",
+                                                                    "node_input_id": "8fd4279a-4f13-4257-9577-1b55e964cdf1",  # noqa: E501
                                                                 },
                                                                 "inputs": [
                                                                     {
@@ -318,8 +318,8 @@ def test_serialize_workflow():
                                                                                 {
                                                                                     "type": "NODE_OUTPUT",
                                                                                     "data": {
-                                                                                        "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                                                        "output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                                                                        "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
+                                                                                        "output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",  # noqa: E501
                                                                                     },
                                                                                 }
                                                                             ],
@@ -345,26 +345,26 @@ def test_serialize_workflow():
                                                         "edges": [
                                                             {
                                                                 "id": "fb2f58f0-9d49-4658-af78-afa9b94091a6",
-                                                                "source_node_id": "afa49a0f-db35-4552-9217-5b8f237e84bc",
-                                                                "source_handle_id": "9914a6a0-9a99-430d-8ddd-f7c13847fe1a",
-                                                                "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                                "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
+                                                                "source_node_id": "afa49a0f-db35-4552-9217-5b8f237e84bc",  # noqa: E501
+                                                                "source_handle_id": "9914a6a0-9a99-430d-8ddd-f7c13847fe1a",  # noqa: E501
+                                                                "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
+                                                                "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",  # noqa: E501
                                                                 "type": "DEFAULT",
                                                             },
                                                             {
                                                                 "id": "6f16dfb8-d794-4be8-8860-6ea34f0b9e7c",
-                                                                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",
-                                                                "target_node_id": "a773c3a5-78cb-4250-8d29-7282e8a579d3",
-                                                                "target_handle_id": "804bb543-9cf4-457f-acf1-fb4b8b7d9259",
+                                                                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
+                                                                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",  # noqa: E501
+                                                                "target_node_id": "a773c3a5-78cb-4250-8d29-7282e8a579d3",  # noqa: E501
+                                                                "target_handle_id": "804bb543-9cf4-457f-acf1-fb4b8b7d9259",  # noqa: E501
                                                                 "type": "DEFAULT",
                                                             },
                                                             {
                                                                 "id": "63b77ff0-5282-46ce-8da9-37ced05ac61c",
-                                                                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",
-                                                                "target_node_id": "570f4d12-69ff-49f1-ba98-ade6283dd7c2",
-                                                                "target_handle_id": "6d4c4a14-c388-4c7a-b223-eb39baf5c080",
+                                                                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
+                                                                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",  # noqa: E501
+                                                                "target_node_id": "570f4d12-69ff-49f1-ba98-ade6283dd7c2",  # noqa: E501
+                                                                "target_handle_id": "6d4c4a14-c388-4c7a-b223-eb39baf5c080",  # noqa: E501
                                                                 "type": "DEFAULT",
                                                             },
                                                         ],
@@ -380,19 +380,19 @@ def test_serialize_workflow():
                                                         },
                                                         "output_values": [
                                                             {
-                                                                "output_variable_id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622",
+                                                                "output_variable_id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622",  # noqa: E501
                                                                 "value": {
                                                                     "type": "NODE_OUTPUT",
                                                                     "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                                    "node_output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
+                                                                    "node_output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",  # noqa: E501
                                                                 },
                                                             },
                                                             {
-                                                                "output_variable_id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82",
+                                                                "output_variable_id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82",  # noqa: E501
                                                                 "value": {
                                                                     "type": "NODE_OUTPUT",
                                                                     "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                                    "node_output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                                                    "node_output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",  # noqa: E501
                                                                 },
                                                             },
                                                         ],
@@ -466,8 +466,8 @@ def test_serialize_workflow():
                                                                 {
                                                                     "type": "NODE_OUTPUT",
                                                                     "data": {
-                                                                        "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
-                                                                        "output_id": "86dd0202-c141-48a3-8382-2da60372e77c",
+                                                                        "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",  # noqa: E501
+                                                                        "output_id": "86dd0202-c141-48a3-8382-2da60372e77c",  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
@@ -509,8 +509,8 @@ def test_serialize_workflow():
                                                                 {
                                                                     "type": "NODE_OUTPUT",
                                                                     "data": {
-                                                                        "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
-                                                                        "output_id": "0a7192da-5576-4933-bba4-de8adf5d7996",
+                                                                        "node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",  # noqa: E501
+                                                                        "output_id": "0a7192da-5576-4933-bba4-de8adf5d7996",  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
