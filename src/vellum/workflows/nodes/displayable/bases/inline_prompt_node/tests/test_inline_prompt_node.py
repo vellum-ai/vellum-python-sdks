@@ -192,7 +192,30 @@ def test_validation_with_extra_variables(vellum_adhoc_prompt_client):
     ]
 
 
-def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client):
+@pytest.mark.parametrize(
+    "custom_parameters,test_description",
+    [
+        (
+            {
+                "json_mode": False,
+                "json_schema": {
+                    "name": "get_result",
+                    "schema": {
+                        "type": "object",
+                        "required": ["result"],
+                        "properties": {"result": {"type": "string", "description": ""}},
+                    },
+                },
+            },
+            "with json_schema configured",
+        ),
+        (
+            {},
+            "without json_mode or json_schema configured",
+        ),
+    ],
+)
+def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client, custom_parameters, test_description):
     """Confirm that InlinePromptNodes output the expected JSON when run."""
 
     # GIVEN a node that subclasses InlinePromptNode
@@ -214,17 +237,7 @@ def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client):
             frequency_penalty=0.0,
             presence_penalty=0.0,
             logit_bias=None,
-            custom_parameters={
-                "json_mode": False,
-                "json_schema": {
-                    "name": "get_result",
-                    "schema": {
-                        "type": "object",
-                        "required": ["result"],
-                        "properties": {"result": {"type": "string", "description": ""}},
-                    },
-                },
-            },
+            custom_parameters=custom_parameters,
         )
 
     # AND a known JSON response from invoking an inline prompt
@@ -284,17 +297,7 @@ def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client):
             frequency_penalty=0.0,
             presence_penalty=0.0,
             logit_bias=None,
-            custom_parameters={
-                "json_mode": False,
-                "json_schema": {
-                    "name": "get_result",
-                    "schema": {
-                        "type": "object",
-                        "required": ["result"],
-                        "properties": {"result": {"type": "string", "description": ""}},
-                    },
-                },
-            },
+            custom_parameters=custom_parameters,
         ),
         request_options=mock.ANY,
         settings=None,
