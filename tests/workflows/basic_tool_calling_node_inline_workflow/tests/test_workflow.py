@@ -24,8 +24,8 @@ from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
-from tests.workflows.basic_tool_calling_node_inline_subworkflow.workflow import (
-    BasicToolCallingNodeInlineSubworkflowWorkflow,
+from tests.workflows.basic_tool_calling_node_inline_workflow.workflow import (
+    BasicToolCallingNodeInlineWorkflowWorkflow,
     WorkflowInputs,
 )
 
@@ -73,7 +73,7 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
     second_call_input_id_2 = uuid4_generator()
 
     # GIVEN a workflow that combines tool calling with a subworkflow
-    workflow = BasicToolCallingNodeInlineSubworkflowWorkflow()
+    workflow = BasicToolCallingNodeInlineWorkflowWorkflow()
 
     # WHEN the workflow is executed
     terminal_event = workflow.run(
