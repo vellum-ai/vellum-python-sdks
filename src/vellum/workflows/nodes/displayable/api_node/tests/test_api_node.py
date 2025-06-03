@@ -158,3 +158,35 @@ def test_api_node__detects_client_environment_urls__does_not_override_headers(
     # AND the vellum API should have been called with the correct headers
     assert mock_response.last_request
     assert mock_response.last_request.headers["X-API-Key"] == "vellum-api-key-5678"
+
+
+def test_api_node__detects_client_environment_urls__legacy_does_not_override_headers(
+    mock_httpx_transport, mock_requests, monkeypatch
+):
+    # GIVEN an API node with a URL pointing back to Vellum
+    class SimpleAPINodeToVellum(APINode):
+        url = "https://api.vellum.ai"
+        headers = {
+            "X_API_KEY": "vellum-api-key-5678",
+        }
+
+    # AND a mock request sent to the Vellum API would return a 200
+    mock_response = mock_requests.get(
+        "https://api.vellum.ai",
+        status_code=200,
+        json={"data": [1, 2, 3]},
+    )
+
+    # AND an api key is set
+    monkeypatch.setenv("VELLUM_API_KEY", "vellum-api-key-1234")
+
+    # WHEN we run the node
+    node = SimpleAPINodeToVellum()
+    node.run()
+
+    # THEN the execute_api method should not have been called
+    mock_httpx_transport.handle_request.assert_not_called()
+
+    # AND the vellum API should have been called with the correct headers
+    assert mock_response.last_request
+    assert mock_response.last_request.headers["X_API_KEY"] == "vellum-api-key-5678"
