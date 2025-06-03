@@ -221,3 +221,107 @@ def test_map_node_parallel_execution_with_workflow():
     # AND each item should have run on a different thread
     thread_ids_list = list(thread_ids.values())
     assert len(set(thread_ids_list)) == 3
+
+
+def test_map_node_serial_execution_with_max_concurrency_1():
+    # GIVEN a map node with max_concurrency=1 that should enforce serial execution
+    execution_times = []
+    thread_ids = []
+
+    class SerialTestNode(BaseNode):
+        item = MapNode.SubworkflowInputs.item
+
+        class Outputs(BaseOutputs):
+            output: str
+            thread_id: int
+
+        def run(self) -> Outputs:
+            start_time = time.time()
+            current_thread_id = threading.get_ident()
+            thread_ids.append(current_thread_id)
+
+            # Simulate work with a meaningful delay
+            time.sleep(0.1)
+
+            end_time = time.time()
+            execution_times.append((self.item, start_time, end_time))
+
+            return self.Outputs(output=f"item_{self.item}", thread_id=current_thread_id)
+
+    # AND a workflow that connects these nodes
+    class SerialTestWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = SerialTestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = SerialTestNode.Outputs.output
+            thread_id = SerialTestNode.Outputs.thread_id
+
+    # AND a map node with max_concurrency=1
+    class SerialMapNode(MapNode):
+        items = [1, 2, 3]
+        max_concurrency = 1
+        subworkflow = SerialTestWorkflow
+
+    # WHEN we run the map node
+    node = SerialMapNode()
+    start_total = time.time()
+    list(node.run())
+    end_total = time.time()
+
+    unique_threads = set(thread_ids)
+    assert len(unique_threads) == 1, f"Expected 1 thread, got {len(unique_threads)} threads: {unique_threads}"
+
+    for i in range(1, len(execution_times)):
+        prev_item, prev_start, prev_end = execution_times[i - 1]
+        curr_item, curr_start, curr_end = execution_times[i]
+
+        assert (
+            curr_start >= prev_end - 0.01
+        ), f"Task {curr_item} started at {curr_start} before task {prev_item} ended at {prev_end}"
+
+    total_time = end_total - start_total
+    expected_min_time = len(execution_times) * 0.1  # 0.1s per task
+    assert (
+        total_time >= expected_min_time - 0.05
+    ), f"Total time {total_time} too short for serial execution, expected at least {expected_min_time}"
+
+
+def test_map_node_event_ordering_with_max_concurrency_1():
+    # GIVEN a map node with max_concurrency=1 that should process events in order
+    execution_order = []
+
+    class EventOrderTestNode(BaseNode):
+        item = MapNode.SubworkflowInputs.item
+
+        class Outputs(BaseOutputs):
+            output: str
+
+        def run(self) -> Outputs:
+            execution_order.append(self.item)
+            # Simulate variable work time to potentially expose race conditions
+            time.sleep(0.05 + (self.item * 0.02))
+            return self.Outputs(output=f"processed_{self.item}")
+
+    class EventOrderTestWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = EventOrderTestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = EventOrderTestNode.Outputs.output
+
+    class EventOrderMapNode(MapNode):
+        items = [1, 2, 3, 4, 5]
+        max_concurrency = 1
+        subworkflow = EventOrderTestWorkflow
+
+    # WHEN we run the map node and capture events
+    node = EventOrderMapNode()
+    outputs = list(node.run())
+
+    final_outputs = [output for output in outputs if hasattr(output, "value") and isinstance(output.value, list)]
+
+    assert execution_order == [1, 2, 3, 4, 5], f"Expected serial execution order [1, 2, 3, 4, 5], got {execution_order}"
+
+    assert len(final_outputs) == 1, f"Expected 1 final output, got {len(final_outputs)}"
+    final_output_values = final_outputs[0].value
+    expected_values = ["processed_1", "processed_2", "processed_3", "processed_4", "processed_5"]
+    assert final_output_values == expected_values, f"Expected {expected_values}, got {final_output_values}"
