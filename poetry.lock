@@ -476,6 +476,20 @@ TOMLi = {version = "*", markers = "python_version < \"3.11\""}
 dev = ["pyTest", "pyTest-cov"]
 
 [[package]]
+name = "flake8-unused-arguments"
+version = "0.0.13"
+description = "flake8 extension to warn on unused function arguments"
+optional = false
+python-versions = "*"
+files = [
+    {file = "flake8-unused-arguments-0.0.13.tar.gz", hash = "sha256:c5894d294424bf7915e44dff0917222c454151016f96edc55b9f847bf307f3f7"},
+    {file = "flake8_unused_arguments-0.0.13-py3-none-any.whl", hash = "sha256:df6a76b73a6ce67720332182a80f2f0a80783cab1ccae8175f39787cd3a74b31"},
+]
+
+[package.dependencies]
+flake8 = ">3.0.0"
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -1824,4 +1838,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "495b6a45b8f5c9476683f4661a897823f77901dfc95a1b34c1c9230e92862e31"
+content-hash = "83d32e04b4e98e2fd2261224c7415f6f920364ea8dbfc94e780a558ddecef9a1"
