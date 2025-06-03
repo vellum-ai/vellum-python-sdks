@@ -67,6 +67,7 @@ flake8-breakpoint = "1.1.0"
 flake8-isort = "6.1.1"
 flake8-print = "5.0.0"
 flake8-pyproject = "1.2.3"
+flake8-unused-arguments = "^0.0.13"
 ipdb = "0.13.13"
 ipython = "8.12.3"
 isort = "5.13.2"
@@ -79,9 +80,6 @@ tomli_w = "1.1.0"
 types-PyYAML = "6.0.12.20240808"
 types-pytz = "2024.1.0.20240417"
 types-requests = "2.32.0.20240712"
-
-[tool.poetry.group.dev.dependencies]
-flake8-unused-arguments = "^0.0.13"
 
 [tool.pytest.ini_options]
 testpaths = [ "tests" ]
@@ -104,8 +102,6 @@ overrides = [
 ]
 [tool.ruff]
 line-length = 120
-
-
 
 [build-system]
 requires = ["poetry-core"]
@@ -143,3 +139,4 @@ exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows)
 max-line-length = 120
 exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/resources,src/vellum/types,tests/client,examples/workflows"
 ignore = "E203, W503, E704, U100, U101"
+per-file-ignores = "ee/vellum_cli/tests/test_pull.py:, ee/vellum_cli/tests/test_image_push.py:"

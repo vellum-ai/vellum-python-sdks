@@ -745,7 +745,7 @@ def test_pull__same_pull_twice__one_entry_in_lockfile(vellum_client, mock_module
     zip_contents = _zip_file_map({"workflow.py": "print('hello')"})
     responses = iter([zip_contents, zip_contents])
 
-    def workflows_pull_side_effect(*args, **kwargs):
+    def workflows_pull_side_effect(*_args, **_kwargs):
         return iter([next(responses)])
 
     vellum_client.workflows.pull.side_effect = workflows_pull_side_effect
@@ -890,8 +890,7 @@ def test_pull__module_name_from_deployment_name(vellum_client):
         assert f.read() == "print('hello')"
 
 
-@pytest.mark.usefixtures("mock_module")
-def test_pull__invalid_zip_file(vellum_client):
+def test_pull__invalid_zip_file(vellum_client, mock_module):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN a workflow pull API call returns an invalid zip file
@@ -899,7 +898,9 @@ def test_pull__invalid_zip_file(vellum_client):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+    result = runner.invoke(
+        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
+    )
 
     # THEN the command returns an error
     assert result.exit_code == 1
@@ -909,8 +910,7 @@ def test_pull__invalid_zip_file(vellum_client):
     )
 
 
-@pytest.mark.usefixtures("mock_module")
-def test_pull__json_decode_error(vellum_client):
+def test_pull__json_decode_error(vellum_client, mock_module):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN a workflow pull API call that returns a generator which raises an error when consumed
@@ -924,7 +924,9 @@ def test_pull__json_decode_error(vellum_client):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+    result = runner.invoke(
+        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
+    )
 
     # THEN the command returns an error
     assert result.exit_code == 1
@@ -934,8 +936,7 @@ def test_pull__json_decode_error(vellum_client):
     )
 
 
-@pytest.mark.usefixtures("mock_module")
-def test_pull__unauthorized_error_path(vellum_client):
+def test_pull__unauthorized_error_path(vellum_client, mock_module):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN an unauthorized error with the error message from the API
@@ -947,15 +948,16 @@ def test_pull__unauthorized_error_path(vellum_client):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+    result = runner.invoke(
+        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
+    )
 
     # THEN the command returns an error
     assert result.exit_code == 1
     assert "Please make sure your `VELLUM_API_KEY` environment variable is set correctly" in result.output
 
 
-@pytest.mark.usefixtures("mock_module")
-def test_pull__unexpected_error_path(vellum_client):
+def test_pull__unexpected_error_path(vellum_client, mock_module):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN an unauthorized error with the error message from the API
@@ -967,7 +969,9 @@ def test_pull__unexpected_error_path(vellum_client):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+    result = runner.invoke(
+        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
+    )
 
     # THEN the command returns an error
     assert result.exit_code == 1
