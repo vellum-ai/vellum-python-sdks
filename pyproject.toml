@@ -102,6 +102,9 @@ overrides = [
 [tool.ruff]
 line-length = 120
 
+[tool.ruff.lint]
+select = ["ARG001"]
+
 
 [build-system]
 requires = ["poetry-core"]
