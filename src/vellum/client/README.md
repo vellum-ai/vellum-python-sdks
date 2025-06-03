@@ -20,7 +20,7 @@ pip install vellum-ai
 
 ## Reference
 
-A full reference for this library is available [here](./reference.md).
+A full reference for this library is available [here](https://github.com/vellum-ai/vellum-python-sdks/blob/HEAD/./reference.md).
 
 ## Usage
 

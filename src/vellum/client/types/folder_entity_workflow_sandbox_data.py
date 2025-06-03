@@ -14,6 +14,7 @@ class FolderEntityWorkflowSandboxData(UniversalBaseModel):
     created: dt.datetime
     modified: dt.datetime
     status: EntityStatus
+    description: typing.Optional[str] = None
     last_deployed_on: typing.Optional[dt.datetime] = None
 
     if IS_PYDANTIC_V2:

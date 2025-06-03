@@ -32,7 +32,6 @@ class DocumentRead(UniversalBaseModel):
     """
 
     original_file_url: typing.Optional[str] = None
-    processed_file_url: typing.Optional[str] = None
     document_to_document_indexes: typing.List[DocumentDocumentToDocumentIndex]
     metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """

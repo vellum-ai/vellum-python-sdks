@@ -18,7 +18,7 @@ class BaseClientWrapper:
         headers: typing.Dict[str, str] = {
             "X-Fern-Language": "Python",
             "X-Fern-SDK-Name": "vellum-ai",
-            "X-Fern-SDK-Version": "0.14.65",
+            "X-Fern-SDK-Version": "0.14.66",
         }
         headers["X-API-KEY"] = self.api_key
         return headers
