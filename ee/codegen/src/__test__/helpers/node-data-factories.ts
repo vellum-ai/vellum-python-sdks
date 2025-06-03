@@ -663,6 +663,7 @@ export function promptDeploymentNodeDataFactory({
 
 export function templatingNodeFactory({
   id,
+  outputId,
   label,
   sourceHandleId,
   targetHandleId,
@@ -673,6 +674,7 @@ export function templatingNodeFactory({
   template,
 }: {
   id?: string;
+  outputId?: string;
   label?: string;
   sourceHandleId?: string;
   targetHandleId?: string;
@@ -711,7 +713,7 @@ export function templatingNodeFactory({
     type: WorkflowNodeType.TEMPLATING,
     data: {
       label: label ?? "Templating Node",
-      outputId: "2d4f1826-de75-499a-8f84-0a690c8136ad",
+      outputId: outputId ?? "2d4f1826-de75-499a-8f84-0a690c8136ad",
       errorOutputId,
       sourceHandleId: sourceHandleId ?? "6ee2c814-d0a5-4ec9-83b6-45156e2f22c4",
       targetHandleId: targetHandleId ?? "3960c8e1-9baa-4b9c-991d-e399d16a45aa",

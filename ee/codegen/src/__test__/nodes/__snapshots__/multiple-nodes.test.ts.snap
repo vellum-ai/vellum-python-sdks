@@ -169,6 +169,34 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 "
 `;
 
+exports[`InlinePromptNode with prompt inputs generating lazy reference > getNodeFile generates lazy reference 1`] = `
+"from vellum import JinjaPromptBlock, PromptParameters
+from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.references import LazyReference
+
+
+class PromptNode(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
+    ]
+    prompt_inputs = {
+        "text": LazyReference("TemplatingNode.Outputs.result"),
+    }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0,
+        max_tokens=1000,
+        top_p=1,
+        top_k=0,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logit_bias={},
+        custom_parameters={},
+    )
+"
+`;
+
 exports[`Non-existent Subworkflow Deployment Node referenced by Templating Node > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
