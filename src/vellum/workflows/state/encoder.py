@@ -57,16 +57,6 @@ class DefaultStateEncoder(JSONEncoder):
             # in practice, we only ever pass the former
             return asdict(obj)  # type: ignore[call-overload]
 
-        if is_workflow_class(obj):
-            from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-
-            workflow_display = get_workflow_display(workflow_class=obj)
-            exec_config = workflow_display.serialize()
-            return {
-                "type": "INLINE_WORKFLOW",
-                "exec_config": exec_config,
-            }
-
         if isinstance(obj, type):
             return str(obj)
 
