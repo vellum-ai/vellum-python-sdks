@@ -251,9 +251,7 @@ class ArrayVellumValue extends AstNode {
     iterableConfig?: IterableConfig
   ): AstNode {
     if (!Array.isArray(value)) {
-      throw new ValueGenerationError(
-        "Expected array value for ArrayVellumValue"
-      );
+      return python.TypeInstantiation.none();
     }
 
     const astNode = python.TypeInstantiation.list(
