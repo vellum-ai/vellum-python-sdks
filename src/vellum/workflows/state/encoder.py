@@ -14,7 +14,6 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
-from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
 
 
