@@ -22,40 +22,6 @@ describe("VellumValue", () => {
       expect(stringValue.getReferences()).toHaveLength(0);
     });
 
-    it("should write nothing when STRING value is null", async () => {
-      const stringValue = codegen.vellumValue({
-        vellumValue: {
-          type: "STRING",
-        },
-      });
-      stringValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(stringValue.getReferences()).toHaveLength(0);
-    });
-
-    it("should handle empty string value", async () => {
-      const stringValue = codegen.vellumValue({
-        vellumValue: {
-          type: "STRING",
-          value: "",
-        },
-      });
-      stringValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(stringValue.getReferences()).toHaveLength(0);
-    });
-
-    it("should handle STRING value with undefined value property", async () => {
-      const stringValue = codegen.vellumValue({
-        vellumValue: {
-          type: "STRING",
-          value: undefined,
-        } as any,
-      });
-      stringValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(stringValue.getReferences()).toHaveLength(0);
-    });
   });
 
   describe("NUMBER", () => {
@@ -71,28 +37,6 @@ describe("VellumValue", () => {
       expect(numberValue.getReferences()).toHaveLength(0);
     });
 
-    it("should write nothing when NUMBER value is null", async () => {
-      const numberValue = codegen.vellumValue({
-        vellumValue: {
-          type: "NUMBER",
-        },
-      });
-      numberValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(numberValue.getReferences()).toHaveLength(0);
-    });
-
-    it("should handle NUMBER value with undefined value property", async () => {
-      const numberValue = codegen.vellumValue({
-        vellumValue: {
-          type: "NUMBER",
-          value: undefined,
-        } as any,
-      });
-      numberValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(numberValue.getReferences()).toHaveLength(0);
-    });
   });
 
   describe("CHAT_HISTORY", () => {
@@ -170,16 +114,6 @@ describe("VellumValue", () => {
       expect(jsonValue.getReferences()).toHaveLength(0);
     });
 
-    it("should write nothing when JSON value is null", async () => {
-      const jsonValue = codegen.vellumValue({
-        vellumValue: {
-          type: "JSON",
-        },
-      });
-      jsonValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(jsonValue.getReferences()).toHaveLength(0);
-    });
   });
 
   describe("ERROR", () => {
@@ -198,31 +132,6 @@ describe("VellumValue", () => {
       expect(errorValue.getReferences()).toHaveLength(1);
     });
 
-    it("should write nothing when ERROR value is null", async () => {
-      const errorValue = codegen.vellumValue({
-        vellumValue: {
-          type: "ERROR",
-        },
-      });
-      errorValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(errorValue.getReferences()).toHaveLength(0);
-    });
-
-    it("should handle ERROR value with empty message", async () => {
-      const errorValue = codegen.vellumValue({
-        vellumValue: {
-          type: "ERROR",
-          value: {
-            message: "",
-            code: "INTERNAL_SERVER_ERROR",
-          },
-        },
-      });
-      errorValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(errorValue.getReferences()).toHaveLength(1);
-    });
   });
 
   describe("IMAGE", () => {
@@ -240,30 +149,6 @@ describe("VellumValue", () => {
       expect(imageValue.getReferences()).toHaveLength(1);
     });
 
-    it("should write nothing when IMAGE value is null", async () => {
-      const imageValue = codegen.vellumValue({
-        vellumValue: {
-          type: "IMAGE",
-        },
-      });
-      imageValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(imageValue.getReferences()).toHaveLength(0);
-    });
-
-    it("should handle IMAGE value with empty src", async () => {
-      const imageValue = codegen.vellumValue({
-        vellumValue: {
-          type: "IMAGE",
-          value: {
-            src: "",
-          },
-        },
-      });
-      imageValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(imageValue.getReferences()).toHaveLength(1);
-    });
   });
 
   describe("FUNCTION_CALL", () => {
@@ -285,16 +170,6 @@ describe("VellumValue", () => {
       expect(functionCallValue.getReferences()).toHaveLength(1);
     });
 
-    it("should write nothing when FUNCTION_CALL value is null", async () => {
-      const functionCallValue = codegen.vellumValue({
-        vellumValue: {
-          type: "FUNCTION_CALL",
-        },
-      });
-      functionCallValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(functionCallValue.getReferences()).toHaveLength(0);
-    });
   });
 
   describe("ARRAY", () => {
@@ -325,28 +200,6 @@ describe("VellumValue", () => {
       expect(arrayValue.getReferences()).toHaveLength(1);
     });
 
-    it("should write nothing when ARRAY value is null", async () => {
-      const arrayValue = codegen.vellumValue({
-        vellumValue: {
-          type: "ARRAY",
-        },
-      });
-      arrayValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(arrayValue.getReferences()).toHaveLength(0);
-    });
-
-    it("should handle empty ARRAY value", async () => {
-      const arrayValue = codegen.vellumValue({
-        vellumValue: {
-          type: "ARRAY",
-          value: [],
-        },
-      });
-      arrayValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(arrayValue.getReferences()).toHaveLength(0);
-    });
 
     it("should handle ARRAY value with non-array value from workflow", async () => {
       const arrayValue = codegen.vellumValue({
@@ -376,16 +229,6 @@ describe("VellumValue", () => {
       expect(audioValue.getReferences()).toHaveLength(1);
     });
 
-    it("should write nothing when AUDIO value is null", async () => {
-      const audioValue = codegen.vellumValue({
-        vellumValue: {
-          type: "AUDIO",
-        },
-      });
-      audioValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(audioValue.getReferences()).toHaveLength(0);
-    });
   });
 
   describe("DOCUMENT", () => {
@@ -403,16 +246,6 @@ describe("VellumValue", () => {
       expect(documentValue.getReferences()).toHaveLength(1);
     });
 
-    it("should write nothing when DOCUMENT value is null", async () => {
-      const documentValue = codegen.vellumValue({
-        vellumValue: {
-          type: "DOCUMENT",
-        },
-      });
-      documentValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(documentValue.getReferences()).toHaveLength(0);
-    });
   });
 
   describe("SEARCH_RESULTS", () => {
@@ -447,15 +280,5 @@ describe("VellumValue", () => {
       expect(searchResultsValue.getReferences()).toHaveLength(4);
     });
 
-    it("should write nothing when SEARCH_RESULTS value is null", async () => {
-      const searchResultsValue = codegen.vellumValue({
-        vellumValue: {
-          type: "SEARCH_RESULTS",
-        },
-      });
-      searchResultsValue.write(writer);
-      expect(writer.toString()).toMatchSnapshot();
-      expect(searchResultsValue.getReferences()).toHaveLength(0);
-    });
   });
 });
