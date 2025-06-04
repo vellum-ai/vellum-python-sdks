@@ -8,7 +8,7 @@ import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
 import { NodeOutputNotFoundError } from "src/generators/errors";
 import { NodePort as NodePortType, WorkflowDataNode } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { toPythonSafeSnakeCaseWithCasePreservation } from "src/utils/casing";
 import { getNodeLabel } from "src/utils/nodes";
 import {
   doesModulePathStartWith,
@@ -172,18 +172,7 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       );
     }
 
-    // For subworkflow deployment nodes, preserve case in output names
-    if (
-      this.nodeData.type === "SUBWORKFLOW" &&
-      this.nodeData.data.variant === "DEPLOYMENT"
-    ) {
-      const isValidPythonIdentifier = /^[a-zA-Z][a-zA-Z0-9]*$/.test(nodeOutputName);
-      if (isValidPythonIdentifier) {
-        return nodeOutputName;
-      }
-    }
-
-    return toPythonSafeSnakeCase(nodeOutputName, "output");
+    return toPythonSafeSnakeCaseWithCasePreservation(nodeOutputName, "output");
   }
 
   public getNodeOutputTypeById(

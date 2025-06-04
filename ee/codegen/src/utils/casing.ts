@@ -88,6 +88,26 @@ export function toPythonSafeSnakeCase(
   return startsWithUnsafe ? cleanedSafetyPrefix + snakeCase : snakeCase;
 }
 
+export function toPythonSafeSnakeCaseWithCasePreservation(
+  str: string,
+  safetyPrefix: string = "_"
+): string {
+  // Strip special characters from start of string
+  const cleanedStr = str.replace(/^[^a-zA-Z0-9_]+/, "");
+
+  // Check if cleaned string starts with a number or an underscore
+  const startsWithUnsafe = /^[\d_]/.test(cleanedStr);
+
+  // Check if the string is already a valid Python identifier (preserve case)
+  const isValidPythonIdentifier = /^[a-zA-Z][a-zA-Z0-9]*$/.test(cleanedStr);
+
+  if (isValidPythonIdentifier && !startsWithUnsafe) {
+    return cleanedStr;
+  }
+
+  return toPythonSafeSnakeCase(str, safetyPrefix);
+}
+
 export function removeEscapeCharacters(str: string): string {
   return str.replace(/\\"/g, '"');
 }

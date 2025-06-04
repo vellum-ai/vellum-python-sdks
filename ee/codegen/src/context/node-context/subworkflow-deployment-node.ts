@@ -6,7 +6,7 @@ import { BaseNodeContext } from "./base";
 import { PortContext } from "src/context/port-context";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { toPythonSafeSnakeCaseWithCasePreservation } from "src/utils/casing";
 import { isVellumErrorWithDetail } from "src/utils/nodes";
 
 export class SubworkflowDeploymentNodeContext extends BaseNodeContext<SubworkflowNodeType> {
@@ -25,8 +25,7 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
       Record<string, string>
     >(
       (acc, output) => {
-        const isValidPythonIdentifier = /^[a-zA-Z][a-zA-Z0-9]*$/.test(output.key);
-        acc[output.id] = isValidPythonIdentifier ? output.key : toPythonSafeSnakeCase(output.key, "output");
+        acc[output.id] = toPythonSafeSnakeCaseWithCasePreservation(output.key, "output");
         return acc;
       },
       { ...(errorOutputId ? { [errorOutputId]: "error" } : {}) }
