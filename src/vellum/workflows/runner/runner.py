@@ -398,9 +398,7 @@ class WorkflowRunner(Generic[StateType]):
             return
 
         for port in ports:
-            nodes_to_fork = []
             for edge in port.edges:
-                nodes_to_fork.append(edge.to_node)
                 if port.fork_state:
                     next_state = deepcopy(state)
                     self._state_forks.add(next_state)
@@ -411,21 +409,6 @@ class WorkflowRunner(Generic[StateType]):
                     self._concurrency_queue.put((next_state, edge.to_node, invoked_by))
                 else:
                     self._run_node_if_ready(next_state, edge.to_node, invoked_by)
-                if invoked_by:
-                    previous_node = state.meta.node_execution_cache.__node_execution_lookup__.get(invoked_by)
-                    if previous_node:
-                        previous_node_fork_id = state.meta.node_execution_cache.__node_to_fork_id__.get(previous_node)
-                        if previous_node_fork_id:
-                            state.meta.node_execution_cache.__node_to_fork_id__[edge.to_node] = previous_node_fork_id
-                            # Remove previous node fork in __node_to_fork_id__
-                            state.meta.node_execution_cache.__node_to_fork_id__.pop(previous_node, None)
-
-            # If there are multiple edges, we need to create a fork ID
-            if len(nodes_to_fork) > 1:
-                fork_id = uuid4()
-                state.meta.node_execution_cache.__all_fork_ids__.add(fork_id)
-                for node in nodes_to_fork:
-                    state.meta.node_execution_cache.__node_to_fork_id__[node] = fork_id
 
         if self._max_concurrency:
             num_nodes_to_run = self._max_concurrency - len(self._active_nodes_by_execution_id)
