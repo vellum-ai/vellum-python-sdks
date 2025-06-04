@@ -1,5 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`VellumValue > ARRAY > should handle ARRAY value with non-array value from workflow 1`] = `"None"`;
+
+exports[`VellumValue > ARRAY > should handle empty ARRAY value 1`] = `"[]"`;
+
 exports[`VellumValue > ARRAY > should write a ARRAY value correctly 1`] = `
 "[
     "Hello, World!",
@@ -9,10 +13,14 @@ exports[`VellumValue > ARRAY > should write a ARRAY value correctly 1`] = `
 "
 `;
 
+exports[`VellumValue > ARRAY > should write nothing when ARRAY value is null 1`] = `"None"`;
+
 exports[`VellumValue > AUDIO > should write a AUDIO value correctly 1`] = `
 "VellumAudio(src="https://example.com/audio.mp3")
 "
 `;
+
+exports[`VellumValue > AUDIO > should write nothing when AUDIO value is null 1`] = `"None"`;
 
 exports[`VellumValue > CHAT_HISTORY > should write a CHAT_HISTORY value with a string content 1`] = `"[ChatMessage(role="USER", content=StringChatMessageContent(value="Hello, AI!")),]"`;
 
@@ -27,10 +35,16 @@ exports[`VellumValue > DOCUMENT > should write a DOCUMENT value correctly 1`] = 
 "
 `;
 
+exports[`VellumValue > DOCUMENT > should write nothing when DOCUMENT value is null 1`] = `"None"`;
+
+exports[`VellumValue > ERROR > should handle ERROR value with empty message 1`] = `"VellumError(message="", code="INTERNAL_SERVER_ERROR")"`;
+
 exports[`VellumValue > ERROR > should write a ERROR value correctly 1`] = `
 "VellumError(message="This is an error!", code="INTERNAL_SERVER_ERROR")
 "
 `;
+
+exports[`VellumValue > ERROR > should write nothing when ERROR value is null 1`] = `"None"`;
 
 exports[`VellumValue > FUNCTION_CALL > should write a FUNCTION_CALL value correctly 1`] = `
 "FunctionCall(
@@ -43,10 +57,16 @@ exports[`VellumValue > FUNCTION_CALL > should write a FUNCTION_CALL value correc
 "
 `;
 
+exports[`VellumValue > FUNCTION_CALL > should write nothing when FUNCTION_CALL value is null 1`] = `"None"`;
+
+exports[`VellumValue > IMAGE > should handle IMAGE value with empty src 1`] = `"VellumImage(src="")"`;
+
 exports[`VellumValue > IMAGE > should write a IMAGE value correctly 1`] = `
 "VellumImage(src="https://example.com/image.png")
 "
 `;
+
+exports[`VellumValue > IMAGE > should write nothing when IMAGE value is null 1`] = `"None"`;
 
 exports[`VellumValue > JSON > should write a JSON value correctly 1`] = `
 "{
@@ -62,10 +82,16 @@ exports[`VellumValue > JSON > should write a JSON value correctly 1`] = `
 "
 `;
 
+exports[`VellumValue > JSON > should write nothing when JSON value is null 1`] = `"None"`;
+
+exports[`VellumValue > NUMBER > should handle NUMBER value with undefined value property 1`] = `"None"`;
+
 exports[`VellumValue > NUMBER > should write a NUMBER value correctly 1`] = `
 "42
 "
 `;
+
+exports[`VellumValue > NUMBER > should write nothing when NUMBER value is null 1`] = `"None"`;
 
 exports[`VellumValue > SEARCH_RESULTS > should write a SEARCH_RESULTS value correctly 1`] = `
 "[
@@ -85,7 +111,15 @@ exports[`VellumValue > SEARCH_RESULTS > should write a SEARCH_RESULTS value corr
 "
 `;
 
+exports[`VellumValue > SEARCH_RESULTS > should write nothing when SEARCH_RESULTS value is null 1`] = `"None"`;
+
+exports[`VellumValue > STRING > should handle STRING value with undefined value property 1`] = `"None"`;
+
+exports[`VellumValue > STRING > should handle empty string value 1`] = `""""`;
+
 exports[`VellumValue > STRING > should write a STRING value correctly 1`] = `
 ""Hello, World!"
 "
 `;
+
+exports[`VellumValue > STRING > should write nothing when STRING value is null 1`] = `"None"`;
