@@ -898,9 +898,7 @@ def test_pull__invalid_zip_file(vellum_client, mock_module):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(
-        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
-    )
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
 
     # THEN the command returns an error
     assert result.exit_code == 1
@@ -924,9 +922,7 @@ def test_pull__json_decode_error(vellum_client, mock_module):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(
-        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
-    )
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
 
     # THEN the command returns an error
     assert result.exit_code == 1
@@ -948,9 +944,7 @@ def test_pull__unauthorized_error_path(vellum_client, mock_module):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(
-        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
-    )
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
 
     # THEN the command returns an error
     assert result.exit_code == 1
@@ -969,9 +963,7 @@ def test_pull__unexpected_error_path(vellum_client, mock_module):
 
     # WHEN the user runs the pull command
     runner = CliRunner()
-    result = runner.invoke(
-        cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment], cwd=mock_module.temp_dir
-    )
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
 
     # THEN the command returns an error
     assert result.exit_code == 1
