@@ -4,12 +4,12 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { BaseState } from "src/generators/base-state";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
-export class FinalOutputNode extends BaseSingleFileNode<
+export class FinalOutputNode extends BaseNode<
   FinalOutputNodeType,
   FinalOutputNodeContext
 > {

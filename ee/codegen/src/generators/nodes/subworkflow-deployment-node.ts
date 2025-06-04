@@ -7,13 +7,13 @@ import {
   NodeAttributeGenerationError,
   NodeDefinitionGenerationError,
 } from "src/generators/errors";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
 
 const INPUTS_PREFIX = "subworkflow_inputs";
 
-export class SubworkflowDeploymentNode extends BaseSingleFileNode<
+export class SubworkflowDeploymentNode extends BaseNode<
   SubworkflowNodeType,
   SubworkflowDeploymentNodeContext
 > {

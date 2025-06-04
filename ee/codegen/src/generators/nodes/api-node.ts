@@ -6,13 +6,13 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";
 
 const BODY_INPUT_KEY = "body";
 const JSON_ATTRIBUTE_NAME = "json";
 
-export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
+export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     if (nodeInputKey === BODY_INPUT_KEY) {
       // This field was renamed in the SDK for consistency with `requests` pip package

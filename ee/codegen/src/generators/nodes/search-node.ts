@@ -14,19 +14,19 @@ import {
   NodeAttributeGenerationError,
   ValueGenerationError,
 } from "src/generators/errors";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   ConstantValuePointer,
   SearchNode as SearchNodeType,
-  VellumLogicalCondition as VellumLogicalConditionType,
   VellumLogicalConditionGroup as VellumLogicalConditionGroupType,
-  VellumLogicalExpression as VellumLogicalExpressionType,
+  VellumLogicalCondition as VellumLogicalConditionType,
   VellumLogicalExpression,
+  VellumLogicalExpression as VellumLogicalExpressionType,
 } from "src/types/vellum";
 import { isUnaryOperator } from "src/utils/nodes";
 
-export class SearchNode extends BaseSingleFileNode<
+export class SearchNode extends BaseNode<
   SearchNodeType,
   TextSearchNodeContext
 > {

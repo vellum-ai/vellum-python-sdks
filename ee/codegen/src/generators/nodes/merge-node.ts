@@ -3,13 +3,10 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { MergeNodeContext } from "src/context/node-context/merge-node";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { MergeNode as MergeNodeType } from "src/types/vellum";
 
-export class MergeNode extends BaseSingleFileNode<
-  MergeNodeType,
-  MergeNodeContext
-> {
+export class MergeNode extends BaseNode<MergeNodeType, MergeNodeContext> {
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
