@@ -890,7 +890,8 @@ def test_pull__module_name_from_deployment_name(vellum_client):
         assert f.read() == "print('hello')"
 
 
-def test_pull__invalid_zip_file(vellum_client, mock_module):
+@pytest.mark.usefixtures("mock_module")
+def test_pull__invalid_zip_file(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN a workflow pull API call returns an invalid zip file
@@ -908,7 +909,8 @@ def test_pull__invalid_zip_file(vellum_client, mock_module):
     )
 
 
-def test_pull__json_decode_error(vellum_client, mock_module):
+@pytest.mark.usefixtures("mock_module")
+def test_pull__json_decode_error(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN a workflow pull API call that returns a generator which raises an error when consumed
@@ -932,7 +934,8 @@ def test_pull__json_decode_error(vellum_client, mock_module):
     )
 
 
-def test_pull__unauthorized_error_path(vellum_client, mock_module):
+@pytest.mark.usefixtures("mock_module")
+def test_pull__unauthorized_error_path(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN an unauthorized error with the error message from the API
@@ -951,7 +954,8 @@ def test_pull__unauthorized_error_path(vellum_client, mock_module):
     assert "Please make sure your `VELLUM_API_KEY` environment variable is set correctly" in result.output
 
 
-def test_pull__unexpected_error_path(vellum_client, mock_module):
+@pytest.mark.usefixtures("mock_module")
+def test_pull__unexpected_error_path(vellum_client):
     workflow_deployment = "test-workflow-deployment-id"
 
     # GIVEN an unauthorized error with the error message from the API
