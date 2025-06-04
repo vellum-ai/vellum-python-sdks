@@ -10,6 +10,7 @@ import {
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { BasePersistedFile } from "src/generators/base-persisted-file";
 import {
   BaseCodegenError,
   NodeAttributeGenerationError,
@@ -52,6 +53,8 @@ export abstract class BaseNode<
 
   private readonly errorOutputId: string | undefined;
 
+  skipFormatting: boolean = false;
+
   constructor({ workflowContext, nodeContext }: BaseNode.Args<T, V>) {
     this.workflowContext = workflowContext;
     this.nodeContext = nodeContext;
@@ -65,7 +68,20 @@ export abstract class BaseNode<
     this.errorOutputId = this.getErrorOutputId();
   }
 
-  public abstract persist(): Promise<void>;
+  public async persist(): Promise<void> {
+    await Promise.all([
+      this.getNodeFile().persist(this.skipFormatting),
+      this.getNodeDisplayFile().persist(),
+    ]);
+  }
+
+  public getNodeFile(): NodeImplementationFile<T, V> {
+    return new NodeImplementationFile({ node: this });
+  }
+
+  public getNodeDisplayFile(): NodeDisplayFile<T, V> {
+    return new NodeDisplayFile({ node: this });
+  }
 
   protected abstract getNodeClassBodyStatements(): AstNode[];
 
@@ -709,5 +725,67 @@ export abstract class BaseNode<
 
     const value = attributeValue.value;
     return value.type === "JSON" ? value.value : value;
+  }
+}
+
+declare namespace NodeImplementationFile {
+  interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
+    node: BaseNode<T, V>;
+  }
+}
+
+class NodeImplementationFile<
+  T extends WorkflowDataNode,
+  V extends BaseNodeContext<T>
+> extends BasePersistedFile {
+  private readonly node: BaseNode<T, V>;
+
+  constructor({ node }: NodeImplementationFile.Args<T, V>) {
+    super({ workflowContext: node.workflowContext, isInitFile: false });
+
+    this.node = node;
+  }
+
+  protected getModulePath(): string[] {
+    return this.node.getNodeModulePath();
+  }
+
+  protected getFileStatements(): AstNode[] {
+    return [this.node.generateNodeClass()];
+  }
+
+  public async persist(skipFormatting: boolean = false): Promise<void> {
+    await super.persist(skipFormatting);
+  }
+}
+
+declare namespace NodeDisplayFile {
+  interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
+    node: BaseNode<T, V>;
+  }
+}
+
+class NodeDisplayFile<
+  T extends WorkflowDataNode,
+  V extends BaseNodeContext<T>
+> extends BasePersistedFile {
+  private readonly node: BaseNode<T, V>;
+
+  constructor({ node }: NodeDisplayFile.Args<T, V>) {
+    super({ workflowContext: node.workflowContext, isInitFile: false });
+
+    this.node = node;
+  }
+
+  protected getModulePath(): string[] {
+    return this.node.getNodeDisplayModulePath();
+  }
+
+  protected getFileStatements(): AstNode[] {
+    return this.node.generateNodeDisplayClasses();
+  }
+
+  public async persist(skipFormatting: boolean = false): Promise<void> {
+    await super.persist(skipFormatting);
   }
 }

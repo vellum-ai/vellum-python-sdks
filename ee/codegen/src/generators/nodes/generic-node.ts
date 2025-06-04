@@ -11,7 +11,7 @@ import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import {
   AttributeConfig,
   AttributeType,
@@ -27,10 +27,7 @@ interface FunctionArgs {
   definition: FunctionDefinition;
 }
 
-export class GenericNode extends BaseSingleFileNode<
-  GenericNodeType,
-  GenericNodeContext
-> {
+export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private functionsToGenerate: Array<{
     functionName: string;
     content: string;
