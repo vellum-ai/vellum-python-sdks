@@ -977,6 +977,27 @@ def test_pull__unexpected_error_path(vellum_client):
     )
 
 
+@pytest.mark.usefixtures("mock_module")
+def test_pull__not_found_error_path(vellum_client):
+    workflow_deployment = "nonexistent-workflow-id"
+
+    # GIVEN a not found error with the error message from the API
+    def mock_error_generator():
+        yield b""
+        raise ApiError(status_code=404, body={"detail": "Workflow not found"})
+
+    vellum_client.workflows.pull.return_value = mock_error_generator()
+
+    # WHEN the user runs the pull command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
+
+    # THEN the command returns an error
+    assert result.exit_code == 1
+    assert "Workflow not found" in result.output
+    assert f"The workflow with ID '{workflow_deployment}' could not be found" in result.output
+
+
 @pytest.mark.parametrize(
     "workflow_deployment",
     [
