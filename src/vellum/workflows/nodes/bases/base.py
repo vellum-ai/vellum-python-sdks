@@ -391,12 +391,14 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
                             current_execution_id
                         )
 
-                        # If we've found our target node class in the chain, we're in a loop
+                        # If we've found our target node class in the chain
                         if current_node_class == cls.node_class:
-                            # If the founded execution ID is the same as the latest fulfilled execution ID, we're in a loop
+                            # Check if the execution id is the same as the latest fulfilled execution id
+                            # If yes, we're in a loop
                             if current_execution_id == current_latest_fulfilled_id:
                                 in_loop = True
-                            # If the founded execution ID is not the same as the latest fulfilled execution ID, we're not in a loop
+                            # If not, current node has been triggered by other node,
+                            # we can break out of the loop
                             break
 
             for queued_node_execution_id in state.meta.node_execution_cache._node_executions_queued[cls.node_class]:
