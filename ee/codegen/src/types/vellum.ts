@@ -8,6 +8,7 @@ import {
   ChatHistoryInput,
   ChatMessageRequest,
   ChatMessageRole,
+  FunctionDefinition,
   JsonInput,
   NumberInput,
   PromptBlockState,
@@ -799,6 +800,7 @@ export interface ExecutionCounterWorkflowReference {
 }
 
 export interface DictionaryWorkflowReferenceEntry {
+  id?: string;
   key: string;
   value: WorkflowValueDescriptor | null;
 }
@@ -876,4 +878,10 @@ export interface IterableConfig {
 
 export interface AttributeConfig {
   lhs: python.Reference;
+}
+
+export interface FunctionArgs {
+  type: string;
+  src: string;
+  definition: FunctionDefinition;
 }
