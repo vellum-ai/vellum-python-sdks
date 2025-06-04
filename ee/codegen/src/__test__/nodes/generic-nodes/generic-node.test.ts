@@ -20,7 +20,7 @@ describe("GenericNode", () => {
   let node: GenericNode;
 
   beforeEach(() => {
-    workflowContext = workflowContextFactory();
+    workflowContext = workflowContextFactory({ strict: false });
     writer = new Writer();
 
     workflowContext.addInputVariableContext(
@@ -502,6 +502,42 @@ describe("GenericNode", () => {
         workflowContext,
         nodeContext,
       });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with invalid node references", () => {
+    beforeEach(async () => {
+      const nodeAttributes: NodeAttribute[] = [
+        {
+          id: "attr-1",
+          name: "invalid-node-reference",
+          value: {
+            type: "NODE_OUTPUT",
+            nodeId: "invalid-node-id",
+            nodeOutputId: "invalid-output-id",
+          },
+        },
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "TestInvalidNodeRef",
+        nodeAttributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should handle invalid node references gracefully", async () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

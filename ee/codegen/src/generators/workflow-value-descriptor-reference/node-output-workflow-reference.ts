@@ -14,7 +14,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
     );
 
     if (!nodeContext) {
-      return undefined;
+      return python.TypeInstantiation.none();
     }
 
     const nodeOutputName = nodeContext.getNodeOutputNameById(
@@ -76,6 +76,6 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
         });
       }
     }
-    return undefined;
+    return python.TypeInstantiation.none();
   }
 }

@@ -177,6 +177,21 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with invalid node references > should handle invalid node references gracefully 1`] = `
+"from vellum.workflows.nodes import BaseNode
+
+
+class TestInvalidNodeRef(BaseNode):
+    invalid_node_reference = None
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

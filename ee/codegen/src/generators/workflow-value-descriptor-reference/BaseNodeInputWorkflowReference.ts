@@ -1,8 +1,10 @@
+import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { BaseCodegenError } from "src/generators/errors";
 import {
   AttributeConfig,
   IterableConfig,
@@ -45,9 +47,18 @@ export abstract class BaseNodeInputWorkflowReference<
     this.attributeConfig = attributeConfig;
     this.nodeInputWorkflowReferencePointer = nodeInputWorkflowReferencePointer;
 
-    this.astNode = this.getAstNode();
-    if (this.astNode) {
-      this.inheritReferences(this.astNode);
+    try {
+      this.astNode = this.getAstNode();
+      if (this.astNode) {
+        this.inheritReferences(this.astNode);
+      }
+    } catch (error) {
+      if (error instanceof BaseCodegenError) {
+        this.workflowContext.addError(error);
+        this.astNode = python.TypeInstantiation.none();
+      } else {
+        throw error;
+      }
     }
   }
 
