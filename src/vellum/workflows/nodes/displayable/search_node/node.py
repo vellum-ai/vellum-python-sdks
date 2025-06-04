@@ -1,6 +1,8 @@
 import json
 from typing import ClassVar
 
+from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BaseSearchNode as BaseSearchNode
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types import MergeBehavior
@@ -35,6 +37,12 @@ class SearchNode(BaseSearchNode[StateType]):
         text: str
 
     def run(self) -> Outputs:
+        if self.query is None:
+            raise NodeException(
+                message="Search query is required but was not provided",
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
+
         if not isinstance(self.query, str):
             self.query = json.dumps(self.query, cls=DefaultStateEncoder)
 

@@ -1,3 +1,4 @@
+import pytest
 import json
 
 from vellum import SearchResponse, SearchResult, SearchResultDocument
@@ -10,6 +11,8 @@ from vellum.client.types.search_weights_request import SearchWeightsRequest
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.client.types.vellum_value_logical_condition_group_request import VellumValueLogicalConditionGroupRequest
 from vellum.client.types.vellum_value_logical_condition_request import VellumValueLogicalConditionRequest
+from vellum.workflows.errors import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.types import (
     MetadataLogicalCondition,
     MetadataLogicalConditionGroup,
@@ -215,3 +218,18 @@ def test_run_workflow__chat_history_as_query(vellum_client):
     assert json.loads(vellum_client.search.call_args.kwargs["query"]) == [
         {"role": "USER", "text": "Hello, world!", "source": None, "content": None}
     ]
+
+
+def test_run_workflow__missing_query_raises_validation_error():
+    """Confirm that missing/None query raises proper user-facing validation error"""
+
+    class MySearchNode(SearchNode):
+        query = None
+        document_index = "document_index"
+
+    with pytest.raises(NodeException) as exc_info:
+        MySearchNode().run()
+
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "query" in exc_info.value.message.lower()
+    assert "required" in exc_info.value.message.lower() or "missing" in exc_info.value.message.lower()
