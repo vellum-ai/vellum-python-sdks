@@ -105,8 +105,6 @@ class NodeExecutionCache:
 
     # Derived fields - no need to serialize
     __node_execution_lookup__: NodeExecutionLookup  # execution_id -> node_class
-    __node_to_fork_id__: Dict[Type["BaseNode"], UUID]  # node_class -> fork_id
-    __all_fork_ids__: Set[UUID]
 
     def __init__(self) -> None:
         self._dependencies_invoked = defaultdict(set)
@@ -114,8 +112,6 @@ class NodeExecutionCache:
         self._node_executions_initiated = defaultdict(set)
         self._node_executions_queued = defaultdict(list)
         self.__node_execution_lookup__ = {}
-        self.__node_to_fork_id__ = {}
-        self.__all_fork_ids__ = set()
 
     @classmethod
     def deserialize(cls, raw_data: dict, nodes: Dict[Union[str, UUID], Type["BaseNode"]]):
