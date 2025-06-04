@@ -37,7 +37,7 @@ class SearchNode(BaseSearchNode[StateType]):
         text: str
 
     def run(self) -> Outputs:
-        if self.query is None:
+        if self.query is None or self.query == "":
             raise NodeException(
                 message="Search query is required but was not provided",
                 code=WorkflowErrorCode.INVALID_INPUTS,

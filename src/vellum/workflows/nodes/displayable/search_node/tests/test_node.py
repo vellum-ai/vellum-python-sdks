@@ -220,11 +220,12 @@ def test_run_workflow__chat_history_as_query(vellum_client):
     ]
 
 
-def test_run_workflow__missing_query_raises_validation_error():
-    """Confirm that missing/None query raises proper user-facing validation error"""
+@pytest.mark.parametrize("invalid_query", [None, ""])
+def test_run_workflow__invalid_query_raises_validation_error(invalid_query):
+    """Confirm that missing/None/empty query raises proper user-facing validation error"""
 
     class MySearchNode(SearchNode):
-        query = None  # type: ignore[assignment]
+        query = invalid_query  # type: ignore[assignment]
         document_index = "document_index"
 
     with pytest.raises(NodeException) as exc_info:
