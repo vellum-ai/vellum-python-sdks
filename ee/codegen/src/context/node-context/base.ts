@@ -172,6 +172,17 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       );
     }
 
+    // For subworkflow deployment nodes, preserve case in output names
+    if (
+      this.nodeData.type === "SUBWORKFLOW" &&
+      this.nodeData.data.variant === "DEPLOYMENT"
+    ) {
+      const isValidPythonIdentifier = /^[a-zA-Z][a-zA-Z0-9]*$/.test(nodeOutputName);
+      if (isValidPythonIdentifier) {
+        return nodeOutputName;
+      }
+    }
+
     return toPythonSafeSnakeCase(nodeOutputName, "output");
   }
 

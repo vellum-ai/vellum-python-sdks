@@ -25,7 +25,8 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
       Record<string, string>
     >(
       (acc, output) => {
-        acc[output.id] = toPythonSafeSnakeCase(output.key, "output");
+        const isValidPythonIdentifier = /^[a-zA-Z][a-zA-Z0-9]*$/.test(output.key);
+        acc[output.id] = isValidPythonIdentifier ? output.key : toPythonSafeSnakeCase(output.key, "output");
         return acc;
       },
       { ...(errorOutputId ? { [errorOutputId]: "error" } : {}) }
