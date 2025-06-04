@@ -224,7 +224,7 @@ def test_run_workflow__missing_query_raises_validation_error():
     """Confirm that missing/None query raises proper user-facing validation error"""
 
     class MySearchNode(SearchNode):
-        query = None
+        query = None  # type: ignore[assignment]
         document_index = "document_index"
 
     with pytest.raises(NodeException) as exc_info:
