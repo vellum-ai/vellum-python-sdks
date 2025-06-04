@@ -53,8 +53,6 @@ export abstract class BaseNode<
 
   private readonly errorOutputId: string | undefined;
 
-  skipFormatting: boolean = false;
-
   constructor({ workflowContext, nodeContext }: BaseNode.Args<T, V>) {
     this.workflowContext = workflowContext;
     this.nodeContext = nodeContext;
@@ -70,7 +68,7 @@ export abstract class BaseNode<
 
   public async persist(): Promise<void> {
     await Promise.all([
-      this.getNodeFile().persist(this.skipFormatting),
+      this.getNodeFile().persist(),
       this.getNodeDisplayFile().persist(),
     ]);
   }
@@ -754,8 +752,8 @@ class NodeImplementationFile<
     return [this.node.generateNodeClass()];
   }
 
-  public async persist(skipFormatting: boolean = false): Promise<void> {
-    await super.persist(skipFormatting);
+  public async persist(): Promise<void> {
+    await super.persist();
   }
 }
 
@@ -785,7 +783,7 @@ class NodeDisplayFile<
     return this.node.generateNodeDisplayClasses();
   }
 
-  public async persist(skipFormatting: boolean = false): Promise<void> {
-    await super.persist(skipFormatting);
+  public async persist(): Promise<void> {
+    await super.persist();
   }
 }
