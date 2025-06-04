@@ -182,7 +182,7 @@ export abstract class BasePersistedFile extends AstNode {
     file.write(writer);
   }
 
-  public async persist(skipFormatting: boolean = false): Promise<void> {
+  public async persist(): Promise<void> {
     const absolutePathToModuleDirectory =
       this.workflowContext.absolutePathToOutputDirectory;
 
@@ -206,14 +206,8 @@ export abstract class BasePersistedFile extends AstNode {
 
     let contents: string;
     try {
-      if (skipFormatting) {
-        // Sometimes we need to disable formatting because of fern problems, this isn't strictly necessary because
-        // of the catch statement below but it will let us avoid an unneeded error log and sentry report.
-        contents = writer.toString();
-      } else {
-        contents = await writer.toStringFormatted({ line_width: 120 });
-        contents = this.postprocessDocstrings(contents);
-      }
+      contents = await writer.toStringFormatted({ line_width: 120 });
+      contents = this.postprocessDocstrings(contents);
     } catch (error) {
       console.error("Error formatting", fileName, "with error", error);
       contents = writer.toString();
