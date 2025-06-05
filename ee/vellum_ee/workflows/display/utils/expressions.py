@@ -38,6 +38,7 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 
@@ -299,6 +300,22 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             }
         else:
             return {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonArray, serialized_entries)}
+
+    if is_workflow_class(value):
+        from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+        workflow_display = get_workflow_display(workflow_class=value)
+        value = workflow_display.serialize()
+        return {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": {
+                    "type": "INLINE_WORKFLOW",
+                    "exec_config": value,
+                },
+            },
+        }
 
     if not isinstance(value, BaseDescriptor):
         vellum_value = primitive_to_vellum_value(value)
