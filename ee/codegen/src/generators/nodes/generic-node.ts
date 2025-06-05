@@ -36,10 +36,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   private generateNodeAttributes(): AstNode[] {
-    const nodeAttributes = NODE_ATTRIBUTES["ToolCallingNode"] as Record<
-      string,
-      AttributeConfig
-    >;
+    const nodeAttributes =
+      (NODE_ATTRIBUTES[this.nodeData.base.name] as Record<
+        string,
+        AttributeConfig
+      >) ?? {};
 
     const nodeAttributesStatements: AstNode[] = [];
 
