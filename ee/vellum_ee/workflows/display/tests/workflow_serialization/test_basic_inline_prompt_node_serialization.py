@@ -274,3 +274,38 @@ def test_serialize_workflow():
         "name": "BasicInlinePromptWithFunctionsWorkflow",
         "module": ["tests", "workflows", "basic_inline_prompt_node_with_functions", "workflow"],
     }
+
+
+def test_serialize_workflow_with_descriptor_functions():
+    """Test that serialization handles BaseDescriptor instances in functions list."""
+    import pytest
+
+    from vellum import ChatMessagePromptBlock, JinjaPromptBlock
+    from vellum.workflows import BaseWorkflow
+    from vellum.workflows.inputs import BaseInputs
+    from vellum.workflows.nodes import InlinePromptNode
+    from vellum.workflows.references.node import NodeReference
+    from vellum.workflows.state import BaseState
+    from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+    class TestInputs(BaseInputs):
+        noun: str
+
+    class TestInlinePromptNodeWithDescriptorFunctions(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="SYSTEM",
+                blocks=[JinjaPromptBlock(template="Test {{noun}}")],
+            ),
+        ]
+        prompt_inputs = {"noun": TestInputs.noun}
+        functions = NodeReference(name="tools", types=(list,), instance=["tools.0", "tools.1"], node_class=object)
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = TestInlinePromptNodeWithDescriptorFunctions
+
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+
+    with pytest.raises(TypeError, match="is not a callable object"):
+        workflow_display.serialize()
