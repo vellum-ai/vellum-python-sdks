@@ -4,13 +4,10 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { NoteNodeContext } from "src/context/node-context/note-node";
 import { Json } from "src/generators/json";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { NoteNode as NoteNodeType } from "src/types/vellum";
 
-export class NoteNode extends BaseSingleFileNode<
-  NoteNodeType,
-  NoteNodeContext
-> {
+export class NoteNode extends BaseNode<NoteNodeType, NoteNodeContext> {
   getNodeClassBodyStatements(): AstNode[] {
     // Note Nodes intentionally have no body statements.
     return [];

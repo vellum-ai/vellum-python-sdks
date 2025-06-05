@@ -4,14 +4,12 @@ import * as path from "path";
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
-import { BaseNode } from "./bases/base";
-
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { InitFile } from "src/generators";
 import { BaseState } from "src/generators/base-state";
 import { NodeAttributeGenerationError } from "src/generators/errors";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
@@ -19,7 +17,7 @@ const CODE_INPUT_KEY = "code";
 const RUNTIME_INPUT_KEY = "runtime";
 const INPUTS_PREFIX = "code_inputs";
 
-export class CodeExecutionNode extends BaseSingleFileNode<
+export class CodeExecutionNode extends BaseNode<
   CodeExecutionNodeType,
   CodeExecutionContext
 > {

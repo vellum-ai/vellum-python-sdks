@@ -7,7 +7,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { FunctionDefinition } from "src/generators/function-definition";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { PromptParameters } from "src/generators/prompt-parameters-request";
 import { StatefulPromptBlock } from "src/generators/stateful-prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -21,7 +21,7 @@ import { isNilOrEmpty } from "src/utils/typing";
 
 const INPUTS_PREFIX = "prompt_inputs";
 
-export class InlinePromptNode extends BaseSingleFileNode<
+export class InlinePromptNode extends BaseNode<
   InlinePromptNodeType,
   InlinePromptNodeContext
 > {

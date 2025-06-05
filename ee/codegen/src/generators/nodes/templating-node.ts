@@ -6,14 +6,14 @@ import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { BaseState } from "src/generators/base-state";
 import { NodeAttributeGenerationError } from "src/generators/errors";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
 const TEMPLATING_INPUT_KEY = "template";
 const INPUTS_PREFIX = "inputs";
 
-export class TemplatingNode extends BaseSingleFileNode<
+export class TemplatingNode extends BaseNode<
   TemplatingNodeType,
   TemplatingNodeContext
 > {

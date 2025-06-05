@@ -1,16 +1,17 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
+import { BaseNode } from "./bases/base";
+
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
 const INPUTS_PREFIX = "metric_inputs";
 const STANDARD_METRIC_OUTPUT_KEYS = ["score", "normalized_score", "log"];
 
-export class GuardrailNode extends BaseSingleFileNode<
+export class GuardrailNode extends BaseNode<
   GuardrailNodeType,
   GuardrailNodeContext
 > {

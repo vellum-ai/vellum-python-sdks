@@ -6,15 +6,15 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { PORTS_CLASS_NAME } from "src/constants";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { ConditionalNodePort } from "src/generators/conditional-node-port";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import {
-  ConditionalNode as ConditionalNodeType,
   ConditionalNodeData,
+  ConditionalNode as ConditionalNodeType,
   ConditionalRuleData,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
 
-export class ConditionalNode extends BaseSingleFileNode<
+export class ConditionalNode extends BaseNode<
   ConditionalNodeType,
   ConditionalNodeContext
 > {

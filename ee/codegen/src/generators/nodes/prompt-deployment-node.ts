@@ -4,13 +4,13 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
-import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { DeploymentPromptNodeData, PromptNode } from "src/types/vellum";
 
 const INPUTS_PREFIX = "prompt_inputs";
 
-export class PromptDeploymentNode extends BaseSingleFileNode<
+export class PromptDeploymentNode extends BaseNode<
   PromptNode,
   PromptDeploymentNodeContext
 > {
