@@ -278,8 +278,6 @@ def test_serialize_workflow():
 
 def test_serialize_workflow_with_descriptor_functions():
     """Test that serialization handles BaseDescriptor instances in functions list."""
-    import pytest
-
     from vellum import ChatMessagePromptBlock, JinjaPromptBlock
     from vellum.workflows import BaseWorkflow
     from vellum.workflows.inputs import BaseInputs
@@ -317,5 +315,8 @@ def test_serialize_workflow_with_descriptor_functions():
 
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
 
-    with pytest.raises(TypeError, match="is not a callable object"):
-        workflow_display.serialize()
+    serialized = workflow_display.serialize()
+
+    assert "workflow_raw_data" in serialized
+    assert "input_variables" in serialized
+    assert "output_variables" in serialized

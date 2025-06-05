@@ -41,18 +41,31 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
         node_blocks = raise_if_descriptor(node.blocks) or []
-        function_definitions = raise_if_descriptor(node.functions)
+        from vellum.workflows.descriptors.base import BaseDescriptor
+
+        if isinstance(node.functions, BaseDescriptor):
+            try:
+                function_definitions = node.functions.instance
+                if function_definitions and isinstance(function_definitions, list):
+                    function_definitions = [
+                        f for f in function_definitions if callable(f) or isinstance(f, FunctionDefinition)
+                    ]
+                else:
+                    function_definitions = []
+            except (AttributeError, TypeError):
+                function_definitions = []
+        else:
+            function_definitions = raise_if_descriptor(node.functions)
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
         blocks: list = [
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
-        functions = (
-            [self._generate_function_tools(function, i) for i, function in enumerate(function_definitions)]
-            if function_definitions
-            else []
-        )
+        functions = []
+        if function_definitions:
+            for i, function in enumerate(function_definitions):
+                functions.append(self._generate_function_tools(function, i))
         blocks.extend(functions)
 
         serialized_node: JsonObject = {
