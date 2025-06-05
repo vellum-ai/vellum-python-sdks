@@ -18,10 +18,9 @@ _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 
 class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
-    __serializable_inputs__ = {InlinePromptNode.prompt_inputs}
+    __serializable_inputs__ = {InlinePromptNode.prompt_inputs, InlinePromptNode.functions}
     __unserializable_attributes__ = {
         InlinePromptNode.blocks,
-        InlinePromptNode.functions,
         InlinePromptNode.parameters,
         InlinePromptNode.settings,
         InlinePromptNode.expand_meta,
@@ -42,19 +41,11 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         json_display = self.output_display[node.Outputs.json]
         node_blocks = raise_if_descriptor(node.blocks) or []
 
-        function_definitions = raise_if_descriptor(node.functions)
-
         ml_model = str(raise_if_descriptor(node.ml_model))
 
         blocks: list = [
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
-        functions = []
-        if function_definitions and isinstance(function_definitions, list):
-            for i, function in enumerate(function_definitions):
-                if callable(function) or isinstance(function, FunctionDefinition):
-                    functions.append(self._generate_function_tools(function, i))
-        blocks.extend(functions)
 
         serialized_node: JsonObject = {
             "id": str(node_id),

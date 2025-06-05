@@ -136,17 +136,6 @@ def test_serialize_workflow():
                                 "cache_config": None,
                                 "state": "ENABLED",
                             },
-                            {
-                                "id": "9b34f084-449d-423f-8691-37518b1ee9ca",
-                                "block_type": "FUNCTION_DEFINITION",
-                                "properties": {
-                                    "function_name": "favorite_noun",
-                                    "function_description": "Returns the favorite noun of the user",
-                                    "function_parameters": {},
-                                    "function_forced": None,
-                                    "function_strict": None,
-                                },
-                            },
                         ],
                     },
                 },
@@ -188,6 +177,27 @@ def test_serialize_workflow():
                                 },
                             }
                         ],
+                    },
+                },
+                {
+                    "id": "8107682b-2ca0-4967-88f9-284455936575",
+                    "name": "functions",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {
+                            "type": "JSON",
+                            "value": [
+                                {
+                                    "state": None,
+                                    "cache_config": None,
+                                    "name": "favorite_noun",
+                                    "description": "Returns the favorite noun of the user",
+                                    "parameters": {},
+                                    "forced": None,
+                                    "strict": None,
+                                }
+                            ],
+                        },
                     },
                 },
             ],
@@ -319,4 +329,10 @@ def test_serialize_workflow_with_descriptor_functions():
     blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
 
     function_blocks = [block for block in blocks if block.get("block_type") == "FUNCTION_DEFINITION"]
-    assert len(function_blocks) == 2  # Should have 2 function blocks for the example_function and FunctionDefinition
+    assert (
+        len(function_blocks) == 0
+    )  # Should have 0 function blocks - we skip prompt block serialization in dynamic case
+
+    assert "attributes" in prompt_node
+    functions_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "functions"), None)
+    assert functions_attr is not None, "functions attribute should be present in serialized attributes"
