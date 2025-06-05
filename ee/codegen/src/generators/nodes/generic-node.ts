@@ -4,7 +4,6 @@ import { join } from "path";
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { FunctionDefinition } from "vellum-ai/api";
 import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
@@ -19,13 +18,8 @@ import {
 } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
-import { GenericNode as GenericNodeType } from "src/types/vellum";
+import { FunctionArgs, GenericNode as GenericNodeType } from "src/types/vellum";
 import { toPythonSafeSnakeCase } from "src/utils/casing";
-
-interface FunctionArgs {
-  src: string;
-  definition: FunctionDefinition;
-}
 
 export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private functionsToGenerate: Array<{
