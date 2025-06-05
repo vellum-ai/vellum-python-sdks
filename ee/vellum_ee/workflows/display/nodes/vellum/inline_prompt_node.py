@@ -2,7 +2,6 @@ from uuid import UUID
 from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
-from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.functions import compile_function_definition
@@ -44,9 +43,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         node_blocks = raise_if_descriptor(node.blocks) or []
 
         function_definitions = raise_if_descriptor(node.functions)
-
-        if isinstance(function_definitions, BaseDescriptor):
-            function_definitions = getattr(function_definitions, "instance", [])
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 

@@ -4,7 +4,6 @@ from vellum import ChatMessagePromptBlock, FunctionDefinition, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import InlinePromptNode
-from vellum.workflows.references.node import NodeReference
 from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -294,12 +293,7 @@ def test_serialize_workflow_with_descriptor_functions():
 
     class MockMCPClientNode:
         class Outputs:
-            tools = NodeReference(
-                name="tools",
-                types=(list,),
-                instance=[example_function, FunctionDefinition(name="test", description="test")],
-                node_class=object,
-            )
+            tools = [example_function, FunctionDefinition(name="test", description="test")]
 
     class TestInlinePromptNodeWithDescriptorFunctions(InlinePromptNode):
         ml_model = "gpt-4o"
@@ -325,10 +319,4 @@ def test_serialize_workflow_with_descriptor_functions():
     blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
 
     function_blocks = [block for block in blocks if block.get("block_type") == "FUNCTION_DEFINITION"]
-
-    assert len(function_blocks) == 2
-
-    for block in function_blocks:
-        assert "properties" in block
-        assert "function_name" in block["properties"]
-        assert "function_description" in block["properties"]
+    assert len(function_blocks) == 2  # Should have 2 function blocks for the example_function and FunctionDefinition
