@@ -8,6 +8,7 @@ import {
   ChatHistoryInput,
   ChatMessageRequest,
   ChatMessageRole,
+  FunctionDefinition,
   JsonInput,
   NumberInput,
   PromptBlockState,
@@ -876,4 +877,10 @@ export interface IterableConfig {
 
 export interface AttributeConfig {
   lhs: python.Reference;
+}
+
+export interface FunctionArgs {
+  type: string;
+  src: string;
+  definition: FunctionDefinition;
 }
