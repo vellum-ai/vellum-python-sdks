@@ -11,11 +11,7 @@ import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseNode } from "src/generators/nodes/bases/base";
-import {
-  AttributeConfig,
-  AttributeType,
-  NODE_ATTRIBUTES,
-} from "src/generators/nodes/constants";
+import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FunctionArgs, GenericNode as GenericNodeType } from "src/types/vellum";
@@ -36,10 +32,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   private generateNodeAttributes(): AstNode[] {
-    const nodeAttributes = NODE_ATTRIBUTES["ToolCallingNode"] as Record<
-      string,
-      AttributeConfig
-    >;
+    const nodeAttributes = NODE_ATTRIBUTES[this.nodeData.base.name] ?? {};
 
     const nodeAttributesStatements: AstNode[] = [];
 
