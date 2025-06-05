@@ -43,21 +43,10 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         json_display = self.output_display[node.Outputs.json]
         node_blocks = raise_if_descriptor(node.blocks) or []
 
-        if isinstance(node.functions, BaseDescriptor):
-            try:
-                instance_data = node.functions.instance
+        function_definitions = raise_if_descriptor(node.functions)
 
-                if isinstance(instance_data, BaseDescriptor):
-                    function_definitions = getattr(instance_data, "instance", [])
-                else:
-                    function_definitions = instance_data
-
-                if not isinstance(function_definitions, list):
-                    function_definitions = []
-            except (AttributeError, TypeError):
-                function_definitions = []
-        else:
-            function_definitions = node.functions or []
+        if isinstance(function_definitions, BaseDescriptor):
+            function_definitions = getattr(function_definitions, "instance", [])
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
@@ -65,7 +54,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
         functions = []
-        if function_definitions:
+        if function_definitions and isinstance(function_definitions, list):
             for i, function in enumerate(function_definitions):
                 if callable(function) or isinstance(function, FunctionDefinition):
                     functions.append(self._generate_function_tools(function, i))
