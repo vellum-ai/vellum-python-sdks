@@ -4,6 +4,7 @@ from tests.workflows.basic_tool_calling_node_inline_workflow.workflow import Bas
 
 
 def test_serialize_workflow():
+
     workflow_display = get_workflow_display(workflow_class=BasicToolCallingNodeInlineWorkflowWorkflow)
 
     serialized_workflow = workflow_display.serialize()
