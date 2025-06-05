@@ -284,12 +284,22 @@ def test_serialize_workflow_with_descriptor_functions():
     from vellum.workflows import BaseWorkflow
     from vellum.workflows.inputs import BaseInputs
     from vellum.workflows.nodes import InlinePromptNode
-    from vellum.workflows.references.node import NodeReference
     from vellum.workflows.state import BaseState
     from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
     class TestInputs(BaseInputs):
         noun: str
+
+    from vellum.workflows.references.node import NodeReference
+
+    class MockMCPClientNode:
+        class Outputs:
+            tools = NodeReference(
+                name="tools",
+                types=(list,),
+                instance=["tools.0", "tools.1"],  # Non-callable objects that will cause the error
+                node_class=object,
+            )
 
     class TestInlinePromptNodeWithDescriptorFunctions(InlinePromptNode):
         ml_model = "gpt-4o"
@@ -300,7 +310,7 @@ def test_serialize_workflow_with_descriptor_functions():
             ),
         ]
         prompt_inputs = {"noun": TestInputs.noun}
-        functions = NodeReference(name="tools", types=(list,), instance=["tools.0", "tools.1"], node_class=object)
+        functions = MockMCPClientNode.Outputs.tools
 
     class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
         graph = TestInlinePromptNodeWithDescriptorFunctions
