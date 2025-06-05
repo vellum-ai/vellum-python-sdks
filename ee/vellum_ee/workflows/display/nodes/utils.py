@@ -16,7 +16,10 @@ def raise_if_descriptor(node_attr: _T) -> _T: ...
 
 def raise_if_descriptor(node_attr: Union[BaseDescriptor[_T], _T]) -> _T:
     if isinstance(node_attr, BaseDescriptor):
-        return node_attr.instance
+        instance = node_attr.instance
+        if instance is None:
+            raise ValueError(f"Descriptor {node_attr} has no instance")
+        return instance
     return node_attr
 
 
