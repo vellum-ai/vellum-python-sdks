@@ -1243,17 +1243,7 @@ baz = foo + bar
               id: "generic-node",
               type: "GENERIC",
               label: "Generic Node",
-              attributes: [
-                {
-                  id: uuidv4(),
-                  name: "forward",
-                  value: {
-                    type: "NODE_OUTPUT",
-                    node_id: "generic-node",
-                    node_output_id: "output",
-                  },
-                },
-              ],
+              attributes: [],
               trigger: {
                 id: "generic-node-trigger",
                 merge_behavior: "AWAIT_ATTRIBUTES",
@@ -2337,17 +2327,7 @@ baz = foo + bar
               id: "generic-node",
               type: "GENERIC",
               label: "Generic Node",
-              attributes: [
-                {
-                  id: uuidv4(),
-                  name: "forward",
-                  value: {
-                    type: "NODE_OUTPUT",
-                    node_id: "generic-node",
-                    node_output_id: "output",
-                  },
-                },
-              ],
+              attributes: [],
               trigger: {
                 id: "generic-node-trigger",
                 merge_behavior: "AWAIT_ATTRIBUTES",

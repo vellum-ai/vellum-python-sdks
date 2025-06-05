@@ -32,40 +32,22 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     functionName: string;
     content: string;
   }> = [];
-  getNodeDecorators(): python.Decorator[] | undefined {
-    if (!this.nodeData.adornments) {
-      return [];
-    }
-    return this.nodeData.adornments.map((adornment) =>
-      python.decorator({
-        callable: python.invokeMethod({
-          methodReference: python.reference({
-            name: adornment.base.name,
-            attribute: ["wrap"],
-            modulePath: adornment.base.module,
-          }),
-          arguments_: adornment.attributes.map((attr) =>
-            python.methodArgument({
-              name: attr.name,
-              value: new WorkflowValueDescriptor({
-                workflowValueDescriptor: attr.value,
-                nodeContext: this.nodeContext,
-                workflowContext: this.workflowContext,
-                iterableConfig: { endWithComma: false },
-              }),
-            })
-          ),
-        }),
-      })
-    );
+
+  private nodeAttributes: AstNode[] = [];
+
+  constructor(args: BaseNode.Args<GenericNodeType, GenericNodeContext>) {
+    super(args);
+
+    this.nodeAttributes = this.generateNodeAttributes();
   }
 
-  getNodeClassBodyStatements(): AstNode[] {
-    const statements: AstNode[] = [];
+  private generateNodeAttributes(): AstNode[] {
     const nodeAttributes = NODE_ATTRIBUTES["ToolCallingNode"] as Record<
       string,
       AttributeConfig
     >;
+
+    const nodeAttributesStatements: AstNode[] = [];
 
     this.nodeData.attributes.forEach((attribute) => {
       const attributeConfig = nodeAttributes[attribute.name];
@@ -89,7 +71,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             });
             const nodeName = this.nodeContext.getNodeLabel();
 
-            statements.push(
+            nodeAttributesStatements.push(
               python.field({
                 name: attribute.name,
                 initializer: python.TypeInstantiation.list(
@@ -135,7 +117,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               }
             );
 
-            statements.push(
+            nodeAttributesStatements.push(
               python.field({
                 name: attribute.name,
                 initializer: python.TypeInstantiation.list(
@@ -155,7 +137,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           break;
         }
         default:
-          statements.push(
+          nodeAttributesStatements.push(
             python.field({
               name: toPythonSafeSnakeCase(attribute.name),
               initializer: new WorkflowValueDescriptor({
@@ -167,6 +149,42 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           );
       }
     });
+
+    return nodeAttributesStatements;
+  }
+
+  getNodeDecorators(): python.Decorator[] | undefined {
+    if (!this.nodeData.adornments) {
+      return [];
+    }
+    return this.nodeData.adornments.map((adornment) =>
+      python.decorator({
+        callable: python.invokeMethod({
+          methodReference: python.reference({
+            name: adornment.base.name,
+            attribute: ["wrap"],
+            modulePath: adornment.base.module,
+          }),
+          arguments_: adornment.attributes.map((attr) =>
+            python.methodArgument({
+              name: attr.name,
+              value: new WorkflowValueDescriptor({
+                workflowValueDescriptor: attr.value,
+                nodeContext: this.nodeContext,
+                workflowContext: this.workflowContext,
+                iterableConfig: { endWithComma: false },
+              }),
+            })
+          ),
+        }),
+      })
+    );
+  }
+
+  getNodeClassBodyStatements(): AstNode[] {
+    const statements: AstNode[] = [];
+
+    statements.push(...this.nodeAttributes);
 
     if (this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES") {
       statements.push(
