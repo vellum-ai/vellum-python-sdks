@@ -88,7 +88,7 @@ export function toPythonSafeSnakeCase(
   return startsWithUnsafe ? cleanedSafetyPrefix + snakeCase : snakeCase;
 }
 
-export function toPythonSafeSnakeCaseWithCasePreservation(
+export function toValidPythonIdentifier(
   str: string,
   safetyPrefix: string = "_"
 ): string {
