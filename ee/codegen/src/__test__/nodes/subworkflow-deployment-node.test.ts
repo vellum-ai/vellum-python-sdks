@@ -191,4 +191,61 @@ describe("SubworkflowDeploymentNode", () => {
       expect(errors[1]?.severity).toBe("WARNING");
     });
   });
+
+  describe("case preservation", () => {
+    it("should preserve case in output names like fooBAR", async () => {
+      vi.spyOn(
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
+      ).mockResolvedValue({
+        id: "mocked-workflow-deployment-history-item-id",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [],
+          outputVariables: [
+            { id: "test-output-id", key: "fooBAR", type: "STRING" },
+          ],
+        },
+        deployment: {
+          name: "test-deployment",
+        },
+        releaseTags: [
+          {
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
+        ],
+        reviews: [
+          {
+            id: "mocked-release-review-id",
+            created: new Date(),
+            reviewer: {
+              id: "mocked-reviewer-id",
+            },
+            state: "APPROVED",
+          },
+        ],
+      } as unknown as WorkflowDeploymentRelease);
+
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as SubworkflowDeploymentNodeContext;
+
+      const outputName = nodeContext.getNodeOutputNameById("test-output-id");
+      expect(outputName).toBe("fooBAR");
+    });
+  });
 });

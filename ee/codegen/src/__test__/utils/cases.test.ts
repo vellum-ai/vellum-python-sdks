@@ -2,6 +2,7 @@ import {
   createPythonClassName,
   toKebabCase,
   toPythonSafeSnakeCase,
+  toValidPythonIdentifier,
 } from "src/utils/casing";
 
 describe("Casing utility functions", () => {
@@ -103,6 +104,33 @@ describe("Casing utility functions", () => {
       "should convert '$input' to '$expected'",
       ({ input, safetyPrefix, expected }) => {
         expect(toPythonSafeSnakeCase(input, safetyPrefix)).toBe(expected);
+      }
+    );
+  });
+
+  describe("toValidPythonIdentifier", () => {
+    const testCases = [
+      {
+        input: "fooBAR",
+        safetyPrefix: undefined,
+        expected: "fooBAR",
+      },
+      {
+        input: "foo_bar",
+        safetyPrefix: undefined,
+        expected: "foo_bar",
+      },
+      {
+        input: "123invalid",
+        safetyPrefix: "output",
+        expected: "output_123invalid",
+      },
+    ];
+
+    it.each(testCases)(
+      "should convert '$input' to '$expected'",
+      ({ input, safetyPrefix, expected }) => {
+        expect(toValidPythonIdentifier(input, safetyPrefix)).toBe(expected);
       }
     );
   });

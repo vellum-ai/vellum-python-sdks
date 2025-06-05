@@ -8,7 +8,7 @@ import { WorkflowContext } from "src/context";
 import { PortContext } from "src/context/port-context";
 import { NodeOutputNotFoundError } from "src/generators/errors";
 import { NodePort as NodePortType, WorkflowDataNode } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { toValidPythonIdentifier } from "src/utils/casing";
 import { getNodeLabel } from "src/utils/nodes";
 import {
   doesModulePathStartWith,
@@ -172,7 +172,7 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       );
     }
 
-    return toPythonSafeSnakeCase(nodeOutputName, "output");
+    return toValidPythonIdentifier(nodeOutputName, "output");
   }
 
   public getNodeOutputTypeById(
