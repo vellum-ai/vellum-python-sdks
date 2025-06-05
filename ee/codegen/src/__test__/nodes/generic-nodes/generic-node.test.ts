@@ -507,22 +507,36 @@ describe("GenericNode", () => {
     });
   });
 
-  describe("basic with invalid node references", () => {
+  describe("basic with invalid coalesce node references", () => {
     beforeEach(async () => {
       const nodeAttributes: NodeAttribute[] = [
         {
           id: "attr-1",
-          name: "invalid-node-reference",
+          name: "coalesce-attribute",
           value: {
-            type: "NODE_OUTPUT",
-            nodeId: "invalid-node-id",
-            nodeOutputId: "invalid-output-id",
-          },
+            rules: [
+              {
+                type: "NODE_OUTPUT",
+                data: {
+                  nodeId: "node_that_doesnt_exist",
+                  outputId: "invalid_output",
+                },
+              },
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "fallback_value",
+                },
+              },
+            ],
+            combinator: "OR",
+          } as any,
         },
       ];
 
       const nodeData = genericNodeFactory({
-        label: "TestInvalidNodeRef",
+        label: "TestCoalesceNode",
         nodeAttributes: nodeAttributes,
       });
 
@@ -537,7 +551,7 @@ describe("GenericNode", () => {
       });
     });
 
-    it("should handle invalid node references gracefully", async () => {
+    it("should handle invalid node references in coalesce gracefully", async () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

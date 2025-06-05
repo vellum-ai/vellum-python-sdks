@@ -177,6 +177,15 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with invalid coalesce node references > should handle invalid node references in coalesce gracefully 1`] = `
+"from vellum.workflows.nodes import BaseNode
+
+
+class TestCoalesceNode(BaseNode):
+    pass
+"
+`;
+
 exports[`GenericNode > basic with invalid node references > should handle invalid node references gracefully 1`] = `
 "from vellum.workflows.nodes import BaseNode
 
