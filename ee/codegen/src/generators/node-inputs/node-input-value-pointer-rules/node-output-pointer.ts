@@ -3,7 +3,10 @@ import { python } from "@fern-api/python-ast";
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
-import { NodeNotFoundError, NodeOutputNotFoundError } from "src/generators/errors";
+import {
+  NodeNotFoundError,
+  NodeOutputNotFoundError,
+} from "src/generators/errors";
 import { NodeOutputPointer } from "src/types/vellum";
 
 export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOutputPointer> {
