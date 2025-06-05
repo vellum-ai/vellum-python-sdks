@@ -1,6 +1,28 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Workflow Sandbox > write > should generate correct and same code for snake and camel casing of input names 1`] = `
+exports[`Workflow Sandbox > write > should generate correct code for camel case input names 1`] = `
+"from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .workflow import TestWorkflow
+
+if __name__ != "__main__":
+    raise Exception("This file is not meant to be imported")
+
+
+runner = WorkflowSandboxRunner(
+    workflow=TestWorkflow(),
+    inputs=[
+        Inputs(someFoo="some-value"),
+        Inputs(someBar="some-value"),
+    ],
+)
+
+runner.run()
+"
+`;
+
+exports[`Workflow Sandbox > write > should generate correct code for snake case input names 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs

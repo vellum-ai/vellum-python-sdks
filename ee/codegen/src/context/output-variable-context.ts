@@ -2,7 +2,7 @@ import { isNil, isEmpty } from "lodash";
 import { VellumVariable } from "vellum-ai/api/types";
 
 import { WorkflowContext } from "src/context/workflow-context";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { toValidPythonIdentifier } from "src/utils/casing";
 
 export declare namespace OutputVariableContext {
   export type Args = {
@@ -43,7 +43,7 @@ export class OutputVariableContext {
     const rawOutputVariableName = this.outputVariableData.key;
     const initialOutputVariableName =
       !isNil(rawOutputVariableName) && !isEmpty(rawOutputVariableName)
-        ? toPythonSafeSnakeCase(rawOutputVariableName, "output")
+        ? toValidPythonIdentifier(rawOutputVariableName, "output")
         : defaultName;
 
     // Deduplicate the output variable name if it's already in use

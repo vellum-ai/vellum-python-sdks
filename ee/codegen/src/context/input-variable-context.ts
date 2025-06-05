@@ -4,7 +4,7 @@ import { CodeResourceDefinition, VellumVariable } from "vellum-ai/api/types";
 import { WorkflowContext } from "src/context/workflow-context";
 import {
   removeEscapeCharacters,
-  toPythonSafeSnakeCase,
+  toValidPythonIdentifier,
 } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
@@ -55,7 +55,7 @@ export class InputVariableContext {
 
     const initialInputVariableName =
       !isNil(rawInputVariableName) && !isEmpty(rawInputVariableName)
-        ? toPythonSafeSnakeCase(rawInputVariableName, "input")
+        ? toValidPythonIdentifier(rawInputVariableName, "input")
         : defaultName;
 
     // Deduplicate the input variable name if it's already in use

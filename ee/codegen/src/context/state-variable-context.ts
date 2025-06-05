@@ -4,7 +4,7 @@ import { CodeResourceDefinition, VellumVariable } from "vellum-ai/api/types";
 import { WorkflowContext } from "src/context/workflow-context";
 import {
   removeEscapeCharacters,
-  toPythonSafeSnakeCase,
+  toValidPythonIdentifier,
 } from "src/utils/casing";
 import { getGeneratedStateModulePath } from "src/utils/paths";
 
@@ -55,7 +55,7 @@ export class StateVariableContext {
 
     const initialStateVariableName =
       !isNil(rawStateVariableName) && !isEmpty(rawStateVariableName)
-        ? toPythonSafeSnakeCase(rawStateVariableName, "state")
+        ? toValidPythonIdentifier(rawStateVariableName, "state")
         : defaultName;
 
     // Deduplicate the state variable name if it's already in use

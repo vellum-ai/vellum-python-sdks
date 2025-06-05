@@ -4,7 +4,7 @@ import { DEFAULT_PORT_NAME } from "src/constants";
 import { WorkflowContext } from "src/context/index";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { WorkflowDataNode } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { toValidPythonIdentifier } from "src/utils/casing";
 
 export declare namespace PortContext {
   export type Args = {
@@ -45,7 +45,7 @@ export class PortContext {
 
     const initialPortName =
       !isNil(rawPortName) && !isEmpty(rawPortName)
-        ? toPythonSafeSnakeCase(rawPortName, "port")
+        ? toValidPythonIdentifier(rawPortName, "port")
         : defaultName;
 
     // Deduplicate the port variable name if it's already in use
