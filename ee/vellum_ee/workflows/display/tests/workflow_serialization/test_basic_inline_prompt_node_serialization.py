@@ -1,5 +1,11 @@
 from deepdiff import DeepDiff
 
+from vellum import ChatMessagePromptBlock, FunctionDefinition, JinjaPromptBlock
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import InlinePromptNode
+from vellum.workflows.references.node import NodeReference
+from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_inline_prompt_node_with_functions.workflow import BasicInlinePromptWithFunctionsWorkflow
@@ -278,24 +284,20 @@ def test_serialize_workflow():
 
 def test_serialize_workflow_with_descriptor_functions():
     """Test that serialization handles BaseDescriptor instances in functions list."""
-    from vellum import ChatMessagePromptBlock, JinjaPromptBlock
-    from vellum.workflows import BaseWorkflow
-    from vellum.workflows.inputs import BaseInputs
-    from vellum.workflows.nodes import InlinePromptNode
-    from vellum.workflows.state import BaseState
-    from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+    def example_function():
+        """Example function for testing."""
+        return "example"
 
     class TestInputs(BaseInputs):
         noun: str
-
-    from vellum.workflows.references.node import NodeReference
 
     class MockMCPClientNode:
         class Outputs:
             tools = NodeReference(
                 name="tools",
                 types=(list,),
-                instance=["tools.0", "tools.1"],  # Non-callable objects that will cause the error
+                instance=[example_function, FunctionDefinition(name="test", description="test")],
                 node_class=object,
             )
 
@@ -314,9 +316,19 @@ def test_serialize_workflow_with_descriptor_functions():
         graph = TestInlinePromptNodeWithDescriptorFunctions
 
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
-
     serialized = workflow_display.serialize()
 
-    assert "workflow_raw_data" in serialized
-    assert "input_variables" in serialized
-    assert "output_variables" in serialized
+    prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    assert len(prompt_nodes) == 1
+
+    prompt_node = prompt_nodes[0]
+    blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
+
+    function_blocks = [block for block in blocks if block.get("block_type") == "FUNCTION_DEFINITION"]
+
+    assert len(function_blocks) == 2
+
+    for block in function_blocks:
+        assert "properties" in block
+        assert "function_name" in block["properties"]
+        assert "function_description" in block["properties"]

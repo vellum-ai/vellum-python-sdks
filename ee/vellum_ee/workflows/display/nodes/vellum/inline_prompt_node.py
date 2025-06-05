@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.functions import compile_function_definition
@@ -41,21 +42,22 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
         node_blocks = raise_if_descriptor(node.blocks) or []
-        from vellum.workflows.descriptors.base import BaseDescriptor
 
         if isinstance(node.functions, BaseDescriptor):
             try:
-                function_definitions = node.functions.instance
-                if function_definitions and isinstance(function_definitions, list):
-                    function_definitions = [
-                        f for f in function_definitions if callable(f) or isinstance(f, FunctionDefinition)
-                    ]
+                instance_data = node.functions.instance
+
+                if isinstance(instance_data, BaseDescriptor):
+                    function_definitions = getattr(instance_data, "instance", [])
                 else:
+                    function_definitions = instance_data
+
+                if not isinstance(function_definitions, list):
                     function_definitions = []
             except (AttributeError, TypeError):
                 function_definitions = []
         else:
-            function_definitions = raise_if_descriptor(node.functions)
+            function_definitions = node.functions or []
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
@@ -65,7 +67,8 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         functions = []
         if function_definitions:
             for i, function in enumerate(function_definitions):
-                functions.append(self._generate_function_tools(function, i))
+                if callable(function) or isinstance(function, FunctionDefinition):
+                    functions.append(self._generate_function_tools(function, i))
         blocks.extend(functions)
 
         serialized_node: JsonObject = {
