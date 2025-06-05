@@ -1,4 +1,3 @@
-# type: ignore  # subworkflow is causing mypy to hang indefinitely
 from deepdiff import DeepDiff
 
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display

@@ -31,9 +31,10 @@ class BaseInlineSubworkflowNodeDisplay(
 
         node_inputs, workflow_inputs = self._generate_node_and_workflow_inputs(node_id, node, display_context)
 
+        subworkflow_class = raise_if_descriptor(node.subworkflow)
         subworkflow_display = get_workflow_display(
             base_display_class=display_context.workflow_display_class,
-            workflow_class=raise_if_descriptor(node.subworkflow),
+            workflow_class=subworkflow_class,
             parent_display_context=display_context,
         )
         workflow_outputs = self._generate_workflow_outputs(node, subworkflow_display.display_context)
@@ -65,8 +66,8 @@ class BaseInlineSubworkflowNodeDisplay(
         node: Type[InlineSubworkflowNode],
         display_context: WorkflowDisplayContext,
     ) -> Tuple[List[NodeInput], List[VellumVariable]]:
-        subworkflow = raise_if_descriptor(node.subworkflow)
-        subworkflow_inputs_class = subworkflow.get_inputs_class()
+        subworkflow_class = raise_if_descriptor(node.subworkflow)
+        subworkflow_inputs_class = subworkflow_class.get_inputs_class()
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
 
         if isinstance(subworkflow_inputs, BaseInputs):
@@ -112,7 +113,8 @@ class BaseInlineSubworkflowNodeDisplay(
         display_context: WorkflowDisplayContext,
     ) -> List[VellumVariable]:
         workflow_outputs: List[VellumVariable] = []
-        for output_descriptor in raise_if_descriptor(node.subworkflow).Outputs:  # type: ignore[union-attr]
+        subworkflow_class = raise_if_descriptor(node.subworkflow)
+        for output_descriptor in subworkflow_class.Outputs:
             workflow_output_display = display_context.workflow_output_displays[output_descriptor]
             output_type = infer_vellum_variable_type(output_descriptor)
             workflow_outputs.append(
