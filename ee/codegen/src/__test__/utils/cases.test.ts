@@ -98,7 +98,6 @@ describe("Casing utility functions", () => {
         safetyPrefix: "attr_",
         expected: "attr_1hello_world",
       },
-
     ];
 
     it.each(testCases)(
