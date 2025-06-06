@@ -745,7 +745,7 @@ def test_pull__same_pull_twice__one_entry_in_lockfile(vellum_client, mock_module
     zip_contents = _zip_file_map({"workflow.py": "print('hello')"})
     responses = iter([zip_contents, zip_contents])
 
-    def workflows_pull_side_effect():
+    def workflows_pull_side_effect(*_args, **_kwargs):
         return iter([next(responses)])
 
     vellum_client.workflows.pull.side_effect = workflows_pull_side_effect

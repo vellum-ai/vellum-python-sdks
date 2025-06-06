@@ -141,4 +141,4 @@ exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows)
 max-line-length = 120
 exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/resources,src/vellum/types,tests/client,examples/workflows"
 ignore = "E203, W503, E704, U100, U101"
-per-file-ignores = "ee/vellum_cli/tests/test_pull.py:, ee/vellum_cli/tests/test_image_push.py:, ee/vellum_ee/workflows/display/nodes/base_node_display.py:U101, ee/vellum_ee/workflows/display/nodes/utils.py:U101"
+per-file-ignores = "ee/vellum_cli/tests/test_pull.py:U101, ee/vellum_cli/tests/test_image_push.py:U100, ee/vellum_ee/workflows/display/nodes/base_node_display.py:U101, ee/vellum_ee/workflows/display/nodes/utils.py:U101, ee/vellum_ee/workflows/display/nodes/vellum/api_node.py:U101, ee/vellum_ee/workflows/display/nodes/vellum/code_execution_node.py:U101, ee/vellum_ee/workflows/display/nodes/vellum/conditional_node.py:U101, ee/vellum_ee/workflows/display/nodes/vellum/error_node.py:U101, ee/vellum_ee/workflows/display/nodes/vellum/final_output_node.py:U101"
