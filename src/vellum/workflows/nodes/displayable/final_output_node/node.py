@@ -61,3 +61,5 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
                 self.__class__.get_output_type(),
             )
         )
+
+    __simulates_workflow_output__ = True

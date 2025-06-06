@@ -5,9 +5,11 @@ from vellum import AdHocExecutePromptEvent, ExecutePromptEvent, PromptOutput
 from vellum.client.core.api_error import ApiError
 from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode, vellum_error_to_workflow_error
+from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
 
@@ -85,3 +87,29 @@ class BasePromptNode(BaseNode, Generic[StateType]):
             message="Failed to execute Prompt",
             code=WorkflowErrorCode.INTERNAL_ERROR,
         ) from e
+
+    def __directly_emit_workflow_output__(
+        self,
+        event: NodeExecutionStreamingEvent,
+        workflow_output_descriptor: OutputReference,
+    ) -> bool:
+        if event.output.name != "results":
+            return False
+
+        if not isinstance(event.output.delta, str) and not event.output.is_initiated:
+            return False
+
+        target_nodes = [e.to_node for e in self.Ports.default.edges if e.to_node.__simulates_workflow_output__]
+        target_node_output = next(
+            (
+                o
+                for target_node in target_nodes
+                for o in target_node.Outputs
+                if o == workflow_output_descriptor.instance
+            ),
+            None,
+        )
+        if not target_node_output:
+            return False
+
+        return True

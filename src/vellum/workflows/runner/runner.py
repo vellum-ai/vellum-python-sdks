@@ -467,6 +467,19 @@ class WorkflowRunner(Generic[StateType]):
 
         if event.name == "node.execution.streaming":
             for workflow_output_descriptor in self.workflow.Outputs:
+                if node.__directly_emit_workflow_output__(event, workflow_output_descriptor):
+                    active_node.was_outputs_streamed = True
+                    self._workflow_event_outer_queue.put(
+                        self._stream_workflow_event(
+                            BaseOutput(
+                                name=workflow_output_descriptor.name,
+                                value=event.output.value,
+                                delta=event.output.delta,
+                            )
+                        )
+                    )
+                    return None
+
                 node_output_descriptor = workflow_output_descriptor.instance
                 if not isinstance(node_output_descriptor, OutputReference):
                     continue
