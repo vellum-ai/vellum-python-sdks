@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.functions import compile_function_definition
@@ -46,6 +47,23 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         blocks: list = [
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
+
+        function_definitions = raise_if_descriptor(node.functions)
+
+        # Only generate function blocks if the functions are not from a dynamic source
+        if (
+            isinstance(node.functions, BaseDescriptor)
+            and hasattr(node.functions, "__str__")
+            and str(node.functions) != f"{node.__name__}.functions"
+        ):
+            functions = []
+        else:
+            functions = (
+                [self._generate_function_tools(function, i) for i, function in enumerate(function_definitions)]
+                if function_definitions
+                else []
+            )
+        blocks.extend(functions)
 
         serialized_node: JsonObject = {
             "id": str(node_id),

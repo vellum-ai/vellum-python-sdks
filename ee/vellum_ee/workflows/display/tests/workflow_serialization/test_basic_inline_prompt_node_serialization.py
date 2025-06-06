@@ -136,6 +136,17 @@ def test_serialize_workflow():
                                 "cache_config": None,
                                 "state": "ENABLED",
                             },
+                            {
+                                "id": "9b34f084-449d-423f-8691-37518b1ee9ca",
+                                "block_type": "FUNCTION_DEFINITION",
+                                "properties": {
+                                    "function_name": "favorite_noun",
+                                    "function_description": "Returns the favorite noun of the user",
+                                    "function_parameters": {},
+                                    "function_forced": None,
+                                    "function_strict": None,
+                                },
+                            },
                         ],
                     },
                 },
@@ -336,3 +347,16 @@ def test_serialize_workflow_with_descriptor_functions():
     assert "attributes" in prompt_node
     functions_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "functions"), None)
     assert functions_attr is not None, "functions attribute should be present in serialized attributes"
+
+    assert functions_attr["value"]["type"] == "CONSTANT_VALUE"
+    assert functions_attr["value"]["value"]["type"] == "JSON"
+
+    functions_list = functions_attr["value"]["value"]["value"]
+    assert len(functions_list) == 2
+
+    assert functions_list[0]["type"] == "CODE_EXECUTION"
+    assert functions_list[0]["definition"]["name"] == "example_function"
+    assert "src" in functions_list[0]
+
+    assert functions_list[1]["name"] == "test"
+    assert functions_list[1]["description"] == "test"
