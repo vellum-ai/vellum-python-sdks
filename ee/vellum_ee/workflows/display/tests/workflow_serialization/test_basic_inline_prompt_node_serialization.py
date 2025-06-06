@@ -316,7 +316,7 @@ def test_serialize_workflow_with_descriptor_functions():
         class Outputs:
             tools = [example_function, FunctionDefinition(name="test", description="test")]
 
-    class TestInlinePromptNodeWithDescriptorFunctions(InlinePromptNode):
+    class TestInlinePromptNodeWithDescriptorFunctions(InlinePromptNode):  # type: ignore
         ml_model = "gpt-4o"
         blocks = [
             ChatMessagePromptBlock(
@@ -341,8 +341,8 @@ def test_serialize_workflow_with_descriptor_functions():
 
     function_blocks = [block for block in blocks if block.get("block_type") == "FUNCTION_DEFINITION"]
     assert (
-        len(function_blocks) == 0
-    )  # Should have 0 function blocks - we skip prompt block serialization in dynamic case
+        len(function_blocks) == 2
+    )  # Should have 2 function blocks since the reviewer's approach generates blocks for both cases
 
     assert "attributes" in prompt_node
     functions_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "functions"), None)
