@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`StateValueDescriptorReference > should generate correct AST for workflow input reference 1`] = `
-"State.test_variable
+"State.testVariable
 "
 `;

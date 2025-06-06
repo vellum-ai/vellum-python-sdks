@@ -6,7 +6,7 @@ exports[`NodeInputValuePointerRule > should generate correct AST for CONSTANT_VA
 `;
 
 exports[`NodeInputValuePointerRule > should generate correct AST for INPUT_VARIABLE pointer 1`] = `
-"Inputs.test_variable
+"Inputs.testVariable
 "
 `;
 

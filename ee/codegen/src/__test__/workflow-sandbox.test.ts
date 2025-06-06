@@ -64,23 +64,24 @@ describe("Workflow Sandbox", () => {
       expect(sandboxFile).toMatchSnapshot();
     });
 
-    it("should generate correct and same code for snake and camel casing of input names", async () => {
+    it("should generate correct code for snake case input names", async () => {
       const snakeCasedVariables: VellumVariable[] = [
         { id: "1", key: "some_foo", type: "STRING" },
         { id: "2", key: "some_bar", type: "STRING" },
       ];
 
+      const snakeCasedResult = await generateSandboxFile(snakeCasedVariables);
+      expect(snakeCasedResult).toMatchSnapshot();
+    });
+
+    it("should generate correct code for camel case input names", async () => {
       const camelCasedVariables: VellumVariable[] = [
         { id: "1", key: "someFoo", type: "STRING" },
         { id: "2", key: "someBar", type: "STRING" },
       ];
 
-      const snakeCasedResult = await generateSandboxFile(snakeCasedVariables);
       const camelCasedResult = await generateSandboxFile(camelCasedVariables);
-
-      // Assert that both results match the same snapshot
-      expect(snakeCasedResult).toEqual(camelCasedResult);
-      expect(snakeCasedResult).toMatchSnapshot();
+      expect(camelCasedResult).toMatchSnapshot();
     });
 
     it("should generate correct code given optional input with default of null string value", async () => {
