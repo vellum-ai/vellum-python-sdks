@@ -25,20 +25,18 @@ def image_push_command(
     config = load_vellum_cli_config()
 
     if source:
-        logger.info(f"Building Docker image from source directory: {source}")
+        logger.info(f"Building Docker image from Dockerfile: {source}")
 
         if not os.path.exists(source):
-            logger.error(f"Source directory does not exist: {source}")
+            logger.error(f"Dockerfile does not exist: {source}")
             exit(1)
 
-        dockerfile_path = os.path.join(source, "Dockerfile")
-        if not os.path.exists(dockerfile_path):
-            logger.error(f"Dockerfile not found in source directory: {dockerfile_path}")
-            exit(1)
+        source_dir = os.path.dirname(source)
+        dockerfile_name = os.path.basename(source)
 
         build_result = subprocess.run(
-            ["docker", "buildx", "build", "-f", "Dockerfile", "--platform=linux/amd64", "-t", f"{image}:1.0.0", "."],
-            cwd=source,
+            ["docker", "buildx", "build", "-f", dockerfile_name, "--platform=linux/amd64", "-t", image, "."],
+            cwd=source_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )

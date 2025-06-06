@@ -362,7 +362,7 @@ def images() -> None:
     "This field does not push multiple local tags of the passed in image.",
 )
 @click.option("--workspace", type=str, help="The specific Workspace config to use when pushing")
-@click.option("--source", type=str, help="Directory containing Dockerfile to build before pushing")
+@click.option("--source", type=str, help="Path to Dockerfile to build before pushing")
 def image_push(
     image: str, tag: Optional[List[str]] = None, workspace: Optional[str] = None, source: Optional[str] = None
 ) -> None:
