@@ -51,8 +51,20 @@ def _is_annotated(cls: Type, name: str) -> bool:
     return False
 
 
+def _next_base_node_class(bases: Tuple[Type, ...]) -> Optional[Type["BaseNode"]]:
+    if "BaseNode" not in globals():
+        return None
+
+    return next(
+        (base for base in reversed(bases) if issubclass(base, BaseNode)),
+        None,
+    )
+
+
 class BaseNodeMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
+        parent_node_class = _next_base_node_class(bases)
+
         if "Outputs" in dct:
             outputs_class = dct["Outputs"]
             if not any(issubclass(base, BaseOutputs) for base in outputs_class.__bases__):
@@ -82,18 +94,22 @@ class BaseNodeMeta(ABCMeta):
                 raise ValueError("Outputs class not found in base classes")
 
         if "Ports" in dct:
+            parent_ports_class = parent_node_class.Ports if parent_node_class else NodePorts
+
+            # We filter out the `default` port when nodes inherit from other nodes
+            parent_ports_class_dict = {k: v for k, v in parent_ports_class.__dict__.items() if k != "default"}
+
             dct["Ports"] = type(
                 f"{name}.Ports",
-                (NodePorts,),
-                {**dct["Ports"].__dict__, "__module__": dct["__module__"]},
+                (parent_ports_class,),
+                {**parent_ports_class_dict, **dct["Ports"].__dict__, "__module__": dct["__module__"]},
             )
         else:
-            for base in reversed(bases):
-                if issubclass(base, BaseNode):
-                    ports_dct = {p.name: Port(default=p.default) for p in base.Ports}
-                    ports_dct["__module__"] = dct["__module__"]
-                    dct["Ports"] = type(f"{name}.Ports", (NodePorts,), ports_dct)
-                    break
+            parent_ports_class = parent_node_class.Ports if parent_node_class else NodePorts
+
+            ports_dct = {p.name: Port(default=p.default) for p in parent_ports_class}
+            ports_dct["__module__"] = dct["__module__"]
+            dct["Ports"] = type(f"{name}.Ports", (parent_ports_class,), ports_dct)
 
         if "Execution" not in dct:
             for base in reversed(bases):
