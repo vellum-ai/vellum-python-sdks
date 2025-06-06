@@ -41,8 +41,8 @@ export class Expression extends AstNode {
   private readonly workflowContext: WorkflowContext;
   constructor({ lhs, operator, rhs, base, workflowContext }: Expression.Args) {
     super();
-    this.astNode = this.generateAstNode({ lhs, operator, rhs, base });
     this.workflowContext = workflowContext;
+    this.astNode = this.generateAstNode({ lhs, operator, rhs, base });
   }
 
   private generateAstNode({
@@ -113,6 +113,18 @@ export class Expression extends AstNode {
         return `${rawLhs.toString()}[""]`;
       }
       return `${rawLhs.toString()}[${rhs.toString()}]`;
+    }
+
+    if (operator === "coalesce") {
+      if (!rhs) {
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            "rhs must be defined if operator is coalesce"
+          )
+        );
+        return `${rawLhs.toString()}`;
+      }
+      return `${rawLhs.toString()}.${operator}(${rhs.toString()})`;
     }
 
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";

@@ -5,7 +5,6 @@ import { isNil } from "lodash";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
-import { ValueGenerationError } from "src/generators/errors";
 import { Expression } from "src/generators/expression";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
@@ -98,12 +97,6 @@ export class WorkflowValueDescriptor extends AstNode {
           workflowValueDescriptor.operator === "coalesce" &&
           workflowValueDescriptor.lhs === null
         ) {
-          this.workflowContext.addError(
-            new ValueGenerationError(
-              "Skipping null LHS in coalesce expression, using only RHS value",
-              "WARNING"
-            )
-          );
           return this.buildExpression(workflowValueDescriptor.rhs);
         }
 

@@ -448,14 +448,12 @@ export class WorkflowContext {
     const nodeContext = this.globalNodeContextsByNodeId.get(nodeId);
 
     if (!nodeContext) {
-      if (!this.strict) {
-        this.addError(
-          new NodeNotFoundError(
-            `Failed to find node with id '${nodeId}'`,
-            "WARNING"
-          )
-        );
-      }
+      this.addError(
+        new NodeNotFoundError(
+          `Failed to find node with id '${nodeId}'`,
+          "WARNING"
+        )
+      );
     }
 
     return nodeContext;

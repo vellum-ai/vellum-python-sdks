@@ -3,10 +3,6 @@ import { python } from "@fern-api/python-ast";
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
-import {
-  NodeNotFoundError,
-  NodeOutputNotFoundError,
-} from "src/generators/errors";
 import { NodeOutputPointer } from "src/types/vellum";
 
 export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOutputPointer> {
@@ -24,12 +20,6 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
     const nodeContext = this.getReferencedNodeContext();
 
     if (!nodeContext) {
-      this.workflowContext.addError(
-        new NodeNotFoundError(
-          `Node with id '${nodeOutputPointerRuleData.nodeId}' not found in coalesce expression`,
-          "WARNING"
-        )
-      );
       return undefined;
     }
 
@@ -64,13 +54,6 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
         attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],
       });
     }
-
-    this.workflowContext.addError(
-      new NodeOutputNotFoundError(
-        `Output with id '${nodeOutputPointerRuleData.outputId}' not found on node '${nodeContext.nodeClassName}' in coalesce expression`,
-        "WARNING"
-      )
-    );
     return undefined;
   }
 }
