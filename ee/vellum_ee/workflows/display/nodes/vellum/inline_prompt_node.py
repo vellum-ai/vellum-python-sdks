@@ -40,6 +40,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
         node_blocks = raise_if_descriptor(node.blocks) or []
+        function_definitions = raise_if_descriptor(node.functions)
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
@@ -47,11 +48,9 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
 
-        function_definitions = raise_if_descriptor(node.functions)
-
         functions = (
             [self._generate_function_tools(function, i) for i, function in enumerate(function_definitions)]
-            if function_definitions
+            if isinstance(function_definitions, list)
             else []
         )
         blocks.extend(functions)
