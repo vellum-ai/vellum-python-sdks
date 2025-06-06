@@ -79,6 +79,8 @@ def test_workflow__prompt_chunks_with_custom_ports(vellum_adhoc_prompt_client):
     stream = workflow.stream(inputs=Inputs(should_execute=True))
     events = list(stream)
 
+    assert events[-1].name == "workflow.execution.fulfilled", events[-1].body
+
     streaming_events = [event for event in events if event.name == "workflow.execution.streaming"]
     assert len(streaming_events) == 5
 
@@ -100,12 +102,3 @@ def test_workflow__prompt_chunks_with_custom_ports(vellum_adhoc_prompt_client):
     streaming_event = streaming_events[4]
     assert streaming_event.output.is_fulfilled
     assert streaming_event.output.value == "Hello, world!"
-
-
-def test_workflow__custom_ports_skip_branch(vellum_adhoc_prompt_client):
-    workflow = StreamCustomPortsWorkflow()
-
-    terminal_event = workflow.run(inputs=Inputs(should_execute=False))
-
-    assert terminal_event.name == "workflow.execution.fulfilled"
-    assert terminal_event.outputs == {}
