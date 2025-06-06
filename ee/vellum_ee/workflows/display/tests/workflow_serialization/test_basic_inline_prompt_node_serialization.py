@@ -1,5 +1,11 @@
 from deepdiff import DeepDiff
 
+from vellum import ChatMessagePromptBlock, FunctionDefinition, JinjaPromptBlock
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import InlinePromptNode
+from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_inline_prompt_node_with_functions.workflow import BasicInlinePromptWithFunctionsWorkflow
@@ -185,6 +191,27 @@ def test_serialize_workflow():
                         ],
                     },
                 },
+                {
+                    "id": "8107682b-2ca0-4967-88f9-284455936575",
+                    "name": "functions",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {
+                            "type": "JSON",
+                            "value": [
+                                {
+                                    "state": None,
+                                    "cache_config": None,
+                                    "name": "favorite_noun",
+                                    "description": "Returns the favorite noun of the user",
+                                    "parameters": {},
+                                    "forced": None,
+                                    "strict": None,
+                                }
+                            ],
+                        },
+                    },
+                },
             ],
         },
         prompt_node,
@@ -273,4 +300,58 @@ def test_serialize_workflow():
     assert definition == {
         "name": "BasicInlinePromptWithFunctionsWorkflow",
         "module": ["tests", "workflows", "basic_inline_prompt_node_with_functions", "workflow"],
+    }
+
+
+def test_serialize_workflow_with_descriptor_functions():
+    """Test that serialization handles BaseDescriptor instances in functions list."""
+
+    class TestInputs(BaseInputs):
+        noun: str
+
+    class MockMCPClientNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            tools: list[FunctionDefinition]
+
+    class TestInlinePromptNodeWithDescriptorFunctions(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="SYSTEM",
+                blocks=[JinjaPromptBlock(template="Test {{noun}}")],
+            ),
+        ]
+        prompt_inputs = {"noun": TestInputs.noun}
+        functions = MockMCPClientNode.Outputs.tools  # type: ignore
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = MockMCPClientNode >> TestInlinePromptNodeWithDescriptorFunctions
+
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized: dict = workflow_display.serialize()
+
+    prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    assert len(prompt_nodes) == 1
+
+    prompt_node = prompt_nodes[0]
+    assert isinstance(prompt_node, dict)
+    blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
+    assert isinstance(blocks, list)
+
+    function_blocks = [
+        block for block in blocks if isinstance(block, dict) and block.get("block_type") == "FUNCTION_DEFINITION"
+    ]
+    assert len(function_blocks) == 0  # We don't serialize the legacy function blocks when dynamic
+
+    assert "attributes" in prompt_node
+    assert isinstance(prompt_node["attributes"], list)
+    functions_attr = next(
+        (attr for attr in prompt_node["attributes"] if isinstance(attr, dict) and attr["name"] == "functions"), None
+    )
+    assert isinstance(functions_attr, dict), "functions attribute should be present in serialized attributes"
+
+    assert functions_attr["value"] == {
+        "node_id": "cb1186e0-8ff1-4145-823e-96b3fc05a39a",
+        "node_output_id": "470fadb9-b8b5-477e-a502-5209d398bcf9",
+        "type": "NODE_OUTPUT",
     }

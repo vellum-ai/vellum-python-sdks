@@ -195,6 +195,17 @@
                 }
               ]
             }
+          },
+          {
+            "id": "2a8be1e2-2dad-4a2f-80be-01c4723ce1da",
+            "name": "functions",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": null
+              }
+            }
           }
         ]
       },

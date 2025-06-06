@@ -18,10 +18,9 @@ _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 
 class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
-    __serializable_inputs__ = {InlinePromptNode.prompt_inputs}
+    __serializable_inputs__ = {InlinePromptNode.prompt_inputs, InlinePromptNode.functions}
     __unserializable_attributes__ = {
         InlinePromptNode.blocks,
-        InlinePromptNode.functions,
         InlinePromptNode.parameters,
         InlinePromptNode.settings,
         InlinePromptNode.expand_meta,
@@ -48,9 +47,10 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         blocks: list = [
             self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
         ]
+
         functions = (
             [self._generate_function_tools(function, i) for i, function in enumerate(function_definitions)]
-            if function_definitions
+            if isinstance(function_definitions, list)
             else []
         )
         blocks.extend(functions)
