@@ -99,7 +99,7 @@ class BasePromptNode(BaseNode, Generic[StateType]):
         if not isinstance(event.output.delta, str) and not event.output.is_initiated:
             return False
 
-        target_nodes = [e.to_node for e in self.Ports.default.edges if e.to_node.__simulates_workflow_output__]
+        target_nodes = [e.to_node for port in self.Ports for e in port.edges if e.to_node.__simulates_workflow_output__]
         target_node_output = next(
             (
                 o
