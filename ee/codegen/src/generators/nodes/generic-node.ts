@@ -8,6 +8,7 @@ import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
+import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -25,6 +26,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
   private nodeAttributes: AstNode[] = [];
 
+  // True for node that has functions in attributes
+  private isNestedNode: boolean = false;
+
   constructor(args: BaseNode.Args<GenericNodeType, GenericNodeContext>) {
     super(args);
 
@@ -40,6 +44,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       const attributeConfig = nodeAttributes[attribute.name];
       switch (attributeConfig?.type) {
         case AttributeType.Functions: {
+          this.isNestedNode = true;
           const value = attribute.value;
 
           if (
@@ -56,7 +61,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 functionNames.push(f.definition.name);
               }
             });
-            const nodeName = this.nodeContext.getNodeLabel();
 
             nodeAttributesStatements.push(
               python.field({
@@ -66,11 +70,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     const snakeName = toPythonSafeSnakeCase(name);
                     return python.reference({
                       name: snakeName,
-                      modulePath: [
-                        `.${toPythonSafeSnakeCase(
-                          nodeName
-                        )}_functions.${snakeName}`,
-                      ],
+                      modulePath: [`.${snakeName}`],
                     });
                   })
                 ),
@@ -238,13 +238,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         });
       }
     });
-
-    if (this.functionsToGenerate.length > 0) {
-      this.functionsToGenerate.push({
-        functionName: "__init__",
-        content: "# Generated __init__.py\n",
-      });
-    }
   }
 
   public async persist(): Promise<void> {
@@ -258,30 +251,42 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
     }
 
-    await super.persist();
+    if (this.isNestedNode) {
+      // Create __init__.py for node implementation
+      const nodeInitFile = new InitFile({
+        workflowContext: this.workflowContext,
+        modulePath: this.nodeContext.nodeModulePath,
+        statements: [this.generateNodeClass()],
+      });
 
-    // Generate function files
+      // Create __init__.py for node display
+      const displayInitFile = new InitFile({
+        workflowContext: this.workflowContext,
+        modulePath: this.nodeContext.nodeDisplayModulePath,
+        statements: this.generateNodeDisplayClasses(),
+      });
+
+      await Promise.all([
+        nodeInitFile.persist(),
+        displayInitFile.persist(),
+        this.generateFunctionFiles(),
+      ]);
+    } else {
+      await super.persist();
+    }
+  }
+
+  private async generateFunctionFiles(): Promise<void> {
     const absolutePath = this.workflowContext.absolutePathToOutputDirectory;
-    const nodeName = this.nodeContext.getNodeLabel();
-
-    const baseModule = this.workflowContext.moduleName;
-    const basePath = `${baseModule}/nodes/${toPythonSafeSnakeCase(
-      nodeName
-    )}_functions`;
+    const basePath = this.nodeContext.nodeModulePath.join("/");
 
     const nodeDir = join(absolutePath, basePath);
     await mkdir(nodeDir, { recursive: true });
 
     await Promise.all(
       this.functionsToGenerate.map(async (funcFile) => {
-        let filepath: string;
-
-        if (funcFile.functionName === "__init__") {
-          filepath = join(nodeDir, "__init__.py");
-        } else {
-          const fileName = `${toPythonSafeSnakeCase(funcFile.functionName)}.py`;
-          filepath = join(nodeDir, fileName);
-        }
+        const fileName = `${toPythonSafeSnakeCase(funcFile.functionName)}.py`;
+        const filepath = join(nodeDir, fileName);
 
         await writeFile(filepath, funcFile.content);
       })

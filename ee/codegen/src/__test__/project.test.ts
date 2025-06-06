@@ -3658,26 +3658,32 @@ baz = foo + bar
       });
 
       await project.generateCode();
-
+      expectProjectFileToMatchSnapshot(["code", "nodes", "__init__.py"]);
       expectProjectFileToMatchSnapshot([
         "code",
         "nodes",
-        "get_current_weather_node_functions",
+        "tool_call",
         "__init__.py",
       ]);
       expectProjectFileToMatchSnapshot([
         "code",
         "nodes",
-        "get_current_weather_node_functions",
+        "tool_call",
         "get_current_weather.py",
       ]);
       expectProjectFileToMatchSnapshot([
         "code",
         "nodes",
-        "get_current_weather_node_functions",
+        "tool_call",
         "format_answer.py",
       ]);
-      expectProjectFileToMatchSnapshot(["code", "nodes", "tool_call.py"]);
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "display",
+        "nodes",
+        "tool_call",
+        "__init__.py",
+      ]);
     });
     it("should generate empty function array if no functions are defined", async () => {
       const displayData = {
@@ -3859,7 +3865,12 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToMatchSnapshot(["code", "nodes", "tool_call.py"]);
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "tool_call",
+        "__init__.py",
+      ]);
     });
   });
 });
