@@ -1,6 +1,6 @@
 import pytest
 from uuid import UUID
-from typing import Optional
+from typing import Optional, Set
 
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.core.pydantic_utilities import UniversalBaseModel
@@ -9,7 +9,9 @@ from vellum.workflows.descriptors.tests.test_utils import FixtureState
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.ports.port import Port
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState, StateMeta
@@ -333,3 +335,47 @@ def test_base_node__node_reference_of_inherited_annotation():
     # THEN the node reference is of the correct type
     assert isinstance(node_reference, NodeReference)
     assert node_reference.name == "foo"
+
+
+def test_base_node__ports_inheritance():
+    # GIVEN a node with one port
+    class MyNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            foo = Port.on_if(ConstantValueReference(True))
+
+            def __lt__(self, output: BaseOutput) -> Set[Port]:
+                return {self.foo}
+
+    # AND a node that inherits from MyNode
+    class InheritedNode(MyNode):
+        pass
+
+    # WHEN we collect the ports
+    ports = [port.name for port in InheritedNode.Ports]
+
+    # THEN the inheritance is correct
+    inherited_ports = InheritedNode.Ports()
+    assert inherited_ports.__lt__(BaseOutput(name="foo")) == {InheritedNode.Ports.foo}
+
+    # AND the ports are correct
+    assert ports == ["foo"]
+
+
+def test_base_node__ports_inheritance__cumulative_ports():
+    # GIVEN a node with one port
+    class MyNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            foo = Port.on_if(ConstantValueReference(True))
+
+    # AND a node that inherits from MyNode with another port
+    class InheritedNode(MyNode):
+        class Ports(MyNode.Ports):
+            bar = Port.on_if(ConstantValueReference(True))
+
+    # WHEN we collect the ports
+    ports = [port.name for port in InheritedNode.Ports]
+
+    # THEN the ports are correct
+    # Potentially in the future, we support inheriting ports from multiple parents.
+    # For now, we take only the declared ports, so that not all nodes have the default port.
+    assert ports == ["bar"]

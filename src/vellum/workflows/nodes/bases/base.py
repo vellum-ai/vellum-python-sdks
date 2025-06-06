@@ -92,7 +92,7 @@ class BaseNodeMeta(ABCMeta):
                 if issubclass(base, BaseNode):
                     ports_dct = {p.name: Port(default=p.default) for p in base.Ports}
                     ports_dct["__module__"] = dct["__module__"]
-                    dct["Ports"] = type(f"{name}.Ports", (NodePorts,), ports_dct)
+                    dct["Ports"] = type(f"{name}.Ports", (base.Ports,), ports_dct)
                     break
 
         if "Execution" not in dct:
