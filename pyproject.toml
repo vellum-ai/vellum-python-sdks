@@ -3,7 +3,7 @@ name = "vellum-ai"
 
 [tool.poetry]
 name = "vellum-ai"
-version = "0.14.66"
+version = "0.14.67"
 description = ""
 readme = "README.md"
 authors = []
@@ -102,6 +102,8 @@ overrides = [
 ]
 [tool.ruff]
 line-length = 120
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
