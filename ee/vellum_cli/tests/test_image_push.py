@@ -163,3 +163,140 @@ def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, vel
 
     # AND gives the error message for self hosted installs not including the repo
     assert "For adding images to your self hosted install you must include" in result.output
+
+
+@patch("vellum_cli.config.load_vellum_cli_config")
+@patch("os.path.exists")
+@patch("subprocess.run")
+@patch("docker.from_env")
+def test_image_push_with_source_success(
+    mock_docker_from_env, mock_run, mock_exists, mock_config, vellum_client, monkeypatch
+):
+    # GIVEN a self hosted vellum api URL env var
+    monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG
+
+    mock_config.return_value = type("Config", (), {"workspaces": [DEFAULT_WORKSPACE_CONFIG]})()
+
+    mock_exists.return_value = True
+
+    mock_docker_client = MagicMock()
+    mock_docker_from_env.return_value = mock_docker_client
+    mock_docker_client.images.push.return_value = [b'{"status": "Pushed"}']
+
+    mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Build successful"),
+        subprocess.CompletedProcess(
+            args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
+        ),
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
+    ]
+
+    vellum_client.container_images.docker_service_token.return_value = type(
+        "obj", (object,), {"access_token": "345678mnopqr", "organization_id": "test-org", "repository": "myrepo.net"}
+    )()
+
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", "/path/to/source"])
+
+    assert result.exit_code == 0, result.output
+
+    build_call = mock_run.call_args_list[0]
+    assert build_call[0][0] == [
+        "docker",
+        "buildx",
+        "build",
+        "-f",
+        "Dockerfile",
+        "--platform=linux/amd64",
+        "-t",
+        "myimage:latest:1.0.0",
+        ".",
+    ]
+    assert build_call[1]["cwd"] == "/path/to/source"
+
+    assert "Docker build completed successfully" in result.output
+    assert "Image successfully pushed" in result.output
+
+
+@patch("vellum_cli.config.load_vellum_cli_config")
+@patch("os.path.exists")
+@patch("subprocess.run")
+@patch("docker.from_env")
+def test_image_push_with_source_directory_not_exists(
+    mock_docker_from_env, mock_run, mock_exists, mock_config, vellum_client, monkeypatch
+):
+    monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG
+
+    mock_config.return_value = type("Config", (), {"workspaces": [DEFAULT_WORKSPACE_CONFIG]})()
+
+    mock_exists.return_value = False
+
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", "/nonexistent/path"])
+
+    assert result.exit_code == 1
+    assert "Source directory does not exist" in result.output
+
+
+@patch("vellum_cli.config.load_vellum_cli_config")
+@patch("os.path.exists")
+@patch("subprocess.run")
+@patch("docker.from_env")
+def test_image_push_with_source_dockerfile_not_exists(
+    mock_docker_from_env, mock_run, mock_exists, mock_config, vellum_client, monkeypatch
+):
+    monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG
+
+    mock_config.return_value = type("Config", (), {"workspaces": [DEFAULT_WORKSPACE_CONFIG]})()
+
+    def mock_exists_side_effect(path):
+        if path == "/path/to/source":
+            return True
+        elif path == "/path/to/source/Dockerfile":
+            return False
+        return False
+
+    mock_exists.side_effect = mock_exists_side_effect
+
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", "/path/to/source"])
+
+    assert result.exit_code == 1
+    assert "Dockerfile not found in source directory" in result.output
+
+
+@patch("vellum_cli.config.load_vellum_cli_config")
+@patch("os.path.exists")
+@patch("subprocess.run")
+@patch("docker.from_env")
+def test_image_push_with_source_build_fails(
+    mock_docker_from_env, mock_run, mock_exists, mock_config, vellum_client, monkeypatch
+):
+    monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG
+
+    mock_config.return_value = type("Config", (), {"workspaces": [DEFAULT_WORKSPACE_CONFIG]})()
+
+    mock_exists.return_value = True
+
+    mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=1, stderr=b"Build failed: missing dependency"),
+    ]
+
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", "/path/to/source"])
+
+    assert result.exit_code == 1
+    assert "Docker build failed" in result.output
+    assert "Build failed: missing dependency" in result.output
