@@ -1,4 +1,3 @@
-import pytest
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -47,7 +46,6 @@ def test_workflow__happy_path(vellum_adhoc_prompt_client):
     assert streaming_event.output.value == "Hello, world!"
 
 
-@pytest.mark.skip(reason="Finishing it up in https://github.com/vellum-ai/vellum-python-sdks/pull/1578")
 def test_workflow__prompt_chunks(vellum_adhoc_prompt_client):
     # GIVEN a workflow with a prompt and a final output
     workflow = StreamFinalOutputWorkflow()
@@ -100,15 +98,15 @@ def test_workflow__prompt_chunks(vellum_adhoc_prompt_client):
 
     streaming_event = streaming_events[1]
     assert streaming_event.output.is_streaming
-    assert streaming_event.output.value == "Hello"
+    assert streaming_event.output.delta == "Hello"
 
     streaming_event = streaming_events[2]
     assert streaming_event.output.is_streaming
-    assert streaming_event.output.value == ", "
+    assert streaming_event.output.delta == ", "
 
     streaming_event = streaming_events[3]
     assert streaming_event.output.is_streaming
-    assert streaming_event.output.value == "world!"
+    assert streaming_event.output.delta == "world!"
 
     streaming_event = streaming_events[4]
     assert streaming_event.output.is_fulfilled

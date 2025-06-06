@@ -10,6 +10,7 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph import Graph
 from vellum.workflows.graph.graph import GraphTarget
@@ -486,3 +487,16 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
 
     def __repr__(self) -> str:
         return str(self.__class__)
+
+    __simulates_workflow_output__ = False
+
+    def __directly_emit_workflow_output__(
+        self, event: NodeExecutionStreamingEvent, workflow_output_descriptor: OutputReference
+    ) -> bool:
+        """
+        In the legacy workflow runner, there was support for emitting streaming workflow outputs for prompt nodes
+        connected to terminal nodes. These two private methods provides a hacky, intentionally short-lived workaround
+        for us to enable this until we can directly reference prompt outputs from the UI.
+        """
+
+        return False
