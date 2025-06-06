@@ -30,7 +30,7 @@ class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
 `;
 
 exports[`ToolCallingNode > basic > getNodeFile 1`] = `
-"from .tool_calling_node_functions.get_current_weather import get_current_weather
+"from .get_current_weather import get_current_weather
 
 from vellum import (
     ChatMessagePromptBlock,
