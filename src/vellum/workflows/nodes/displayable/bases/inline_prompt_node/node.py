@@ -63,7 +63,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     class Trigger(BasePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
-    def _extract_required_input_variables(self, blocks: Union[List[PromptBlock], List[RichTextChildBlock]]) -> Set[str]:
+    def _extract_required_input_variables(
+        self, blocks: Union[List[PromptBlock], List[RichTextChildBlock]]
+    ) -> Set[str]:
         required_variables = set()
 
         for block in blocks:
@@ -175,6 +177,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             if event.state == "INITIATED":
                 continue
             elif event.state == "STREAMING":
+                if event.output.type == "STRING":
+                    yield BaseOutput(name="text", delta=event.output.value)
+
                 yield BaseOutput(name="results", delta=event.output.value)
             elif event.state == "FULFILLED":
                 outputs = event.outputs

@@ -1,9 +1,11 @@
+import types
 from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.bases.base import BaseNodeMeta
+from vellum.workflows.nodes.bases.base import BaseNodeMeta, NodeRunResponse
 from vellum.workflows.nodes.utils import cast_to_output_type
+from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
@@ -53,8 +55,15 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
         # for downstream references to this output.
         value: _OutputType = undefined  # type: ignore[valid-type]
 
-    def run(self) -> Outputs:
+    def run(self) -> NodeRunResponse:
         original_outputs = self.Outputs()
+        print("RUN", original_outputs.value)
+
+        if isinstance(original_outputs.value, types.GeneratorType):
+            for value in original_outputs.value:
+                yield BaseOutput(delta=value, name="value")
+
+            return
 
         return self.Outputs(
             value=cast_to_output_type(

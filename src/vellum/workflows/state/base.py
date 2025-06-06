@@ -10,6 +10,7 @@ from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, cast
 from typing_extensions import dataclass_transform
 
+import types
 from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
 from pydantic_core import core_schema
 
@@ -210,7 +211,8 @@ class NodeExecutionCache:
                 for execution_id, dependencies in self._dependencies_invoked.items()
             },
             "node_executions_initiated": {
-                str(node.__id__): list(execution_ids) for node, execution_ids in self._node_executions_initiated.items()
+                str(node.__id__): list(execution_ids)
+                for node, execution_ids in self._node_executions_initiated.items()
             },
             "node_executions_fulfilled": {
                 str(node.__id__): execution_ids.dump()
@@ -391,6 +393,10 @@ class StateMeta(UniversalBaseModel):
     def __deepcopy__(self, memo: Optional[Dict[int, Any]] = None) -> "StateMeta":
         if not memo:
             memo = {}
+
+        for key, value in self.node_outputs.items():
+            if isinstance(value, types.GeneratorType):
+                breakpoint()
 
         new_node_outputs = {
             descriptor: value if isinstance(value, Queue) else deepcopy(value, memo)

@@ -247,6 +247,7 @@ class WorkflowRunner(Generic[StateType]):
                         instance=None,
                         outputs_class=node.Outputs,
                     )
+                    print("INITIATED OUTPUT", output.name)
                     with node.state.__quiet__():
                         node.state.meta.node_outputs[output_descriptor] = streaming_output_queues[output.name]
                     initiated_output: BaseOutput = BaseOutput(name=output.name)
@@ -316,6 +317,7 @@ class WorkflowRunner(Generic[StateType]):
                     node.state.meta.node_outputs[descriptor] = output_value
 
             invoked_ports = ports(outputs, node.state)
+            print("FULFILLED OUTPUT", outputs)
             self._workflow_event_inner_queue.put(
                 NodeExecutionFulfilledEvent(
                     trace_id=execution.trace_id,

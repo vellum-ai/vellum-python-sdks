@@ -47,7 +47,6 @@ def test_workflow__happy_path(vellum_adhoc_prompt_client):
     assert streaming_event.output.value == "Hello, world!"
 
 
-@pytest.mark.skip(reason="Finishing it up in https://github.com/vellum-ai/vellum-python-sdks/pull/1578")
 def test_workflow__prompt_chunks(vellum_adhoc_prompt_client):
     # GIVEN a workflow with a prompt and a final output
     workflow = StreamFinalOutputWorkflow()

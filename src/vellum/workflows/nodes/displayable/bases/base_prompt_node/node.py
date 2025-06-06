@@ -37,9 +37,8 @@ class BasePromptNode(BaseNode, Generic[StateType]):
                 return super().__call__(outputs, state)
 
         def __lt__(self, output: BaseOutput) -> Set[Port]:
-            if output.is_initiated:
-                if self.__is_streamable__():
-                    return {self.default}
+            if output.is_initiated and self.__is_streamable__() and output.name == "text":
+                return {self.default}
 
             return set()
 
