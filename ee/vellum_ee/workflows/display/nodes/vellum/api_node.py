@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar, cast
+from typing import ClassVar, Dict, Generic, Optional, TypeVar, cast
 
 from vellum.workflows.nodes.displayable import APINode
 from vellum.workflows.references.output import OutputReference
@@ -32,7 +32,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
     }
 
     def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
+        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
     ) -> JsonObject:
         node = self._node
         node_id = self.node_id
