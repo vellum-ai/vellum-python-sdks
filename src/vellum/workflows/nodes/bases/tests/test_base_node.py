@@ -376,4 +376,6 @@ def test_base_node__ports_inheritance__cumulative_ports():
     ports = [port.name for port in InheritedNode.Ports]
 
     # THEN the ports are correct
-    assert ports == ["foo", "bar"]
+    # Potentially in the future, we support inheriting ports from multiple parents.
+    # For now, we take only the declared ports, so that not all nodes have the default port.
+    assert ports == ["bar"]
