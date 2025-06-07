@@ -284,34 +284,17 @@ class BadNode(TemplatingNode[BaseState, str]):
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 1`] = `
-"# Generated __init__.py
+"from .tool_call import GetCurrentWeatherNode
+
+__all__ = [
+    "GetCurrentWeatherNode",
+]
 "
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 2`] = `
-"def get_current_weather(location: str, unit: str) -> str:
-    """
-    Get the current weather in a given location.
-    """
-    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
-"
-`;
-
-exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 3`] = `
-"def format_answer(answer: str) -> str:
-    """
-    Format the answer and request the LLM to provide a final text summary.
-    """
-    formatted = f"The answer to the question is: {answer}"
-    return (
-        f"{formatted}\\n\\nNow please provide a final summary with any temperature conversions or additional information."
-    )
-"
-`;
-
-exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 4`] = `
-"from .get_current_weather_node_functions.format_answer import format_answer
-from .get_current_weather_node_functions.get_current_weather import get_current_weather
+"from .format_answer import format_answer
+from .get_current_weather import get_current_weather
 from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
@@ -338,6 +321,52 @@ class GetCurrentWeatherNode(ToolCallingNode):
     class Outputs(ToolCallingNode.Outputs):
         text: str
         chat_history: List[ChatMessage]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 3`] = `
+"def get_current_weather(location: str, unit: str) -> str:
+    """
+    Get the current weather in a given location.
+    """
+    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 4`] = `
+"def format_answer(answer: str) -> str:
+    """
+    Format the answer and request the LLM to provide a final text summary.
+    """
+    formatted = f"The answer to the question is: {answer}"
+    return (
+        f"{formatted}\\n\\nNow please provide a final summary with any temperature conversions or additional information."
+    )
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file 5`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+
+from ....nodes.tool_call import GetCurrentWeatherNode
+
+
+class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    attribute_ids_by_name = {
+        "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
+        "max_tool_calls": UUID("723f614a-be30-4f27-90d0-896c740e58d3"),
+        "blocks": UUID("beec5344-2eff-47d2-b920-b90367370d79"),
+        "functions": UUID("7b1ab802-3228-43b3-a493-734c94794710"),
+        "prompt_inputs": UUID("38cf126e-a186-4a63-8e30-47c4507413cd"),
+    }
+    port_displays = {
+        GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("7b97f998-4be5-478d-94c4-9423db5f6392"))
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
 "
 `;
 
