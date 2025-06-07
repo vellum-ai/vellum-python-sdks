@@ -93,13 +93,6 @@ export class WorkflowValueDescriptor extends AstNode {
         });
       }
       case "BINARY_EXPRESSION": {
-        if (
-          workflowValueDescriptor.operator === "coalesce" &&
-          workflowValueDescriptor.lhs === null
-        ) {
-          return this.buildExpression(workflowValueDescriptor.rhs);
-        }
-
         const lhs = this.buildExpression(workflowValueDescriptor.lhs);
         const rhs = this.buildExpression(workflowValueDescriptor.rhs);
         const operator = convertOperatorType(workflowValueDescriptor);

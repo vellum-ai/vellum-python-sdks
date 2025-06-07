@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
 
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
@@ -41,8 +42,8 @@ export class Expression extends AstNode {
   private readonly workflowContext: WorkflowContext;
   constructor({ lhs, operator, rhs, base, workflowContext }: Expression.Args) {
     super();
-    this.workflowContext = workflowContext;
     this.astNode = this.generateAstNode({ lhs, operator, rhs, base });
+    this.workflowContext = workflowContext;
   }
 
   private generateAstNode({
@@ -97,7 +98,8 @@ export class Expression extends AstNode {
     let rawLhs = lhs;
     if (
       this.isConstantValueReference(lhs) ||
-      this.isConstantValuePointer(lhs)
+      this.isConstantValuePointer(lhs) ||
+      this.isTypeInstantiation(lhs)
     ) {
       rawLhs = this.generateLhsAsConstantReference(lhs);
     }
@@ -119,7 +121,8 @@ export class Expression extends AstNode {
       if (!rhs) {
         this.workflowContext.addError(
           new NodeAttributeGenerationError(
-            "rhs must be defined if operator is coalesce"
+            "Missing RHS definition of `coalesce` operator",
+            "WARNING"
           )
         );
         return `${rawLhs.toString()}`;
@@ -172,6 +175,10 @@ export class Expression extends AstNode {
       lhs.nodeInputValuePointer.nodeInputValuePointerData.rules[0]?.type ===
         "CONSTANT_VALUE"
     );
+  }
+
+  private isTypeInstantiation(lhs: AstNode): boolean {
+    return lhs instanceof TypeInstantiation
   }
 
   public write(writer: Writer) {
