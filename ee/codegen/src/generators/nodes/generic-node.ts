@@ -26,7 +26,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
   private nodeAttributes: AstNode[] = [];
 
-  // True for node that has functions in attributes
+  // True for node that has additional assets generated from attributes like functions or subworkflows
   private isNestedNode: boolean = false;
 
   constructor(args: BaseNode.Args<GenericNodeType, GenericNodeContext>) {
