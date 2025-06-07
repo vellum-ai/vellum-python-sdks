@@ -28,8 +28,7 @@ def image_push_command(
         logger.info(f"Building Docker image from Dockerfile: {source}")
 
         if not os.path.exists(source):
-            logger.error(f"Dockerfile does not exist: {source}")
-            exit(1)
+            handle_cli_error(logger, "Dockerfile not found", f"Dockerfile does not exist: {source}")
 
         source_dir = os.path.dirname(source)
         dockerfile_name = os.path.basename(source)
@@ -42,8 +41,7 @@ def image_push_command(
         )
 
         if build_result.returncode != 0:
-            logger.error(f"Docker build failed: {build_result.stderr.decode('utf-8')}")
-            exit(1)
+            handle_cli_error(logger, "Docker build failed", build_result.stderr.decode("utf-8"))
 
         logger.info("Docker build completed successfully")
     workspace_config = next((w for w in config.workspaces if w.name == workspace), DEFAULT_WORKSPACE_CONFIG)

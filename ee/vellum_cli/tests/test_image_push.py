@@ -187,9 +187,11 @@ def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_c
         subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
     ]
 
-    vellum_client.container_images.docker_service_token.return_value = type(
-        "obj", (object,), {"access_token": "345678mnopqr", "organization_id": "test-org", "repository": "myrepo.net"}
-    )()
+    from vellum.client.types.docker_service_token import DockerServiceToken
+
+    vellum_client.container_images.docker_service_token.return_value = DockerServiceToken(
+        access_token="345678mnopqr", organization_id="test-org", repository="myrepo.net"
+    )
 
     runner = CliRunner()
     result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", dockerfile_path])
