@@ -4,7 +4,6 @@ from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
-from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.experimental.tool_calling_node import ToolCallingNode
 from vellum.workflows.outputs.base import BaseOutputs
@@ -16,12 +15,8 @@ class Inputs(BaseInputs):
     date: str
 
 
-class NestedInputs(BaseInputs):
-    metro: str
-
-
 class StartNode(BaseNode):
-    metro = NestedInputs.metro
+    city = Inputs.city
     date = Inputs.date
 
     class Outputs(BaseOutputs):
@@ -29,30 +24,15 @@ class StartNode(BaseNode):
         reasoning: str
 
     def run(self) -> Outputs:
-        return self.Outputs(temperature=70, reasoning=f"The weather in {self.metro} on {self.date} was hot")
+        return self.Outputs(temperature=70, reasoning=f"The weather in {self.city} on {self.date} was hot")
 
 
-class NestedWorkflow(BaseWorkflow[NestedInputs, BaseState]):
+class BasicInlineSubworkflowWorkflow(BaseWorkflow[Inputs, BaseState]):
     graph = StartNode
 
     class Outputs(BaseOutputs):
         temperature = StartNode.Outputs.temperature
         reasoning = StartNode.Outputs.reasoning
-
-
-class ExampleInlineSubworkflowNode(InlineSubworkflowNode):
-    subworkflow_inputs = {
-        "metro": Inputs.city,
-    }
-    subworkflow = NestedWorkflow
-
-
-class BasicInlineSubworkflowWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = ExampleInlineSubworkflowNode
-
-    class Outputs(BaseOutputs):
-        temperature = ExampleInlineSubworkflowNode.Outputs.temperature
-        reasoning = ExampleInlineSubworkflowNode.Outputs.reasoning
 
 
 class WorkflowInputs(BaseInputs):
