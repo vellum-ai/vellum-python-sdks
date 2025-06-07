@@ -403,6 +403,8 @@ def test_serialize_workflow():
                                                             "id": "704c4640-bfda-44f0-8da3-e9cfc4f21cf2",
                                                             "key": "metro",
                                                             "type": "STRING",
+                                                            "default": None,
+                                                            "required": True,
                                                         }
                                                     ],
                                                     "output_variables": [

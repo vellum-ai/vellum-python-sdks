@@ -301,7 +301,15 @@ def test_serialize_workflow():
                         },
                     ],
                 },
-                "input_variables": [{"id": "704c4640-bfda-44f0-8da3-e9cfc4f21cf2", "key": "metro", "type": "STRING"}],
+                "input_variables": [
+                    {
+                        "id": "704c4640-bfda-44f0-8da3-e9cfc4f21cf2",
+                        "key": "metro",
+                        "type": "STRING",
+                        "required": True,
+                        "default": None,
+                    }
+                ],
                 "output_variables": [
                     {"id": "2fc57139-7420-49e5-96a6-dcbb3ff5d622", "key": "temperature", "type": "NUMBER"},
                     {"id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82", "key": "reasoning", "type": "STRING"},

@@ -2,8 +2,10 @@ from uuid import UUID
 from typing import ClassVar, Dict, Generic, List, Optional, Tuple, Type, TypeVar
 
 from vellum import VellumVariable
+from vellum.workflows.constants import undefined
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlineSubworkflowNode
+from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -100,6 +102,12 @@ class BaseInlineSubworkflowNodeDisplay(
                 id=node_inputs_by_key[descriptor.name].id,
                 key=descriptor.name,
                 type=infer_vellum_variable_type(descriptor),
+                required=descriptor.instance is undefined,
+                default=(
+                    primitive_to_vellum_value(descriptor.instance).dict()
+                    if descriptor.instance is not undefined
+                    else None
+                ),
             )
             for descriptor in subworkflow_inputs_class
         ]
