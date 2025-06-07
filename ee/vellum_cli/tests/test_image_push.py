@@ -11,6 +11,7 @@ from typing import Generator
 from click.testing import CliRunner
 from httpx import Response
 
+from vellum.client.types.docker_service_token import DockerServiceToken
 from vellum_cli import main as cli_main
 
 
@@ -186,8 +187,6 @@ def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_c
         ),
         subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
     ]
-
-    from vellum.client.types.docker_service_token import DockerServiceToken
 
     vellum_client.container_images.docker_service_token.return_value = DockerServiceToken(
         access_token="345678mnopqr", organization_id="test-org", repository="myrepo.net"
