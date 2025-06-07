@@ -1,7 +1,7 @@
 import { python } from "@fern-api/python-ast";
+import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
 
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
@@ -178,7 +178,7 @@ export class Expression extends AstNode {
   }
 
   private isTypeInstantiation(lhs: AstNode): boolean {
-    return lhs instanceof TypeInstantiation
+    return lhs instanceof TypeInstantiation;
   }
 
   public write(writer: Writer) {
