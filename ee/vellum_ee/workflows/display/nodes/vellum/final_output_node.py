@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Any, ClassVar, Generic, Optional, TypeVar
+from typing import ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.types.core import JsonObject
@@ -19,7 +19,7 @@ NODE_INPUT_KEY = "node_input"
 class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[_FinalOutputNodeType]):
     output_name: ClassVar[Optional[str]] = None
 
-    def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext, **_kwargs) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

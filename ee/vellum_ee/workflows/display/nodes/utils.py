@@ -8,11 +8,11 @@ _T = TypeVar("_T")
 
 
 @overload
-def raise_if_descriptor(node_attr: BaseDescriptor[_T]) -> _T: ...
+def raise_if_descriptor(_node_attr: BaseDescriptor[_T]) -> _T: ...
 
 
 @overload
-def raise_if_descriptor(node_attr: _T) -> _T: ...
+def raise_if_descriptor(_node_attr: _T) -> _T: ...
 
 
 def raise_if_descriptor(node_attr: Union[NodeReference[_T], _T]) -> Optional[_T]:
