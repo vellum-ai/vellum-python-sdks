@@ -130,6 +130,16 @@
       "container_image_tag": null,
       "workspace": "default",
       "target_directory": null
+    },
+    {
+      "module": "mcp_demo",
+      "workflow_sandbox_id": "f530e95a-c752-4c17-bbfc-309eed234502",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
     }
   ],
   "workspaces": [
