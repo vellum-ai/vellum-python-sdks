@@ -1,4 +1,5 @@
 import { python } from "@fern-api/python-ast";
+import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
@@ -97,7 +98,8 @@ export class Expression extends AstNode {
     let rawLhs = lhs;
     if (
       this.isConstantValueReference(lhs) ||
-      this.isConstantValuePointer(lhs)
+      this.isConstantValuePointer(lhs) ||
+      this.isTypeInstantiation(lhs)
     ) {
       rawLhs = this.generateLhsAsConstantReference(lhs);
     }
@@ -160,6 +162,10 @@ export class Expression extends AstNode {
       lhs.nodeInputValuePointer.nodeInputValuePointerData.rules[0]?.type ===
         "CONSTANT_VALUE"
     );
+  }
+
+  private isTypeInstantiation(lhs: AstNode): boolean {
+    return lhs instanceof TypeInstantiation;
   }
 
   public write(writer: Writer) {

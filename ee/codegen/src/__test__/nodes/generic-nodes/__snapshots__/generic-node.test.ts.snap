@@ -177,6 +177,22 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with invalid coalesce binary expression > should handle null LHS in coalesce expression gracefully 1`] = `
+"from vellum.workflows.nodes import BaseNode
+from vellum.workflows.references.constant import ConstantValueReference
+
+
+class TestCoalesceNode(BaseNode):
+    coalesce_attribute = ConstantValueReference(None).coalesce("fallback_value")
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

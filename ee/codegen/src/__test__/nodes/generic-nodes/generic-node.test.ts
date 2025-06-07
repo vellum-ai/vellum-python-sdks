@@ -12,7 +12,11 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
-import { AdornmentNode, NodeAttribute } from "src/types/vellum";
+import {
+  AdornmentNode,
+  NodeAttribute,
+  WorkflowValueDescriptor,
+} from "src/types/vellum";
 
 describe("GenericNode", () => {
   let workflowContext: WorkflowContext;
@@ -20,7 +24,7 @@ describe("GenericNode", () => {
   let node: GenericNode;
 
   beforeEach(() => {
-    workflowContext = workflowContextFactory();
+    workflowContext = workflowContextFactory({ strict: false });
     writer = new Writer();
 
     workflowContext.addInputVariableContext(
@@ -502,6 +506,49 @@ describe("GenericNode", () => {
         workflowContext,
         nodeContext,
       });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with invalid coalesce binary expression", () => {
+    beforeEach(async () => {
+      const nodeAttributes: NodeAttribute[] = [
+        {
+          id: "attr-1",
+          name: "coalesce-attribute",
+          value: {
+            type: "BINARY_EXPRESSION",
+            operator: "coalesce",
+            lhs: null,
+            rhs: {
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "STRING",
+                value: "fallback_value",
+              },
+            },
+          } as unknown as WorkflowValueDescriptor,
+        },
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "TestCoalesceNode",
+        nodeAttributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should handle null LHS in coalesce expression gracefully", async () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
