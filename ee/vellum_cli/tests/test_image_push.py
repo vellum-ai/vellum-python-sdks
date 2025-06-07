@@ -11,6 +11,7 @@ from typing import Generator
 from click.testing import CliRunner
 from httpx import Response
 
+from vellum.client.types.docker_service_token import DockerServiceToken
 from vellum_cli import main as cli_main
 
 
@@ -163,3 +164,91 @@ def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, vel
 
     # AND gives the error message for self hosted installs not including the repo
     assert "For adding images to your self hosted install you must include" in result.output
+
+
+@patch("subprocess.run")
+@patch("docker.from_env")
+def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir):
+    monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    dockerfile_path = os.path.join(mock_temp_dir, "Dockerfile")
+    with open(dockerfile_path, "w") as f:
+        f.write("FROM alpine:latest\n")
+
+    mock_docker_client = MagicMock()
+    mock_docker_from_env.return_value = mock_docker_client
+    mock_docker_client.images.push.return_value = [b'{"status": "Pushed"}']
+
+    mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Build successful"),
+        subprocess.CompletedProcess(
+            args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
+        ),
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
+    ]
+
+    vellum_client.container_images.docker_service_token.return_value = DockerServiceToken(
+        access_token="345678mnopqr", organization_id="test-org", repository="myrepo.net"
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", dockerfile_path])
+
+    assert result.exit_code == 0, result.output
+
+    build_call = mock_run.call_args_list[0]
+    assert build_call[0][0] == [
+        "docker",
+        "buildx",
+        "build",
+        "-f",
+        "Dockerfile",
+        "--platform=linux/amd64",
+        "-t",
+        "myimage:latest",
+        ".",
+    ]
+    assert build_call[1]["cwd"] == mock_temp_dir
+
+    assert "Docker build completed successfully" in result.output
+    assert "Image successfully pushed" in result.output
+
+
+@patch("subprocess.run")
+@patch("docker.from_env")
+def test_image_push_with_source_dockerfile_not_exists(
+    mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir
+):
+    monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    nonexistent_dockerfile = os.path.join(mock_temp_dir, "nonexistent_dockerfile")
+
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", nonexistent_dockerfile])
+
+    assert result.exit_code == 1
+    assert "Dockerfile does not exist" in result.output
+
+
+@patch("subprocess.run")
+@patch("docker.from_env")
+def test_image_push_with_source_build_fails(mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir):
+    monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    dockerfile_path = os.path.join(mock_temp_dir, "Dockerfile")
+    with open(dockerfile_path, "w") as f:
+        f.write("FROM alpine:latest\n")
+
+    mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=1, stderr=b"Build failed: missing dependency"),
+    ]
+
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", dockerfile_path])
+
+    assert result.exit_code == 1
+    assert "Docker build failed" in result.output
+    assert "Build failed: missing dependency" in result.output
