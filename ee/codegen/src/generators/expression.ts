@@ -117,19 +117,6 @@ export class Expression extends AstNode {
       return `${rawLhs.toString()}[${rhs.toString()}]`;
     }
 
-    if (operator === "coalesce") {
-      if (!rhs) {
-        this.workflowContext.addError(
-          new NodeAttributeGenerationError(
-            "Missing RHS definition of `coalesce` operator",
-            "WARNING"
-          )
-        );
-        return `${rawLhs.toString()}`;
-      }
-      return `${rawLhs.toString()}.${operator}(${rhs.toString()})`;
-    }
-
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
 
     if (operator === "or") {
