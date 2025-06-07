@@ -16,6 +16,7 @@ from .google_vertex_ai_vectorizer_text_embedding_004 import GoogleVertexAiVector
 from .google_vertex_ai_vectorizer_text_multilingual_embedding_002 import (
     GoogleVertexAiVectorizerTextMultilingualEmbedding002,
 )
+from .fast_embed_vectorizer_baai_bge_small_en_v_15 import FastEmbedVectorizerBaaiBgeSmallEnV15
 
 IndexingConfigVectorizer = typing.Union[
     OpenAiVectorizerTextEmbedding3Small,
@@ -27,4 +28,5 @@ IndexingConfigVectorizer = typing.Union[
     HkunlpInstructorXlVectorizer,
     GoogleVertexAiVectorizerTextEmbedding004,
     GoogleVertexAiVectorizerTextMultilingualEmbedding002,
+    FastEmbedVectorizerBaaiBgeSmallEnV15,
 ]

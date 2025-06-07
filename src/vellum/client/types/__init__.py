@@ -127,6 +127,8 @@ from .execution_vellum_value import ExecutionVellumValue
 from .external_input_descriptor import ExternalInputDescriptor
 from .external_test_case_execution import ExternalTestCaseExecution
 from .external_test_case_execution_request import ExternalTestCaseExecutionRequest
+from .fast_embed_vectorizer_baai_bge_small_en_v_15 import FastEmbedVectorizerBaaiBgeSmallEnV15
+from .fast_embed_vectorizer_baai_bge_small_en_v_15_request import FastEmbedVectorizerBaaiBgeSmallEnV15Request
 from .finish_reason_enum import FinishReasonEnum
 from .folder_entity import FolderEntity
 from .folder_entity_document_index import FolderEntityDocumentIndex
@@ -737,6 +739,8 @@ __all__ = [
     "ExternalInputDescriptor",
     "ExternalTestCaseExecution",
     "ExternalTestCaseExecutionRequest",
+    "FastEmbedVectorizerBaaiBgeSmallEnV15",
+    "FastEmbedVectorizerBaaiBgeSmallEnV15Request",
     "FinishReasonEnum",
     "FolderEntity",
     "FolderEntityDocumentIndex",
