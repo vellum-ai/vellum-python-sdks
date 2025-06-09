@@ -790,32 +790,27 @@ def test_serialize_workflow__dict_reference():
 
 
 def test_serialize_workflow__empty_rules_indexerror():
-    """Test that reproduces IndexError when workflow output has empty rules due to unsupported descriptor."""
-    from unittest.mock import MagicMock, patch
+    """Test that reproduces IndexError when workflow output has empty rules due to dictionary key access."""
 
-    # GIVEN a simple node with string output
+    # GIVEN a node with dictionary output
     class StartNode(BaseNode):
         class Outputs(BaseNode.Outputs):
-            simple_output: str = "test"
+            data: dict = {"key": "value"}
 
-    # AND a workflow that references this output
+    # AND a workflow that references dictionary key access in its outputs
     class MyWorkflow(BaseWorkflow):
         graph = StartNode
 
         class Outputs(BaseWorkflow.Outputs):
-            problematic_output = StartNode.Outputs.simple_output
+            # This dictionary key access should cause empty rules and trigger IndexError
+            problematic_output = StartNode.Outputs.data["bar"]
 
-    # WHEN we mock create_node_input to return a NodeInput with empty rules
-    with patch("vellum_ee.workflows.display.workflows.base_workflow_display.create_node_input") as mock_create_input:
-        mock_node_input = MagicMock()
-        mock_node_input.value.rules = []  # Empty rules list that will cause IndexError
-        mock_create_input.return_value = mock_node_input
+    # WHEN we try to serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
 
-        workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    # THEN it should raise an IndexError due to accessing rules[0] on empty list
+    with pytest.raises(IndexError) as exc_info:
+        workflow_display.serialize()
 
-        # THEN it should raise an IndexError due to accessing rules[0] on empty list
-        with pytest.raises(IndexError) as exc_info:
-            workflow_display.serialize()
-
-        # AND the error should be related to list index out of range
-        assert "list index out of range" in str(exc_info.value)
+    # AND the error should be related to list index out of range
+    assert "list index out of range" in str(exc_info.value)
