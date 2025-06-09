@@ -553,4 +553,39 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("basic with environment variable reference as attribute", () => {
+    beforeEach(async () => {
+      const nodeAttributes: NodeAttribute[] = [
+        {
+          id: "attr-1",
+          name: "api-key-attribute",
+          value: {
+            type: "ENVIRONMENT_VARIABLE",
+            environmentVariable: "API_KEY",
+          },
+        },
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "TestEnvironmentVariableNode",
+        nodeAttributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

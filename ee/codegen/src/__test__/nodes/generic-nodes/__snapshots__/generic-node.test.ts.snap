@@ -160,6 +160,22 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with environment variable reference as attribute > getNodeFile 1`] = `
+"from vellum.workflows.nodes import BaseNode
+from vellum.workflows.references import EnvironmentVariableReference
+
+
+class TestEnvironmentVariableNode(BaseNode):
+    api_key_attribute = EnvironmentVariableReference(name="API_KEY")
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with generic node output as attribute > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
 
