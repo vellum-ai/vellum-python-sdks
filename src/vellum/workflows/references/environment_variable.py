@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class EnvironmentVariableReference(BaseDescriptor[str]):
-    def __init__(self, *, name: str, default: Optional[str]):
+    def __init__(self, *, name: str, default: Optional[str] = ""):
         super().__init__(name=name, types=(str,))
         self._default = default
 
