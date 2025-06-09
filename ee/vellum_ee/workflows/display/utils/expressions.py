@@ -241,13 +241,10 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         }
 
     if isinstance(value, EnvironmentVariableReference):
-        result: JsonObject = {
+        return {
             "type": "ENVIRONMENT_VARIABLE",
-            "name": value.name,
+            "environment_variable": value.name,
         }
-        if value._default is not None:
-            result["default"] = primitive_to_vellum_value(value._default).dict()
-        return result
 
     if isinstance(value, ExecutionCountReference):
         node_class_display = display_context.global_node_displays[value.node_class]

@@ -478,14 +478,13 @@ def test_serialize_node__node_execution(serialize_node):
 
 def test_serialize_node__environment_variable(serialize_node):
     class EnvironmentVariableGenericNode(BaseNode):
-        attr = EnvironmentVariableReference(name="API_KEY", default="default_value")
+        attr = EnvironmentVariableReference(name="API_KEY")
 
     serialized_node = serialize_node(EnvironmentVariableGenericNode)
 
     expected_value = {
         "type": "ENVIRONMENT_VARIABLE",
-        "name": "API_KEY",
-        "default": {"type": "STRING", "value": "default_value"},
+        "environment_variable": "API_KEY",
     }
 
     actual_value = serialized_node["attributes"][0]["value"]
