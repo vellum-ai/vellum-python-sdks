@@ -1,11 +1,11 @@
 import asyncio
-import os
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from vellum import ChatMessage, FunctionCallChatMessageContent, StringChatMessageContent
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
 from ..state import State
 from .my_prompt_node import MyPromptNode
@@ -13,6 +13,7 @@ from .my_prompt_node import MyPromptNode
 
 class ExecuteActionNode(BaseNode[State]):
     action = MyPromptNode.Outputs.results[0]
+    token = EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN", default="")
 
     class Outputs(BaseNode.Outputs):
         action_result: str
@@ -33,7 +34,7 @@ class ExecuteActionNode(BaseNode[State]):
             command="/usr/local/bin/docker",
             args=["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
             env={
-                "GITHUB_PERSONAL_ACCESS_TOKEN": os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"],
+                "GITHUB_PERSONAL_ACCESS_TOKEN": self.token,
             },
         )
 
