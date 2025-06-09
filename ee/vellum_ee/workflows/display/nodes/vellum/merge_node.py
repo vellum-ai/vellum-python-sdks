@@ -17,7 +17,7 @@ class BaseMergeNodeDisplay(BaseNodeDisplay[_MergeNodeType], Generic[_MergeNodeTy
         super().__init__()
         self._target_handle_iterator = 0
 
-    def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext, **_kwargs: Any) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

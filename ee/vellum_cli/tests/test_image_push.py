@@ -148,14 +148,14 @@ def test_image_push__self_hosted_happy_path__workspace_option(
 
 @patch("subprocess.run")
 @patch("docker.from_env")
-@pytest.mark.usefixtures("vellum_client")
-def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, monkeypatch):
+@pytest.mark.usefixtures("vellum_client", "mock_run")
+def test_image_push__self_hosted_blocks_repo(_mock_docker_from_env, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
 
     # Mock Docker client
     mock_docker_client = MagicMock()
-    mock_docker_from_env.return_value = mock_docker_client
+    _mock_docker_from_env.return_value = mock_docker_client
 
     # WHEN the user runs the image push command
     runner = CliRunner()
@@ -219,13 +219,12 @@ def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_c
 
 @patch("subprocess.run")
 @patch("docker.from_env")
-def test_image_push_with_source_dockerfile_not_exists(
-    mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir
-):
+@pytest.mark.usefixtures("mock_docker_from_env", "mock_run", "vellum_client")
+def test_image_push_with_source_dockerfile_not_exists(monkeypatch, _mock_temp_dir):
     monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
     monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
 
-    nonexistent_dockerfile = os.path.join(mock_temp_dir, "nonexistent_dockerfile")
+    nonexistent_dockerfile = os.path.join(_mock_temp_dir, "nonexistent_dockerfile")
 
     runner = CliRunner()
     result = runner.invoke(cli_main, ["image", "push", "myimage:latest", "--source", nonexistent_dockerfile])
@@ -236,15 +235,16 @@ def test_image_push_with_source_dockerfile_not_exists(
 
 @patch("subprocess.run")
 @patch("docker.from_env")
-def test_image_push_with_source_build_fails(mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir):
+@pytest.mark.usefixtures("mock_docker_from_env", "vellum_client")
+def test_image_push_with_source_build_fails(_mock_run, monkeypatch, _mock_temp_dir):
     monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
     monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
 
-    dockerfile_path = os.path.join(mock_temp_dir, "Dockerfile")
+    dockerfile_path = os.path.join(_mock_temp_dir, "Dockerfile")
     with open(dockerfile_path, "w") as f:
         f.write("FROM alpine:latest\n")
 
-    mock_run.side_effect = [
+    _mock_run.side_effect = [
         subprocess.CompletedProcess(args="", returncode=1, stderr=b"Build failed: missing dependency"),
     ]
 

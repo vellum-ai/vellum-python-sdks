@@ -15,7 +15,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
     __serializable_inputs__ = {PromptDeploymentNode.prompt_inputs}
 
     def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs
+        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
     ) -> JsonObject:
         node = self._node
         node_id = self.node_id
