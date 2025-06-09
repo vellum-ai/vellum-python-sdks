@@ -1,10 +1,10 @@
-from vellum.workflows.environment import Environment
+from vellum.workflows.environment import EnvironmentVariables
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class ReferenceEnvironmentNode(BaseNode):
-    url = Environment.get("API_URL", "https://default.api.vellum.ai")
+    url = EnvironmentVariables.get("API_URL", "https://default.api.vellum.ai")
 
     class Outputs(BaseNode.Outputs):
         url: str
