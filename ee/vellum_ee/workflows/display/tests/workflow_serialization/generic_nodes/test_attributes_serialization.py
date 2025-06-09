@@ -7,6 +7,7 @@ from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.state.base import BaseState
@@ -465,6 +466,52 @@ def test_serialize_node__node_execution(serialize_node):
                     "value": {
                         "type": "EXECUTION_COUNTER",
                         "node_id": "d68cc3c3-d5dc-4a51-bbfc-1fd4b41abad0",
+                    },
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+def test_serialize_node__environment_variable(serialize_node):
+    class EnvironmentVariableGenericNode(BaseNode):
+        attr = EnvironmentVariableReference(name="API_KEY", default="default_value")
+
+    serialized_node = serialize_node(EnvironmentVariableGenericNode)
+
+    assert not DeepDiff(
+        {
+            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "label": "test_serialize_node__environment_variable.<locals>.EnvironmentVariableGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "EnvironmentVariableGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "b2c3d4e5-f6a7-8901-bcde-f23456789012", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "c3d4e5f6-a7b8-9012-cdef-345678901234", "type": "DEFAULT", "name": "default"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "d4e5f6a7-b8c9-0123-def4-56789012345a",
+                    "name": "attr",
+                    "value": {
+                        "type": "ENVIRONMENT_VARIABLE",
+                        "variable_name": "API_KEY",
+                        "default_value": "default_value",
                     },
                 }
             ],
