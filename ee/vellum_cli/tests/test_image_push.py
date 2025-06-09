@@ -4,7 +4,7 @@ import os
 import shutil
 import subprocess
 import tempfile
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from uuid import uuid4
 from typing import Generator
 
@@ -27,10 +27,18 @@ def mock_temp_dir() -> Generator[str, None, None]:
     shutil.rmtree(temp_dir)
 
 
-@patch("subprocess.run")
-@patch("docker.from_env")
+@pytest.fixture
+def mock_docker_from_env(mocker):
+    return mocker.patch("docker.from_env")
+
+
+@pytest.fixture
+def mock_subprocess_run(mocker):
+    return mocker.patch("subprocess.run")
+
+
 @pytest.mark.usefixtures("vellum_client")
-def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_run, monkeypatch):
+def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_subprocess_run, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
     monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
@@ -39,7 +47,7 @@ def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_run, monk
     mock_docker_client = MagicMock()
     mock_docker_from_env.return_value = mock_docker_client
 
-    mock_run.side_effect = [
+    mock_subprocess_run.side_effect = [
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -58,10 +66,8 @@ def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_run, monk
     assert "Image successfully pushed" in result.output
 
 
-@patch("subprocess.run")
-@patch("docker.from_env")
 def test_image_push__self_hosted_happy_path__workspace_option(
-    mock_docker_from_env, mock_run, mock_httpx_transport, mock_temp_dir
+    mock_docker_from_env, mock_subprocess_run, mock_httpx_transport, mock_temp_dir
 ):
     # GIVEN a workspace config with a new env for url
     with open(os.path.join(mock_temp_dir, "vellum.lock.json"), "w") as f:
@@ -92,7 +98,7 @@ def test_image_push__self_hosted_happy_path__workspace_option(
     mock_docker_client = MagicMock()
     mock_docker_from_env.return_value = mock_docker_client
 
-    mock_run.side_effect = [
+    mock_subprocess_run.side_effect = [
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -146,10 +152,8 @@ def test_image_push__self_hosted_happy_path__workspace_option(
     assert str(request.url) == "https://api.vellum.mycompany.ai/v1/container-images/push"
 
 
-@patch("subprocess.run")
-@patch("docker.from_env")
-@pytest.mark.usefixtures("vellum_client")
-def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, monkeypatch):
+@pytest.mark.usefixtures("vellum_client", "mock_subprocess_run")
+def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
 
@@ -168,9 +172,9 @@ def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, mon
     assert "For adding images to your self hosted install you must include" in result.output
 
 
-@patch("subprocess.run")
-@patch("docker.from_env")
-def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir):
+def test_image_push_with_source_success(
+    mock_docker_from_env, mock_subprocess_run, vellum_client, monkeypatch, mock_temp_dir
+):
     monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
     monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
 
@@ -182,7 +186,7 @@ def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_c
     mock_docker_from_env.return_value = mock_docker_client
     mock_docker_client.images.push.return_value = [b'{"status": "Pushed"}']
 
-    mock_run.side_effect = [
+    mock_subprocess_run.side_effect = [
         subprocess.CompletedProcess(args="", returncode=0, stdout=b"Build successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
@@ -199,7 +203,7 @@ def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_c
 
     assert result.exit_code == 0, result.output
 
-    build_call = mock_run.call_args_list[0]
+    build_call = mock_subprocess_run.call_args_list[0]
     assert build_call[0][0] == [
         "docker",
         "buildx",
@@ -217,11 +221,8 @@ def test_image_push_with_source_success(mock_docker_from_env, mock_run, vellum_c
     assert "Image successfully pushed" in result.output
 
 
-@patch("subprocess.run")
-@patch("docker.from_env")
-def test_image_push_with_source_dockerfile_not_exists(
-    mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir
-):
+@pytest.mark.usefixtures("mock_docker_from_env", "mock_subprocess_run", "vellum_client")
+def test_image_push_with_source_dockerfile_not_exists(monkeypatch, mock_temp_dir):
     monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
     monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
 
@@ -234,9 +235,8 @@ def test_image_push_with_source_dockerfile_not_exists(
     assert "Dockerfile does not exist" in result.output
 
 
-@patch("subprocess.run")
-@patch("docker.from_env")
-def test_image_push_with_source_build_fails(mock_docker_from_env, mock_run, vellum_client, monkeypatch, mock_temp_dir):
+@pytest.mark.usefixtures("mock_docker_from_env", "vellum_client")
+def test_image_push_with_source_build_fails(mock_subprocess_run, monkeypatch, mock_temp_dir):
     monkeypatch.setenv("VELLUM_API_URL", "https://api.vellum.ai")
     monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
 
@@ -244,7 +244,7 @@ def test_image_push_with_source_build_fails(mock_docker_from_env, mock_run, vell
     with open(dockerfile_path, "w") as f:
         f.write("FROM alpine:latest\n")
 
-    mock_run.side_effect = [
+    mock_subprocess_run.side_effect = [
         subprocess.CompletedProcess(args="", returncode=1, stderr=b"Build failed: missing dependency"),
     ]
 

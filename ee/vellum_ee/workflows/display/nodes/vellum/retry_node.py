@@ -18,7 +18,7 @@ _RetryNodeType = TypeVar("_RetryNodeType", bound=RetryNode)
 
 
 class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_RetryNodeType]):
-    def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext, **_kwargs: Any) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
