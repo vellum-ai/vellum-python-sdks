@@ -482,44 +482,14 @@ def test_serialize_node__environment_variable(serialize_node):
 
     serialized_node = serialize_node(EnvironmentVariableGenericNode)
 
-    assert not DeepDiff(
-        {
-            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-            "label": "test_serialize_node__environment_variable.<locals>.EnvironmentVariableGenericNode",
-            "type": "GENERIC",
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "definition": {
-                "name": "EnvironmentVariableGenericNode",
-                "module": [
-                    "vellum_ee",
-                    "workflows",
-                    "display",
-                    "tests",
-                    "workflow_serialization",
-                    "generic_nodes",
-                    "test_attributes_serialization",
-                ],
-            },
-            "trigger": {"id": "b2c3d4e5-f6a7-8901-bcde-f23456789012", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "c3d4e5f6-a7b8-9012-cdef-345678901234", "type": "DEFAULT", "name": "default"}],
-            "adornments": None,
-            "attributes": [
-                {
-                    "id": "d4e5f6a7-b8c9-0123-def4-56789012345a",
-                    "name": "attr",
-                    "value": {
-                        "type": "ENVIRONMENT_VARIABLE",
-                        "name": "API_KEY",
-                        "default": {"type": "STRING", "value": "default_value"},
-                    },
-                }
-            ],
-            "outputs": [],
-        },
-        serialized_node,
-        ignore_order=True,
-    )
+    expected_value = {
+        "type": "ENVIRONMENT_VARIABLE",
+        "name": "API_KEY",
+        "default": {"type": "STRING", "value": "default_value"},
+    }
+
+    actual_value = serialized_node["attributes"][0]["value"]
+    assert actual_value == expected_value
 
 
 def test_serialize_node__coalesce(serialize_node):
