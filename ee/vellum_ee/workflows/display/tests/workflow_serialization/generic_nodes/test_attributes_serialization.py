@@ -510,8 +510,8 @@ def test_serialize_node__environment_variable(serialize_node):
                     "name": "attr",
                     "value": {
                         "type": "ENVIRONMENT_VARIABLE",
-                        "variable_name": "API_KEY",
-                        "default_value": "default_value",
+                        "name": "API_KEY",
+                        "default": {"type": "STRING", "value": "default_value"},
                     },
                 }
             ],

@@ -31,6 +31,7 @@ from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
@@ -238,6 +239,15 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             "type": "VELLUM_SECRET",
             "vellum_secret_name": value.name,
         }
+
+    if isinstance(value, EnvironmentVariableReference):
+        result: JsonObject = {
+            "type": "ENVIRONMENT_VARIABLE",
+            "name": value.name,
+        }
+        if value._default is not None:
+            result["default"] = primitive_to_vellum_value(value._default).dict()
+        return result
 
     if isinstance(value, ExecutionCountReference):
         node_class_display = display_context.global_node_displays[value.node_class]
