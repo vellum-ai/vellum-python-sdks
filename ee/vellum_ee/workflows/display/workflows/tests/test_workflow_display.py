@@ -806,7 +806,7 @@ def test_serialize_workflow__empty_rules_indexerror():
             problematic_output = StartNode.Outputs.data["bar"]
 
     # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    workflow_display: dict = get_workflow_display(workflow_class=MyWorkflow)
     result = workflow_display.serialize()
 
     assert result is not None
