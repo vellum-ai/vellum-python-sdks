@@ -7,9 +7,13 @@ from mcp.client.stdio import stdio_client
 
 from vellum import FunctionDefinition
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
 
 class MCPClientNode(BaseNode):
+
+    token = EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN", default="")
+
     class Outputs(BaseNode.Outputs):
         tools: List[FunctionDefinition]
         thinking: str
@@ -19,7 +23,7 @@ class MCPClientNode(BaseNode):
             command="/usr/local/bin/docker",
             args=["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
             env={
-                "GITHUB_PERSONAL_ACCESS_TOKEN": os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"],
+                "GITHUB_PERSONAL_ACCESS_TOKEN": self.token,
             },
         )
 

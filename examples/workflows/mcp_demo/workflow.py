@@ -22,4 +22,4 @@ class MCPDemoWorkflow(BaseWorkflow[Inputs, State]):
     }
 
     class Outputs:
-        answer = ExitNode.Outputs.answer
+        answer = ExitNode.Outputs.value

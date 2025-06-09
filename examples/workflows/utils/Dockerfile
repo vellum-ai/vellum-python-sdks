@@ -1,7 +1,8 @@
 FROM vellumai/python-workflow-runtime:latest
 
 RUN pip install --upgrade pip \
-    && pip install boto3
+    && pip install boto3 \
+    && pip install mcp
 
 COPY ./utils /custom/utils
 
