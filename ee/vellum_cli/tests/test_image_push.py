@@ -29,7 +29,8 @@ def mock_temp_dir() -> Generator[str, None, None]:
 
 @patch("subprocess.run")
 @patch("docker.from_env")
-def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_run, vellum_client, monkeypatch):
+@pytest.mark.usefixtures("vellum_client")
+def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_run, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
     monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
@@ -147,7 +148,8 @@ def test_image_push__self_hosted_happy_path__workspace_option(
 
 @patch("subprocess.run")
 @patch("docker.from_env")
-def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, vellum_client, monkeypatch):
+@pytest.mark.usefixtures("vellum_client")
+def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, mock_run, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
 
