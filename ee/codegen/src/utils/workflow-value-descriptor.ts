@@ -65,6 +65,7 @@ export function isReference(
     workflowValueDescriptor.type === "WORKFLOW_STATE" ||
     workflowValueDescriptor.type === "CONSTANT_VALUE" ||
     workflowValueDescriptor.type === "VELLUM_SECRET" ||
+    workflowValueDescriptor.type === "ENVIRONMENT_VARIABLE" ||
     workflowValueDescriptor.type === "EXECUTION_COUNTER" ||
     workflowValueDescriptor.type === "DICTIONARY_REFERENCE" ||
     workflowValueDescriptor.type === "ARRAY_REFERENCE"
