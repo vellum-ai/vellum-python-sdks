@@ -22,6 +22,7 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import is_workflow_class
@@ -152,8 +153,7 @@ def create_function_node(
 
             # Call the function based on its type
             inputs_instance = function.get_inputs_class()(**arguments)
-
-            workflow = function()
+            workflow = function(context=WorkflowContext.create_from(self._context))
             terminal_event = workflow.run(
                 inputs=inputs_instance,
             )
