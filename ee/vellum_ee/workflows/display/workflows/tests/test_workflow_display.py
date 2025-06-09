@@ -790,7 +790,7 @@ def test_serialize_workflow__dict_reference():
 
 
 def test_serialize_workflow__empty_rules_indexerror():
-    """Test that reproduces IndexError when workflow output has empty rules due to dictionary key access."""
+    """Test that workflow serialization handles dictionary key access correctly."""
 
     # GIVEN a node with dictionary output
     class StartNode(BaseNode):
@@ -802,15 +802,29 @@ def test_serialize_workflow__empty_rules_indexerror():
         graph = StartNode
 
         class Outputs(BaseWorkflow.Outputs):
-            # This dictionary key access should cause empty rules and trigger IndexError
+            # This dictionary key access should be handled gracefully
             problematic_output = StartNode.Outputs.data["bar"]
 
-    # WHEN we try to serialize the workflow
+    # WHEN we serialize the workflow
     workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    result = workflow_display.serialize()
 
-    # THEN it should raise an IndexError due to accessing rules[0] on empty list
-    with pytest.raises(IndexError) as exc_info:
-        workflow_display.serialize()
+    assert result is not None
+    assert "output_variables" in result
+    assert "workflow_raw_data" in result
 
-    # AND the error should be related to list index out of range
-    assert "list index out of range" in str(exc_info.value)
+    # AND the workflow output should contain the dictionary key access
+    output_variables = result["output_variables"]
+    assert len(output_variables) == 1
+    assert output_variables[0]["key"] == "problematic_output"
+
+    # AND the workflow raw data should contain nodes including terminal node
+    workflow_raw_data = result["workflow_raw_data"]
+    assert "nodes" in workflow_raw_data
+    nodes = workflow_raw_data["nodes"]
+
+    assert len(nodes) >= 3
+
+    terminal_nodes = [node for node in nodes if node.get("type") == "TERMINAL"]
+    assert len(terminal_nodes) == 1
+    assert terminal_nodes[0]["data"]["name"] == "problematic_output"

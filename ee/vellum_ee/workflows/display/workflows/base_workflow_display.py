@@ -200,16 +200,21 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     raise ValueError(f"Failed to serialize output '{workflow_output.name}': {str(e)}") from e
 
                 source_node_display: Optional[BaseNodeDisplay]
-                first_rule = node_input.value.rules[0]
-                if first_rule.type == "NODE_OUTPUT":
-                    source_node_id = UUID(first_rule.data.node_id)
-                    try:
-                        source_node_display = [
-                            node_display
-                            for node_display in self.display_context.node_displays.values()
-                            if node_display.node_id == source_node_id
-                        ][0]
-                    except IndexError:
+                if not node_input.value.rules:
+                    source_node_display = None
+                else:
+                    first_rule = node_input.value.rules[0]
+                    if first_rule.type == "NODE_OUTPUT":
+                        source_node_id = UUID(first_rule.data.node_id)
+                        try:
+                            source_node_display = [
+                                node_display
+                                for node_display in self.display_context.node_displays.values()
+                                if node_display.node_id == source_node_id
+                            ][0]
+                        except IndexError:
+                            source_node_display = None
+                    else:
                         source_node_display = None
 
                 synthetic_target_handle_id = str(
