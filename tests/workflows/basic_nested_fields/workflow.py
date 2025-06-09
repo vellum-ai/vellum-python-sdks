@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.environment import Environment
+from vellum.workflows.environment import EnvironmentVariables
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
@@ -45,7 +45,7 @@ class StartNode(BaseNode):
     nested_array_field = ["a", {"b": Inputs.input_value}, "c"]
     node_output_field = UpstreamNode.Outputs.value
     state_field = {"value": State.value}
-    env_field = {"value": Environment.get("EXAMPLE_ENV_VAR")}
+    env_field = {"value": EnvironmentVariables.get("EXAMPLE_ENV_VAR")}
 
     class Outputs(BaseOutputs):
         simple_field: int

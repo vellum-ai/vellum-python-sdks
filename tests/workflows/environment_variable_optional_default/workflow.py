@@ -1,10 +1,10 @@
-from vellum.workflows.environment import Environment
+from vellum.workflows.environment import EnvironmentVariables
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class OptionalDefaultEnvironmentNode(BaseNode):
-    url = Environment.get("MISSING_ENV_VAR")
+    url = EnvironmentVariables.get("MISSING_ENV_VAR")
 
     class Outputs(BaseNode.Outputs):
         url: str

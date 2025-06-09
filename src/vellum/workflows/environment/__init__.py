@@ -1,5 +1,9 @@
-from .environment import Environment
+from .environment import EnvironmentVariables, EnvVars
+
+Environment = EnvironmentVariables
 
 __all__ = [
+    "EnvironmentVariables",
+    "EnvVars",
     "Environment",
 ]
