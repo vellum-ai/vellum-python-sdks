@@ -152,8 +152,7 @@ def create_function_node(
 
             # Call the function based on its type
             inputs_instance = function.get_inputs_class()(**arguments)
-
-            workflow = function()
+            workflow = function(context=WorkflowContext.create_from(self._context))
             terminal_event = workflow.run(
                 inputs=inputs_instance,
             )
