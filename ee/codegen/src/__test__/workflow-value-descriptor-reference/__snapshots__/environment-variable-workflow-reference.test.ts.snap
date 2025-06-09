@@ -1,0 +1,6 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EnvironmentVariableWorkflowReference > should generate correct AST for environment variable reference 1`] = `
+"EnvironmentVariableReference(name="API_KEY")
+"
+`;

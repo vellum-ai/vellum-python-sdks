@@ -9,6 +9,7 @@ import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { ConstantValueReference } from "src/generators/workflow-value-descriptor-reference/constant-value-reference";
+import { EnvironmentVariableWorkflowReference } from "src/generators/workflow-value-descriptor-reference/environment-variable-workflow-reference";
 import { ExecutionCounterWorkflowReference } from "src/generators/workflow-value-descriptor-reference/execution-counter-workflow-reference";
 import { NodeOutputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/node-output-workflow-reference";
 import { VellumSecretWorkflowReference } from "src/generators/workflow-value-descriptor-reference/vellum-secret-workflow-reference";
@@ -101,6 +102,12 @@ export class WorkflowValueDescriptorReference extends AstNode {
         });
       case "VELLUM_SECRET":
         return new VellumSecretWorkflowReference({
+          nodeContext: this.nodeContext,
+          workflowContext: this.workflowContext,
+          nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
+        });
+      case "ENVIRONMENT_VARIABLE":
+        return new EnvironmentVariableWorkflowReference({
           nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
