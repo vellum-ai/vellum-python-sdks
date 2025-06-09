@@ -7,6 +7,7 @@ from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.state.base import BaseState
@@ -473,6 +474,21 @@ def test_serialize_node__node_execution(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+def test_serialize_node__environment_variable(serialize_node):
+    class EnvironmentVariableGenericNode(BaseNode):
+        attr = EnvironmentVariableReference(name="API_KEY")
+
+    serialized_node = serialize_node(EnvironmentVariableGenericNode)
+
+    expected_value = {
+        "type": "ENVIRONMENT_VARIABLE",
+        "environment_variable": "API_KEY",
+    }
+
+    actual_value = serialized_node["attributes"][0]["value"]
+    assert actual_value == expected_value
 
 
 def test_serialize_node__coalesce(serialize_node):
