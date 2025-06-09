@@ -9,4 +9,4 @@ class EnvironmentVariables:
         return EnvironmentVariableReference(name=name, default=default)
 
 
-EnvVars = EnvironmentVariables
+Environment = EnvironmentVariables
