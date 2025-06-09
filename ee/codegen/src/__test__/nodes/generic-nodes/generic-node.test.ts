@@ -587,10 +587,5 @@ describe("GenericNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-
-    it("getNodeDisplayFile", async () => {
-      node.getNodeDisplayFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
   });
 });

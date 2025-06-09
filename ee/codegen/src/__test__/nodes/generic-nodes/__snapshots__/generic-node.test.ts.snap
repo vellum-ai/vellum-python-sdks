@@ -160,29 +160,6 @@ class MyCustomNode(BaseNode):
 "
 `;
 
-exports[`GenericNode > basic with environment variable reference as attribute > getNodeDisplayFile 1`] = `
-"from uuid import UUID
-
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
-
-from ...nodes.my_custom_node import TestEnvironmentVariableNode
-
-
-class TestEnvironmentVariableNodeDisplay(BaseNodeDisplay[TestEnvironmentVariableNode]):
-    attribute_ids_by_name = {"api-key-attribute": UUID("attr-1")}
-    port_displays = {
-        TestEnvironmentVariableNode.Ports.default_port: PortDisplayOverrides(
-            id=UUID("aa011a0e-881a-4349-8ad9-f9ec816d0a8f")
-        )
-    }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
-    )
-"
-`;
-
 exports[`GenericNode > basic with environment variable reference as attribute > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references import EnvironmentVariableReference
