@@ -53,6 +53,7 @@ import {
   DictionaryWorkflowReferenceEntry,
   ElifConditionNodePort,
   ElseConditionNodePort,
+  EnvironmentVariableWorkflowReference,
   EntrypointNode,
   ErrorNode,
   ExecutionCounterPointer,
@@ -764,6 +765,19 @@ export declare namespace VellumSecretWorkflowReferenceSerializer {
   }
 }
 
+export const EnvironmentVariableWorkflowReferenceSerializer: ObjectSchema<
+  EnvironmentVariableWorkflowReferenceSerializer.Raw,
+  Omit<EnvironmentVariableWorkflowReference, "type">
+> = objectSchema({
+  environmentVariable: propertySchema("environment_variable", stringSchema()),
+});
+
+export declare namespace EnvironmentVariableWorkflowReferenceSerializer {
+  interface Raw {
+    environment_variable: string;
+  }
+}
+
 export const ExecutionCounterWorkflowReferenceSerializer: ObjectSchema<
   ExecutionCounterWorkflowReferenceSerializer.Raw,
   Omit<ExecutionCounterWorkflowReference, "type">
@@ -830,6 +844,7 @@ export const WorkflowValueDescriptorSerializer: Schema<
   WORKFLOW_STATE: WorkflowStateVariableWorkflowReferenceSerializer,
   CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
   VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
+  ENVIRONMENT_VARIABLE: EnvironmentVariableWorkflowReferenceSerializer,
   EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
   DICTIONARY_REFERENCE: DictionaryWorkflowReferenceSerializer,
   ARRAY_REFERENCE: ArrayWorkflowReferenceSerializer,
@@ -845,6 +860,7 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | WorkflowStateVariableWorkflowReferenceSerializer.Raw
     | ConstantValueWorkflowReferenceSerializer.Raw
     | VellumSecretWorkflowReferenceSerializer.Raw
+    | EnvironmentVariableWorkflowReferenceSerializer.Raw
     | ExecutionCounterWorkflowReferenceSerializer.Raw
     | DictionaryWorkflowReferenceSerializer.Raw
     | ArrayWorkflowReferenceSerializer.Raw;
