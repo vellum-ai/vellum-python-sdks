@@ -13,6 +13,10 @@ class EnvironmentVariableReference(BaseDescriptor[str]):
         self._default = default
 
     def resolve(self, state: "BaseState") -> str:
+        if hasattr(state, "context") and hasattr(state.context, "environment_variables"):
+            context_env_value = state.context.environment_variables.get(self.name)
+            if context_env_value is not None:
+                return context_env_value
         env_value = os.environ.get(self.name)
         if env_value is not None:
             return env_value

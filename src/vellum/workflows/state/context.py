@@ -20,6 +20,7 @@ class WorkflowContext:
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
         generated_files: Optional[dict[str, str]] = None,
+        environment_variables: Optional[dict[str, str]] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
@@ -28,6 +29,7 @@ class WorkflowContext:
         if not self._execution_context.parent_context and execution_context:
             self._execution_context = execution_context
         self._generated_files = generated_files
+        self._environment_variables = environment_variables or {}
 
     @cached_property
     def vellum_client(self) -> Vellum:
@@ -43,6 +45,10 @@ class WorkflowContext:
     @cached_property
     def generated_files(self) -> Optional[dict[str, str]]:
         return self._generated_files
+
+    @cached_property
+    def environment_variables(self) -> dict[str, str]:
+        return self._environment_variables
 
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
@@ -77,4 +83,8 @@ class WorkflowContext:
 
     @classmethod
     def create_from(cls, context):
-        return cls(vellum_client=context.vellum_client, generated_files=context.generated_files)
+        return cls(
+            vellum_client=context.vellum_client,
+            generated_files=context.generated_files,
+            environment_variables=getattr(context, "environment_variables", {}),
+        )
