@@ -1,5 +1,3 @@
-from typing import Callable, Type
-
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
@@ -9,7 +7,7 @@ def test_base_adornment_node__output_references_of_same_name():
     # GIVEN a custom adornment node
     class CustomAdornmentNode(BaseAdornmentNode):
         @classmethod
-        def wrap(cls) -> Callable[..., Type["CustomAdornmentNode"]]:
+        def wrap(cls):
             return create_adornment(cls)
 
     # AND two nodes wrapped by the adornment with the same output

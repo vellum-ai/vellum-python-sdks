@@ -28,7 +28,7 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
     """Converts a python primitive to a VellumVariableType"""
     if isinstance(type_, BaseDescriptor):
         # Ignore None because those just make types optional
-        types = [t for t in type_.types if t is not type(None)]
+        types = [t for t in type_.types if not isinstance(t, type(type(None)))]
 
         # default to JSON for typevars where the types is empty tuple
         if len(types) == 0:
@@ -91,7 +91,7 @@ def _is_type_optionally_equal(type_: Type, target_type: Type) -> bool:
         return False
 
     source_type, none_type = args
-    if none_type is not type(None):
+    if not isinstance(none_type, type(type(None))):
         return False
 
     return _is_type_optionally_equal(source_type, target_type)
