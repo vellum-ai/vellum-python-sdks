@@ -9,8 +9,8 @@ from ..core.pydantic_utilities import update_forward_refs
 
 
 class WorkflowDeploymentParentContext(UniversalBaseModel):
-    parent: typing.Optional["ParentContext"] = None
-    links: typing.Optional[typing.List["SpanLink"]] = None
+    parent: typing.Optional[ParentContext] = None
+    links: typing.Optional[typing.List[SpanLink]] = None
     type: typing.Literal["WORKFLOW_RELEASE_TAG"] = "WORKFLOW_RELEASE_TAG"
     span_id: str
     deployment_id: str

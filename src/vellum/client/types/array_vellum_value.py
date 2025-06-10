@@ -14,7 +14,7 @@ class ArrayVellumValue(UniversalBaseModel):
     """
 
     type: typing.Literal["ARRAY"] = "ARRAY"
-    value: typing.Optional[typing.List["VellumValue"]] = None
+    value: typing.Optional[typing.List[VellumValue]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

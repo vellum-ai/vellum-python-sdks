@@ -10,8 +10,8 @@ from ..core.pydantic_utilities import update_forward_refs
 
 
 class NodeParentContext(UniversalBaseModel):
-    parent: typing.Optional["ParentContext"] = None
-    links: typing.Optional[typing.List["SpanLink"]] = None
+    parent: typing.Optional[ParentContext] = None
+    links: typing.Optional[typing.List[SpanLink]] = None
     node_definition: VellumCodeResourceDefinition
     type: typing.Literal["WORKFLOW_NODE"] = "WORKFLOW_NODE"
     span_id: str

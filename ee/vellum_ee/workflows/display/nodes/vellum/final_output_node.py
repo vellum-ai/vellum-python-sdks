@@ -19,7 +19,7 @@ NODE_INPUT_KEY = "node_input"
 class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[_FinalOutputNodeType]):
     output_name: ClassVar[Optional[str]] = None
 
-    def serialize(self, display_context: WorkflowDisplayContext, **_kwargs) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

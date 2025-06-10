@@ -20,7 +20,7 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
 
     __serializable_inputs__ = {ErrorNode.error}
 
-    def serialize(self, display_context: WorkflowDisplayContext, **_kwargs) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node_id = self.node_id
         error_source_input_id = self.node_input_ids_by_name.get(
             ErrorNode.error.name,

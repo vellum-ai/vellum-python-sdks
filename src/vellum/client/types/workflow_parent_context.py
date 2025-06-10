@@ -10,8 +10,8 @@ from ..core.pydantic_utilities import update_forward_refs
 
 
 class WorkflowParentContext(UniversalBaseModel):
-    parent: typing.Optional["ParentContext"] = None
-    links: typing.Optional[typing.List["SpanLink"]] = None
+    parent: typing.Optional[ParentContext] = None
+    links: typing.Optional[typing.List[SpanLink]] = None
     workflow_definition: VellumCodeResourceDefinition
     type: typing.Literal["WORKFLOW"] = "WORKFLOW"
     span_id: str

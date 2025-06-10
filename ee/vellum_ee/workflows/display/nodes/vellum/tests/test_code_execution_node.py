@@ -10,7 +10,8 @@ from vellum_ee.workflows.display.nodes.vellum.code_execution_node import BaseCod
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
-def _no_display_class(Node: Type[CodeExecutionNode]):
+def _no_display_class(_node_type: Type[CodeExecutionNode]):
+    del _node_type  # Mark as intentionally unused
     return None
 
 

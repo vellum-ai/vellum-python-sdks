@@ -45,7 +45,7 @@ class BaseConditionalNodeDisplay(BaseNodeDisplay[_ConditionalNodeType], Generic[
     rule_ids: ClassVar[List[RuleIdMap]]
     condition_ids: ClassVar[list[ConditionId]]
 
-    def serialize(self, display_context: WorkflowDisplayContext, **_kwargs) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

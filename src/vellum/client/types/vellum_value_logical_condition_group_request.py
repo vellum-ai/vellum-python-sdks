@@ -16,7 +16,7 @@ class VellumValueLogicalConditionGroupRequest(UniversalBaseModel):
     """
 
     type: typing.Literal["LOGICAL_CONDITION_GROUP"] = "LOGICAL_CONDITION_GROUP"
-    conditions: typing.List["VellumValueLogicalExpressionRequest"]
+    conditions: typing.List[VellumValueLogicalExpressionRequest]
     combinator: ConditionCombinator
     negated: bool
 

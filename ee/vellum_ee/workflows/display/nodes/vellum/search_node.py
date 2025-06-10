@@ -41,9 +41,7 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         SearchNode.result_merging,
     }
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None) -> JsonObject:
         node = self._node
         node_id = self.node_id
         node_inputs = self._generate_search_node_inputs(node_id, node, display_context)

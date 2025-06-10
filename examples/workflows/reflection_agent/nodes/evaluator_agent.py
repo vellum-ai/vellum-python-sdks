@@ -14,7 +14,8 @@ from .problem_solver_agent import ProblemSolverAgent
 class EvaluatorAgent(InlinePromptNode):
     """Here we use GPT's Structured Outputs to return "status" and "feedback" of whether or not the proposed solution is acceptable, along with feedback about what isn't correct in the proposed solution.
 
-    Notably, we are not including the full conversation context here. This is a use-case dependent decision. By doing this, we are effectively grading the quality of the current solution in isolation, reducing some variability, reducing the tokens in our context window, and reducing  cost."""
+    Notably, we are not including the full conversation context here. This is a use-case dependent decision. By doing this, we are effectively grading the quality of the current solution in isolation, reducing some variability, reducing the tokens in our context window, and reducing  cost.
+    """
 
     ml_model = "gpt-4o-mini"
     blocks = [

@@ -22,7 +22,6 @@ class GenerateResponse(UniversalBaseModel):
             smart_union = True
             extra = pydantic.Extra.allow
 
-
     @property
     def texts(self) -> typing.List[str]:
         return [

@@ -9,8 +9,8 @@ from ..core.pydantic_utilities import update_forward_refs
 
 
 class WorkflowSandboxParentContext(UniversalBaseModel):
-    parent: typing.Optional["ParentContext"] = None
-    links: typing.Optional[typing.List["SpanLink"]] = None
+    parent: typing.Optional[ParentContext] = None
+    links: typing.Optional[typing.List[SpanLink]] = None
     type: typing.Literal["WORKFLOW_SANDBOX"] = "WORKFLOW_SANDBOX"
     span_id: str
     sandbox_id: str

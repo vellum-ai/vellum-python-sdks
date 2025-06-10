@@ -735,9 +735,7 @@ class Installer:
                 version=colorize("b", version),
                 poetry_home_bin=colorize("comment", self.bin_dir),
                 poetry_executable=colorize("b", self.bin_dir.joinpath("poetry")),
-                configure_message=POST_MESSAGE_CONFIGURE_FISH.format(
-                    poetry_home_bin=colorize("comment", self.bin_dir)
-                ),
+                configure_message=POST_MESSAGE_CONFIGURE_FISH.format(poetry_home_bin=colorize("comment", self.bin_dir)),
                 test_command=colorize("b", "poetry --version"),
             )
         )
@@ -781,9 +779,7 @@ class Installer:
                 version=colorize("b", version),
                 poetry_home_bin=colorize("comment", self.bin_dir),
                 poetry_executable=colorize("b", self.bin_dir.joinpath("poetry")),
-                configure_message=POST_MESSAGE_CONFIGURE_UNIX.format(
-                    poetry_home_bin=colorize("comment", self.bin_dir)
-                ),
+                configure_message=POST_MESSAGE_CONFIGURE_UNIX.format(poetry_home_bin=colorize("comment", self.bin_dir)),
                 test_command=colorize("b", "poetry --version"),
                 rc_file=colorize("b", rc_file),
             )

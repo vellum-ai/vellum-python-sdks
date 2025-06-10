@@ -9,7 +9,8 @@ from vellum_ee.workflows.display.nodes.vellum.subworkflow_deployment_node import
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
-def _no_display_class(Node: Type[SubworkflowDeploymentNode]):  # type: ignore
+def _no_display_class(_node_type: Type[SubworkflowDeploymentNode]):  # type: ignore
+    del _node_type  # Mark as intentionally unused
     return None
 
 
@@ -66,7 +67,9 @@ def mock_fetch_deployment(mocker):
         "display_class_with_node_input_ids_by_name_with_inputs_prefix",
     ],
 )
-def test_serialize_node__subworkflow_inputs(GetDisplayClass, expected_input_id, mock_fetch_deployment):
+def test_serialize_node__subworkflow_inputs(GetDisplayClass, expected_input_id, _mock_fetch_deployment):
+    del _mock_fetch_deployment  # Mark as intentionally unused
+
     # GIVEN a deployment subworkflow node with inputs
     class MySubworkflowDeploymentNode(SubworkflowDeploymentNode):
         deployment = "DEPLOYMENT"

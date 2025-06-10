@@ -310,13 +310,13 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return self._get_node_display_uuid("target_handle_id")
 
-    def get_target_handle_id_by_source_node_id(self, _source_node_id: UUID) -> UUID:
+    def get_target_handle_id_by_source_node_id(self, source_node_id: UUID) -> UUID:
         """
         In the vast majority of cases, nodes will only have a single target handle and can be retrieved independently
         of the source node. However, in rare cases (such as legacy Merge nodes), this method can be overridden to
         account for the case of retrieving one amongst multiple target handles on a node.
         """
-
+        del source_node_id  # Mark as intentionally unused
         return self.get_target_handle_id()
 
     @cached_property

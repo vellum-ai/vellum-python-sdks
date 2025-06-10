@@ -60,7 +60,8 @@ def test_serialize_node__lazy_reference_in_prompt_inputs():
     ]
 
 
-def _no_display_class(Node: Type[InlinePromptNode]):
+def _no_display_class(_node_type: Type[InlinePromptNode]):
+    del _node_type  # Mark as intentionally unused
     return None
 
 

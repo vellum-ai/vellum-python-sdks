@@ -69,8 +69,7 @@ class WorkflowsClient:
             try:
                 if 200 <= _response.status_code < 300:
                     _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    for _chunk in _response.iter_bytes(chunk_size=_chunk_size):
-                        yield _chunk
+                    yield from _response.iter_bytes(chunk_size=_chunk_size)
                     return
                 _response.read()
                 if _response.status_code == 400:

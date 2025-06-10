@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Generic, Tuple, Type, TypeVar
+from typing import Generic, Tuple, Type, TypeVar
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
@@ -18,7 +18,7 @@ _RetryNodeType = TypeVar("_RetryNodeType", bound=RetryNode)
 
 
 class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_RetryNodeType]):
-    def serialize(self, display_context: WorkflowDisplayContext, **_kwargs: Any) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

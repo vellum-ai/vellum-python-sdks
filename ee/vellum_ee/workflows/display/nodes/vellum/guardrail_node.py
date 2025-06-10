@@ -14,9 +14,7 @@ _GuardrailNodeType = TypeVar("_GuardrailNodeType", bound=GuardrailNode)
 class BaseGuardrailNodeDisplay(BaseNodeDisplay[_GuardrailNodeType], Generic[_GuardrailNodeType]):
     __serializable_inputs__ = {GuardrailNode.metric_inputs}
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

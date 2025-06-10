@@ -9,8 +9,8 @@ from ..core.pydantic_utilities import update_forward_refs
 
 
 class ApiRequestParentContext(UniversalBaseModel):
-    parent: typing.Optional["ParentContext"] = None
-    links: typing.Optional[typing.List["SpanLink"]] = None
+    parent: typing.Optional[ParentContext] = None
+    links: typing.Optional[typing.List[SpanLink]] = None
     type: typing.Literal["API_REQUEST"] = "API_REQUEST"
     span_id: str
 

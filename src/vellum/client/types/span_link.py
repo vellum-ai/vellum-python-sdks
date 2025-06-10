@@ -12,7 +12,7 @@ from ..core.pydantic_utilities import update_forward_refs
 class SpanLink(UniversalBaseModel):
     trace_id: str
     type: SpanLinkTypeEnum = "TRIGGERED_BY"
-    span_context: "ParentContext"
+    span_context: ParentContext
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

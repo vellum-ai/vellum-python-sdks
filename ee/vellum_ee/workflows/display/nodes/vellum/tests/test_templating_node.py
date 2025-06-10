@@ -8,7 +8,8 @@ from vellum_ee.workflows.display.nodes.vellum.templating_node import BaseTemplat
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
-def _no_display_class(Node: Type[TemplatingNode]):
+def _no_display_class(_node_type: Type[TemplatingNode]):
+    del _node_type  # Mark as intentionally unused
     return None
 
 

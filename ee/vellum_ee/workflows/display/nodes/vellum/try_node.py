@@ -1,6 +1,6 @@
 import inspect
 from uuid import UUID
-from typing import Any, ClassVar, Generic, Optional, Tuple, Type, TypeVar
+from typing import ClassVar, Generic, Optional, Tuple, Type, TypeVar
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
@@ -21,7 +21,7 @@ _TryNodeType = TypeVar("_TryNodeType", bound=TryNode)
 class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNodeType]):
     error_output_id: ClassVar[Optional[UUID]] = None
 
-    def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
+    def serialize(self, display_context: "WorkflowDisplayContext") -> JsonObject:
         node = self._node
         node_id = self.node_id
 

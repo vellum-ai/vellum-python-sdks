@@ -22,7 +22,7 @@ class ChatMessagePromptBlock(UniversalBaseModel):
     chat_role: ChatMessageRole
     chat_source: typing.Optional[str] = None
     chat_message_unterminated: typing.Optional[bool] = None
-    blocks: typing.List["PromptBlock"]
+    blocks: typing.List[PromptBlock]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

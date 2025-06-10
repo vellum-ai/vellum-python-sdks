@@ -31,9 +31,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         APINode.authorization_type,
     }
 
-    def serialize(
-        self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
-    ) -> JsonObject:
+    def serialize(self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None) -> JsonObject:
         node = self._node
         node_id = self.node_id
 

@@ -13,7 +13,7 @@ from ..core.pydantic_utilities import update_forward_refs
 class MetadataFilterRuleRequest(UniversalBaseModel):
     combinator: typing.Optional[MetadataFilterRuleCombinator] = None
     negated: typing.Optional[bool] = None
-    rules: typing.Optional[typing.List["MetadataFilterRuleRequest"]] = None
+    rules: typing.Optional[typing.List[MetadataFilterRuleRequest]] = None
     field: typing.Optional[str] = None
     operator: typing.Optional[LogicalOperator] = None
     value: typing.Optional[str] = None
