@@ -526,7 +526,7 @@ export class WorkflowContext {
     return this.classNames.has(className);
   }
 
-  private addUsedClassName(className: string): void {
+  public addUsedClassName(className: string): void {
     this.classNames.add(className);
   }
 

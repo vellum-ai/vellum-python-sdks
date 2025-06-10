@@ -76,6 +76,10 @@ export function getGeneratedNodeModuleInfo({
       nodeDefinition?.name ?? workflowContext.getUniqueClassName(nodeLabel);
   }
 
+  // Add the node class name to the used class names to ensure that the node class name that
+  // does not call getUniqueClassName still gets added to the used class names.
+  workflowContext.addUsedClassName(nodeClassName);
+
   // Deduplicate the module name if it's already in use
   let moduleName = rawModuleName;
   let numRenameAttempts = 0;
