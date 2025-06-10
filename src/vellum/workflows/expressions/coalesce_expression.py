@@ -27,7 +27,7 @@ class CoalesceExpression(BaseDescriptor[Union[LHS, RHS]]):
 
     def resolve(self, state: "BaseState") -> Union[LHS, RHS]:
         lhs = resolve_value(self._lhs, state)
-        if lhs is not undefined and lhs is not None and lhs != "":
+        if lhs is not undefined and lhs is not None:
             return lhs
 
         return resolve_value(self._rhs, state)
