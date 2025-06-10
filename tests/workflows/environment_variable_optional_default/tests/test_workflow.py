@@ -10,7 +10,7 @@ def test_run_workflow__optional_default_empty_string(monkeypatch):
 
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
 
-    assert terminal_event.outputs == {"final_value": ""}
+    assert terminal_event.outputs == {}
 
 
 def test_run_workflow__optional_default_with_env_var(monkeypatch):
