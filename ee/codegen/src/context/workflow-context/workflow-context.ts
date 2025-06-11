@@ -535,7 +535,6 @@ export class WorkflowContext {
     let numRenameAttempts = 0;
 
     if (!this.isClassNameUsed(sanitizedName)) {
-      this.addUsedClassName(sanitizedName);
       return sanitizedName;
     }
 
@@ -544,7 +543,6 @@ export class WorkflowContext {
       sanitizedName = `${createPythonClassName(baseName)}${numRenameAttempts}`;
     }
 
-    this.addUsedClassName(sanitizedName);
     return sanitizedName;
   }
 

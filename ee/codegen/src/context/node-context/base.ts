@@ -92,6 +92,8 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     this.nodeModuleName = moduleName;
     this.nodeClassName = nodeClassName;
     this.nodeModulePath = modulePath;
+
+    this.workflowContext.addUsedClassName(nodeClassName);
     this.nodeFileName = `${this.nodeModuleName}.py`;
 
     this.nodeDisplayModuleName = this.nodeModuleName;
