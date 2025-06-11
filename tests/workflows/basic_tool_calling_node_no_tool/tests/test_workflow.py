@@ -24,7 +24,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
     Test that the GetCurrentWeatherWorkflow returns the expected outputs.
     """
 
-    def generate_prompt_events(*args, **kwargs) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
         execution_id = str(uuid4())
 
         expected_outputs = [
