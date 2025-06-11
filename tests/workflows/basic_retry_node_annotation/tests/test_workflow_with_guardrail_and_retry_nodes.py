@@ -35,7 +35,7 @@ def test_workflow_with_two_nodes__happy_path(vellum_client, vellum_adhoc_prompt_
         StringVellumValue(value="My favorite city is NYC."),
     ]
 
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[AdHocExecutePromptEvent]:
+    def generate_prompt_events(*_args: Any, **_kwargs: Any) -> Iterator[AdHocExecutePromptEvent]:
         execution_id = str(uuid4())
         events: List[AdHocExecutePromptEvent] = [
             InitiatedAdHocExecutePromptEvent(execution_id=execution_id),

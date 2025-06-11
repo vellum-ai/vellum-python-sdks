@@ -35,7 +35,7 @@ def test_run_workflow__happy_path(vellum_client):
         FunctionCallVellumValue(value=FunctionCall(name="get_current_weather", arguments={"city": "San Francisco"})),
     ]
 
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*_args: Any, **_kwargs: Any) -> Iterator[ExecutePromptEvent]:
         execution_id = str(uuid4())
         events: List[ExecutePromptEvent] = [
             InitiatedExecutePromptEvent(execution_id=execution_id),
@@ -99,7 +99,7 @@ def test_stream_workflow__happy_path(vellum_client):
         StringVellumValue(value="It was hot"),
     ]
 
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*_args: Any, **_kwargs: Any) -> Iterator[ExecutePromptEvent]:
         execution_id = str(uuid4())
         events: List[ExecutePromptEvent] = [
             InitiatedExecutePromptEvent(execution_id=execution_id),
