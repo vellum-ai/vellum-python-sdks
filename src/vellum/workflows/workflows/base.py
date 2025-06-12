@@ -135,7 +135,7 @@ class _BaseWorkflowMeta(type):
         workflow_class.__id__ = uuid4_from_hash(workflow_class.__qualname__)
 
         inputs_class = workflow_class.get_inputs_class()
-        if inputs_class is not BaseInputs and inputs_class.__parent_class__ is type(None):
+        if inputs_class is not BaseInputs and isinstance(inputs_class.__parent_class__, type(type(None))):
             inputs_class.__parent_class__ = workflow_class
 
         return workflow_class

@@ -19,7 +19,7 @@ class _BaseAdornmentNodeMeta(BaseNodeMeta):
         if (
             isinstance(SubworkflowInputs, type)
             and issubclass(SubworkflowInputs, BaseInputs)
-            and SubworkflowInputs.__parent_class__ is type(None)
+            and isinstance(SubworkflowInputs.__parent_class__, type(type(None)))
         ):
             SubworkflowInputs.__parent_class__ = node_class
 

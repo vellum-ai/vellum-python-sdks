@@ -99,10 +99,31 @@ def image_push_command(
         )
 
         if exists_result.returncode != 0:
-            logger.error(
-                "Image does not exist in repository. Push the image to the "
-                "repository your self hosted install is using and try again."
-            )
+            stderr_output = exists_result.stderr.decode("utf-8").lower()
+
+            auth_error_indicators = [
+                "unauthorized",
+                "authentication required",
+                "access denied",
+                "permission denied",
+                "login required",
+                "no basic auth credentials",
+                "token authentication required",
+            ]
+
+            is_auth_error = any(indicator in stderr_output for indicator in auth_error_indicators)
+
+            if is_auth_error:
+                logger.error(
+                    "Docker authentication failed. Please ensure you are logged in to the Docker registry "
+                    "that your self-hosted install is using. Run 'docker login <registry-url>' to authenticate, "
+                    "then try again."
+                )
+            else:
+                logger.error(
+                    "Image does not exist in repository. Push the image to the "
+                    "repository your self hosted install is using and try again."
+                )
             exit(1)
     else:
         logger.info("Authenticating...")
