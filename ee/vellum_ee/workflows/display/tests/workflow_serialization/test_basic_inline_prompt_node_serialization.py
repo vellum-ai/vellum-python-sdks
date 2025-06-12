@@ -391,3 +391,9 @@ def test_serialize_workflow_with_descriptor_blocks():
     blocks_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "blocks"), None)
     assert blocks_attr is not None, "blocks attribute should be present when blocks contain BaseDescriptor"
     assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE", "blocks attribute should be serialized as ARRAY_REFERENCE"
+    assert "items" in blocks_attr["value"], "blocks attribute should contain items field"
+    assert isinstance(blocks_attr["value"]["items"], list), "blocks attribute items should be a list"
+    assert len(blocks_attr["value"]["items"]) > 0, "blocks attribute items should not be empty"
+    first_item = blocks_attr["value"]["items"][0]
+    assert first_item["type"] == "BINARY_EXPRESSION", "first item should be a BINARY_EXPRESSION"
+    assert "lhs" in first_item and "rhs" in first_item, "binary expression should have lhs and rhs"
