@@ -243,7 +243,19 @@ ${errors.slice(0, 3).map((err) => {
 
     const parentNode = this.workflowContext.parentNode;
     if (parentNode) {
-      statements.push(parentNode.generateNodeClass());
+      if (this.workflowContext.nestedWorkflowModuleName) {
+        comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
+        imports.push(
+          python.starImport({
+            modulePath: [
+              ...parentNode.getNodeDisplayModulePath().slice(0, 1),
+              GENERATED_DISPLAY_MODULE_NAME,
+            ],
+          })
+        );
+      } else {
+        statements.push(parentNode.generateNodeClass());
+      }
     } else {
       comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
@@ -271,16 +283,24 @@ ${errors.slice(0, 3).map((err) => {
 
     const parentNode = this.workflowContext.parentNode;
     if (parentNode) {
+      let parentModulePath: string[] = [];
+      if (this.workflowContext.nestedWorkflowModuleName) {
+        parentModulePath = [
+          ...parentNode.getNodeDisplayModulePath().slice(0, 1),
+        ];
+      } else {
+        parentModulePath = [...parentNode.getNodeDisplayModulePath()];
+      }
       statements.push(...parentNode.generateNodeDisplayClasses());
       comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
         python.starImport({
-          modulePath: [...parentNode.getNodeDisplayModulePath(), "nodes"],
+          modulePath: [...parentModulePath, "nodes"],
         })
       );
       imports.push(
         python.starImport({
-          modulePath: [...parentNode.getNodeDisplayModulePath(), "workflow"],
+          modulePath: [...parentModulePath, "workflow"],
         })
       );
     } else {
