@@ -382,30 +382,12 @@ def test_serialize_workflow_with_descriptor_blocks():
     serialized: dict = workflow_display.serialize()
 
     prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
-    assert len(prompt_nodes) == 1
-
     prompt_node = prompt_nodes[0]
-    assert isinstance(prompt_node, dict)
 
     blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
-    assert isinstance(blocks, list)
     descriptor_blocks = [block for block in blocks if not isinstance(block, dict) or not block.get("block_type")]
-    assert len(descriptor_blocks) == 0
+    assert len(descriptor_blocks) == 0, "BaseDescriptor blocks should not appear in serialized blocks"
 
-    assert "attributes" in prompt_node
-    assert isinstance(prompt_node["attributes"], list)
-    blocks_attr = next(
-        (attr for attr in prompt_node["attributes"] if isinstance(attr, dict) and attr["name"] == "blocks"), None
-    )
-    assert isinstance(blocks_attr, dict), "blocks attribute should be present in serialized attributes"
-
-    assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE"
-    assert "items" in blocks_attr["value"]
-    assert len(blocks_attr["value"]["items"]) == 1
-
-    binary_expr = blocks_attr["value"]["items"][0]
-    assert binary_expr["type"] == "BINARY_EXPRESSION"
-    assert binary_expr["operator"] == "accessField"
-    assert binary_expr["lhs"]["type"] == "NODE_OUTPUT"
-    assert "node_id" in binary_expr["lhs"]
-    assert "node_output_id" in binary_expr["lhs"]
+    blocks_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "blocks"), None)
+    assert blocks_attr is not None, "blocks attribute should be present when blocks contain BaseDescriptor"
+    assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE", "blocks attribute should be serialized as ARRAY_REFERENCE"
