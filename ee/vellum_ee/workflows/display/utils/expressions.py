@@ -34,6 +34,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
+from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
@@ -253,6 +254,13 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             "type": "EXECUTION_COUNTER",
             "node_id": str(node_class_display.node_id),
         }
+
+    if isinstance(value, NodeReference):
+        if value.instance is not None:
+            return serialize_value(display_context, value.instance)
+        else:
+            # This handles cases like UpstreamNode.Outputs.results which creates a NodeReference
+            raise UnsupportedSerializationException(f"NodeReference {value._name} has no instance - cannot serialize")
 
     if isinstance(value, list):
         serialized_items = [serialize_value(display_context, item) for item in value]

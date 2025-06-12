@@ -372,7 +372,7 @@ def test_serialize_workflow_with_descriptor_blocks():
 
     class TestInlinePromptNodeWithDescriptorBlocks(InlinePromptNode):
         ml_model = "gpt-4o"
-        blocks = [UpstreamNode.Outputs.results[0]]
+        blocks = [UpstreamNode.Outputs.results[0]]  # type: ignore
         prompt_inputs = {"noun": TestInputs.noun}
 
     class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):

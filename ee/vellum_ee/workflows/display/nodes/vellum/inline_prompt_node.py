@@ -98,8 +98,8 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             ],
             "ports": self.serialize_ports(display_context),
         }
+        attributes = self._serialize_attributes(display_context)
 
-        attributes = []
         original_blocks = raise_if_descriptor(node.blocks) or []
         blocks_contain_descriptors = False
         try:
@@ -109,14 +109,34 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 blocks_contain_descriptors = isinstance(original_blocks, BaseDescriptor)
         except Exception:
             blocks_contain_descriptors = False
-        for attribute in node:
-            if attribute.name == "blocks":
-                if not blocks_contain_descriptors:
-                    continue  # Skip blocks if they don't contain descriptors
-            elif attribute in self.__unserializable_attributes__:
+
+        if blocks_contain_descriptors:
+            blocks_attr_id = str(uuid4_from_hash(f"{node_id}|blocks"))
+            try:
+                blocks_attribute = {
+                    "id": blocks_attr_id,
+                    "name": "blocks",
+                    "value": serialize_value(display_context, node.blocks),
+                }
+                attributes.append(blocks_attribute)
+            except ValueError as e:
+                raise ValueError(f"Failed to serialize blocks attribute: {e}")
+
+        if attributes:
+            serialized_node["attributes"] = attributes
+        return serialized_node
+
+    def _serialize_attributes(self, display_context: "WorkflowDisplayContext"):
+        attributes = []
+        for attribute in self._node:
+            if attribute in self.__unserializable_attributes__:
                 continue
 
-            id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
+            id = (
+                str(self.attribute_ids_by_name[attribute.name])
+                if self.attribute_ids_by_name.get(attribute.name)
+                else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
+            )
             try:
                 attributes.append(
                     {
@@ -128,9 +148,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             except ValueError as e:
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
-        if attributes:
-            serialized_node["attributes"] = attributes
-        return serialized_node
+        return attributes
 
     def _generate_node_and_prompt_inputs(
         self,
