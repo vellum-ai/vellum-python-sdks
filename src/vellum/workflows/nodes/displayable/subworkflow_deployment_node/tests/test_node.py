@@ -339,7 +339,7 @@ def test_run_workflow__hyphenated_output(vellum_client):
         ),
         (
             ApiError(status_code=400, body="Missing required input variable: 'foo'"),
-            WorkflowErrorCode.INTERNAL_ERROR,
+            WorkflowErrorCode.INVALID_INPUTS,
             "Failed to execute Subworkflow Deployment",
         ),
         (
@@ -493,3 +493,25 @@ def test_run_workflow__missing_required_input(vellum_client):
     # AND the error should indicate the missing required input
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert exc_info.value.message == "Missing required input for 'my_var_1'"
+
+
+def test_subworkflow_deployment_node__404_string_body__user_facing_error(vellum_client):
+    """Test that 404 errors with string bodies return user-facing errors instead of internal errors"""
+
+    # GIVEN a SubworkflowDeploymentNode trying to hit a workflow deployment
+    class MyNode(SubworkflowDeploymentNode):
+        deployment = "nonexistent_workflow_deployment"
+        subworkflow_inputs = {
+            "input": "value",
+        }
+
+    # AND the vellum client execute workflow stream raises a 404 error with string body
+    vellum_client.execute_workflow_stream.side_effect = ApiError(status_code=404, body="Workflow deployment not found")
+
+    # WHEN the node is run
+    with pytest.raises(NodeException) as e:
+        list(MyNode().run())
+
+    # THEN the node raises a user-facing NodeException instead of internal error
+    assert e.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert e.value.message == "Failed to execute Subworkflow Deployment"
