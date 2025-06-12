@@ -355,3 +355,57 @@ def test_serialize_workflow_with_descriptor_functions():
         "node_output_id": "470fadb9-b8b5-477e-a502-5209d398bcf9",
         "type": "NODE_OUTPUT",
     }
+
+
+def test_serialize_workflow_with_descriptor_blocks():
+    """Test that serialization handles BaseDescriptor instances in blocks list."""
+
+    class TestInputs(BaseInputs):
+        noun: str
+
+    class UpstreamNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            results: list
+
+        def run(self) -> Outputs:
+            return self.Outputs(results=["test"])
+
+    class TestInlinePromptNodeWithDescriptorBlocks(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [UpstreamNode.Outputs.results[0]]
+        prompt_inputs = {"noun": TestInputs.noun}
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = UpstreamNode >> TestInlinePromptNodeWithDescriptorBlocks
+
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized: dict = workflow_display.serialize()
+
+    prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    assert len(prompt_nodes) == 1
+
+    prompt_node = prompt_nodes[0]
+    assert isinstance(prompt_node, dict)
+
+    blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
+    assert isinstance(blocks, list)
+    descriptor_blocks = [block for block in blocks if not isinstance(block, dict) or not block.get("block_type")]
+    assert len(descriptor_blocks) == 0
+
+    assert "attributes" in prompt_node
+    assert isinstance(prompt_node["attributes"], list)
+    blocks_attr = next(
+        (attr for attr in prompt_node["attributes"] if isinstance(attr, dict) and attr["name"] == "blocks"), None
+    )
+    assert isinstance(blocks_attr, dict), "blocks attribute should be present in serialized attributes"
+
+    assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE"
+    assert "items" in blocks_attr["value"]
+    assert len(blocks_attr["value"]["items"]) == 1
+
+    binary_expr = blocks_attr["value"]["items"][0]
+    assert binary_expr["type"] == "BINARY_EXPRESSION"
+    assert binary_expr["operator"] == "accessField"
+    assert binary_expr["lhs"]["type"] == "NODE_OUTPUT"
+    assert "node_id" in binary_expr["lhs"]
+    assert "node_output_id" in binary_expr["lhs"]

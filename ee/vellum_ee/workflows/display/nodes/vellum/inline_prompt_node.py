@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.functions import compile_function_definition
@@ -39,7 +40,27 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         output_display = self.output_display[node.Outputs.text]
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
-        node_blocks = raise_if_descriptor(node.blocks) or []
+
+        blocks_contain_descriptors = False
+        if hasattr(node, "blocks") and node.blocks is not None:
+            try:
+                # Try to resolve the descriptor first, then check if any items are BaseDescriptor
+                resolved_blocks = raise_if_descriptor(node.blocks)
+                if resolved_blocks is not None:
+                    blocks_list = resolved_blocks if isinstance(resolved_blocks, list) else [resolved_blocks]
+                    blocks_contain_descriptors = any(isinstance(block, BaseDescriptor) for block in blocks_list)
+            except Exception:
+                # If we can't resolve or access the blocks, assume they contain descriptors
+                blocks_contain_descriptors = True
+
+        # Store this information for use in _serialize_attributes
+        self._blocks_contain_descriptors = blocks_contain_descriptors
+
+        if blocks_contain_descriptors:
+            node_blocks = []
+        else:
+            node_blocks = raise_if_descriptor(node.blocks) or []
+
         function_definitions = raise_if_descriptor(node.functions)
 
         ml_model = str(raise_if_descriptor(node.ml_model))
@@ -228,9 +249,15 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
     def _serialize_attributes(self, display_context: "WorkflowDisplayContext"):
         attributes = []
+
+        blocks_contain_descriptors = getattr(self, "_blocks_contain_descriptors", False)
+
         for attribute in self._node:
             if attribute in self.__unserializable_attributes__:
-                continue
+                if attribute == InlinePromptNode.blocks and blocks_contain_descriptors:
+                    pass  # Don't skip, allow serialization as attribute
+                else:
+                    continue
 
             id = (
                 str(self.attribute_ids_by_name[attribute.name])
