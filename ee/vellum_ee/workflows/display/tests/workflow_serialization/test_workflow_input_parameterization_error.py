@@ -29,6 +29,9 @@ def test_workflow_serialization_error_when_node_references_unparameterized_input
         workflow_display.serialize()
 
     error_message = str(exc_info.value)
-    assert "CustomInputs.custom_input" in error_message
-    assert "parameterize" in error_message.lower()
-    assert "BaseWorkflow[" in error_message
+    expected_message = (
+        "Inputs class 'CustomInputs' referenced during serialization of 'TestWorkflow' "
+        "without parameterizing this Workflow with this Inputs definition. "
+        "Update your Workflow definition to 'TestWorkflow(BaseWorkflow[CustomInputs, BaseState])'."
+    )
+    assert error_message == expected_message
