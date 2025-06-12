@@ -211,7 +211,15 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         return serialize_value(display_context, child_descriptor)
 
     if isinstance(value, WorkflowInputReference):
-        workflow_input_display = display_context.global_workflow_input_displays[value]
+        try:
+            workflow_input_display = display_context.global_workflow_input_displays[value]
+        except KeyError:
+            inputs_class_name = value.__class__.__name__
+            raise UnsupportedSerializationException(
+                f"Node references workflow input '{value}' but the workflow is not parameterized with the "
+                f"inputs class that defines this input. To fix this, parameterize your workflow class with "
+                f"the inputs class: 'class YourWorkflow(BaseWorkflow[{inputs_class_name}, YourState])'"
+            )
         return {
             "type": "WORKFLOW_INPUT",
             "input_variable_id": str(workflow_input_display.id),
