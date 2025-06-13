@@ -9,6 +9,7 @@ import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
+import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { NodeTrigger } from "src/generators/node-trigger";
@@ -83,18 +84,22 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const workflowVersionExecConfigResult =
                     WorkflowVersionExecConfigSerializer.parse(rawExecConfig);
                   if (!workflowVersionExecConfigResult.ok) {
-                    throw new Error(
-                      `Failed to parse WorkflowVersionExecConfig: ${JSON.stringify(
-                        workflowVersionExecConfigResult.errors
-                      )}`
+                    this.workflowContext.addError(
+                      new NodeDefinitionGenerationError(
+                        `Failed to parse WorkflowVersionExecConfig: ${JSON.stringify(
+                          workflowVersionExecConfigResult.errors
+                        )}`,
+                        "WARNING"
+                      )
                     );
+                  } else {
+                    const workflowVersionExecConfig: WorkflowVersionExecConfig =
+                      workflowVersionExecConfigResult.value;
+                    inlineWorkflowFunctions.push({
+                      type: "INLINE_WORKFLOW",
+                      exec_config: workflowVersionExecConfig,
+                    });
                   }
-                  const workflowVersionExecConfig: WorkflowVersionExecConfig =
-                    workflowVersionExecConfigResult.value;
-                  inlineWorkflowFunctions.push({
-                    type: "INLINE_WORKFLOW",
-                    exec_config: workflowVersionExecConfig,
-                  });
                   break;
                 }
 
