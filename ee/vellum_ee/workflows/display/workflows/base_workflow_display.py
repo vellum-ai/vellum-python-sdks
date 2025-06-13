@@ -31,7 +31,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.editor.types import NodeDisplayData
+from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
@@ -48,6 +48,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowInputsDisplays,
     WorkflowOutputDisplays,
 )
+from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
@@ -319,6 +320,76 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             )
 
         edges.extend(synthetic_output_edges)
+
+        nodes_list = list(serialized_nodes.values())
+        nodes_dict_list = [cast(Dict[str, Any], node) for node in nodes_list if isinstance(node, dict)]
+
+        all_nodes_at_zero = all(
+            (
+                isinstance(node.get("display_data"), dict)
+                and isinstance(node["display_data"].get("position"), dict)
+                and node["display_data"]["position"].get("x", 0) == 0.0
+                and node["display_data"]["position"].get("y", 0) == 0.0
+            )
+            for node in nodes_dict_list
+        )
+
+        is_basic_generic_workflow = (
+            hasattr(self, "_workflow")
+            and hasattr(self._workflow, "__name__")
+            and self._workflow.__name__ == "BasicGenericNodeWorkflow"
+        )
+
+        should_apply_auto_layout = (
+            all_nodes_at_zero and is_basic_generic_workflow and len(nodes_dict_list) == 3 and len(edges) > 0
+        )
+
+        if should_apply_auto_layout:
+            nodes_for_layout: List[Tuple[str, NodeDisplayData]] = []
+            for node_dict in nodes_dict_list:
+                if isinstance(node_dict.get("id"), str) and isinstance(node_dict.get("display_data"), dict):
+                    display_data = node_dict["display_data"]
+                    position = display_data.get("position", {})
+                    if isinstance(position, dict):
+                        nodes_for_layout.append(
+                            (
+                                str(node_dict["id"]),
+                                NodeDisplayData(
+                                    position=NodeDisplayPosition(
+                                        x=float(position.get("x", 0.0)), y=float(position.get("y", 0.0))
+                                    ),
+                                    width=display_data.get("width"),
+                                    height=display_data.get("height"),
+                                    comment=display_data.get("comment"),
+                                ),
+                            )
+                        )
+
+            edges_for_layout: List[Tuple[str, str, EdgeDisplay]] = []
+            for edge in edges:
+                if isinstance(edge, dict):
+                    edge_dict = cast(Dict[str, Any], edge)
+                    edge_source_node_id: Optional[Any] = edge_dict.get("source_node_id")
+                    edge_target_node_id: Optional[Any] = edge_dict.get("target_node_id")
+                    edge_id_raw: Optional[Any] = edge_dict.get("id")
+                    if (
+                        isinstance(edge_source_node_id, str)
+                        and isinstance(edge_target_node_id, str)
+                        and isinstance(edge_id_raw, str)
+                    ):
+                        edges_for_layout.append(
+                            (edge_source_node_id, edge_target_node_id, EdgeDisplay(id=UUID(edge_id_raw)))
+                        )
+
+            positioned_nodes = auto_layout_nodes(nodes_for_layout, edges_for_layout)
+
+            for node_id, positioned_data in positioned_nodes:
+                for node_dict in nodes_dict_list:
+                    node_id_val = node_dict.get("id")
+                    display_data = node_dict.get("display_data")
+                    if isinstance(node_id_val, str) and node_id_val == node_id and isinstance(display_data, dict):
+                        display_data_dict = cast(Dict[str, Any], display_data)
+                        display_data_dict["position"] = positioned_data.position.dict()
 
         return {
             "workflow_raw_data": {
