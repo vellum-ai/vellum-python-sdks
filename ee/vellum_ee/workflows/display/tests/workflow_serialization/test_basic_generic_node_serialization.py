@@ -70,19 +70,47 @@ def test_serialize_workflow():
     assert api_node["id"] == "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f"
 
     final_output_node = workflow_raw_data["nodes"][2]
-    assert final_output_node["id"] == "50e3b446-afcd-4a5d-8c6f-5f05eaf2200e"
-    assert final_output_node["type"] == "TERMINAL"
-    assert final_output_node["data"]["label"] == "Final Output"
-    assert final_output_node["data"]["name"] == "output"
-    assert final_output_node["data"]["target_handle_id"] == "8bd9f4f3-9f66-4d95-8e84-529b0002c531"
-    assert final_output_node["data"]["output_id"] == "2b6389d0-266a-4be4-843e-4e543dd3d727"
-    assert final_output_node["data"]["output_type"] == "STRING"
-    assert final_output_node["data"]["node_input_id"] == "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90"
-    assert len(final_output_node["inputs"]) == 1
-    assert final_output_node["inputs"][0]["id"] == "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90"
-    assert final_output_node["inputs"][0]["key"] == "node_input"
-    assert final_output_node["base"]["name"] == "FinalOutputNode"
-    assert final_output_node["definition"] is None
+    assert not DeepDiff(
+        {
+            "id": "50e3b446-afcd-4a5d-8c6f-5f05eaf2200e",
+            "type": "TERMINAL",
+            "data": {
+                "label": "Final Output",
+                "name": "output",
+                "target_handle_id": "8bd9f4f3-9f66-4d95-8e84-529b0002c531",
+                "output_id": "2b6389d0-266a-4be4-843e-4e543dd3d727",
+                "output_type": "STRING",
+                "node_input_id": "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90",
+            },
+            "inputs": [
+                {
+                    "id": "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90",
+                    "key": "node_input",
+                    "value": {
+                        "rules": [
+                            {
+                                "type": "NODE_OUTPUT",
+                                "data": {
+                                    "node_id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
+                                    "output_id": "0a9c7a80-fc89-4a71-aac0-66489e4ddb85",
+                                },
+                            }
+                        ],
+                        "combinator": "OR",
+                    },
+                }
+            ],
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},  # Will be ignored due to exclude_paths
+            "base": {
+                "name": "FinalOutputNode",
+                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
+            },
+            "definition": None,
+        },
+        final_output_node,
+        ignore_order=True,
+        exclude_paths=["root['display_data']['position']"],  # Exclude position since auto-layout changes it
+    )
 
     # AND each edge should be serialized correctly
     serialized_edges = workflow_raw_data["edges"]
