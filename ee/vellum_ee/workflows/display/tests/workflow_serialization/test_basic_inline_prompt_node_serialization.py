@@ -355,3 +355,57 @@ def test_serialize_workflow_with_descriptor_functions():
         "node_output_id": "470fadb9-b8b5-477e-a502-5209d398bcf9",
         "type": "NODE_OUTPUT",
     }
+
+
+def test_serialize_workflow_with_descriptor_blocks():
+    """Test that serialization handles BaseDescriptor instances in blocks list."""
+
+    class TestInputs(BaseInputs):
+        noun: str
+
+    class UpstreamNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            results: list
+
+        def run(self) -> Outputs:
+            return self.Outputs(results=["test"])
+
+    class TestInlinePromptNodeWithDescriptorBlocks(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [UpstreamNode.Outputs.results[0]]  # type: ignore
+        prompt_inputs = {"noun": TestInputs.noun}
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = UpstreamNode >> TestInlinePromptNodeWithDescriptorBlocks
+
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized: dict = workflow_display.serialize()
+
+    prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    prompt_node = prompt_nodes[0]
+
+    blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
+    descriptor_blocks = [block for block in blocks if not isinstance(block, dict) or not block.get("block_type")]
+    assert len(descriptor_blocks) == 0, "BaseDescriptor blocks should not appear in serialized blocks"
+
+    blocks_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "blocks"), None)
+    assert blocks_attr is not None, "blocks attribute should be present when blocks contain BaseDescriptor"
+    assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE", "blocks attribute should be serialized as ARRAY_REFERENCE"
+    assert blocks_attr["value"]["items"] == [
+        {
+            "type": "BINARY_EXPRESSION",
+            "lhs": {
+                "type": "NODE_OUTPUT",
+                "node_id": str(UpstreamNode.__id__),
+                "node_output_id": str(UpstreamNode.__output_ids__["results"]),
+            },
+            "operator": "accessField",
+            "rhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "NUMBER",
+                    "value": 0.0,
+                },
+            },
+        }
+    ]

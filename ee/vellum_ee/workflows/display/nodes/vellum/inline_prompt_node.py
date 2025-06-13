@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.functions import compile_function_definition
@@ -18,9 +19,10 @@ _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 
 class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
-    __serializable_inputs__ = {InlinePromptNode.prompt_inputs, InlinePromptNode.functions}
+    __serializable_inputs__ = {
+        InlinePromptNode.prompt_inputs,
+    }
     __unserializable_attributes__ = {
-        InlinePromptNode.blocks,
         InlinePromptNode.parameters,
         InlinePromptNode.settings,
         InlinePromptNode.expand_meta,
@@ -45,7 +47,9 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         ml_model = str(raise_if_descriptor(node.ml_model))
 
         blocks: list = [
-            self._generate_prompt_block(block, input_variable_id_by_name, [i]) for i, block in enumerate(node_blocks)
+            self._generate_prompt_block(block, input_variable_id_by_name, [i])
+            for i, block in enumerate(node_blocks)
+            if not isinstance(block, BaseDescriptor)
         ]
 
         functions = (
