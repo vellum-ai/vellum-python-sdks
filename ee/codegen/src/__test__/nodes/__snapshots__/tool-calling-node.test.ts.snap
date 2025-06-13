@@ -70,3 +70,31 @@ class ToolCallingNode(BaseToolCallingNode):
     max_tool_calls = 1
 "
 `;
+
+exports[`ToolCallingNode > function ordering > should preserve order: code-exec, workflow 1`] = `
+"from .add_numbers import add_numbers
+from .subtract_workflow.workflow import ToolCallingNodeSubtractWorkflowWorkflow
+
+from vellum.workflows.nodes.experimental.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [add_numbers, ToolCallingNodeSubtractWorkflowWorkflow]
+"
+`;
+
+exports[`ToolCallingNode > function ordering > should preserve order: workflow, code-exec 1`] = `
+"from .add_numbers import add_numbers
+from .subtract_workflow.workflow import ToolCallingNodeSubtractWorkflowWorkflow
+
+from vellum.workflows.nodes.experimental.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [ToolCallingNodeSubtractWorkflowWorkflow, add_numbers]
+"
+`;
