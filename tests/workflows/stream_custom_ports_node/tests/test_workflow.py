@@ -18,7 +18,7 @@ def test_workflow__happy_path_with_custom_ports(vellum_adhoc_prompt_client):
         StringVellumValue(value="Hello, world!"),
     ]
 
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*_args: Any, **_kwargs: Any) -> Iterator[ExecutePromptEvent]:
         execution_id = str(uuid4())
         events: List[ExecutePromptEvent] = [
             InitiatedExecutePromptEvent(execution_id=execution_id),
@@ -48,7 +48,7 @@ def test_workflow__prompt_chunks_with_custom_ports(vellum_adhoc_prompt_client):
         StringVellumValue(value="Hello, world!"),
     ]
 
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*_args: Any, **_kwargs: Any) -> Iterator[ExecutePromptEvent]:
         execution_id = str(uuid4())
         events: List[ExecutePromptEvent] = [
             InitiatedExecutePromptEvent(execution_id=execution_id),
