@@ -30,6 +30,13 @@ export function getGeneratedNodesModulePath(
   workflowContext: WorkflowContext
 ): string[] {
   if (workflowContext.parentNode) {
+    if (workflowContext.nestedWorkflowModuleName) {
+      return [
+        ...workflowContext.parentNode.getNodeModulePath(),
+        workflowContext.nestedWorkflowModuleName,
+        GENERATED_NODES_MODULE_NAME,
+      ];
+    }
     return [
       ...workflowContext.parentNode.getNodeModulePath(),
       GENERATED_NODES_MODULE_NAME,
@@ -96,6 +103,14 @@ export function getGeneratedNodeDisplayModulePath(
   moduleName: string
 ): string[] {
   if (workflowContext.parentNode) {
+    if (workflowContext.nestedWorkflowModuleName) {
+      return [
+        ...workflowContext.parentNode.getNodeDisplayModulePath(),
+        workflowContext.nestedWorkflowModuleName,
+        GENERATED_NODES_MODULE_NAME,
+        moduleName,
+      ];
+    }
     return [
       ...workflowContext.parentNode.getNodeDisplayModulePath(),
       GENERATED_NODES_MODULE_NAME,

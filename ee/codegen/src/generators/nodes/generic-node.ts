@@ -6,6 +6,7 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 
+import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { InitFile } from "src/generators/init-file";
@@ -15,13 +16,26 @@ import { BaseNode } from "src/generators/nodes/bases/base";
 import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
-import { FunctionArgs, GenericNode as GenericNodeType } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { WorkflowProjectGenerator } from "src/project";
+import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
+import {
+  FunctionArgs,
+  GenericNode as GenericNodeType,
+  InlineWorkflowFunctionArgs,
+  WorkflowRawData,
+  WorkflowVersionExecConfig,
+} from "src/types/vellum";
+import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private functionsToGenerate: Array<{
     functionName: string;
     content: string;
+  }> = [];
+
+  private inlineWorkflowsToGenerate: Array<{
+    functionName: string;
+    workflowProject: WorkflowProjectGenerator;
   }> = [];
 
   private nodeAttributes: AstNode[] = [];
@@ -52,28 +66,105 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             value.value?.type === "JSON" &&
             Array.isArray(value.value.value)
           ) {
-            const functions: Array<FunctionArgs> = value.value.value;
-            this.generateFunctionFile(functions);
+            const functions: Array<FunctionArgs | InlineWorkflowFunctionArgs> =
+              value.value.value;
+
+            const codeExecutionFunctions: FunctionArgs[] = [];
+            const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];
+
+            functions.forEach((f) => {
+              switch (f.type) {
+                case "CODE_EXECUTION":
+                  codeExecutionFunctions.push(f as FunctionArgs);
+                  break;
+                case "INLINE_WORKFLOW": {
+                  const rawExecConfig =
+                    f.exec_config as unknown as WorkflowVersionExecConfigSerializer.Raw;
+                  const workflowVersionExecConfigResult =
+                    WorkflowVersionExecConfigSerializer.parse(rawExecConfig);
+                  if (!workflowVersionExecConfigResult.ok) {
+                    throw new Error(
+                      `Failed to parse WorkflowVersionExecConfig: ${JSON.stringify(
+                        workflowVersionExecConfigResult.errors
+                      )}`
+                    );
+                  }
+                  const workflowVersionExecConfig: WorkflowVersionExecConfig =
+                    workflowVersionExecConfigResult.value;
+                  inlineWorkflowFunctions.push({
+                    type: "INLINE_WORKFLOW",
+                    exec_config: workflowVersionExecConfig,
+                  });
+                  break;
+                }
+
+                default:
+                  throw new Error(
+                    `Unsupported function type. Only CODE_EXECUTION and INLINE_WORKFLOW are supported.`
+                  );
+              }
+            });
+
+            if (codeExecutionFunctions.length > 0) {
+              this.generateFunctionFile(codeExecutionFunctions);
+            }
+
+            if (inlineWorkflowFunctions.length > 0) {
+              this.generateInlineWorkflowFiles(inlineWorkflowFunctions);
+            }
 
             const functionNames: string[] = [];
-            functions.forEach((f) => {
+
+            codeExecutionFunctions.forEach((f) => {
               if (f.definition && f.definition.name) {
                 functionNames.push(f.definition.name);
               }
             });
 
+            inlineWorkflowFunctions.forEach((workflow) => {
+              const workflowName = this.getInlineWorkflowFunctionName(workflow);
+              functionNames.push(workflowName);
+            });
+
             nodeAttributesStatements.push(
               python.field({
                 name: attribute.name,
-                initializer: python.TypeInstantiation.list(
-                  functionNames.map((name) => {
-                    const snakeName = toPythonSafeSnakeCase(name);
-                    return python.reference({
-                      name: snakeName,
-                      modulePath: [`.${snakeName}`],
-                    });
-                  })
-                ),
+                initializer: python.TypeInstantiation.list([
+                  ...codeExecutionFunctions
+                    .map((f) => {
+                      if (f.definition && f.definition.name) {
+                        const snakeName = toPythonSafeSnakeCase(
+                          f.definition.name
+                        );
+                        return python.reference({
+                          name: snakeName,
+                          modulePath: [`.${snakeName}`],
+                        });
+                      }
+                      return null;
+                    })
+                    .filter((ref): ref is python.Reference => ref !== null),
+                  ...inlineWorkflowFunctions
+                    .map((workflow) => {
+                      const workflowName =
+                        this.getInlineWorkflowFunctionName(workflow);
+                      if (workflowName) {
+                        const nestedProject =
+                          this.getNestedWorkflowProject(workflow);
+                        const workflowClassName =
+                          nestedProject.workflowContext.workflowClassName;
+                        return python.reference({
+                          name: workflowClassName,
+                          modulePath: [
+                            `.${workflowName}`,
+                            GENERATED_WORKFLOW_MODULE_NAME,
+                          ],
+                        });
+                      }
+                      return null;
+                    })
+                    .filter((ref): ref is python.Reference => ref !== null),
+                ]),
               })
             );
           }
@@ -138,6 +229,63 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     });
 
     return nodeAttributesStatements;
+  }
+
+  getInnerWorkflowData(workflow: InlineWorkflowFunctionArgs): WorkflowRawData {
+    return workflow.exec_config.workflowRawData;
+  }
+
+  private getNestedWorkflowProject(
+    workflow: InlineWorkflowFunctionArgs
+  ): WorkflowProjectGenerator {
+    const workflowName = this.getInlineWorkflowFunctionName(workflow);
+
+    const nestedWorkflowLabel = `${this.nodeContext.getNodeLabel()} ${workflowName} Workflow`;
+    const nestedWorkflowClassName = createPythonClassName(nestedWorkflowLabel);
+    const nestedWorkflowContext =
+      this.workflowContext.createNestedWorkflowContext({
+        parentNode: this,
+        workflowClassName: nestedWorkflowClassName,
+        workflowRawData: workflow.exec_config.workflowRawData,
+        classNames: this.workflowContext.classNames,
+        nestedWorkflowModuleName: workflowName,
+      });
+
+    return new WorkflowProjectGenerator({
+      workflowVersionExecConfig: {
+        workflowRawData: workflow.exec_config.workflowRawData,
+        inputVariables: workflow.exec_config.inputVariables,
+        stateVariables: [],
+        outputVariables: workflow.exec_config.outputVariables,
+      },
+      moduleName: nestedWorkflowContext.moduleName,
+      workflowContext: nestedWorkflowContext,
+    });
+  }
+
+  private getInlineWorkflowFunctionName(
+    workflow: InlineWorkflowFunctionArgs
+  ): string {
+    const definition = workflow.exec_config.workflowRawData.definition;
+    if (!definition?.name) {
+      throw new Error(
+        "Workflow definition name is required for inline workflows"
+      );
+    }
+    return toPythonSafeSnakeCase(definition.name);
+  }
+
+  private generateInlineWorkflowFiles(
+    inlineWorkflows: InlineWorkflowFunctionArgs[]
+  ): void {
+    inlineWorkflows.forEach((workflow) => {
+      const nestedWorkflowProject = this.getNestedWorkflowProject(workflow);
+
+      this.inlineWorkflowsToGenerate.push({
+        functionName: this.getInlineWorkflowFunctionName(workflow),
+        workflowProject: nestedWorkflowProject,
+      });
+    });
   }
 
   getNodeDecorators(): python.Decorator[] | undefined {
@@ -270,6 +418,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         nodeInitFile.persist(),
         displayInitFile.persist(),
         this.generateFunctionFiles(),
+        this.generateInlineWorkflowProjects(),
       ]);
     } else {
       await super.persist();
@@ -289,6 +438,15 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         const filepath = join(nodeDir, fileName);
 
         await writeFile(filepath, funcFile.content);
+      })
+    );
+  }
+
+  private async generateInlineWorkflowProjects(): Promise<void> {
+    // Generate nested workflow projects
+    await Promise.all(
+      this.inlineWorkflowsToGenerate.map(async (workflowFile) => {
+        await workflowFile.workflowProject.generateCode();
       })
     );
   }

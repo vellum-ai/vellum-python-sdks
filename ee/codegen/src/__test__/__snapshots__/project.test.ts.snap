@@ -400,6 +400,243 @@ class GetCurrentWeatherNode(ToolCallingNode):
 "
 `;
 
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    query: str
+    city: str
+    date: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 2`] = `
+"from .final_output import FinalOutput
+from .final_output_1 import FinalOutput1
+from .final_output_2 import FinalOutput2
+from .tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+__all__ = [
+    "FinalOutput",
+    "FinalOutput1",
+    "FinalOutput2",
+    "GetCurrentWeatherNode",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 3`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from ..inputs import Inputs
+
+
+class FinalOutput(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = Inputs.city
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 4`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class FinalOutput1(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = GetCurrentWeatherNode.Outputs.text
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 5`] = `
+"from typing import List
+
+from vellum import ChatMessage
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class FinalOutput2(FinalOutputNode[BaseState, List[ChatMessage]]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = GetCurrentWeatherNode.Outputs.chat_history
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 6`] = `
+"from .weather_function.workflow import GetCurrentWeatherNodeWeatherFunctionWorkflow
+from typing import List
+
+from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+
+from ...inputs import Inputs
+
+
+class GetCurrentWeatherNode(ToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    max_tool_calls = 3
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""You are a weather expert""")])],
+        ),
+        ChatMessagePromptBlock(
+            chat_role="USER",
+            blocks=[
+                RichTextPromptBlock(
+                    blocks=[
+                        PlainTextPromptBlock(text="""What is the weather in """),
+                        VariablePromptBlock(input_variable="city"),
+                        PlainTextPromptBlock(text=""" on """),
+                        VariablePromptBlock(input_variable="date"),
+                        PlainTextPromptBlock(text="""?"""),
+                    ]
+                )
+            ],
+        ),
+    ]
+    functions = [GetCurrentWeatherNodeWeatherFunctionWorkflow]
+    prompt_inputs = {
+        "city": Inputs.city,
+        "date": Inputs.date,
+    }
+    function_configs = None
+
+    class Outputs(ToolCallingNode.Outputs):
+        text: str
+        chat_history: List[ChatMessage]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 7`] = `
+"# flake8: noqa: F401, F403
+
+from ....display import *
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 8`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    city: str
+    date: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 9`] = `
+"from .final_output import FinalOutput3
+from .final_output_1 import FinalOutput4
+from .tool_call_start_node import StartNode
+
+__all__ = [
+    "FinalOutput3",
+    "FinalOutput4",
+    "StartNode",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 10`] = `
+"from typing import Union
+
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_start_node import StartNode
+
+
+class FinalOutput3(FinalOutputNode[BaseState, Union[float, int]]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = StartNode.Outputs.temperature
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 11`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_start_node import StartNode
+
+
+class FinalOutput4(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = StartNode.Outputs.reasoning
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 12`] = `
+"from typing import Union
+
+from vellum.workflows.nodes import BaseNode
+
+from ..inputs import Inputs
+
+
+class StartNode(BaseNode):
+    city = Inputs.city
+    date = Inputs.date
+
+    class Outputs(BaseNode.Outputs):
+        temperature: Union[float, int]
+        reasoning: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 13`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.final_output import FinalOutput3
+from .nodes.final_output_1 import FinalOutput4
+from .nodes.tool_call_start_node import StartNode
+
+
+class GetCurrentWeatherNodeWeatherFunctionWorkflow(BaseWorkflow[Inputs, BaseState]):
+    graph = StartNode >> {
+        FinalOutput3,
+        FinalOutput4,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        temperature = FinalOutput3.Outputs.value
+        reasoning = FinalOutput4.Outputs.value
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 14`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.final_output import FinalOutput
+from .nodes.final_output_1 import FinalOutput1
+from .nodes.final_output_2 import FinalOutput2
+from .nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class Workflow(BaseWorkflow[Inputs, BaseState]):
+    graph = GetCurrentWeatherNode >> {
+        FinalOutput,
+        FinalOutput1,
+        FinalOutput2,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = FinalOutput.Outputs.value
+        text = FinalOutput1.Outputs.value
+        chat_history = FinalOutput2.Outputs.value
+"
+`;
+
 exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs 1`] = `
 "from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
 from vellum.workflows.sandbox import WorkflowSandboxRunner
