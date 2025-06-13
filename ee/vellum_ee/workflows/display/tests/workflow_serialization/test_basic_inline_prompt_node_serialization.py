@@ -175,6 +175,34 @@ def test_serialize_workflow():
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o"}},
                 },
                 {
+                    "id": "25f935f3-363f-4ead-a5a0-db234ca67e1e",
+                    "name": "blocks",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {
+                            "type": "JSON",
+                            "value": [
+                                {
+                                    "block_type": "CHAT_MESSAGE",
+                                    "state": None,
+                                    "cache_config": None,
+                                    "chat_role": "SYSTEM",
+                                    "chat_source": None,
+                                    "chat_message_unterminated": None,
+                                    "blocks": [
+                                        {
+                                            "block_type": "JINJA",
+                                            "state": None,
+                                            "cache_config": None,
+                                            "template": "What's your favorite {{noun}}?",
+                                        }
+                                    ],
+                                }
+                            ],
+                        },
+                    },
+                },
+                {
                     "id": "ffabe7d2-8ab6-4201-9d41-c4d7be1386e1",
                     "name": "prompt_inputs",
                     "value": {

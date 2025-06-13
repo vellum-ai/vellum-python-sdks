@@ -16,6 +16,7 @@ class PromptNode16Display(BaseInlinePromptNodeDisplay[PromptNode16]):
     node_input_ids_by_name = {"prompt_inputs.most_recent_message": UUID("0f0f394c-dc7d-46a1-9217-24c1e59b273a")}
     attribute_ids_by_name = {
         "ml_model": UUID("35c7463b-4fb3-44aa-8c2b-1f30ab4b71ac"),
+        "blocks": UUID("805ae978-3d9f-4d39-a433-d7812542c532"),
         "prompt_inputs": UUID("35ae3ecc-030b-479d-b6c8-c2ccdd7ae984"),
         "functions": UUID("e9e50650-027f-4595-9479-b4e488153402"),
     }

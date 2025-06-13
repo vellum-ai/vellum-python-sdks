@@ -16,6 +16,7 @@ class PromptNode14Display(BaseInlinePromptNodeDisplay[PromptNode14]):
     node_input_ids_by_name = {"prompt_inputs.chat_history": UUID("b6524b5f-7697-4923-8b87-f85baadb505a")}
     attribute_ids_by_name = {
         "ml_model": UUID("4c6baea4-e4c9-4ea2-bffd-88d0b7210725"),
+        "blocks": UUID("e8c2a5b2-0706-4598-bb54-f5b3ac613bdc"),
         "prompt_inputs": UUID("5736796a-5529-4cbe-a930-9b2067e21aca"),
         "functions": UUID("1a360feb-6271-4b9c-a543-6ff1af06391d"),
     }

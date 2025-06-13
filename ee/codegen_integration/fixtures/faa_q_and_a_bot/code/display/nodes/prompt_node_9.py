@@ -19,6 +19,7 @@ class PromptNode9Display(BaseInlinePromptNodeDisplay[PromptNode9]):
     }
     attribute_ids_by_name = {
         "ml_model": UUID("8ae0df7b-2d57-48d7-a396-37f3e3ef4c75"),
+        "blocks": UUID("bd31dcbe-3a12-4bc1-948f-8fab8a2519ea"),
         "prompt_inputs": UUID("8036c42e-206f-4185-ad09-2f7abdddc125"),
         "functions": UUID("a3293819-18fa-45d7-9aa8-048d68e517e0"),
     }
