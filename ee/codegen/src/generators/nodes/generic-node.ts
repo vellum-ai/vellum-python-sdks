@@ -72,12 +72,23 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
             const codeExecutionFunctions: FunctionArgs[] = [];
             const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];
+            const functionReferences: python.Reference[] = [];
 
             functions.forEach((f) => {
               switch (f.type) {
-                case "CODE_EXECUTION":
+                case "CODE_EXECUTION": {
                   codeExecutionFunctions.push(f as FunctionArgs);
+                  if (f.definition && f.definition.name) {
+                    const snakeName = toPythonSafeSnakeCase(f.definition.name);
+                    functionReferences.push(
+                      python.reference({
+                        name: snakeName,
+                        modulePath: [`.${snakeName}`],
+                      })
+                    );
+                  }
                   break;
+                }
                 case "INLINE_WORKFLOW": {
                   const rawExecConfig =
                     f.exec_config as unknown as WorkflowVersionExecConfigSerializer.Raw;
@@ -95,10 +106,29 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   } else {
                     const workflowVersionExecConfig: WorkflowVersionExecConfig =
                       workflowVersionExecConfigResult.value;
-                    inlineWorkflowFunctions.push({
+                    const workflow: InlineWorkflowFunctionArgs = {
                       type: "INLINE_WORKFLOW",
                       exec_config: workflowVersionExecConfig,
-                    });
+                    };
+                    inlineWorkflowFunctions.push(workflow);
+
+                    const workflowName =
+                      this.getInlineWorkflowFunctionName(workflow);
+                    if (workflowName) {
+                      const nestedProject =
+                        this.getNestedWorkflowProject(workflow);
+                      const workflowClassName =
+                        nestedProject.workflowContext.workflowClassName;
+                      functionReferences.push(
+                        python.reference({
+                          name: workflowClassName,
+                          modulePath: [
+                            `.${workflowName}`,
+                            GENERATED_WORKFLOW_MODULE_NAME,
+                          ],
+                        })
+                      );
+                    }
                   }
                   break;
                 }
@@ -118,58 +148,10 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               this.generateInlineWorkflowFiles(inlineWorkflowFunctions);
             }
 
-            const functionNames: string[] = [];
-
-            codeExecutionFunctions.forEach((f) => {
-              if (f.definition && f.definition.name) {
-                functionNames.push(f.definition.name);
-              }
-            });
-
-            inlineWorkflowFunctions.forEach((workflow) => {
-              const workflowName = this.getInlineWorkflowFunctionName(workflow);
-              functionNames.push(workflowName);
-            });
-
             nodeAttributesStatements.push(
               python.field({
                 name: attribute.name,
-                initializer: python.TypeInstantiation.list([
-                  ...codeExecutionFunctions
-                    .map((f) => {
-                      if (f.definition && f.definition.name) {
-                        const snakeName = toPythonSafeSnakeCase(
-                          f.definition.name
-                        );
-                        return python.reference({
-                          name: snakeName,
-                          modulePath: [`.${snakeName}`],
-                        });
-                      }
-                      return null;
-                    })
-                    .filter((ref): ref is python.Reference => ref !== null),
-                  ...inlineWorkflowFunctions
-                    .map((workflow) => {
-                      const workflowName =
-                        this.getInlineWorkflowFunctionName(workflow);
-                      if (workflowName) {
-                        const nestedProject =
-                          this.getNestedWorkflowProject(workflow);
-                        const workflowClassName =
-                          nestedProject.workflowContext.workflowClassName;
-                        return python.reference({
-                          name: workflowClassName,
-                          modulePath: [
-                            `.${workflowName}`,
-                            GENERATED_WORKFLOW_MODULE_NAME,
-                          ],
-                        });
-                      }
-                      return null;
-                    })
-                    .filter((ref): ref is python.Reference => ref !== null),
-                ]),
+                initializer: python.TypeInstantiation.list(functionReferences),
               })
             );
           }
