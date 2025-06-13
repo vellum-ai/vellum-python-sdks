@@ -129,6 +129,47 @@
             }
           },
           {
+            "id": "35a10b43-ece9-40de-93a4-c1590cfa2c9f",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "What is the origin of the following phrase\n\n"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "state": null,
+                            "cache_config": null,
+                            "input_variable": "text"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
             "id": "91448235-24d7-4ee1-bba4-3bbce03ebdcb",
             "name": "prompt_inputs",
             "value": {

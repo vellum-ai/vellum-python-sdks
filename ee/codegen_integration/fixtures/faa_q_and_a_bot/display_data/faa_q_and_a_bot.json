@@ -147,9 +147,7 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": [
-                      "classification"
-                    ],
+                    "required": ["classification"],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -249,6 +247,64 @@
               "value": {
                 "type": "STRING",
                 "value": "gpt-4o"
+              }
+            }
+          },
+          {
+            "id": "96f1c44f-1ba8-4096-aaa6-ce798f9dc585",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "You are an expert classifier. You will analyze the chat and output one of the following in JSON format: \n\n1. \"weather\" if it is a question about the weather\n2. \"flight status\" if it is about which flights are currently in transit at a certain airport\n3. \"faa\" if the question is about any FAA related aviation policies\n4. \"other\" if the question is about anything else"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "VARIABLE",
+                            "state": null,
+                            "cache_config": null,
+                            "input_variable": "var_1"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             }
           },
@@ -1132,6 +1188,72 @@
             }
           },
           {
+            "id": "bd31dcbe-3a12-4bc1-948f-8fab8a2519ea",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": " Question:\n---------------\n"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "state": null,
+                            "cache_config": null,
+                            "input_variable": "question"
+                          },
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "\n\nPolicy Quotes:\n-----------------------\n"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "state": null,
+                            "cache_config": null,
+                            "input_variable": "context"
+                          }
+                        ]
+                      },
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "You are an expert on FAA rules, guidelines, and safety. Answer the above question given the context. Provide citation of the policy you got it from at the end of the response. If you don't know the answer, say \"Sorry, I don't know\"\n\nLimit your response to 250 words. Just use plain text, no special characters, no commas, no mathematical signs like + -"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
             "id": "8036c42e-206f-4185-ad09-2f7abdddc125",
             "name": "prompt_inputs",
             "value": {
@@ -1328,6 +1450,47 @@
               "value": {
                 "type": "STRING",
                 "value": "gpt-4o"
+              }
+            }
+          },
+          {
+            "id": "805ae978-3d9f-4d39-a433-d7812542c532",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "Respond with the IATA airport name this incoming message is about. For example, respond only with \"SJC\", \"SFO\", \"EWR\" or \"JFK\"\n\n"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "state": null,
+                            "cache_config": null,
+                            "input_variable": "most_recent_message"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             }
           },
@@ -1875,6 +2038,93 @@
             }
           },
           {
+            "id": "c82ae1f2-18f6-4951-9fd6-22564cd2ec03",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "Based on the below JSON response from an airline flight status tracker API, which flights are on the ground? And which airports are they going from and to? Where are they right now?\n\n"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "state": null,
+                            "cache_config": null,
+                            "input_variable": "text"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": " Respond in the following format\n\nThe flights that are on the ground are:\n\n1. **Flight Number:** WN597\n   - **Departure Airport:** LAS (Las Vegas McCarran International Airport)\n   - **Arrival Airport:** SJC (San Jose International Airport)\n   - **Current Location:** Latitude 37.3664, Longitude -121.929 (San Jose International Airport)\n"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "USER",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": " Just use plain text and no special characters"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
             "id": "92d646e7-8288-4b3e-bd50-b10dbe8c782e",
             "name": "prompt_inputs",
             "value": {
@@ -2024,6 +2274,41 @@
               "value": {
                 "type": "STRING",
                 "value": "gpt-4o-2024-05-13"
+              }
+            }
+          },
+          {
+            "id": "2d47190b-bba2-4546-88af-b2dc723365a1",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "Respond with \"Sorry I don't know\""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             }
           },
@@ -2275,6 +2560,47 @@
               "value": {
                 "type": "STRING",
                 "value": "gpt-4o-mini"
+              }
+            }
+          },
+          {
+            "id": "e8c2a5b2-0706-4598-bb54-f5b3ac613bdc",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "Summarize the weather. Just use plain text, no special characters, no commas, no mathematical signs like + -"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "block_type": "VARIABLE",
+                    "state": null,
+                    "cache_config": null,
+                    "input_variable": "chat_history"
+                  }
+                ]
               }
             }
           },

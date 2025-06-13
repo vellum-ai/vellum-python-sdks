@@ -180,6 +180,47 @@
             }
           },
           {
+            "id": "6a3ab4d8-4ff6-43fe-a919-93b2a05fa0a6",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "block_type": "CHAT_MESSAGE",
+                    "state": null,
+                    "cache_config": null,
+                    "chat_role": "SYSTEM",
+                    "chat_source": null,
+                    "chat_message_unterminated": null,
+                    "blocks": [
+                      {
+                        "block_type": "RICH_TEXT",
+                        "state": null,
+                        "cache_config": null,
+                        "blocks": [
+                          {
+                            "block_type": "PLAIN_TEXT",
+                            "state": null,
+                            "cache_config": null,
+                            "text": "Summarize the following text:\n\n"
+                          },
+                          {
+                            "block_type": "VARIABLE",
+                            "state": null,
+                            "cache_config": null,
+                            "input_variable": "text"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
             "id": "84bafdbf-3ca8-4e48-9ea6-380e90756a7f",
             "name": "prompt_inputs",
             "value": {
