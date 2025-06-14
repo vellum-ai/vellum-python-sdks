@@ -17,10 +17,42 @@ export class ExecutionCounterWorkflowReference extends BaseNodeInputWorkflowRefe
       return undefined;
     }
 
-    return python.reference({
+    const reference = python.reference({
       name: nodeContext.nodeClassName,
       modulePath: nodeContext.nodeModulePath,
       attribute: ["Execution", "count"],
     });
+
+    const hasReferenceToSelf = this.hasReferenceToSelf(executionCounterNodeId);
+    if (hasReferenceToSelf) {
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "LazyReference",
+          modulePath: [
+            ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+            "references",
+          ],
+        }),
+        arguments_: [
+          python.methodArgument({
+            value: python.lambda({
+              body: reference,
+            }),
+          }),
+        ],
+      });
+    }
+
+    return reference;
+  }
+
+  private hasReferenceToSelf(referencedNodeId: string): boolean {
+    if (!this.nodeContext) {
+      return false;
+    }
+
+    const currentNodeId = this.nodeContext.nodeData?.id;
+
+    return currentNodeId === referencedNodeId;
   }
 }

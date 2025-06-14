@@ -45,4 +45,21 @@ describe("ExecutionCounterWorkflowReferencePointer", () => {
 
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
+  it("should generate Lazy Reference for self-referencing nodes", async () => {
+    const counterReference: WorkflowValueDescriptorReference = {
+      type: "EXECUTION_COUNTER",
+      nodeId: node.id,
+    };
+
+    const pointer = new ExecutionCounterWorkflowReference({
+      nodeContext: workflowContext.findNodeContext(node.id),
+      workflowContext,
+      nodeInputWorkflowReferencePointer: counterReference,
+    });
+
+    const writer = new Writer();
+    pointer.write(writer);
+
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
 });
