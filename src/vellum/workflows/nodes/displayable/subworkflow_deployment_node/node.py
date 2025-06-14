@@ -21,6 +21,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
@@ -43,7 +44,7 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
 
     # Either the Workflow Deployment's UUID or its name.
     deployment: ClassVar[Union[UUID, str]]
-    subworkflow_inputs: ClassVar[EntityInputsInterface] = {}
+    subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs]] = {}
 
     release_tag: str = LATEST_RELEASE_TAG
     external_id: Optional[str] = OMIT
@@ -62,68 +63,77 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
 
         compiled_inputs: List[WorkflowRequestInputRequest] = []
 
-        for input_name, input_value in self.subworkflow_inputs.items():
-            # Exclude inputs that resolved to be null. This ensure that we don't pass input values
-            # to optional subworkflow inputs whose values were unresolved.
-            if input_value is None:
-                continue
-            if isinstance(input_value, str):
-                compiled_inputs.append(
-                    WorkflowRequestStringInputRequest(
-                        name=input_name,
-                        value=input_value,
-                    )
-                )
-            elif (
-                isinstance(input_value, list)
-                and len(input_value) > 0
-                and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
-            ):
-                chat_history = [
-                    (
-                        message
-                        if isinstance(message, ChatMessageRequest)
-                        else ChatMessageRequest.model_validate(message.model_dump())
-                    )
-                    for message in input_value
-                    if isinstance(message, (ChatMessage, ChatMessageRequest))
-                ]
-                compiled_inputs.append(
-                    WorkflowRequestChatHistoryInputRequest(
-                        name=input_name,
-                        value=chat_history,
-                    )
-                )
-            elif isinstance(input_value, dict):
-                compiled_inputs.append(
-                    WorkflowRequestJsonInputRequest(
-                        name=input_name,
-                        value=cast(Dict[str, Any], input_value),
-                    )
-                )
-            elif isinstance(input_value, (int, float)):
-                compiled_inputs.append(
-                    WorkflowRequestNumberInputRequest(
-                        name=input_name,
-                        value=input_value,
-                    )
-                )
-            else:
-                try:
-                    input_value = default_serializer(input_value)
-                except json.JSONDecodeError as e:
-                    raise NodeException(
-                        message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
-                        code=WorkflowErrorCode.INVALID_INPUTS,
-                    )
-                compiled_inputs.append(
-                    WorkflowRequestJsonInputRequest(
-                        name=input_name,
-                        value=input_value,
-                    )
-                )
+        if isinstance(self.subworkflow_inputs, BaseInputs):
+            for input_descriptor, input_value in self.subworkflow_inputs:
+                self._add_compiled_input(compiled_inputs, input_descriptor.name, input_value)
+        else:
+            for input_name, input_value in self.subworkflow_inputs.items():
+                self._add_compiled_input(compiled_inputs, input_name, input_value)
 
         return compiled_inputs
+
+    def _add_compiled_input(
+        self, compiled_inputs: List[WorkflowRequestInputRequest], input_name: str, input_value: Any
+    ) -> None:
+        # Exclude inputs that resolved to be null. This ensure that we don't pass input values
+        # to optional subworkflow inputs whose values were unresolved.
+        if input_value is None:
+            return
+        if isinstance(input_value, str):
+            compiled_inputs.append(
+                WorkflowRequestStringInputRequest(
+                    name=input_name,
+                    value=input_value,
+                )
+            )
+        elif (
+            isinstance(input_value, list)
+            and len(input_value) > 0
+            and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
+        ):
+            chat_history = [
+                (
+                    message
+                    if isinstance(message, ChatMessageRequest)
+                    else ChatMessageRequest.model_validate(message.model_dump())
+                )
+                for message in input_value
+                if isinstance(message, (ChatMessage, ChatMessageRequest))
+            ]
+            compiled_inputs.append(
+                WorkflowRequestChatHistoryInputRequest(
+                    name=input_name,
+                    value=chat_history,
+                )
+            )
+        elif isinstance(input_value, dict):
+            compiled_inputs.append(
+                WorkflowRequestJsonInputRequest(
+                    name=input_name,
+                    value=cast(Dict[str, Any], input_value),
+                )
+            )
+        elif isinstance(input_value, (int, float)):
+            compiled_inputs.append(
+                WorkflowRequestNumberInputRequest(
+                    name=input_name,
+                    value=input_value,
+                )
+            )
+        else:
+            try:
+                input_value = default_serializer(input_value)
+            except json.JSONDecodeError as e:
+                raise NodeException(
+                    message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
+            compiled_inputs.append(
+                WorkflowRequestJsonInputRequest(
+                    name=input_name,
+                    value=input_value,
+                )
+            )
 
     def run(self) -> Iterator[BaseOutput]:
         execution_context = get_execution_context()
