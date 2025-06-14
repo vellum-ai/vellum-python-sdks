@@ -36,6 +36,8 @@ export function convertOperatorType(
     notIn: "not_in",
     between: "between",
     notBetween: "not_between",
+    blank: "is_blank",
+    notBlank: "is_not_blank",
     parseJson: "parse_json",
     coalesce: "coalesce",
     accessField: "access_field",

@@ -193,6 +193,22 @@ class MyCustomNode(BaseNode):
 "
 `;
 
+exports[`GenericNode > basic with invalid blank binary expression > should handle null LHS and RHS in blank expression gracefully 1`] = `
+"from vellum.workflows.nodes import BaseNode
+from vellum.workflows.references.constant import ConstantValueReference
+
+
+class TestBlankNode(BaseNode):
+    blank_attribute = ConstantValueReference(None).is_blank(None)
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = "AWAIT_ALL"
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+"
+`;
+
 exports[`GenericNode > basic with invalid coalesce binary expression > should handle null LHS in coalesce expression gracefully 1`] = `
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
