@@ -871,6 +871,8 @@ export type OperatorMapping =
   | "not_in"
   | "between"
   | "not_between"
+  | "is_blank"
+  | "is_not_blank"
   | "parse_json"
   | "coalesce"
   | "access_field"

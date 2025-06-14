@@ -554,6 +554,43 @@ describe("GenericNode", () => {
     });
   });
 
+  describe("basic with invalid blank binary expression", () => {
+    beforeEach(async () => {
+      const nodeAttributes: NodeAttribute[] = [
+        {
+          id: "attr-1",
+          name: "blank-attribute",
+          value: {
+            type: "BINARY_EXPRESSION",
+            operator: "blank",
+            lhs: null,
+            rhs: null,
+          } as unknown as WorkflowValueDescriptor,
+        },
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "TestBlankNode",
+        nodeAttributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should handle null LHS and RHS in blank expression gracefully", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
   describe("basic with environment variable reference as attribute", () => {
     beforeEach(async () => {
       const nodeAttributes: NodeAttribute[] = [
