@@ -103,6 +103,12 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
 
 
 def primitive_to_vellum_value_request(value: Any) -> VellumValueRequest:
+    if hasattr(value, "__class__") and value.__class__.__name__ == "WorkflowInputReference":
+        from vellum.workflows.references import WorkflowInputReference
+
+        if isinstance(value, WorkflowInputReference):
+            return StringVellumValueRequest(value=value.name)
+
     vellum_value = primitive_to_vellum_value(value)
     vellum_value_request_class = next(
         (

@@ -13,6 +13,7 @@ from vellum.client.types.vellum_value_logical_condition_group_request import Vel
 from vellum.client.types.vellum_value_logical_condition_request import VellumValueLogicalConditionRequest
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable.bases.types import (
     MetadataLogicalCondition,
     MetadataLogicalConditionGroup,
@@ -234,3 +235,32 @@ def test_run_workflow__invalid_query_raises_validation_error(invalid_query):
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "query" in exc_info.value.message.lower()
     assert "required" in exc_info.value.message.lower() or "missing" in exc_info.value.message.lower()
+
+
+def test_search_filters_with_input_reference():
+    """Test that SearchFilters with MetadataLogicalCondition using input references can be serialized"""
+
+    class TestInputs(BaseInputs):
+        file_id: str
+
+    filters = SearchFilters(
+        external_ids=None,
+        metadata=MetadataLogicalConditionGroup(
+            combinator="AND",
+            negated=False,
+            conditions=[MetadataLogicalCondition(lhs_variable="ID", operator="=", rhs_variable=TestInputs.file_id)],
+        ),
+    )
+
+    assert filters.metadata is not None
+    request = filters.metadata.to_request()
+
+    assert request.combinator == "AND"
+    assert request.negated is False
+    assert len(request.conditions) == 1
+
+    condition = request.conditions[0]
+    assert isinstance(condition, VellumValueLogicalConditionRequest)
+    assert condition.lhs_variable.value == "ID"
+    assert condition.operator == "="
+    assert condition.rhs_variable.value == "file_id"
