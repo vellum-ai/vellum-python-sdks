@@ -1233,3 +1233,56 @@ def main(numbers: List[str]) -> str:
         ],
         request_options=None,
     )
+
+
+def test_run_node__vellum_secret_forces_api_execution(vellum_client):
+    """Test that CodeExecutionNode with VellumSecretReference forces API execution instead of inline execution."""
+
+    # GIVEN a node that subclasses CodeExecutionNode with VellumSecretReference but no packages
+    # This should normally run inline, but the presence of secrets should force API execution
+    class State(BaseState):
+        pass
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, str]):
+        code = """
+def main(secret: str) -> str:
+    return f"Secret value: {secret}"
+"""
+        runtime = "PYTHON_3_11_6"
+        # Note: No packages specified, which would normally trigger inline execution
+
+        code_inputs = {
+            "secret": VellumSecretReference("MY_SECRET"),
+        }
+
+    # AND we know what the Code Execution Node will respond with
+    mock_code_execution = CodeExecutorResponse(
+        log="",
+        output=StringVellumValue(value="Secret value: my_secret_value"),
+    )
+    vellum_client.execute_code.return_value = mock_code_execution
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+    outputs = node.run()
+
+    # THEN the node should have produced the outputs we expect
+    assert outputs == {"result": "Secret value: my_secret_value", "log": ""}
+
+    # AND we should have invoked the Code via API (not inline) due to the secret
+    vellum_client.execute_code.assert_called_once_with(
+        input_values=[
+            CodeExecutorSecretInput(
+                name="secret",
+                value="MY_SECRET",
+            )
+        ],
+        code="""
+def main(secret: str) -> str:
+    return f"Secret value: {secret}"
+""",
+        runtime="PYTHON_3_11_6",
+        output_type="STRING",
+        packages=[],
+        request_options=None,
+    )
