@@ -219,11 +219,11 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
             )
 
         elif isinstance(logical_expression, MetadataLogicalConditionGroup):
-            conditions: JsonArray = []
+            conditions = []
             variables = []
-            for idx, condition in enumerate(logical_expression.conditions):
+            for idx, metadata_condition in enumerate(logical_expression.conditions):
                 serialized_condition, serialized_variables = self._serialize_logical_expression(
-                    condition, display_context=display_context, path=path + [idx]
+                    metadata_condition, display_context=display_context, path=path + [idx]
                 )
                 conditions.append(serialized_condition)
                 variables.extend(serialized_variables)
@@ -242,8 +242,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
             lhs_variable = logical_expression.lhs_variable
             rhs_variable = logical_expression.rhs_variable
 
-            lhs_query_input_id: UUID = uuid4_from_hash(f"{self.node_id}|lhs|{hash(tuple(path))}")
-            rhs_query_input_id: UUID = uuid4_from_hash(f"{self.node_id}|rhs|{hash(tuple(path))}")
+            lhs_query_input_id = uuid4_from_hash(f"{self.node_id}|lhs|{hash(tuple(path))}")
+            rhs_query_input_id = uuid4_from_hash(f"{self.node_id}|rhs|{hash(tuple(path))}")
 
             return (
                 {

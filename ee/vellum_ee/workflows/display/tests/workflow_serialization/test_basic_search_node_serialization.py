@@ -167,7 +167,7 @@ def test_serialize_workflow():
                     "rules": [
                         {
                             "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "8ffffeb2-79b3-4105-acc7-78b0267da955"},
+                            "data": {"input_variable_id": "b118247f-96dd-4b3e-8289-9f277483c520"},
                         }
                     ],
                     "combinator": "OR",
@@ -180,7 +180,7 @@ def test_serialize_workflow():
                     "rules": [
                         {
                             "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "8ffffeb2-79b3-4105-acc7-78b0267da955"},
+                            "data": {"input_variable_id": "aae2c10a-88b7-40bd-87a2-5e1e60c1e906"},
                         }
                     ],
                     "combinator": "OR",
@@ -193,7 +193,7 @@ def test_serialize_workflow():
                     "rules": [
                         {
                             "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "f5eee974-b0c3-4775-bc8a-679a9e99d7ba"},
+                            "data": {"input_variable_id": "c9611a62-d1f5-4b41-bf9c-1aa3355760b4"},
                         }
                     ],
                     "combinator": "OR",
@@ -206,7 +206,7 @@ def test_serialize_workflow():
                     "rules": [
                         {
                             "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "f5eee974-b0c3-4775-bc8a-679a9e99d7ba"},
+                            "data": {"input_variable_id": "f374640e-a5c0-470e-ac71-c36c2b198c00"},
                         }
                     ],
                     "combinator": "OR",
