@@ -1,5 +1,10 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`ExecutionCounterWorkflowReferencePointer > should generate Lazy Reference for self-referencing nodes 1`] = `
+"LazyReference(lambda: SearchNode.Execution.count)
+"
+`;
+
 exports[`ExecutionCounterWorkflowReferencePointer > should generate correct AST for execution counter reference 1`] = `
 "SearchNode.Execution.count
 "
