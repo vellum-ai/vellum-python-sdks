@@ -104,8 +104,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 }
 
                 default:
-                  throw new Error(
-                    `Unsupported function type. Only CODE_EXECUTION and INLINE_WORKFLOW are supported.`
+                  this.workflowContext.addError(
+                    new NodeDefinitionGenerationError(
+                      `Unsupported function type. Only CODE_EXECUTION and INLINE_WORKFLOW are supported.`,
+                      "WARNING"
+                    )
                   );
               }
             });
