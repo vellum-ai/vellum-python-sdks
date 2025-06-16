@@ -7,6 +7,7 @@ from vellum import (
     VellumValueLogicalConditionGroupRequest,
     VellumValueLogicalConditionRequest,
 )
+from vellum.workflows.nodes.displayable.bases.types import MetadataLogicalCondition, MetadataLogicalConditionGroup
 from vellum.workflows.nodes.displayable.search_node import SearchNode
 from vellum.workflows.references import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -88,7 +89,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         node_inputs: Dict[str, NodeInput] = {}
 
         options = raise_if_descriptor(node.options)
-        filters = options.filters if options else None
+        raw_filters = raise_if_descriptor(node.filters)
+        filters = raw_filters if raw_filters else options.filters if options else None
 
         external_id_filters = filters.external_ids if filters else None
 
@@ -104,17 +106,21 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
                 raw_metadata_filters, display_context=display_context
             )
 
-        result_merging = options.result_merging if options else None
+        raw_result_merging = raise_if_descriptor(node.result_merging)
+        result_merging = raw_result_merging if raw_result_merging else options.result_merging if options else None
         result_merging_enabled = True if result_merging and result_merging.enabled else False
 
         raw_weights = raise_if_descriptor(node.weights)
         weights = raw_weights if raw_weights is not None else options.weights if options is not None else None
 
+        raw_limit = raise_if_descriptor(node.limit)
+        limit = raw_limit if raw_limit is not None else options.limit if options is not None else None
+
         node_input_names_and_values = [
             ("query", node.query),
             ("document_index_id", node.document_index),
             ("weights", weights.dict() if weights else None),
-            ("limit", options.limit if options else None),
+            ("limit", limit),
             ("separator", raise_if_descriptor(node.chunk_separator)),
             (
                 "result_merging_enabled",
@@ -141,7 +147,12 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
 
     def _serialize_logical_expression(
         self,
-        logical_expression: Union[VellumValueLogicalConditionGroupRequest, VellumValueLogicalConditionRequest],
+        logical_expression: Union[
+            VellumValueLogicalConditionGroupRequest,
+            VellumValueLogicalConditionRequest,
+            MetadataLogicalConditionGroup,
+            MetadataLogicalCondition,
+        ],
         display_context: WorkflowDisplayContext,
         path: List[int] = [],
     ) -> Tuple[JsonObject, List[NodeInput]]:
@@ -175,10 +186,10 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
 
             lhs_query_input_id: UUID = self.metadata_filter_input_id_by_operand_id.get(
                 UUID(lhs_variable_id)
-            ) or uuid4_from_hash(f"{self.node_id}|{hash(tuple(path))}")
+            ) or uuid4_from_hash(f"{self.node_id}|lhs|{hash(tuple(path))}")
             rhs_query_input_id: UUID = self.metadata_filter_input_id_by_operand_id.get(
                 UUID(rhs_variable_id)
-            ) or uuid4_from_hash(f"{self.node_id}|{hash(tuple(path))}")
+            ) or uuid4_from_hash(f"{self.node_id}|rhs|{hash(tuple(path))}")
 
             return (
                 {
@@ -203,6 +214,58 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
                         display_context,
                         input_id=UUID(rhs_variable_id),
                         pointer_type=InputVariablePointer,
+                    ),
+                ],
+            )
+
+        elif isinstance(logical_expression, MetadataLogicalConditionGroup):
+            conditions = []
+            variables = []
+            for idx, metadata_condition in enumerate(logical_expression.conditions):
+                serialized_condition, serialized_variables = self._serialize_logical_expression(
+                    metadata_condition, display_context=display_context, path=path + [idx]
+                )
+                conditions.append(serialized_condition)
+                variables.extend(serialized_variables)
+
+            return (
+                {
+                    "type": "LOGICAL_CONDITION_GROUP",
+                    "combinator": logical_expression.combinator,
+                    "conditions": conditions,
+                    "negated": logical_expression.negated,
+                },
+                variables,
+            )
+
+        elif isinstance(logical_expression, MetadataLogicalCondition):
+            lhs_variable = logical_expression.lhs_variable
+            rhs_variable = logical_expression.rhs_variable
+
+            lhs_query_input_id = uuid4_from_hash(f"{self.node_id}|lhs|{hash(tuple(path))}")
+            rhs_query_input_id = uuid4_from_hash(f"{self.node_id}|rhs|{hash(tuple(path))}")
+
+            return (
+                {
+                    "type": "LOGICAL_CONDITION",
+                    "lhs_variable_id": str(lhs_query_input_id),
+                    "operator": logical_expression.operator,
+                    "rhs_variable_id": str(rhs_query_input_id),
+                },
+                [
+                    create_node_input(
+                        self.node_id,
+                        f"vellum-query-builder-variable-{lhs_query_input_id}",
+                        lhs_variable,
+                        display_context,
+                        input_id=lhs_query_input_id,
+                    ),
+                    create_node_input(
+                        self.node_id,
+                        f"vellum-query-builder-variable-{rhs_query_input_id}",
+                        rhs_variable,
+                        display_context,
+                        input_id=rhs_query_input_id,
                     ),
                 ],
             )
