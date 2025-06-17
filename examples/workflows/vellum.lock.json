@@ -87,7 +87,7 @@
       "ignore": null,
       "deployments": [],
       "container_image_name": "sdk-examples-utils",
-      "container_image_tag": "1.0.4",
+      "container_image_tag": "1.0.5",
       "workspace": "default",
       "target_directory": null
     },

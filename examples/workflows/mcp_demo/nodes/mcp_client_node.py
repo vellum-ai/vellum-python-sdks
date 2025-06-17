@@ -33,7 +33,6 @@ class MCPClientNode(BaseNode):
                 async with ClientSession(stdio_stream, write_stream) as session:
                     await session.initialize()
                     response = await session.list_tools()
-
             return response.tools
 
         mcp_tools = asyncio.run(run_stdio())
