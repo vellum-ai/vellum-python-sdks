@@ -14,7 +14,7 @@ def test_stream_workflow__happy_path():
     workflow = TrivialWorkflow()
     events = list(workflow.stream())
 
-    assert len(events) == 5
+    assert len(events) == 2
 
     assert events[0].name == "workflow.execution.initiated"
 

@@ -44,6 +44,7 @@ from vellum.workflows.events.node import (
 )
 from vellum.workflows.events.workflow import (
     GenericWorkflowEvent,
+    WorkflowEvent,
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedBody,
@@ -462,11 +463,20 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         self,
         runner_stream: WorkflowEventStream,
         event_filter: Callable[[Type["BaseWorkflow"], WorkflowEvent], bool],
-    ) -> Generator[WorkflowEvent, None, None]:
+    ) -> WorkflowEventStream:
         """Helper method to filter events from the runner stream."""
-        for event in runner_stream:
-            if event_filter(self.__class__, event):
-                yield event
+
+        def _generate_filtered_events() -> Generator[WorkflowEvent, None, None]:
+            for event in runner_stream:
+                if event_filter(self.__class__, event):
+                    yield event
+
+        if hasattr(runner_stream, "span_id"):
+            from vellum.workflows.events.workflow import WorkflowEventStreamWrapper
+
+            return WorkflowEventStreamWrapper(_generate_filtered_events(), runner_stream.span_id)
+        else:
+            return _generate_filtered_events()
 
     def validate(self) -> None:
         """

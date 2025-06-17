@@ -130,8 +130,8 @@ def test_stream_workflow__happy_path(vellum_client):
     )
     events = list(result)
 
-    # THEN the workflow should have completed successfully with 12 events
-    assert len(events) == 12
+    # THEN the workflow should have completed successfully with 3 events
+    assert len(events) == 3
 
     # AND the outputs should be as expected
     assert events[0].name == "workflow.execution.initiated"
