@@ -100,7 +100,7 @@ def test_serialize_workflow():
                     },
                 }
             ],
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},  # Will be ignored due to exclude_paths
+            "display_data": {"position": {"x": 400.0, "y": -50.0}},
             "base": {
                 "name": "FinalOutputNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -109,7 +109,6 @@ def test_serialize_workflow():
         },
         final_output_node,
         ignore_order=True,
-        exclude_paths=["root['display_data']['position']"],  # Exclude position since auto-layout changes it
     )
 
     # AND each edge should be serialized correctly
