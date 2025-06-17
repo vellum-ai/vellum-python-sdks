@@ -457,6 +457,14 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         if event_filter is None:
             return runner_stream
 
+        return self._filter_events(runner_stream, event_filter)
+
+    def _filter_events(
+        self,
+        runner_stream: WorkflowEventStream,
+        event_filter: Callable[[Type["BaseWorkflow"], WorkflowEvent], bool],
+    ) -> Generator[WorkflowEvent, None, None]:
+        """Helper method to filter events from the runner stream."""
         for event in runner_stream:
             if event_filter(self.__class__, event):
                 yield event

@@ -36,9 +36,10 @@ def test_stream_workflow__span_id_property():
     remaining_events = list(stream)
     all_events = [first_event] + remaining_events
 
-    assert len(all_events) == 2
+    assert len(all_events) >= 2
     assert all_events[0].name == "workflow.execution.initiated"
-    assert all_events[1].name == "workflow.execution.fulfilled"
+    assert all_events[-1].name == "workflow.execution.fulfilled"
 
-    for event in all_events:
+    workflow_events = [event for event in all_events if event.name.startswith("workflow.")]
+    for event in workflow_events:
         assert event.span_id == span_id
