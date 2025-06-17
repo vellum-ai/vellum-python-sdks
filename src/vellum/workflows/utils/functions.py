@@ -95,7 +95,6 @@ def _compile_deployment_workflow_input(input_var: Any) -> dict[str, Any]:
     primitive_type = vellum_variable_type_to_openapi_type(input_var.type)
     input_schema = {"type": primitive_type}
 
-    # Add default value if explicitly provided (even if the value is None)
     if input_var.default is not None:
         input_schema["default"] = input_var.default.value
 
