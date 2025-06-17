@@ -109,7 +109,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
                 outputs=[
                     WorkflowOutputString(
                         id="mock-output-id",
-                        name="result",
+                        name="mock-output-name",
                         type="STRING",
                         value="The current weather in San Francisco is sunny with a temperature of 70 degrees celsius.",
                     )
@@ -157,7 +157,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
             role="FUNCTION",
             content=StringChatMessageContent(
                 type="STRING",
-                value='{"result": "The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."}',  # noqa: E501
+                value='{"mock_output_name": "The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."}',
             ),
             source=None,
         ),
@@ -304,7 +304,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
                         role="FUNCTION",
                         content=StringChatMessageContent(
                             type="STRING",
-                            value='{"result": "The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."}',  # noqa: E501
+                            value='{"mock_output_name": "The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."}',
                         ),
                         source=None,
                     ),
