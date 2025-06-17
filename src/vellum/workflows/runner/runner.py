@@ -45,6 +45,7 @@ from vellum.workflows.events.node import (
 )
 from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
+    WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionInitiatedBody,
     WorkflowExecutionPausedBody,
@@ -744,7 +745,7 @@ class WorkflowRunner(Generic[StateType]):
             return event.workflow_definition == self.workflow.__class__
         return False
 
-    def stream(self) -> WorkflowEventGenerator[WorkflowEvent]:
+    def stream(self) -> WorkflowEventStream:
         def _generate_events() -> Generator[WorkflowEvent, None, None]:
             background_thread = Thread(
                 target=self._run_background_thread,

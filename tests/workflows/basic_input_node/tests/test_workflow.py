@@ -1,5 +1,3 @@
-from typing import cast
-
 from tests.workflows.basic_input_node.workflow import BasicInputNodeWorkflow, Inputs, MiddleNode, State
 
 
@@ -72,7 +70,7 @@ def test_workflow__happy_path_stream():
     # AND we should end with a FULFILLED state
     final_event = events[-1]
     assert final_event.name == "workflow.execution.fulfilled"
-    assert cast(BasicInputNodeWorkflow.Outputs, final_event.outputs).final_value == "hello sunny world"
+    assert final_event.outputs.final_value == "hello sunny world"
 
     # AND the workflow execution should have the same span id
     assert events[0].span_id == terminal_event.span_id

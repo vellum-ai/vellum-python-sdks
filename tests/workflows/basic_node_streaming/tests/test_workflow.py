@@ -1,5 +1,3 @@
-from typing import cast
-
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_node_streaming.workflow import BasicNodeStreaming, Inputs, StreamingNode
@@ -95,7 +93,7 @@ def test_run_workflow__happy_path():
     ]
 
     assert events[14].name == "workflow.execution.fulfilled"
-    assert cast(BasicNodeStreaming.Outputs, events[14].outputs).outer_stream == [
+    assert events[14].outputs.outer_stream == [
         "Hello, world! 0",
         "Hello, world! 1",
         "Hello, world! 2",
