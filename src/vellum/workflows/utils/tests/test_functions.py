@@ -470,10 +470,16 @@ def test_compile_deployment_workflow_function_definition__all_args():
     for key, vellum_type in [
         ("a", "STRING"),
         ("b", "NUMBER"),
-        ("c", "NUMBER"),
-        ("d", "STRING"),
-        ("e", "ARRAY"),
-        ("f", "JSON"),
+        ("c", "JSON"),
+        ("d", "CHAT_HISTORY"),
+        ("e", "SEARCH_RESULTS"),
+        ("f", "ERROR"),
+        ("g", "ARRAY"),
+        ("h", "FUNCTION_CALL"),
+        ("i", "IMAGE"),
+        ("j", "AUDIO"),
+        ("k", "DOCUMENT"),
+        ("l", "NULL"),
     ]:
         mock_input = VellumVariable(
             id=f"input_{key}",
@@ -502,12 +508,18 @@ def test_compile_deployment_workflow_function_definition__all_args():
             "properties": {
                 "a": {"type": "string"},
                 "b": {"type": "number"},
-                "c": {"type": "number"},
-                "d": {"type": "string"},
+                "c": {"type": "object"},
+                "d": {"type": "array"},
                 "e": {"type": "array"},
                 "f": {"type": "object"},
+                "g": {"type": "array"},
+                "h": {"type": "object"},
+                "i": {"type": "object"},
+                "j": {"type": "object"},
+                "k": {"type": "object"},
+                "l": {"type": "null"},
             },
-            "required": ["a", "b", "c", "d", "e", "f"],
+            "required": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"],
         },
     )
 
