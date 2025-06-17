@@ -31,7 +31,10 @@ describe("WorkflowProjectGenerator", () => {
         getAllFilesInDir(join(tempDir))
       ).join("\n")}`
     ).toBe(true);
-    expect(fs.readFileSync(completeFilePath, "utf-8")).toMatchSnapshot();
+    const snapshotName = filePath.join("/");
+    expect(fs.readFileSync(completeFilePath, "utf-8")).toMatchSnapshot(
+      snapshotName
+    );
   }
 
   function expectProjectFileToExist(filePath: string[]) {
