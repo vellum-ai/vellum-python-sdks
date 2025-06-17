@@ -73,7 +73,6 @@ from vellum.workflows.state.store import Store
 from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum.workflows.workflows.event_filters import workflow_event_filter
 
 
 class _BaseWorkflowMeta(type):
@@ -443,8 +442,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             subworkflows or nodes that utilizes threads.
         """
 
-        should_yield = event_filter or workflow_event_filter
-        for event in WorkflowRunner(
+        runner_stream = WorkflowRunner(
             self,
             inputs=inputs,
             state=state,
@@ -454,8 +452,13 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
-        ).stream():
-            if should_yield(self.__class__, event):
+        ).stream()
+
+        if event_filter is None:
+            return runner_stream
+
+        for event in runner_stream:
+            if event_filter(self.__class__, event):
                 yield event
 
     def validate(self) -> None:
