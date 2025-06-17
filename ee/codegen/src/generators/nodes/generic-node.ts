@@ -276,9 +276,13 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   ): string {
     const definition = workflow.exec_config.workflowRawData.definition;
     if (!definition?.name) {
-      throw new Error(
-        "Workflow definition name is required for inline workflows"
+      this.workflowContext.addError(
+        new NodeDefinitionGenerationError(
+          "Workflow definition name is required for inline workflows",
+          "WARNING"
+        )
       );
+      return "inline_workflow_function";
     }
     return toPythonSafeSnakeCase(definition.name);
   }
