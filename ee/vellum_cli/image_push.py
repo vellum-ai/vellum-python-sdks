@@ -30,12 +30,8 @@ def image_push_command(
         if not os.path.exists(source):
             handle_cli_error(logger, "Dockerfile not found", f"Dockerfile does not exist: {source}")
 
-        source_dir = os.path.dirname(source)
-        dockerfile_name = os.path.basename(source)
-
         build_result = subprocess.run(
-            ["docker", "buildx", "build", "-f", dockerfile_name, "--platform=linux/amd64", "-t", image, "."],
-            cwd=source_dir,
+            ["docker", "buildx", "build", "-f", source, "--platform=linux/amd64", "-t", image, "."],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
