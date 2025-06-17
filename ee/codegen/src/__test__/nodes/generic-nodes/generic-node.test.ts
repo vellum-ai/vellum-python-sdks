@@ -554,17 +554,16 @@ describe("GenericNode", () => {
     });
   });
 
-  describe("basic with invalid blank binary expression", () => {
+  describe("basic with invalid blank unary expression", () => {
     beforeEach(async () => {
       const nodeAttributes: NodeAttribute[] = [
         {
           id: "attr-1",
           name: "blank-attribute",
           value: {
-            type: "BINARY_EXPRESSION",
+            type: "UNARY_EXPRESSION",
             operator: "blank",
             lhs: null,
-            rhs: null,
           } as unknown as WorkflowValueDescriptor,
         },
       ];
@@ -585,7 +584,43 @@ describe("GenericNode", () => {
       });
     });
 
-    it("should handle null LHS and RHS in blank expression gracefully", async () => {
+    it("should handle null LHS in blank expression gracefully", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("basic with invalid notBlank unary expression", () => {
+    beforeEach(async () => {
+      const nodeAttributes: NodeAttribute[] = [
+        {
+          id: "attr-2",
+          name: "notBlank-attribute",
+          value: {
+            type: "UNARY_EXPRESSION",
+            operator: "notBlank",
+            lhs: null,
+          } as unknown as WorkflowValueDescriptor,
+        },
+      ];
+
+      const nodeData = genericNodeFactory({
+        label: "TestNotBlankNode",
+        nodeAttributes: nodeAttributes,
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should handle null LHS in notBlank expression gracefully", async () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
