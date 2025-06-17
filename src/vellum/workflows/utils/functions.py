@@ -1,12 +1,14 @@
 import dataclasses
 import inspect
-from typing import TYPE_CHECKING, Any, Callable, Optional, Type, Union, get_args, get_origin
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Type, Union, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
 from pydash import snake_case
 
+from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
+from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
@@ -86,6 +88,20 @@ def _compile_default_value(default: Any) -> Any:
     return default
 
 
+def _compile_deployment_workflow_input(input_var: Any) -> dict[str, Any]:
+    """
+    Converts a deployment workflow input variable to a JSON schema type definition.
+    """
+    primitive_type = vellum_variable_type_to_openapi_type(input_var.type)
+    input_schema = {"type": primitive_type}
+
+    # Add default value if explicitly provided (even if the value is None)
+    if input_var.default is not None:
+        input_schema["default"] = input_var.default.value
+
+    return input_schema
+
+
 def compile_function_definition(function: Callable) -> FunctionDefinition:
     """
     Converts a Python function into our Vellum-native FunctionDefinition type.
@@ -149,5 +165,44 @@ def compile_workflow_function_definition(workflow_class: Type["BaseWorkflow"]) -
     return FunctionDefinition(
         name=snake_case(workflow_class.__name__),
         description=workflow_class.__doc__,
+        parameters=parameters,
+    )
+
+
+def compile_deployment_workflow_function_definition(
+    deployment_config: Dict[str, str],
+    vellum_client: Vellum,
+) -> FunctionDefinition:
+    """
+    Converts a deployment workflow config into our Vellum-native FunctionDefinition type.
+
+    Args:
+        deployment_config: Dict with 'deployment' and 'release_tag' keys
+        vellum_client: Vellum client instance
+    """
+    deployment = deployment_config["deployment"]
+    release_tag = deployment_config["release_tag"]
+
+    workflow_deployment_release = vellum_client.release_reviews.retrieve_workflow_deployment_release(
+        deployment, release_tag
+    )
+
+    input_variables = workflow_deployment_release.workflow_version.input_variables
+    description = workflow_deployment_release.description
+
+    properties = {}
+    required = []
+
+    for input_var in input_variables:
+        properties[input_var.key] = _compile_deployment_workflow_input(input_var)
+
+        if input_var.required and input_var.default is None:
+            required.append(input_var.key)
+
+    parameters = {"type": "object", "properties": properties, "required": required}
+
+    return FunctionDefinition(
+        name=deployment,
+        description=description,
         parameters=parameters,
     )
