@@ -78,7 +78,7 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
     return "JSON"
 
 
-def vellum_variable_type_to_primitive_type(vellum_type: VellumVariableType) -> str:
+def vellum_variable_type_to_openapi_type(vellum_type: VellumVariableType) -> str:
     """Converts a VellumVariableType to a JSON schema primitive type string"""
     if vellum_type == "STRING":
         return "string"

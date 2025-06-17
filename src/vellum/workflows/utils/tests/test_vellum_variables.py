@@ -5,7 +5,7 @@ from vellum import ChatMessage, SearchResult, VellumAudio, VellumDocument, Vellu
 from vellum.workflows.types.core import Json
 from vellum.workflows.utils.vellum_variables import (
     primitive_type_to_vellum_variable_type,
-    vellum_variable_type_to_primitive_type,
+    vellum_variable_type_to_openapi_type,
 )
 
 
@@ -53,5 +53,5 @@ def test_primitive_type_to_vellum_variable_type(type_, expected):
         ("NULL", "null"),
     ],
 )
-def test_vellum_variable_type_to_primitive_type(vellum_type, expected):
-    assert vellum_variable_type_to_primitive_type(vellum_type) == expected
+def test_vellum_variable_type_to_openapi_type(vellum_type, expected):
+    assert vellum_variable_type_to_openapi_type(vellum_type) == expected
