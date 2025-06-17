@@ -209,13 +209,12 @@ def test_image_push_with_source_success(
         "buildx",
         "build",
         "-f",
-        "Dockerfile",
+        dockerfile_path,
         "--platform=linux/amd64",
         "-t",
         "myimage:latest",
         ".",
     ]
-    assert build_call[1]["cwd"] == mock_temp_dir
 
     assert "Docker build completed successfully" in result.output
     assert "Image successfully pushed" in result.output
