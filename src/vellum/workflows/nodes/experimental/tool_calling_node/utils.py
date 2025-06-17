@@ -145,7 +145,7 @@ def create_function_node(
     """
     if is_workflow_class(function):
         # Create a class-level wrapper that calls the original function
-        def execute_function(self) -> BaseNode.Outputs:
+        def execute_inline_workflow_function(self) -> BaseNode.Outputs:
             outputs = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
 
             outputs = json.loads(outputs)
@@ -181,7 +181,7 @@ def create_function_node(
             f"InlineWorkflowNode_{function.__name__}",
             (FunctionNode,),
             {
-                "run": execute_function,
+                "run": execute_inline_workflow_function,
                 "__module__": __name__,
             },
         )
