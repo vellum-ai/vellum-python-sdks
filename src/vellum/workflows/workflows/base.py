@@ -45,6 +45,8 @@ from vellum.workflows.events.node import (
 from vellum.workflows.events.workflow import (
     GenericWorkflowEvent,
     WorkflowEvent,
+    WorkflowEventStream,
+    WorkflowEventStreamWrapper,
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedBody,
@@ -167,8 +169,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         WorkflowExecutionRejectedEvent,
         WorkflowExecutionPausedEvent,
     ]
-
-    WorkflowEventStream = Generator[WorkflowEvent, None, None]
 
     def __init__(
         self,
@@ -472,8 +472,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     yield event
 
         if hasattr(runner_stream, "span_id"):
-            from vellum.workflows.events.workflow import WorkflowEventStreamWrapper
-
             return WorkflowEventStreamWrapper(_generate_filtered_events(), runner_stream.span_id)
         else:
             return _generate_filtered_events()
