@@ -42,11 +42,10 @@ from vellum.workflows.events.node import (
     NodeExecutionStreamingBody,
     NodeExecutionStreamingEvent,
 )
+from vellum.workflows.events.stream import WorkflowEventGenerator
 from vellum.workflows.events.workflow import (
     GenericWorkflowEvent,
     WorkflowEvent,
-    WorkflowEventStream,
-    WorkflowEventStreamWrapper,
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedBody,
@@ -169,6 +168,8 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         WorkflowExecutionRejectedEvent,
         WorkflowExecutionPausedEvent,
     ]
+
+    WorkflowEventStream = WorkflowEventGenerator[WorkflowEvent]
 
     def __init__(
         self,
@@ -457,24 +458,13 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         ).stream()
 
         filter_func = event_filter or workflow_event_filter
-        return self._filter_events(runner_stream, filter_func)
-
-    def _filter_events(
-        self,
-        runner_stream: WorkflowEventStream,
-        event_filter: Callable[[Type["BaseWorkflow"], WorkflowEvent], bool],
-    ) -> WorkflowEventStream:
-        """Helper method to filter events from the runner stream."""
 
         def _generate_filtered_events() -> Generator[WorkflowEvent, None, None]:
             for event in runner_stream:
-                if event_filter(self.__class__, event):
+                if filter_func(self.__class__, event):
                     yield event
 
-        if hasattr(runner_stream, "span_id"):
-            return WorkflowEventStreamWrapper(_generate_filtered_events(), runner_stream.span_id)
-        else:
-            return _generate_filtered_events()
+        return WorkflowEventGenerator(_generate_filtered_events(), runner_stream.span_id)
 
     def validate(self) -> None:
         """

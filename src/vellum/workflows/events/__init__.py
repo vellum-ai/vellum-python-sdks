@@ -5,10 +5,10 @@ from .node import (
     NodeExecutionRejectedEvent,
     NodeExecutionStreamingEvent,
 )
+from .stream import WorkflowEventGenerator
 from .workflow import (
     WorkflowEvent,
     WorkflowEventStream,
-    WorkflowEventStreamWrapper,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedEvent,
     WorkflowExecutionRejectedEvent,
@@ -27,5 +27,5 @@ __all__ = [
     "WorkflowExecutionStreamingEvent",
     "WorkflowEvent",
     "WorkflowEventStream",
-    "WorkflowEventStreamWrapper",
+    "WorkflowEventGenerator",
 ]

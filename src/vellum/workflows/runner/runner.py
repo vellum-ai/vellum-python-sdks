@@ -31,7 +31,7 @@ from vellum.workflows.events import (
     NodeExecutionRejectedEvent,
     NodeExecutionStreamingEvent,
     WorkflowEvent,
-    WorkflowEventStreamWrapper,
+    WorkflowEventGenerator,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedEvent,
     WorkflowExecutionRejectedEvent,
@@ -744,7 +744,7 @@ class WorkflowRunner(Generic[StateType]):
             return event.workflow_definition == self.workflow.__class__
         return False
 
-    def stream(self) -> WorkflowEventStreamWrapper:
+    def stream(self) -> WorkflowEventGenerator[WorkflowEvent]:
         def _generate_events() -> Generator[WorkflowEvent, None, None]:
             background_thread = Thread(
                 target=self._run_background_thread,
@@ -804,4 +804,4 @@ class WorkflowRunner(Generic[StateType]):
             self._background_thread_queue.put(None)
             cancel_thread_kill_switch.set()
 
-        return WorkflowEventStreamWrapper(_generate_events(), self._initial_state.meta.span_id)
+        return WorkflowEventGenerator(_generate_events(), self._initial_state.meta.span_id)

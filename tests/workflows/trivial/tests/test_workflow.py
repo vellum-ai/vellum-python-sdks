@@ -1,4 +1,4 @@
-from vellum.workflows.events.workflow import WorkflowEventStreamWrapper
+from vellum.workflows.events.stream import WorkflowEventGenerator
 
 from tests.workflows.trivial.workflow import TrivialWorkflow
 
@@ -25,7 +25,7 @@ def test_stream_workflow__span_id_property():
     workflow = TrivialWorkflow()
     stream = workflow.stream()
 
-    assert isinstance(stream, WorkflowEventStreamWrapper)
+    assert isinstance(stream, WorkflowEventGenerator)
 
     span_id = stream.span_id
     assert span_id is not None
