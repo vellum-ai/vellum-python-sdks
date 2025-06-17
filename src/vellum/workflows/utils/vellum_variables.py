@@ -78,6 +78,36 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
     return "JSON"
 
 
+def vellum_variable_type_to_openapi_type(vellum_type: VellumVariableType) -> str:
+    """Converts a VellumVariableType to a JSON schema primitive type string"""
+    if vellum_type == "STRING":
+        return "string"
+    elif vellum_type == "NUMBER":
+        return "number"
+    elif vellum_type == "JSON":
+        return "object"
+    elif vellum_type == "CHAT_HISTORY":
+        return "array"
+    elif vellum_type == "SEARCH_RESULTS":
+        return "array"
+    elif vellum_type == "ERROR":
+        return "object"
+    elif vellum_type == "ARRAY":
+        return "array"
+    elif vellum_type == "FUNCTION_CALL":
+        return "object"
+    elif vellum_type == "IMAGE":
+        return "object"
+    elif vellum_type == "AUDIO":
+        return "object"
+    elif vellum_type == "DOCUMENT":
+        return "object"
+    elif vellum_type == "NULL":
+        return "null"
+    else:
+        return "object"
+
+
 def _is_type_optionally_equal(type_: Type, target_type: Type) -> bool:
     if type_ == target_type:
         return True
