@@ -69,7 +69,7 @@ class ToolRouterNode(InlinePromptNode):
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
-    functions: List[Callable[..., Any]],
+    functions: List[Union[Callable[..., Any], Dict[str, str]]],
     prompt_inputs: Optional[EntityInputsInterface],
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
