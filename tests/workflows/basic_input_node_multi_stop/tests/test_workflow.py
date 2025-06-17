@@ -1,3 +1,5 @@
+from typing import cast
+
 from tests.workflows.basic_input_node_multi_stop.workflow import BasicInputNodeWorkflow, InputNode, InputNode2
 
 
@@ -89,4 +91,4 @@ def test_workflow__happy_path_stream_multi_stop():
     # AND we should end with a FULFILLED state
     final_event = events[-1]
     assert final_event.name == "workflow.execution.fulfilled"
-    assert final_event.outputs.final_value == "sunny rain"
+    assert cast(BasicInputNodeWorkflow.Outputs, final_event.outputs).final_value == "sunny rain"

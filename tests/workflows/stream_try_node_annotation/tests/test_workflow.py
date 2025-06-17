@@ -1,3 +1,5 @@
+from typing import cast
+
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum.workflows.types.definition import CodeResourceDefinition, VellumCodeResourceDefinition
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -148,7 +150,7 @@ def test_workflow_stream__happy_path():
     assert workflow_fulfilled_events[0].workflow_definition == InnerWorkflow
     assert workflow_fulfilled_events[0].outputs == {"processed": ["apple apple", "banana banana", "cherry cherry"]}
     assert workflow_fulfilled_events[1].workflow_definition == StreamingTryExample
-    assert workflow_fulfilled_events[1].outputs.final_value == [
+    assert cast(StreamingTryExample.Outputs, workflow_fulfilled_events[1].outputs).final_value == [
         "apple apple",
         "banana banana",
         "cherry cherry",
