@@ -8,6 +8,7 @@ from .node import (
 from .workflow import (
     WorkflowEvent,
     WorkflowEventStream,
+    WorkflowEventStreamWrapper,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedEvent,
     WorkflowExecutionRejectedEvent,
@@ -26,4 +27,5 @@ __all__ = [
     "WorkflowExecutionStreamingEvent",
     "WorkflowEvent",
     "WorkflowEventStream",
+    "WorkflowEventStreamWrapper",
 ]

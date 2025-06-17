@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Iterable, Literal, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Iterable, Iterator, Literal, Optional, Type, Union
 from typing_extensions import TypeGuard
 
 from pydantic import field_serializer
@@ -193,7 +193,32 @@ WorkflowEvent = Union[
     WorkflowExecutionSnapshottedEvent,
 ]
 
-WorkflowEventStream = Generator[WorkflowEvent, None, None]
+
+class WorkflowEventStreamWrapper:
+    """
+    Wrapper for WorkflowEventStream that exposes span_id as a top-level property
+    while maintaining iterator compatibility.
+    """
+
+    def __init__(self, event_generator: Generator[WorkflowEvent, None, None], span_id: UUID):
+        self._event_generator = event_generator
+        self._span_id = span_id
+
+    @property
+    def span_id(self) -> UUID:
+        """The span_id associated with this workflow stream."""
+        return self._span_id
+
+    def __iter__(self) -> Iterator[WorkflowEvent]:
+        """Return self to make this object iterable."""
+        return self
+
+    def __next__(self) -> WorkflowEvent:
+        """Get the next event from the underlying generator."""
+        return next(self._event_generator)
+
+
+WorkflowEventStream = Union[Generator[WorkflowEvent, None, None], WorkflowEventStreamWrapper]
 
 WorkflowExecutionEvent = Union[
     WorkflowExecutionInitiatedEvent,
