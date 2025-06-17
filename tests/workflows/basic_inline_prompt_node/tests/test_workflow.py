@@ -131,8 +131,8 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     result = workflow.stream(inputs=WorkflowInputs(noun="color"))
     events = list(result)
 
-    # THEN the workflow should have completed successfully with 8 events
-    assert len(events) == 7
+    # THEN the workflow should have completed successfully with 15 events
+    assert len(events) == 15
 
     # AND the outputs should be as expected
     assert events[0].name == "workflow.execution.initiated"
