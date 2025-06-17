@@ -2,7 +2,7 @@ from collections.abc import Callable, Sequence
 import inspect
 import json
 import types
-from typing import Any, Iterator, List, Optional, Type, cast
+from typing import Any, Dict, Iterator, List, Optional, Type, Union, cast
 
 from pydash import snake_case
 
@@ -18,6 +18,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
+from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
@@ -75,7 +76,7 @@ def create_tool_router_node(
         # If we have functions, create dynamic ports for each function
         Ports = type("Ports", (), {})
         for function in functions:
-            function_name = snake_case(function.__name__)
+            function_name = get_function_name(function)
 
             # Avoid using lambda to capture function_name
             # lambda will capture the function_name by reference,
@@ -127,7 +128,7 @@ def create_tool_router_node(
 
 
 def create_function_node(
-    function: Callable[..., Any],
+    function: Union[Callable[..., Any], Dict[str, str]],
     tool_router_node: Type[ToolRouterNode],
     packages: Optional[Sequence[CodeExecutionPackage]] = None,
     runtime: CodeExecutionRuntime = "PYTHON_3_11_6",
@@ -143,7 +144,59 @@ def create_function_node(
         packages: Optional list of packages to install for code execution (only used for regular functions)
         runtime: The runtime to use for code execution (default: "PYTHON_3_11_6")
     """
-    if is_workflow_class(function):
+    if isinstance(function, Dict):
+        deployment = function["deployment"]
+        release_tag = function["release_tag"]
+
+        def execute_deployment_workflow_function(self) -> BaseNode.Outputs:
+            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
+            if function_call_output and len(function_call_output) > 0:
+                function_call = function_call_output[0]
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
+
+            subworkflow_node = type(
+                f"DynamicSubworkflowNode_{deployment}",
+                (SubworkflowDeploymentNode,),
+                {
+                    "deployment": deployment,
+                    "release_tag": release_tag,
+                    "subworkflow_inputs": arguments,
+                    "__module__": __name__,
+                },
+            )
+
+            node_instance = subworkflow_node(
+                context=WorkflowContext.create_from(self._context),
+                state=self.state,
+            )
+
+            outputs = {}
+            for output in node_instance.run():
+                outputs[output.name] = output.value
+
+            self.state.chat_history.append(
+                ChatMessage(
+                    role="FUNCTION",
+                    content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
+                )
+            )
+
+            return self.Outputs()
+
+        node = type(
+            f"DeploymentWorkflowNode_{deployment}",
+            (FunctionNode,),
+            {
+                "run": execute_deployment_workflow_function,
+                "__module__": __name__,
+            },
+        )
+
+        return node
+
+    elif is_workflow_class(function):
         # Create a class-level wrapper that calls the original function
         def execute_inline_workflow_function(self) -> BaseNode.Outputs:
             outputs = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
@@ -246,3 +299,10 @@ def main(arguments):
         )
 
     return node
+
+
+def get_function_name(function: Union[Callable[..., Any], Dict[str, str]]) -> str:
+    if isinstance(function, Dict):
+        return function["deployment"]
+    else:
+        return snake_case(function.__name__)

@@ -1,6 +1,6 @@
 import json
 from uuid import uuid4
-from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
+from typing import Callable, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -31,7 +31,11 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants impor
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType, is_workflow_class
-from vellum.workflows.utils.functions import compile_function_definition, compile_workflow_function_definition
+from vellum.workflows.utils.functions import (
+    compile_deployment_workflow_function_definition,
+    compile_function_definition,
+    compile_workflow_function_definition,
+)
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -53,7 +57,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     blocks: ClassVar[List[PromptBlock]]
 
     # The functions/tools that a Prompt has access to
-    functions: Optional[List[Union[FunctionDefinition, Callable]]] = None
+    functions: Optional[List[Union[FunctionDefinition, Callable, Dict[str, str]]]] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = None
@@ -105,6 +109,13 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             for function in self.functions:
                 if isinstance(function, FunctionDefinition):
                     normalized_functions.append(function)
+                elif isinstance(function, Dict):
+                    normalized_functions.append(
+                        compile_deployment_workflow_function_definition(
+                            function,
+                            vellum_client=self._context.vellum_client,
+                        )
+                    )
                 elif is_workflow_class(function):
                     normalized_functions.append(compile_workflow_function_definition(function))
                 else:
