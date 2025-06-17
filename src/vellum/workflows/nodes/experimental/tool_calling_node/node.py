@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, ClassVar, Dict, List, Optional, cast
+from typing import Any, ClassVar, Dict, List, Optional, Union, cast
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.code_execution_package import CodeExecutionPackage
@@ -37,7 +37,7 @@ class ToolCallingNode(BaseNode):
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
-    functions: ClassVar[List[Callable[..., Any]]] = []
+    functions: ClassVar[List[Union[Callable[..., Any], Dict[str, str]]]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     function_configs: ClassVar[Optional[Dict[str, Dict[str, Any]]]] = None
 
