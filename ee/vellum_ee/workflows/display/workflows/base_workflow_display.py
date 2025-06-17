@@ -18,7 +18,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
-from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -334,12 +334,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             for node in nodes_dict_list
         )
 
-        workflow_name = self._workflow.__name__
         should_apply_auto_layout = (
             all_nodes_at_zero
             and len(nodes_dict_list) > 0
             and len(edges) > 0
-            and workflow_name in ["BasicGenericNodeWorkflow"]
+            and getattr(self._workflow, "_enable_auto_layout", False)
         )
 
         if should_apply_auto_layout:
@@ -347,7 +346,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         return {
             "workflow_raw_data": {
-                "nodes": nodes_dict_list,
+                "nodes": cast(JsonArray, nodes_dict_list),
                 "edges": edges,
                 "display_data": self.display_context.workflow_display.display_data.dict(),
                 "definition": {
@@ -361,9 +360,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "output_variables": output_variables,
         }
 
-    def _apply_auto_layout(
-        self, nodes_dict_list: List[Dict[str, Any]], edges: List[Union[Dict[str, Any], EdgeDisplay]]
-    ) -> None:
+    def _apply_auto_layout(self, nodes_dict_list: List[Dict[str, Any]], edges: List[Json]) -> None:
         """Apply auto-layout to nodes that are all positioned at (0,0)."""
         nodes_for_layout: List[Tuple[str, NodeDisplayData]] = []
         for node_dict in nodes_dict_list:

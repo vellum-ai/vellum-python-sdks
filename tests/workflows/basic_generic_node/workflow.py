@@ -14,6 +14,7 @@ class BasicGenericNode(BaseNode):
 
 
 class BasicGenericNodeWorkflow(BaseWorkflow[Inputs, BaseState]):
+    _enable_auto_layout = True
     graph = BasicGenericNode
 
     class Outputs(BaseWorkflow.Outputs):
