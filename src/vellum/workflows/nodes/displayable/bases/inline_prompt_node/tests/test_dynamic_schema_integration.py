@@ -1,9 +1,9 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from uuid import uuid4
 
 from vellum import PromptParameters
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.node import BaseInlinePromptNode
-from vellum.workflows.state.base import BaseState, StateMeta
+from vellum.workflows.state.base import BaseState
 
 
 class TestDynamicSchemaIntegration:
@@ -14,11 +14,11 @@ class TestDynamicSchemaIntegration:
         mock_node2.__id__ = uuid4()
         current_node_id = uuid4()
 
+        state = BaseState()
+
         mock_workflow = Mock()
         mock_workflow.get_nodes.return_value = [mock_node1, mock_node2]
-
-        state = BaseState()
-        state.meta = StateMeta(workflow_definition=mock_workflow)
+        state.meta.workflow_definition = mock_workflow
 
         custom_parameters = {
             "json_schema": {
@@ -44,7 +44,12 @@ class TestDynamicSchemaIntegration:
         result = node._process_parameters_for_dynamic_schema()
 
         expected_enum = [str(mock_node1.__id__), str(mock_node2.__id__), "END"]
-        actual_enum = result.custom_parameters["json_schema"]["schema"]["properties"]["next_step"]["enum"]
+        assert result.custom_parameters is not None
+        json_schema = result.custom_parameters["json_schema"]
+        assert isinstance(json_schema, dict)
+        schema = json_schema["schema"]
+        assert isinstance(schema, dict)
+        actual_enum = schema["properties"]["next_step"]["enum"]
 
         assert set(actual_enum) == set(expected_enum)
 
@@ -79,7 +84,6 @@ class TestDynamicSchemaIntegration:
 
     def test_process_parameters_without_workflow_nodes(self):
         state = BaseState()
-        state.meta = StateMeta()
 
         custom_parameters = {
             "json_schema": {
@@ -108,11 +112,11 @@ class TestDynamicSchemaIntegration:
         mock_node2 = Mock()
         mock_node2.__id__ = uuid4()
 
+        state = BaseState()
+
         mock_workflow = Mock()
         mock_workflow.get_nodes.return_value = [mock_node1, mock_node2]
-
-        state = BaseState()
-        state.meta = StateMeta(workflow_definition=mock_workflow)
+        state.meta.workflow_definition = mock_workflow
 
         custom_parameters = {
             "json_schema": {
@@ -133,21 +137,25 @@ class TestDynamicSchemaIntegration:
 
         result = node._process_parameters_for_dynamic_schema()
 
-        actual_enum = result.custom_parameters["json_schema"]["schema"]["properties"]["next"]["enum"]
+        assert result.custom_parameters is not None
+        json_schema = result.custom_parameters["json_schema"]
+        assert isinstance(json_schema, dict)
+        schema = json_schema["schema"]
+        assert isinstance(schema, dict)
+        actual_enum = schema["properties"]["next"]["enum"]
         assert actual_enum == [str(mock_node2.__id__)]
         assert str(current_node_id) not in actual_enum
 
-    @patch("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.replace")
-    def test_process_parameters_creates_new_instance_when_changed(self, mock_replace):
+    def test_process_parameters_creates_new_instance_when_changed(self):
         mock_node1 = Mock()
         mock_node1.__id__ = uuid4()
         current_node_id = uuid4()
 
+        state = BaseState()
+
         mock_workflow = Mock()
         mock_workflow.get_nodes.return_value = [mock_node1]
-
-        state = BaseState()
-        state.meta = StateMeta(workflow_definition=mock_workflow)
+        state.meta.workflow_definition = mock_workflow
 
         custom_parameters = {
             "json_schema": {
@@ -156,8 +164,6 @@ class TestDynamicSchemaIntegration:
         }
 
         parameters = PromptParameters(custom_parameters=custom_parameters)
-        new_parameters = PromptParameters(custom_parameters={"processed": True})
-        mock_replace.return_value = new_parameters
 
         class TestPromptNode(BaseInlinePromptNode):
             ml_model = "test-model"
@@ -170,5 +176,12 @@ class TestDynamicSchemaIntegration:
 
         result = node._process_parameters_for_dynamic_schema()
 
-        mock_replace.assert_called_once()
-        assert result == new_parameters
+        # Verify that a new instance was created with processed parameters
+        assert result != parameters
+        assert result.custom_parameters is not None
+        json_schema = result.custom_parameters["json_schema"]
+        assert isinstance(json_schema, dict)
+        schema = json_schema["schema"]
+        assert isinstance(schema, dict)
+        actual_enum = schema["properties"]["next"]["enum"]
+        assert actual_enum == [str(mock_node1.__id__)]

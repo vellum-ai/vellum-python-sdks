@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 from uuid import uuid4
+from typing import Any, Dict, List
 
 from vellum.workflows.utils.dynamic_schema import DynamicSchemaProcessor, process_dynamic_json_schema
 
@@ -41,7 +42,7 @@ class TestDynamicSchemaProcessor:
         assert result["properties"]["action"]["enum"] == expected_enum
 
     def test_process_schema_without_dynamic_enums(self):
-        workflow_nodes = []
+        workflow_nodes: List[Any] = []
         processor = DynamicSchemaProcessor(workflow_nodes, uuid4())
 
         schema = {"type": "object", "properties": {"status": {"type": "string", "enum": ["SUCCESS", "FAILURE"]}}}
@@ -134,6 +135,7 @@ class TestProcessDynamicJsonSchema:
             custom_parameters=custom_parameters, workflow_nodes=[mock_node], current_node_id=current_node_id
         )
 
+        assert result is not None
         assert result["json_schema"]["schema"]["properties"]["next"]["enum"] == [str(mock_node.__id__)]
 
     def test_process_without_json_schema_parameter(self):
@@ -151,7 +153,7 @@ class TestProcessDynamicJsonSchema:
         assert result is None
 
     def test_process_with_empty_json_schema(self):
-        custom_parameters = {"json_schema": {}}
+        custom_parameters: Dict[str, Any] = {"json_schema": {}}
 
         result = process_dynamic_json_schema(
             custom_parameters=custom_parameters, workflow_nodes=[], current_node_id=uuid4()
@@ -176,6 +178,7 @@ class TestProcessDynamicJsonSchema:
             custom_parameters=custom_parameters, workflow_nodes=[mock_node], current_node_id=current_node_id
         )
 
+        assert result is not None
         assert result["json_schema"]["name"] == "test_schema"
         assert result["json_schema"]["description"] == "A test schema"
         assert result["json_schema"]["schema"]["properties"]["next"]["enum"] == [str(mock_node.__id__)]

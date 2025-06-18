@@ -288,12 +288,17 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         if not hasattr(self.parameters, "custom_parameters") or not self.parameters.custom_parameters:
             return self.parameters
 
-        workflow_nodes = []
-        if hasattr(self, "state") and hasattr(self.state.meta, "workflow_definition"):
-            workflow_definition = self.state.meta.workflow_definition
-            if hasattr(workflow_definition, "get_nodes"):
-                workflow_nodes = workflow_definition.get_nodes()
+        if "json_schema" not in self.parameters.custom_parameters:
+            return self.parameters
 
+        workflow_nodes = []
+        if hasattr(self, "state") and self.state and hasattr(self.state, "meta") and self.state.meta:
+            if hasattr(self.state.meta, "workflow_definition") and self.state.meta.workflow_definition:
+                workflow_definition = self.state.meta.workflow_definition
+                if hasattr(workflow_definition, "get_nodes"):
+                    workflow_nodes = list(workflow_definition.get_nodes())
+
+        # Only process if we have workflow nodes, otherwise return original parameters
         if not workflow_nodes:
             return self.parameters
 
@@ -304,8 +309,6 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         )
 
         if processed_custom_parameters != self.parameters.custom_parameters:
-            from dataclasses import replace
-
-            return replace(self.parameters, custom_parameters=processed_custom_parameters)
+            return self.parameters.model_copy(update={"custom_parameters": processed_custom_parameters})
 
         return self.parameters
