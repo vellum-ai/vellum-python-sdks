@@ -336,8 +336,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         should_apply_auto_layout = (
             all_nodes_at_zero
-            and hasattr(self._workflow, "__name__")
-            and self._workflow.__name__ == "BasicGenericNodeWorkflow"
+            and len(nodes_dict_list) > 0
         )
 
         if should_apply_auto_layout:
