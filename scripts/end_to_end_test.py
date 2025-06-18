@@ -13,12 +13,7 @@ def main():
     """
     Main entry point for end-to-end testing.
 
-    This function will be expanded to include:
-    - Python compilation, formatting, linting, and type checking
-    - Python test suite execution
-    - TypeScript codegen compilation, formatting, linting, and type checking
-    - TypeScript codegen test suite execution
-    - Any additional end-to-end validation needed for releases
+    This function will be expanded to include any additional end-to-end validation needed for releases
     """
     print("End-to-end testing script placeholder")
     print("TODO: Implement comprehensive testing logic")
