@@ -35,7 +35,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
     Test that the GetCurrentWeatherWorkflow returns the expected outputs.
     """
 
-    def generate_prompt_events(*args, **kwargs) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
         execution_id = str(uuid4())
 
         call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count

@@ -14,6 +14,7 @@ def get_current_weather(location: str, unit: str) -> str:
 
 
 def format_answer(answer: str) -> int:
+    _ = answer
     return 1 + 1
 
 

@@ -28,6 +28,8 @@ class FirstNode(BaseNode[State]):
         default = Port(default=True)
 
         def __call__(self, outputs: BaseOutputs, state: BaseState) -> Set[Port]:
+            _ = outputs
+            _ = state
             return set()
 
         def __lt__(self, output: BaseOutput) -> Set[Port]:
