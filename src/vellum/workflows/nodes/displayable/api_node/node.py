@@ -1,8 +1,6 @@
 from typing import Optional, Union
 
 from vellum.workflows.constants import AuthorizationType
-from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.api_node import BaseAPINode
 from vellum.workflows.types.core import MergeBehavior, VellumSecret
 
@@ -32,13 +30,7 @@ class APINode(BaseAPINode):
     class Trigger(BaseAPINode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
-    def _validate(self) -> None:
-        if not self.url or not isinstance(self.url, str) or not self.url.strip():
-            raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
-
     def run(self) -> BaseAPINode.Outputs:
-        self._validate()
-
         headers = self.headers or {}
         header_overrides = {}
         bearer_token = None
@@ -59,8 +51,10 @@ class APINode(BaseAPINode):
         final_headers = {**headers, **header_overrides}
 
         vellum_client_wrapper = self._context.vellum_client._client_wrapper
-        if self.url.startswith(vellum_client_wrapper._environment.default) and (
-            "X-API-Key" not in final_headers and "X_API_KEY" not in final_headers
+        if (
+            self.url
+            and self.url.startswith(vellum_client_wrapper._environment.default)
+            and ("X-API-Key" not in final_headers and "X_API_KEY" not in final_headers)
         ):
             final_headers["X-API-Key"] = vellum_client_wrapper.api_key
 

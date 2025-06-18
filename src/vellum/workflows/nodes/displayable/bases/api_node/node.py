@@ -40,6 +40,10 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         status_code: int
         text: str
 
+    def _validate(self) -> None:
+        if not self.url or not isinstance(self.url, str) or not self.url.strip():
+            raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
+
     def run(self) -> Outputs:
         return self._run(method=self.method, url=self.url, data=self.data, json=self.json, headers=self.headers)
 
