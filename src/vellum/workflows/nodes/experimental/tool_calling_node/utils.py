@@ -1,8 +1,8 @@
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 import inspect
 import json
 import types
-from typing import Any, Iterator, List, Optional, Type, Union, cast
+from typing import Any, Iterator, List, Optional, Type, cast
 
 from pydash import snake_case
 
@@ -25,7 +25,7 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, ToolFunction
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
@@ -70,7 +70,7 @@ class ToolRouterNode(InlinePromptNode):
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
-    functions: List[Union[Callable[..., Any], DeploymentDefinition]],
+    functions: List[ToolFunction],
     prompt_inputs: Optional[EntityInputsInterface],
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
@@ -129,7 +129,7 @@ def create_tool_router_node(
 
 
 def create_function_node(
-    function: Union[Callable[..., Any], DeploymentDefinition],
+    function: ToolFunction,
     tool_router_node: Type[ToolRouterNode],
     packages: Optional[Sequence[CodeExecutionPackage]] = None,
     runtime: CodeExecutionRuntime = "PYTHON_3_11_6",
@@ -302,7 +302,7 @@ def main(arguments):
     return node
 
 
-def get_function_name(function: Union[Callable[..., Any], DeploymentDefinition]) -> str:
+def get_function_name(function: ToolFunction) -> str:
     if isinstance(function, DeploymentDefinition):
         return function.deployment
     else:
