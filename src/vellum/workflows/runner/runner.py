@@ -373,6 +373,12 @@ class WorkflowRunner(Generic[StateType]):
         except Exception as e:
             logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
 
+            node_module = node.__class__.__module__
+            if node_module.startswith("vellum."):
+                error_code = WorkflowErrorCode.INTERNAL_ERROR
+            else:
+                error_code = WorkflowErrorCode.NODE_EXECUTION
+
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
                     trace_id=execution.trace_id,
@@ -381,7 +387,7 @@ class WorkflowRunner(Generic[StateType]):
                         node_definition=node.__class__,
                         error=WorkflowError(
                             message=str(e),
-                            code=WorkflowErrorCode.INTERNAL_ERROR,
+                            code=error_code,
                         ),
                     ),
                     parent=execution.parent_context,
