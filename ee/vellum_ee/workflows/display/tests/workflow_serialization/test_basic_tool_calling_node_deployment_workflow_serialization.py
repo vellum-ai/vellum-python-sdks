@@ -87,7 +87,7 @@ def test_serialize_workflow():
                                                 "block_type": "PLAIN_TEXT",
                                                 "state": None,
                                                 "cache_config": None,
-                                                "text": "You are a helpful assistant. Use the available tools to help the user.",
+                                                "text": "You are a helpful assistant. Use the available tools to help the user.",  # noqa: E501
                                             }
                                         ],
                                     }
