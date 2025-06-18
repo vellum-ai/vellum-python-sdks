@@ -13,9 +13,8 @@ def get_current_weather(location: str, unit: str) -> str:
     return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
 
 
-def format_answer(answer: str) -> int:
-    _ = answer
-    return 1 + 1
+def format_answer(answer: str) -> str:
+    return f"The answer is: {answer}"
 
 
 class GetCurrentWeatherNode(ToolCallingNode):

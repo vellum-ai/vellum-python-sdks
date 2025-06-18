@@ -139,7 +139,13 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             source=None,
         ),
         ChatMessage(
-            text=None, role="FUNCTION", content=StringChatMessageContent(type="STRING", value="2"), source=None
+            text=None,
+            role="FUNCTION",
+            content=StringChatMessageContent(
+                type="STRING",
+                value='"The answer is: The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',  # noqa: E501
+            ),
+            source=None,
         ),
         ChatMessage(
             text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
@@ -424,7 +430,10 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                     ChatMessage(
                         text=None,
                         role="FUNCTION",
-                        content=StringChatMessageContent(type="STRING", value="2"),
+                        content=StringChatMessageContent(
+                            type="STRING",
+                            value='"The answer is: The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',  # noqa: E501
+                        ),
                         source=None,
                     ),
                 ],
