@@ -2,7 +2,7 @@ from collections.abc import Callable, Sequence
 import inspect
 import json
 import types
-from typing import Any, Dict, Iterator, List, Optional, Type, Union, cast
+from typing import Any, Iterator, List, Optional, Type, Union, cast
 
 from pydash import snake_case
 
@@ -70,7 +70,7 @@ class ToolRouterNode(InlinePromptNode):
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
-    functions: List[Union[Callable[..., Any], Dict[str, str]]],
+    functions: List[Union[Callable[..., Any], DeploymentDefinition]],
     prompt_inputs: Optional[EntityInputsInterface],
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
@@ -129,7 +129,7 @@ def create_tool_router_node(
 
 
 def create_function_node(
-    function: Union[Callable[..., Any], Dict[str, str]],
+    function: Union[Callable[..., Any], DeploymentDefinition],
     tool_router_node: Type[ToolRouterNode],
     packages: Optional[Sequence[CodeExecutionPackage]] = None,
     runtime: CodeExecutionRuntime = "PYTHON_3_11_6",
