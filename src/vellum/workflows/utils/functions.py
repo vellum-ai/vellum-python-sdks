@@ -132,7 +132,7 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     )
 
 
-def compile_workflow_function_definition(workflow_class: Type["BaseWorkflow"]) -> FunctionDefinition:
+def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkflow"]) -> FunctionDefinition:
     """
     Converts a base workflow class into our Vellum-native FunctionDefinition type.
     """

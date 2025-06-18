@@ -35,7 +35,7 @@ from vellum.workflows.types.generics import StateType, is_workflow_class
 from vellum.workflows.utils.functions import (
     compile_deployment_workflow_function_definition,
     compile_function_definition,
-    compile_workflow_function_definition,
+    compile_inline_workflow_function_definition,
 )
 
 
@@ -118,7 +118,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                         )
                     )
                 elif is_workflow_class(function):
-                    normalized_functions.append(compile_workflow_function_definition(function))
+                    normalized_functions.append(compile_inline_workflow_function_definition(function))
                 else:
                     normalized_functions.append(compile_function_definition(function))
 
