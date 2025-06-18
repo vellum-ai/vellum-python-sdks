@@ -14,7 +14,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.utils.functions import (
     compile_deployment_workflow_function_definition,
     compile_function_definition,
-    compile_workflow_function_definition,
+    compile_inline_workflow_function_definition,
 )
 
 
@@ -306,7 +306,7 @@ def test_compile_function_definition__lambda():
     )
 
 
-def test_compile_workflow_function_definition():
+def test_compile_inline_workflow_function_definition():
     class MyNode(BaseNode):
         pass
 
@@ -314,7 +314,7 @@ def test_compile_workflow_function_definition():
         graph = MyNode
 
     # WHEN compiling the function
-    compiled_function = compile_workflow_function_definition(MyWorkflow)
+    compiled_function = compile_inline_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -323,7 +323,7 @@ def test_compile_workflow_function_definition():
     )
 
 
-def test_compile_workflow_function_definition__docstring():
+def test_compile_inline_workflow_function_definition__docstring():
     class MyNode(BaseNode):
         pass
 
@@ -335,7 +335,7 @@ def test_compile_workflow_function_definition__docstring():
         graph = MyNode
 
     # WHEN compiling the function
-    compiled_function = compile_workflow_function_definition(MyWorkflow)
+    compiled_function = compile_inline_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -345,7 +345,7 @@ def test_compile_workflow_function_definition__docstring():
     )
 
 
-def test_compile_workflow_function_definition__all_args():
+def test_compile_inline_workflow_function_definition__all_args():
     class MyInputs(BaseInputs):
         a: str
         b: int
@@ -361,7 +361,7 @@ def test_compile_workflow_function_definition__all_args():
         graph = MyNode
 
     # WHEN compiling the workflow
-    compiled_function = compile_workflow_function_definition(MyWorkflow)
+    compiled_function = compile_inline_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -381,7 +381,7 @@ def test_compile_workflow_function_definition__all_args():
     )
 
 
-def test_compile_workflow_function_definition__unions():
+def test_compile_inline_workflow_function_definition__unions():
     # GIVEN a workflow with a union
     class MyInputs(BaseInputs):
         a: Union[str, int]
@@ -393,7 +393,7 @@ def test_compile_workflow_function_definition__unions():
         graph = MyNode
 
     # WHEN compiling the workflow
-    compiled_function = compile_workflow_function_definition(MyWorkflow)
+    compiled_function = compile_inline_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -406,7 +406,7 @@ def test_compile_workflow_function_definition__unions():
     )
 
 
-def test_compile_workflow_function_definition__optionals():
+def test_compile_inline_workflow_function_definition__optionals():
     class MyInputs(BaseInputs):
         a: str
         b: Optional[str]
@@ -421,7 +421,7 @@ def test_compile_workflow_function_definition__optionals():
         graph = MyNode
 
     # WHEN compiling the workflow
-    compiled_function = compile_workflow_function_definition(MyWorkflow)
+    compiled_function = compile_inline_workflow_function_definition(MyWorkflow)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
