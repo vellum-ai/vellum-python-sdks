@@ -242,6 +242,13 @@ def push_command(
 {json.dumps(response.proposed_diffs, indent=2)}
 """
         )  # type: ignore[attr-defined]
+
+        error_list = list(workflow_display.errors)
+        has_errors = len(error_list) > 0
+        has_diffs = response.proposed_diffs is not None and response.proposed_diffs
+
+        if has_errors or has_diffs:
+            exit(1)
     else:
         default_api_url = client._client_wrapper._environment.default
         base_url = default_api_url.split("/v1")[0].replace("//api.", "//app.")
