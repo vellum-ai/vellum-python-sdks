@@ -110,7 +110,7 @@ class ToolCallingNode(BaseNode):
 
             # Get configuration for this function
             config = {}
-            if self.function_configs and function.__name__ in self.function_configs:
+            if callable(function) and self.function_configs and function.__name__ in self.function_configs:
                 config = self.function_configs[function.__name__]
 
             packages = config.get("packages", None)
