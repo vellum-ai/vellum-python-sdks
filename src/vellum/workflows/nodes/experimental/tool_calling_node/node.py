@@ -18,7 +18,7 @@ from vellum.workflows.nodes.experimental.tool_calling_node.utils import (
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.core import EntityInputsInterface, ToolFunction
+from vellum.workflows.types.core import EntityInputsInterface, Tool
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -37,7 +37,7 @@ class ToolCallingNode(BaseNode):
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
-    functions: ClassVar[List[ToolFunction]] = []
+    functions: ClassVar[List[Tool]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     function_configs: ClassVar[Optional[Dict[str, Dict[str, Any]]]] = None
 

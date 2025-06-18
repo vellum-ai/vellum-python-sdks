@@ -50,4 +50,4 @@ class ConditionType(Enum):
 
 
 # Type alias for functions that can be called in tool calling nodes
-ToolFunction = Union[Callable[..., Any], DeploymentDefinition, Type["BaseWorkflow"]]
+Tool = Union[Callable[..., Any], DeploymentDefinition, Type["BaseWorkflow"]]
