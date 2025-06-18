@@ -45,7 +45,6 @@ from vellum.workflows.events.node import (
 from vellum.workflows.events.stream import WorkflowEventGenerator
 from vellum.workflows.events.workflow import (
     GenericWorkflowEvent,
-    WorkflowEvent,
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedBody,
@@ -445,6 +444,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             subworkflows or nodes that utilizes threads.
         """
 
+        should_yield = event_filter or workflow_event_filter
         runner_stream = WorkflowRunner(
             self,
             inputs=inputs,
@@ -457,11 +457,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             init_execution_context=self._execution_context,
         ).stream()
 
-        filter_func = event_filter or workflow_event_filter
-
-        def _generate_filtered_events() -> Generator[WorkflowEvent, None, None]:
+        def _generate_filtered_events() -> Generator[BaseWorkflow.WorkflowEvent, None, None]:
             for event in runner_stream:
-                if filter_func(self.__class__, event):
+                if should_yield(self.__class__, event):
                     yield event
 
         return WorkflowEventGenerator(_generate_filtered_events(), runner_stream.span_id)

@@ -31,4 +31,4 @@ class BasicNodeStreaming(BaseWorkflow[Inputs, BaseState]):
     graph = StreamingNode
 
     class Outputs(BaseNode.Outputs):
-        outer_stream: List[str] = StreamingNode.Outputs.stream
+        outer_stream = StreamingNode.Outputs.stream

@@ -36,4 +36,4 @@ class BasicInputNodeWorkflow(BaseWorkflow):
     graph = StartNode >> InputNode >> InputNode2 >> EndNode
 
     class Outputs(BaseWorkflow.Outputs):
-        final_value: str = EndNode.Outputs.final_value
+        final_value = EndNode.Outputs.final_value

@@ -36,4 +36,4 @@ class StreamingRetryExample(BaseWorkflow):
     graph = InnerNode
 
     class Outputs(BaseWorkflow.Outputs):
-        final_value: List[str] = InnerNode.Outputs.processed
+        final_value = InnerNode.Outputs.processed

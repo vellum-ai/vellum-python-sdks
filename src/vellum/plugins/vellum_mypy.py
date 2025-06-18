@@ -573,7 +573,7 @@ class VellumMypyPlugin(Plugin):
         alias_target = alias.target
         if (
             not isinstance(alias_target, Instance)
-            or not _is_subclass(alias_target.type, "typing.Iterator")
+            or not _is_subclass(alias_target.type, "vellum.workflows.events.stream.WorkflowEventGenerator")
             or not alias_target.args
         ):
             return ctx.default_return_type

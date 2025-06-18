@@ -745,64 +745,64 @@ class WorkflowRunner(Generic[StateType]):
             return event.workflow_definition == self.workflow.__class__
         return False
 
-    def stream(self) -> WorkflowEventStream:
-        def _generate_events() -> Generator[WorkflowEvent, None, None]:
-            background_thread = Thread(
-                target=self._run_background_thread,
-                name=f"{self.workflow.__class__.__name__}.background_thread",
+    def _generate_events(self) -> Generator[WorkflowEvent, None, None]:
+        background_thread = Thread(
+            target=self._run_background_thread,
+            name=f"{self.workflow.__class__.__name__}.background_thread",
+        )
+        background_thread.start()
+
+        cancel_thread_kill_switch = ThreadingEvent()
+        if self._cancel_signal:
+            cancel_thread = Thread(
+                target=self._run_cancel_thread,
+                name=f"{self.workflow.__class__.__name__}.cancel_thread",
+                kwargs={"kill_switch": cancel_thread_kill_switch},
             )
-            background_thread.start()
+            cancel_thread.start()
 
-            cancel_thread_kill_switch = ThreadingEvent()
-            if self._cancel_signal:
-                cancel_thread = Thread(
-                    target=self._run_cancel_thread,
-                    name=f"{self.workflow.__class__.__name__}.cancel_thread",
-                    kwargs={"kill_switch": cancel_thread_kill_switch},
-                )
-                cancel_thread.start()
+        event: WorkflowEvent
+        if self._is_resuming:
+            event = self._resume_workflow_event()
+        else:
+            event = self._initiate_workflow_event()
 
-            event: WorkflowEvent
-            if self._is_resuming:
-                event = self._resume_workflow_event()
-            else:
-                event = self._initiate_workflow_event()
+        yield self._emit_event(event)
+
+        # The extra level of indirection prevents the runner from waiting on the caller to consume the event stream
+        stream_thread = Thread(
+            target=self._stream,
+            name=f"{self.workflow.__class__.__name__}.stream_thread",
+        )
+        stream_thread.start()
+
+        while stream_thread.is_alive():
+            try:
+                event = self._workflow_event_outer_queue.get(timeout=0.1)
+            except Empty:
+                continue
 
             yield self._emit_event(event)
 
-            # The extra level of indirection prevents the runner from waiting on the caller to consume the event stream
-            stream_thread = Thread(
-                target=self._stream,
-                name=f"{self.workflow.__class__.__name__}.stream_thread",
-            )
-            stream_thread.start()
+            if self._is_terminal_event(event):
+                break
 
-            while stream_thread.is_alive():
-                try:
-                    event = self._workflow_event_outer_queue.get(timeout=0.1)
-                except Empty:
-                    continue
-
+        try:
+            while event := self._workflow_event_outer_queue.get_nowait():
                 yield self._emit_event(event)
+        except Empty:
+            pass
 
-                if self._is_terminal_event(event):
-                    break
-
-            try:
-                while event := self._workflow_event_outer_queue.get_nowait():
-                    yield self._emit_event(event)
-            except Empty:
-                pass
-
-            if not self._is_terminal_event(event):
-                yield self._reject_workflow_event(
-                    WorkflowError(
-                        code=WorkflowErrorCode.INTERNAL_ERROR,
-                        message="An unexpected error occurred while streaming Workflow events",
-                    )
+        if not self._is_terminal_event(event):
+            yield self._reject_workflow_event(
+                WorkflowError(
+                    code=WorkflowErrorCode.INTERNAL_ERROR,
+                    message="An unexpected error occurred while streaming Workflow events",
                 )
+            )
 
-            self._background_thread_queue.put(None)
-            cancel_thread_kill_switch.set()
+        self._background_thread_queue.put(None)
+        cancel_thread_kill_switch.set()
 
-        return WorkflowEventGenerator(_generate_events(), self._initial_state.meta.span_id)
+    def stream(self) -> WorkflowEventStream:
+        return WorkflowEventGenerator(self._generate_events(), self._initial_state.meta.span_id)
