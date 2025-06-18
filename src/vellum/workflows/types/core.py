@@ -12,11 +12,12 @@ from typing import (  # type: ignore[attr-defined]
     _UnionGenericAlias,
 )
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.workflows.types.definition import DeploymentDefinition
+
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
-from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.workflows.types.definition import DeploymentDefinition
 
 JsonArray = List["Json"]
 JsonObject = Dict[str, "Json"]
