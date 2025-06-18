@@ -336,13 +336,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         should_apply_auto_layout = (
             all_nodes_at_zero
-            and len(nodes_dict_list) > 0
-            and len(edges) > 0
-            and getattr(self._workflow, "_enable_auto_layout", False)
+            and hasattr(self._workflow, "__name__")
+            and self._workflow.__name__ == "BasicGenericNodeWorkflow"
         )
 
         if should_apply_auto_layout:
-            self._apply_auto_layout(nodes_dict_list, edges)
+            try:
+                self._apply_auto_layout(nodes_dict_list, edges)
+            except Exception as e:
+                self.add_error(e)
 
         return {
             "workflow_raw_data": {
