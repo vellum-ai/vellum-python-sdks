@@ -22,7 +22,7 @@ import sys
 import tempfile
 import time
 import traceback
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type, Union
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
@@ -64,7 +64,7 @@ class WorkflowE2ETester:
 
     def discover_workflows(self, examples_dir: str = "examples/workflows") -> List[WorkflowTestCase]:
         """Discover all workflow examples in the repository"""
-        workflows = []
+        workflows: List[WorkflowTestCase] = []
         examples_path = Path(examples_dir)
 
         if not examples_path.exists():
@@ -85,7 +85,7 @@ class WorkflowE2ETester:
         logger.info(f"Discovered {len(workflows)} workflow examples")
         return workflows
 
-    def load_workflow_class(self, module_name: str) -> Optional[type]:
+    def load_workflow_class(self, module_name: str) -> Optional[Type[BaseWorkflow]]:
         """Load a workflow class from a module name"""
         try:
             import sys
@@ -103,13 +103,13 @@ class WorkflowE2ETester:
             logger.error(f"Failed to load workflow {module_name}: {e}")
             return None
 
-    def get_default_test_inputs(self, workflow_class: type) -> Optional[BaseInputs]:
+    def get_default_test_inputs(self, workflow_class: Type[BaseWorkflow]) -> Optional[BaseInputs]:
         """Generate default test inputs for a workflow"""
         try:
             inputs_class = workflow_class.get_inputs_class()
 
             if hasattr(inputs_class, "__annotations__"):
-                kwargs = {}
+                kwargs: Dict[str, Any] = {}
                 for field_name, field_type in inputs_class.__annotations__.items():
                     if field_name.lower() in ["query", "question", "prompt", "text", "input"]:
                         kwargs[field_name] = "What is the weather like today?"
