@@ -52,8 +52,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         headers: Any = None,
         bearer_token: Optional[VellumSecret] = None,
     ) -> Outputs:
-        if not url or not isinstance(url, str) or not url.strip():
-            raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
+        self._validate()
 
         vellum_instance = False
         for header in headers or {}:
@@ -65,9 +64,6 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             return self._local_execute_api(data, headers, json, method, url)
 
     def _local_execute_api(self, data, headers, json, method, url):
-        if not url or not isinstance(url, str) or not url.strip():
-            raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
-
         try:
             if data is not None:
                 prepped = Request(method=method.value, url=url, data=data, headers=headers).prepare()
@@ -94,9 +90,6 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         )
 
     def _vellum_execute_api(self, bearer_token, data, headers, method, url):
-        if not url or not isinstance(url, str) or not url.strip():
-            raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
-
         client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
         try:
             vellum_response = self._context.vellum_client.execute_api(
