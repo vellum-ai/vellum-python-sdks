@@ -10,10 +10,14 @@ def test_run_workflow__happy_path():
 
 def test_stream_workflow__happy_path():
     workflow = TrivialWorkflow()
-    events = list(workflow.stream())
+    stream = workflow.stream()
+    events = list(stream)
 
     assert len(events) == 2
 
     assert events[0].name == "workflow.execution.initiated"
 
     assert events[1].name == "workflow.execution.fulfilled"
+
+    for event in events:
+        assert event.span_id == stream.span_id

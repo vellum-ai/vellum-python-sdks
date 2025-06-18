@@ -42,6 +42,7 @@ from vellum.workflows.events.node import (
     NodeExecutionStreamingBody,
     NodeExecutionStreamingEvent,
 )
+from vellum.workflows.events.stream import WorkflowEventGenerator
 from vellum.workflows.events.workflow import (
     GenericWorkflowEvent,
     WorkflowExecutionFulfilledBody,
@@ -167,7 +168,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         WorkflowExecutionPausedEvent,
     ]
 
-    WorkflowEventStream = Generator[WorkflowEvent, None, None]
+    WorkflowEventStream = WorkflowEventGenerator[WorkflowEvent]
 
     def __init__(
         self,
@@ -444,7 +445,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         """
 
         should_yield = event_filter or workflow_event_filter
-        for event in WorkflowRunner(
+        runner_stream = WorkflowRunner(
             self,
             inputs=inputs,
             state=state,
@@ -454,9 +455,14 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
-        ).stream():
-            if should_yield(self.__class__, event):
-                yield event
+        ).stream()
+
+        def _generate_filtered_events() -> Generator[BaseWorkflow.WorkflowEvent, None, None]:
+            for event in runner_stream:
+                if should_yield(self.__class__, event):
+                    yield event
+
+        return WorkflowEventGenerator(_generate_filtered_events(), runner_stream.span_id)
 
     def validate(self) -> None:
         """

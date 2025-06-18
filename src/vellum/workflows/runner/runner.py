@@ -5,7 +5,21 @@ import logging
 from queue import Empty, Queue
 from threading import Event as ThreadingEvent, Thread
 from uuid import UUID, uuid4
-from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Generator,
+    Generic,
+    Iterable,
+    Iterator,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
@@ -17,7 +31,7 @@ from vellum.workflows.events import (
     NodeExecutionRejectedEvent,
     NodeExecutionStreamingEvent,
     WorkflowEvent,
-    WorkflowEventStream,
+    WorkflowEventGenerator,
     WorkflowExecutionFulfilledEvent,
     WorkflowExecutionInitiatedEvent,
     WorkflowExecutionRejectedEvent,
@@ -31,6 +45,7 @@ from vellum.workflows.events.node import (
 )
 from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
+    WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
     WorkflowExecutionInitiatedBody,
     WorkflowExecutionPausedBody,
@@ -730,7 +745,7 @@ class WorkflowRunner(Generic[StateType]):
             return event.workflow_definition == self.workflow.__class__
         return False
 
-    def stream(self) -> WorkflowEventStream:
+    def _generate_events(self) -> Generator[WorkflowEvent, None, None]:
         background_thread = Thread(
             target=self._run_background_thread,
             name=f"{self.workflow.__class__.__name__}.background_thread",
@@ -788,3 +803,6 @@ class WorkflowRunner(Generic[StateType]):
 
         self._background_thread_queue.put(None)
         cancel_thread_kill_switch.set()
+
+    def stream(self) -> WorkflowEventStream:
+        return WorkflowEventGenerator(self._generate_events(), self._initial_state.meta.span_id)

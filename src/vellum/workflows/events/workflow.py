@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Iterable, Literal, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union
 from typing_extensions import TypeGuard
 
 from pydantic import field_serializer
@@ -19,6 +19,7 @@ from .node import (
     NodeExecutionResumedEvent,
     NodeExecutionStreamingEvent,
 )
+from .stream import WorkflowEventGenerator
 from .types import BaseEvent, default_serializer
 
 if TYPE_CHECKING:
@@ -193,7 +194,7 @@ WorkflowEvent = Union[
     WorkflowExecutionSnapshottedEvent,
 ]
 
-WorkflowEventStream = Generator[WorkflowEvent, None, None]
+WorkflowEventStream = WorkflowEventGenerator[WorkflowEvent]
 
 WorkflowExecutionEvent = Union[
     WorkflowExecutionInitiatedEvent,
