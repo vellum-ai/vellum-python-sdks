@@ -30,6 +30,7 @@ from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePrompt
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
+from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import StateType, is_workflow_class
 from vellum.workflows.utils.functions import (
     compile_deployment_workflow_function_definition,
@@ -57,7 +58,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     blocks: ClassVar[List[PromptBlock]]
 
     # The functions/tools that a Prompt has access to
-    functions: Optional[List[Union[FunctionDefinition, Callable]]] = None
+    functions: Optional[List[Union[FunctionDefinition, DeploymentDefinition, Callable]]] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = None
@@ -109,10 +110,10 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             for function in self.functions:
                 if isinstance(function, FunctionDefinition):
                     normalized_functions.append(function)
-                elif isinstance(function, Dict):
+                elif isinstance(function, DeploymentDefinition):
                     normalized_functions.append(
                         compile_deployment_workflow_function_definition(
-                            function,
+                            function.model_dump(),
                             vellum_client=self._context.vellum_client,
                         )
                     )

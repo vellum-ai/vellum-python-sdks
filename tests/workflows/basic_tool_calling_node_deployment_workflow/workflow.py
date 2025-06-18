@@ -9,11 +9,12 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.experimental.tool_calling_node import ToolCallingNode
 from vellum.workflows.state import BaseState
+from vellum.workflows.types.definition import DeploymentDefinition
 
-workflow_deployment_tool = {
-    "deployment": "deployment_1",
-    "release_tag": "latest",
-}
+workflow_deployment_tool = DeploymentDefinition(
+    deployment="deployment_1",
+    release_tag="LATEST",
+)
 
 
 class Inputs(BaseInputs):

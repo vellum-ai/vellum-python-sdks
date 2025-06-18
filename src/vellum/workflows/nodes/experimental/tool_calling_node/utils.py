@@ -26,6 +26,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
+from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
 
@@ -144,9 +145,9 @@ def create_function_node(
         packages: Optional list of packages to install for code execution (only used for regular functions)
         runtime: The runtime to use for code execution (default: "PYTHON_3_11_6")
     """
-    if isinstance(function, Dict):
-        deployment = function["deployment"]
-        release_tag = function["release_tag"]
+    if isinstance(function, DeploymentDefinition):
+        deployment = function.deployment
+        release_tag = function.release_tag
 
         def execute_deployment_workflow_function(self) -> BaseNode.Outputs:
             function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
@@ -301,8 +302,8 @@ def main(arguments):
     return node
 
 
-def get_function_name(function: Union[Callable[..., Any], Dict[str, str]]) -> str:
-    if isinstance(function, Dict):
-        return function["deployment"]
+def get_function_name(function: Union[Callable[..., Any], DeploymentDefinition]) -> str:
+    if isinstance(function, DeploymentDefinition):
+        return function.deployment
     else:
         return snake_case(function.__name__)
