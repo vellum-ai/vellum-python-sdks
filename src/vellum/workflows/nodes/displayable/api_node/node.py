@@ -31,6 +31,12 @@ class APINode(BaseAPINode):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
     def run(self) -> BaseAPINode.Outputs:
+        if not self.url or not isinstance(self.url, str) or not self.url.strip():
+            from vellum.workflows.errors.types import WorkflowErrorCode
+            from vellum.workflows.exceptions import NodeException
+
+            raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
+
         headers = self.headers or {}
         header_overrides = {}
         bearer_token = None

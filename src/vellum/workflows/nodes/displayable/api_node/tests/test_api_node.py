@@ -3,6 +3,7 @@ import pytest
 from vellum import ExecuteApiResponse, VellumSecret as ClientVellumSecret
 from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes import APINode
 from vellum.workflows.types.core import VellumSecret
@@ -190,3 +191,45 @@ def test_api_node__detects_client_environment_urls__legacy_does_not_override_hea
     # AND the vellum API should have been called with the correct headers
     assert mock_response.last_request
     assert mock_response.last_request.headers["X_API_KEY"] == "vellum-api-key-5678"
+
+
+def test_api_node_raises_error_for_empty_url():
+    class APINodeWithEmptyURL(APINode):
+        method = APIRequestMethod.GET
+        url = ""
+
+    node = APINodeWithEmptyURL()
+
+    with pytest.raises(NodeException) as excinfo:
+        node.run()
+
+    assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "URL is required and must be a non-empty string" in str(excinfo.value)
+
+
+def test_api_node_raises_error_for_none_url():
+    class APINodeWithNoneURL(APINode):
+        method = APIRequestMethod.GET
+        url = None  # type: ignore
+
+    node = APINodeWithNoneURL()
+
+    with pytest.raises(NodeException) as excinfo:
+        node.run()
+
+    assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "URL is required and must be a non-empty string" in str(excinfo.value)
+
+
+def test_api_node_raises_error_for_whitespace_url():
+    class APINodeWithWhitespaceURL(APINode):
+        method = APIRequestMethod.GET
+        url = "   "
+
+    node = APINodeWithWhitespaceURL()
+
+    with pytest.raises(NodeException) as excinfo:
+        node.run()
+
+    assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "URL is required and must be a non-empty string" in str(excinfo.value)
