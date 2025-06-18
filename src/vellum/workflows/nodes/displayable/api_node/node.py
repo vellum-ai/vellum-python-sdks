@@ -32,7 +32,7 @@ class APINode(BaseAPINode):
 
     def run(self) -> BaseAPINode.Outputs:
         self._validate()
-        
+
         headers = self.headers or {}
         header_overrides = {}
         bearer_token = None
@@ -53,7 +53,9 @@ class APINode(BaseAPINode):
         final_headers = {**headers, **header_overrides}
 
         vellum_client_wrapper = self._context.vellum_client._client_wrapper
-        if self.url.startswith(vellum_client_wrapper._environment.default) and ("X-API-Key" not in final_headers and "X_API_KEY" not in final_headers):
+        if self.url.startswith(vellum_client_wrapper._environment.default) and (
+            "X-API-Key" not in final_headers and "X_API_KEY" not in final_headers
+        ):
             final_headers["X-API-Key"] = vellum_client_wrapper.api_key
 
         return self._run(
