@@ -32,6 +32,7 @@ from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import StateType, is_workflow_class
+from vellum.workflows.utils.dynamic_schema import process_dynamic_json_schema
 from vellum.workflows.utils.functions import (
     compile_deployment_workflow_function_definition,
     compile_function_definition,
@@ -122,6 +123,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 else:
                     normalized_functions.append(compile_function_definition(function))
 
+        processed_parameters = self._process_parameters_for_dynamic_schema()
+
         if self.settings and not self.settings.stream_enabled:
             # This endpoint is returning a single event, so we need to wrap it in a generator
             # to match the existing interface.
@@ -129,7 +132,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 ml_model=self.ml_model,
                 input_values=input_values,
                 input_variables=input_variables,
-                parameters=self.parameters,
+                parameters=processed_parameters,
                 blocks=self.blocks,
                 settings=self.settings,
                 functions=normalized_functions,
@@ -142,7 +145,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 ml_model=self.ml_model,
                 input_values=input_values,
                 input_variables=input_variables,
-                parameters=self.parameters,
+                parameters=processed_parameters,
                 blocks=self.blocks,
                 settings=self.settings,
                 functions=normalized_functions,
@@ -279,3 +282,30 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 )
 
         return input_variables, input_values
+
+    def _process_parameters_for_dynamic_schema(self) -> PromptParameters:
+        """Process parameters to handle dynamic JSON schema enum values."""
+        if not hasattr(self.parameters, "custom_parameters") or not self.parameters.custom_parameters:
+            return self.parameters
+
+        workflow_nodes = []
+        if hasattr(self, "state") and hasattr(self.state.meta, "workflow_definition"):
+            workflow_definition = self.state.meta.workflow_definition
+            if hasattr(workflow_definition, "get_nodes"):
+                workflow_nodes = workflow_definition.get_nodes()
+
+        if not workflow_nodes:
+            return self.parameters
+
+        processed_custom_parameters = process_dynamic_json_schema(
+            custom_parameters=self.parameters.custom_parameters,
+            workflow_nodes=workflow_nodes,
+            current_node_id=self.__id__,
+        )
+
+        if processed_custom_parameters != self.parameters.custom_parameters:
+            from dataclasses import replace
+
+            return replace(self.parameters, custom_parameters=processed_custom_parameters)
+
+        return self.parameters
