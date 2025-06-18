@@ -1,0 +1,90 @@
+name: ci-release-label
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'release')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Bootstrap poetry
+        run: make setup-poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: Format
+        run: poetry run black --check .
+      - name: Order Imports
+        run: poetry run isort --check .
+      - name: Lint
+        run: poetry run flake8
+      - name: Compile
+        run: poetry run mypy .
+
+  test:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'release')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Bootstrap poetry
+        run: make setup-poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: Test
+        run: poetry run pytest -rEfP .
+
+  codegen-compile:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'release')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.18.0"
+      - name: Install dependencies
+        run: npm install
+        working-directory: ee/codegen
+      - name: Format
+        run: npm run format:check
+        working-directory: ee/codegen
+      - name: Lint
+        run: npm run lint
+        working-directory: ee/codegen
+      - name: Compile
+        run: npm run types
+        working-directory: ee/codegen
+
+  codegen-test:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'release')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.17.0"
+      - name: Install dependencies
+        run: npm install
+        working-directory: ee/codegen
+      - name: Test
+        run: npm test
+        working-directory: ee/codegen
