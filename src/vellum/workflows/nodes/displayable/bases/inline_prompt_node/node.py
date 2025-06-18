@@ -1,6 +1,6 @@
 import json
 from uuid import uuid4
-from typing import Callable, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
+from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
 
 from vellum import (
     AdHocExecutePromptEvent,
