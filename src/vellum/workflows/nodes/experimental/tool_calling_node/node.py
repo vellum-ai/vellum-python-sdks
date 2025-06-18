@@ -1,7 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, ClassVar, Dict, List, Optional, cast
-
-from pydash import snake_case
+from typing import Any, ClassVar, Dict, List, Optional, Union, cast
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.code_execution_package import CodeExecutionPackage
@@ -12,11 +10,16 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.experimental.tool_calling_node.utils import create_function_node, create_tool_router_node
+from vellum.workflows.nodes.experimental.tool_calling_node.utils import (
+    create_function_node,
+    create_tool_router_node,
+    get_function_name,
+)
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
+from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -35,7 +38,7 @@ class ToolCallingNode(BaseNode):
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[PromptBlock]] = []
-    functions: ClassVar[List[Callable[..., Any]]] = []
+    functions: ClassVar[List[Union[Callable[..., Any], DeploymentDefinition]]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     function_configs: ClassVar[Optional[Dict[str, Dict[str, Any]]]] = None
 
@@ -106,8 +109,7 @@ class ToolCallingNode(BaseNode):
 
         self._function_nodes = {}
         for function in self.functions:
-            function_name = snake_case(function.__name__)
-
+            function_name = get_function_name(function)
             # Get configuration for this function
             config = {}
             if callable(function) and self.function_configs and function.__name__ in self.function_configs:

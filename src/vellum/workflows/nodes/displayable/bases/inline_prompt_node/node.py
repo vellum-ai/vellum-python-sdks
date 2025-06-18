@@ -30,8 +30,13 @@ from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePrompt
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
+from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import StateType, is_workflow_class
-from vellum.workflows.utils.functions import compile_function_definition, compile_workflow_function_definition
+from vellum.workflows.utils.functions import (
+    compile_deployment_workflow_function_definition,
+    compile_function_definition,
+    compile_workflow_function_definition,
+)
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -105,6 +110,13 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             for function in self.functions:
                 if isinstance(function, FunctionDefinition):
                     normalized_functions.append(function)
+                elif isinstance(function, DeploymentDefinition):
+                    normalized_functions.append(
+                        compile_deployment_workflow_function_definition(
+                            function.model_dump(),
+                            vellum_client=self._context.vellum_client,
+                        )
+                    )
                 elif is_workflow_class(function):
                     normalized_functions.append(compile_workflow_function_definition(function))
                 else:

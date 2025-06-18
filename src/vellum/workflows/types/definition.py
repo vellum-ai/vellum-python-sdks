@@ -6,6 +6,7 @@ from typing import Annotated, Any, Dict, Optional, Union
 
 from pydantic import BeforeValidator
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
 
 
@@ -69,3 +70,8 @@ VellumCodeResourceDefinition = Annotated[
     CodeResourceDefinition,
     BeforeValidator(lambda d: (d if type(d) is dict else serialize_type_encoder_with_id(d))),
 ]
+
+
+class DeploymentDefinition(UniversalBaseModel):
+    deployment: str
+    release_tag: Optional[str] = "LATEST"
