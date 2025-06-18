@@ -1,0 +1,27 @@
+name: ci-release-label
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+
+jobs:
+  end-to-end-test:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'release')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Bootstrap poetry
+        run: make setup-poetry
+      - name: Install Python dependencies
+        run: poetry install
+      - name: Run end-to-end tests
+        run: python scripts/end_to_end_test.py
