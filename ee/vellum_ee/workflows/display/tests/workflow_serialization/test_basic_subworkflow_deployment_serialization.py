@@ -199,7 +199,7 @@ def test_serialize_workflow(vellum_client):
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                "display_data": {"position": {"x": 400.0, "y": -175.0}},
             },
             {
                 "id": "94afd0ac-1ec4-486b-a6fb-fa1ec7029d19",
@@ -242,7 +242,7 @@ def test_serialize_workflow(vellum_client):
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                "display_data": {"position": {"x": 400.0, "y": 75.0}},
             },
         ],
         workflow_raw_data["nodes"][2:],

@@ -39,7 +39,7 @@ def test_base_workflow_display__serialize_empty_workflow():
                     "data": {"label": "Entrypoint Node", "source_handle_id": "0af025a4-3b25-457d-a7ae-e3a7ba15c86c"},
                     "base": None,
                     "definition": None,
-                    "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                    "display_data": {"position": {"x": 0.0, "y": -50.0}},
                     "id": "3c41cdd9-999a-48b8-9088-f6dfa1369bfd",
                     "inputs": [],
                     "type": "ENTRYPOINT",

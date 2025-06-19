@@ -465,7 +465,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             "template_node_input_id": "7c775379-d589-4d79-b876-dcd224d72966",
             "output_type": "STRING",
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 400.0, "y": -50.0}},
         "base": {
             "name": "TemplatingNode",
             "module": ["vellum", "workflows", "nodes", "core", "templating_node", "node"],
@@ -512,7 +512,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 },
             }
         ],
-        "display_data": {"position": {"x": 400.0, "y": -50.0}},
+        "display_data": {"position": {"x": 600.0, "y": -50.0}},
         "base": {
             "name": "FinalOutputNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],

@@ -105,7 +105,7 @@ def test_serialize_workflow():
                 "target_handle_id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
                 "error_source_input_id": "8e4c8d76-2e02-4d7e-a7bf-d71af392dc49",
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {"position": {"x": 400.0, "y": 75.0}},
             "base": {
                 "name": "ErrorNode",
                 "module": ["vellum", "workflows", "nodes", "core", "error_node", "node"],
@@ -153,7 +153,7 @@ def test_serialize_workflow():
                     },
                 }
             ],
-            "display_data": {"position": {"x": 400.0, "y": -50.0}},
+            "display_data": {"position": {"x": 600.0, "y": -50.0}},
             "base": {
                 "name": "FinalOutputNode",
                 "module": [

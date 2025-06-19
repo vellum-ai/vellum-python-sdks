@@ -544,7 +544,7 @@ def test_serialize_workflow():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                "display_data": {"position": {"x": 600.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -580,7 +580,7 @@ def test_serialize_workflow():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                "display_data": {"position": {"x": 600.0, "y": -550.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -616,7 +616,7 @@ def test_serialize_workflow():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                "display_data": {"position": {"x": 600.0, "y": 200.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -652,7 +652,7 @@ def test_serialize_workflow():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                "display_data": {"position": {"x": 600.0, "y": -300.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -688,7 +688,7 @@ def test_serialize_workflow():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                "display_data": {"position": {"x": 600.0, "y": 450.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],

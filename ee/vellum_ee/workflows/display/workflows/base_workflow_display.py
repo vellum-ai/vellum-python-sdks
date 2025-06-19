@@ -334,10 +334,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             for node in nodes_dict_list
         )
 
-        should_apply_auto_layout = (
-            all_nodes_at_zero
-            and len(nodes_dict_list) > 0
-        )
+        should_apply_auto_layout = all_nodes_at_zero and len(nodes_dict_list) > 0
 
         if should_apply_auto_layout:
             try:

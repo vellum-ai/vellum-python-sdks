@@ -102,7 +102,7 @@ def _topological_sort_layers(
                 if neighbor in remaining_nodes:
                     in_degree[neighbor] -= 1
 
-    return layers
+    return [sorted(layer) for layer in layers]
 
 
 def _calculate_layer_height(layer_nodes: List[Tuple[str, NodeDisplayData]], node_spacing: float) -> float:
