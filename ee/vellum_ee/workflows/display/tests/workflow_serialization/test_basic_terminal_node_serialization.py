@@ -54,7 +54,7 @@ def test_serialize_workflow():
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "8b8d52a2-844f-44fe-a6c4-142fa70d391b"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
         "base": None,
         "definition": None,
     }
@@ -86,7 +86,7 @@ def test_serialize_workflow():
                 },
             }
         ],
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}},
         "base": {
             "name": "FinalOutputNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],

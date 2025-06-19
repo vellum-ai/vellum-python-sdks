@@ -65,7 +65,7 @@ def test_serialize_workflow():
         "definition": None,
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "41840690-8d85-486e-a864-b0661ccf0f2e"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
     }
 
     guardrail_node = workflow_raw_data["nodes"][1]
@@ -108,7 +108,7 @@ def test_serialize_workflow():
             "metric_definition_id": "example_metric_definition",
             "release_tag": "LATEST",
         },
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}},
         "base": {
             "module": ["vellum", "workflows", "nodes", "displayable", "guardrail_node", "node"],
             "name": "GuardrailNode",
@@ -162,7 +162,7 @@ def test_serialize_workflow():
                 },
             }
         ],
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 400.0, "y": -50.0}},
     }
 
     # AND each edge should be serialized correctly

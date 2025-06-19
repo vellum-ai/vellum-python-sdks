@@ -56,15 +56,15 @@ def test_serialize_workflow():
 
     # AND each node should be serialized correctly
     entrypoint_node = workflow_raw_data["nodes"][0]
-    assert entrypoint_node == {
-        "id": "f1e4678f-c470-400b-a40e-c8922cc99a86",
-        "type": "ENTRYPOINT",
-        "inputs": [],
-        "data": {"label": "Entrypoint Node", "source_handle_id": "40201804-8beb-43ad-8873-a027759512f1"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "base": None,
-        "definition": None,
+    assert entrypoint_node["id"] == "f1e4678f-c470-400b-a40e-c8922cc99a86"
+    assert entrypoint_node["type"] == "ENTRYPOINT"
+    assert entrypoint_node["inputs"] == []
+    assert entrypoint_node["data"] == {
+        "label": "Entrypoint Node",
+        "source_handle_id": "40201804-8beb-43ad-8873-a027759512f1",
     }
+    assert entrypoint_node["base"] is None
+    assert entrypoint_node["definition"] is None
 
     api_node = workflow_raw_data["nodes"][1]
     assert api_node["id"] == "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f"
@@ -100,7 +100,7 @@ def test_serialize_workflow():
                     },
                 }
             ],
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 400.0, "y": -50.0}},
             "base": {
                 "name": "FinalOutputNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -145,6 +145,17 @@ def test_serialize_workflow():
             "zoom": 1.0,
         }
     }
+
+    # AND the nodes should have been auto-positioned since they all started at (0,0)
+    nodes = workflow_raw_data["nodes"]
+    positions = [node["display_data"]["position"] for node in nodes]
+
+    nodes_at_zero = sum(1 for pos in positions if pos["x"] == 0.0 and pos["y"] == 0.0)
+    assert nodes_at_zero < len(nodes), "Auto layout should have positioned nodes away from (0,0)"
+
+    x_positions = [pos["x"] for pos in positions]
+    assert all(x >= 0 for x in x_positions), "All x positions should be non-negative"
+    assert len(set(x_positions)) > 1 or len(nodes) == 1, "Nodes should be spread across different x positions"
 
     # AND the definition should be what we expect
     definition = workflow_raw_data["definition"]

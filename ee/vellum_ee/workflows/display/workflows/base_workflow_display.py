@@ -18,7 +18,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
-from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -31,7 +31,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.editor.types import NodeDisplayData
+from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
@@ -48,6 +48,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowInputsDisplays,
     WorkflowOutputDisplays,
 )
+from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
@@ -320,9 +321,30 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         edges.extend(synthetic_output_edges)
 
+        nodes_list = list(serialized_nodes.values())
+        nodes_dict_list = [cast(Dict[str, Any], node) for node in nodes_list if isinstance(node, dict)]
+
+        all_nodes_at_zero = all(
+            (
+                isinstance(node.get("display_data"), dict)
+                and isinstance(node["display_data"].get("position"), dict)
+                and node["display_data"]["position"].get("x", 0) == 0.0
+                and node["display_data"]["position"].get("y", 0) == 0.0
+            )
+            for node in nodes_dict_list
+        )
+
+        should_apply_auto_layout = all_nodes_at_zero and len(nodes_dict_list) > 0
+
+        if should_apply_auto_layout:
+            try:
+                self._apply_auto_layout(nodes_dict_list, edges)
+            except Exception as e:
+                self.add_error(e)
+
         return {
             "workflow_raw_data": {
-                "nodes": list(serialized_nodes.values()),
+                "nodes": cast(JsonArray, nodes_dict_list),
                 "edges": edges,
                 "display_data": self.display_context.workflow_display.display_data.dict(),
                 "definition": {
@@ -335,6 +357,54 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "state_variables": state_variables,
             "output_variables": output_variables,
         }
+
+    def _apply_auto_layout(self, nodes_dict_list: List[Dict[str, Any]], edges: List[Json]) -> None:
+        """Apply auto-layout to nodes that are all positioned at (0,0)."""
+        nodes_for_layout: List[Tuple[str, NodeDisplayData]] = []
+        for node_dict in nodes_dict_list:
+            if isinstance(node_dict.get("id"), str) and isinstance(node_dict.get("display_data"), dict):
+                display_data = node_dict["display_data"]
+                position = display_data.get("position", {})
+                if isinstance(position, dict):
+                    nodes_for_layout.append(
+                        (
+                            str(node_dict["id"]),
+                            NodeDisplayData(
+                                position=NodeDisplayPosition(
+                                    x=float(position.get("x", 0.0)), y=float(position.get("y", 0.0))
+                                ),
+                                width=display_data.get("width"),
+                                height=display_data.get("height"),
+                                comment=display_data.get("comment"),
+                            ),
+                        )
+                    )
+
+        edges_for_layout: List[Tuple[str, str, EdgeDisplay]] = []
+        for edge in edges:
+            if isinstance(edge, dict):
+                edge_dict = cast(Dict[str, Any], edge)
+                edge_source_node_id: Optional[Any] = edge_dict.get("source_node_id")
+                edge_target_node_id: Optional[Any] = edge_dict.get("target_node_id")
+                edge_id_raw: Optional[Any] = edge_dict.get("id")
+                if (
+                    isinstance(edge_source_node_id, str)
+                    and isinstance(edge_target_node_id, str)
+                    and isinstance(edge_id_raw, str)
+                ):
+                    edges_for_layout.append(
+                        (edge_source_node_id, edge_target_node_id, EdgeDisplay(id=UUID(edge_id_raw)))
+                    )
+
+        positioned_nodes = auto_layout_nodes(nodes_for_layout, edges_for_layout)
+
+        for node_id, positioned_data in positioned_nodes:
+            for node_dict in nodes_dict_list:
+                node_id_val = node_dict.get("id")
+                display_data = node_dict.get("display_data")
+                if isinstance(node_id_val, str) and node_id_val == node_id and isinstance(display_data, dict):
+                    display_data_dict = cast(Dict[str, Any], display_data)
+                    display_data_dict["position"] = positioned_data.position.dict()
 
     @cached_property
     def workflow_id(self) -> UUID:

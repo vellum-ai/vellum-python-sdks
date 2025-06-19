@@ -63,7 +63,7 @@ def test_serialize_workflow():
             "source_handle_id": "04da0bb6-5b42-4dd1-a4e4-08f3ab03e1a3",
         },
         "display_data": {
-            "position": {"x": 0.0, "y": 0.0},
+            "position": {"x": 0.0, "y": -50.0},
         },
     }
 

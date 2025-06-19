@@ -61,7 +61,7 @@ def test_serialize_workflow__missing_final_output_node():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 200.0, "y": 75.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -111,7 +111,7 @@ def test_serialize_workflow__missing_final_output_node():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 400.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],

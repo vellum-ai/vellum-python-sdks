@@ -52,7 +52,7 @@ def test_serialize_workflow__await_all():
             "source_handle_id": "017d40f5-8326-4e42-a409-b08995defaa8",
         },
         "display_data": {
-            "position": {"x": 0.0, "y": 0.0},
+            "position": {"x": 0.0, "y": -50.0},
         },
     }
 
@@ -74,7 +74,7 @@ def test_serialize_workflow__await_all():
                 ],
                 "source_handle_id": "3bbc469f-0fb0-4b3d-a28b-746fefec2818",
             },
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 400.0, "y": -50.0}},
             "base": {
                 "module": ["vellum", "workflows", "nodes", "displayable", "merge_node", "node"],
                 "name": "MergeNode",
@@ -131,7 +131,7 @@ def test_serialize_workflow__await_all():
                 },
             }
         ],
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 800.0, "y": -50.0}},
     }
 
     # AND each edge should be serialized correctly
