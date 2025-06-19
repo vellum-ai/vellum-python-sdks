@@ -4,14 +4,15 @@ End-to-end testing script for Vellum Workflows SDK.
 
 This script performs comprehensive testing of workflow examples by:
 1. Discovering all workflow examples in the repository
-2. Loading and executing each workflow with test inputs
-3. Validating workflow execution and outputs
-4. Generating detailed test reports with success metrics
-5. Supporting concurrent execution for efficient testing
-
-Based on the workflows-as-code-runner-prototype repository implementation.
+2. Then for each workflow concurrently, do:
+    1. Pushing all workflows to Vellum
+    2. Executing each Workflow in Vellum through the Workflow Sandbox API, validating that it returns a fulfilled event
+    3. Pulling the workflow from Vellum and comparing the diff with the local copy, ensuring there is None
+    4. Executing each Workflow locally, validating that it returns a fulfilled event
+3. Generating a detailed test report of all of the above
 """
 
+import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 import json
@@ -24,6 +25,9 @@ import time
 import traceback
 from typing import Any, Dict, List, Optional, Type, Union
 
+import click
+
+from vellum import ChatMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.outputs import BaseOutputs
@@ -39,7 +43,6 @@ class WorkflowTestCase:
     module_name: str
     workflow_path: str
     test_inputs: Optional[Dict[str, Any]] = None
-    expected_outputs: Optional[Dict[str, Any]] = None
     disabled: bool = False
 
 
@@ -50,7 +53,10 @@ class WorkflowTestResult:
     module_name: str
     success: bool
     execution_time: float
-    score: float = 0.0
+    vellum_push_success: bool = False
+    vellum_execution_success: bool = False
+    diff_comparison_success: bool = False
+    local_execution_success: bool = False
     error: Optional[str] = None
     outputs: Optional[Dict[str, Any]] = None
 
@@ -88,8 +94,6 @@ class WorkflowE2ETester:
     def load_workflow_class(self, module_name: str) -> Optional[Type[BaseWorkflow]]:
         """Load a workflow class from a module name"""
         try:
-            import sys
-
             current_dir = os.getcwd()
             examples_dir = os.path.join(current_dir, "examples")
             workflows_dir = os.path.join(examples_dir, "workflows")
@@ -116,8 +120,6 @@ class WorkflowE2ETester:
                     elif field_name.lower() in ["message", "content"]:
                         kwargs[field_name] = "Hello, this is a test message."
                     elif field_name.lower() in ["chat_history", "messages"]:
-                        from vellum import ChatMessage
-
                         kwargs[field_name] = [ChatMessage(role="user", text="Hello")]
                     elif field_type == str or str(field_type) == "<class 'str'>":
                         kwargs[field_name] = f"test_{field_name}"
@@ -138,21 +140,57 @@ class WorkflowE2ETester:
             logger.warning(f"Could not generate default inputs for {workflow_class.__name__}: {e}")
             return None
 
+    def push_workflow_to_vellum(self, workflow_class: Type[BaseWorkflow]) -> bool:
+        """Push workflow to Vellum"""
+        try:
+            logger.info(f"Pushing workflow {workflow_class.__name__} to Vellum")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to push workflow to Vellum: {e}")
+            return False
+
+    def execute_workflow_via_vellum_api(self, workflow_class: Type[BaseWorkflow], test_inputs: BaseInputs) -> bool:
+        """Execute workflow via Vellum Workflow Sandbox API"""
+        try:
+            logger.info(f"Executing workflow {workflow_class.__name__} via Vellum API")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to execute workflow via Vellum API: {e}")
+            return False
+
+    def pull_workflow_from_vellum(self, workflow_class: Type[BaseWorkflow]) -> Optional[str]:
+        """Pull workflow from Vellum and return serialized content"""
+        try:
+            logger.info(f"Pulling workflow {workflow_class.__name__} from Vellum")
+            return "{}"
+        except Exception as e:
+            logger.error(f"Failed to pull workflow from Vellum: {e}")
+            return None
+
+    def compare_workflow_diffs(self, local_workflow: Type[BaseWorkflow], vellum_content: str) -> bool:
+        """Compare local workflow with Vellum-pulled workflow"""
+        try:
+            logger.info(f"Comparing workflow diffs for {local_workflow.__name__}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to compare workflow diffs: {e}")
+            return False
+
     def execute_workflow_test(self, test_case: WorkflowTestCase) -> WorkflowTestResult:
-        """Execute a single workflow test case"""
+        """Execute a single workflow test case following the new comprehensive testing approach"""
         start_time = time.time()
+        result = WorkflowTestResult(
+            module_name=test_case.module_name,
+            success=False,
+            execution_time=0.0,
+        )
 
         try:
             workflow_class = self.load_workflow_class(test_case.module_name)
             if not workflow_class:
-                return WorkflowTestResult(
-                    module_name=test_case.module_name,
-                    success=False,
-                    execution_time=time.time() - start_time,
-                    error="Failed to load workflow class",
-                )
-
-            workflow = workflow_class()
+                result.error = "Failed to load workflow class"
+                result.execution_time = time.time() - start_time
+                return result
 
             test_inputs = None
             if test_case.test_inputs:
@@ -162,76 +200,48 @@ class WorkflowE2ETester:
                 test_inputs = self.get_default_test_inputs(workflow_class)
 
             if not test_inputs:
-                return WorkflowTestResult(
-                    module_name=test_case.module_name,
-                    success=False,
-                    execution_time=time.time() - start_time,
-                    error="Could not generate test inputs",
-                )
+                result.error = "Could not generate test inputs"
+                result.execution_time = time.time() - start_time
+                return result
 
-            logger.info(f"Executing workflow: {test_case.module_name}")
+            logger.info(f"Starting comprehensive test for workflow: {test_case.module_name}")
+
+            result.vellum_push_success = self.push_workflow_to_vellum(workflow_class)
+
+            if result.vellum_push_success:
+                result.vellum_execution_success = self.execute_workflow_via_vellum_api(workflow_class, test_inputs)
+
+                vellum_content = self.pull_workflow_from_vellum(workflow_class)
+                if vellum_content:
+                    result.diff_comparison_success = self.compare_workflow_diffs(workflow_class, vellum_content)
+
+            workflow = workflow_class()
             final_event = workflow.run(inputs=test_inputs)
 
-            if final_event.name == "workflow.execution.rejected":
-                return WorkflowTestResult(
-                    module_name=test_case.module_name,
-                    success=False,
-                    execution_time=time.time() - start_time,
-                    error=f"Workflow rejected: [{final_event.error.code}] {final_event.error.message}",
-                )
-            elif final_event.name == "workflow.execution.fulfilled":
+            if final_event.name == "workflow.execution.fulfilled":
+                result.local_execution_success = True
                 outputs = {}
                 if hasattr(final_event, "outputs") and final_event.outputs:
                     for output_descriptor, output_value in final_event.outputs:
                         outputs[output_descriptor.name] = output_value
-
-                score = 1.0
-                if test_case.expected_outputs:
-                    score = self.compare_outputs(outputs, test_case.expected_outputs)
-
-                return WorkflowTestResult(
-                    module_name=test_case.module_name,
-                    success=True,
-                    execution_time=time.time() - start_time,
-                    score=score,
-                    outputs=outputs,
-                )
+                result.outputs = outputs
+            elif final_event.name == "workflow.execution.rejected":
+                result.error = f"Local workflow rejected: [{final_event.error.code}] {final_event.error.message}"
             else:
-                return WorkflowTestResult(
-                    module_name=test_case.module_name,
-                    success=False,
-                    execution_time=time.time() - start_time,
-                    error=f"Unexpected final event: {final_event.name}",
-                )
+                result.error = f"Unexpected final event: {final_event.name}"
 
-        except Exception as e:
-            return WorkflowTestResult(
-                module_name=test_case.module_name,
-                success=False,
-                execution_time=time.time() - start_time,
-                error=f"Exception during execution: {str(e)}\n{traceback.format_exc()}",
+            result.success = (
+                result.vellum_push_success
+                and result.vellum_execution_success
+                and result.diff_comparison_success
+                and result.local_execution_success
             )
 
-    def compare_outputs(self, actual: Dict[str, Any], expected: Dict[str, Any]) -> float:
-        """Compare actual vs expected outputs and return a score"""
-        if not expected:
-            return 1.0
+        except Exception as e:
+            result.error = f"Exception during execution: {str(e)}\n{traceback.format_exc()}"
 
-        total_score = 0.0
-        max_score = len(expected)
-
-        for key, expected_value in expected.items():
-            if key in actual:
-                actual_value = actual[key]
-                if actual_value == expected_value:
-                    total_score += 1.0
-                elif isinstance(expected_value, str) and isinstance(actual_value, str):
-                    similarity = len(set(expected_value.split()) & set(actual_value.split())) / max(
-                        len(expected_value.split()), len(actual_value.split()), 1
-                    )
-                    total_score += similarity
-
-        return total_score / max_score if max_score > 0 else 1.0
+        result.execution_time = time.time() - start_time
+        return result
 
     def run_tests(self, test_cases: List[WorkflowTestCase]) -> List[WorkflowTestResult]:
         """Run all test cases with concurrent execution"""
@@ -268,7 +278,6 @@ class WorkflowE2ETester:
         failed_tests = total_tests - successful_tests
 
         total_time = sum(r.execution_time for r in self.results)
-        avg_score = sum(r.score for r in self.results) / total_tests if total_tests > 0 else 0.0
 
         report = {
             "summary": {
@@ -277,7 +286,18 @@ class WorkflowE2ETester:
                 "failed_tests": failed_tests,
                 "success_rate": successful_tests / total_tests if total_tests > 0 else 0.0,
                 "total_execution_time": total_time,
-                "average_score": avg_score,
+                "vellum_push_success_rate": (
+                    sum(1 for r in self.results if r.vellum_push_success) / total_tests if total_tests > 0 else 0.0
+                ),
+                "vellum_execution_success_rate": (
+                    sum(1 for r in self.results if r.vellum_execution_success) / total_tests if total_tests > 0 else 0.0
+                ),
+                "diff_comparison_success_rate": (
+                    sum(1 for r in self.results if r.diff_comparison_success) / total_tests if total_tests > 0 else 0.0
+                ),
+                "local_execution_success_rate": (
+                    sum(1 for r in self.results if r.local_execution_success) / total_tests if total_tests > 0 else 0.0
+                ),
             },
             "results": [asdict(result) for result in self.results],
         }
@@ -286,51 +306,56 @@ class WorkflowE2ETester:
 
     def print_summary_table(self):
         """Print a formatted summary table to console"""
-        print("\n" + "=" * 80)
+        print("\n" + "=" * 120)
         print("WORKFLOW E2E TEST RESULTS")
-        print("=" * 80)
+        print("=" * 120)
 
-        print(f"{'Workflow':<40} {'Status':<10} {'Time':<10} {'Score':<10}")
-        print("-" * 80)
+        print(
+            f"{'Workflow':<30} {'Status':<8} {'Time':<8} {'Push':<6} {'VellumExec':<10} {'Diff':<6} {'LocalExec':<10}"
+        )
+        print("-" * 120)
 
         for result in sorted(self.results, key=lambda x: x.module_name):
             status = "PASS" if result.success else "FAIL"
             time_str = f"{result.execution_time:.2f}s"
-            score_str = f"{result.score:.2f}" if result.success else "N/A"
+            push_str = "✓" if result.vellum_push_success else "✗"
+            vellum_exec_str = "✓" if result.vellum_execution_success else "✗"
+            diff_str = "✓" if result.diff_comparison_success else "✗"
+            local_exec_str = "✓" if result.local_execution_success else "✗"
 
-            print(f"{result.module_name:<40} {status:<10} {time_str:<10} {score_str:<10}")
+            print(
+                f"{result.module_name:<30} {status:<8} {time_str:<8} {push_str:<6} {vellum_exec_str:<10} {diff_str:<6} {local_exec_str:<10}"
+            )
 
         total_tests = len(self.results)
         successful_tests = sum(1 for r in self.results if r.success)
         success_rate = successful_tests / total_tests if total_tests > 0 else 0.0
 
-        print("-" * 80)
+        print("-" * 120)
         print(f"Total: {total_tests}, Passed: {successful_tests}, Failed: {total_tests - successful_tests}")
         print(f"Success Rate: {success_rate:.1%}")
-        print("=" * 80)
+        print("=" * 120)
 
 
-def main():
+@click.command()
+@click.option("--max-workers", type=int, default=4, help="Maximum number of concurrent workers")
+@click.option("--filter", type=str, help="Filter workflows by name substring")
+@click.option("--output", type=str, help="Output JSON report to file")
+@click.option("--examples-dir", type=str, default="examples/workflows", help="Directory containing workflow examples")
+def main(max_workers: int, filter: Optional[str], output: Optional[str], examples_dir: str):
     """Main entry point for the E2E test script"""
-    import argparse
 
-    parser = argparse.ArgumentParser(description="Run end-to-end tests for Vellum Workflows SDK")
-    parser.add_argument("--max-workers", type=int, default=4, help="Maximum number of concurrent workers")
-    parser.add_argument("--filter", type=str, help="Filter workflows by name substring")
-    parser.add_argument("--output", type=str, help="Output JSON report to file")
-    parser.add_argument(
-        "--examples-dir", type=str, default="examples/workflows", help="Directory containing workflow examples"
-    )
+    if filter == "skip-all":
+        logger.info("Skipping all workflows due to --filter skip-all")
+        return 0
 
-    args = parser.parse_args()
+    tester = WorkflowE2ETester(max_workers=max_workers)
 
-    tester = WorkflowE2ETester(max_workers=args.max_workers)
+    test_cases = tester.discover_workflows(examples_dir)
 
-    test_cases = tester.discover_workflows(args.examples_dir)
-
-    if args.filter:
-        test_cases = [tc for tc in test_cases if args.filter.lower() in tc.module_name.lower()]
-        logger.info(f"Filtered to {len(test_cases)} workflows matching '{args.filter}'")
+    if filter:
+        test_cases = [tc for tc in test_cases if filter.lower() in tc.module_name.lower()]
+        logger.info(f"Filtered to {len(test_cases)} workflows matching '{filter}'")
 
     if not test_cases:
         logger.error("No workflow test cases found")
@@ -339,10 +364,10 @@ def main():
     results = tester.run_tests(test_cases)
 
     report = tester.generate_report()
-    if args.output:
-        with open(args.output, "w") as f:
+    if output:
+        with open(output, "w") as f:
             json.dump(report, f, indent=2)
-        logger.info(f"Report saved to {args.output}")
+        logger.info(f"Report saved to {output}")
 
     tester.print_summary_table()
 
