@@ -346,13 +346,35 @@ class WorkflowRunner(Generic[StateType]):
             )
         except NodeException as e:
             logger.info(e)
+
+            import sys
+            import traceback
+
+            _, _, tb = sys.exc_info()
+            if tb:
+                tb_list = traceback.extract_tb(tb)
+                if tb_list:
+                    last_frame = tb_list[-1]
+                    exception_module = last_frame.filename
+
+                    if "vellum" in exception_module and "/vellum/" in exception_module:
+                        error_code = WorkflowErrorCode.INTERNAL_ERROR
+                        error_message = "Internal error"
+                        error = WorkflowError(message=error_message, code=error_code)
+                    else:
+                        error = e.error
+                else:
+                    error = e.error
+            else:
+                error = e.error
+
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
                     trace_id=execution.trace_id,
                     span_id=span_id,
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
-                        error=e.error,
+                        error=error,
                     ),
                     parent=execution.parent_context,
                 )
@@ -370,14 +392,41 @@ class WorkflowRunner(Generic[StateType]):
                     parent=execution.parent_context,
                 )
             )
+
         except Exception as e:
             logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
 
-            node_module = node.__class__.__module__
-            if node_module.startswith("vellum."):
-                error_code = WorkflowErrorCode.INTERNAL_ERROR
+            import sys
+            import traceback
+
+            _, _, tb = sys.exc_info()
+            if tb:
+                tb_list = traceback.extract_tb(tb)
+                if tb_list:
+                    last_frame = tb_list[-1]
+                    exception_module = last_frame.filename
+                    if "vellum" in exception_module and "/vellum/" in exception_module:
+                        error_code = WorkflowErrorCode.INTERNAL_ERROR
+                        error_message = "Internal error"
+                    else:
+                        error_code = WorkflowErrorCode.NODE_EXECUTION
+                        error_message = str(e)
+                else:
+                    node_module = node.__class__.__module__
+                    if node_module.startswith("vellum."):
+                        error_code = WorkflowErrorCode.INTERNAL_ERROR
+                        error_message = "Internal error"
+                    else:
+                        error_code = WorkflowErrorCode.NODE_EXECUTION
+                        error_message = str(e)
             else:
-                error_code = WorkflowErrorCode.NODE_EXECUTION
+                node_module = node.__class__.__module__
+                if node_module.startswith("vellum."):
+                    error_code = WorkflowErrorCode.INTERNAL_ERROR
+                    error_message = "Internal error"
+                else:
+                    error_code = WorkflowErrorCode.NODE_EXECUTION
+                    error_message = str(e)
 
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
@@ -386,7 +435,7 @@ class WorkflowRunner(Generic[StateType]):
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
                         error=WorkflowError(
-                            message=str(e),
+                            message=error_message,
                             code=error_code,
                         ),
                     ),
