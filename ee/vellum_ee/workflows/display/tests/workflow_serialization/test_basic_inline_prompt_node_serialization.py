@@ -437,3 +437,36 @@ def test_serialize_workflow_with_descriptor_blocks():
             },
         }
     ]
+
+
+def test_has_nested_descriptors_function():
+    """Test the _has_nested_descriptors helper function directly."""
+    from unittest.mock import Mock
+
+    from vellum.workflows.descriptors.base import BaseDescriptor
+    from vellum_ee.workflows.display.nodes.vellum.inline_prompt_node import _has_nested_descriptors
+
+    mock_plain_block = Mock()
+    mock_plain_block.block_type = "PLAIN_TEXT"
+    assert not _has_nested_descriptors([mock_plain_block])
+
+    mock_descriptor = Mock(spec=BaseDescriptor)
+    assert _has_nested_descriptors([mock_descriptor])
+
+    mock_chat_block = Mock()
+    mock_chat_block.block_type = "CHAT_MESSAGE"
+    mock_chat_block.blocks = [mock_descriptor]
+    assert _has_nested_descriptors([mock_chat_block])
+
+    mock_rich_block = Mock()
+    mock_rich_block.block_type = "RICH_TEXT"
+    mock_rich_block.blocks = [mock_descriptor]
+    assert _has_nested_descriptors([mock_rich_block])
+
+    mock_outer_chat = Mock()
+    mock_outer_chat.block_type = "CHAT_MESSAGE"
+    mock_inner_rich = Mock()
+    mock_inner_rich.block_type = "RICH_TEXT"
+    mock_inner_rich.blocks = [mock_descriptor]
+    mock_outer_chat.blocks = [mock_inner_rich]
+    assert _has_nested_descriptors([mock_outer_chat])
