@@ -44,7 +44,7 @@ def test_retry_node__retry_on_error_code__missed():
 
         def run(self) -> Outputs:
             if self.attempt_number < 3:
-                raise Exception("This will not be retried")
+                raise NodeException(message="This will not be retried", code=WorkflowErrorCode.INTERNAL_ERROR)
 
             return self.Outputs(execution_count=self.attempt_number)
 
