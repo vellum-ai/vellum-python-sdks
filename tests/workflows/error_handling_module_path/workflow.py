@@ -1,5 +1,6 @@
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.api_node import APINode
 from vellum.workflows.state.base import BaseState
 
@@ -13,15 +14,15 @@ class State(BaseState):
 
 
 class VellumAPINode(APINode):
-    url = ""  # Empty URL will cause validation error
-
-    def run(self) -> APINode.Outputs:
-        return super().run()
+    pass
 
 
-class CustomAPINode(APINode):
-    def run(self) -> APINode.Outputs:
-        raise Exception("User configuration error: Invalid API endpoint")
+class CustomAPINode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        json: dict
+
+    def run(self) -> BaseNode.Outputs:
+        raise Exception("User defined error")
 
 
 class VellumErrorWorkflow(BaseWorkflow[Inputs, State]):

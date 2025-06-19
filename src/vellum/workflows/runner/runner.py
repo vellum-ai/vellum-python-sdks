@@ -3,7 +3,9 @@ from copy import deepcopy
 from dataclasses import dataclass
 import logging
 from queue import Empty, Queue
+import sys
 from threading import Event as ThreadingEvent, Thread
+import traceback
 from uuid import UUID, uuid4
 from typing import (
     TYPE_CHECKING,
@@ -347,34 +349,13 @@ class WorkflowRunner(Generic[StateType]):
         except NodeException as e:
             logger.info(e)
 
-            import sys
-            import traceback
-
-            _, _, tb = sys.exc_info()
-            if tb:
-                tb_list = traceback.extract_tb(tb)
-                if tb_list:
-                    last_frame = tb_list[-1]
-                    exception_module = last_frame.filename
-
-                    if "vellum" in exception_module and "/vellum/" in exception_module:
-                        error_code = WorkflowErrorCode.INTERNAL_ERROR
-                        error_message = "Internal error"
-                        error = WorkflowError(message=error_message, code=error_code)
-                    else:
-                        error = e.error
-                else:
-                    error = e.error
-            else:
-                error = e.error
-
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
                     trace_id=execution.trace_id,
                     span_id=span_id,
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
-                        error=error,
+                        error=e.error,
                     ),
                     parent=execution.parent_context,
                 )
@@ -394,39 +375,13 @@ class WorkflowRunner(Generic[StateType]):
             )
 
         except Exception as e:
-            logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
-
-            import sys
-            import traceback
-
-            _, _, tb = sys.exc_info()
-            if tb:
-                tb_list = traceback.extract_tb(tb)
-                if tb_list:
-                    last_frame = tb_list[-1]
-                    exception_module = last_frame.filename
-                    if "vellum" in exception_module and "/vellum/" in exception_module:
-                        error_code = WorkflowErrorCode.INTERNAL_ERROR
-                        error_message = "Internal error"
-                    else:
-                        error_code = WorkflowErrorCode.NODE_EXECUTION
-                        error_message = str(e)
-                else:
-                    node_module = node.__class__.__module__
-                    if node_module.startswith("vellum."):
-                        error_code = WorkflowErrorCode.INTERNAL_ERROR
-                        error_message = "Internal error"
-                    else:
-                        error_code = WorkflowErrorCode.NODE_EXECUTION
-                        error_message = str(e)
+            error_message = self._parse_error_message(e)
+            if error_message is None:
+                logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
+                error_code = WorkflowErrorCode.INTERNAL_ERROR
+                error_message = "Internal error"
             else:
-                node_module = node.__class__.__module__
-                if node_module.startswith("vellum."):
-                    error_code = WorkflowErrorCode.INTERNAL_ERROR
-                    error_message = "Internal error"
-                else:
-                    error_code = WorkflowErrorCode.NODE_EXECUTION
-                    error_message = str(e)
+                error_code = WorkflowErrorCode.NODE_EXECUTION
 
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
@@ -444,6 +399,28 @@ class WorkflowRunner(Generic[StateType]):
             )
 
         logger.debug(f"Finished running node: {node.__class__.__name__}")
+
+    def _parse_error_message(self, exception: Exception) -> Optional[str]:
+        try:
+            _, _, tb = sys.exc_info()
+            if tb:
+                tb_list = traceback.extract_tb(tb)
+                if tb_list:
+                    last_frame = tb_list[-1]
+                    exception_module = next(
+                        (
+                            mod.__name__
+                            for mod in sys.modules.values()
+                            if hasattr(mod, "__file__") and mod.__file__ == last_frame.filename
+                        ),
+                        None,
+                    )
+                    if exception_module and not exception_module.startswith("vellum."):
+                        return str(exception)
+        except Exception:
+            pass
+
+        return None
 
     def _context_run_work_item(
         self,
