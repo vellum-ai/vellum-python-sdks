@@ -31,6 +31,8 @@ class APINode(BaseAPINode):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
     def run(self) -> BaseAPINode.Outputs:
+        self._validate()
+
         headers = self.headers or {}
         header_overrides = {}
         bearer_token = None

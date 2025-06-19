@@ -40,6 +40,10 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         status_code: int
         text: str
 
+    def _validate(self) -> None:
+        if not self.url or not isinstance(self.url, str) or not self.url.strip():
+            raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
+
     def run(self) -> Outputs:
         return self._run(method=self.method, url=self.url, data=self.data, json=self.json, headers=self.headers)
 
@@ -52,6 +56,8 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         headers: Any = None,
         bearer_token: Optional[VellumSecret] = None,
     ) -> Outputs:
+        self._validate()
+
         vellum_instance = False
         for header in headers or {}:
             if isinstance(headers[header], VellumSecret):
