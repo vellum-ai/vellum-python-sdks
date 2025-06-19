@@ -249,7 +249,7 @@ def test_serialize_node__stacked():
             "id": "074833b0-e142-4bbc-8dec-209a35e178a3",
             "label": "test_serialize_node__stacked.<locals>.InnerStackedGenericNode",
             "type": "GENERIC",
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "InnerStackedGenericNode",

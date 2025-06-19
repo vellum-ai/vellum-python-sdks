@@ -50,7 +50,7 @@ def test_serialize_workflow():
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "df80b4aa-2ba1-49a2-8375-fb1f78eee31f"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
         "base": None,
         "definition": None,
     }
@@ -229,7 +229,7 @@ def test_serialize_workflow():
             "external_id_filters_node_input_id": "036dee8f-194a-4b92-9739-69c98a4aa1b9",
             "metadata_filters_node_input_id": "855d3f57-e633-467e-a348-a394360247df",
         },
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}},
         "base": {
             "name": "SearchNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "search_node", "node"],
@@ -271,7 +271,7 @@ def test_serialize_workflow():
                 },
             }
         ],
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 400.0, "y": -50.0}},
         "base": {
             "name": "FinalOutputNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],

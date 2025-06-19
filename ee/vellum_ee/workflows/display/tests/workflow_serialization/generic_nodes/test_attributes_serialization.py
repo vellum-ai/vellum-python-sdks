@@ -269,7 +269,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
             "id": "11be9d37-0069-4695-a317-14a3b6519d4e",
             "label": "test_serialize_node__workflow_input_as_nested_chat_history.<locals>.GenericNode",
             "type": "GENERIC",
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
             "definition": {
                 "name": "GenericNode",

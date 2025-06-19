@@ -56,7 +56,7 @@ def test_serialize_workflow():
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "34069190-0942-4e0c-8700-b33b9dea4ea0"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
         "base": None,
         "definition": None,
     }
@@ -103,7 +103,7 @@ def test_serialize_workflow():
                 "template_node_input_id": "7c775379-d589-4d79-b876-dcd224d72966",
                 "output_type": "JSON",
             },
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}},
             "base": {
                 "name": "TemplatingNode",
                 "module": ["vellum", "workflows", "nodes", "core", "templating_node", "node"],
@@ -148,7 +148,7 @@ def test_serialize_workflow():
                     },
                 }
             ],
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 400.0, "y": -50.0}},
             "base": {
                 "name": "FinalOutputNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],

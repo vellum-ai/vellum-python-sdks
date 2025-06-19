@@ -43,7 +43,7 @@ def test_serialize_workflow():
         "label": "GetCurrentWeatherNode",
         "type": "GENERIC",
         "display_data": {
-            "position": {"x": 0.0, "y": 0.0},
+            "position": {"x": 200.0, "y": -50.0},
             "comment": {"value": "\n    A tool calling node that calls the get_current_weather function.\n    "},
         },
         "base": {

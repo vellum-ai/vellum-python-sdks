@@ -70,7 +70,7 @@ def test_serialize_workflow():
         "base": None,
         "definition": None,
         "display_data": {
-            "position": {"x": 0.0, "y": 0.0},
+            "position": {"x": 0.0, "y": -50.0},
         },
     }
 
@@ -110,7 +110,7 @@ def test_serialize_workflow():
                                 "label": "Entrypoint Node",
                                 "source_handle_id": "520d3616-8369-4e79-9da5-3febae299c2a",
                             },
-                            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                            "display_data": {"position": {"x": 0.0, "y": -50.0}},
                             "base": None,
                             "definition": None,
                         },
@@ -118,7 +118,7 @@ def test_serialize_workflow():
                             "id": "baf6d316-dc75-41e8-96c0-015aede96309",
                             "label": "Iteration",
                             "type": "GENERIC",
-                            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                            "display_data": {"position": {"x": 200.0, "y": -50.0}},
                             "base": {
                                 "name": "BaseNode",
                                 "module": ["vellum", "workflows", "nodes", "bases", "base"],
@@ -191,7 +191,7 @@ def test_serialize_workflow():
                                     },
                                 }
                             ],
-                            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                            "display_data": {"position": {"x": 400.0, "y": -50.0}},
                             "base": {
                                 "name": "FinalOutputNode",
                                 "module": [
@@ -277,7 +277,7 @@ def test_serialize_workflow():
                 "item_input_id": "b29bb546-9bc8-4136-857d-8c7a464ba9d4",
                 "index_input_id": "17e7ca49-668f-450d-a792-e1f97d13db67",
             },
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}},
             "base": {
                 "name": "MapNode",
                 "module": ["vellum", "workflows", "nodes", "core", "map_node", "node"],
@@ -322,7 +322,7 @@ def test_serialize_workflow():
                     },
                 }
             ],
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "display_data": {"position": {"x": 400.0, "y": -50.0}},
             "base": {
                 "module": [
                     "vellum",

@@ -99,7 +99,7 @@ def test_serialize_workflow(vellum_client):
             "source_handle_id": "13d9eb34-aecb-496d-9e57-d5e786b0bc7c",
         },
         "display_data": {
-            "position": {"x": 0.0, "y": 0.0},
+            "position": {"x": 0.0, "y": -50.0},
         },
     }
 
@@ -144,7 +144,7 @@ def test_serialize_workflow(vellum_client):
             "workflow_deployment_id": deployment.id,
             "release_tag": "LATEST",
         },
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}},
         "base": {
             "module": ["vellum", "workflows", "nodes", "displayable", "subworkflow_deployment_node", "node"],
             "name": "SubworkflowDeploymentNode",
@@ -199,7 +199,7 @@ def test_serialize_workflow(vellum_client):
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 400.0, "y": -50.0}},
             },
             {
                 "id": "94afd0ac-1ec4-486b-a6fb-fa1ec7029d19",
@@ -242,7 +242,7 @@ def test_serialize_workflow(vellum_client):
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 400.0, "y": -50.0}},
             },
         ],
         workflow_raw_data["nodes"][2:],

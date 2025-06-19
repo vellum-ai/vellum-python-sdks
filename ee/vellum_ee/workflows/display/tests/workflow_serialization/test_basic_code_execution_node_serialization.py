@@ -50,7 +50,7 @@ def test_serialize_workflow_with_filepath():
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "118e4298-aa79-467c-b8b4-2df540905e86"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
         "base": None,
         "definition": None,
     }
@@ -94,7 +94,7 @@ def test_serialize_workflow_with_filepath():
             "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
         "base": {
             "module": [
                 "vellum",
@@ -143,7 +143,7 @@ def test_serialize_workflow_with_filepath():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 200.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -179,7 +179,7 @@ def test_serialize_workflow_with_filepath():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 200.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -289,7 +289,7 @@ def test_serialize_workflow_with_code():
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "e82390bb-c68c-48c1-9f87-7fbfff494c45"},
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
         "base": None,
         "definition": None,
     }
@@ -333,7 +333,7 @@ def test_serialize_workflow_with_code():
             "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}},
         "base": {
             "name": "CodeExecutionNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],
@@ -375,7 +375,7 @@ def test_serialize_workflow_with_code():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 200.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -411,7 +411,7 @@ def test_serialize_workflow_with_code():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 200.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -522,7 +522,7 @@ def test_serialize_workflow__try_wrapped():
         "base": None,
         "definition": None,
         "display_data": {
-            "position": {"x": 0.0, "y": 0.0},
+            "position": {"x": 0.0, "y": -50.0},
         },
     }
 
@@ -565,7 +565,7 @@ def test_serialize_workflow__try_wrapped():
             "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": -50.0}},
         "base": {
             "module": [
                 "vellum",
@@ -637,7 +637,7 @@ def test_serialize_workflow__try_wrapped():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 200.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -673,7 +673,7 @@ def test_serialize_workflow__try_wrapped():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 0.0, "y": 0.0}},
+                "display_data": {"position": {"x": 200.0, "y": -50.0}},
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
