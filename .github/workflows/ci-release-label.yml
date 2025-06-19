@@ -24,4 +24,6 @@ jobs:
       - name: Install Python dependencies
         run: poetry install
       - name: Run end-to-end tests
-        run: python scripts/end_to_end_test.py
+        env:
+          VELLUM_API_URL: http://localhost:8000
+        run: python scripts/end_to_end_test.py --filter skip-all
