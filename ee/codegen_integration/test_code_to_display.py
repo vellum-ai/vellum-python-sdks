@@ -4,8 +4,7 @@ from typing import Any, Dict
 
 from deepdiff import DeepDiff
 
-from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
 @pytest.mark.usefixtures("workspace_secret_client", "deployment_client")
@@ -17,9 +16,7 @@ def test_code_to_display_data(code_to_display_fixture_paths):
     code_sub_path = code_dir.split("/".join(base_module_path))[1].split("/")[1:]
     module_path = ".".join(base_module_path + code_sub_path)
 
-    workflow = BaseWorkflow.load_from_module(module_path)
-    workflow_display = get_workflow_display(workflow_class=workflow)
-    actual_serialized_workflow: dict = workflow_display.serialize()
+    actual_serialized_workflow: dict = BaseWorkflowDisplay.serialize_module(module_path)
 
     with open(expected_display_data_file_path) as file:
         expected_serialized_workflow = json.load(file, object_hook=_custom_obj_hook)  # noqa: F841
