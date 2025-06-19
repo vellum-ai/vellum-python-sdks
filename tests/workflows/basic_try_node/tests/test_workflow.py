@@ -46,6 +46,6 @@ def test_run_workflow__catch_error(mock_random_int):
 
     # AND the output should match the expected value
     assert terminal_event.outputs.error == WorkflowError(
-        message="This is a flaky node", code=WorkflowErrorCode.INTERNAL_ERROR
+        message="This is a flaky node", code=WorkflowErrorCode.NODE_EXECUTION
     )
     assert terminal_event.outputs.final_value is undefined

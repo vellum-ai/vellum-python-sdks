@@ -1,6 +1,8 @@
 import random
 
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 
@@ -13,7 +15,7 @@ class StartNode(BaseNode):
     def run(self) -> Outputs:
         arg = random.randint(0, 10)
         if arg < 5:
-            raise Exception("This is a flaky node")
+            raise NodeException(message="This is a flaky node", code=WorkflowErrorCode.NODE_EXECUTION)
         return self.Outputs(value=arg)
 
 
