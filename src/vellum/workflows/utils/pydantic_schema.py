@@ -3,31 +3,28 @@ from typing import Any, Dict
 
 from pydantic import BaseModel
 
-from vellum.workflows.utils.functions import _compile_annotation
+from vellum.workflows.utils.functions import compile_annotation
 
 
-def convert_pydantic_to_json_schema(schema_input: Any) -> Dict[str, Any]:
+def normalize_json(schema_input: Any) -> Any:
     """
-    Convert a Pydantic model class, instance, or existing dict to a JSON schema.
+    Recursively normalize JSON data by converting Pydantic models to JSON schema.
 
-    This function reuses the existing _compile_annotation logic but provides
-    a simplified interface for single schema conversion without $defs references.
+    This function processes dictionaries recursively to find and convert any
+    Pydantic model classes or instances to their JSON schema representation.
 
     Args:
-        schema_input: Can be a Pydantic model class, instance, or existing dict
+        schema_input: Can be a Pydantic model class, instance, dict, or any other value
 
     Returns:
-        JSON schema as a dictionary
-
-    Raises:
-        ValueError: If input is not a supported type
+        Normalized JSON data with Pydantic models converted to JSON schema
     """
     if isinstance(schema_input, dict):
-        return schema_input
+        return {key: normalize_json(value) for key, value in schema_input.items()}
 
     if inspect.isclass(schema_input) and issubclass(schema_input, BaseModel):
         defs: Dict[str, Any] = {}
-        result = _compile_annotation(schema_input, defs)
+        result = compile_annotation(schema_input, defs)
 
         if "$ref" in result and defs:
             ref_name = result["$ref"].split("/")[-1]
@@ -36,6 +33,6 @@ def convert_pydantic_to_json_schema(schema_input: Any) -> Dict[str, Any]:
 
         return result
     elif isinstance(schema_input, BaseModel):
-        return convert_pydantic_to_json_schema(schema_input.__class__)
+        return normalize_json(schema_input.__class__)
     else:
-        raise ValueError(f"Expected Pydantic model class/instance or dict, got {type(schema_input)}")
+        return schema_input
