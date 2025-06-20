@@ -2,6 +2,7 @@ import pytest
 from uuid import UUID
 from typing import Type
 
+from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
@@ -310,6 +311,7 @@ def test_serialize_node__prompt_inputs__dynamic_parameters():
         }
         blocks = []
         ml_model = "gpt-4o"
+        parameters = PromptParameters(custom_parameters={"json_schema": MyInputs.input_value})
 
     # AND a workflow with all nodes
     class Workflow(BaseWorkflow[MyInputs, MyState]):
@@ -386,3 +388,15 @@ def test_serialize_node__prompt_inputs__dynamic_parameters():
     assert constant_entry["value"]["type"] == "CONSTANT_VALUE"
     assert constant_entry["value"]["value"]["type"] == "STRING"
     assert constant_entry["value"]["value"]["value"] == "static_value"
+
+    # AND the parameters should be properly serialized in exec_config
+    exec_config = dynamic_prompt_node["data"]["exec_config"]
+    assert "parameters" in exec_config
+
+    parameters = exec_config["parameters"]
+    assert "custom_parameters" in parameters
+    assert "json_schema" in parameters["custom_parameters"]
+
+    json_schema_value = parameters["custom_parameters"]["json_schema"]
+    # Since this is a dynamic reference, it should be serialized as the actual input reference
+    assert json_schema_value is not None
