@@ -204,6 +204,13 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           }
           break;
         }
+        case AttributeType.FunctionConfigs: {
+          // We didn't support function configs yet, so we skip generating the field
+          if (attribute.value === attributeConfig.defaultValue) {
+            break;
+          }
+          break;
+        }
         default:
           nodeAttributesStatements.push(
             python.field({

@@ -2,6 +2,7 @@ export enum AttributeType {
   WorkflowErrorCode = "WorkflowErrorCode",
   PromptBlocks = "PromptBlocks",
   Functions = "Functions",
+  FunctionConfigs = "FunctionConfigs",
 }
 
 export interface AttributeConfig {
@@ -40,6 +41,10 @@ export const NODE_ATTRIBUTES: Record<
     functions: {
       defaultValue: null,
       type: AttributeType.Functions,
+    },
+    function_configs: {
+      defaultValue: null,
+      type: AttributeType.FunctionConfigs,
     },
   },
 };

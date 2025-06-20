@@ -506,7 +506,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
-    function_configs = None
 
     class Outputs(ToolCallingNode.Outputs):
         text: str
