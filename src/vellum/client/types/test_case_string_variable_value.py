@@ -12,7 +12,7 @@ class TestCaseStringVariableValue(UniversalBaseModel):
     """
 
     variable_id: str
-    name: str
+    name: typing.Optional[str] = None
     type: typing.Literal["STRING"] = "STRING"
     value: typing.Optional[str] = None
 

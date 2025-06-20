@@ -7,7 +7,7 @@ import pydantic
 
 
 class ReleaseCreatedBy(UniversalBaseModel):
-    id: str
+    id: typing.Optional[str] = None
     full_name: typing.Optional[str] = None
     email: str
 

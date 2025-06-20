@@ -2,8 +2,8 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 from .array_vellum_value import ArrayVellumValue
-import pydantic
 import typing
+import pydantic
 from .entity_status import EntityStatus
 from .environment_enum import EnvironmentEnum
 import datetime as dt
@@ -12,7 +12,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class SlimWorkflowDeployment(UniversalBaseModel):
-    id: str
+    id: typing.Optional[str] = None
     name: str = pydantic.Field()
     """
     A name that uniquely identifies this workflow deployment within its workspace
@@ -40,7 +40,7 @@ class SlimWorkflowDeployment(UniversalBaseModel):
     * `PRODUCTION` - Production
     """
 
-    created: dt.datetime
+    created: typing.Optional[dt.datetime] = None
     last_deployed_on: dt.datetime
     input_variables: typing.List[VellumVariable] = pydantic.Field()
     """

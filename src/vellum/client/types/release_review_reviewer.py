@@ -7,7 +7,7 @@ import pydantic
 
 
 class ReleaseReviewReviewer(UniversalBaseModel):
-    id: str
+    id: typing.Optional[str] = None
     full_name: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:

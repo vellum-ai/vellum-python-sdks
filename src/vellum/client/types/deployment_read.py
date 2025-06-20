@@ -2,9 +2,9 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 from .array_vellum_value import ArrayVellumValue
+import typing
 import datetime as dt
 import pydantic
-import typing
 from .entity_status import EntityStatus
 from .environment_enum import EnvironmentEnum
 from .vellum_variable import VellumVariable
@@ -12,8 +12,8 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class DeploymentRead(UniversalBaseModel):
-    id: str
-    created: dt.datetime
+    id: typing.Optional[str] = None
+    created: typing.Optional[dt.datetime] = None
     label: str = pydantic.Field()
     """
     A human-readable label for the deployment

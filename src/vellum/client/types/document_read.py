@@ -11,7 +11,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class DocumentRead(UniversalBaseModel):
-    id: str
+    id: typing.Optional[str] = None
     external_id: typing.Optional[str] = pydantic.Field(default=None)
     """
     The unique id of this document as it exists in the user's system.

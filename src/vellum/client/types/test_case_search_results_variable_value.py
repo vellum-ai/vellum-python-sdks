@@ -13,7 +13,7 @@ class TestCaseSearchResultsVariableValue(UniversalBaseModel):
     """
 
     variable_id: str
-    name: str
+    name: typing.Optional[str] = None
     type: typing.Literal["SEARCH_RESULTS"] = "SEARCH_RESULTS"
     value: typing.Optional[typing.List[SearchResult]] = None
 

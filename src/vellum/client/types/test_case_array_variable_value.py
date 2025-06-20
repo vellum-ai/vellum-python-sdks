@@ -14,7 +14,7 @@ class TestCaseArrayVariableValue(UniversalBaseModel):
     """
 
     variable_id: str
-    name: str
+    name: typing.Optional[str] = None
     type: typing.Literal["ARRAY"] = "ARRAY"
     value: typing.Optional[typing.List[VellumValue]] = None
 

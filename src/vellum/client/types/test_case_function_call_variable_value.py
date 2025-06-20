@@ -13,7 +13,7 @@ class TestCaseFunctionCallVariableValue(UniversalBaseModel):
     """
 
     variable_id: str
-    name: str
+    name: typing.Optional[str] = None
     type: typing.Literal["FUNCTION_CALL"] = "FUNCTION_CALL"
     value: typing.Optional[FunctionCall] = None
 

@@ -8,7 +8,7 @@ import pydantic
 
 
 class OrganizationRead(UniversalBaseModel):
-    id: str
+    id: typing.Optional[str] = None
     name: str
     allow_staff_access: typing.Optional[bool] = None
     new_member_join_behavior: NewMemberJoinBehaviorEnum

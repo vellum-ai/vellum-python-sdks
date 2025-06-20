@@ -2,19 +2,19 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 from .array_vellum_value import ArrayVellumValue
+import typing
 import datetime as dt
 from .test_suite_run_test_suite import TestSuiteRunTestSuite
 from .test_suite_run_state import TestSuiteRunState
 import pydantic
-import typing
 from .test_suite_run_exec_config import TestSuiteRunExecConfig
 from .test_suite_run_progress import TestSuiteRunProgress
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class TestSuiteRunRead(UniversalBaseModel):
-    id: str
-    created: dt.datetime
+    id: typing.Optional[str] = None
+    created: typing.Optional[dt.datetime] = None
     test_suite: TestSuiteRunTestSuite
     state: TestSuiteRunState = pydantic.Field()
     """

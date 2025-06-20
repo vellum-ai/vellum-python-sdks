@@ -13,7 +13,7 @@ class TestCaseErrorVariableValue(UniversalBaseModel):
     """
 
     variable_id: str
-    name: str
+    name: typing.Optional[str] = None
     type: typing.Literal["ERROR"] = "ERROR"
     value: typing.Optional[VellumError] = None
 

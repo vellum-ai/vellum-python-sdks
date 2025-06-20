@@ -12,7 +12,7 @@ class TestCaseJsonVariableValue(UniversalBaseModel):
     """
 
     variable_id: str
-    name: str
+    name: typing.Optional[str] = None
     type: typing.Literal["JSON"] = "JSON"
     value: typing.Optional[typing.Any] = None
 

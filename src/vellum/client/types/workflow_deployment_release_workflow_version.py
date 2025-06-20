@@ -9,9 +9,9 @@ import pydantic
 
 
 class WorkflowDeploymentReleaseWorkflowVersion(UniversalBaseModel):
-    id: str
-    input_variables: typing.List[VellumVariable]
-    output_variables: typing.List[VellumVariable]
+    id: typing.Optional[str] = None
+    input_variables: typing.Optional[typing.List[VellumVariable]] = None
+    output_variables: typing.Optional[typing.List[VellumVariable]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

@@ -8,7 +8,7 @@ import pydantic
 
 class WorkflowSandboxExample(UniversalBaseModel):
     id: str
-    label: str
+    label: typing.Optional[str] = None
     description: typing.Optional[str] = None
     icon_name: typing.Optional[str] = None
 

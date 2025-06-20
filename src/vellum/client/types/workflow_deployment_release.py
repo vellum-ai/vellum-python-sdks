@@ -2,9 +2,9 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 from .array_vellum_value import ArrayVellumValue
+import typing
 import datetime as dt
 from .release_environment import ReleaseEnvironment
-import typing
 from .release_created_by import ReleaseCreatedBy
 from .workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
 from .workflow_deployment_release_workflow_deployment import WorkflowDeploymentReleaseWorkflowDeployment
@@ -15,8 +15,8 @@ import pydantic
 
 
 class WorkflowDeploymentRelease(UniversalBaseModel):
-    id: str
-    created: dt.datetime
+    id: typing.Optional[str] = None
+    created: typing.Optional[dt.datetime] = None
     environment: ReleaseEnvironment
     created_by: typing.Optional[ReleaseCreatedBy] = None
     workflow_version: WorkflowDeploymentReleaseWorkflowVersion
