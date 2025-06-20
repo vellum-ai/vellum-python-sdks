@@ -74,7 +74,6 @@ import {
   MapNodeData,
   MergeNode,
   MergeNodeTargetHandle,
-  ModuleData,
   NodeAttribute,
   NodeDisplayComment,
   NodeDisplayData,
@@ -119,7 +118,6 @@ import {
   WorkflowSandboxRoutingConfig,
   WorkflowStateVariableWorkflowReference,
   WorkflowValueDescriptor,
-  WorkflowVersionExecConfig,
   WorkspaceSecretPointer,
 } from "src/types/vellum";
 
