@@ -439,34 +439,41 @@ def test_serialize_workflow_with_descriptor_blocks():
     ]
 
 
-def test_has_nested_descriptors_function():
-    """Test the _has_nested_descriptors helper function directly."""
-    from unittest.mock import Mock
+def test_serialize_workflow_with_nested_descriptor_blocks():
+    """Test that serialization handles BaseDescriptor instances nested in ChatMessageBlock.blocks."""
 
-    from vellum.workflows.descriptors.base import BaseDescriptor
-    from vellum_ee.workflows.display.nodes.vellum.inline_prompt_node import _has_nested_descriptors
+    class TestInputs(BaseInputs):
+        noun: str
 
-    mock_plain_block = Mock()
-    mock_plain_block.block_type = "PLAIN_TEXT"
-    assert not _has_nested_descriptors([mock_plain_block])
+    class UpstreamNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            results: list
 
-    mock_descriptor = Mock(spec=BaseDescriptor)
-    assert _has_nested_descriptors([mock_descriptor])
+        def run(self) -> Outputs:
+            return self.Outputs(results=["test"])
 
-    mock_chat_block = Mock()
-    mock_chat_block.block_type = "CHAT_MESSAGE"
-    mock_chat_block.blocks = [mock_descriptor]
-    assert _has_nested_descriptors([mock_chat_block])
+    chat_block = ChatMessagePromptBlock(chat_role="SYSTEM", blocks=[JinjaPromptBlock(template="Hello")])
 
-    mock_rich_block = Mock()
-    mock_rich_block.block_type = "RICH_TEXT"
-    mock_rich_block.blocks = [mock_descriptor]
-    assert _has_nested_descriptors([mock_rich_block])
+    class TestInlinePromptNodeWithNestedDescriptorBlocks(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [chat_block]
+        prompt_inputs = {"noun": TestInputs.noun}
 
-    mock_outer_chat = Mock()
-    mock_outer_chat.block_type = "CHAT_MESSAGE"
-    mock_inner_rich = Mock()
-    mock_inner_rich.block_type = "RICH_TEXT"
-    mock_inner_rich.blocks = [mock_descriptor]
-    mock_outer_chat.blocks = [mock_inner_rich]
-    assert _has_nested_descriptors([mock_outer_chat])
+    object.__setattr__(chat_block, "blocks", [UpstreamNode.Outputs.results[0]])  # type: ignore
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = UpstreamNode >> TestInlinePromptNodeWithNestedDescriptorBlocks
+
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized: dict = workflow_display.serialize()
+
+    prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    prompt_node = prompt_nodes[0]
+
+    blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
+    descriptor_blocks = [block for block in blocks if not isinstance(block, dict) or not block.get("block_type")]
+    assert len(descriptor_blocks) == 0, "BaseDescriptor blocks should not appear in serialized blocks"
+
+    blocks_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "blocks"), None)
+    assert blocks_attr is not None, "blocks attribute should be present when blocks contain nested BaseDescriptor"
+    assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE", "blocks attribute should be serialized as ARRAY_REFERENCE"

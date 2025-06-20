@@ -24,13 +24,11 @@ def _has_nested_descriptors(blocks: Sequence[Union[PromptBlock, RichTextChildBlo
         if isinstance(block, BaseDescriptor):
             return True
 
-        if hasattr(block, "blocks") and hasattr(block, "block_type") and block.block_type == "CHAT_MESSAGE":
-            if _has_nested_descriptors(block.blocks):
-                return True
+        if block.block_type == "CHAT_MESSAGE" and _has_nested_descriptors(block.blocks):
+            return True
 
-        if hasattr(block, "blocks") and hasattr(block, "block_type") and block.block_type == "RICH_TEXT":
-            if _has_nested_descriptors(block.blocks):
-                return True
+        if block.block_type == "RICH_TEXT" and _has_nested_descriptors(block.blocks):
+            return True
 
     return False
 
@@ -63,9 +61,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
-        has_descriptors = any(isinstance(block, BaseDescriptor) for block in node_blocks) or _has_nested_descriptors(
-            node_blocks
-        )
+        has_descriptors = _has_nested_descriptors(node_blocks)
 
         blocks: list = []
         if not has_descriptors:
