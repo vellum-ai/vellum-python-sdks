@@ -459,7 +459,7 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
         blocks = [chat_block]
         prompt_inputs = {"noun": TestInputs.noun}
 
-    object.__setattr__(chat_block, "blocks", [UpstreamNode.Outputs.results[0]])  # type: ignore
+    object.__setattr__(chat_block, "blocks", [UpstreamNode.Outputs.results[0]])
 
     class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
         graph = UpstreamNode >> TestInlinePromptNodeWithNestedDescriptorBlocks

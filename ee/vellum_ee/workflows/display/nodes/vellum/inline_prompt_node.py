@@ -175,14 +175,19 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             }
 
         elif prompt_block.block_type == "CHAT_MESSAGE":
+            nested_blocks = []
+            if not _has_nested_descriptors(prompt_block.blocks):
+                nested_blocks = [
+                    self._generate_prompt_block(block, input_variable_id_by_name, path + [i])
+                    for i, block in enumerate(prompt_block.blocks)
+                    if not isinstance(block, BaseDescriptor)
+                ]
+
             chat_properties: JsonObject = {
                 "chat_role": prompt_block.chat_role,
                 "chat_source": prompt_block.chat_source,
                 "chat_message_unterminated": bool(prompt_block.chat_message_unterminated),
-                "blocks": [
-                    self._generate_prompt_block(block, input_variable_id_by_name, path + [i])
-                    for i, block in enumerate(prompt_block.blocks)
-                ],
+                "blocks": nested_blocks,
             }
 
             block = {
