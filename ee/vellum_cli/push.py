@@ -13,11 +13,9 @@ from vellum.client.core.api_error import ApiError
 from vellum.resources.workflows.client import OMIT
 from vellum.types import WorkflowPushDeploymentConfigRequest
 from vellum.workflows.vellum_client import create_vellum_client
-from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
 from vellum_cli.logger import handle_cli_error, load_cli_logger
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
-from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
 def push_command(
@@ -107,11 +105,12 @@ def push_command(
 
     # Remove this once we could serialize using the artifact in Vembda
     # https://app.shortcut.com/vellum/story/5585
-    exec_config = BaseWorkflowDisplay.serialize_module(
+    serialization_result = BaseWorkflowDisplay.serialize_module(
         workflow_config.module,
         client=client,
         dry_run=dry_run or False,
     )
+    exec_config = serialization_result.exec_config
 
     container_tag = workflow_config.container_image_tag
     if workflow_config.container_image_name and not workflow_config.container_image_tag:
@@ -228,13 +227,7 @@ def push_command(
         raise e
 
     if dry_run:
-        workflow = BaseWorkflow.load_from_module(workflow_config.module)
-        workflow_display = get_workflow_display(
-            workflow_class=workflow,
-            client=client,
-            dry_run=dry_run or False,
-        )
-        error_messages = [str(e) for e in workflow_display.errors]
+        error_messages = serialization_result.errors
         error_message = "\n".join(error_messages) if error_messages else "No errors found."
         logger.info(
             f"""\
@@ -248,7 +241,7 @@ def push_command(
 """
         )  # type: ignore[attr-defined]
 
-        error_list = list(workflow_display.errors)
+        error_list = serialization_result.errors
         has_errors = len(error_list) > 0
         has_diffs = response.proposed_diffs is not None and response.proposed_diffs
 

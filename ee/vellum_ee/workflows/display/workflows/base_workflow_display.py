@@ -7,6 +7,7 @@ from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.client import Vellum as VellumClient
+from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -55,6 +56,11 @@ from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
+
+
+class WorkflowSerializationResult(UniversalBaseModel):
+    exec_config: Dict[str, Any]
+    errors: List[str]
 
 
 class BaseWorkflowDisplay(Generic[WorkflowType]):
@@ -820,7 +826,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         *,
         client: Optional[VellumClient] = None,
         dry_run: bool = False,
-    ) -> JsonObject:
+    ) -> WorkflowSerializationResult:
         """
         Load a workflow from a module and serialize it to JSON.
 
@@ -830,7 +836,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             dry_run: Whether to run in dry-run mode
 
         Returns:
-            The serialized workflow as a JSON object
+            WorkflowSerializationResult containing exec_config and errors
         """
         workflow = BaseWorkflow.load_from_module(module)
         workflow_display = get_workflow_display(
@@ -838,7 +844,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             client=client,
             dry_run=dry_run,
         )
-        return workflow_display.serialize()
+        return WorkflowSerializationResult(
+            exec_config=workflow_display.serialize(),
+            errors=[str(error) for error in workflow_display.errors],
+        )
 
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)

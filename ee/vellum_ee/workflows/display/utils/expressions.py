@@ -318,9 +318,10 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             return {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonArray, serialized_entries)}
 
     if is_workflow_class(value):
-        from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
+        from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-        value = BaseWorkflowDisplay.serialize_module(value.__module__)
+        workflow_display = get_workflow_display(workflow_class=value)
+        value = workflow_display.serialize()
         return {
             "type": "CONSTANT_VALUE",
             "value": {
