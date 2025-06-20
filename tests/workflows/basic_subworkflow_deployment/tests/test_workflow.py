@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime
 from unittest.mock import ANY
 from uuid import uuid4
@@ -23,17 +24,29 @@ from tests.workflows.basic_subworkflow_deployment.workflow import (
     ExampleSubworkflowDeploymentNode,
     Inputs,
 )
+from tests.workflows.basic_subworkflow_deployment.workflow_with_base_inputs import (
+    ExampleSubworkflowDeploymentNodeWithBaseInputs,
+    TestInputs,
+    WorkflowWithBaseInputsSubworkflow,
+)
 from tests.workflows.basic_subworkflow_deployment.workflow_with_optional_inputs import (
     InputsWithOptional,
     WorkflowWithOptionalInputsSubworkflow,
 )
 
 
-def test_run_workflow__happy_path(vellum_client):
+@pytest.mark.parametrize(
+    "workflow_class,inputs_class,node_class",
+    [
+        (BasicSubworkflowDeploymentWorkflow, Inputs, ExampleSubworkflowDeploymentNode),
+        (WorkflowWithBaseInputsSubworkflow, TestInputs, ExampleSubworkflowDeploymentNodeWithBaseInputs),
+    ],
+)
+def test_run_workflow__happy_path(vellum_client, workflow_class, inputs_class, node_class):
     """Confirm that we can successfully invoke a Workflow with a single Subworkflow Deployment Node"""
 
     # GIVEN a workflow that's set up to hit a Subworkflow Deployment
-    workflow = BasicSubworkflowDeploymentWorkflow()
+    workflow = workflow_class()
 
     # AND we know what the Workflow Deployment will respond with
     expected_outputs: List[WorkflowOutput] = [
@@ -71,7 +84,7 @@ def test_run_workflow__happy_path(vellum_client):
 
     # WHEN we run the workflow
     terminal_event = workflow.run(
-        inputs=Inputs(
+        inputs=inputs_class(
             city="San Francisco",
             date="2024-01-01",
         )
@@ -103,7 +116,7 @@ def test_run_workflow__happy_path(vellum_client):
 
     call_args = vellum_client.execute_workflow_stream.call_args.kwargs
     parent_context = call_args["request_options"]["additional_body_parameters"]["execution_context"]["parent_context"]
-    expected_context = VellumCodeResourceDefinition.encode(ExampleSubworkflowDeploymentNode).model_dump()
+    expected_context = VellumCodeResourceDefinition.encode(node_class).model_dump()
     assert parent_context["node_definition"]["id"] == str(expected_context["id"])
     assert parent_context["node_definition"]["module"] == expected_context["module"]
     assert parent_context["node_definition"]["name"] == expected_context["name"]

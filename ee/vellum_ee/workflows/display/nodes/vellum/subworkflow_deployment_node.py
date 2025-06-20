@@ -1,6 +1,7 @@
 from uuid import UUID
 from typing import Generic, Optional, TypeVar
 
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode
 from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -23,6 +24,12 @@ class BaseSubworkflowDeploymentNodeDisplay(
         node_id = self.node_id
 
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
+
+        if isinstance(subworkflow_inputs, BaseInputs):
+            input_items = [(input_descriptor.name, input_value) for input_descriptor, input_value in subworkflow_inputs]
+        else:
+            input_items = list(subworkflow_inputs.items())
+
         node_inputs = [
             create_node_input(
                 node_id=node_id,
@@ -34,7 +41,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 )
                 or self.node_input_ids_by_name.get(variable_name),
             )
-            for variable_name, variable_value in subworkflow_inputs.items()
+            for variable_name, variable_value in input_items
         ]
 
         deployment = display_context.client.workflow_deployments.retrieve(
