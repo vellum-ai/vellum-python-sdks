@@ -1,8 +1,10 @@
 from copy import copy
+import fnmatch
 from functools import cached_property
 import importlib
 import inspect
 import logging
+import os
 from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
@@ -57,6 +59,14 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 
 logger = logging.getLogger(__name__)
 
+IGNORE_PATTERNS = [
+    "*.pyc",
+    "__pycache__",
+    ".*",
+    "node_modules/*",
+    "*.log",
+]
+
 
 class WorkflowSerializationResult(UniversalBaseModel):
     exec_config: Dict[str, Any]
@@ -107,6 +117,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         self._dry_run = dry_run
 
     def serialize(self) -> JsonObject:
+        self._serialized_files = ["nodes/*", "workflow.py", "state.py", "inputs.py", "display/*", "__init__.py"]
+
         input_variables: JsonArray = []
         for workflow_input_reference, workflow_input_display in self.display_context.workflow_input_displays.items():
             default = (
@@ -845,9 +857,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             dry_run=dry_run,
         )
 
-        additional_files = BaseWorkflowDisplay._gather_additional_module_files(module)
-
         exec_config = workflow_display.serialize()
+        additional_files = workflow_display._gather_additional_module_files(module)
+
         if additional_files:
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
 
@@ -856,11 +868,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             errors=[str(error) for error in workflow_display.errors],
         )
 
-    @staticmethod
-    def _gather_additional_module_files(module_path: str) -> Dict[str, str]:
-        import importlib
-        import os
-
+    def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
         workflow_module_path = f"{module_path}.workflow"
         workflow_module = importlib.import_module(workflow_module_path)
 
@@ -876,16 +884,21 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 file_path = os.path.join(root, filename)
                 relative_path = os.path.relpath(file_path, start=module_dir)
 
-                if (
-                    filename == "workflow.py"
-                    or filename == "__init__.py"
-                    or filename == "inputs.py"
-                    or filename.endswith(".pyc")
-                    or "__pycache__" in relative_path
-                    or filename.startswith(".")
-                    or relative_path.startswith("nodes/")
-                    or relative_path.startswith("display/")
-                ):
+                should_ignore = False
+                for ignore_pattern in IGNORE_PATTERNS:
+                    if fnmatch.fnmatch(filename, ignore_pattern) or fnmatch.fnmatch(relative_path, ignore_pattern):
+                        should_ignore = True
+                        break
+
+                if not should_ignore and hasattr(self, "_serialized_files"):
+                    for serialized_pattern in self._serialized_files:
+                        if fnmatch.fnmatch(relative_path, serialized_pattern) or fnmatch.fnmatch(
+                            filename, serialized_pattern
+                        ):
+                            should_ignore = True
+                            break
+
+                if should_ignore:
                     continue
 
                 try:
