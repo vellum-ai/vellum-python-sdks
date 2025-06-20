@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime
 from unittest.mock import ANY
 from uuid import uuid4
@@ -23,17 +24,28 @@ from tests.workflows.basic_subworkflow_deployment.workflow import (
     ExampleSubworkflowDeploymentNode,
     Inputs,
 )
+from tests.workflows.basic_subworkflow_deployment.workflow_with_base_inputs import (
+    TestInputs,
+    WorkflowWithBaseInputsSubworkflow,
+)
 from tests.workflows.basic_subworkflow_deployment.workflow_with_optional_inputs import (
     InputsWithOptional,
     WorkflowWithOptionalInputsSubworkflow,
 )
 
 
-def test_run_workflow__happy_path(vellum_client):
+@pytest.mark.parametrize(
+    "workflow_class,inputs_class",
+    [
+        (BasicSubworkflowDeploymentWorkflow, Inputs),
+        (WorkflowWithBaseInputsSubworkflow, TestInputs),
+    ],
+)
+def test_run_workflow__happy_path(vellum_client, workflow_class, inputs_class):
     """Confirm that we can successfully invoke a Workflow with a single Subworkflow Deployment Node"""
 
     # GIVEN a workflow that's set up to hit a Subworkflow Deployment
-    workflow = BasicSubworkflowDeploymentWorkflow()
+    workflow = workflow_class()
 
     # AND we know what the Workflow Deployment will respond with
     expected_outputs: List[WorkflowOutput] = [
@@ -71,7 +83,7 @@ def test_run_workflow__happy_path(vellum_client):
 
     # WHEN we run the workflow
     terminal_event = workflow.run(
-        inputs=Inputs(
+        inputs=inputs_class(
             city="San Francisco",
             date="2024-01-01",
         )
@@ -107,25 +119,6 @@ def test_run_workflow__happy_path(vellum_client):
     assert parent_context["node_definition"]["id"] == str(expected_context["id"])
     assert parent_context["node_definition"]["module"] == expected_context["module"]
     assert parent_context["node_definition"]["name"] == expected_context["name"]
-
-
-def test_subworkflow_deployment_node_with_base_inputs(vellum_client):
-    from tests.workflows.basic_subworkflow_deployment.workflow_with_base_inputs import (
-        ExampleSubworkflowDeploymentNodeWithBaseInputs,
-    )
-
-    node = ExampleSubworkflowDeploymentNodeWithBaseInputs()
-    compiled_inputs = node._compile_subworkflow_inputs()
-
-    assert len(compiled_inputs) == 2
-    input_names = {inp.name for inp in compiled_inputs}
-    assert "city" in input_names
-    assert "date" in input_names
-
-    city_input = next(inp for inp in compiled_inputs if inp.name == "city")
-    date_input = next(inp for inp in compiled_inputs if inp.name == "date")
-    assert city_input.value == "San Francisco"
-    assert date_input.value == "2024-01-01"
 
 
 def test_stream_workflow__happy_path(vellum_client):
