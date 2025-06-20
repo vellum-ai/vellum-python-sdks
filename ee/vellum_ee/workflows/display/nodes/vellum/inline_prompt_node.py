@@ -61,10 +61,10 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
-        has_descriptors = _has_nested_descriptors(node_blocks)
+        has_nested_descriptors = _has_nested_descriptors(node_blocks)
 
         blocks: list = []
-        if not has_descriptors:
+        if not has_nested_descriptors:
             blocks = [
                 self._generate_prompt_block(block, input_variable_id_by_name, [i])
                 for i, block in enumerate(node_blocks)
@@ -254,6 +254,18 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         for attribute in self._node:
             if attribute in self.__unserializable_attributes__:
                 continue
+
+            if attribute.name == "blocks":
+                try:
+                    node_blocks = raise_if_descriptor(attribute.instance) or []
+                except AttributeError:
+                    node_blocks = attribute.instance or []
+
+                has_nested_descriptors = _has_nested_descriptors(node_blocks)
+                has_top_level_descriptors = any(isinstance(block, BaseDescriptor) for block in node_blocks)
+
+                if has_nested_descriptors and not has_top_level_descriptors:
+                    continue
 
             id = (
                 str(self.attribute_ids_by_name[attribute.name])
