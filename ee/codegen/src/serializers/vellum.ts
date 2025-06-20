@@ -2211,14 +2211,11 @@ export const ModuleDataSerializer = objectSchema({
 
 export declare namespace ModuleDataSerializer {
   interface Raw {
-    additional_files?: Record<string, string> | null;
+    additional_files?: Record<string, string>;
   }
 }
 
-export const WorkflowVersionExecConfigSerializer: ObjectSchema<
-  WorkflowVersionExecConfigSerializer.Raw,
-  WorkflowVersionExecConfig
-> = objectSchema({
+export const WorkflowVersionExecConfigSerializer = objectSchema({
   workflowRawData: propertySchema(
     "workflow_raw_data",
     WorkflowRawDataSerializer

@@ -733,7 +733,7 @@ export interface RunnerConfig {
 }
 
 export interface ModuleData {
-  additionalFiles?: Record<string, string> | null;
+  additionalFiles?: Record<string, string>;
 }
 
 export interface WorkflowVersionExecConfig {
