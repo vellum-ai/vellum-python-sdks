@@ -380,27 +380,9 @@ from vellum.workflows.types.definition import DeploymentDefinition
 
 class MyToolCallingNode(ToolCallingNode):
     ml_model = "gpt-4"
-    blocks = [
-        ChatMessagePromptBlock(
-            chat_role="SYSTEM",
-            blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            text="""You are a helpful assistant. Use the available tools to help the user."""
-                        )
-                    ]
-                )
-            ],
-        ),
-        ChatMessagePromptBlock(
-            chat_role="USER", blocks=[RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="query")])]
-        ),
-    ]
+    blocks = []
     functions = [DeploymentDefinition(deployment="deployment_1", release_tag="LATEST")]
-    prompt_inputs = {
-        "query": None,
-    }
+    prompt_inputs = {}
 
     class Outputs(ToolCallingNode.Outputs):
         text: str

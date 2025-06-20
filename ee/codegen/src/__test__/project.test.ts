@@ -4844,54 +4844,7 @@ baz = foo + bar
                     type: "CONSTANT_VALUE",
                     value: {
                       type: "JSON",
-                      value: [
-                        {
-                          block_type: "CHAT_MESSAGE",
-                          state: null,
-                          cache_config: null,
-                          chat_role: "SYSTEM",
-                          chat_source: null,
-                          chat_message_unterminated: null,
-                          blocks: [
-                            {
-                              block_type: "RICH_TEXT",
-                              state: null,
-                              cache_config: null,
-                              blocks: [
-                                {
-                                  block_type: "PLAIN_TEXT",
-                                  state: null,
-                                  cache_config: null,
-                                  text: "You are a helpful assistant. Use the available tools to help the user.",
-                                },
-                              ],
-                            },
-                          ],
-                        },
-                        {
-                          block_type: "CHAT_MESSAGE",
-                          state: null,
-                          cache_config: null,
-                          chat_role: "USER",
-                          chat_source: null,
-                          chat_message_unterminated: null,
-                          blocks: [
-                            {
-                              block_type: "RICH_TEXT",
-                              state: null,
-                              cache_config: null,
-                              blocks: [
-                                {
-                                  block_type: "VARIABLE",
-                                  state: null,
-                                  cache_config: null,
-                                  input_variable: "query",
-                                },
-                              ],
-                            },
-                          ],
-                        },
-                      ],
+                      value: [],
                     },
                   },
                 },
@@ -4917,17 +4870,7 @@ baz = foo + bar
                   name: "prompt_inputs",
                   value: {
                     type: "DICTIONARY_REFERENCE",
-                    entries: [
-                      {
-                        id: "50c33b12-7263-4803-9363-946b7dc5e92a",
-                        key: "query",
-                        value: {
-                          type: "WORKFLOW_INPUT",
-                          input_variable_id:
-                            "8eb6877a-7a92-439b-8355-124c5880a94d",
-                        },
-                      },
-                    ],
+                    entries: [],
                   },
                 },
               ],
