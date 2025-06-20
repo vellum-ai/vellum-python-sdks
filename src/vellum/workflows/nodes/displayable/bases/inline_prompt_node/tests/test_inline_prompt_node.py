@@ -4,6 +4,8 @@ from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List
 
+from pydantic import BaseModel
+
 from vellum import (
     AdHocExecutePromptEvent,
     ChatMessagePromptBlock,
@@ -192,6 +194,11 @@ def test_validation_with_extra_variables(vellum_adhoc_prompt_client):
     ]
 
 
+class TestPydanticModel(BaseModel):
+    result: str
+    confidence: float = 0.9
+
+
 @pytest.mark.parametrize(
     "custom_parameters,test_description",
     [
@@ -208,6 +215,13 @@ def test_validation_with_extra_variables(vellum_adhoc_prompt_client):
                 },
             },
             "with json_schema configured",
+        ),
+        (
+            {
+                "json_mode": False,
+                "json_schema": {"name": "get_result_pydantic", "schema": TestPydanticModel},
+            },
+            "with json_schema configured using Pydantic model",
         ),
         (
             {},
