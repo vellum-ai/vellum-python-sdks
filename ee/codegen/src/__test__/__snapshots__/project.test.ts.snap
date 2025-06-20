@@ -373,7 +373,7 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 exports[`WorkflowProjectGenerator > function > should generate deployment workflow tool > code/nodes/workflow/__init__.py 1`] = `
 "from typing import List
 
-from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum import ChatMessage
 from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.types.definition import DeploymentDefinition
 

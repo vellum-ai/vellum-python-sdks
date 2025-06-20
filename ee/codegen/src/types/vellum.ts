@@ -899,7 +899,7 @@ export interface InlineWorkflowFunctionArgs {
 }
 
 export interface DeploymentWorkflowFunctionArgs {
-  type: "DEPLOYMENT_WORKFLOW";
+  type: "WORKFLOW_DEPLOYMENT";
   deployment: string;
   release_tag: string | null;
 }

@@ -4812,7 +4812,7 @@ baz = foo + bar
                 module: [
                   "tests",
                   "workflows",
-                  "basic_tool_calling_node_deployment_workflow",
+                  "basic_tool_calling_node_workflow_deployment",
                   "workflow",
                 ],
               },
@@ -4857,7 +4857,7 @@ baz = foo + bar
                       type: "JSON",
                       value: [
                         {
-                          type: "DEPLOYMENT_WORKFLOW",
+                          type: "WORKFLOW_DEPLOYMENT",
                           deployment: "deployment_1",
                           release_tag: "LATEST",
                         },

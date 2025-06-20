@@ -138,7 +138,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   }
                   break;
                 }
-                case "DEPLOYMENT_WORKFLOW": {
+                case "WORKFLOW_DEPLOYMENT": {
                   deploymentWorkflowFunctions.push(
                     f as DeploymentWorkflowFunctionArgs
                   );
@@ -173,7 +173,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 default:
                   this.workflowContext.addError(
                     new NodeDefinitionGenerationError(
-                      `Unsupported function type. Only CODE_EXECUTION, INLINE_WORKFLOW, and DEPLOYMENT_WORKFLOW are supported.`,
+                      `Unsupported function type. Only CODE_EXECUTION, INLINE_WORKFLOW, and WORKFLOW_DEPLOYMENT are supported.`,
                       "WARNING"
                     )
                   );
