@@ -33,6 +33,6 @@ def normalize_json(schema_input: Any) -> Any:
 
         return result
     elif isinstance(schema_input, BaseModel):
-        return normalize_json(schema_input.__class__)
+        return {key: normalize_json(getattr(schema_input, key)) for key in schema_input.__class__.model_fields.keys()}
     else:
         return schema_input

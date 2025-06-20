@@ -185,9 +185,6 @@ def _convert_mapping(
                 convert_and_respect_annotation_metadata(object_=value, annotation=type_, direction=direction)
             )
 
-    if "custom_parameters" in converted_object:
-        converted_object["custom_parameters"] = _handle_json_schema_conversion(converted_object["custom_parameters"])
-
     return converted_object
 
 
@@ -263,22 +260,6 @@ def _get_alias_from_type(type_: typing.Any) -> typing.Optional[str]:
             if isinstance(annotation, FieldMetadata) and annotation.alias is not None:
                 return annotation.alias
     return None
-
-
-def _handle_json_schema_conversion(value: typing.Any) -> typing.Any:
-    """
-    Handle conversion of Pydantic models in json_schema.schema fields.
-    """
-    if isinstance(value, dict) and "json_schema" in value:
-        json_schema = value["json_schema"]
-        if isinstance(json_schema, dict) and "schema" in json_schema:
-            try:
-                from .pydantic_utilities import convert_pydantic_to_json_schema
-
-                json_schema["schema"] = convert_pydantic_to_json_schema(json_schema["schema"])
-            except (ValueError, ImportError):
-                pass
-    return value
 
 
 def _alias_key(
