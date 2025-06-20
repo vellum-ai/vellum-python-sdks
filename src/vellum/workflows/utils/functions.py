@@ -26,27 +26,27 @@ type_map = {
 }
 
 
-def _compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
+def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if annotation is None:
         return {"type": "null"}
 
     if get_origin(annotation) is Union:
-        return {"anyOf": [_compile_annotation(a, defs) for a in get_args(annotation)]}
+        return {"anyOf": [compile_annotation(a, defs) for a in get_args(annotation)]}
 
     if get_origin(annotation) is dict:
         _, value_type = get_args(annotation)
-        return {"type": "object", "additionalProperties": _compile_annotation(value_type, defs)}
+        return {"type": "object", "additionalProperties": compile_annotation(value_type, defs)}
 
     if get_origin(annotation) is list:
         item_type = get_args(annotation)[0]
-        return {"type": "array", "items": _compile_annotation(item_type, defs)}
+        return {"type": "array", "items": compile_annotation(item_type, defs)}
 
     if dataclasses.is_dataclass(annotation):
         if annotation.__name__ not in defs:
             properties = {}
             required = []
             for field in dataclasses.fields(annotation):
-                properties[field.name] = _compile_annotation(field.type, defs)
+                properties[field.name] = compile_annotation(field.type, defs)
                 if field.default is dataclasses.MISSING:
                     required.append(field.name)
                 else:
@@ -61,7 +61,7 @@ def _compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict
             for field_name, field in annotation.model_fields.items():
                 # Mypy is incorrect here, the `annotation` attribute is defined on `FieldInfo`
                 field_annotation = field.annotation  # type: ignore[attr-defined]
-                properties[field_name] = _compile_annotation(field_annotation, defs)
+                properties[field_name] = compile_annotation(field_annotation, defs)
                 if field.default is PydanticUndefined:
                     required.append(field_name)
                 else:
@@ -115,7 +115,7 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     required = []
     defs: dict[str, Any] = {}
     for param in signature.parameters.values():
-        properties[param.name] = _compile_annotation(param.annotation, defs)
+        properties[param.name] = compile_annotation(param.annotation, defs)
         if param.default is inspect.Parameter.empty:
             required.append(param.name)
         else:
@@ -148,7 +148,7 @@ def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkfl
         if name.startswith("__"):
             continue
 
-        properties[name] = _compile_annotation(field_type, defs)
+        properties[name] = compile_annotation(field_type, defs)
 
         # Check if the field has a default value
         if name not in vars_inputs_class:

@@ -37,6 +37,7 @@ from vellum.workflows.utils.functions import (
     compile_function_definition,
     compile_inline_workflow_function_definition,
 )
+from vellum.workflows.utils.pydantic_schema import normalize_json
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -98,6 +99,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         execution_context = get_execution_context()
         request_options = self.request_options or RequestOptions()
 
+        processed_parameters = self._process_parameters(self.parameters)
+
         request_options["additional_body_parameters"] = {
             "execution_context": execution_context.model_dump(mode="json"),
             **request_options.get("additional_body_parameters", {}),
@@ -129,7 +132,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 ml_model=self.ml_model,
                 input_values=input_values,
                 input_variables=input_variables,
-                parameters=self.parameters,
+                parameters=processed_parameters,
                 blocks=self.blocks,
                 settings=self.settings,
                 functions=normalized_functions,
@@ -142,7 +145,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 ml_model=self.ml_model,
                 input_values=input_values,
                 input_variables=input_variables,
-                parameters=self.parameters,
+                parameters=processed_parameters,
                 blocks=self.blocks,
                 settings=self.settings,
                 functions=normalized_functions,
@@ -279,3 +282,14 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 )
 
         return input_variables, input_values
+
+    def _process_parameters(self, parameters: PromptParameters) -> PromptParameters:
+        """
+        Process parameters to recursively convert any Pydantic models to JSON schema dictionaries.
+        """
+        if not parameters.custom_parameters:
+            return parameters
+
+        processed_custom_params = normalize_json(parameters.custom_parameters)
+
+        return parameters.model_copy(update={"custom_parameters": processed_custom_params})
