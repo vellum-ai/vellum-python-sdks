@@ -25,6 +25,7 @@ from tests.workflows.basic_subworkflow_deployment.workflow import (
     Inputs,
 )
 from tests.workflows.basic_subworkflow_deployment.workflow_with_base_inputs import (
+    ExampleSubworkflowDeploymentNodeWithBaseInputs,
     TestInputs,
     WorkflowWithBaseInputsSubworkflow,
 )
@@ -35,13 +36,13 @@ from tests.workflows.basic_subworkflow_deployment.workflow_with_optional_inputs 
 
 
 @pytest.mark.parametrize(
-    "workflow_class,inputs_class",
+    "workflow_class,inputs_class,node_class",
     [
-        (BasicSubworkflowDeploymentWorkflow, Inputs),
-        (WorkflowWithBaseInputsSubworkflow, TestInputs),
+        (BasicSubworkflowDeploymentWorkflow, Inputs, ExampleSubworkflowDeploymentNode),
+        (WorkflowWithBaseInputsSubworkflow, TestInputs, ExampleSubworkflowDeploymentNodeWithBaseInputs),
     ],
 )
-def test_run_workflow__happy_path(vellum_client, workflow_class, inputs_class):
+def test_run_workflow__happy_path(vellum_client, workflow_class, inputs_class, node_class):
     """Confirm that we can successfully invoke a Workflow with a single Subworkflow Deployment Node"""
 
     # GIVEN a workflow that's set up to hit a Subworkflow Deployment
@@ -115,7 +116,7 @@ def test_run_workflow__happy_path(vellum_client, workflow_class, inputs_class):
 
     call_args = vellum_client.execute_workflow_stream.call_args.kwargs
     parent_context = call_args["request_options"]["additional_body_parameters"]["execution_context"]["parent_context"]
-    expected_context = VellumCodeResourceDefinition.encode(ExampleSubworkflowDeploymentNode).model_dump()
+    expected_context = VellumCodeResourceDefinition.encode(node_class).model_dump()
     assert parent_context["node_definition"]["id"] == str(expected_context["id"])
     assert parent_context["node_definition"]["module"] == expected_context["module"]
     assert parent_context["node_definition"]["name"] == expected_context["name"]
