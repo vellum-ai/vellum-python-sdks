@@ -16,7 +16,7 @@ def test_code_to_display_data(code_to_display_fixture_paths):
     code_sub_path = code_dir.split("/".join(base_module_path))[1].split("/")[1:]
     module_path = ".".join(base_module_path + code_sub_path)
 
-    actual_serialized_workflow: dict = BaseWorkflowDisplay.serialize_module(module_path)
+    actual_serialized_workflow: dict = BaseWorkflowDisplay.serialize_module(module_path).exec_config
 
     with open(expected_display_data_file_path) as file:
         expected_serialized_workflow = json.load(file, object_hook=_custom_obj_hook)  # noqa: F841
