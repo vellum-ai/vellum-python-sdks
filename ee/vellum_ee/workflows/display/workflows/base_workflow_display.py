@@ -97,6 +97,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     _errors: List[Exception]
 
+    _serialized_files: List[str]
+
     _dry_run: bool
 
     def __init__(
@@ -114,11 +116,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             else create_vellum_client()
         )
         self._errors: List[Exception] = []
+        self._serialized_files: List[str] = [
+            "nodes/*",
+            "workflow.py",
+            "state.py",
+            "inputs.py",
+            "display/*",
+            "__init__.py",
+        ]
         self._dry_run = dry_run
 
     def serialize(self) -> JsonObject:
-        self._serialized_files = ["nodes/*", "workflow.py", "state.py", "inputs.py", "display/*", "__init__.py"]
-
         input_variables: JsonArray = []
         for workflow_input_reference, workflow_input_display in self.display_context.workflow_input_displays.items():
             default = (
@@ -890,7 +898,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                         should_ignore = True
                         break
 
-                if not should_ignore and hasattr(self, "_serialized_files"):
+                if not should_ignore:
                     for serialized_pattern in self._serialized_files:
                         if fnmatch.fnmatch(relative_path, serialized_pattern) or fnmatch.fnmatch(
                             filename, serialized_pattern

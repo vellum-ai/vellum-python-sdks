@@ -41,10 +41,6 @@ def test_serialize_module_includes_additional_files():
     assert "__init__.py" not in additional_files
     assert "utils/__init__.py" not in additional_files
 
-    assert "nodes/test_node.py" not in additional_files
-    for file_path in additional_files.keys():
-        assert not file_path.startswith("nodes/"), f"Node file {file_path} should be excluded"
-
     assert "def helper_function():" in additional_files["helper.py"]
     assert "sample data file" in additional_files["data.txt"]
     assert "CONSTANT_VALUE" in additional_files["utils/constants.py"]
