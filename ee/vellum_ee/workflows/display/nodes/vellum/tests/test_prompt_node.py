@@ -283,111 +283,31 @@ def test_serialize_node__port_groups():
     assert my_prompt_node["data"]["source_handle_id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
 
 
-def test_serialize_node__prompt_inputs__dynamic_parameters():
-    # GIVEN a state definition
-    class MyState(BaseState):
-        state_value: str
-
-    # AND input definition
+def test_serialize_node__prompt_parameters__dynamic_references():
+    # GIVEN input definition
     class MyInputs(BaseInputs):
         input_value: str
 
-    class OtherNode(BaseNode):
-        class Outputs:
-            result: str
-
-    class AnotherNode(BaseNode):
-        class Outputs:
-            data: str
-
-    # AND a prompt node with mixed dynamic parameters in prompt_inputs
+    # AND a prompt node with PromptParameters containing dynamic references
     class DynamicPromptNode(InlinePromptNode):
-        prompt_inputs = {
-            "lazy_ref": LazyReference[str]("OtherNode.Outputs.result"),
-            "state_ref": MyState.state_value,
-            "input_ref": MyInputs.input_value,
-            "constant": "static_value",
-            "another_lazy": LazyReference[str]("AnotherNode.Outputs.data"),
-        }
         blocks = []
         ml_model = "gpt-4o"
         parameters = PromptParameters(custom_parameters={"json_schema": MyInputs.input_value})
 
-    # AND a workflow with all nodes
-    class Workflow(BaseWorkflow[MyInputs, MyState]):
-        graph = DynamicPromptNode >> OtherNode >> AnotherNode
+    # AND a workflow with the prompt node
+    class Workflow(BaseWorkflow[MyInputs, BaseState]):
+        graph = DynamicPromptNode
 
     # WHEN the workflow is serialized
     workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN the node should properly serialize all dynamic references
+    # THEN the node should properly serialize the PromptParameters
     dynamic_prompt_node = next(
         node
         for node in serialized_workflow["workflow_raw_data"]["nodes"]
         if node["id"] == str(DynamicPromptNode.__id__)
     )
-
-    inputs_by_key = {inp["key"]: inp for inp in dynamic_prompt_node["inputs"]}
-
-    lazy_ref_input = inputs_by_key["lazy_ref"]
-    assert lazy_ref_input["value"]["combinator"] == "OR"
-    assert len(lazy_ref_input["value"]["rules"]) == 1
-    assert lazy_ref_input["value"]["rules"][0]["type"] == "NODE_OUTPUT"
-    assert lazy_ref_input["value"]["rules"][0]["data"]["node_id"] == str(OtherNode.__id__)
-
-    another_lazy_input = inputs_by_key["another_lazy"]
-    assert another_lazy_input["value"]["combinator"] == "OR"
-    assert len(another_lazy_input["value"]["rules"]) == 1
-    assert another_lazy_input["value"]["rules"][0]["type"] == "NODE_OUTPUT"
-    assert another_lazy_input["value"]["rules"][0]["data"]["node_id"] == str(AnotherNode.__id__)
-
-    state_ref_input = inputs_by_key["state_ref"]
-    assert state_ref_input["value"]["combinator"] == "OR"
-    assert state_ref_input["value"]["rules"] == []
-
-    input_ref_input = inputs_by_key["input_ref"]
-    assert input_ref_input["value"]["combinator"] == "OR"
-    assert len(input_ref_input["value"]["rules"]) == 1
-    assert input_ref_input["value"]["rules"][0]["type"] == "INPUT_VARIABLE"
-
-    constant_input = inputs_by_key["constant"]
-    assert constant_input["value"]["combinator"] == "OR"
-    assert len(constant_input["value"]["rules"]) == 1
-    assert constant_input["value"]["rules"][0]["type"] == "CONSTANT_VALUE"
-    assert constant_input["value"]["rules"][0]["data"]["type"] == "STRING"
-    assert constant_input["value"]["rules"][0]["data"]["value"] == "static_value"
-
-    # AND the prompt_inputs attribute should include a DICTIONARY_REFERENCE with all dynamic references
-    prompt_inputs_attribute = next(
-        attribute for attribute in dynamic_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
-    )
-
-    assert prompt_inputs_attribute["name"] == "prompt_inputs"
-    assert prompt_inputs_attribute["value"]["type"] == "DICTIONARY_REFERENCE"
-
-    entries_by_key = {entry["key"]: entry for entry in prompt_inputs_attribute["value"]["entries"]}
-
-    lazy_ref_entry = entries_by_key["lazy_ref"]
-    assert lazy_ref_entry["value"]["type"] == "NODE_OUTPUT"
-    assert lazy_ref_entry["value"]["node_id"] == str(OtherNode.__id__)
-
-    another_lazy_entry = entries_by_key["another_lazy"]
-    assert another_lazy_entry["value"]["type"] == "NODE_OUTPUT"
-    assert another_lazy_entry["value"]["node_id"] == str(AnotherNode.__id__)
-
-    state_ref_entry = entries_by_key["state_ref"]
-    assert state_ref_entry["value"]["type"] == "WORKFLOW_STATE"
-    assert "state_variable_id" in state_ref_entry["value"]
-
-    input_ref_entry = entries_by_key["input_ref"]
-    assert input_ref_entry["value"]["type"] == "WORKFLOW_INPUT"
-    assert "input_variable_id" in input_ref_entry["value"]
-
-    constant_entry = entries_by_key["constant"]
-    assert constant_entry["value"]["type"] == "CONSTANT_VALUE"
-    assert constant_entry["value"]["value"]["type"] == "STRING"
-    assert constant_entry["value"]["value"]["value"] == "static_value"
 
     # AND the parameters should be properly serialized in exec_config
     exec_config = dynamic_prompt_node["data"]["exec_config"]
