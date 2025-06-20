@@ -4777,4 +4777,148 @@ baz = foo + bar
       }
     });
   });
+
+  describe("module data with additional files", () => {
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: "templating-node",
+            type: "TEMPLATING",
+            data: {
+              label: "Templating Node",
+              template_node_input_id: "template",
+              output_id: "output",
+              output_type: "STRING",
+              source_handle_id: "template_source",
+              target_handle_id: "template_target",
+            },
+            inputs: [
+              {
+                id: "template",
+                key: "template",
+                value: {
+                  combinator: "OR",
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "hello",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: "templating-node",
+            target_handle_id: "template_target",
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+        ],
+      },
+      input_variables: [],
+      state_variables: [],
+      output_variables: [],
+      module_data: {
+        additional_files: {
+          "utils.py": "def helper_function():\n    return 'Hello from utils'\n",
+          "config/settings.json": '{"debug": true, "version": "1.0.0"}',
+          "nested/deep/file.txt": "This is a nested file content",
+        },
+      },
+    };
+
+    it("should write additional files from module_data to disk during code generation", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(["code", "workflow.py"]);
+
+      expectProjectFileToExist(["code", "utils.py"]);
+      expectProjectFileToExist(["code", "config", "settings.json"]);
+      expectProjectFileToExist(["code", "nested", "deep", "file.txt"]);
+
+      const utilsPath = join(tempDir, "code", "utils.py");
+      const configPath = join(tempDir, "code", "config", "settings.json");
+      const nestedPath = join(tempDir, "code", "nested", "deep", "file.txt");
+
+      expect(fs.readFileSync(utilsPath, "utf-8")).toBe(
+        "def helper_function():\n    return 'Hello from utils'\n"
+      );
+      expect(fs.readFileSync(configPath, "utf-8")).toBe(
+        '{"debug": true, "version": "1.0.0"}'
+      );
+      expect(fs.readFileSync(nestedPath, "utf-8")).toBe(
+        "This is a nested file content"
+      );
+    });
+
+    it("should handle empty additional files gracefully", async () => {
+      const displayDataWithEmptyFiles = {
+        ...displayData,
+        module_data: {
+          additional_files: {},
+        },
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayDataWithEmptyFiles,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(["code", "workflow.py"]);
+    });
+
+    it("should handle missing module_data gracefully", async () => {
+      const { module_data, ...displayDataWithoutModuleData } = displayData;
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayDataWithoutModuleData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToExist(["code", "workflow.py"]);
+    });
+  });
 });
