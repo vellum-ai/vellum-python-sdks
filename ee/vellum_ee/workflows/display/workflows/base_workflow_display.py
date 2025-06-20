@@ -844,10 +844,57 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             client=client,
             dry_run=dry_run,
         )
+
+        additional_files = BaseWorkflowDisplay._gather_additional_module_files(module)
+
+        exec_config = workflow_display.serialize()
+        if additional_files:
+            exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
+
         return WorkflowSerializationResult(
-            exec_config=workflow_display.serialize(),
+            exec_config=exec_config,
             errors=[str(error) for error in workflow_display.errors],
         )
+
+    @staticmethod
+    def _gather_additional_module_files(module_path: str) -> Dict[str, str]:
+        import importlib
+        import os
+
+        workflow_module_path = f"{module_path}.workflow"
+        workflow_module = importlib.import_module(workflow_module_path)
+
+        workflow_file_path = workflow_module.__file__
+        if not workflow_file_path:
+            return {}
+
+        module_dir = os.path.dirname(workflow_file_path)
+        additional_files = {}
+
+        for root, _, filenames in os.walk(module_dir):
+            for filename in filenames:
+                file_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(file_path, start=module_dir)
+
+                if (
+                    filename == "workflow.py"
+                    or filename == "__init__.py"
+                    or filename == "inputs.py"
+                    or filename.endswith(".pyc")
+                    or "__pycache__" in relative_path
+                    or filename.startswith(".")
+                    or relative_path.startswith("nodes/")
+                    or relative_path.startswith("display/")
+                ):
+                    continue
+
+                try:
+                    with open(file_path, encoding="utf-8") as f:
+                        additional_files[relative_path] = f.read()
+                except (UnicodeDecodeError, PermissionError):
+                    continue
+
+        return additional_files
 
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
