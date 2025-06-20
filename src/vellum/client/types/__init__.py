@@ -38,6 +38,7 @@ from .basic_vectorizer_sentence_transformers_multi_qa_mpnet_base_dot_v_1 import 
 from .basic_vectorizer_sentence_transformers_multi_qa_mpnet_base_dot_v_1_request import (
     BasicVectorizerSentenceTransformersMultiQaMpnetBaseDotV1Request,
 )
+from .build_status_enum import BuildStatusEnum
 from .chat_history_input import ChatHistoryInput
 from .chat_history_input_request import ChatHistoryInputRequest
 from .chat_history_vellum_value import ChatHistoryVellumValue
@@ -73,6 +74,7 @@ from .components_schemas_prompt_version_build_config_sandbox import ComponentsSc
 from .condition_combinator import ConditionCombinator
 from .conditional_node_result import ConditionalNodeResult
 from .conditional_node_result_data import ConditionalNodeResultData
+from .container_image_build_config import ContainerImageBuildConfig
 from .container_image_container_image_tag import ContainerImageContainerImageTag
 from .container_image_read import ContainerImageRead
 from .create_test_suite_test_case_request import CreateTestSuiteTestCaseRequest
@@ -131,6 +133,8 @@ from .fast_embed_vectorizer_baai_bge_small_en_v_15 import FastEmbedVectorizerBaa
 from .fast_embed_vectorizer_baai_bge_small_en_v_15_request import FastEmbedVectorizerBaaiBgeSmallEnV15Request
 from .finish_reason_enum import FinishReasonEnum
 from .folder_entity import FolderEntity
+from .folder_entity_dataset import FolderEntityDataset
+from .folder_entity_dataset_data import FolderEntityDatasetData
 from .folder_entity_document_index import FolderEntityDocumentIndex
 from .folder_entity_document_index_data import FolderEntityDocumentIndexData
 from .folder_entity_folder import FolderEntityFolder
@@ -650,6 +654,7 @@ __all__ = [
     "BasicVectorizerSentenceTransformersMultiQaMpnetBaseCosV1Request",
     "BasicVectorizerSentenceTransformersMultiQaMpnetBaseDotV1",
     "BasicVectorizerSentenceTransformersMultiQaMpnetBaseDotV1Request",
+    "BuildStatusEnum",
     "ChatHistoryInput",
     "ChatHistoryInputRequest",
     "ChatHistoryVellumValue",
@@ -685,6 +690,7 @@ __all__ = [
     "ConditionCombinator",
     "ConditionalNodeResult",
     "ConditionalNodeResultData",
+    "ContainerImageBuildConfig",
     "ContainerImageContainerImageTag",
     "ContainerImageRead",
     "CreateTestSuiteTestCaseRequest",
@@ -743,6 +749,8 @@ __all__ = [
     "FastEmbedVectorizerBaaiBgeSmallEnV15Request",
     "FinishReasonEnum",
     "FolderEntity",
+    "FolderEntityDataset",
+    "FolderEntityDatasetData",
     "FolderEntityDocumentIndex",
     "FolderEntityDocumentIndexData",
     "FolderEntityFolder",

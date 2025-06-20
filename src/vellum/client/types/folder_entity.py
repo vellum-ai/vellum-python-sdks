@@ -6,6 +6,7 @@ from .folder_entity_prompt_sandbox import FolderEntityPromptSandbox
 from .folder_entity_workflow_sandbox import FolderEntityWorkflowSandbox
 from .folder_entity_document_index import FolderEntityDocumentIndex
 from .folder_entity_test_suite import FolderEntityTestSuite
+from .folder_entity_dataset import FolderEntityDataset
 
 FolderEntity = typing.Union[
     FolderEntityFolder,
@@ -13,4 +14,5 @@ FolderEntity = typing.Union[
     FolderEntityWorkflowSandbox,
     FolderEntityDocumentIndex,
     FolderEntityTestSuite,
+    FolderEntityDataset,
 ]

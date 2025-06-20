@@ -5,6 +5,8 @@ from .entity_visibility import EntityVisibility
 import datetime as dt
 import typing
 from .container_image_container_image_tag import ContainerImageContainerImageTag
+from .build_status_enum import BuildStatusEnum
+from .container_image_build_config import ContainerImageBuildConfig
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
@@ -18,6 +20,8 @@ class ContainerImageRead(UniversalBaseModel):
     repository: str
     sha: str
     tags: typing.List[ContainerImageContainerImageTag]
+    build_status: typing.Optional[BuildStatusEnum] = None
+    build_config: typing.Optional[ContainerImageBuildConfig] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
