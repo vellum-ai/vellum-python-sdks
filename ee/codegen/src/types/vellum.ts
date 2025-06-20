@@ -732,12 +732,17 @@ export interface RunnerConfig {
   containerImageTag?: string;
 }
 
+export interface ModuleData {
+  additionalFiles?: Record<string, string> | null;
+}
+
 export interface WorkflowVersionExecConfig {
   workflowRawData: WorkflowRawData;
   inputVariables: VellumVariable[];
   stateVariables?: VellumVariable[];
   outputVariables: VellumVariable[];
   runnerConfig?: RunnerConfig;
+  moduleData?: ModuleData;
 }
 
 type WorkflowSandboxInput =
