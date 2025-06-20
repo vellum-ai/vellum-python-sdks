@@ -2245,10 +2245,7 @@ export const WorkflowVersionExecConfigSerializer = objectSchema({
       ),
     }).optional()
   ),
-  moduleData: propertySchema(
-    "module_data",
-    ModuleDataSerializer.optional()
-  ),
+  moduleData: propertySchema("module_data", ModuleDataSerializer.optional()),
 });
 
 export declare namespace WorkflowVersionExecConfigSerializer {

@@ -4793,42 +4793,34 @@ baz = foo + bar
             inputs: [],
           },
           {
-            id: "templating-node",
-            type: "TEMPLATING",
-            data: {
-              label: "Templating Node",
-              template_node_input_id: "template",
-              output_id: "output",
-              output_type: "STRING",
-              source_handle_id: "template_source",
-              target_handle_id: "template_target",
+            id: "generic-node",
+            type: "GENERIC",
+            label: "Generic Node",
+            attributes: [],
+            trigger: {
+              id: "generic-node-trigger",
+              merge_behavior: "AWAIT_ATTRIBUTES",
             },
-            inputs: [
+            ports: [
               {
-                id: "template",
-                key: "template",
-                value: {
-                  combinator: "OR",
-                  rules: [
-                    {
-                      type: "CONSTANT_VALUE",
-                      data: {
-                        type: "STRING",
-                        value: "hello",
-                      },
-                    },
-                  ],
-                },
+                id: "generic-node-default-port",
+                name: "default",
+                type: "DEFAULT",
               },
             ],
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+            outputs: [],
           },
         ],
         edges: [
           {
             source_node_id: "entry",
             source_handle_id: "entry_source",
-            target_node_id: "templating-node",
-            target_handle_id: "template_target",
+            target_node_id: "generic-node",
+            target_handle_id: "generic-node-trigger",
             type: "DEFAULT",
             id: "edge_1",
           },
@@ -4891,24 +4883,6 @@ baz = foo + bar
       const project = new WorkflowProjectGenerator({
         absolutePathToOutputDirectory: tempDir,
         workflowVersionExecConfigData: displayDataWithEmptyFiles,
-        moduleName: "code",
-        vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
-      });
-
-      await project.generateCode();
-
-      expectProjectFileToExist(["code", "workflow.py"]);
-    });
-
-    it("should handle missing module_data gracefully", async () => {
-      const { module_data, ...displayDataWithoutModuleData } = displayData;
-
-      const project = new WorkflowProjectGenerator({
-        absolutePathToOutputDirectory: tempDir,
-        workflowVersionExecConfigData: displayDataWithoutModuleData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
         options: {

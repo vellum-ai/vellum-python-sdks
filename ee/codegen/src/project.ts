@@ -815,11 +815,13 @@ ${errors.slice(0, 3).map((err) => {
     );
 
     await Promise.all(
-      Object.entries(moduleData.additionalFiles).map(async ([relativePath, content]) => {
-        const fullPath = join(absolutePathToModuleDirectory, relativePath);
-        await mkdir(path.dirname(fullPath), { recursive: true });
-        await writeFile(fullPath, content);
-      })
+      Object.entries(moduleData.additionalFiles).map(
+        async ([relativePath, content]) => {
+          const fullPath = join(absolutePathToModuleDirectory, relativePath);
+          await mkdir(path.dirname(fullPath), { recursive: true });
+          await writeFile(fullPath, content);
+        }
+      )
     );
   }
 
