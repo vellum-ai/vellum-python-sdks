@@ -475,4 +475,5 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
     assert len(descriptor_blocks) == 0, "BaseDescriptor blocks should not appear in serialized blocks"
 
     blocks_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "blocks"), None)
-    assert blocks_attr is None, "blocks attribute should not be present when blocks contain nested BaseDescriptor"
+    assert blocks_attr is not None, "blocks attribute should be present when blocks contain nested BaseDescriptor"
+    assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE", "blocks attribute should be serialized as ARRAY_REFERENCE"
