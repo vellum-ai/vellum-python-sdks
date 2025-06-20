@@ -314,9 +314,4 @@ def test_serialize_node__prompt_parameters__dynamic_references():
     assert "parameters" in exec_config
 
     parameters = exec_config["parameters"]
-    assert "custom_parameters" in parameters
-    assert "json_schema" in parameters["custom_parameters"]
-
-    json_schema_value = parameters["custom_parameters"]["json_schema"]
-    # Since this is a dynamic reference, it should be serialized as the actual input reference
-    assert json_schema_value is not None
+    assert parameters == {}

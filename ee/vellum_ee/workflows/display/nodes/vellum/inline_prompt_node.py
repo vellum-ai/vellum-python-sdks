@@ -91,7 +91,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "INLINE",
                 "exec_config": {
-                    "parameters": raise_if_descriptor(node.parameters).dict(),
+                    "parameters": self._serialize_parameters(node.parameters, display_context),
                     "input_variables": [prompt_input.dict() for prompt_input in prompt_inputs],
                     "prompt_template_block_data": {
                         "version": 1,
@@ -273,3 +273,33 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
         return attributes
+
+    def _serialize_parameters(self, parameters, display_context: "WorkflowDisplayContext") -> JsonObject:
+        """Serialize parameters, returning empty object when nested descriptors are detected."""
+        from vellum.workflows.descriptors.base import BaseDescriptor
+        from vellum.workflows.references.lazy import LazyReference
+        from vellum.workflows.references.output import OutputReference
+        from vellum.workflows.references.state_value import StateValueReference
+        from vellum.workflows.references.workflow_input import WorkflowInputReference
+
+        params = raise_if_descriptor(parameters)
+        if not params:
+            return {}
+
+        def contains_descriptors(obj):
+            if isinstance(
+                obj, (BaseDescriptor, WorkflowInputReference, StateValueReference, OutputReference, LazyReference)
+            ):
+                return True
+            elif isinstance(obj, dict):
+                return any(contains_descriptors(v) for v in obj.values())
+            elif isinstance(obj, (list, tuple)):
+                return any(contains_descriptors(item) for item in obj)
+            elif hasattr(obj, "__dict__"):
+                return any(contains_descriptors(getattr(obj, field)) for field in obj.__dict__)
+            return False
+
+        if contains_descriptors(params):
+            return {}
+
+        return params.dict()
