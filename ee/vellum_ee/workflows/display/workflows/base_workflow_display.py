@@ -1,8 +1,10 @@
 from copy import copy
+import fnmatch
 from functools import cached_property
 import importlib
 import inspect
 import logging
+import os
 from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
@@ -57,6 +59,14 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 
 logger = logging.getLogger(__name__)
 
+IGNORE_PATTERNS = [
+    "*.pyc",
+    "__pycache__",
+    ".*",
+    "node_modules/*",
+    "*.log",
+]
+
 
 class WorkflowSerializationResult(UniversalBaseModel):
     exec_config: Dict[str, Any]
@@ -87,6 +97,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     _errors: List[Exception]
 
+    _serialized_files: List[str]
+
     _dry_run: bool
 
     def __init__(
@@ -103,10 +115,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if self._parent_display_context
             else create_vellum_client()
         )
-        self._errors: List[Exception] = []
+        self._errors = []
+        self._serialized_files = []
         self._dry_run = dry_run
 
     def serialize(self) -> JsonObject:
+        self._serialized_files = [
+            "__init__.py",
+            "display/*",
+            "inputs.py",
+            "nodes/*",
+            "state.py",
+            "workflow.py",
+        ]
+
         input_variables: JsonArray = []
         for workflow_input_reference, workflow_input_display in self.display_context.workflow_input_displays.items():
             default = (
@@ -844,10 +866,58 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             client=client,
             dry_run=dry_run,
         )
+
+        exec_config = workflow_display.serialize()
+        additional_files = workflow_display._gather_additional_module_files(module)
+
+        if additional_files:
+            exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
+
         return WorkflowSerializationResult(
-            exec_config=workflow_display.serialize(),
+            exec_config=exec_config,
             errors=[str(error) for error in workflow_display.errors],
         )
+
+    def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
+        workflow_module_path = f"{module_path}.workflow"
+        workflow_module = importlib.import_module(workflow_module_path)
+
+        workflow_file_path = workflow_module.__file__
+        if not workflow_file_path:
+            return {}
+
+        module_dir = os.path.dirname(workflow_file_path)
+        additional_files = {}
+
+        for root, _, filenames in os.walk(module_dir):
+            for filename in filenames:
+                file_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(file_path, start=module_dir)
+
+                should_ignore = False
+                for ignore_pattern in IGNORE_PATTERNS:
+                    if fnmatch.fnmatch(filename, ignore_pattern) or fnmatch.fnmatch(relative_path, ignore_pattern):
+                        should_ignore = True
+                        break
+
+                if not should_ignore:
+                    for serialized_pattern in self._serialized_files:
+                        if fnmatch.fnmatch(relative_path, serialized_pattern) or fnmatch.fnmatch(
+                            filename, serialized_pattern
+                        ):
+                            should_ignore = True
+                            break
+
+                if should_ignore:
+                    continue
+
+                try:
+                    with open(file_path, encoding="utf-8") as f:
+                        additional_files[relative_path] = f.read()
+                except (UnicodeDecodeError, PermissionError):
+                    continue
+
+        return additional_files
 
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
