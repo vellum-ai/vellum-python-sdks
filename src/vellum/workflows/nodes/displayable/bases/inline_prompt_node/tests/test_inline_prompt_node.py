@@ -295,6 +295,21 @@ def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client, custom_para
     assert json_output.value == expected_json
 
     # AND we should have made the expected call to Vellum search
+    expected_custom_parameters = custom_parameters
+    if "json_schema" in custom_parameters and "schema" in custom_parameters["json_schema"]:
+        if custom_parameters["json_schema"]["schema"] == TestPydanticModel:
+            expected_custom_parameters = {
+                "json_mode": False,
+                "json_schema": {
+                    "name": "get_result_pydantic",
+                    "schema": {
+                        "type": "object",
+                        "properties": {"result": {"type": "string"}, "confidence": {"type": "number", "default": 0.9}},
+                        "required": ["result"],
+                    },
+                },
+            }
+
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.assert_called_once_with(
         blocks=[],
         expand_meta=None,
@@ -311,7 +326,7 @@ def test_inline_prompt_node__json_output(vellum_adhoc_prompt_client, custom_para
             frequency_penalty=0.0,
             presence_penalty=0.0,
             logit_bias=None,
-            custom_parameters=custom_parameters,
+            custom_parameters=expected_custom_parameters,
         ),
         request_options=mock.ANY,
         settings=None,
