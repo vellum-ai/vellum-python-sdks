@@ -20,6 +20,7 @@ import { WorkflowValueDescriptor } from "src/generators/workflow-value-descripto
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
+  DeploymentWorkflowFunctionArgs,
   FunctionArgs,
   GenericNode as GenericNodeType,
   InlineWorkflowFunctionArgs,
@@ -67,12 +68,17 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             value.value?.type === "JSON" &&
             Array.isArray(value.value.value)
           ) {
-            const functions: Array<FunctionArgs | InlineWorkflowFunctionArgs> =
-              value.value.value;
+            const functions: Array<
+              | FunctionArgs
+              | InlineWorkflowFunctionArgs
+              | DeploymentWorkflowFunctionArgs
+            > = value.value.value;
 
             const codeExecutionFunctions: FunctionArgs[] = [];
             const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];
-            const functionReferences: python.Reference[] = [];
+            const deploymentWorkflowFunctions: DeploymentWorkflowFunctionArgs[] =
+              [];
+            const functionReferences: python.AstNode[] = [];
 
             functions.forEach((f) => {
               switch (f.type) {
@@ -132,11 +138,42 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   }
                   break;
                 }
+                case "DEPLOYMENT_WORKFLOW": {
+                  deploymentWorkflowFunctions.push(
+                    f as DeploymentWorkflowFunctionArgs
+                  );
+                  functionReferences.push(
+                    python.instantiateClass({
+                      classReference: python.reference({
+                        name: "DeploymentDefinition",
+                        modulePath: [
+                          "vellum",
+                          "workflows",
+                          "types",
+                          "definition",
+                        ],
+                      }),
+                      arguments_: [
+                        python.methodArgument({
+                          name: "deployment",
+                          value: python.TypeInstantiation.str(f.deployment),
+                        }),
+                        python.methodArgument({
+                          name: "release_tag",
+                          value: python.TypeInstantiation.str(
+                            f.release_tag ?? "LATEST"
+                          ),
+                        }),
+                      ],
+                    })
+                  );
+                  break;
+                }
 
                 default:
                   this.workflowContext.addError(
                     new NodeDefinitionGenerationError(
-                      `Unsupported function type. Only CODE_EXECUTION and INLINE_WORKFLOW are supported.`,
+                      `Unsupported function type. Only CODE_EXECUTION, INLINE_WORKFLOW, and DEPLOYMENT_WORKFLOW are supported.`,
                       "WARNING"
                     )
                   );

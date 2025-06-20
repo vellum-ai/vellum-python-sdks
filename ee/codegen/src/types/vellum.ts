@@ -897,3 +897,9 @@ export interface InlineWorkflowFunctionArgs {
   type: "INLINE_WORKFLOW";
   exec_config: WorkflowVersionExecConfig;
 }
+
+export interface DeploymentWorkflowFunctionArgs {
+  type: "DEPLOYMENT_WORKFLOW";
+  deployment: string;
+  release_tag: string | null;
+}

@@ -4776,5 +4776,200 @@ baz = foo + bar
         expectProjectFileToMatchSnapshot(file);
       }
     });
+    it("should generate deployment workflow tool", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "entrypoint",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "d8144c82-8b1a-4181-b068-6aaf69d21b73",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+            },
+            {
+              id: "b6d28aed-a60f-4c29-9d02-6a130358f2be",
+              label: "MyToolCallingNode",
+              type: "GENERIC",
+              display_data: { position: { x: 0.0, y: 0.0 } },
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "experimental",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              definition: {
+                name: "MyToolCallingNode",
+                module: [
+                  "tests",
+                  "workflows",
+                  "basic_tool_calling_node_deployment_workflow",
+                  "workflow",
+                ],
+              },
+              trigger: {
+                id: "e7774637-d160-4c4a-8106-4fa15b261f5f",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: "9427ace6-cc30-4c4c-ac09-91842e6ca01f",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              adornments: null,
+              attributes: [
+                {
+                  id: "43a479ed-8130-403b-b6d4-e085bab497db",
+                  name: "ml_model",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "gpt-4" },
+                  },
+                },
+                {
+                  id: "f17c7e76-5696-485f-92a7-45dfc94b10fb",
+                  name: "blocks",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          block_type: "CHAT_MESSAGE",
+                          state: null,
+                          cache_config: null,
+                          chat_role: "SYSTEM",
+                          chat_source: null,
+                          chat_message_unterminated: null,
+                          blocks: [
+                            {
+                              block_type: "RICH_TEXT",
+                              state: null,
+                              cache_config: null,
+                              blocks: [
+                                {
+                                  block_type: "PLAIN_TEXT",
+                                  state: null,
+                                  cache_config: null,
+                                  text: "You are a helpful assistant. Use the available tools to help the user.",
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                        {
+                          block_type: "CHAT_MESSAGE",
+                          state: null,
+                          cache_config: null,
+                          chat_role: "USER",
+                          chat_source: null,
+                          chat_message_unterminated: null,
+                          blocks: [
+                            {
+                              block_type: "RICH_TEXT",
+                              state: null,
+                              cache_config: null,
+                              blocks: [
+                                {
+                                  block_type: "VARIABLE",
+                                  state: null,
+                                  cache_config: null,
+                                  input_variable: "query",
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  id: "73a94e3c-1935-4308-a68a-ecd5441804b7",
+                  name: "functions",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          type: "DEPLOYMENT_WORKFLOW",
+                          deployment: "deployment_1",
+                          release_tag: "LATEST",
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  id: "f8ef2b4f-4c43-4d24-84b1-63081e5fc490",
+                  name: "prompt_inputs",
+                  value: {
+                    type: "DICTIONARY_REFERENCE",
+                    entries: [
+                      {
+                        id: "50c33b12-7263-4803-9363-946b7dc5e92a",
+                        key: "query",
+                        value: {
+                          type: "WORKFLOW_INPUT",
+                          input_variable_id:
+                            "8eb6877a-7a92-439b-8355-124c5880a94d",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              outputs: [
+                {
+                  id: "de0286f1-d33f-4953-9808-3aa8330af2d6",
+                  name: "text",
+                  type: "STRING",
+                  value: null,
+                },
+                {
+                  id: "77bc809c-4d17-4e61-ac7d-93da4d17a40f",
+                  name: "chat_history",
+                  type: "CHAT_HISTORY",
+                  value: null,
+                },
+              ],
+            },
+          ],
+          output_values: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      await project.generateCode();
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "workflow",
+        "__init__.py",
+      ]);
+    });
   });
 });
