@@ -128,7 +128,7 @@ def test_serialize_workflow():
                     "value": {
                         "type": "JSON",
                         "value": [
-                            {"type": "DEPLOYMENT_WORKFLOW", "deployment": "deployment_1", "release_tag": "LATEST"}
+                            {"type": "WORKFLOW_DEPLOYMENT", "deployment": "deployment_1", "release_tag": "LATEST"}
                         ],
                     },
                 },

@@ -340,7 +340,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             "value": {
                 "type": "JSON",
                 "value": {
-                    "type": "DEPLOYMENT_WORKFLOW",
+                    "type": "WORKFLOW_DEPLOYMENT",
                     "deployment": value.deployment,
                     "release_tag": value.release_tag,
                 },
