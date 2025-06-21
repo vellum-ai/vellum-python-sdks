@@ -315,3 +315,23 @@ def test_serialize_node__prompt_parameters__dynamic_references():
 
     parameters = exec_config["parameters"]
     assert parameters == {}
+
+    # AND the parameters should also be serialized in the attributes array
+    parameters_attribute = next(
+        (attr for attr in dynamic_prompt_node.get("attributes", []) if attr["name"] == "parameters"), None
+    )
+    assert parameters_attribute is not None
+    assert parameters_attribute["name"] == "parameters"
+    assert parameters_attribute["value"]["type"] == "CONSTANT_VALUE"
+
+    # AND the attribute should have the correct structure for an empty JSON object
+    assert parameters_attribute["value"]["value"]["type"] == "JSON"
+    assert parameters_attribute["value"]["value"]["value"] == {}
+
+    # AND the attribute should have a valid ID
+    assert "id" in parameters_attribute
+    assert isinstance(parameters_attribute["id"], str)
+    assert len(parameters_attribute["id"]) > 0
+
+    attribute_names = [attr["name"] for attr in dynamic_prompt_node.get("attributes", [])]
+    assert "parameters" in attribute_names

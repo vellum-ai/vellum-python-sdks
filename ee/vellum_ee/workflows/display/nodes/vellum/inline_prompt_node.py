@@ -15,6 +15,26 @@ from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import NodeInput
 
+
+def _contains_descriptors(obj):
+    """Check if an object contains any descriptors or references that need special handling."""
+    from vellum.workflows.descriptors.base import BaseDescriptor
+    from vellum.workflows.references.lazy import LazyReference
+    from vellum.workflows.references.output import OutputReference
+    from vellum.workflows.references.state_value import StateValueReference
+    from vellum.workflows.references.workflow_input import WorkflowInputReference
+
+    if isinstance(obj, (BaseDescriptor, WorkflowInputReference, StateValueReference, OutputReference, LazyReference)):
+        return True
+    elif isinstance(obj, dict):
+        return any(_contains_descriptors(v) for v in obj.values())
+    elif isinstance(obj, (list, tuple)):
+        return any(_contains_descriptors(item) for item in obj)
+    elif hasattr(obj, "__dict__"):
+        return any(_contains_descriptors(getattr(obj, field)) for field in obj.__dict__)
+    return False
+
+
 _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 
@@ -38,7 +58,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         InlinePromptNode.prompt_inputs,
     }
     __unserializable_attributes__ = {
-        InlinePromptNode.parameters,
         InlinePromptNode.settings,
         InlinePromptNode.expand_meta,
         InlinePromptNode.request_options,
@@ -262,11 +281,16 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
             )
             try:
+                if attribute.name == "parameters":
+                    value = self._serialize_parameters_for_attributes(attribute.instance, display_context)
+                else:
+                    value = serialize_value(display_context, attribute.instance)
+
                 attributes.append(
                     {
                         "id": id,
                         "name": attribute.name,
-                        "value": serialize_value(display_context, attribute.instance),
+                        "value": value,
                     }
                 )
             except ValueError as e:
@@ -276,30 +300,21 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
     def _serialize_parameters(self, parameters, display_context: "WorkflowDisplayContext") -> JsonObject:
         """Serialize parameters, returning empty object when nested descriptors are detected."""
-        from vellum.workflows.descriptors.base import BaseDescriptor
-        from vellum.workflows.references.lazy import LazyReference
-        from vellum.workflows.references.output import OutputReference
-        from vellum.workflows.references.state_value import StateValueReference
-        from vellum.workflows.references.workflow_input import WorkflowInputReference
-
         params = raise_if_descriptor(parameters)
         if not params:
             return {}
 
-        def contains_descriptors(obj):
-            if isinstance(
-                obj, (BaseDescriptor, WorkflowInputReference, StateValueReference, OutputReference, LazyReference)
-            ):
-                return True
-            elif isinstance(obj, dict):
-                return any(contains_descriptors(v) for v in obj.values())
-            elif isinstance(obj, (list, tuple)):
-                return any(contains_descriptors(item) for item in obj)
-            elif hasattr(obj, "__dict__"):
-                return any(contains_descriptors(getattr(obj, field)) for field in obj.__dict__)
-            return False
-
-        if contains_descriptors(params):
+        if _contains_descriptors(params):
             return {}
 
         return params.dict()
+
+    def _serialize_parameters_for_attributes(self, parameters, display_context: "WorkflowDisplayContext") -> JsonObject:
+        """Serialize parameters for attributes array, using serialize_value to handle dynamic references properly."""
+        if not parameters:
+            return {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {}}}
+
+        if _contains_descriptors(parameters):
+            return {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {}}}
+
+        return {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": parameters.dict()}}
