@@ -240,6 +240,27 @@ def test_serialize_workflow():
                         },
                     },
                 },
+                {
+                    "id": "2b98319f-f43d-42d9-a8b0-b148d5de0a2c",
+                    "name": "parameters",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {
+                            "type": "JSON",
+                            "value": {
+                                "stop": [],
+                                "temperature": 0.0,
+                                "max_tokens": 4096,
+                                "top_p": 1.0,
+                                "top_k": 0,
+                                "frequency_penalty": 0.0,
+                                "presence_penalty": 0.0,
+                                "logit_bias": None,
+                                "custom_parameters": None,
+                            },
+                        },
+                    },
+                },
             ],
         },
         prompt_node,
