@@ -29,8 +29,8 @@ from vellum.client.types.workflow_request_string_input_request import WorkflowRe
 from vellum.client.types.workflow_result_event import WorkflowResultEvent
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
-from tests.workflows.basic_tool_calling_node_deployment_workflow.workflow import (
-    BasicToolCallingNodeDeploymentWorkflowWorkflow,
+from tests.workflows.basic_tool_calling_node_workflow_deployment.workflow import (
+    BasicToolCallingNodeWorkflowDeploymentWorkflow,
     Inputs,
 )
 
@@ -126,7 +126,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
     second_call_input_id_2 = uuid4_generator()
 
     # GIVEN a get current weather workflow
-    workflow = BasicToolCallingNodeDeploymentWorkflowWorkflow()
+    workflow = BasicToolCallingNodeWorkflowDeploymentWorkflow()
 
     # WHEN the workflow is executed
     terminal_event = workflow.run(Inputs(query="What's the weather like in San Francisco?"))

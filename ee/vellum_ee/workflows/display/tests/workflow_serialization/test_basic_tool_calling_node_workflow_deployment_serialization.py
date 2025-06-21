@@ -2,15 +2,15 @@ from deepdiff import DeepDiff
 
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-from tests.workflows.basic_tool_calling_node_deployment_workflow.workflow import (
-    BasicToolCallingNodeDeploymentWorkflowWorkflow,
+from tests.workflows.basic_tool_calling_node_workflow_deployment.workflow import (
+    BasicToolCallingNodeWorkflowDeploymentWorkflow,
 )
 
 
 def test_serialize_workflow():
     # GIVEN a Workflow that uses a generic node
     # WHEN we serialize it
-    workflow_display = get_workflow_display(workflow_class=BasicToolCallingNodeDeploymentWorkflowWorkflow)
+    workflow_display = get_workflow_display(workflow_class=BasicToolCallingNodeWorkflowDeploymentWorkflow)
 
     serialized_workflow: dict = workflow_display.serialize()
     # THEN we should get a serialized representation of the Workflow
@@ -30,8 +30,8 @@ def test_serialize_workflow():
     assert len(output_variables) == 2
     assert not DeepDiff(
         [
-            {"id": "5c740646-7866-447f-b68d-833f3e198c30", "key": "text", "type": "STRING"},
-            {"id": "7bd47b06-0481-48a7-a51e-6a998385ee9a", "key": "chat_history", "type": "CHAT_HISTORY"},
+            {"id": "3626cfa6-76f8-465e-b156-c809e3a2cee9", "key": "text", "type": "STRING"},
+            {"id": "cb82117a-d649-4c3e-9342-c552028fa2ad", "key": "chat_history", "type": "CHAT_HISTORY"},
         ],
         output_variables,
         ignore_order=True,

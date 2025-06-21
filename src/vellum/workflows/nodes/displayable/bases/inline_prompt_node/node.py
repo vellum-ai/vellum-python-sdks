@@ -33,9 +33,9 @@ from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import StateType, is_workflow_class
 from vellum.workflows.utils.functions import (
-    compile_deployment_workflow_function_definition,
     compile_function_definition,
     compile_inline_workflow_function_definition,
+    compile_workflow_deployment_function_definition,
 )
 from vellum.workflows.utils.pydantic_schema import normalize_json
 
@@ -115,7 +115,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                     normalized_functions.append(function)
                 elif isinstance(function, DeploymentDefinition):
                     normalized_functions.append(
-                        compile_deployment_workflow_function_definition(
+                        compile_workflow_deployment_function_definition(
                             function.model_dump(),
                             vellum_client=self._context.vellum_client,
                         )
