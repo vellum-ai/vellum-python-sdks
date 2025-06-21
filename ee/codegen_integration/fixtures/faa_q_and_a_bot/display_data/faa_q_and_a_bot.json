@@ -336,6 +336,42 @@
                 "value": null
               }
             }
+          },
+          {
+            "id": "3bce1d14-9bff-4721-affa-e93add4185bb",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000,
+                  "top_p": 1.0,
+                  "top_k": null,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": {},
+                  "custom_parameters": {
+                    "json_mode": true,
+                    "json_schema": {
+                      "name": "Classification",
+                      "schema": {
+                        "type": "object",
+                        "required": ["classification"],
+                        "properties": {
+                          "classification": {
+                            "type": "string",
+                            "description": ""
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         ],
         "base": {
@@ -1290,6 +1326,27 @@
                 "value": null
               }
             }
+          },
+          {
+            "id": "6d7092ef-35f8-46a3-babf-de70f22b86e4",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000,
+                  "top_p": 1.0,
+                  "top_k": 0,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": {},
+                  "custom_parameters": null
+                }
+              }
+            }
           }
         ],
         "display_data": {
@@ -1520,6 +1577,27 @@
               "value": {
                 "type": "JSON",
                 "value": null
+              }
+            }
+          },
+          {
+            "id": "fb2b621f-f975-4e58-ad3b-d074c2a03d3d",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000,
+                  "top_p": 1.0,
+                  "top_k": null,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": {},
+                  "custom_parameters": null
+                }
               }
             }
           }
@@ -2152,6 +2230,27 @@
                 "value": null
               }
             }
+          },
+          {
+            "id": "0884a164-7fdc-49c9-aab0-426169290650",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000,
+                  "top_p": 1.0,
+                  "top_k": null,
+                  "frequency_penalty": null,
+                  "presence_penalty": null,
+                  "logit_bias": null,
+                  "custom_parameters": null
+                }
+              }
+            }
           }
         ],
         "base": {
@@ -2331,6 +2430,27 @@
               "value": {
                 "type": "JSON",
                 "value": null
+              }
+            }
+          },
+          {
+            "id": "899c301a-c6db-4fc6-acfe-f3011277bcbd",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000,
+                  "top_p": 1.0,
+                  "top_k": null,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": {},
+                  "custom_parameters": null
+                }
               }
             }
           }
@@ -2630,6 +2750,27 @@
               "value": {
                 "type": "JSON",
                 "value": null
+              }
+            }
+          },
+          {
+            "id": "2236093c-ea33-404e-b218-79d7852d508d",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000,
+                  "top_p": 1.0,
+                  "top_k": 0,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": {},
+                  "custom_parameters": null
+                }
               }
             }
           }
