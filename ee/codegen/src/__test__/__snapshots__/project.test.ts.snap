@@ -552,11 +552,13 @@ class Inputs(BaseInputs):
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
-"from .final_output import FinalOutput3
+"from .code_execution_node import CodeExecutionNode
+from .final_output import FinalOutput3
 from .final_output_1 import FinalOutput4
 from .tool_call_start_node import StartNode
 
 __all__ = [
+    "CodeExecutionNode",
     "FinalOutput3",
     "FinalOutput4",
     "StartNode",
@@ -615,16 +617,21 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
+from .nodes.code_execution_node import CodeExecutionNode
 from .nodes.final_output import FinalOutput3
 from .nodes.final_output_1 import FinalOutput4
 from .nodes.tool_call_start_node import StartNode
 
 
 class GetCurrentWeatherNodeWeatherFunctionWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = StartNode >> {
-        FinalOutput3,
-        FinalOutput4,
-    }
+    graph = (
+        CodeExecutionNode
+        >> StartNode
+        >> {
+            FinalOutput3,
+            FinalOutput4,
+        }
+    )
 
     class Outputs(BaseWorkflow.Outputs):
         temperature = FinalOutput3.Outputs.value

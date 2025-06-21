@@ -99,7 +99,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const rawExecConfig =
                     f.exec_config as unknown as WorkflowVersionExecConfigSerializer.Raw;
                   const workflowVersionExecConfigResult =
-                    WorkflowVersionExecConfigSerializer.parse(rawExecConfig);
+                    WorkflowVersionExecConfigSerializer.parse(rawExecConfig, {
+                      allowUnrecognizedUnionMembers: true,
+                      allowUnrecognizedEnumValues: true,
+                      unrecognizedObjectKeys: "strip",
+                    });
                   if (!workflowVersionExecConfigResult.ok) {
                     this.workflowContext.addError(
                       new NodeDefinitionGenerationError(
