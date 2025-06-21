@@ -298,10 +298,6 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         dict_value = asdict(value)
         return serialize_value(display_context, dict_value)
 
-    if isinstance(value, BaseModel):
-        dict_value = value.model_dump()
-        return serialize_value(display_context, dict_value)
-
     if isinstance(value, dict):
         serialized_entries: List[Dict[str, Any]] = [
             {
@@ -357,6 +353,10 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 },
             },
         }
+
+    if isinstance(value, BaseModel):
+        dict_value = value.model_dump()
+        return serialize_value(display_context, dict_value)
 
     if not isinstance(value, BaseDescriptor):
         vellum_value = primitive_to_vellum_value(value)
