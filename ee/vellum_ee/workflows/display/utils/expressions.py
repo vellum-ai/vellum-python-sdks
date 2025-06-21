@@ -39,6 +39,7 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
@@ -329,6 +330,19 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 "value": {
                     "type": "INLINE_WORKFLOW",
                     "exec_config": value,
+                },
+            },
+        }
+
+    if isinstance(value, DeploymentDefinition):
+        return {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": {
+                    "type": "WORKFLOW_DEPLOYMENT",
+                    "deployment": value.deployment,
+                    "release_tag": value.release_tag,
                 },
             },
         }
