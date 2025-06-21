@@ -477,3 +477,59 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
     blocks_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "blocks"), None)
     assert blocks_attr is not None, "blocks attribute should be present when blocks contain nested BaseDescriptor"
     assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE", "blocks attribute should be serialized as ARRAY_REFERENCE"
+    assert blocks_attr["value"]["items"] == [
+        {
+            "entries": [
+                {
+                    "id": "24a203be-3cba-4b20-bc84-9993a476c120",
+                    "key": "block_type",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "CHAT_MESSAGE"}},
+                },
+                {
+                    "id": "c06269e6-f74c-4860-8fa5-22dcbdc89399",
+                    "key": "state",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "dd9c0d43-b931-4dc8-8b3a-a7507ddff0c1",
+                    "key": "cache_config",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "bef22f2b-0b6e-4910-88cc-6df736d2e20e",
+                    "key": "chat_role",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "SYSTEM"}},
+                },
+                {
+                    "id": "c0beec30-f85e-4a78-a3fb-baee54a692f8",
+                    "key": "chat_source",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "f601f4f2-62fe-4697-9fe0-99ca8aa64500",
+                    "key": "chat_message_unterminated",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "ad550008-64e3-44a3-a32a-84ec226db31c",
+                    "key": "blocks",
+                    "value": {
+                        "items": [
+                            {
+                                "lhs": {
+                                    "node_id": "9fe5d3a3-7d26-4692-aa2d-e67c673b0c2b",
+                                    "node_output_id": "92f9a1b7-d33b-4f00-b4c2-e6f58150e166",
+                                    "type": "NODE_OUTPUT",
+                                },
+                                "operator": "accessField",
+                                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 0.0}},
+                                "type": "BINARY_EXPRESSION",
+                            }
+                        ],
+                        "type": "ARRAY_REFERENCE",
+                    },
+                },
+            ],
+            "type": "DICTIONARY_REFERENCE",
+        }
+    ]
