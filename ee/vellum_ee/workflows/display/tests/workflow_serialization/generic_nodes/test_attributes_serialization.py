@@ -3,6 +3,7 @@ from uuid import uuid4
 from typing import List
 
 from deepdiff import DeepDiff
+from pydantic import BaseModel
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows.inputs.base import BaseInputs
@@ -602,6 +603,38 @@ def test_serialize_node__dataclass_with_node_output_reference(serialize_node):
     node_output_id = uuid4()
     serialized_node = serialize_node(
         node_class=GenericNodeWithDataclass,
+        global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
+        global_node_output_displays={
+            NodeWithOutput.Outputs.result: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="result"))
+        },
+    )
+
+    attr_value = serialized_node["attributes"][0]["value"]
+    assert attr_value["type"] == "DICTIONARY_REFERENCE"
+
+    assert any(
+        entry["key"] == "node_ref" and entry["value"]["type"] == "NODE_OUTPUT" for entry in attr_value["entries"]
+    )
+
+
+def test_serialize_node__pydantic_with_node_output_reference(serialize_node):
+    class MyPydanticModel(BaseModel):
+        name: str
+        node_ref: str
+
+    class NodeWithOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
+        pass
+
+    class GenericNodeWithPydantic(BaseNode):
+        attr = MyPydanticModel(name="test", node_ref=NodeWithOutput.Outputs.result)
+
+    node_output_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=GenericNodeWithPydantic,
         global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
         global_node_output_displays={
             NodeWithOutput.Outputs.result: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="result"))
