@@ -88,7 +88,7 @@ def _compile_default_value(default: Any) -> Any:
     return default
 
 
-def _compile_deployment_workflow_input(input_var: Any) -> dict[str, Any]:
+def _compile_workflow_deployment_input(input_var: Any) -> dict[str, Any]:
     """
     Converts a deployment workflow input variable to a JSON schema type definition.
     """
@@ -168,7 +168,7 @@ def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkfl
     )
 
 
-def compile_deployment_workflow_function_definition(
+def compile_workflow_deployment_function_definition(
     deployment_config: Dict[str, str],
     vellum_client: Vellum,
 ) -> FunctionDefinition:
@@ -193,7 +193,7 @@ def compile_deployment_workflow_function_definition(
     required = []
 
     for input_var in input_variables:
-        properties[input_var.key] = _compile_deployment_workflow_input(input_var)
+        properties[input_var.key] = _compile_workflow_deployment_input(input_var)
 
         if input_var.required and input_var.default is None:
             required.append(input_var.key)

@@ -55,7 +55,7 @@ class MyToolCallingNode(ToolCallingNode):
     }
 
 
-class BasicToolCallingNodeDeploymentWorkflowWorkflow(BaseWorkflow[Inputs, BaseState]):
+class BasicToolCallingNodeWorkflowDeploymentWorkflow(BaseWorkflow[Inputs, BaseState]):
     graph = MyToolCallingNode
 
     class Outputs(BaseWorkflow.Outputs):

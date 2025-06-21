@@ -149,7 +149,7 @@ def create_function_node(
         deployment = function.deployment
         release_tag = function.release_tag
 
-        def execute_deployment_workflow_function(self) -> BaseNode.Outputs:
+        def execute_workflow_deployment_function(self) -> BaseNode.Outputs:
             function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
             if function_call_output and len(function_call_output) > 0:
                 function_call = function_call_output[0]
@@ -187,10 +187,10 @@ def create_function_node(
             return self.Outputs()
 
         node = type(
-            f"DeploymentWorkflowNode_{deployment}",
+            f"WorkflowDeploymentNode_{deployment}",
             (FunctionNode,),
             {
-                "run": execute_deployment_workflow_function,
+                "run": execute_workflow_deployment_function,
                 "__module__": __name__,
             },
         )

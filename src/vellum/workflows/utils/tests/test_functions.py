@@ -12,9 +12,9 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.utils.functions import (
-    compile_deployment_workflow_function_definition,
     compile_function_definition,
     compile_inline_workflow_function_definition,
+    compile_workflow_deployment_function_definition,
 )
 
 
@@ -440,7 +440,7 @@ def test_compile_inline_workflow_function_definition__optionals():
     )
 
 
-def test_compile_deployment_workflow_function_definition__just_name():
+def test_compile_workflow_deployment_function_definition__just_name():
     # GIVEN a mock Vellum client and deployment
     mock_client = Mock()
     mock_release = Mock()
@@ -451,7 +451,7 @@ def test_compile_deployment_workflow_function_definition__just_name():
     deployment_config = {"deployment": "my_deployment", "release_tag": "latest"}
 
     # WHEN compiling the deployment workflow function
-    compiled_function = compile_deployment_workflow_function_definition(deployment_config, mock_client)
+    compiled_function = compile_workflow_deployment_function_definition(deployment_config, mock_client)
 
     # THEN it should return the compiled function definition (same structure as function test)
     assert compiled_function == FunctionDefinition(
@@ -461,7 +461,7 @@ def test_compile_deployment_workflow_function_definition__just_name():
     )
 
 
-def test_compile_deployment_workflow_function_definition__all_args():
+def test_compile_workflow_deployment_function_definition__all_args():
     # GIVEN a mock Vellum client and deployment
     mock_client = Mock()
     mock_release = Mock()
@@ -497,7 +497,7 @@ def test_compile_deployment_workflow_function_definition__all_args():
     deployment_config = {"deployment": "my_deployment", "release_tag": "latest"}
 
     # WHEN compiling the deployment workflow function
-    compiled_function = compile_deployment_workflow_function_definition(deployment_config, mock_client)
+    compiled_function = compile_workflow_deployment_function_definition(deployment_config, mock_client)
 
     # THEN it should return the compiled function definition
     assert compiled_function == FunctionDefinition(
@@ -524,7 +524,7 @@ def test_compile_deployment_workflow_function_definition__all_args():
     )
 
 
-def test_compile_deployment_workflow_function_definition__defaults():
+def test_compile_workflow_deployment_function_definition__defaults():
     # GIVEN a mock Vellum client and deployment
     mock_client = Mock()
     mock_release = Mock()
@@ -565,7 +565,7 @@ def test_compile_deployment_workflow_function_definition__defaults():
     deployment_config = {"deployment": "my_deployment", "release_tag": "latest"}
 
     # WHEN compiling the deployment workflow function
-    compiled_function = compile_deployment_workflow_function_definition(deployment_config, mock_client)
+    compiled_function = compile_workflow_deployment_function_definition(deployment_config, mock_client)
 
     # THEN it should return the compiled function definition with proper default handling
     assert compiled_function == FunctionDefinition(
