@@ -142,6 +142,22 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   deploymentWorkflowFunctions.push(
                     f as DeploymentWorkflowFunctionArgs
                   );
+                  const args = [
+                    python.methodArgument({
+                      name: "deployment",
+                      value: python.TypeInstantiation.str(f.deployment),
+                    }),
+                  ];
+
+                  if (f.release_tag !== null) {
+                    args.push(
+                      python.methodArgument({
+                        name: "release_tag",
+                        value: python.TypeInstantiation.str(f.release_tag),
+                      })
+                    );
+                  }
+
                   functionReferences.push(
                     python.instantiateClass({
                       classReference: python.reference({
@@ -153,18 +169,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                           "definition",
                         ],
                       }),
-                      arguments_: [
-                        python.methodArgument({
-                          name: "deployment",
-                          value: python.TypeInstantiation.str(f.deployment),
-                        }),
-                        python.methodArgument({
-                          name: "release_tag",
-                          value: python.TypeInstantiation.str(
-                            f.release_tag ?? "LATEST"
-                          ),
-                        }),
-                      ],
+                      arguments_: args,
                     })
                   );
                   break;
