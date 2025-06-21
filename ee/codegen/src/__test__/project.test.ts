@@ -4207,38 +4207,6 @@ baz = foo + bar
                                   ],
                                   inputs: [
                                     {
-                                      id: "a533e1d1-397d-4402-9509-b468f7bc63a3",
-                                      key: "var_1",
-                                      value: {
-                                        rules: [
-                                          {
-                                            data: {
-                                              input_variable_id:
-                                                "78a053a3-2f97-4004-b809-906fd4d81c88",
-                                            },
-                                            type: "INPUT_VARIABLE",
-                                          },
-                                        ],
-                                        combinator: "OR",
-                                      },
-                                    },
-                                    {
-                                      id: "bb42eda2-bf7d-468c-872d-dccb07151334",
-                                      key: "var_2",
-                                      value: {
-                                        rules: [
-                                          {
-                                            data: {
-                                              input_variable_id:
-                                                "6f49221f-47ce-4a9e-8c34-d66e6f583895",
-                                            },
-                                            type: "INPUT_VARIABLE",
-                                          },
-                                        ],
-                                        combinator: "OR",
-                                      },
-                                    },
-                                    {
                                       id: "82a5d32f-fc12-4b64-b72c-2a65f860f8cb",
                                       key: "code",
                                       value: {
@@ -4275,16 +4243,6 @@ baz = foo + bar
                                   trigger: {
                                     id: "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
                                     merge_behavior: "AWAIT_ANY",
-                                  },
-                                  adornments: null,
-                                  definition: null,
-                                  display_data: {
-                                    width: 554,
-                                    height: 310,
-                                    position: {
-                                      x: 1923.0793471328748,
-                                      y: 264.27623669032835,
-                                    },
                                   },
                                 },
                                 {
