@@ -4121,18 +4121,26 @@ baz = foo + bar
                                   type: "DEFAULT",
                                   source_node_id:
                                     "d97d2a36-3347-487e-b915-3bc874aaded4",
-                                  target_node_id:
-                                    "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                  target_node_id: "code-execution-node-id",
                                   source_handle_id:
                                     "c55f8e1e-0422-4009-af54-86df5625ba71",
+                                  target_handle_id:
+                                    "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
+                                },
+                                {
+                                  id: "code-to-start-edge",
+                                  type: "DEFAULT",
+                                  source_node_id: "code-execution-node-id",
+                                  target_node_id: "start-node-id",
+                                  source_handle_id:
+                                    "5352eb9f-c28f-4e90-b32e-82cb970efa21",
                                   target_handle_id:
                                     "6492efcf-4437-4af1-9ad7-269795ccb27a",
                                 },
                                 {
                                   id: "ab8c4a64-465d-4406-a407-9faa09d0326d",
                                   type: "DEFAULT",
-                                  source_node_id:
-                                    "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                  source_node_id: "start-node-id",
                                   target_node_id:
                                     "938ac916-6b4d-4097-a16e-cf7feb663b17",
                                   source_handle_id:
@@ -4143,8 +4151,7 @@ baz = foo + bar
                                 {
                                   id: "f9dc12de-4284-419d-beb2-927452b80da0",
                                   type: "DEFAULT",
-                                  source_node_id:
-                                    "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                  source_node_id: "start-node-id",
                                   target_node_id:
                                     "d4abe0fd-0ba5-438c-8d20-4155ca89429e",
                                   source_handle_id:
@@ -4170,7 +4177,118 @@ baz = foo + bar
                                   },
                                 },
                                 {
-                                  id: "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                  id: "code-execution-node-id",
+                                  data: {
+                                    label: "Code Execution Node",
+                                    filepath: null,
+                                    packages: [],
+                                    output_id:
+                                      "f2ea61aa-256e-41b0-8ab4-aa3a22e489dd",
+                                    output_type: "NUMBER",
+                                    code_input_id:
+                                      "82a5d32f-fc12-4b64-b72c-2a65f860f8cb",
+                                    log_output_id:
+                                      "77eab8ac-bc36-4f53-8449-8be6396d3331",
+                                    error_output_id: null,
+                                    runtime_input_id:
+                                      "247da47f-ad5b-412d-825a-61c29c6a3847",
+                                    source_handle_id:
+                                      "5352eb9f-c28f-4e90-b32e-82cb970efa21",
+                                    target_handle_id:
+                                      "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
+                                  },
+                                  type: "CODE_EXECUTION",
+                                  ports: [
+                                    {
+                                      id: "5352eb9f-c28f-4e90-b32e-82cb970efa21",
+                                      name: "default",
+                                      type: "DEFAULT",
+                                    },
+                                  ],
+                                  inputs: [
+                                    {
+                                      id: "a533e1d1-397d-4402-9509-b468f7bc63a3",
+                                      key: "var_1",
+                                      value: {
+                                        rules: [
+                                          {
+                                            data: {
+                                              input_variable_id:
+                                                "78a053a3-2f97-4004-b809-906fd4d81c88",
+                                            },
+                                            type: "INPUT_VARIABLE",
+                                          },
+                                        ],
+                                        combinator: "OR",
+                                      },
+                                    },
+                                    {
+                                      id: "bb42eda2-bf7d-468c-872d-dccb07151334",
+                                      key: "var_2",
+                                      value: {
+                                        rules: [
+                                          {
+                                            data: {
+                                              input_variable_id:
+                                                "6f49221f-47ce-4a9e-8c34-d66e6f583895",
+                                            },
+                                            type: "INPUT_VARIABLE",
+                                          },
+                                        ],
+                                        combinator: "OR",
+                                      },
+                                    },
+                                    {
+                                      id: "82a5d32f-fc12-4b64-b72c-2a65f860f8cb",
+                                      key: "code",
+                                      value: {
+                                        rules: [
+                                          {
+                                            data: {
+                                              type: "STRING",
+                                              value:
+                                                "def main(\n    arg1: int,\n    arg2: int,\n) -> int:\n    return arg1 + arg2\n    ",
+                                            },
+                                            type: "CONSTANT_VALUE",
+                                          },
+                                        ],
+                                        combinator: "OR",
+                                      },
+                                    },
+                                    {
+                                      id: "247da47f-ad5b-412d-825a-61c29c6a3847",
+                                      key: "runtime",
+                                      value: {
+                                        rules: [
+                                          {
+                                            data: {
+                                              type: "STRING",
+                                              value: "PYTHON_3_11_6",
+                                            },
+                                            type: "CONSTANT_VALUE",
+                                          },
+                                        ],
+                                        combinator: "OR",
+                                      },
+                                    },
+                                  ],
+                                  trigger: {
+                                    id: "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
+                                    merge_behavior: "AWAIT_ANY",
+                                  },
+                                  adornments: null,
+                                  definition: null,
+                                  display_data: {
+                                    width: 554,
+                                    height: 310,
+                                    position: {
+                                      x: 1923.0793471328748,
+                                      y: 264.27623669032835,
+                                    },
+                                  },
+                                },
+                                {
+                                  id: "start-node-id",
                                   base: {
                                     name: "BaseNode",
                                     module: [
@@ -4274,8 +4392,7 @@ baz = foo + bar
                                         rules: [
                                           {
                                             data: {
-                                              node_id:
-                                                "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                              node_id: "start-node-id",
                                               output_id:
                                                 "3f4c753e-f057-47bb-9748-7968283cc8aa",
                                             },
@@ -4324,8 +4441,7 @@ baz = foo + bar
                                         rules: [
                                           {
                                             data: {
-                                              node_id:
-                                                "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                              node_id: "start-node-id",
                                               output_id:
                                                 "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
                                             },
@@ -4357,8 +4473,7 @@ baz = foo + bar
                                 {
                                   value: {
                                     type: "NODE_OUTPUT",
-                                    node_id:
-                                      "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                    node_id: "start-node-id",
                                     node_output_id:
                                       "3f4c753e-f057-47bb-9748-7968283cc8aa",
                                   },
@@ -4368,8 +4483,7 @@ baz = foo + bar
                                 {
                                   value: {
                                     type: "NODE_OUTPUT",
-                                    node_id:
-                                      "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                    node_id: "start-node-id",
                                     node_output_id:
                                       "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
                                   },
