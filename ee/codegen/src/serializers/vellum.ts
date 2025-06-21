@@ -118,7 +118,6 @@ import {
   WorkflowSandboxRoutingConfig,
   WorkflowStateVariableWorkflowReference,
   WorkflowValueDescriptor,
-  WorkflowVersionExecConfig,
   WorkspaceSecretPointer,
 } from "src/types/vellum";
 
@@ -2201,10 +2200,20 @@ export declare namespace WorkflowRawDataSerializer {
   }
 }
 
-export const WorkflowVersionExecConfigSerializer: ObjectSchema<
-  WorkflowVersionExecConfigSerializer.Raw,
-  WorkflowVersionExecConfig
-> = objectSchema({
+export const ModuleDataSerializer = objectSchema({
+  additionalFiles: propertySchema(
+    "additional_files",
+    recordSchema(stringSchema(), stringSchema()).optional()
+  ),
+});
+
+export declare namespace ModuleDataSerializer {
+  interface Raw {
+    additional_files?: Record<string, string>;
+  }
+}
+
+export const WorkflowVersionExecConfigSerializer = objectSchema({
   workflowRawData: propertySchema(
     "workflow_raw_data",
     WorkflowRawDataSerializer
@@ -2234,6 +2243,7 @@ export const WorkflowVersionExecConfigSerializer: ObjectSchema<
       ),
     }).optional()
   ),
+  moduleData: propertySchema("module_data", ModuleDataSerializer.optional()),
 });
 
 export declare namespace WorkflowVersionExecConfigSerializer {
@@ -2246,6 +2256,7 @@ export declare namespace WorkflowVersionExecConfigSerializer {
       container_image_name?: string | null;
       container_image_tag?: string | null;
     } | null;
+    module_data?: ModuleDataSerializer.Raw | null;
   }
 }
 

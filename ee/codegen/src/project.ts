@@ -1,5 +1,6 @@
-import { mkdir } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
+import * as path from "path";
 
 import { python } from "@fern-api/python-ast";
 import { Comment } from "@fern-api/python-ast/Comment";
@@ -229,6 +230,7 @@ ${errors.slice(0, 3).map((err) => {
       ...this.generateNodeFiles(nodes),
       // sandbox.py
       ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
+      this.writeAdditionalFiles(),
     ]);
 
     // error.log - this gets generated separately from the other files because it
@@ -801,6 +803,28 @@ ${errors.slice(0, 3).map((err) => {
    * Gets the node file paths that have been tracked during code generation that will be merged by codegen-service
    * @returns Set of node file paths
    */
+  private async writeAdditionalFiles(): Promise<void> {
+    const moduleData = this.workflowVersionExecConfig.moduleData;
+    if (!moduleData?.additionalFiles) {
+      return;
+    }
+
+    const absolutePathToModuleDirectory = join(
+      this.workflowContext.absolutePathToOutputDirectory,
+      ...this.getModulePath()
+    );
+
+    await Promise.all(
+      Object.entries(moduleData.additionalFiles).map(
+        async ([relativePath, content]) => {
+          const fullPath = join(absolutePathToModuleDirectory, relativePath);
+          await mkdir(path.dirname(fullPath), { recursive: true });
+          await writeFile(fullPath, content);
+        }
+      )
+    );
+  }
+
   public getPythonCodeMergeableNodeFiles(): Set<string> {
     return this.workflowContext.getPythonCodeMergeableNodeFiles();
   }
