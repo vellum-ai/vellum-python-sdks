@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from uuid import uuid4
 from typing import List
 
@@ -580,3 +581,41 @@ def test_serialize_node__coalesce(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+def test_serialize_node__dataclass_with_node_output_reference(serialize_node):
+    @dataclass
+    class MyDataClass:
+        name: str
+        node_ref: str
+
+    class NodeWithOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
+        pass
+
+    class GenericNodeWithDataclass(BaseNode):
+        attr = MyDataClass(name="test", node_ref=NodeWithOutput.Outputs.result)
+
+    node_output_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=GenericNodeWithDataclass,
+        global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
+        global_node_output_displays={
+            NodeWithOutput.Outputs.result: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="result"))
+        },
+    )
+
+    attr_value = serialized_node["attributes"][0]["value"]
+    assert attr_value["type"] == "DICTIONARY_REFERENCE"
+    assert len(attr_value["entries"]) == 2
+
+    name_entry = next(entry for entry in attr_value["entries"] if entry["key"] == "name")
+    assert name_entry["value"]["type"] == "CONSTANT_VALUE"
+    assert name_entry["value"]["value"]["value"] == "test"
+
+    node_ref_entry = next(entry for entry in attr_value["entries"] if entry["key"] == "node_ref")
+    assert node_ref_entry["value"]["type"] == "NODE_OUTPUT"
+    assert node_ref_entry["value"]["node_output_id"] == str(node_output_id)
