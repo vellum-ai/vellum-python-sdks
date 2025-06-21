@@ -1,3 +1,4 @@
+from dataclasses import asdict, is_dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, cast
 
 from vellum.client.types.logical_operator import LogicalOperator
@@ -290,6 +291,10 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 "type": "ARRAY_REFERENCE",
                 "items": cast(JsonArray, serialized_items),  # list[JsonObject] -> JsonArray
             }
+
+    if is_dataclass(value) and not isinstance(value, type):
+        dict_value = asdict(value)
+        return serialize_value(display_context, dict_value)
 
     if isinstance(value, dict):
         serialized_entries: List[Dict[str, Any]] = [
