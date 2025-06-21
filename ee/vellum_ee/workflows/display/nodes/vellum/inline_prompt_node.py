@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Callable, Dict, Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -16,6 +16,21 @@ from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import NodeInput
 
 _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
+
+
+def _has_nested_descriptors(blocks: Sequence[Union[PromptBlock, RichTextChildBlock]]) -> bool:
+    """Recursively check if any blocks contain BaseDescriptor instances."""
+    for block in blocks:
+        if isinstance(block, BaseDescriptor):
+            return True
+
+        if block.block_type == "CHAT_MESSAGE" and _has_nested_descriptors(block.blocks):
+            return True
+
+        if block.block_type == "RICH_TEXT" and _has_nested_descriptors(block.blocks):
+            return True
+
+    return False
 
 
 class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
@@ -46,11 +61,15 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
-        blocks: list = [
-            self._generate_prompt_block(block, input_variable_id_by_name, [i])
-            for i, block in enumerate(node_blocks)
-            if not isinstance(block, BaseDescriptor)
-        ]
+        has_descriptors = _has_nested_descriptors(node_blocks)
+
+        blocks: list = []
+        if not has_descriptors:
+            blocks = [
+                self._generate_prompt_block(block, input_variable_id_by_name, [i])
+                for i, block in enumerate(node_blocks)
+                if not isinstance(block, BaseDescriptor)
+            ]
 
         functions = (
             [self._generate_function_tools(function, i) for i, function in enumerate(function_definitions)]
@@ -156,6 +175,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             }
 
         elif prompt_block.block_type == "CHAT_MESSAGE":
+
             chat_properties: JsonObject = {
                 "chat_role": prompt_block.chat_role,
                 "chat_source": prompt_block.chat_source,

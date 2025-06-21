@@ -437,3 +437,99 @@ def test_serialize_workflow_with_descriptor_blocks():
             },
         }
     ]
+
+
+def test_serialize_workflow_with_nested_descriptor_blocks():
+    """Test that serialization handles BaseDescriptor instances nested in ChatMessageBlock.blocks."""
+
+    class TestInputs(BaseInputs):
+        noun: str
+
+    class UpstreamNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            results: list
+
+        def run(self) -> Outputs:
+            return self.Outputs(results=["test"])
+
+    chat_block = ChatMessagePromptBlock(chat_role="SYSTEM", blocks=[JinjaPromptBlock(template="Hello")])
+
+    class TestInlinePromptNodeWithNestedDescriptorBlocks(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [chat_block]
+        prompt_inputs = {"noun": TestInputs.noun}
+
+    object.__setattr__(chat_block, "blocks", [UpstreamNode.Outputs.results[0]])
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = UpstreamNode >> TestInlinePromptNodeWithNestedDescriptorBlocks
+
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized: dict = workflow_display.serialize()
+
+    prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    prompt_node = prompt_nodes[0]
+
+    blocks = prompt_node["data"]["exec_config"]["prompt_template_block_data"]["blocks"]
+    descriptor_blocks = [block for block in blocks if not isinstance(block, dict) or not block.get("block_type")]
+    assert len(descriptor_blocks) == 0, "BaseDescriptor blocks should not appear in serialized blocks"
+
+    blocks_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "blocks"), None)
+    assert blocks_attr is not None, "blocks attribute should be present when blocks contain nested BaseDescriptor"
+    assert blocks_attr["value"]["type"] == "ARRAY_REFERENCE", "blocks attribute should be serialized as ARRAY_REFERENCE"
+    assert blocks_attr["value"]["items"] == [
+        {
+            "entries": [
+                {
+                    "id": "24a203be-3cba-4b20-bc84-9993a476c120",
+                    "key": "block_type",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "CHAT_MESSAGE"}},
+                },
+                {
+                    "id": "c06269e6-f74c-4860-8fa5-22dcbdc89399",
+                    "key": "state",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "dd9c0d43-b931-4dc8-8b3a-a7507ddff0c1",
+                    "key": "cache_config",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "bef22f2b-0b6e-4910-88cc-6df736d2e20e",
+                    "key": "chat_role",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "SYSTEM"}},
+                },
+                {
+                    "id": "c0beec30-f85e-4a78-a3fb-baee54a692f8",
+                    "key": "chat_source",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "f601f4f2-62fe-4697-9fe0-99ca8aa64500",
+                    "key": "chat_message_unterminated",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                },
+                {
+                    "id": "ad550008-64e3-44a3-a32a-84ec226db31c",
+                    "key": "blocks",
+                    "value": {
+                        "items": [
+                            {
+                                "lhs": {
+                                    "node_id": "9fe5d3a3-7d26-4692-aa2d-e67c673b0c2b",
+                                    "node_output_id": "92f9a1b7-d33b-4f00-b4c2-e6f58150e166",
+                                    "type": "NODE_OUTPUT",
+                                },
+                                "operator": "accessField",
+                                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 0.0}},
+                                "type": "BINARY_EXPRESSION",
+                            }
+                        ],
+                        "type": "ARRAY_REFERENCE",
+                    },
+                },
+            ],
+            "type": "DICTIONARY_REFERENCE",
+        }
+    ]
