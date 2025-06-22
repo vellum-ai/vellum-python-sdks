@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Callable, Dict, Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -32,21 +32,6 @@ def _contains_descriptors(obj):
 _InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 
-def _has_nested_descriptors(blocks: Sequence[Union[PromptBlock, RichTextChildBlock]]) -> bool:
-    """Recursively check if any blocks contain BaseDescriptor instances."""
-    for block in blocks:
-        if isinstance(block, BaseDescriptor):
-            return True
-
-        if block.block_type == "CHAT_MESSAGE" and _has_nested_descriptors(block.blocks):
-            return True
-
-        if block.block_type == "RICH_TEXT" and _has_nested_descriptors(block.blocks):
-            return True
-
-    return False
-
-
 class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
     __serializable_inputs__ = {
         InlinePromptNode.prompt_inputs,
@@ -74,7 +59,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
-        has_descriptors = _has_nested_descriptors(node_blocks)
+        has_descriptors = _contains_descriptors(node_blocks)
 
         blocks: list = []
         if not has_descriptors:
@@ -275,16 +260,11 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
             )
             try:
-                if attribute.name == "parameters":
-                    value = self._serialize_parameters_for_attributes(attribute.instance, display_context)
-                else:
-                    value = serialize_value(display_context, attribute.instance)
-
                 attributes.append(
                     {
                         "id": id,
                         "name": attribute.name,
-                        "value": value,
+                        "value": serialize_value(display_context, attribute.instance),
                     }
                 )
             except ValueError as e:
@@ -302,13 +282,3 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             return {}
 
         return params.dict()
-
-    def _serialize_parameters_for_attributes(self, parameters, display_context: "WorkflowDisplayContext") -> JsonObject:
-        """Serialize parameters for attributes array, using serialize_value to handle dynamic references properly."""
-        if not parameters:
-            return {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {}}}
-
-        if _contains_descriptors(parameters):
-            return {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {}}}
-
-        return {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": parameters.dict()}}

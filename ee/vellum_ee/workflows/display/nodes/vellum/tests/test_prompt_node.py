@@ -322,16 +322,63 @@ def test_serialize_node__prompt_parameters__dynamic_references():
     )
     assert parameters_attribute is not None
     assert parameters_attribute["name"] == "parameters"
-    assert parameters_attribute["value"]["type"] == "CONSTANT_VALUE"
-
-    # AND the attribute should have the correct structure for an empty JSON object
-    assert parameters_attribute["value"]["value"]["type"] == "JSON"
-    assert parameters_attribute["value"]["value"]["value"] == {}
-
-    # AND the attribute should have a valid ID
-    assert "id" in parameters_attribute
-    assert isinstance(parameters_attribute["id"], str)
-    assert len(parameters_attribute["id"]) > 0
-
-    attribute_names = [attr["name"] for attr in dynamic_prompt_node.get("attributes", [])]
-    assert "parameters" in attribute_names
+    assert parameters_attribute["value"]["type"] == "DICTIONARY_REFERENCE"
+    assert parameters_attribute["value"]["entries"] == [
+        {
+            "id": "6b63ff96-a2eb-4c6e-bad1-bde01605fa86",
+            "key": "stop",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "265a1c17-2089-4ac1-b2ce-361b6b9a3335",
+            "key": "temperature",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "699976ec-8ec2-476a-a011-7cf810a8a307",
+            "key": "max_tokens",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "a87e23da-9794-41ff-ba80-c3a77e976e75",
+            "key": "top_p",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "18eb53c2-ec1a-4115-9f21-083af430df67",
+            "key": "top_k",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "295509a2-5837-452c-893d-f47b67c63c8a",
+            "key": "frequency_penalty",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "5fc64379-5566-426a-a909-dd56c3305aa5",
+            "key": "presence_penalty",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "5d326da0-c096-4425-8bf1-3a18764e96e3",
+            "key": "logit_bias",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "cd1a0e1b-6667-48a0-9964-257e1ec8851d",
+            "key": "custom_parameters",
+            "value": {
+                "entries": [
+                    {
+                        "id": "a9a3092e-dd18-4533-b6b5-24588ebd8f7f",
+                        "key": "json_schema",
+                        "value": {
+                            "input_variable_id": "c02d1201-86d1-4364-b3b3-4fc6824db8a4",
+                            "type": "WORKFLOW_INPUT",
+                        },
+                    }
+                ],
+                "type": "DICTIONARY_REFERENCE",
+            },
+        },
+    ]

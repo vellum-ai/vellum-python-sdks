@@ -238,6 +238,27 @@
             }
           },
           {
+            "id": "56de8c71-1f6c-4a0d-b566-f6b27265b71a",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000.0,
+                  "top_p": 1.0,
+                  "top_k": 0.0,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": {},
+                  "custom_parameters": null
+                }
+              }
+            }
+          },
+          {
             "id": "2a8be1e2-2dad-4a2f-80be-01c4723ce1da",
             "name": "functions",
             "value": {
