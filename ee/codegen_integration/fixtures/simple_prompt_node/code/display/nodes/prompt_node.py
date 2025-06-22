@@ -18,6 +18,7 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
         "ml_model": UUID("bb466968-7547-458c-8e8f-5d0fb1eb33f5"),
         "blocks": UUID("6a3ab4d8-4ff6-43fe-a919-93b2a05fa0a6"),
         "prompt_inputs": UUID("84bafdbf-3ca8-4e48-9ea6-380e90756a7f"),
+        "parameters": UUID("56de8c71-1f6c-4a0d-b566-f6b27265b71a"),
         "functions": UUID("2a8be1e2-2dad-4a2f-80be-01c4723ce1da"),
     }
     output_display = {

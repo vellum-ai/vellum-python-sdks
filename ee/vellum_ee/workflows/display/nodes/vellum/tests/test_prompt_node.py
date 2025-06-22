@@ -2,6 +2,7 @@ import pytest
 from uuid import UUID
 from typing import Type
 
+from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
@@ -280,3 +281,104 @@ def test_serialize_node__port_groups():
 
     # AND the legacy source_handle_id should be the default port
     assert my_prompt_node["data"]["source_handle_id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
+
+
+def test_serialize_node__prompt_parameters__dynamic_references():
+    # GIVEN input definition
+    class MyInputs(BaseInputs):
+        input_value: str
+
+    # AND a prompt node with PromptParameters containing dynamic references
+    class DynamicPromptNode(InlinePromptNode):
+        blocks = []
+        ml_model = "gpt-4o"
+        parameters = PromptParameters(custom_parameters={"json_schema": MyInputs.input_value})
+
+    # AND a workflow with the prompt node
+    class Workflow(BaseWorkflow[MyInputs, BaseState]):
+        graph = DynamicPromptNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the PromptParameters
+    dynamic_prompt_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(DynamicPromptNode.__id__)
+    )
+
+    # AND the parameters should be properly serialized in exec_config
+    exec_config = dynamic_prompt_node["data"]["exec_config"]
+    assert "parameters" in exec_config
+
+    parameters = exec_config["parameters"]
+    assert parameters == {}
+
+    # AND the parameters should also be serialized in the attributes array
+    parameters_attribute = next(
+        (attr for attr in dynamic_prompt_node.get("attributes", []) if attr["name"] == "parameters"), None
+    )
+    assert parameters_attribute is not None
+    assert parameters_attribute["name"] == "parameters"
+    assert parameters_attribute["value"]["type"] == "DICTIONARY_REFERENCE"
+    assert parameters_attribute["value"]["entries"] == [
+        {
+            "id": "6b63ff96-a2eb-4c6e-bad1-bde01605fa86",
+            "key": "stop",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "265a1c17-2089-4ac1-b2ce-361b6b9a3335",
+            "key": "temperature",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "699976ec-8ec2-476a-a011-7cf810a8a307",
+            "key": "max_tokens",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "a87e23da-9794-41ff-ba80-c3a77e976e75",
+            "key": "top_p",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "18eb53c2-ec1a-4115-9f21-083af430df67",
+            "key": "top_k",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "295509a2-5837-452c-893d-f47b67c63c8a",
+            "key": "frequency_penalty",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "5fc64379-5566-426a-a909-dd56c3305aa5",
+            "key": "presence_penalty",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "5d326da0-c096-4425-8bf1-3a18764e96e3",
+            "key": "logit_bias",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+        },
+        {
+            "id": "cd1a0e1b-6667-48a0-9964-257e1ec8851d",
+            "key": "custom_parameters",
+            "value": {
+                "entries": [
+                    {
+                        "id": "a9a3092e-dd18-4533-b6b5-24588ebd8f7f",
+                        "key": "json_schema",
+                        "value": {
+                            "input_variable_id": "c02d1201-86d1-4364-b3b3-4fc6824db8a4",
+                            "type": "WORKFLOW_INPUT",
+                        },
+                    }
+                ],
+                "type": "DICTIONARY_REFERENCE",
+            },
+        },
+    ]

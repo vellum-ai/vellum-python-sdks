@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Callable, Dict, Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -15,22 +15,21 @@ from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import NodeInput
 
-_InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
-
-def _has_nested_descriptors(blocks: Sequence[Union[PromptBlock, RichTextChildBlock]]) -> bool:
-    """Recursively check if any blocks contain BaseDescriptor instances."""
-    for block in blocks:
-        if isinstance(block, BaseDescriptor):
-            return True
-
-        if block.block_type == "CHAT_MESSAGE" and _has_nested_descriptors(block.blocks):
-            return True
-
-        if block.block_type == "RICH_TEXT" and _has_nested_descriptors(block.blocks):
-            return True
-
+def _contains_descriptors(obj):
+    """Check if an object contains any descriptors or references that need special handling."""
+    if isinstance(obj, BaseDescriptor):
+        return True
+    elif isinstance(obj, dict):
+        return any(_contains_descriptors(v) for v in obj.values())
+    elif isinstance(obj, (list, tuple)):
+        return any(_contains_descriptors(item) for item in obj)
+    elif hasattr(obj, "__dict__"):
+        return any(_contains_descriptors(getattr(obj, field)) for field in obj.__dict__)
     return False
+
+
+_InlinePromptNodeType = TypeVar("_InlinePromptNodeType", bound=InlinePromptNode)
 
 
 class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generic[_InlinePromptNodeType]):
@@ -38,7 +37,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         InlinePromptNode.prompt_inputs,
     }
     __unserializable_attributes__ = {
-        InlinePromptNode.parameters,
         InlinePromptNode.settings,
         InlinePromptNode.expand_meta,
         InlinePromptNode.request_options,
@@ -61,7 +59,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
-        has_descriptors = _has_nested_descriptors(node_blocks)
+        has_descriptors = _contains_descriptors(node_blocks)
 
         blocks: list = []
         if not has_descriptors:
@@ -91,7 +89,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "INLINE",
                 "exec_config": {
-                    "parameters": raise_if_descriptor(node.parameters).dict(),
+                    "parameters": self._serialize_parameters(node.parameters, display_context),
                     "input_variables": [prompt_input.dict() for prompt_input in prompt_inputs],
                     "prompt_template_block_data": {
                         "version": 1,
@@ -273,3 +271,14 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
         return attributes
+
+    def _serialize_parameters(self, parameters, display_context: "WorkflowDisplayContext") -> JsonObject:
+        """Serialize parameters, returning empty object when nested descriptors are detected."""
+        params = raise_if_descriptor(parameters)
+        if not params:
+            return {}
+
+        if _contains_descriptors(params):
+            return {}
+
+        return params.dict()

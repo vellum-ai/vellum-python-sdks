@@ -19,6 +19,7 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
         "blocks": UUID("96f1c44f-1ba8-4096-aaa6-ce798f9dc585"),
         "prompt_inputs": UUID("b35a446c-1e59-4119-b7e0-529b7628b561"),
         "functions": UUID("4f0822c2-4be5-4b5d-9fd7-c45e88b64e70"),
+        "parameters": UUID("3bce1d14-9bff-4721-affa-e93add4185bb"),
     }
     output_display = {
         PromptNode.Outputs.text: NodeOutputDisplay(id=UUID("f7e45a43-f55c-4c19-8fe6-c3ce1308a076"), name="text"),

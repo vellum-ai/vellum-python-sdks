@@ -190,6 +190,27 @@
                 "value": null
               }
             }
+          },
+          {
+            "id": "29391062-4d86-4e67-ac46-f8a71237384b",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 1000,
+                  "top_p": 1.0,
+                  "top_k": 0,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": {},
+                  "custom_parameters": null
+                }
+              }
+            }
           }
         ],
         "base": {
