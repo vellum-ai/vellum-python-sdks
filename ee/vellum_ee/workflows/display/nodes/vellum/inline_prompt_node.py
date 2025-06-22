@@ -18,13 +18,7 @@ from vellum_ee.workflows.display.vellum import NodeInput
 
 def _contains_descriptors(obj):
     """Check if an object contains any descriptors or references that need special handling."""
-    from vellum.workflows.descriptors.base import BaseDescriptor
-    from vellum.workflows.references.lazy import LazyReference
-    from vellum.workflows.references.output import OutputReference
-    from vellum.workflows.references.state_value import StateValueReference
-    from vellum.workflows.references.workflow_input import WorkflowInputReference
-
-    if isinstance(obj, (BaseDescriptor, WorkflowInputReference, StateValueReference, OutputReference, LazyReference)):
+    if isinstance(obj, BaseDescriptor):
         return True
     elif isinstance(obj, dict):
         return any(_contains_descriptors(v) for v in obj.values())
