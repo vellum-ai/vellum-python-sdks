@@ -269,9 +269,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             if attribute in self.__unserializable_attributes__:
                 continue
 
-            if attribute.name == "parameters" and not _contains_descriptors(attribute.instance):
-                continue
-
             id = (
                 str(self.attribute_ids_by_name[attribute.name])
                 if self.attribute_ids_by_name.get(attribute.name)

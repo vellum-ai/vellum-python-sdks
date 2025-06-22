@@ -1,0 +1,830 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference when there is a long branch > code/nodes/api_node.py 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+from vellum.workflows.references import VellumSecretReference
+
+from .parallel_node_2 import ParallelNode2
+from .request_body_node import RequestBodyNode
+
+
+class APINode(BaseAPINode):
+    url = ParallelNode2.Outputs.result
+    method = APIRequestMethod.POST
+    json = RequestBodyNode.Outputs.result
+    api_key_header_key = None
+    authorization_type = AuthorizationType.BEARER_TOKEN
+    api_key_header_value = None
+    bearer_token_value = VellumSecretReference("TEST_SECRET")
+"
+`;
+
+exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference when there is a simple loop > code/nodes/router_node.py 1`] = `
+"from vellum.workflows.nodes import BaseNode
+from vellum.workflows.ports import Port
+
+from .start_node import StartNode
+
+
+class RouterNode(BaseNode):
+    class Ports(BaseNode.Ports):
+        top = Port.on_if(StartNode.Outputs.result.equals("top"))
+        bottom = Port.on_else()
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should generate unused_graphs if final output is not used > code/workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.final_output import FinalOutput
+from .nodes.generic_node import GenericNode
+
+
+class Workflow(BaseWorkflow):
+    graph = GenericNode
+    unused_graphs = {FinalOutput}
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = FinalOutput.Outputs.value
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/display/nodes/__init__.py 1`] = `
+"from .first_node import FirstNodeDisplay
+from .second_node import SecondNodeDisplay
+
+__all__ = [
+    "FirstNodeDisplay",
+    "SecondNodeDisplay",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/display/nodes/second_node.py 1`] = `
+"from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+
+from ...nodes.second_node import SecondNode
+
+
+class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/nodes/__init__.py 1`] = `
+"from .first_node import FirstNode
+from .second_node import SecondNode
+
+__all__ = [
+    "FirstNode",
+    "SecondNode",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/nodes/second_node.py 1`] = `
+"from vellum.workflows.nodes import BaseNode
+
+
+class SecondNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.first_node import FirstNode
+from .nodes.second_node import SecondNode
+
+
+class Workflow(BaseWorkflow):
+    graph = FirstNode
+    unused_graphs = {SecondNode}
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes with forward references > should generate a proper Lazy Reference for the first node > code/nodes/first_node.py 1`] = `
+"from vellum.workflows.nodes import BaseNode
+from vellum.workflows.references import LazyReference
+
+
+class FirstNode(BaseNode):
+    forward = LazyReference("SecondNode.Outputs.output")
+"
+`;
+
+exports[`WorkflowProjectGenerator > adornments > should correctly generate code for a prompt node with retry adornment > code/nodes/prompt.py 1`] = `
+"from vellum import (
+    ChatMessagePromptBlock,
+    PlainTextPromptBlock,
+    PromptParameters,
+    RichTextPromptBlock,
+    VariablePromptBlock,
+)
+from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+
+@RetryNode.wrap(max_attempts=5)
+class Prompt(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[
+                RichTextPromptBlock(
+                    blocks=[
+                        PlainTextPromptBlock(
+                            text="""\\
+Summarize the following text: hello today is feb 7 bad weather
+
+\\
+"""
+                        ),
+                        VariablePromptBlock(input_variable="text"),
+                    ]
+                )
+            ],
+        ),
+    ]
+    prompt_inputs = {
+        "text": None,
+    }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0,
+        max_tokens=1000,
+        top_p=1,
+        top_k=0,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logit_bias={},
+        custom_parameters=None,
+    )
+"
+`;
+
+exports[`WorkflowProjectGenerator > adornments > should correctly generate default code for adornments > code/nodes/prompt.py 1`] = `
+"from vellum import PromptParameters
+from vellum.workflows.nodes.core.retry_node.node import RetryNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+
+@TryNode.wrap()
+@RetryNode.wrap(max_attempts=1)
+class Prompt(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = []
+    parameters = PromptParameters(
+        stop=[],
+        temperature=None,
+        max_tokens=None,
+        top_p=None,
+        top_k=None,
+        frequency_penalty=None,
+        presence_penalty=None,
+        logit_bias=None,
+        custom_parameters=None,
+    )
+"
+`;
+
+exports[`WorkflowProjectGenerator > adornments > should correctly handle error code and custom string attribute types in adornments > code/nodes/prompt.py 1`] = `
+"from vellum import PromptParameters
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+
+@TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW, custom_message="This is a regular string")
+class Prompt(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = []
+    parameters = PromptParameters(
+        stop=[],
+        temperature=None,
+        max_tokens=None,
+        top_p=None,
+        top_k=None,
+        frequency_penalty=None,
+        presence_penalty=None,
+        logit_bias=None,
+        custom_parameters=None,
+    )
+"
+`;
+
+exports[`WorkflowProjectGenerator > adornments > should generate try adornment node with correct attributes > generic_test/nodes/prompt.py 1`] = `
+"from vellum import PromptParameters
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+
+@TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW)
+class Prompt(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = []
+    parameters = PromptParameters(
+        stop=[],
+        temperature=None,
+        max_tokens=None,
+        top_p=None,
+        top_k=None,
+        frequency_penalty=None,
+        presence_penalty=None,
+        logit_bias=None,
+        custom_parameters=None,
+    )
+"
+`;
+
+exports[`WorkflowProjectGenerator > code execution node at project level > should not autoformat the script file > code/nodes/code_execution_node/script.py 1`] = `
+"import foo, bar
+baz = foo + bar
+"
+`;
+
+exports[`WorkflowProjectGenerator > combinator normalization > should normalize AND to OR combinators > code/nodes/final_output.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+
+class FinalOutput(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = 3
+"
+`;
+
+exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to find invalid ports and target nodes > code/nodes/bad_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class BadNode(TemplatingNode[BaseState, str]):
+    template = """foo"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to generate > code/nodes/bad_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class BadNode(TemplatingNode[BaseState, str]):
+    template = """foo"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/display/nodes/tool_call/__init__.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+
+from ....nodes.tool_call import GetCurrentWeatherNode
+
+
+class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    attribute_ids_by_name = {
+        "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
+        "max_tool_calls": UUID("723f614a-be30-4f27-90d0-896c740e58d3"),
+        "blocks": UUID("beec5344-2eff-47d2-b920-b90367370d79"),
+        "functions": UUID("7b1ab802-3228-43b3-a493-734c94794710"),
+        "prompt_inputs": UUID("38cf126e-a186-4a63-8e30-47c4507413cd"),
+    }
+    port_displays = {
+        GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("7b97f998-4be5-478d-94c4-9423db5f6392"))
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/__init__.py 1`] = `
+"from .tool_call import GetCurrentWeatherNode
+
+__all__ = [
+    "GetCurrentWeatherNode",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/tool_call/__init__.py 1`] = `
+"from .format_answer import format_answer
+from .get_current_weather import get_current_weather
+from typing import List
+
+from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+
+
+class GetCurrentWeatherNode(ToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    max_tool_calls = 3
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""You are a weather expert""")])],
+        ),
+        ChatMessagePromptBlock(
+            chat_role="USER", blocks=[RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="question")])]
+        ),
+    ]
+    functions = [get_current_weather, format_answer]
+    prompt_inputs = {
+        "question": "What's the weather like in San Francisco?",
+    }
+
+    class Outputs(ToolCallingNode.Outputs):
+        text: str
+        chat_history: List[ChatMessage]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/tool_call/format_answer.py 1`] = `
+"def format_answer(answer: str) -> str:
+    """
+    Format the answer and request the LLM to provide a final text summary.
+    """
+    formatted = f"The answer to the question is: {answer}"
+    return (
+        f"{formatted}\\n\\nNow please provide a final summary with any temperature conversions or additional information."
+    )
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/tool_call/get_current_weather.py 1`] = `
+"def get_current_weather(location: str, unit: str) -> str:
+    """
+    Get the current weather in a given location.
+    """
+    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate deployment workflow tool > code/nodes/workflow/__init__.py 1`] = `
+"from typing import List
+
+from vellum import ChatMessage
+from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.types.definition import DeploymentDefinition
+
+
+class MyToolCallingNode(ToolCallingNode):
+    ml_model = "gpt-4"
+    blocks = []
+    functions = [DeploymentDefinition(deployment="deployment_1", release_tag="LATEST")]
+    prompt_inputs = {}
+
+    class Outputs(ToolCallingNode.Outputs):
+        text: str
+        chat_history: List[ChatMessage]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate empty function array if no functions are defined > code/nodes/tool_call/__init__.py 1`] = `
+"from typing import List
+
+from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+
+
+class GetCurrentWeatherNode(ToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    max_tool_calls = 3
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""You are a weather expert""")])],
+        ),
+        ChatMessagePromptBlock(
+            chat_role="USER", blocks=[RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="question")])]
+        ),
+    ]
+    functions = []
+    prompt_inputs = {
+        "question": "What's the weather like in San Francisco?",
+    }
+
+    class Outputs(ToolCallingNode.Outputs):
+        text: str
+        chat_history: List[ChatMessage]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/inputs.py 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    query: str
+    city: str
+    date: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/__init__.py 1`] = `
+"from .final_output import FinalOutput
+from .final_output_1 import FinalOutput1
+from .final_output_2 import FinalOutput2
+from .tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+__all__ = [
+    "FinalOutput",
+    "FinalOutput1",
+    "FinalOutput2",
+    "GetCurrentWeatherNode",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/final_output.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from ..inputs import Inputs
+
+
+class FinalOutput(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = Inputs.city
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/final_output_1.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class FinalOutput1(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = GetCurrentWeatherNode.Outputs.text
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/final_output_2.py 1`] = `
+"from typing import List
+
+from vellum import ChatMessage
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class FinalOutput2(FinalOutputNode[BaseState, List[ChatMessage]]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = GetCurrentWeatherNode.Outputs.chat_history
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
+"from .weather_function.workflow import GetCurrentWeatherNodeWeatherFunctionWorkflow
+from typing import List
+
+from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+
+from ...inputs import Inputs
+
+
+class GetCurrentWeatherNode(ToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    max_tool_calls = 3
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""You are a weather expert""")])],
+        ),
+        ChatMessagePromptBlock(
+            chat_role="USER",
+            blocks=[
+                RichTextPromptBlock(
+                    blocks=[
+                        PlainTextPromptBlock(text="""What is the weather in """),
+                        VariablePromptBlock(input_variable="city"),
+                        PlainTextPromptBlock(text=""" on """),
+                        VariablePromptBlock(input_variable="date"),
+                        PlainTextPromptBlock(text="""?"""),
+                    ]
+                )
+            ],
+        ),
+    ]
+    functions = [GetCurrentWeatherNodeWeatherFunctionWorkflow]
+    prompt_inputs = {
+        "city": Inputs.city,
+        "date": Inputs.date,
+    }
+    function_configs = None
+
+    class Outputs(ToolCallingNode.Outputs):
+        text: str
+        chat_history: List[ChatMessage]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/__init__.py 1`] = `
+"# flake8: noqa: F401, F403
+
+from ....display import *
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/inputs.py 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    city: str
+    date: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
+"from .final_output import FinalOutput3
+from .final_output_1 import FinalOutput4
+from .tool_call_start_node import StartNode
+
+__all__ = [
+    "FinalOutput3",
+    "FinalOutput4",
+    "StartNode",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/final_output.py 1`] = `
+"from typing import Union
+
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_start_node import StartNode
+
+
+class FinalOutput3(FinalOutputNode[BaseState, Union[float, int]]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = StartNode.Outputs.temperature
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/final_output_1.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .tool_call_start_node import StartNode
+
+
+class FinalOutput4(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = StartNode.Outputs.reasoning
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/tool_call_start_node.py 1`] = `
+"from typing import Union
+
+from vellum.workflows.nodes import BaseNode
+
+from ..inputs import Inputs
+
+
+class StartNode(BaseNode):
+    city = Inputs.city
+    date = Inputs.date
+
+    class Outputs(BaseNode.Outputs):
+        temperature: Union[float, int]
+        reasoning: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.final_output import FinalOutput3
+from .nodes.final_output_1 import FinalOutput4
+from .nodes.tool_call_start_node import StartNode
+
+
+class GetCurrentWeatherNodeWeatherFunctionWorkflow(BaseWorkflow[Inputs, BaseState]):
+    graph = StartNode >> {
+        FinalOutput3,
+        FinalOutput4,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        temperature = FinalOutput3.Outputs.value
+        reasoning = FinalOutput4.Outputs.value
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.final_output import FinalOutput
+from .nodes.final_output_1 import FinalOutput1
+from .nodes.final_output_2 import FinalOutput2
+from .nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class Workflow(BaseWorkflow[Inputs, BaseState]):
+    graph = GetCurrentWeatherNode >> {
+        FinalOutput,
+        FinalOutput1,
+        FinalOutput2,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = FinalOutput.Outputs.value
+        text = FinalOutput1.Outputs.value
+        chat_history = FinalOutput2.Outputs.value
+"
+`;
+
+exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs > code/sandbox.py 1`] = `
+"from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .workflow import Workflow
+
+if __name__ != "__main__":
+    raise Exception("This file is not meant to be imported")
+
+
+runner = WorkflowSandboxRunner(
+    workflow=Workflow(),
+    inputs=[
+        Inputs(
+            input="foo",
+            chat=[
+                ChatMessage(role="USER", text="foo"),
+            ],
+        ),
+        Inputs(
+            input="bar",
+            chat=[
+                ChatMessage(role="USER", content=StringChatMessageContent(value="bar")),
+            ],
+        ),
+        Inputs(
+            input="hello",
+            chat=[
+                ChatMessage(
+                    role="USER",
+                    content=ArrayChatMessageContent(
+                        value=[
+                            StringChatMessageContent(value="hello"),
+                        ]
+                    ),
+                ),
+            ],
+        ),
+    ],
+)
+
+runner.run()
+"
+`;
+
+exports[`WorkflowProjectGenerator > initialization case > should handle workflow with only ENTRYPOINT and TERMINAL nodes > code/nodes/final_output.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+
+class FinalOutput(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        pass
+"
+`;
+
+exports[`WorkflowProjectGenerator > modules > should generate code in the same module as the project > my/module/nodes/templating_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """foo"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > nodes with output values > should prioritize terminal node data over output values > code/nodes/final_output.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .templating_node import TemplatingNode
+
+
+class FinalOutput(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = TemplatingNode.Outputs.result
+"
+`;
+
+exports[`WorkflowProjectGenerator > runner config with no container image > should handle a runner config with no container image > code/workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.templating_node import TemplatingNode
+
+
+class Workflow(BaseWorkflow):
+    graph = TemplatingNode
+"
+`;
+
+exports[`WorkflowProjectGenerator > should escape special characters > should handle node comments with quotes at the beginning and end > code/nodes/templating_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    """\\"Hello" "World\\""""
+
+    template = """test template"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > should escape special characters > should not escape single quotes in node comments > code/nodes/templating_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    """'Hello' 'World'"""
+
+    template = """test template"""
+    inputs = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > state > should generate a state.py file > code/display/workflow.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, StateValueDisplay, WorkflowMetaDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+from ..nodes.templating_node import TemplatingNode
+from ..state import State
+from ..workflow import Workflow
+
+
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
+    workflow_display = WorkflowMetaDisplay(
+        entrypoint_node_id=UUID("entry"),
+        entrypoint_node_source_handle_id=UUID("entry_source"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None),
+        display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=0)),
+    )
+    state_value_displays = {
+        State.foo: StateValueDisplay(id=UUID("5bc5356a-154f-4bba-a8ee-eb283bfd2a25"), name="foo"),
+    }
+    entrypoint_displays = {
+        TemplatingNode: EntrypointDisplay(id=UUID("entry"), edge_display=EdgeDisplay(id=UUID("edge_1")))
+    }
+    output_displays = {}
+"
+`;
+
+exports[`WorkflowProjectGenerator > state > should generate a state.py file > code/state.py 1`] = `
+"from typing import Optional
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    foo: Optional[str] = None
+"
+`;
+
+exports[`WorkflowProjectGenerator > state > should generate a state.py file > code/workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+
+from .nodes.templating_node import TemplatingNode
+from .state import State
+
+
+class Workflow(BaseWorkflow[BaseInputs, State]):
+    graph = TemplatingNode
+"
+`;
