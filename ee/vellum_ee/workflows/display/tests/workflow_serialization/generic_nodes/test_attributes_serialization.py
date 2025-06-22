@@ -1,3 +1,4 @@
+import pytest
 from dataclasses import dataclass
 from uuid import uuid4
 from typing import List
@@ -70,6 +71,28 @@ def test_serialize_node__constant_value(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+@pytest.mark.parametrize(
+    "boolean_value, expected_value",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_serialize_node__constant_boolean_value(serialize_node, boolean_value, expected_value):
+    class BooleanValueGenericNode(BaseNode):
+        attr: bool = boolean_value
+
+    serialized_node = serialize_node(BooleanValueGenericNode)
+
+    assert serialized_node["attributes"][0]["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {
+            "type": "JSON",
+            "value": expected_value,
+        },
+    }
 
 
 def test_serialize_node__constant_value_reference(serialize_node):

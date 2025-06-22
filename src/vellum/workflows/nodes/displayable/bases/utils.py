@@ -52,6 +52,8 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return StringVellumValue(value=value)
     elif isinstance(value, enum.Enum):
         return StringVellumValue(value=value.value)
+    elif isinstance(value, bool):
+        return JsonVellumValue(value=value)
     elif isinstance(value, (int, float)):
         return NumberVellumValue(value=value)
     elif isinstance(value, list) and (
