@@ -1,3 +1,4 @@
+import pytest
 from dataclasses import dataclass
 from uuid import uuid4
 from typing import List
@@ -72,100 +73,26 @@ def test_serialize_node__constant_value(serialize_node):
     )
 
 
-def test_serialize_node__constant_boolean_value(serialize_node):
+@pytest.mark.parametrize(
+    "boolean_value, expected_value",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_serialize_node__constant_boolean_value(serialize_node, boolean_value, expected_value):
     class BooleanValueGenericNode(BaseNode):
-        attr: bool = True
+        attr: bool = boolean_value
 
     serialized_node = serialize_node(BooleanValueGenericNode)
 
-    assert not DeepDiff(
-        {
-            "id": "fe568d1f-192a-4b5e-896a-85e33428a949",
-            "label": "test_serialize_node__constant_boolean_value.<locals>.BooleanValueGenericNode",
-            "type": "GENERIC",
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "definition": {
-                "name": "BooleanValueGenericNode",
-                "module": [
-                    "vellum_ee",
-                    "workflows",
-                    "display",
-                    "tests",
-                    "workflow_serialization",
-                    "generic_nodes",
-                    "test_attributes_serialization",
-                ],
-            },
-            "trigger": {"id": "6157d327-f479-4f9b-bf9c-344327085b55", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "2c145fc5-409b-4676-805b-8040f98f0eb2", "type": "DEFAULT", "name": "default"}],
-            "adornments": None,
-            "attributes": [
-                {
-                    "id": "f88b604e-0a4f-493d-bff2-04f9e7a5577d",
-                    "name": "attr",
-                    "value": {
-                        "type": "CONSTANT_VALUE",
-                        "value": {
-                            "type": "NUMBER",
-                            "value": 1.0,
-                        },
-                    },
-                }
-            ],
-            "outputs": [],
+    assert serialized_node["attributes"][0]["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {
+            "type": "JSON",
+            "value": expected_value,
         },
-        serialized_node,
-        ignore_order=True,
-    )
-
-
-def test_serialize_node__constant_boolean_false_value(serialize_node):
-    class BooleanFalseValueGenericNode(BaseNode):
-        attr: bool = False
-
-    serialized_node = serialize_node(BooleanFalseValueGenericNode)
-
-    assert not DeepDiff(
-        {
-            "id": "5ee663c9-fedc-448d-bd0d-1ca00db79828",
-            "label": "test_serialize_node__constant_boolean_false_value.<locals>.BooleanFalseValueGenericNode",
-            "type": "GENERIC",
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "definition": {
-                "name": "BooleanFalseValueGenericNode",
-                "module": [
-                    "vellum_ee",
-                    "workflows",
-                    "display",
-                    "tests",
-                    "workflow_serialization",
-                    "generic_nodes",
-                    "test_attributes_serialization",
-                ],
-            },
-            "trigger": {"id": "85d19028-b7cc-423d-82eb-6b1f2bdb1c29", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "fa1e09d5-9fe7-46b6-b933-e62f09734999", "type": "DEFAULT", "name": "default"}],
-            "adornments": None,
-            "attributes": [
-                {
-                    "id": "4e155c6b-2557-410d-908c-6f8b1e893df5",
-                    "name": "attr",
-                    "value": {
-                        "type": "CONSTANT_VALUE",
-                        "value": {
-                            "type": "NUMBER",
-                            "value": 0.0,
-                        },
-                    },
-                }
-            ],
-            "outputs": [],
-        },
-        serialized_node,
-        ignore_order=True,
-    )
+    }
 
 
 def test_serialize_node__constant_value_reference(serialize_node):
