@@ -3,6 +3,7 @@ import threading
 import time
 
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.map_node.node import MapNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
@@ -221,3 +222,43 @@ def test_map_node_parallel_execution_with_workflow():
     # AND each item should have run on a different thread
     thread_ids_list = list(thread_ids.values())
     assert len(set(thread_ids_list)) == 3
+
+
+def test_map_node__shared_state_race_condition():
+    # GIVEN a templating node that processes items
+    class TemplatingNode(BaseNode):
+        item = MapNode.SubworkflowInputs.item
+
+        class Outputs(BaseOutputs):
+            processed_item: str
+
+        def run(self) -> Outputs:
+            processed_item = f"{self.item}!"
+            return self.Outputs(processed_item=processed_item)
+
+    # AND a final output node
+    class FinalOutput(FinalOutputNode[BaseState, str]):
+        class Outputs(FinalOutputNode.Outputs):
+            value = TemplatingNode.Outputs.processed_item
+
+    # AND a workflow using those nodes
+    class ProcessItemWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = TemplatingNode >> FinalOutput
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = FinalOutput.Outputs.value
+
+    # AND a map node with high concurrency
+    class RaceConditionMapNode(MapNode):
+        items = ["a", "b", "c", "d", "e", "f"]
+        subworkflow = ProcessItemWorkflow
+        max_concurrency = 50
+
+    # WHEN we run the map node once to see what's happening
+    node = RaceConditionMapNode(state=BaseState())
+    outputs = list(node.run())
+    final_result = outputs[-1].value
+
+    # THEN all results should be in correct order
+    expected_result = ["a!", "b!", "c!", "d!", "e!", "f!"]
+    assert final_result == expected_result

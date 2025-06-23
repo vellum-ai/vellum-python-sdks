@@ -2,6 +2,7 @@ from collections import defaultdict
 import concurrent.futures
 import logging
 from queue import Empty, Queue
+from threading import Lock
 from typing import (
     TYPE_CHECKING,
     Callable,
@@ -51,6 +52,8 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     items: List[MapNodeItemType]
     max_concurrency: Optional[int] = None
+
+    _execution_lock = Lock()
 
     class Outputs(BaseAdornmentNode.Outputs):
         pass
@@ -178,8 +181,10 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             event_filter=all_workflow_event_filter,
         )
 
-        for event in events:
-            self._event_queue.put((index, event))
+        # Only serialize the event queuing
+        with self._execution_lock:
+            for event in events:
+                self._event_queue.put((index, event))
 
     @overload
     @classmethod
