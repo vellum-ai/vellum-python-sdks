@@ -58,6 +58,7 @@ typing_extensions = ">= 4.0.0"
 mypy = "1.11.1"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.23.5"
+pytest-cov = "^4.0.0"
 python-dateutil = "^2.9.0"
 types-python-dateutil = "^2.9.0.20240316"
 black = "24.8.0"
@@ -84,6 +85,7 @@ types-requests = "2.32.0.20240712"
 [tool.pytest.ini_options]
 testpaths = [ "tests" ]
 asyncio_mode = "auto"
+addopts = "--cov --cov-report=html --cov-report=term-missing"
 filterwarnings = [
     "ignore::pytest.PytestCollectionWarning"
 ]
@@ -140,3 +142,27 @@ exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows)
 max-line-length = 120
 exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/resources,src/vellum/types,tests/client,examples/workflows"
 ignore = "E203, W503, E704, U100, U101"
+
+[tool.coverage.run]
+source = ["src/vellum", "ee/vellum_cli", "ee/vellum_ee"]
+omit = [
+    "src/vellum/client/*",
+    "src/vellum/core/*",
+    "src/vellum/environment.py",
+    "src/vellum/errors/*",
+    "src/vellum/resources/*",
+    "src/vellum/types/*",
+    "tests/*",
+    "examples/*",
+    "scripts/*",
+    "*/tests/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+fail_under = 25
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
