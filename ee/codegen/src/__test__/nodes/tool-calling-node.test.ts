@@ -10,7 +10,12 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
-import { FunctionArgs, NodeAttribute, NodePort } from "src/types/vellum";
+import {
+  DeploymentWorkflowFunctionArgs,
+  FunctionArgs,
+  NodeAttribute,
+  NodePort,
+} from "src/types/vellum";
 
 describe("ToolCallingNode", () => {
   let workflowContext: WorkflowContext;
@@ -216,6 +221,57 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = createFunctionAttribute([
         inlineWorkflowFunction,
         codeExecutionFunction,
+      ]);
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+  describe("deployment workflow", () => {
+    const createFunctionAttribute = <T>(
+      functions: Array<T>
+    ): NodeAttribute => ({
+      id: "functions-attr-id",
+      name: "functions",
+      value: {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "JSON",
+          value: functions,
+        },
+      },
+    });
+
+    const deploymentWorkflowFunction: DeploymentWorkflowFunctionArgs = {
+      type: "WORKFLOW_DEPLOYMENT",
+      deployment: "deployment_1",
+      release_tag: null,
+    };
+
+    it("should generate latest release tag if release_tag is null", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = createFunctionAttribute([
+        deploymentWorkflowFunction,
       ]);
 
       const nodeData = toolCallingNodeFactory({
