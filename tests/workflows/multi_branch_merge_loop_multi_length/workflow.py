@@ -24,7 +24,7 @@ class TopNode(BaseNode):
 
     def run(self) -> Outputs:
         if self.counter >= 1:
-            time.sleep(0.015)
+            time.sleep(0.03)
 
         return self.Outputs()
 
@@ -37,7 +37,7 @@ class BottomNode(BaseNode):
 
     def run(self) -> Outputs:
         if self.counter < 1:
-            time.sleep(0.01)
+            time.sleep(0.02)
 
         return self.Outputs()
 
