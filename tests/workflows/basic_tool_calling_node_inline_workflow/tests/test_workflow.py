@@ -312,7 +312,7 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                 state=None,
                 cache_config=None,
                 name="basic_inline_subworkflow_workflow",
-                description=None,
+                description="\n    A workflow that gets the weather for a given city and date.\n    ",
                 parameters={
                     "type": "object",
                     "properties": {"city": {"type": "string"}, "date": {"type": "string"}},
