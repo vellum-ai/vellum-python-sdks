@@ -12,6 +12,7 @@ from vellum.workflows.nodes.experimental.tool_calling_node.utils import create_f
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.types.definition import DeploymentDefinition
 
 
 def first_function() -> str:
@@ -127,3 +128,15 @@ def test_tool_calling_node_inline_workflow_context():
     assert isinstance(function_response.content, StringChatMessageContent)
     data = json.loads(function_response.content.value)
     assert data["generated_files"] == {"script.py": "print('hello world')"}
+
+
+def test_deployment_definition_release_tag_defaults_to_latest():
+    """
+    Test that when creating a DeploymentDefinition without specifying release_tag,
+    it defaults to "LATEST".
+    """
+    # WHEN we create a deployment definition without specifying release_tag
+    deployment_config = DeploymentDefinition(deployment="test-deployment")
+
+    # THEN the release_tag should default to "LATEST"
+    assert deployment_config.release_tag == "LATEST"

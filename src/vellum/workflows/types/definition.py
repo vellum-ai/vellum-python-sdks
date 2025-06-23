@@ -74,4 +74,4 @@ VellumCodeResourceDefinition = Annotated[
 
 class DeploymentDefinition(UniversalBaseModel):
     deployment: str
-    release_tag: Optional[str] = "LATEST"
+    release_tag: str = "LATEST"
