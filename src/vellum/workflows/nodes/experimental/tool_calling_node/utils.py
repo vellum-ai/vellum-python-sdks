@@ -42,7 +42,7 @@ class ToolRouterNode(InlinePromptNode):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
-        if hasattr(self, "max_prompt_iterations") and self.max_prompt_iterations is not None:
+        if self.max_prompt_iterations is not None:
             if self.state.prompt_iterations >= self.max_prompt_iterations:
                 max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
                 self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=max_iterations_message))
@@ -60,7 +60,7 @@ class ToolRouterNode(InlinePromptNode):
                     if values[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
                     elif values[0].type == "FUNCTION_CALL":
-                        if hasattr(self, "max_prompt_iterations") and self.max_prompt_iterations is not None:
+                        if self.max_prompt_iterations is not None:
                             self.state.prompt_iterations += 1
 
                         function_call = values[0].value
