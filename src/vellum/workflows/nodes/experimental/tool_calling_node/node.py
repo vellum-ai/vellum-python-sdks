@@ -96,7 +96,7 @@ class ToolCallingNode(BaseNode):
 
                 return node_outputs
             elif terminal_event.name == "workflow.execution.rejected":
-                raise Exception(f"Workflow execution rejected: {terminal_event.error}")
+                raise NodeException(message=terminal_event.error.message, code=terminal_event.error.code)
 
             raise Exception(f"Unexpected workflow event: {terminal_event.name}")
 

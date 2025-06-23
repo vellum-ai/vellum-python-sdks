@@ -1,16 +1,13 @@
 from uuid import uuid4
 from typing import Iterator, List
 
-from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
-from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
-from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.prompt_output import PromptOutput
-from vellum.client.types.string_chat_message_content import StringChatMessageContent
+from vellum.workflows.errors.types import WorkflowErrorCode
 
 from tests.workflows.basic_tool_calling_node_max_prompt_iterations.workflow import (
     BasicToolCallingNodeMaxPromptIterationsWorkflow,
@@ -77,25 +74,9 @@ def test_tool_calling_node_max_prompt_iterations_workflow(vellum_adhoc_prompt_cl
     terminal_event = workflow.run()
 
     # THEN the workflow is executed successfully
-    assert terminal_event.name == "workflow.execution.fulfilled"
+    assert terminal_event.name == "workflow.execution.rejected"
 
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 1
 
-    assert terminal_event.outputs.text == "Maximum number of prompt iterations `1` reached."
-    assert terminal_event.outputs.chat_history == [
-        ChatMessage(
-            text=None,
-            role="ASSISTANT",
-            content=FunctionCallChatMessageContent(
-                type="FUNCTION_CALL",
-                value=FunctionCallChatMessageContentValue(name="add_numbers", arguments={"a": 5, "b": 3}, id="call_1"),
-            ),
-            source=None,
-        ),
-        ChatMessage(
-            text=None, role="FUNCTION", content=StringChatMessageContent(type="STRING", value="8"), source=None
-        ),
-        ChatMessage(
-            text="Maximum number of prompt iterations `1` reached.", role="ASSISTANT", content=None, source=None
-        ),
-    ]
+    assert terminal_event.error.code == WorkflowErrorCode.NODE_EXECUTION
+    assert terminal_event.error.message == "Maximum number of prompt iterations `1` reached."

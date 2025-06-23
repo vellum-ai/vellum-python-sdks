@@ -12,7 +12,6 @@ from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
-from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -44,11 +43,7 @@ class ToolRouterNode(InlinePromptNode):
     def run(self) -> Iterator[BaseOutput]:
         if self.state.prompt_iterations >= self.max_prompt_iterations:
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
-            self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=max_iterations_message))
-
-            yield BaseOutput(name="results", value=[StringVellumValue(value=max_iterations_message)])
-            yield BaseOutput(name="text", value=max_iterations_message)
-            return
+            raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
         self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}  # type: ignore
         generator = super().run()
@@ -232,7 +227,7 @@ def create_function_node(
             elif terminal_event.name == "workflow.execution.fulfilled":
                 result = terminal_event.outputs
             elif terminal_event.name == "workflow.execution.rejected":
-                raise Exception(f"Workflow execution rejected: {terminal_event.error}")
+                raise NodeException(message=terminal_event.error.message, code=terminal_event.error.code)
 
             self.state.chat_history.append(
                 ChatMessage(
