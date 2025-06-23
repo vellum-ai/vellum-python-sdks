@@ -40,7 +40,7 @@ class ToolCallingNode(BaseNode):
     functions: ClassVar[List[Tool]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     function_configs: ClassVar[Optional[Dict[str, Dict[str, Any]]]] = None
-    max_prompt_iterations: ClassVar[Optional[int]] = None
+    max_prompt_iterations: ClassVar[Optional[int]] = 5
 
     class Outputs(BaseOutputs):
         """
