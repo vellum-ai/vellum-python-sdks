@@ -4,7 +4,10 @@ RUN pip install --upgrade pip \
     && pip install boto3 \
     && pip install mcp
 
-COPY ./utils /custom/utils
+# Install Docker (daemon and CLI)
+RUN apt-get update && apt-get install -y docker.io
 
+COPY ./utils /custom/utils
 ENV PYTHONPATH="${PYTHONPATH}:/custom"
-CMD ["vellum_start_server"]
+
+CMD dockerd & vellum_start_server

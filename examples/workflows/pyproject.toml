@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-vellum-ai = "0.14.71"
+vellum-ai = "^0.14.73"
 boto3 = "^1.38.4"
 mcp = "1.1.1"
 
@@ -28,7 +28,7 @@ container_image_tag = "1.0.3"
 [[tool.vellum.workflows]]
 module = "mcp_demo"
 container_image_name = "sdk-examples-utils"
-container_image_tag = "1.0.5"
+container_image_tag = "1.0.7"
 
 [[tool.vellum.workspaces]]
 name = "aws-staging"

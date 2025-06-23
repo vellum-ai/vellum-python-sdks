@@ -1,11 +1,14 @@
 import asyncio
 import os
+import traceback
 from typing import List
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from vellum import FunctionDefinition
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
@@ -20,7 +23,7 @@ class MCPClientNode(BaseNode):
 
     def run(self) -> Outputs:
         server_params = StdioServerParameters(
-            command="/usr/local/bin/docker",
+            command="docker",
             args=["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
             env={
                 "GITHUB_PERSONAL_ACCESS_TOKEN": self.token,
@@ -35,7 +38,14 @@ class MCPClientNode(BaseNode):
                     response = await session.list_tools()
             return response.tools
 
-        mcp_tools = asyncio.run(run_stdio())
+        try:
+            mcp_tools = asyncio.run(run_stdio())
+        except Exception as e:
+            tb_str = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+            raise NodeException(
+                f"Error: Failed to retrieve tools from MCP Server: {tb_str}",
+                code=WorkflowErrorCode.INVALID_CODE,
+            )
 
         return self.Outputs(
             tools=[
