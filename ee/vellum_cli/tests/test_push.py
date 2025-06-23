@@ -447,10 +447,13 @@ class ExampleWorkflow(BaseWorkflow):
     # THEN it should fail with exit code 1 due to errors
     assert result.exit_code == 1
 
-    # AND we should have called the push API with the dry-run option
-    vellum_client.workflows.push.assert_called_once()
-    call_args = vellum_client.workflows.push.call_args.kwargs
-    assert call_args["dry_run"] is True
+    # AND we should have called the push API twice (once normal dry-run, once strict)
+    assert vellum_client.workflows.push.call_count == 2
+    call_args_list = vellum_client.workflows.push.call_args_list
+    assert call_args_list[0].kwargs["dry_run"] is True
+    assert call_args_list[0].kwargs.get("strict") is None or call_args_list[0].kwargs.get("strict") is False
+    assert call_args_list[1].kwargs["dry_run"] is True
+    assert call_args_list[1].kwargs["strict"] is True
 
     # AND the report should be in the output
     assert "## Errors" in result.output
@@ -479,10 +482,13 @@ def test_push__dry_run_option_no_errors_returns_success(mock_module, vellum_clie
     # THEN it should succeed with exit code 0
     assert result.exit_code == 0
 
-    # AND we should have called the push API with the dry-run option
-    vellum_client.workflows.push.assert_called_once()
-    call_args = vellum_client.workflows.push.call_args.kwargs
-    assert call_args["dry_run"] is True
+    # AND we should have called the push API twice (once normal dry-run, once strict)
+    assert vellum_client.workflows.push.call_count == 2
+    call_args_list = vellum_client.workflows.push.call_args_list
+    assert call_args_list[0].kwargs["dry_run"] is True
+    assert call_args_list[0].kwargs.get("strict") is None or call_args_list[0].kwargs.get("strict") is False
+    assert call_args_list[1].kwargs["dry_run"] is True
+    assert call_args_list[1].kwargs["strict"] is True
 
     # AND the report should be in the output
     assert "## Errors" in result.output
@@ -974,3 +980,58 @@ def test_push__use_default_workspace_if_not_specified__multiple_workflows_config
         config = configs[0]
         assert config["workflow_sandbox_id"] == workflow_sandbox_id
         assert config["workspace"] == "default"
+
+
+def test_push__dry_run_with_artifact_changes(mock_module, vellum_client):
+    """Test that dry-run includes artifact_changes when strict diff detects differences"""
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    _ensure_workflow_py(temp_dir, module)
+
+    def side_effect(*args, **kwargs):
+        if kwargs.get("strict"):
+            raise ApiError(
+                status_code=400,
+                body={
+                    "detail": "Artifact differences detected",
+                    "diffs": {
+                        "generated_only": ["new_file.py"],
+                        "modified": {"workflow.py": ["diff content"]},
+                    },
+                },
+            )
+        return WorkflowPushResponse(
+            workflow_sandbox_id=str(uuid4()),
+            proposed_diffs={"some": "diffs"},
+        )
+
+    vellum_client.workflows.push.side_effect = side_effect
+
+    runner = CliRunner(mix_stderr=True)
+    result = runner.invoke(cli_main, ["push", module, "--dry-run"])
+
+    assert result.exit_code == 1
+    assert vellum_client.workflows.push.call_count == 2
+    assert "artifact_changes" in result.output
+    assert "generated_only" in result.output
+    assert "new_file.py" in result.output
+
+
+def test_push__dry_run_no_artifact_changes(mock_module, vellum_client):
+    """Test that dry-run works normally when no artifact differences detected"""
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    _ensure_workflow_py(temp_dir, module)
+
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        proposed_diffs=None,
+    )
+
+    runner = CliRunner(mix_stderr=True)
+    result = runner.invoke(cli_main, ["push", module, "--dry-run"])
+
+    assert result.exit_code == 0
+    assert vellum_client.workflows.push.call_count == 2
+    assert "artifact_changes" in result.output
+    assert "null" in result.output

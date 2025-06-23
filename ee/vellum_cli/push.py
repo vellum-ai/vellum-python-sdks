@@ -227,8 +227,29 @@ def push_command(
         raise e
 
     if dry_run:
+        artifact_changes = None
+        if artifact:
+            try:
+                artifact.seek(0)
+                client.workflows.push(
+                    exec_config=json.dumps(exec_config),
+                    workflow_sandbox_id=workflow_config.workflow_sandbox_id or workflow_sandbox_id,
+                    artifact=artifact,
+                    deployment_config=deployment_config_serialized,  # type: ignore[arg-type]
+                    dry_run=True,
+                    strict=True,
+                )
+            except ApiError as e:
+                if e.status_code == 400 and isinstance(e.body, dict) and "diffs" in e.body:
+                    artifact_changes = e.body["diffs"]
+
         error_messages = serialization_result.errors
         error_message = "\n".join(error_messages) if error_messages else "No errors found."
+
+        if hasattr(response, "proposed_diffs") and response.proposed_diffs is not None:
+            response.proposed_diffs["artifact_changes"] = artifact_changes
+        elif artifact_changes is not None:
+            response.proposed_diffs = {"artifact_changes": artifact_changes}
         logger.info(
             f"""\
 # Workflow Push Report
@@ -244,8 +265,9 @@ def push_command(
         error_list = serialization_result.errors
         has_errors = len(error_list) > 0
         has_diffs = response.proposed_diffs is not None and response.proposed_diffs
+        has_artifact_changes = artifact_changes is not None
 
-        if has_errors or has_diffs:
+        if has_errors or has_diffs or has_artifact_changes:
             exit(1)
     else:
         default_api_url = client._client_wrapper._environment.default
