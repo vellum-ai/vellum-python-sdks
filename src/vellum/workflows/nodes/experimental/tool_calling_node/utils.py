@@ -37,6 +37,8 @@ class FunctionNode(BaseNode):
 
 
 class ToolRouterNode(InlinePromptNode):
+    max_prompt_iterations: Optional[int] = 5
+
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
