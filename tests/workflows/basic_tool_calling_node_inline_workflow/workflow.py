@@ -28,6 +28,10 @@ class StartNode(BaseNode):
 
 
 class BasicInlineSubworkflowWorkflow(BaseWorkflow[Inputs, BaseState]):
+    """
+    A workflow that gets the weather for a given city and date.
+    """
+
     graph = StartNode
 
     class Outputs(BaseOutputs):
