@@ -32,6 +32,7 @@ class ToolCallingNode(BaseNode):
         functions: List[Tool] - The functions that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
         function_configs: Optional[Dict[str, Dict[str, Any]]] - Mapping of function names to their configuration
+        max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping
     """
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
@@ -39,6 +40,7 @@ class ToolCallingNode(BaseNode):
     functions: ClassVar[List[Tool]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     function_configs: ClassVar[Optional[Dict[str, Dict[str, Any]]]] = None
+    max_prompt_iterations: ClassVar[Optional[int]] = None
 
     class Outputs(BaseOutputs):
         """
@@ -65,6 +67,7 @@ class ToolCallingNode(BaseNode):
 
             class ToolCallingState(BaseState):
                 chat_history: List[ChatMessage] = []
+                prompt_iterations: int = 0
 
             class ToolCallingWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
                 graph = self._graph
@@ -103,6 +106,7 @@ class ToolCallingNode(BaseNode):
             blocks=self.blocks,
             functions=self.functions,
             prompt_inputs=self.prompt_inputs,
+            max_prompt_iterations=self.max_prompt_iterations,
         )
 
         self._function_nodes = {}

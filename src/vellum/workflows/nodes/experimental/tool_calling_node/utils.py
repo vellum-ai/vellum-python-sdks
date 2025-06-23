@@ -12,6 +12,7 @@ from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
+from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -41,6 +42,15 @@ class ToolRouterNode(InlinePromptNode):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
+        if hasattr(self, "max_prompt_iterations") and self.max_prompt_iterations is not None:
+            if self.state.prompt_iterations >= self.max_prompt_iterations:
+                max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
+                self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=max_iterations_message))
+
+                yield BaseOutput(name="results", value=[StringVellumValue(value=max_iterations_message)])
+                yield BaseOutput(name="text", value=max_iterations_message)
+                return
+
         self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}  # type: ignore
         generator = super().run()
         for output in generator:
@@ -50,6 +60,9 @@ class ToolRouterNode(InlinePromptNode):
                     if values[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
                     elif values[0].type == "FUNCTION_CALL":
+                        if hasattr(self, "max_prompt_iterations") and self.max_prompt_iterations is not None:
+                            self.state.prompt_iterations += 1
+
                         function_call = values[0].value
                         if function_call is not None:
                             self.state.chat_history.append(
@@ -72,6 +85,7 @@ def create_tool_router_node(
     blocks: List[PromptBlock],
     functions: List[Tool],
     prompt_inputs: Optional[EntityInputsInterface],
+    max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
         # If we have functions, create dynamic ports for each function
@@ -120,6 +134,7 @@ def create_tool_router_node(
                 "blocks": blocks,
                 "functions": functions,
                 "prompt_inputs": prompt_inputs,
+                "max_prompt_iterations": max_prompt_iterations,
                 "Ports": Ports,
                 "__module__": __name__,
             },
