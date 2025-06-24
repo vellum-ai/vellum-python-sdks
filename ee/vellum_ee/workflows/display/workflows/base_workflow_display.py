@@ -689,28 +689,34 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         full_workflow_display_module_path = f"{module_path}.display.workflow"
         try:
             display_module = importlib.import_module(full_workflow_display_module_path)
-
-            WorkflowDisplayClass: Optional[Type[BaseWorkflowDisplay]] = None
-            for name, definition in display_module.__dict__.items():
-                if name.startswith("_"):
-                    continue
-
-                if (
-                    not isinstance(definition, type)
-                    or not issubclass(definition, BaseWorkflowDisplay)
-                    or definition == BaseWorkflowDisplay
-                ):
-                    continue
-
-                WorkflowDisplayClass = definition
-                break
-
-            if WorkflowDisplayClass:
-                return WorkflowDisplayClass().get_event_display_context()
-
         except ModuleNotFoundError:
-            pass
+            return BaseWorkflowDisplay._gather_event_display_context_from_workflow_crawling(module_path, workflow_class)
 
+        WorkflowDisplayClass: Optional[Type[BaseWorkflowDisplay]] = None
+        for name, definition in display_module.__dict__.items():
+            if name.startswith("_"):
+                continue
+
+            if (
+                not isinstance(definition, type)
+                or not issubclass(definition, BaseWorkflowDisplay)
+                or definition == BaseWorkflowDisplay
+            ):
+                continue
+
+            WorkflowDisplayClass = definition
+            break
+
+        if WorkflowDisplayClass:
+            return WorkflowDisplayClass().get_event_display_context()
+
+        return BaseWorkflowDisplay._gather_event_display_context_from_workflow_crawling(module_path, workflow_class)
+
+    @staticmethod
+    def _gather_event_display_context_from_workflow_crawling(
+        module_path: str,
+        workflow_class: Optional[Type[BaseWorkflow]] = None,
+    ) -> Union[WorkflowEventDisplayContext, None]:
         try:
             if workflow_class is None:
                 workflow_class = BaseWorkflow.load_from_module(module_path)

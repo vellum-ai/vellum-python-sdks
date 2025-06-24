@@ -106,6 +106,7 @@ class MyCustomWorkflowDisplay(BaseWorkflowDisplay[MyCustomWorkflow]):
 
 
 def test_gather_event_display_context__workflow_crawling_without_display_module():
+    # GIVEN a workflow module without a display module
     files = {
         "__init__.py": "",
         "workflow.py": """\
@@ -126,13 +127,17 @@ class TestWorkflow(BaseWorkflow):
 
     namespace = str(uuid4())
 
+    # AND the virtual file loader is registered
     sys.meta_path.append(VirtualFileFinder(files, namespace))
 
+    # WHEN the workflow display context is gathered
     display_meta = BaseWorkflowDisplay.gather_event_display_context(namespace)
 
+    # THEN the workflow display context should be successfully created via workflow crawling
     assert display_meta is not None
     assert isinstance(display_meta, WorkflowEventDisplayContext)
 
+    # AND the node displays should be populated with the correct node structure
     assert len(display_meta.node_displays) == 1
     node_display = list(display_meta.node_displays.values())[0]
     assert "result" in node_display.output_display
