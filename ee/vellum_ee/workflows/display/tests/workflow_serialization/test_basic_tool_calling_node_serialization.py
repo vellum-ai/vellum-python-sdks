@@ -131,6 +131,8 @@ def test_serialize_workflow():
                         "value": [
                             {
                                 "type": "CODE_EXECUTION",
+                                "name": "get_current_weather",
+                                "description": "\n    Get the current weather in a given location.\n    ",
                                 "definition": {
                                     "state": None,
                                     "cache_config": None,

@@ -68,6 +68,8 @@ class DefaultStateEncoder(JSONEncoder):
 
             return {
                 "type": "CODE_EXECUTION",
+                "name": function_definition.name,
+                "description": function_definition.description,
                 "definition": function_definition,
                 "src": source_code,
             }
