@@ -338,10 +338,8 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 "type": "JSON",
                 "value": {
                     "type": "INLINE_WORKFLOW",
-                    "definition": {
-                        "name": name,
-                        "description": description,
-                    },
+                    "name": name,
+                    "description": description,
                     "exec_config": serialized_value,
                 },
             },

@@ -131,10 +131,8 @@ def test_serialize_workflow():
                         "value": [
                             {
                                 "type": "INLINE_WORKFLOW",
-                                "definition": {
-                                    "name": "BasicInlineSubworkflowWorkflow",
-                                    "description": "\n    A workflow that gets the weather for a given city and date.\n    ",  # noqa: E501
-                                },
+                                "name": "BasicInlineSubworkflowWorkflow",
+                                "description": "\n    A workflow that gets the weather for a given city and date.\n    ",  # noqa: E501
                                 "exec_config": {
                                     "workflow_raw_data": {
                                         "nodes": [
