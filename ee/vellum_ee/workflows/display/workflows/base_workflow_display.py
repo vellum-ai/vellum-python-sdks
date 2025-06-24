@@ -724,7 +724,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             workflow_display = get_workflow_display(workflow_class=workflow_class)
             return workflow_display.get_event_display_context()
 
-        except Exception:
+        except (ModuleNotFoundError, ValueError) as e:
+            logger.exception("Failed to load workflow from module %s: %s", module_path, e)
             return None
 
     def get_event_display_context(self):
