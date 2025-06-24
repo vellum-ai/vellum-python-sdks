@@ -329,14 +329,18 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
         workflow_display = get_workflow_display(workflow_class=value)
-        value = workflow_display.serialize()
+        serialized_value: dict = workflow_display.serialize()
+        name = serialized_value["workflow_raw_data"]["definition"]["name"]
+        description = value.__doc__ or ""
         return {
             "type": "CONSTANT_VALUE",
             "value": {
                 "type": "JSON",
                 "value": {
                     "type": "INLINE_WORKFLOW",
-                    "exec_config": value,
+                    "name": name,
+                    "description": description,
+                    "exec_config": serialized_value,
                 },
             },
         }
