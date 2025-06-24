@@ -1,5 +1,6 @@
 from collections import defaultdict
 import concurrent.futures
+from copy import deepcopy
 import logging
 from queue import Empty, Queue
 from typing import (
@@ -168,7 +169,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
         context = WorkflowContext.create_from(self._context)
         subworkflow = self.subworkflow(
-            parent_state=self.state,
+            parent_state=deepcopy(self.state),
             context=context,
         )
         SubworkflowInputsClass = self.subworkflow.get_inputs_class()
