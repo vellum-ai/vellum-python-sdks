@@ -37,10 +37,16 @@ class FunctionNode(BaseNode):
 
 
 class ToolRouterNode(InlinePromptNode):
+    max_prompt_iterations: Optional[int] = 5
+
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
+        if self.state.prompt_iterations >= self.max_prompt_iterations:
+            max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
+            raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
+
         self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}  # type: ignore
         generator = super().run()
         for output in generator:
@@ -50,6 +56,8 @@ class ToolRouterNode(InlinePromptNode):
                     if values[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
                     elif values[0].type == "FUNCTION_CALL":
+                        self.state.prompt_iterations += 1
+
                         function_call = values[0].value
                         if function_call is not None:
                             self.state.chat_history.append(
@@ -72,6 +80,7 @@ def create_tool_router_node(
     blocks: List[PromptBlock],
     functions: List[Tool],
     prompt_inputs: Optional[EntityInputsInterface],
+    max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
         # If we have functions, create dynamic ports for each function
@@ -120,6 +129,7 @@ def create_tool_router_node(
                 "blocks": blocks,
                 "functions": functions,
                 "prompt_inputs": prompt_inputs,
+                "max_prompt_iterations": max_prompt_iterations,
                 "Ports": Ports,
                 "__module__": __name__,
             },
@@ -219,7 +229,7 @@ def create_function_node(
             elif terminal_event.name == "workflow.execution.fulfilled":
                 result = terminal_event.outputs
             elif terminal_event.name == "workflow.execution.rejected":
-                raise Exception(f"Workflow execution rejected: {terminal_event.error}")
+                raise NodeException(message=terminal_event.error.message, code=terminal_event.error.code)
 
             self.state.chat_history.append(
                 ChatMessage(
