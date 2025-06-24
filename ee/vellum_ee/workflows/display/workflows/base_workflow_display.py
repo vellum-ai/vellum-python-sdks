@@ -690,8 +690,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         try:
             display_module = importlib.import_module(full_workflow_display_module_path)
         except ModuleNotFoundError:
-            logger.exception("Failed to import workflow display module: %s", full_workflow_display_module_path)
-            return None
+            return BaseWorkflowDisplay._gather_event_display_context_from_workflow_crawling(module_path, workflow_class)
 
         WorkflowDisplayClass: Optional[Type[BaseWorkflowDisplay]] = None
         for name, definition in display_module.__dict__.items():
@@ -708,11 +707,26 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             WorkflowDisplayClass = definition
             break
 
-        if not WorkflowDisplayClass:
-            logger.exception("No workflow display class found in module: %s", full_workflow_display_module_path)
-            return None
+        if WorkflowDisplayClass:
+            return WorkflowDisplayClass().get_event_display_context()
 
-        return WorkflowDisplayClass().get_event_display_context()
+        return BaseWorkflowDisplay._gather_event_display_context_from_workflow_crawling(module_path, workflow_class)
+
+    @staticmethod
+    def _gather_event_display_context_from_workflow_crawling(
+        module_path: str,
+        workflow_class: Optional[Type[BaseWorkflow]] = None,
+    ) -> Union[WorkflowEventDisplayContext, None]:
+        try:
+            if workflow_class is None:
+                workflow_class = BaseWorkflow.load_from_module(module_path)
+
+            workflow_display = get_workflow_display(workflow_class=workflow_class)
+            return workflow_display.get_event_display_context()
+
+        except ModuleNotFoundError:
+            logger.exception("Failed to load workflow from module %s", module_path)
+            return None
 
     def get_event_display_context(self):
         display_context = self.display_context
