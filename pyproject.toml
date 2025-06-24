@@ -3,7 +3,7 @@ name = "vellum-ai"
 
 [tool.poetry]
 name = "vellum-ai"
-version = "0.14.73"
+version = "0.14.74"
 description = ""
 readme = "README.md"
 authors = []
@@ -27,12 +27,12 @@ classifiers = [
     "Typing :: Typed",
     "License :: OSI Approved :: MIT License"
 ]
-urls = { Repository = "https://github.com/vellum-ai/vellum-python-sdks" }
 packages = [
-    { include = "vellum", from = "src" },
-    { include = "vellum_cli", from = "ee" },
-    { include = "vellum_ee", from = "ee" },
+    { include = "vellum", from = "src"}
 ]
+
+[project.urls]
+Repository = 'https://github.com/vellum-ai/vellum-python-sdks'
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -55,10 +55,9 @@ tomli = ">=2.0.0,<3.0.0"
 typing_extensions = ">= 4.0.0"
 
 [tool.poetry.dev-dependencies]
-mypy = "1.11.1"
+mypy = "1.0.1"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.23.5"
-pytest-cov = "^4.0.0"
 python-dateutil = "^2.9.0"
 types-python-dateutil = "^2.9.0.20240316"
 black = "24.8.0"
@@ -73,6 +72,7 @@ ipdb = "0.13.13"
 ipython = "8.12.3"
 isort = "5.13.2"
 pre-commit = "3.5.0"
+pytest-cov = "^4.0.0"
 pytest-mock = "3.10.0"
 pytest-timeout = "2.3.1"
 requests-mock = "1.11.0"
@@ -85,23 +85,10 @@ types-requests = "2.32.0.20240712"
 [tool.pytest.ini_options]
 testpaths = [ "tests" ]
 asyncio_mode = "auto"
-addopts = "--cov --cov-report=html --cov-report=term-missing"
-filterwarnings = [
-    "ignore::pytest.PytestCollectionWarning"
-]
 
 [tool.mypy]
-plugins = [
-    "pydantic.mypy",
-    "vellum.plugins.vellum_mypy",
-]
-check_untyped_defs = true
-exclude = ["venv", "examples/workflows"]
-overrides = [
-    { module = "deepdiff.*", ignore_missing_imports = true },
-    { module = "docker.*", ignore_missing_imports = true },
-    { module = "setuptools.*", ignore_missing_imports = true },
-]
+plugins = ["pydantic.mypy"]
+
 [tool.ruff]
 line-length = 120
 
@@ -109,60 +96,3 @@ line-length = 120
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-vellum = "vellum_cli:main"
-
-[tool.isort]
-skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows"]
-multi_line_output = 3
-force_grid_wrap = 0
-line_length = 120
-combine_as_imports = true
-force_sort_within_sections = true
-include_trailing_comma = true
-use_parentheses = true
-known_testing = "pytest"
-known_typing = ["typing", "typing_extensions"]
-known_vellum = ["vellum", "vellum_cli", "vellum_ee"]
-default_section = "THIRDPARTY"
-sections = ["FUTURE", "TESTING", "STDLIB", "TYPING", "THIRDPARTY", "VELLUM", "FIRSTPARTY", "LOCALFOLDER"]
-no_lines_before = ["STDLIB", "TYPING"]
-sort_order = "native"
-
-[tool.black]
-line-length = 120
-target-version = [
-    "py38",
-]
-include = ".*\\.py$"
-exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows)"
-
-[tool.flake8]
-max-line-length = 120
-exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/resources,src/vellum/types,tests/client,examples/workflows"
-ignore = "E203, W503, E704, U100, U101"
-
-[tool.coverage.run]
-source = ["src/vellum", "ee/vellum_cli", "ee/vellum_ee"]
-omit = [
-    "src/vellum/client/*",
-    "src/vellum/core/*",
-    "src/vellum/environment.py",
-    "src/vellum/errors/*",
-    "src/vellum/resources/*",
-    "src/vellum/types/*",
-    "tests/*",
-    "examples/*",
-    "scripts/*",
-    "*/tests/*",
-    "*/__pycache__/*",
-]
-
-[tool.coverage.report]
-fail_under = 25
-show_missing = true
-skip_covered = false
-
-[tool.coverage.html]
-directory = "htmlcov"
