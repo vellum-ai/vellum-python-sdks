@@ -226,6 +226,7 @@ def test_map_node_parallel_execution_with_workflow():
 
 def test_map_node__shared_state_race_condition():
     state_ids: list[int] = []
+    parent_ids: list[int] = []
 
     # GIVEN a templating node that processes items
     class TemplatingNode(BaseNode):
@@ -238,6 +239,8 @@ def test_map_node__shared_state_race_condition():
             processed_item = f"{self.item}!"
             state_id = id(self.state)
             state_ids.append(state_id)
+            parent_id = id(self.state.meta.parent)
+            parent_ids.append(parent_id)
             return self.Outputs(processed_item=processed_item)
 
     # AND a final output node
@@ -265,6 +268,9 @@ def test_map_node__shared_state_race_condition():
 
     # THEN the state is unique among each run
     assert len(set(state_ids)) == 6
+
+    # AND we only have one shared parent among each run
+    assert len(set(parent_ids)) == 1
 
     # AND all results should be in correct order
     expected_result = ["a!", "b!", "c!", "d!", "e!", "f!"]
