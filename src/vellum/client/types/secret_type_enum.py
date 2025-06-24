@@ -2,4 +2,6 @@
 
 import typing
 
-SecretTypeEnum = typing.Union[typing.Literal["USER_DEFINED", "HMAC", "INTERNAL_API_KEY"], typing.Any]
+SecretTypeEnum = typing.Union[
+    typing.Literal["USER_DEFINED", "HMAC", "INTERNAL_API_KEY", "EXTERNALLY_PROVISIONED"], typing.Any
+]

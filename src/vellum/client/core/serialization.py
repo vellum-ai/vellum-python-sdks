@@ -184,7 +184,6 @@ def _convert_mapping(
             converted_object[_alias_key(key, type_, direction, aliases_to_field_names)] = (
                 convert_and_respect_annotation_metadata(object_=value, annotation=type_, direction=direction)
             )
-
     return converted_object
 
 
