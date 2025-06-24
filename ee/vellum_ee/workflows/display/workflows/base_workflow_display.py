@@ -689,30 +689,37 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         full_workflow_display_module_path = f"{module_path}.display.workflow"
         try:
             display_module = importlib.import_module(full_workflow_display_module_path)
+
+            WorkflowDisplayClass: Optional[Type[BaseWorkflowDisplay]] = None
+            for name, definition in display_module.__dict__.items():
+                if name.startswith("_"):
+                    continue
+
+                if (
+                    not isinstance(definition, type)
+                    or not issubclass(definition, BaseWorkflowDisplay)
+                    or definition == BaseWorkflowDisplay
+                ):
+                    continue
+
+                WorkflowDisplayClass = definition
+                break
+
+            if WorkflowDisplayClass:
+                return WorkflowDisplayClass().get_event_display_context()
+
         except ModuleNotFoundError:
-            logger.exception("Failed to import workflow display module: %s", full_workflow_display_module_path)
+            pass
+
+        try:
+            if workflow_class is None:
+                workflow_class = BaseWorkflow.load_from_module(module_path)
+
+            workflow_display = get_workflow_display(workflow_class=workflow_class)
+            return workflow_display.get_event_display_context()
+
+        except Exception:
             return None
-
-        WorkflowDisplayClass: Optional[Type[BaseWorkflowDisplay]] = None
-        for name, definition in display_module.__dict__.items():
-            if name.startswith("_"):
-                continue
-
-            if (
-                not isinstance(definition, type)
-                or not issubclass(definition, BaseWorkflowDisplay)
-                or definition == BaseWorkflowDisplay
-            ):
-                continue
-
-            WorkflowDisplayClass = definition
-            break
-
-        if not WorkflowDisplayClass:
-            logger.exception("No workflow display class found in module: %s", full_workflow_display_module_path)
-            return None
-
-        return WorkflowDisplayClass().get_event_display_context()
 
     def get_event_display_context(self):
         display_context = self.display_context

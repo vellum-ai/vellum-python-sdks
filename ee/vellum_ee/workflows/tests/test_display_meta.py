@@ -4,6 +4,7 @@ import sys
 from uuid import uuid4
 
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.events.workflow import WorkflowEventDisplayContext
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
@@ -102,3 +103,38 @@ class MyCustomWorkflowDisplay(BaseWorkflowDisplay[MyCustomWorkflow]):
     assert display_meta.workflow_outputs == {
         "answer": workflow_output_id,
     }
+
+
+def test_gather_event_display_context__workflow_crawling_without_display_module():
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import BaseNode
+
+class TestNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        result: str
+
+class TestWorkflow(BaseWorkflow):
+    graph = TestNode
+    
+    class Outputs(BaseWorkflow.Outputs):
+        final_result = TestNode.Outputs.result
+""",
+    }
+
+    namespace = str(uuid4())
+
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    display_meta = BaseWorkflowDisplay.gather_event_display_context(namespace)
+
+    assert display_meta is not None
+    assert isinstance(display_meta, WorkflowEventDisplayContext)
+
+    assert len(display_meta.node_displays) == 1
+    node_display = list(display_meta.node_displays.values())[0]
+    assert "result" in node_display.output_display
+
+    assert "final_result" in display_meta.workflow_outputs
