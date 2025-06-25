@@ -43,6 +43,7 @@ export function convertOperatorType(
     accessField: "access_field",
     or: "or",
     and: "and",
+    isError: "is_error",
   };
 
   return operatorMappings[operator] || "equals"; // return default operator if not found

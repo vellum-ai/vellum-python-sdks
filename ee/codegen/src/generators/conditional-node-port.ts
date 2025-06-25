@@ -239,6 +239,7 @@ export class ConditionalNodePort extends AstNode {
       notIn: "not_in",
       between: "between",
       notBetween: "not_between",
+      isError: "is_error",
     };
     const value = operatorMappings[operator];
     if (!value) {
