@@ -1,5 +1,6 @@
 import pytest
 
+from vellum.client.types.vellum_error import VellumError
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -96,6 +97,27 @@ class DummyNode(BaseNode[FixtureState]):
             ).does_not_contain("test"),
             False,
         ),
+        (
+            ConstantValueReference(
+                WorkflowError(
+                    message="This is a test",
+                    code=WorkflowErrorCode.USER_DEFINED_ERROR,
+                )
+            ).is_error(),
+            True,
+        ),
+        (
+            ConstantValueReference(
+                VellumError(
+                    message="This is a test",
+                    code="USER_DEFINED_ERROR",
+                )
+            ).is_error(),
+            True,
+        ),
+        (FixtureState.alpha.is_error(), False),
+        (FixtureState.eta.is_error(), False),
+        (DummyNode.Outputs.empty.is_error(), False),
         (ConstantValueReference('{"foo": "bar"}').parse_json(), {"foo": "bar"}),
         (ConstantValueReference('{"foo": "bar"}').parse_json()["foo"], "bar"),
         (ConstantValueReference("[1, 2, 3]").parse_json(), [1, 2, 3]),
@@ -150,6 +172,11 @@ class DummyNode(BaseNode[FixtureState]):
         "list_index",
         "error_contains",
         "error_does_not_contain",
+        "is_error_on_workflow_error",
+        "is_error_on_vellum_error",
+        "is_error_on_value",
+        "is_error_on_null",
+        "is_error_on_undefined",
         "parse_json_constant",
         "parse_json_accessor",
         "parse_json_list",
