@@ -1864,6 +1864,8 @@ export function toolCallingNodeFactory({
               {
                 type: "CODE_EXECUTION",
                 src: 'def get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',
+                name: "get_current_weather",
+                description: "Get the current weather in a given location.",
                 definition: {
                   name: "get_current_weather",
                   state: null,
