@@ -197,7 +197,7 @@ def create_function_node(
             return self.Outputs()
 
         node = type(
-            f"WorkflowDeploymentNode_{deployment}",
+            f"WorkflowDeploymentNode_{snake_case(deployment)}",
             (FunctionNode,),
             {
                 "run": execute_workflow_deployment_function,
@@ -314,6 +314,7 @@ def main(arguments):
 
 def get_function_name(function: Tool) -> str:
     if isinstance(function, DeploymentDefinition):
-        return str(function.deployment_id or function.deployment_name)
+        name = str(function.deployment_id or function.deployment_name)
+        return snake_case(name)
     else:
         return snake_case(function.__name__)

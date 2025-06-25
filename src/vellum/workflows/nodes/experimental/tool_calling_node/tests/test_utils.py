@@ -46,4 +46,13 @@ def test_get_function_name_subworkflow_deployment():
 
     result = get_function_name(deployment_config)
 
-    assert result == "my-test-deployment"
+    assert result == "my_test_deployment"
+
+
+def test_get_function_name_subworkflow_deployment_uuid():
+    """Test subworkflow deployment with UUID."""
+    deployment_config = DeploymentDefinition(deployment="57f09beb-b463-40e0-bf9e-c972e664352f", release_tag="v1.0.0")
+
+    result = get_function_name(deployment_config)
+
+    assert result == "57_f_09_beb_b_463_40_e_0_bf_9_e_c_972_e_664352_f"

@@ -201,7 +201,7 @@ def compile_workflow_deployment_function_definition(
     parameters = {"type": "object", "properties": properties, "required": required}
 
     return FunctionDefinition(
-        name=deployment,
+        name=snake_case(deployment),
         description=description,
         parameters=parameters,
     )
