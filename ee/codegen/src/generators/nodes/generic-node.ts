@@ -294,7 +294,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   ): WorkflowProjectGenerator {
     const workflowName = this.getInlineWorkflowFunctionName(workflow);
 
-    const nestedWorkflowLabel = `${this.nodeContext.getNodeLabel()} ${workflowName} Workflow`;
+    const nestedWorkflowLabel = workflowName;
     const nestedWorkflowClassName = createPythonClassName(nestedWorkflowLabel);
     const nestedWorkflowContext =
       this.workflowContext.createNestedWorkflowContext({
