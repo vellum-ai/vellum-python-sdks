@@ -4,7 +4,9 @@ from unittest.mock import Mock
 from conftest import pytest_collection_modifyitems
 
 
-def _simulate_configure_logging_logic(dotenv_values_return=None, existing_log_level=None, single_test_env=None):
+def _simulate_configure_logging_logic(
+    dotenv_values_return=None, existing_log_level=None, single_test_env=None, cli_tests_present=False
+):
     """Helper function to simulate the configure_logging logic for testing"""
     if dotenv_values_return is None:
         dotenv_values_return = {}
@@ -13,12 +15,14 @@ def _simulate_configure_logging_logic(dotenv_values_return=None, existing_log_le
 
     if dotenv_log_level and not existing_log_level:
         return dotenv_log_level
-    elif not existing_log_level:
+    elif not existing_log_level and not cli_tests_present:
         is_single_test = single_test_env == "1"
         if is_single_test:
             return "DEBUG"
         else:
             return "WARNING"
+    elif cli_tests_present:
+        return None
     else:
         return existing_log_level
 
@@ -80,7 +84,7 @@ class TestLoggingConfiguration:
         """
 
         result = _simulate_configure_logging_logic(
-            dotenv_values_return={}, existing_log_level=None, single_test_env="1"
+            dotenv_values_return={}, existing_log_level=None, single_test_env="1", cli_tests_present=False
         )
 
         assert result == "DEBUG"
@@ -91,7 +95,7 @@ class TestLoggingConfiguration:
         """
 
         result = _simulate_configure_logging_logic(
-            dotenv_values_return={}, existing_log_level=None, single_test_env="0"
+            dotenv_values_return={}, existing_log_level=None, single_test_env="0", cli_tests_present=False
         )
 
         assert result == "WARNING"
@@ -102,7 +106,7 @@ class TestLoggingConfiguration:
         """
 
         result = _simulate_configure_logging_logic(
-            dotenv_values_return={}, existing_log_level="ERROR", single_test_env="1"
+            dotenv_values_return={}, existing_log_level="ERROR", single_test_env="1", cli_tests_present=False
         )
 
         assert result == "ERROR"
@@ -113,7 +117,10 @@ class TestLoggingConfiguration:
         """
 
         result = _simulate_configure_logging_logic(
-            dotenv_values_return={"LOG_LEVEL": "INFO"}, existing_log_level=None, single_test_env="1"
+            dotenv_values_return={"LOG_LEVEL": "INFO"},
+            existing_log_level=None,
+            single_test_env="1",
+            cli_tests_present=False,
         )
 
         assert result == "INFO"
@@ -124,7 +131,10 @@ class TestLoggingConfiguration:
         """
 
         result = _simulate_configure_logging_logic(
-            dotenv_values_return={"LOG_LEVEL": "INFO"}, existing_log_level=None, single_test_env="0"
+            dotenv_values_return={"LOG_LEVEL": "INFO"},
+            existing_log_level=None,
+            single_test_env="0",
+            cli_tests_present=False,
         )
 
         assert result == "INFO"
@@ -135,7 +145,10 @@ class TestLoggingConfiguration:
         """
 
         result = _simulate_configure_logging_logic(
-            dotenv_values_return={"LOG_LEVEL": "INFO"}, existing_log_level="ERROR", single_test_env="1"
+            dotenv_values_return={"LOG_LEVEL": "INFO"},
+            existing_log_level="ERROR",
+            single_test_env="1",
+            cli_tests_present=False,
         )
 
         assert result == "ERROR"
@@ -160,7 +173,10 @@ class TestLoggingConfiguration:
             pytest_collection_modifyitems(mock_session, mock_config, items)
 
             result = _simulate_configure_logging_logic(
-                dotenv_values_return={}, existing_log_level=None, single_test_env=os.environ.get("_PYTEST_SINGLE_TEST")
+                dotenv_values_return={},
+                existing_log_level=None,
+                single_test_env=os.environ.get("_PYTEST_SINGLE_TEST"),
+                cli_tests_present=False,
             )
 
             assert result == "DEBUG"
@@ -193,7 +209,10 @@ class TestLoggingConfiguration:
             pytest_collection_modifyitems(mock_session, mock_config, items)
 
             result = _simulate_configure_logging_logic(
-                dotenv_values_return={}, existing_log_level=None, single_test_env=os.environ.get("_PYTEST_SINGLE_TEST")
+                dotenv_values_return={},
+                existing_log_level=None,
+                single_test_env=os.environ.get("_PYTEST_SINGLE_TEST"),
+                cli_tests_present=False,
             )
 
             assert result == "WARNING"
@@ -224,3 +243,29 @@ class TestLoggingConfiguration:
         finally:
             if "_PYTEST_SINGLE_TEST" in os.environ:
                 del os.environ["_PYTEST_SINGLE_TEST"]
+
+    def test_configure_logging_cli_tests__skips_conditional_logging(self):
+        """
+        Tests that configure_logging skips conditional logging when CLI tests are detected in sys.argv.
+        """
+        import sys
+
+        original_argv = sys.argv.copy()
+        sys.argv = ["pytest", "ee/vellum_cli/tests/test_ping.py::test_ping__happy_path"]
+
+        try:
+            cli_tests_present = any("ee/vellum_cli/tests/" in str(arg) for arg in sys.argv)
+
+            assert cli_tests_present is True
+
+            result = _simulate_configure_logging_logic(
+                dotenv_values_return={},
+                existing_log_level=None,
+                single_test_env="1",
+                cli_tests_present=cli_tests_present,
+            )
+
+            assert result is None
+
+        finally:
+            sys.argv = original_argv

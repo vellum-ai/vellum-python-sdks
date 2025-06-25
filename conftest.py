@@ -31,11 +31,13 @@ def pytest_collection_modifyitems(session, config, items):
 def configure_logging() -> Generator[None, None, None]:
     """Used to output logs when running tests"""
 
+    cli_tests_present = any("ee/vellum_cli/tests/" in str(arg) for arg in sys.argv)
+
     env_vars = dotenv_values()
     dotenv_log_level = env_vars.get("LOG_LEVEL")
     if dotenv_log_level and not os.environ.get("LOG_LEVEL"):
         os.environ["LOG_LEVEL"] = dotenv_log_level
-    elif not os.environ.get("LOG_LEVEL"):
+    elif not os.environ.get("LOG_LEVEL") and not cli_tests_present:
         is_single_test = os.environ.get("_PYTEST_SINGLE_TEST") == "1"
         if is_single_test:
             os.environ["LOG_LEVEL"] = "DEBUG"
