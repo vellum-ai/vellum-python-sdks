@@ -156,7 +156,7 @@ def create_function_node(
         runtime: The runtime to use for code execution (default: "PYTHON_3_11_6")
     """
     if isinstance(function, DeploymentDefinition):
-        deployment = function.deployment
+        deployment = function.deployment_id or function.deployment_name
         release_tag = function.release_tag
 
         def execute_workflow_deployment_function(self) -> BaseNode.Outputs:
@@ -314,6 +314,6 @@ def main(arguments):
 
 def get_function_name(function: Tool) -> str:
     if isinstance(function, DeploymentDefinition):
-        return function.deployment
+        return str(function.deployment_id or function.deployment_name)
     else:
         return snake_case(function.__name__)
