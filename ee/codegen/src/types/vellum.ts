@@ -810,7 +810,7 @@ export interface ExecutionCounterWorkflowReference {
 }
 
 export interface DictionaryWorkflowReferenceEntry {
-  id?: string;
+  id?: string; // TODO: Temporary supporting id key translation for input variable in blocks
   key: string;
   value: WorkflowValueDescriptor | null;
 }
