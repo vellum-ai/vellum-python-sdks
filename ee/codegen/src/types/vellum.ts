@@ -892,19 +892,24 @@ export interface AttributeConfig {
   lhs: python.Reference;
 }
 
-export interface FunctionArgs {
+interface NameDescription {
+  name: string;
+  description: string;
+}
+
+export type FunctionArgs = {
   type: "CODE_EXECUTION";
   src: string;
   definition: FunctionDefinition;
-}
+} & NameDescription;
 
-export interface InlineWorkflowFunctionArgs {
+export type InlineWorkflowFunctionArgs = {
   type: "INLINE_WORKFLOW";
   exec_config: WorkflowVersionExecConfig;
-}
+};
 
-export interface DeploymentWorkflowFunctionArgs {
+export type DeploymentWorkflowFunctionArgs = {
   type: "WORKFLOW_DEPLOYMENT";
   deployment: string;
   release_tag: string | null;
-}
+} & NameDescription;

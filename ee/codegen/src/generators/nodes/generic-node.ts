@@ -84,8 +84,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               switch (f.type) {
                 case "CODE_EXECUTION": {
                   codeExecutionFunctions.push(f as FunctionArgs);
-                  if (f.definition && f.definition.name) {
-                    const snakeName = toPythonSafeSnakeCase(f.definition.name);
+                  if (f.name) {
+                    const snakeName = toPythonSafeSnakeCase(f.name);
                     functionReferences.push(
                       python.reference({
                         name: snakeName,
@@ -419,9 +419,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     functions: Array<FunctionArgs>
   ): Promise<void> {
     functions.forEach((f) => {
-      if (f.definition?.name) {
+      if (f.name) {
         this.functionsToGenerate.push({
-          functionName: f.definition.name,
+          functionName: f.name,
           content: f.src,
         });
       }

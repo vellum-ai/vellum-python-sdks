@@ -87,6 +87,8 @@ describe("ToolCallingNode", () => {
     const codeExecutionFunction: FunctionArgs = {
       type: "CODE_EXECUTION",
       src: 'def add_numbers(a: int, b: int) -> int:\n    """\n    Add two numbers together.\n    """\n    return a + b\n',
+      name: "add_numbers",
+      description: "Add two numbers together.",
       definition: {
         name: "add_numbers",
         parameters: {
@@ -259,6 +261,8 @@ describe("ToolCallingNode", () => {
 
     const deploymentWorkflowFunction: DeploymentWorkflowFunctionArgs = {
       type: "WORKFLOW_DEPLOYMENT",
+      name: "deployment_1",
+      description: "Deployment 1 description",
       deployment: "deployment_1",
       release_tag: null,
     };
