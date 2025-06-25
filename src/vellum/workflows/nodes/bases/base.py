@@ -457,21 +457,6 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
             resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs)
             setattr(self, descriptor.name, resolved_value)
 
-        # Resolve descriptors set as defaults to the outputs class
-        def _outputs_post_init(outputs_self: "BaseNode.Outputs", **kwargs: Any) -> None:
-            for node_output_descriptor in self.Outputs:
-                if node_output_descriptor.name in kwargs:
-                    continue
-
-                if isinstance(node_output_descriptor.instance, BaseDescriptor):
-                    setattr(
-                        outputs_self,
-                        node_output_descriptor.name,
-                        node_output_descriptor.instance.resolve(self.state),
-                    )
-
-        setattr(self.Outputs, "_outputs_post_init", _outputs_post_init)
-
         # We only want to store the attributes that were actually set as inputs, not every attribute that exists.
         all_inputs = {}
         for key, value in inputs.items():
