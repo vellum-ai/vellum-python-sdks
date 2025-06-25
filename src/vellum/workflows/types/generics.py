@@ -42,6 +42,11 @@ def is_node_class(obj: Any) -> TypeGuard[Type["BaseNode"]]:
     return isinstance(obj, type) and issubclass(obj, base_node_class)
 
 
+def is_node_instance(obj: Any) -> TypeGuard["BaseNode"]:
+    base_node_class = _import_node_class()
+    return isinstance(obj, base_node_class)
+
+
 def is_workflow_class(obj: Any) -> TypeGuard[Type["BaseWorkflow"]]:
     base_workflow_class = import_workflow_class()
     return isinstance(obj, type) and issubclass(obj, base_workflow_class)

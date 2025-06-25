@@ -1,3 +1,4 @@
+import inspect
 from typing import TYPE_CHECKING, Any, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
 
@@ -9,6 +10,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.references.output import OutputReference
+from vellum.workflows.types.generics import is_node_instance
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
 
 if TYPE_CHECKING:
@@ -198,8 +200,27 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
         for name, value in kwargs.items():
             setattr(self, name, value)
 
-        if hasattr(self, "_outputs_post_init") and callable(self._outputs_post_init):
-            self._outputs_post_init(**kwargs)
+        # If climb up the to the caller's frame, and if it's a BaseNode instance, it should
+        # have a state attribute that we can use to resolve the output descriptors.
+        frame = inspect.currentframe()
+        caller_frame = frame.f_back
+        if "self" not in caller_frame.f_locals:
+            return
+
+        caller_self = caller_frame.f_locals["self"]
+        if not is_node_instance(caller_self):
+            return
+
+        for node_output_descriptor in self.__class__:
+            if node_output_descriptor.name in kwargs:
+                continue
+
+            if isinstance(node_output_descriptor.instance, BaseDescriptor):
+                setattr(
+                    self,
+                    node_output_descriptor.name,
+                    node_output_descriptor.instance.resolve(caller_self.state),
+                )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, (dict, BaseOutputs)):

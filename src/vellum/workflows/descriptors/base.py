@@ -84,9 +84,6 @@ class BaseDescriptor(Generic[_T]):
         if not instance:
             return self
 
-        # TODO: REMOVE THESE PRINTS AFTER INVESTIGATING APO-695
-        print(f"{self.name} {id(self)}")
-        print("------")
         if instance.__class__.__name__ == "BaseNode":
             node = cast("BaseNode", instance)
             return self.resolve(node.state)
