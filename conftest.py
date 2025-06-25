@@ -17,6 +17,12 @@ from vellum.workflows.logging import load_logger
 
 def pytest_sessionstart(session):
     """Set log level based on number of tests being run"""
+    cli_tests_present = any("ee/vellum_cli/tests/" in str(arg) for arg in session.config.args)
+
+    if cli_tests_present:
+        os.environ["_PYTEST_CLI_TESTS"] = "1"
+        return
+
     if session.testscollected == 1:
         os.environ["_PYTEST_SINGLE_TEST"] = "1"
     else:
@@ -32,11 +38,14 @@ def configure_logging() -> Generator[None, None, None]:
     if dotenv_log_level and not os.environ.get("LOG_LEVEL"):
         os.environ["LOG_LEVEL"] = dotenv_log_level
     elif not os.environ.get("LOG_LEVEL"):
-        is_single_test = os.environ.get("_PYTEST_SINGLE_TEST") == "1"
-        if is_single_test:
-            os.environ["LOG_LEVEL"] = "DEBUG"
+        if os.environ.get("_PYTEST_CLI_TESTS") == "1":
+            pass  # Don't set LOG_LEVEL, let CLI use its default
         else:
-            os.environ["LOG_LEVEL"] = "WARNING"
+            is_single_test = os.environ.get("_PYTEST_SINGLE_TEST") == "1"
+            if is_single_test:
+                os.environ["LOG_LEVEL"] = "DEBUG"
+            else:
+                os.environ["LOG_LEVEL"] = "WARNING"
 
     # Set the package's logger
     logger = load_logger()

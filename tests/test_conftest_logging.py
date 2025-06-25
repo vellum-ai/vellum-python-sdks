@@ -33,6 +33,12 @@ class TestLoggingConfiguration:
         mock_session = Mock()
         mock_session.testscollected = 1
 
+        mock_config = Mock()
+        mock_config.args = [
+            "tests/workflows/basic_emitter_workflow/tests/test_workflow.py::test_run_workflow__happy_path"
+        ]
+        mock_session.config = mock_config
+
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
 
@@ -48,6 +54,10 @@ class TestLoggingConfiguration:
         """
         mock_session = Mock()
         mock_session.testscollected = 5
+
+        mock_config = Mock()
+        mock_config.args = ["tests/workflows/basic_emitter_workflow/tests/test_workflow.py"]
+        mock_session.config = mock_config
 
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
@@ -131,6 +141,12 @@ class TestLoggingConfiguration:
         mock_session = Mock()
         mock_session.testscollected = 1
 
+        mock_config = Mock()
+        mock_config.args = [
+            "tests/workflows/basic_emitter_workflow/tests/test_workflow.py::test_run_workflow__happy_path"
+        ]
+        mock_session.config = mock_config
+
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
 
@@ -154,6 +170,10 @@ class TestLoggingConfiguration:
         mock_session = Mock()
         mock_session.testscollected = 3
 
+        mock_config = Mock()
+        mock_config.args = ["tests/workflows/basic_emitter_workflow/tests/test_workflow.py"]
+        mock_session.config = mock_config
+
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
 
@@ -169,3 +189,31 @@ class TestLoggingConfiguration:
         finally:
             if "_PYTEST_SINGLE_TEST" in os.environ:
                 del os.environ["_PYTEST_SINGLE_TEST"]
+
+    def test_pytest_sessionstart_cli_tests__sets_cli_environment_variable(self):
+        """
+        Tests that pytest_sessionstart sets CLI environment variable when CLI tests are present.
+        """
+        mock_session = Mock()
+        mock_session.testscollected = 5
+
+        mock_config = Mock()
+        mock_config.args = ["ee/vellum_cli/tests/test_ping.py::test_ping__happy_path"]
+        mock_session.config = mock_config
+
+        if "_PYTEST_SINGLE_TEST" in os.environ:
+            del os.environ["_PYTEST_SINGLE_TEST"]
+        if "_PYTEST_CLI_TESTS" in os.environ:
+            del os.environ["_PYTEST_CLI_TESTS"]
+
+        try:
+            pytest_sessionstart(mock_session)
+
+            assert "_PYTEST_SINGLE_TEST" not in os.environ
+            assert os.environ["_PYTEST_CLI_TESTS"] == "1"
+
+        finally:
+            if "_PYTEST_SINGLE_TEST" in os.environ:
+                del os.environ["_PYTEST_SINGLE_TEST"]
+            if "_PYTEST_CLI_TESTS" in os.environ:
+                del os.environ["_PYTEST_CLI_TESTS"]
