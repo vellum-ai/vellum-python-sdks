@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime
 
 from click.testing import CliRunner
@@ -8,6 +9,7 @@ from vellum.client.types.workspace_read import WorkspaceRead
 from vellum_cli import main as cli_main
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_ping__happy_path(vellum_client):
     # GIVEN a cli
     runner = CliRunner()

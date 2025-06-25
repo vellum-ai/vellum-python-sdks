@@ -58,3 +58,9 @@ def mock_module(request) -> Generator[MockModuleResult, None, None]:
 
     os.chdir(current_dir)
     shutil.rmtree(temp_dir)
+
+
+@pytest.fixture
+def info_log_level(monkeypatch):
+    """Set log level to INFO for tests that request this fixture"""
+    monkeypatch.setenv("LOG_LEVEL", "INFO")

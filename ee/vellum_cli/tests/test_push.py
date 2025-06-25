@@ -140,6 +140,7 @@ def test_push__happy_path(mock_module, vellum_client, base_command):
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_push__verify_default_url_in_raw_httpx_transport(mock_module, mock_httpx_transport):
     # GIVEN a single workflow configured
     module = mock_module.module
@@ -396,6 +397,7 @@ def test_push__deployment(mock_module, vellum_client, base_command):
     assert extracted_files["workflow.py"] == workflow_py_file_content
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_push__dry_run_option_returns_report(mock_module, vellum_client):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
@@ -459,6 +461,7 @@ class ExampleWorkflow(BaseWorkflow):
     assert "iterable_item_added" in result.output
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_push__dry_run_option_no_errors_returns_success(mock_module, vellum_client):
     """Test that dry-run returns exit code 0 when there are no errors or diffs"""
     # GIVEN a workflow module with a valid workflow (using the same pattern as happy path test)
@@ -490,6 +493,7 @@ def test_push__dry_run_option_no_errors_returns_success(mock_module, vellum_clie
     assert "## Proposed Diffs" in result.output
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_push__strict_option_returns_diffs(mock_module, vellum_client):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
@@ -733,6 +737,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         }
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_push__workspace_option__uses_different_api_url_env(mock_module, mock_httpx_transport):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir

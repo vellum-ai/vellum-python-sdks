@@ -37,7 +37,7 @@ def mock_subprocess_run(mocker):
     return mocker.patch("subprocess.run")
 
 
-@pytest.mark.usefixtures("vellum_client")
+@pytest.mark.usefixtures("vellum_client", "info_log_level")
 def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_subprocess_run, monkeypatch):
     # GIVEN a self hosted vellum api URL env var
     monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
@@ -66,6 +66,7 @@ def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_subproces
     assert "Image successfully pushed" in result.output
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_image_push__self_hosted_happy_path__workspace_option(
     mock_docker_from_env, mock_subprocess_run, mock_httpx_transport, mock_temp_dir
 ):
@@ -172,6 +173,7 @@ def test_image_push__self_hosted_blocks_repo(mock_docker_from_env, monkeypatch):
     assert "For adding images to your self hosted install you must include" in result.output
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_image_push_with_source_success(
     mock_docker_from_env, mock_subprocess_run, vellum_client, monkeypatch, mock_temp_dir
 ):
