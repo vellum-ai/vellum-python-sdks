@@ -1,7 +1,7 @@
 import os
 from unittest.mock import Mock
 
-from conftest import pytest_sessionstart
+from conftest import pytest_collection_modifyitems
 
 
 def _simulate_configure_logging_logic(dotenv_values_return=None, existing_log_level=None, single_test_env=None):
@@ -26,43 +26,49 @@ def _simulate_configure_logging_logic(dotenv_values_return=None, existing_log_le
 class TestLoggingConfiguration:
     """Test the conditional logging behavior based on test count"""
 
-    def test_pytest_sessionstart_single_test__sets_environment_variable(self):
+    def test_pytest_collection_modifyitems_single_test__sets_environment_variable(self):
         """
-        Tests that pytest_sessionstart sets environment variable correctly for single test.
+        Tests that pytest_collection_modifyitems sets environment variable correctly for single test.
         """
         mock_session = Mock()
-        mock_session.testscollected = 1
-
         mock_config = Mock()
-        mock_config.args = [
-            "tests/workflows/basic_emitter_workflow/tests/test_workflow.py::test_run_workflow__happy_path"
-        ]
-        mock_session.config = mock_config
+
+        mock_item = Mock()
+        mock_item.fspath = (
+            "/home/ubuntu/repos/vellum-python-sdks/tests/workflows/" "basic_emitter_workflow/tests/test_workflow.py"
+        )
+        items = [mock_item]
 
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
 
-        pytest_sessionstart(mock_session)
+        pytest_collection_modifyitems(mock_session, mock_config, items)
 
         assert os.environ["_PYTEST_SINGLE_TEST"] == "1"
 
         del os.environ["_PYTEST_SINGLE_TEST"]
 
-    def test_pytest_sessionstart_multiple_tests__sets_environment_variable(self):
+    def test_pytest_collection_modifyitems_multiple_tests__sets_environment_variable(self):
         """
-        Tests that pytest_sessionstart sets environment variable correctly for multiple tests.
+        Tests that pytest_collection_modifyitems sets environment variable correctly for multiple tests.
         """
         mock_session = Mock()
-        mock_session.testscollected = 5
-
         mock_config = Mock()
-        mock_config.args = ["tests/workflows/basic_emitter_workflow/tests/test_workflow.py"]
-        mock_session.config = mock_config
+
+        mock_item1 = Mock()
+        mock_item1.fspath = (
+            "/home/ubuntu/repos/vellum-python-sdks/tests/workflows/" "basic_emitter_workflow/tests/test_workflow.py"
+        )
+        mock_item2 = Mock()
+        mock_item2.fspath = (
+            "/home/ubuntu/repos/vellum-python-sdks/tests/workflows/" "basic_await_all/tests/test_workflow.py"
+        )
+        items = [mock_item1, mock_item2]
 
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
 
-        pytest_sessionstart(mock_session)
+        pytest_collection_modifyitems(mock_session, mock_config, items)
 
         assert os.environ["_PYTEST_SINGLE_TEST"] == "0"
 
@@ -139,19 +145,19 @@ class TestLoggingConfiguration:
         Integration test: pytest hook + logging logic for single test results in DEBUG level.
         """
         mock_session = Mock()
-        mock_session.testscollected = 1
-
         mock_config = Mock()
-        mock_config.args = [
-            "tests/workflows/basic_emitter_workflow/tests/test_workflow.py::test_run_workflow__happy_path"
-        ]
-        mock_session.config = mock_config
+
+        mock_item = Mock()
+        mock_item.fspath = (
+            "/home/ubuntu/repos/vellum-python-sdks/tests/workflows/" "basic_emitter_workflow/tests/test_workflow.py"
+        )
+        items = [mock_item]
 
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
 
         try:
-            pytest_sessionstart(mock_session)
+            pytest_collection_modifyitems(mock_session, mock_config, items)
 
             result = _simulate_configure_logging_logic(
                 dotenv_values_return={}, existing_log_level=None, single_test_env=os.environ.get("_PYTEST_SINGLE_TEST")
@@ -168,17 +174,23 @@ class TestLoggingConfiguration:
         Integration test: pytest hook + logging logic for multiple tests results in WARNING level.
         """
         mock_session = Mock()
-        mock_session.testscollected = 3
-
         mock_config = Mock()
-        mock_config.args = ["tests/workflows/basic_emitter_workflow/tests/test_workflow.py"]
-        mock_session.config = mock_config
+
+        mock_item1 = Mock()
+        mock_item1.fspath = (
+            "/home/ubuntu/repos/vellum-python-sdks/tests/workflows/" "basic_emitter_workflow/tests/test_workflow.py"
+        )
+        mock_item2 = Mock()
+        mock_item2.fspath = (
+            "/home/ubuntu/repos/vellum-python-sdks/tests/workflows/" "basic_await_all/tests/test_workflow.py"
+        )
+        items = [mock_item1, mock_item2]
 
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
 
         try:
-            pytest_sessionstart(mock_session)
+            pytest_collection_modifyitems(mock_session, mock_config, items)
 
             result = _simulate_configure_logging_logic(
                 dotenv_values_return={}, existing_log_level=None, single_test_env=os.environ.get("_PYTEST_SINGLE_TEST")
@@ -190,30 +202,25 @@ class TestLoggingConfiguration:
             if "_PYTEST_SINGLE_TEST" in os.environ:
                 del os.environ["_PYTEST_SINGLE_TEST"]
 
-    def test_pytest_sessionstart_cli_tests__sets_cli_environment_variable(self):
+    def test_pytest_collection_modifyitems_cli_tests__skips_conditional_logging(self):
         """
-        Tests that pytest_sessionstart sets CLI environment variable when CLI tests are present.
+        Tests that pytest_collection_modifyitems skips conditional logging when CLI tests are present.
         """
         mock_session = Mock()
-        mock_session.testscollected = 5
-
         mock_config = Mock()
-        mock_config.args = ["ee/vellum_cli/tests/test_ping.py::test_ping__happy_path"]
-        mock_session.config = mock_config
+
+        mock_item = Mock()
+        mock_item.fspath = "/home/ubuntu/repos/vellum-python-sdks/ee/vellum_cli/tests/test_ping.py"
+        items = [mock_item]
 
         if "_PYTEST_SINGLE_TEST" in os.environ:
             del os.environ["_PYTEST_SINGLE_TEST"]
-        if "_PYTEST_CLI_TESTS" in os.environ:
-            del os.environ["_PYTEST_CLI_TESTS"]
 
         try:
-            pytest_sessionstart(mock_session)
+            pytest_collection_modifyitems(mock_session, mock_config, items)
 
             assert "_PYTEST_SINGLE_TEST" not in os.environ
-            assert os.environ["_PYTEST_CLI_TESTS"] == "1"
 
         finally:
             if "_PYTEST_SINGLE_TEST" in os.environ:
                 del os.environ["_PYTEST_SINGLE_TEST"]
-            if "_PYTEST_CLI_TESTS" in os.environ:
-                del os.environ["_PYTEST_CLI_TESTS"]

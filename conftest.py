@@ -15,15 +15,13 @@ from vellum.client.environment import VellumEnvironment
 from vellum.workflows.logging import load_logger
 
 
-def pytest_sessionstart(session):
-    """Set log level based on number of tests being run"""
-    cli_tests_present = any("ee/vellum_cli/tests/" in str(arg) for arg in session.config.args)
-
+def pytest_collection_modifyitems(session, config, items):
+    """Set log level based on number of tests being run and their types"""
+    cli_tests_present = any("ee/vellum_cli/tests/" in str(item.fspath) for item in items)
     if cli_tests_present:
-        os.environ["_PYTEST_CLI_TESTS"] = "1"
         return
 
-    if session.testscollected == 1:
+    if len(items) == 1:
         os.environ["_PYTEST_SINGLE_TEST"] = "1"
     else:
         os.environ["_PYTEST_SINGLE_TEST"] = "0"
@@ -38,14 +36,11 @@ def configure_logging() -> Generator[None, None, None]:
     if dotenv_log_level and not os.environ.get("LOG_LEVEL"):
         os.environ["LOG_LEVEL"] = dotenv_log_level
     elif not os.environ.get("LOG_LEVEL"):
-        if os.environ.get("_PYTEST_CLI_TESTS") == "1":
-            pass  # Don't set LOG_LEVEL, let CLI use its default
+        is_single_test = os.environ.get("_PYTEST_SINGLE_TEST") == "1"
+        if is_single_test:
+            os.environ["LOG_LEVEL"] = "DEBUG"
         else:
-            is_single_test = os.environ.get("_PYTEST_SINGLE_TEST") == "1"
-            if is_single_test:
-                os.environ["LOG_LEVEL"] = "DEBUG"
-            else:
-                os.environ["LOG_LEVEL"] = "WARNING"
+            os.environ["LOG_LEVEL"] = "WARNING"
 
     # Set the package's logger
     logger = load_logger()
