@@ -75,3 +75,25 @@ VellumCodeResourceDefinition = Annotated[
 class DeploymentDefinition(UniversalBaseModel):
     deployment: str
     release_tag: str = "LATEST"
+
+    def _is_uuid(self) -> bool:
+        """Check if the deployment field is a valid UUID."""
+        try:
+            UUID(self.deployment)
+            return True
+        except ValueError:
+            return False
+
+    @property
+    def deployment_id(self) -> Optional[UUID]:
+        """Get the deployment ID if the deployment field is a UUID."""
+        if self._is_uuid():
+            return UUID(self.deployment)
+        return None
+
+    @property
+    def deployment_name(self) -> Optional[str]:
+        """Get the deployment name if the deployment field is not a UUID."""
+        if not self._is_uuid():
+            return self.deployment
+        return None
