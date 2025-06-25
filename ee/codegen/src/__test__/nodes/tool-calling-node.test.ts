@@ -69,6 +69,89 @@ describe("ToolCallingNode", () => {
     });
   });
 
+  describe("input variables", () => {
+    it("should generate input variables", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [
+          {
+            id: "b5ae358b-e111-4209-9a3e-4e7126f2d391",
+            name: "ml_model",
+            value: {
+              type: "CONSTANT_VALUE",
+              value: { type: "STRING", value: "gpt-4o-mini" },
+            },
+          },
+          {
+            id: "be73bec8-a35a-43b1-b140-9541ba837f8e",
+            name: "prompt_inputs",
+            value: {
+              type: "DICTIONARY_REFERENCE",
+              entries: [
+                {
+                  id: "1dc7d5dc-c41d-4a9b-8add-1e0c6705da04",
+                  key: "text",
+                  value: null,
+                },
+              ],
+            },
+          },
+          {
+            id: "dfdafe9a-1dae-4895-8a08-22b71c0119ff",
+            name: "blocks",
+            value: {
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "JSON",
+                value: [
+                  {
+                    blocks: [
+                      {
+                        blocks: [
+                          {
+                            text: "Summarize the following text:\n\n",
+                            block_type: "PLAIN_TEXT",
+                          },
+                          {
+                            block_type: "VARIABLE",
+                            input_variable:
+                              "1dc7d5dc-c41d-4a9b-8add-1e0c6705da04",
+                          },
+                        ],
+                        block_type: "RICH_TEXT",
+                      },
+                    ],
+                    chat_role: "SYSTEM",
+                    block_type: "CHAT_MESSAGE",
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
   describe("function ordering", () => {
     const createFunctionAttribute = <T>(
       functions: Array<T>

@@ -110,3 +110,42 @@ class ToolCallingNode(BaseToolCallingNode):
     functions = [ToolCallingNodeSubtractWorkflowWorkflow, add_numbers]
 "
 `;
+
+exports[`ToolCallingNode > input variables > should generate input variables 1`] = `
+"from vellum import (
+    ChatMessagePromptBlock,
+    PlainTextPromptBlock,
+    RichTextPromptBlock,
+    VariablePromptBlock,
+)
+from vellum.workflows.nodes.experimental.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    prompt_inputs = {
+        "text": None,
+    }
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[
+                RichTextPromptBlock(
+                    blocks=[
+                        PlainTextPromptBlock(
+                            text="""\\
+Summarize the following text:
+
+\\
+"""
+                        ),
+                        VariablePromptBlock(input_variable="text"),
+                    ]
+                )
+            ],
+        ),
+    ]
+"
+`;

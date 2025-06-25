@@ -231,6 +231,23 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               }
             );
 
+            // Build the mapping from input variable ID to key from prompt_inputs attribute
+            const inputVariableNameById: Record<string, string> = {};
+            const promptInputsAttr = this.nodeData.attributes.find(
+              (attr) => attr.name === "prompt_inputs"
+            );
+            if (
+              promptInputsAttr &&
+              promptInputsAttr.value?.type === "DICTIONARY_REFERENCE" &&
+              promptInputsAttr.value.entries
+            ) {
+              for (const entry of promptInputsAttr.value.entries) {
+                if (entry.id && entry.key) {
+                  inputVariableNameById[entry.id] = entry.key;
+                }
+              }
+            }
+
             nodeAttributesStatements.push(
               python.field({
                 name: attribute.name,
@@ -239,6 +256,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     return new PromptBlock({
                       workflowContext: this.workflowContext,
                       promptBlock: block,
+                      inputVariableNameById: inputVariableNameById,
                     });
                   }),
                   {

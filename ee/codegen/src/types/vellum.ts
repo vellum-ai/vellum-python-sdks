@@ -810,6 +810,7 @@ export interface ExecutionCounterWorkflowReference {
 }
 
 export interface DictionaryWorkflowReferenceEntry {
+  id?: string;
   key: string;
   value: WorkflowValueDescriptor | null;
 }
