@@ -203,8 +203,11 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
         # If climb up the to the caller's frame, and if it's a BaseNode instance, it should
         # have a state attribute that we can use to resolve the output descriptors.
         frame = inspect.currentframe()
+        if not frame:
+            return
+
         caller_frame = frame.f_back
-        if "self" not in caller_frame.f_locals:
+        if not caller_frame or "self" not in caller_frame.f_locals:
             return
 
         caller_self = caller_frame.f_locals["self"]

@@ -225,7 +225,7 @@ def test_map_node_parallel_execution_with_workflow():
 
 
 def test_map_node__shared_state_race_condition():
-    processed_items: list[str] = []
+    processed_items = []
 
     # GIVEN a templating node that processes items
     class TemplatingNode(BaseNode):
@@ -246,7 +246,7 @@ def test_map_node__shared_state_race_condition():
         def run(self) -> Outputs:
             outputs = super().run()
             processed_items.append(outputs.value)
-            return outputs
+            return outputs  # type: ignore[return-value]
 
     # AND a workflow using those nodes
     class ProcessItemWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
@@ -262,7 +262,7 @@ def test_map_node__shared_state_race_condition():
         max_concurrency = 1
 
     # WHEN we run the map node multiple times to see pass consistently
-    num_runs = 1
+    num_runs = 50
     for index in range(num_runs):
         processed_items.clear()
         node = RaceConditionMapNode(state=BaseState())
