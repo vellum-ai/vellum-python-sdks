@@ -489,7 +489,7 @@ class FinalOutput2(FinalOutputNode[BaseState, List[ChatMessage]]):
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
-"from .weather_function.workflow import GetCurrentWeatherNodeWeatherFunctionWorkflow
+"from .weather_function.workflow import WeatherFunction
 from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
@@ -521,7 +521,7 @@ class GetCurrentWeatherNode(ToolCallingNode):
             ],
         ),
     ]
-    functions = [GetCurrentWeatherNodeWeatherFunctionWorkflow]
+    functions = [WeatherFunction]
     prompt_inputs = {
         "city": Inputs.city,
         "date": Inputs.date,
@@ -623,7 +623,7 @@ from .nodes.final_output_1 import FinalOutput4
 from .nodes.tool_call_start_node import StartNode
 
 
-class GetCurrentWeatherNodeWeatherFunctionWorkflow(BaseWorkflow[Inputs, BaseState]):
+class WeatherFunction(BaseWorkflow[Inputs, BaseState]):
     graph = (
         CodeExecutionNode
         >> StartNode
