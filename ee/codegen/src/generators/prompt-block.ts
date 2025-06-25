@@ -158,7 +158,10 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       ...this.constructCommonClassArguments(promptBlock),
     ];
 
-    const inputVariableName = promptBlock.inputVariable;
+    // Use the mapping to convert ID to key, fallback to original value if not found
+    const inputVariableName =
+      this.inputVariableNameById?.[promptBlock.inputVariable] ??
+      promptBlock.inputVariable;
 
     classArgs.push(
       new MethodArgument({

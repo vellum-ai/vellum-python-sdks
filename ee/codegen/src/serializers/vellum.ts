@@ -794,12 +794,14 @@ export const DictionaryWorkflowReferenceEntrySerializer: ObjectSchema<
   DictionaryWorkflowReferenceEntrySerializer.Raw,
   Omit<DictionaryWorkflowReferenceEntry, "type">
 > = objectSchema({
+  id: stringSchema().optional(),
   key: stringSchema(),
   value: lazySchema(() => WorkflowValueDescriptorSerializer).nullable(),
 });
 
 export declare namespace DictionaryWorkflowReferenceEntrySerializer {
   interface Raw {
+    id?: string | null;
     key: string;
     value: WorkflowValueDescriptorSerializer.Raw | null;
   }
