@@ -4270,7 +4270,15 @@ client.prompts.push(
 <dl>
 <dd>
 
-**prompt_variant_id:** `typing.Optional[str]` 
+**prompt_variant_id:** `typing.Optional[str]` — If specified, an existing Prompt Variant by the provided ID will be updated. Otherwise, a new Prompt Variant will be created and an ID generated.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_variant_label:** `typing.Optional[str]` — If provided, then the created/updated Prompt Variant will have this label.
     
 </dd>
 </dl>

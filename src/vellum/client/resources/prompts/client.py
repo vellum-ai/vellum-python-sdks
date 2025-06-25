@@ -110,6 +110,7 @@ class PromptsClient:
         *,
         exec_config: PromptExecConfig,
         prompt_variant_id: typing.Optional[str] = OMIT,
+        prompt_variant_label: typing.Optional[str] = OMIT,
         prompt_sandbox_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptPushResponse:
@@ -121,6 +122,10 @@ class PromptsClient:
         exec_config : PromptExecConfig
 
         prompt_variant_id : typing.Optional[str]
+            If specified, an existing Prompt Variant by the provided ID will be updated. Otherwise, a new Prompt Variant will be created and an ID generated.
+
+        prompt_variant_label : typing.Optional[str]
+            If provided, then the created/updated Prompt Variant will have this label.
 
         prompt_sandbox_id : typing.Optional[str]
 
@@ -169,11 +174,12 @@ class PromptsClient:
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
+                "prompt_variant_id": prompt_variant_id,
+                "prompt_variant_label": prompt_variant_label,
+                "prompt_sandbox_id": prompt_sandbox_id,
                 "exec_config": convert_and_respect_annotation_metadata(
                     object_=exec_config, annotation=PromptExecConfig, direction="write"
                 ),
-                "prompt_variant_id": prompt_variant_id,
-                "prompt_sandbox_id": prompt_sandbox_id,
             },
             headers={
                 "content-type": "application/json",
@@ -316,6 +322,7 @@ class AsyncPromptsClient:
         *,
         exec_config: PromptExecConfig,
         prompt_variant_id: typing.Optional[str] = OMIT,
+        prompt_variant_label: typing.Optional[str] = OMIT,
         prompt_sandbox_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptPushResponse:
@@ -327,6 +334,10 @@ class AsyncPromptsClient:
         exec_config : PromptExecConfig
 
         prompt_variant_id : typing.Optional[str]
+            If specified, an existing Prompt Variant by the provided ID will be updated. Otherwise, a new Prompt Variant will be created and an ID generated.
+
+        prompt_variant_label : typing.Optional[str]
+            If provided, then the created/updated Prompt Variant will have this label.
 
         prompt_sandbox_id : typing.Optional[str]
 
@@ -383,11 +394,12 @@ class AsyncPromptsClient:
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
+                "prompt_variant_id": prompt_variant_id,
+                "prompt_variant_label": prompt_variant_label,
+                "prompt_sandbox_id": prompt_sandbox_id,
                 "exec_config": convert_and_respect_annotation_metadata(
                     object_=exec_config, annotation=PromptExecConfig, direction="write"
                 ),
-                "prompt_variant_id": prompt_variant_id,
-                "prompt_sandbox_id": prompt_sandbox_id,
             },
             headers={
                 "content-type": "application/json",
