@@ -33,6 +33,8 @@ class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     workflow_input_ids_by_name = {}
+    label = "My node"
+    node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     output_display = {
         MyNode.Outputs.final_output: NodeOutputDisplay(
             id=UUID("edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb"), name="final-output"
@@ -62,6 +64,8 @@ class InlineSubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[InlineSubwor
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     workflow_input_ids_by_name = {}
+    label = "Inline Subworkflow Node"
+    node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     output_display = {
         InlineSubworkflowNode.Outputs.final_output: NodeOutputDisplay(
             id=UUID("edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb"), name="final-output"
@@ -115,6 +119,8 @@ class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     workflow_input_ids_by_name = {}
+    label = "My node"
+    node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     output_display = {
         MyNode.Outputs.final_output: NodeOutputDisplay(
             id=UUID("edd5cfd5-6ad8-437d-8775-4b9aeb62a5fb"), name="final-output"
@@ -150,6 +156,8 @@ class MyNode1Display(BaseTemplatingNodeDisplay[MyNode1]):
     label = "My node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
     target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
+    label = "My node"
+    node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
     node_input_ids_by_name = {"template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
     output_display = {
         MyNode1.Outputs.result: NodeOutputDisplay(id=UUID("2d4f1826-de75-499a-8f84-0a690c8136ad"), name="result")

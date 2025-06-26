@@ -15,6 +15,8 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
     node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
+    label = "Final Output Node"
+    node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     node_input_ids_by_name = {
         "node_input": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
     }
@@ -57,6 +59,8 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
     node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
+    label = "Final Output Node"
+    node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     node_input_ids_by_name = {
         "node_input": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
     }
@@ -99,6 +103,8 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
     node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
+    label = "Final Output Node"
+    node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     output_display = {
         FinalOutputNode.Outputs.value: NodeOutputDisplay(
             id=UUID("<output-id>"), name="value"
@@ -138,6 +144,8 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
     node_id = UUID("node-with-definition")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final_output"
+    label = "Final Output"
+    node_id = UUID("node-with-definition")
     node_input_ids_by_name = {
         "node_input": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
     }
@@ -167,6 +175,8 @@ class FinalOutput1Display(BaseFinalOutputNodeDisplay[FinalOutput1]):
     node_id = UUID("node-without-definition-1")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "text"
+    label = "Final Output"
+    node_id = UUID("node-without-definition-1")
     node_input_ids_by_name = {
         "node_input": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
     }
@@ -196,6 +206,8 @@ class FinalOutput2Display(BaseFinalOutputNodeDisplay[FinalOutput2]):
     node_id = UUID("node-without-definition-2")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "chat_history"
+    label = "Final Output"
+    node_id = UUID("node-without-definition-2")
     node_input_ids_by_name = {
         "node_input": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc")
     }

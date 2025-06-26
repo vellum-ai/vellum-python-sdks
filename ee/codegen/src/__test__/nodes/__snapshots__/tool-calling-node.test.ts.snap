@@ -11,6 +11,8 @@ from ...nodes.tool_calling_node import ToolCallingNode
 
 
 class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
+    label = "Tool Calling Node"
+    node_id = UUID("a72bbfd6-9eb5-48af-9c43-55f1d0a75106")
     attribute_ids_by_name = {
         "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
         "blocks": UUID("beec5344-2eff-47d2-b920-b90367370d79"),

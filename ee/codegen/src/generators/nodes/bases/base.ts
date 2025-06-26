@@ -609,6 +609,20 @@ export abstract class BaseNode<
       nodeClass.add(statement)
     );
 
+    nodeClass.add(
+      python.field({
+        name: "label",
+        initializer: python.TypeInstantiation.str(this.nodeContext.getNodeLabel()),
+      })
+    );
+
+    nodeClass.add(
+      python.field({
+        name: "node_id",
+        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
+      })
+    );
+
     if (this.nodeInputsByKey.size > 0) {
       const nodeInputIdsByNameField = python.field({
         name: "node_input_ids_by_name",

@@ -27,6 +27,8 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
         "bar": UUID("00baaee1-b785-403d-b391-f68b3aea334f"),
         "baz": UUID("408c2b3d-7c30-4e01-a2e3-276753beadbc"),
     }
+    label = "API Node"
+    node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     node_input_ids_by_name = {
         "method": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc"),
         "url": UUID("480a4c12-22d6-4223-a38a-85db5eda118c"),
@@ -216,6 +218,8 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
         "bar": UUID("00baaee1-b785-403d-b391-f68b3aea334f"),
         "baz": UUID("408c2b3d-7c30-4e01-a2e3-276753beadbc"),
     }
+    label = "API Node"
+    node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     node_input_ids_by_name = {
         "method": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc"),
         "url": UUID("480a4c12-22d6-4223-a38a-85db5eda118c"),

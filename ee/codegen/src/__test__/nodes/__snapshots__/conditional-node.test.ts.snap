@@ -192,6 +192,8 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
         ConditionId(id="ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60", rule_group_id=None),
     ]
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(
             "2cb6582e-c329-4952-8598-097830b766c7"
@@ -279,6 +281,8 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
         ConditionId(id="ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60", rule_group_id=None),
     ]
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8": "2cb6582e-c329-4952-8598-097830b766c7|cf63d0ad-5e52-4031-a29f-922e7004cdd8",
         "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d": "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d",
@@ -351,6 +355,8 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
             rule_group_id="fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
         )
     ]
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(
             "2cb6582e-c329-4952-8598-097830b766c7"
