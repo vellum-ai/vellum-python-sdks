@@ -6,7 +6,10 @@ import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
 
-import { GENERATED_WORKFLOW_MODULE_NAME } from "src/constants";
+import {
+  GENERATED_WORKFLOW_MODULE_NAME,
+  OUTPUTS_CLASS_NAME,
+} from "src/constants";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
@@ -412,7 +415,40 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   protected getOutputDisplay(): Field | undefined {
-    return undefined;
+    if (!this.nodeData.outputs || this.nodeData.outputs.length === 0) {
+      return undefined;
+    }
+
+    const outputDisplayEntries = this.nodeData.outputs.map((output) => ({
+      key: python.reference({
+        name: this.nodeContext.nodeClassName,
+        modulePath: this.nodeContext.nodeModulePath,
+        attribute: [OUTPUTS_CLASS_NAME, output.name],
+      }),
+      value: python.instantiateClass({
+        classReference: python.reference({
+          name: "NodeOutputDisplay",
+          modulePath:
+            this.workflowContext.sdkModulePathNames
+              .NODE_DISPLAY_TYPES_MODULE_PATH,
+        }),
+        arguments_: [
+          python.methodArgument({
+            name: "id",
+            value: python.TypeInstantiation.uuid(output.id),
+          }),
+          python.methodArgument({
+            name: "name",
+            value: python.TypeInstantiation.str(output.name),
+          }),
+        ],
+      }),
+    }));
+
+    return python.field({
+      name: "output_display",
+      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
+    });
   }
 
   protected getErrorOutputId(): string | undefined {

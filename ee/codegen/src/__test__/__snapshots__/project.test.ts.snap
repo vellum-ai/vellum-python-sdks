@@ -66,6 +66,7 @@ exports[`WorkflowProjectGenerator > Nodes present but not in graph > should stil
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
 from ...nodes.second_node import SecondNode
 
@@ -73,6 +74,9 @@ from ...nodes.second_node import SecondNode
 class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
     label = "Second Node"
     node_id = UUID("6bdede82-bcd6-42ab-8f6b-b3988fc6648f")
+    output_display = {
+        SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("a3ad3551-f9fd-487d-82fd-fcecf8954d41"), name="output")
+    }
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
 "
 `;
@@ -292,7 +296,7 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
 from ....nodes.tool_call import GetCurrentWeatherNode
 
@@ -306,6 +310,14 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
         "blocks": UUID("beec5344-2eff-47d2-b920-b90367370d79"),
         "functions": UUID("7b1ab802-3228-43b3-a493-734c94794710"),
         "prompt_inputs": UUID("38cf126e-a186-4a63-8e30-47c4507413cd"),
+    }
+    output_display = {
+        GetCurrentWeatherNode.Outputs.text: NodeOutputDisplay(
+            id=UUID("73a3c1e6-b632-45c5-a837-50922ccf0d47"), name="text"
+        ),
+        GetCurrentWeatherNode.Outputs.chat_history: NodeOutputDisplay(
+            id=UUID("7dfce73d-3d56-4bb6-8a7e-cc1b3e38746e"), name="chat_history"
+        ),
     }
     port_displays = {
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("7b97f998-4be5-478d-94c4-9423db5f6392"))
