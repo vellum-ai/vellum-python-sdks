@@ -1,3 +1,4 @@
+from custom_base_node.nodes.exit_node import ExitNode
 from dotenv import load_dotenv
 
 from .inputs import Inputs
@@ -17,7 +18,19 @@ def main():
         is_rejected = False
         for event in stream:
             if event.name == "node.execution.fulfilled":
-                print("Finished Node", event.node_definition, "thinking", event.outputs["thinking"])  # noqa: T201
+                can_think = any(o[0].name == "thinking" for o in event.outputs)
+                if can_think:
+                    print(
+                        "Finished Node",
+                        event.node_definition,
+                        "thinking",
+                        event.outputs["thinking"],
+                    )  # noqa: T201
+                else:
+                    print(
+                        "Finished Node",
+                        event.node_definition,
+                    )  # noqa: T201
             elif event.name == "workflow.execution.fulfilled":
                 print(event.outputs["answer"])  # noqa: T201
             elif event.name == "workflow.execution.rejected":

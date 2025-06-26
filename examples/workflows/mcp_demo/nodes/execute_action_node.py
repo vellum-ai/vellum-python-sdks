@@ -1,9 +1,11 @@
 import asyncio
 
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
+from mcp import ClientSession
+from mcp.client.streamable_http import streamablehttp_client
 
 from vellum import ChatMessage, FunctionCallChatMessageContent, StringChatMessageContent
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
@@ -30,28 +32,38 @@ class ExecuteActionNode(BaseNode[State]):
             )
         )
 
-        server_params = StdioServerParameters(
-            command="/usr/local/bin/docker",
-            args=["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
-            env={
-                "GITHUB_PERSONAL_ACCESS_TOKEN": self.token,
-            },
-        )
-
         async def run_stdio():
-            async with stdio_client(server_params) as stdio_transport:
-                stdio_stream, write_stream = stdio_transport
-                async with ClientSession(stdio_stream, write_stream) as session:
-                    await session.initialize()
-                    response = await session.call_tool(
-                        name=self.action.value.name,
-                        arguments=self.action.value.arguments,
-                    )
+            try:
+                async with streamablehttp_client(
+                    url="https://api.githubcopilot.com/mcp",
+                    headers={
+                        "Authorization": f"Bearer {self.token}",
+                    },
+                ) as http_stream:
+                    read_stream, write_stream, get_id = http_stream
+                    try:
+                        async with ClientSession(read_stream, write_stream) as session:
+                            try:
+                                await session.initialize()
+                                response = await session.call_tool(
+                                    name=self.action.value.name,
+                                    arguments=self.action.value.arguments,
+                                )
+                            except Exception as e:
+                                return str(e)
+                    except Exception as e:
+                        return str(e)
 
-            return response.content
+                return response.content
+            except Exception as e:
+                return str(e)
 
         action_results = asyncio.run(run_stdio())
-        compiled_action_result = "\n".join([res.text for res in action_results if res.type == "text"])
+        if isinstance(action_results, str):
+            compiled_action_result = action_results
+        else:
+            compiled_action_result = "\n".join([res.text for res in action_results if res.type == "text"])
+
         self.state.chat_history.append(
             ChatMessage(
                 role="FUNCTION",

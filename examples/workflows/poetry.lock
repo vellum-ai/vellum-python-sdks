@@ -646,22 +646,30 @@ traitlets = "*"
 
 [[package]]
 name = "mcp"
-version = "1.1.1"
+version = "1.9.4"
 description = "Model Context Protocol SDK"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "mcp-1.1.1-py3-none-any.whl", hash = "sha256:29f693a54ca1d3730e625dcc06732bc83b52d64b993d253881de576a1d66feed"},
-    {file = "mcp-1.1.1.tar.gz", hash = "sha256:44d9c12461b640c4431618a3ebf1be4178d35511e9169e25c9b1afeb59313b99"},
+    {file = "mcp-1.9.4-py3-none-any.whl", hash = "sha256:7fcf36b62936adb8e63f89346bccca1268eeca9bf6dfb562ee10b1dfbda9dac0"},
+    {file = "mcp-1.9.4.tar.gz", hash = "sha256:cfb0bcd1a9535b42edaef89947b9e18a8feb49362e1cc059d6e7fc636f2cb09f"},
 ]
 
 [package.dependencies]
 anyio = ">=4.5"
 httpx = ">=0.27"
 httpx-sse = ">=0.4"
-pydantic = ">=2.7.2"
-sse-starlette = ">=2.0"
+pydantic = ">=2.7.2,<3.0.0"
+pydantic-settings = ">=2.5.2"
+python-multipart = ">=0.0.9"
+sse-starlette = ">=1.6.1"
 starlette = ">=0.27"
+uvicorn = {version = ">=0.23.1", markers = "sys_platform != \"emscripten\""}
+
+[package.extras]
+cli = ["python-dotenv (>=1.0.0)", "typer (>=0.12.4)"]
+rich = ["rich (>=13.9.4)"]
+ws = ["websockets (>=15.0.1)"]
 
 [[package]]
 name = "openai"
@@ -912,6 +920,29 @@ files = [
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
+name = "pydantic-settings"
+version = "2.10.1"
+description = "Settings management using Pydantic"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pydantic_settings-2.10.1-py3-none-any.whl", hash = "sha256:a60952460b99cf661dc25c29c0ef171721f98bfcb52ef8d9ea4c943d7c8cc796"},
+    {file = "pydantic_settings-2.10.1.tar.gz", hash = "sha256:06f0062169818d0f5524420a360d632d5857b83cffd4d42fe29597807a1614ee"},
+]
+
+[package.dependencies]
+pydantic = ">=2.7.0"
+python-dotenv = ">=0.21.0"
+typing-inspection = ">=0.4.0"
+
+[package.extras]
+aws-secrets-manager = ["boto3 (>=1.35.0)", "boto3-stubs[secretsmanager]"]
+azure-key-vault = ["azure-identity (>=1.16.0)", "azure-keyvault-secrets (>=4.8.0)"]
+gcp-secret-manager = ["google-cloud-secret-manager (>=2.23.1)"]
+toml = ["tomli (>=2.0.1)"]
+yaml = ["pyyaml (>=6.0.1)"]
+
+[[package]]
 name = "pydash"
 version = "7.0.6"
 description = "The kitchen sink of Python utility libraries for doing \"stuff\" in a functional way. Based on the Lo-Dash Javascript library."
@@ -969,6 +1000,17 @@ files = [
 
 [package.extras]
 cli = ["click (>=5.0)"]
+
+[[package]]
+name = "python-multipart"
+version = "0.0.20"
+description = "A streaming multipart parser for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104"},
+    {file = "python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13"},
+]
 
 [[package]]
 name = "pytz"
@@ -1273,14 +1315,33 @@ socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
+name = "uvicorn"
+version = "0.34.3"
+description = "The lightning-fast ASGI server."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "uvicorn-0.34.3-py3-none-any.whl", hash = "sha256:16246631db62bdfbf069b0645177d6e8a77ba950cfedbfd093acef9444e4d885"},
+    {file = "uvicorn-0.34.3.tar.gz", hash = "sha256:35919a9a979d7a59334b6b10e05d77c1d0d574c50e0fc98b8b1a0f165708b55a"},
+]
+
+[package.dependencies]
+click = ">=7.0"
+h11 = ">=0.8"
+typing-extensions = {version = ">=4.0", markers = "python_version < \"3.11\""}
+
+[package.extras]
+standard = ["colorama (>=0.4)", "httptools (>=0.6.3)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.15.1)", "watchfiles (>=0.13)", "websockets (>=10.4)"]
+
+[[package]]
 name = "vellum-ai"
-version = "0.14.73"
+version = "0.14.76"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "vellum_ai-0.14.73-py3-none-any.whl", hash = "sha256:07f6b18a6ce76e9d6c4ac0c2a8529dbab3ebc99925bb72e431839c757d6b98d1"},
-    {file = "vellum_ai-0.14.73.tar.gz", hash = "sha256:d2512d2fe9171621f8704418a103880fe2351b044fd890ea86cd5da13d082e07"},
+    {file = "vellum_ai-0.14.76-py3-none-any.whl", hash = "sha256:e97a29ddd863d4c089adae0c3b906bc7b36480af10e6e3de9c2254b21e65f4f9"},
+    {file = "vellum_ai-0.14.76.tar.gz", hash = "sha256:cfdec3efc649710814e621061af9d1a8df6d4baad2c32136e7792d732ee54633"},
 ]
 
 [package.dependencies]
@@ -1316,4 +1377,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "0b6803b34f82a5cf1fe3094a4b33e9553263bcdd18f66aa7402f51e5d8054032"
+content-hash = "12d6a27b58901038ba699666869edda25c32cfe81c73e192159b97a0d6d9b50e"

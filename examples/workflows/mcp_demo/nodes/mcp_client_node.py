@@ -3,8 +3,8 @@ import os
 import traceback
 from typing import List
 
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
+from mcp import ClientSession
+from mcp.client.streamable_http import streamablehttp_client
 
 from vellum import FunctionDefinition
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -22,18 +22,15 @@ class MCPClientNode(BaseNode):
         thinking: str
 
     def run(self) -> Outputs:
-        server_params = StdioServerParameters(
-            command="docker",
-            args=["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
-            env={
-                "GITHUB_PERSONAL_ACCESS_TOKEN": self.token,
-            },
-        )
-
         async def run_stdio():
-            async with stdio_client(server_params) as stdio_transport:
-                stdio_stream, write_stream = stdio_transport
-                async with ClientSession(stdio_stream, write_stream) as session:
+            async with streamablehttp_client(
+                url="https://api.githubcopilot.com/mcp/",
+                headers={
+                    "Authorization": f"Bearer {self.token}",
+                },
+            ) as http_stream:
+                read_stream, write_stream, get_id = http_stream
+                async with ClientSession(read_stream, write_stream) as session:
                     await session.initialize()
                     response = await session.list_tools()
             return response.tools
