@@ -36,22 +36,6 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def setup_environment_variables():
-    """Set up environment variables with staging fallbacks if needed"""
-    staging_api_key = os.getenv("STAGING_VELLUM_API_KEY")
-    if not os.getenv("VELLUM_API_KEY") and staging_api_key:
-        os.environ["VELLUM_API_KEY"] = staging_api_key
-        logger.info("Using STAGING_VELLUM_API_KEY as VELLUM_API_KEY")
-
-    staging_api_url = os.getenv("STAGING_VELLUM_API_URL")
-    if not os.getenv("VELLUM_API_URL") and staging_api_url:
-        os.environ["VELLUM_API_URL"] = staging_api_url
-        logger.info("Using STAGING_VELLUM_API_URL as VELLUM_API_URL")
-
-
-setup_environment_variables()
-
-
 @dataclass
 class WorkflowTestCase:
     """Represents a single workflow test case"""
@@ -148,16 +132,22 @@ class WorkflowE2ETester:
             logger.warning(f"Could not generate default inputs for {workflow_class.__name__}: {e}")
             return None
 
-    def push_workflow_to_vellum(self, workflow_class: Type[BaseWorkflow]) -> bool:
-        """Push workflow to Vellum"""
+    def push_workflow_to_vellum(self, module_name: str) -> bool:
+        """Push workflow to Vellum using CLI command"""
         try:
-            from ee.vellum_cli.push import push_command
+            import subprocess
 
-            module_name = workflow_class.__module__
-            logger.info(f"Pushing workflow {workflow_class.__name__} (module: {module_name}) to Vellum")
+            logger.info(f"Pushing workflow module {module_name} to Vellum")
 
-            push_command(module=module_name)
+            result = subprocess.run(
+                ["vellum", "workflows", "push", module_name], capture_output=True, text=True, check=True
+            )
+
+            logger.info(f"Successfully pushed workflow: {result.stdout}")
             return True
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to push workflow to Vellum: {e.stderr}")
+            return False
         except Exception as e:
             logger.error(f"Failed to push workflow to Vellum: {e}")
             return False
@@ -199,6 +189,10 @@ class WorkflowE2ETester:
         )
 
         try:
+            logger.info(f"Starting comprehensive test for workflow: {test_case.module_name}")
+
+            result.vellum_push_success = self.push_workflow_to_vellum(test_case.module_name)
+
             workflow_class = self.load_workflow_class(test_case.module_name)
             if not workflow_class:
                 result.error = "Failed to load workflow class"
@@ -216,10 +210,6 @@ class WorkflowE2ETester:
                 result.error = "Could not generate test inputs"
                 result.execution_time = time.time() - start_time
                 return result
-
-            logger.info(f"Starting comprehensive test for workflow: {test_case.module_name}")
-
-            result.vellum_push_success = self.push_workflow_to_vellum(workflow_class)
 
             if result.vellum_push_success:
                 result.vellum_execution_success = self.execute_workflow_via_vellum_api(workflow_class, test_inputs)
