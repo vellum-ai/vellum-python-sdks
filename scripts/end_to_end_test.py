@@ -19,6 +19,7 @@ import json
 import logging
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import time
@@ -34,6 +35,20 @@ from vellum.workflows.outputs import BaseOutputs
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
+def setup_environment_variables():
+    """Set up environment variables with staging fallbacks if needed"""
+    staging_api_key = os.getenv("STAGING_VELLUM_API_KEY")
+    if not os.getenv("VELLUM_API_KEY") and staging_api_key:
+        os.environ["VELLUM_API_KEY"] = staging_api_key
+
+    staging_api_url = os.getenv("STAGING_VELLUM_API_URL")
+    if not os.getenv("VELLUM_API_URL") and staging_api_url:
+        os.environ["VELLUM_API_URL"] = staging_api_url
+
+
+setup_environment_variables()
 
 
 @dataclass
@@ -135,15 +150,11 @@ class WorkflowE2ETester:
     def push_workflow_to_vellum(self, module_name: str) -> bool:
         """Push workflow to Vellum using CLI command"""
         try:
-            import subprocess
-
             logger.info(f"Pushing workflow module {module_name} to Vellum")
 
-            result = subprocess.run(
-                ["vellum", "workflows", "push", module_name], capture_output=True, text=True, check=True
-            )
+            _ = subprocess.run(["vellum", "workflows", "push", module_name], capture_output=True, text=True, check=True)
 
-            logger.info(f"Successfully pushed workflow: {result.stdout}")
+            logger.info("Successfully pushed workflow")
             return True
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to push workflow to Vellum: {e.stderr}")
