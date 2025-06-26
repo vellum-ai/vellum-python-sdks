@@ -605,6 +605,22 @@ export abstract class BaseNode<
       decorators: decorators.length > 0 ? decorators : undefined,
     });
 
+    nodeClass.add(
+      python.field({
+        name: "label",
+        initializer: python.TypeInstantiation.str(
+          this.nodeContext.getNodeLabel()
+        ),
+      })
+    );
+
+    nodeClass.add(
+      python.field({
+        name: "node_id",
+        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
+      })
+    );
+
     this.getNodeDisplayClassBodyStatements().forEach((statement) =>
       nodeClass.add(statement)
     );

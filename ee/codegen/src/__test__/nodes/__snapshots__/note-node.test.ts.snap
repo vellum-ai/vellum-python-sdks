@@ -1,13 +1,17 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`NoteNode > basic > getNodeDisplayFile 1`] = `
-"from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNoteNodeDisplay
 
 from ...nodes.note_node import NoteNode
 
 
 class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):
+    label = "Note Node"
+    node_id = UUID("<note-node-id>")
     text = "This is a note"
     style = {
         "color": "red",

@@ -62,13 +62,17 @@ __all__ = [
 `;
 
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/display/nodes/second_node.py 1`] = `
-"from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 
 from ...nodes.second_node import SecondNode
 
 
 class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
+    label = "Second Node"
+    node_id = UUID("6bdede82-bcd6-42ab-8f6b-b3988fc6648f")
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
 "
 `;
@@ -294,6 +298,8 @@ from ....nodes.tool_call import GetCurrentWeatherNode
 
 
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    label = "GetCurrentWeatherNode"
+    node_id = UUID("tool-calling-node")
     attribute_ids_by_name = {
         "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
         "max_tool_calls": UUID("723f614a-be30-4f27-90d0-896c740e58d3"),

@@ -1115,7 +1115,7 @@ baz = foo + bar
 
   describe("Nodes present but not in graph", () => {
     const firstNodeId = uuidv4();
-    const secondNodeId = uuidv4();
+    const secondNodeId = "6bdede82-bcd6-42ab-8f6b-b3988fc6648f";
     const secondNodeOutputId = uuidv4();
     const firstNodeTriggerId = uuidv4();
     const secondNodeTriggerId = uuidv4();
