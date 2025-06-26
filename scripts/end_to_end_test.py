@@ -36,6 +36,20 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
+def setup_environment_variables():
+    """Set up environment variables with staging fallbacks if needed"""
+    if not os.getenv("VELLUM_API_KEY") and os.getenv("STAGING_VELLUM_API_KEY"):
+        os.environ["VELLUM_API_KEY"] = os.getenv("STAGING_VELLUM_API_KEY")
+        logger.info("Using STAGING_VELLUM_API_KEY as VELLUM_API_KEY")
+
+    if not os.getenv("VELLUM_API_URL") and os.getenv("STAGING_VELLUM_API_URL"):
+        os.environ["VELLUM_API_URL"] = os.getenv("STAGING_VELLUM_API_URL")
+        logger.info("Using STAGING_VELLUM_API_URL as VELLUM_API_URL")
+
+
+setup_environment_variables()
+
+
 @dataclass
 class WorkflowTestCase:
     """Represents a single workflow test case"""
