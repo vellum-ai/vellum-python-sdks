@@ -883,7 +883,8 @@ export type OperatorMapping =
   | "coalesce"
   | "access_field"
   | "or"
-  | "and";
+  | "and"
+  | "is_error";
 
 export interface IterableConfig {
   endWithComma?: boolean;

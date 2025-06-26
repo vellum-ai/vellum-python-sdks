@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
     from vellum.workflows.expressions.in_ import InExpression
     from vellum.workflows.expressions.is_blank import IsBlankExpression
+    from vellum.workflows.expressions.is_error import IsErrorExpression
     from vellum.workflows.expressions.is_nil import IsNilExpression
     from vellum.workflows.expressions.is_not_blank import IsNotBlankExpression
     from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
@@ -358,3 +359,8 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.parse_json import ParseJsonExpression
 
         return ParseJsonExpression(expression=self)
+
+    def is_error(self) -> "IsErrorExpression":
+        from vellum.workflows.expressions.is_error import IsErrorExpression
+
+        return IsErrorExpression(expression=self)

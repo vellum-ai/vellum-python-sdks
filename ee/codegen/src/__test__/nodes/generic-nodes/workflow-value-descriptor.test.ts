@@ -187,6 +187,26 @@ describe("WorkflowValueDescriptor", () => {
       valueDescriptor.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("generates unary expression with is_error operator", async () => {
+      const descriptor: WorkflowValueDescriptorType = {
+        type: "UNARY_EXPRESSION",
+        operator: "isError",
+        lhs: {
+          type: "NODE_OUTPUT",
+          nodeId: "node-1",
+          nodeOutputId: "output-1",
+        },
+      };
+
+      const valueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: descriptor,
+        workflowContext,
+      });
+
+      valueDescriptor.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 
   describe("expressions that begin with constant values", () => {
@@ -253,6 +273,27 @@ describe("WorkflowValueDescriptor", () => {
         rhs: {
           type: "WORKFLOW_INPUT",
           inputVariableId: "input-2",
+        },
+      };
+      const valueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: descriptor,
+        workflowContext,
+      });
+
+      valueDescriptor.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("generates unary expression with is_error operator on constant value", async () => {
+      const descriptor: WorkflowValueDescriptorType = {
+        type: "UNARY_EXPRESSION",
+        operator: "isError",
+        lhs: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "STRING",
+            value: "Some error message",
+          },
         },
       };
       const valueDescriptor = new WorkflowValueDescriptor({

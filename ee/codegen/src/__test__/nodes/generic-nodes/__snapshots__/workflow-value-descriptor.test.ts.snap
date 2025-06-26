@@ -25,6 +25,11 @@ exports[`WorkflowValueDescriptor > expressions > generates unary expression with
 "
 `;
 
+exports[`WorkflowValueDescriptor > expressions > generates unary expression with is_error operator 1`] = `
+"TestNode.Outputs.my_output.is_error()
+"
+`;
+
 exports[`WorkflowValueDescriptor > expressions that begin with constant values > generates binary expression beginning with constant value reference 1`] = `
 "ConstantValueReference("Hello, World!").equals(Inputs.count)
 "
@@ -37,5 +42,10 @@ exports[`WorkflowValueDescriptor > expressions that begin with constant values >
 
 exports[`WorkflowValueDescriptor > expressions that begin with constant values > generates unary expression beginning with constant value reference 1`] = `
 "ConstantValueReference("Hello, World!").is_null()
+"
+`;
+
+exports[`WorkflowValueDescriptor > expressions that begin with constant values > generates unary expression with is_error operator on constant value 1`] = `
+"ConstantValueReference("Some error message").is_error()
 "
 `;
