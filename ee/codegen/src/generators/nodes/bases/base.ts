@@ -608,7 +608,9 @@ export abstract class BaseNode<
     nodeClass.add(
       python.field({
         name: "label",
-        initializer: python.TypeInstantiation.str(this.nodeContext.getNodeLabel()),
+        initializer: python.TypeInstantiation.str(
+          this.nodeContext.getNodeLabel()
+        ),
       })
     );
 

@@ -71,7 +71,6 @@ export class GuardrailNode extends BaseNode<
   getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-
     statements.push(
       python.field({
         name: "target_handle_id",

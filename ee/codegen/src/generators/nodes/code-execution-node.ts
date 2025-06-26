@@ -150,7 +150,6 @@ export class CodeExecutionNode extends BaseNode<
     const nodeData = this.nodeData.data;
     const statements: AstNode[] = [];
 
-
     statements.push(
       python.field({
         name: "target_handle_id",

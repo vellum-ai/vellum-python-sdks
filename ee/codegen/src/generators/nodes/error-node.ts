@@ -36,7 +36,6 @@ export class ErrorNode extends BaseNode<ErrorNodeType, ErrorNodeContext> {
       );
     }
 
-
     if (this.nodeData.data.errorOutputId) {
       // DEPRECATED: To be removed in the 0.15.0 release
       statements.push(

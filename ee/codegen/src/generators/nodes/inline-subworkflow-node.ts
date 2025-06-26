@@ -45,7 +45,6 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
   getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-
     statements.push(
       python.field({
         name: "target_handle_id",
