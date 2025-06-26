@@ -8,8 +8,6 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
-    node_id = UUID("e5ff9360-a29c-437b-a9c1-05fc52df2834")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"),
@@ -17,6 +15,8 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
         UUID("a89483b6-6850-4105-8c4e-ec0fd197cd43"): UUID("a89483b6-6850-4105-8c4e-ec0fd197cd43"),
         UUID("847b8ee0-2c37-4e41-9dea-b4ba3579e2c1"): UUID("847b8ee0-2c37-4e41-9dea-b4ba3579e2c1"),
     }
+    label = "Search Node"
+    node_id = UUID("e5ff9360-a29c-437b-a9c1-05fc52df2834")
     node_input_ids_by_name = {
         "query": UUID("f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a"),
         "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),

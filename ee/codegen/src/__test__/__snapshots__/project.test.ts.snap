@@ -72,7 +72,7 @@ from ...nodes.second_node import SecondNode
 
 class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
     label = "Second Node"
-    node_id = UUID("4dd2f551-ae3e-49ca-8fe1-8faebc22ba16")
+    node_id = UUID("efef1549-7292-42ce-883c-b6eaea698a01")
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
 "
 `;

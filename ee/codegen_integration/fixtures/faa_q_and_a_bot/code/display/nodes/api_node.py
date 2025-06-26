@@ -8,11 +8,11 @@ from ...nodes.api_node import APINode
 
 
 class APINodeDisplay(BaseAPINodeDisplay[APINode]):
-    label = "API Node"
-    node_id = UUID("81246ab6-153a-4c87-9f28-b6c28c915cf1")
     target_handle_id = UUID("8f6f1b95-dd80-46dd-b1f6-167196baf697")
     additional_header_key_input_ids = {}
     additional_header_value_input_ids = {}
+    label = "API Node"
+    node_id = UUID("81246ab6-153a-4c87-9f28-b6c28c915cf1")
     node_input_ids_by_name = {
         "url": UUID("20932275-1a55-455f-b481-5895f9e28123"),
         "method": UUID("96d6ea69-24b7-4e5a-94ed-4c4eb3fcfe69"),

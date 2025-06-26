@@ -9,8 +9,6 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
-    label = "Conditional Node"
-    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
         0: UUID("8e2b2af3-db06-4025-9395-a6d08a8b9256"),
@@ -50,6 +48,8 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ConditionId(id="f1572ff3-df6e-4d87-9149-2323efe2e840", rule_group_id="b695d023-629a-48e1-8ca3-ee6bb9ba40ff"),
         ConditionId(id="27339e00-c535-436e-95f4-3c70d8bf5762", rule_group_id=None),
     ]
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "6a73037b-bd3e-4f09-8bdb-adc6c5834a65.field": UUID("4e5d07ad-0c7d-4149-8cf6-c46a9adf82a5"),
         "6a73037b-bd3e-4f09-8bdb-adc6c5834a65.value": UUID("627bf471-2ddf-48f9-9f49-9eb0a2a242b9"),

@@ -8,9 +8,9 @@ from .....nodes.map_node.nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
+    target_handle_id = UUID("df39e340-f66c-4f1c-b030-5437a2183414")
     label = "Search Node"
     node_id = UUID("4b0a7578-e5ec-4d72-b396-62abdecbd101")
-    target_handle_id = UUID("df39e340-f66c-4f1c-b030-5437a2183414")
     node_input_ids_by_name = {
         "query": UUID("eca53704-291f-419b-b69e-44ccb9791227"),
         "document_index_id": UUID("f5bdc71b-c100-4237-999f-14b97378da4d"),

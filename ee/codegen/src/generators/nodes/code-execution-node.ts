@@ -150,19 +150,6 @@ export class CodeExecutionNode extends BaseNode<
     const nodeData = this.nodeData.data;
     const statements: AstNode[] = [];
 
-    statements.push(
-      python.field({
-        name: "label",
-        initializer: python.TypeInstantiation.str(this.nodeData.data.label),
-      })
-    );
-
-    statements.push(
-      python.field({
-        name: "node_id",
-        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
-      })
-    );
 
     statements.push(
       python.field({

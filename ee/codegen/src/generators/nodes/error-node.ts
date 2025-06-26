@@ -36,18 +36,6 @@ export class ErrorNode extends BaseNode<ErrorNodeType, ErrorNodeContext> {
       );
     }
 
-    statements.push(
-      python.field({
-        name: "node_id",
-        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
-      })
-    );
-    statements.push(
-      python.field({
-        name: "label",
-        initializer: python.TypeInstantiation.str(this.nodeData.data.label),
-      })
-    );
 
     if (this.nodeData.data.errorOutputId) {
       // DEPRECATED: To be removed in the 0.15.0 release

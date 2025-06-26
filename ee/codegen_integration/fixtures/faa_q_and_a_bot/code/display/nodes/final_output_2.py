@@ -8,10 +8,10 @@ from ...nodes.final_output_2 import FinalOutput2
 
 
 class FinalOutput2Display(BaseFinalOutputNodeDisplay[FinalOutput2]):
-    label = "Final Output 2"
-    node_id = UUID("f9c5254c-b86d-420d-811a-a1674df273cd")
     target_handle_id = UUID("87d73dc6-cafd-4f8b-b2fd-8367baba5d61")
     output_name = "answer"
+    label = "Final Output 2"
+    node_id = UUID("f9c5254c-b86d-420d-811a-a1674df273cd")
     node_input_ids_by_name = {"node_input": UUID("4a999b21-0555-404c-a4f4-c613cd108450")}
     output_display = {
         FinalOutput2.Outputs.value: NodeOutputDisplay(id=UUID("8c6e5464-8916-4039-b911-cf707855d372"), name="value")

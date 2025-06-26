@@ -206,14 +206,6 @@ export class InlinePromptNode extends BaseNode<
 
     statements.push(
       python.field({
-        name: "label",
-        initializer: python.TypeInstantiation.str(this.nodeData.data.label),
-      }),
-      python.field({
-        name: "node_id",
-        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
-      }),
-      python.field({
         name: "output_id",
         initializer: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
       }),

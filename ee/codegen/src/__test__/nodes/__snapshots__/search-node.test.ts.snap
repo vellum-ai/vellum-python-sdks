@@ -52,8 +52,6 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
-    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
@@ -198,8 +196,6 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
-    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("500ce391-ee26-4588-a5a0-2dfa6b70add5"): UUID(
@@ -314,8 +310,6 @@ from ...nodes.search_node import SearchNode
     error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"),
 )
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
-    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
@@ -420,8 +414,6 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
-    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
@@ -519,8 +511,6 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
-    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {}
     label = "Search Node"
@@ -574,8 +564,6 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
-    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {}
     label = "Search Node"

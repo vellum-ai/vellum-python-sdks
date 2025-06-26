@@ -8,9 +8,9 @@ from ...nodes.faa_document_store import FAADocumentStore
 
 
 class FAADocumentStoreDisplay(BaseSearchNodeDisplay[FAADocumentStore]):
+    target_handle_id = UUID("32346adc-40f3-49b5-aea8-5c64b88643ef")
     label = "FAA Document Store"
     node_id = UUID("fbe1571c-e904-40f6-a414-55adf3b72817")
-    target_handle_id = UUID("32346adc-40f3-49b5-aea8-5c64b88643ef")
     node_input_ids_by_name = {
         "query": UUID("d25dcbce-5d7b-40a4-a5b4-2033bd0d350a"),
         "document_index_id": UUID("43c7c857-8b25-4dd9-ba16-aa2e5e6ecd0a"),

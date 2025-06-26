@@ -8,11 +8,11 @@ from ...nodes.prompt_node import PromptNode
 
 
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
-    label = "Prompt Node"
-    node_id = UUID("393c798a-111a-4f73-bfee-5efb93228dcb")
     output_id = UUID("f7e45a43-f55c-4c19-8fe6-c3ce1308a076")
     array_output_id = UUID("63213d3c-547c-43df-905f-082aeb7dac61")
     target_handle_id = UUID("b14f0322-965d-43c9-96d4-7bce9fd87067")
+    label = "Prompt Node"
+    node_id = UUID("393c798a-111a-4f73-bfee-5efb93228dcb")
     node_input_ids_by_name = {"prompt_inputs.var_1": UUID("183b03e5-b903-4d39-abe4-9267c78285f6")}
     attribute_ids_by_name = {
         "ml_model": UUID("3e918914-3f95-4404-8c98-3b66cda834cd"),

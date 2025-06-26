@@ -11,8 +11,6 @@ from ...nodes.final_output_node import FinalOutputNode
 
 
 class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
-    label = "Final Output Node"
-    node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
     label = "Final Output Node"
@@ -55,8 +53,6 @@ from ...nodes.final_output_node import FinalOutputNode
 
 
 class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
-    label = "Final Output Node"
-    node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
     label = "Final Output Node"
@@ -99,8 +95,6 @@ from ...nodes.final_output_node import FinalOutputNode
 
 
 class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
-    label = "Final Output Node"
-    node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
     label = "Final Output Node"
@@ -140,8 +134,6 @@ from ...nodes.final_output import FinalOutput
 
 
 class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
-    label = "Final Output"
-    node_id = UUID("node-with-definition")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final_output"
     label = "Final Output"
@@ -171,8 +163,6 @@ from ...nodes.final_output_1 import FinalOutput1
 
 
 class FinalOutput1Display(BaseFinalOutputNodeDisplay[FinalOutput1]):
-    label = "Final Output"
-    node_id = UUID("node-without-definition-1")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "text"
     label = "Final Output"
@@ -202,8 +192,6 @@ from ...nodes.final_output_2 import FinalOutput2
 
 
 class FinalOutput2Display(BaseFinalOutputNodeDisplay[FinalOutput2]):
-    label = "Final Output"
-    node_id = UUID("node-without-definition-2")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "chat_history"
     label = "Final Output"
