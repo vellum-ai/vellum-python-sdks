@@ -19,6 +19,7 @@ import json
 import logging
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import time
@@ -34,6 +35,17 @@ from vellum.workflows.outputs import BaseOutputs
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
+def setup_environment_variables():
+    """Set up environment variables with staging fallbacks if needed"""
+    staging_api_key = os.getenv("STAGING_VELLUM_API_KEY")
+    if not os.getenv("VELLUM_API_KEY") and staging_api_key:
+        os.environ["VELLUM_API_KEY"] = staging_api_key
+
+    staging_api_url = os.getenv("STAGING_VELLUM_API_URL")
+    if not os.getenv("VELLUM_API_URL") and staging_api_url:
+        os.environ["VELLUM_API_URL"] = staging_api_url
 
 
 @dataclass
@@ -94,14 +106,6 @@ class WorkflowE2ETester:
     def load_workflow_class(self, module_name: str) -> Optional[Type[BaseWorkflow]]:
         """Load a workflow class from a module name"""
         try:
-            current_dir = os.getcwd()
-            examples_dir = os.path.join(current_dir, "examples")
-            workflows_dir = os.path.join(examples_dir, "workflows")
-
-            for path in [current_dir, examples_dir, workflows_dir]:
-                if path not in sys.path:
-                    sys.path.insert(0, path)
-
             return BaseWorkflow.load_from_module(module_name)
         except Exception as e:
             logger.error(f"Failed to load workflow {module_name}: {e}")
@@ -140,11 +144,18 @@ class WorkflowE2ETester:
             logger.warning(f"Could not generate default inputs for {workflow_class.__name__}: {e}")
             return None
 
-    def push_workflow_to_vellum(self, workflow_class: Type[BaseWorkflow]) -> bool:
-        """Push workflow to Vellum"""
+    def push_workflow_to_vellum(self, module_name: str) -> bool:
+        """Push workflow to Vellum using CLI command"""
         try:
-            logger.info(f"Pushing workflow {workflow_class.__name__} to Vellum")
+            logger.info(f"Pushing workflow module {module_name} to Vellum")
+
+            _ = subprocess.run(["vellum", "workflows", "push", module_name], capture_output=True, text=True, check=True)
+
+            logger.info("Successfully pushed workflow")
             return True
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to push workflow to Vellum: {e.stderr}")
+            return False
         except Exception as e:
             logger.error(f"Failed to push workflow to Vellum: {e}")
             return False
@@ -186,6 +197,10 @@ class WorkflowE2ETester:
         )
 
         try:
+            logger.info(f"Starting comprehensive test for workflow: {test_case.module_name}")
+
+            result.vellum_push_success = self.push_workflow_to_vellum(test_case.module_name)
+
             workflow_class = self.load_workflow_class(test_case.module_name)
             if not workflow_class:
                 result.error = "Failed to load workflow class"
@@ -203,10 +218,6 @@ class WorkflowE2ETester:
                 result.error = "Could not generate test inputs"
                 result.execution_time = time.time() - start_time
                 return result
-
-            logger.info(f"Starting comprehensive test for workflow: {test_case.module_name}")
-
-            result.vellum_push_success = self.push_workflow_to_vellum(workflow_class)
 
             if result.vellum_push_success:
                 result.vellum_execution_success = self.execute_workflow_via_vellum_api(workflow_class, test_inputs)
@@ -344,6 +355,8 @@ class WorkflowE2ETester:
 @click.option("--examples-dir", type=str, default="examples/workflows", help="Directory containing workflow examples")
 def main(max_workers: int, filter: Optional[str], output: Optional[str], examples_dir: str):
     """Main entry point for the E2E test script"""
+
+    setup_environment_variables()
 
     if filter == "skip-all":
         logger.info("Skipping all workflows due to --filter skip-all")
