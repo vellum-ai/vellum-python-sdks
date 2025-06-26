@@ -327,6 +327,69 @@ describe("ToolCallingNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+  describe("inline workflow", () => {
+    const createFunctionAttribute = <T>(
+      functions: Array<T>
+    ): NodeAttribute => ({
+      id: "functions-attr-id",
+      name: "functions",
+      value: {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "JSON",
+          value: functions,
+        },
+      },
+    });
+    it("should generate inline workflow function name", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functions = [
+        {
+          name: "subtract",
+          type: "INLINE_WORKFLOW",
+          description: "subtract two numbers",
+          exec_config: {
+            runner_config: {},
+            input_variables: [],
+            state_variables: [],
+            output_variables: [],
+            workflow_raw_data: {
+              edges: [],
+              nodes: [],
+              definition: null, // Testing null definition
+              output_values: [],
+            },
+          },
+        },
+      ];
+
+      const functionsAttribute = createFunctionAttribute(functions);
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
   describe("deployment workflow", () => {
     const createFunctionAttribute = <T>(
       functions: Array<T>

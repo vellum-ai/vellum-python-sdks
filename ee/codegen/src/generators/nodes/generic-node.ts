@@ -118,6 +118,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                       workflowVersionExecConfigResult.value;
                     const workflow: InlineWorkflowFunctionArgs = {
                       type: "INLINE_WORKFLOW",
+                      name: f.name,
+                      description: f.description,
                       exec_config: workflowVersionExecConfig,
                     };
                     inlineWorkflowFunctions.push(workflow);
@@ -321,16 +323,19 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     workflow: InlineWorkflowFunctionArgs
   ): string {
     const definition = workflow.exec_config.workflowRawData.definition;
-    if (!definition?.name) {
-      this.workflowContext.addError(
-        new NodeDefinitionGenerationError(
-          "Workflow definition name is required for inline workflows",
-          "WARNING"
-        )
-      );
-      return "inline_workflow_function";
+    if (definition?.name) {
+      return toPythonSafeSnakeCase(definition.name);
     }
-    return toPythonSafeSnakeCase(definition.name);
+    if (workflow.name) {
+      return toPythonSafeSnakeCase(`${workflow.name} Workflow`);
+    }
+    this.workflowContext.addError(
+      new NodeDefinitionGenerationError(
+        "Workflow definition name is required for inline workflows",
+        "WARNING"
+      )
+    );
+    return "inline_workflow_function";
   }
 
   private generateInlineWorkflowFiles(

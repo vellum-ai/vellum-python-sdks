@@ -907,7 +907,7 @@ export type FunctionArgs = {
 export type InlineWorkflowFunctionArgs = {
   type: "INLINE_WORKFLOW";
   exec_config: WorkflowVersionExecConfig;
-};
+} & NameDescription;
 
 export type DeploymentWorkflowFunctionArgs = {
   type: "WORKFLOW_DEPLOYMENT";

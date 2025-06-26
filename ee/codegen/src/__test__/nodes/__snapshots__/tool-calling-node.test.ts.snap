@@ -111,6 +111,19 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > inline workflow > should generate inline workflow function name 1`] = `
+"from .subtract_workflow.workflow import SubtractWorkflow
+
+from vellum.workflows.nodes.experimental.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [SubtractWorkflow]
+"
+`;
+
 exports[`ToolCallingNode > input variables > should generate input variables 1`] = `
 "from vellum import (
     ChatMessagePromptBlock,
