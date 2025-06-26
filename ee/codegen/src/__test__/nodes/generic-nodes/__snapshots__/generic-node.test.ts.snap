@@ -5,7 +5,10 @@ exports[`GenericNode > basic > getNodeDisplayFile 1`] = `
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
 
 from ...nodes.my_custom_node import MyCustomNode
 
@@ -16,6 +19,11 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
     attribute_ids_by_name = {
         "default-attribute": UUID("990d55db-9d72-452a-b074-9bee1f89ecb9"),
         "default-attribute-2": UUID("70652383-d93f-4c3a-b194-1ea5cdced8f1"),
+    }
+    output_display = {
+        MyCustomNode.Outputs.output: NodeOutputDisplay(
+            id=UUID("output-1"), name="output"
+        )
     }
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
@@ -68,7 +76,10 @@ from vellum_ee.workflows.display.nodes import (
     BaseRetryNodeDisplay,
     BaseTryNodeDisplay,
 )
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
 
 from ...nodes.my_custom_node import MyCustomNode
 
@@ -82,6 +93,11 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
     attribute_ids_by_name = {
         "default-attribute": UUID("990d55db-9d72-452a-b074-9bee1f89ecb9"),
         "default-attribute-2": UUID("70652383-d93f-4c3a-b194-1ea5cdced8f1"),
+    }
+    output_display = {
+        MyCustomNode.Outputs.output: NodeOutputDisplay(
+            id=UUID("output-1"), name="output"
+        )
     }
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
@@ -250,7 +266,10 @@ exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
 
 from ...nodes.my_custom_node import MyCustomNode
 
@@ -259,6 +278,11 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
     label = "MyCustomNode"
     node_id = UUID("bed8d22e-4835-41d9-ad81-e78a4b0e7ae0")
     attribute_ids_by_name = {"default-attribute": UUID("attr-1-id")}
+    output_display = {
+        MyCustomNode.Outputs.output: NodeOutputDisplay(
+            id=UUID("output-1"), name="output"
+        )
+    }
     port_displays = {
         MyCustomNode.Ports.default_port: PortDisplayOverrides(
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
