@@ -33,9 +33,10 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
 
 exports[`FinalOutputNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
+from vellum.workflows.state import BaseState
 
 
-class FinalOutputNode(BaseFinalOutputNode[str]):
+class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
         value = "<my-output>"
 "
@@ -74,9 +75,10 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
 
 exports[`FinalOutputNode > should codegen deduplicated output class > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
+from vellum.workflows.state import BaseState
 
 
-class FinalOutputNode(BaseFinalOutputNode[str]):
+class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
         value = "<my-output>"
 "
@@ -112,9 +114,10 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
 
 exports[`FinalOutputNode > should codegen successfully without node input > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
+from vellum.workflows.state import BaseState
 
 
-class FinalOutputNode(BaseFinalOutputNode[str]):
+class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
         pass
 "
@@ -211,25 +214,28 @@ class FinalOutput2Display(BaseFinalOutputNodeDisplay[FinalOutput2]):
 
 exports[`FinalOutputNode > should generate unique class names when mixing defined and undefined class names > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
 
 
-class FinalOutput(FinalOutputNode[str]):
+class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = "<my-output>"
 
 
 from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
 
 
-class FinalOutput1(FinalOutputNode[str]):
+class FinalOutput1(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = "<my-output>"
 
 
 from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
 
 
-class FinalOutput2(FinalOutputNode[str]):
+class FinalOutput2(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = "<my-output>"
 "
