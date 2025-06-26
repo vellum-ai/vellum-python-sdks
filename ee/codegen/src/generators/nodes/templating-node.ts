@@ -25,11 +25,11 @@ export class TemplatingNode extends BaseNode<
   }
 
   protected getNodeBaseGenericTypes(): AstNode[] {
-    const baseTypes = super.getNodeBaseGenericTypes() || [];
+    const stateType = this.getStateTypeOrBaseState();
     const primitiveOutputType = this.generateOutputType(
       this.nodeData.data.outputType
     );
-    return [...baseTypes, primitiveOutputType];
+    return [stateType, primitiveOutputType];
   }
 
   protected getNodeClassBodyStatements(): AstNode[] {

@@ -13,11 +13,11 @@ export class FinalOutputNode extends BaseNode<
   FinalOutputNodeContext
 > {
   protected getNodeBaseGenericTypes(): AstNode[] {
-    const baseTypes = super.getNodeBaseGenericTypes() || [];
+    const stateType = this.getStateTypeOrBaseState();
     const primitiveOutputType = getVellumVariablePrimitiveType(
       this.nodeData.data.outputType
     );
-    return [...baseTypes, primitiveOutputType];
+    return [stateType, primitiveOutputType];
   }
 
   getNodeClassBodyStatements(): AstNode[] {
