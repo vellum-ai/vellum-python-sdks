@@ -48,9 +48,6 @@ def setup_environment_variables():
         os.environ["VELLUM_API_URL"] = staging_api_url
 
 
-setup_environment_variables()
-
-
 @dataclass
 class WorkflowTestCase:
     """Represents a single workflow test case"""
@@ -358,6 +355,8 @@ class WorkflowE2ETester:
 @click.option("--examples-dir", type=str, default="examples/workflows", help="Directory containing workflow examples")
 def main(max_workers: int, filter: Optional[str], output: Optional[str], examples_dir: str):
     """Main entry point for the E2E test script"""
+
+    setup_environment_variables()
 
     if filter == "skip-all":
         logger.info("Skipping all workflows due to --filter skip-all")
