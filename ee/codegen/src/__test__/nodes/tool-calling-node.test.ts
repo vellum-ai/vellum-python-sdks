@@ -3,6 +3,7 @@ import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
+import { nodeAttributeFactory } from "src/__test__/helpers/node-attribute-factory";
 import {
   nodePortFactory,
   toolCallingNodeFactory,
@@ -13,7 +14,6 @@ import { GenericNode } from "src/generators/nodes/generic-node";
 import {
   DeploymentWorkflowFunctionArgs,
   FunctionArgs,
-  NodeAttribute,
   NodePort,
 } from "src/types/vellum";
 
@@ -153,20 +153,6 @@ describe("ToolCallingNode", () => {
   });
 
   describe("function ordering", () => {
-    const createFunctionAttribute = <T>(
-      functions: Array<T>
-    ): NodeAttribute => ({
-      id: "functions-attr-id",
-      name: "functions",
-      value: {
-        type: "CONSTANT_VALUE",
-        value: {
-          type: "JSON",
-          value: functions,
-        },
-      },
-    });
-
     const codeExecutionFunction: FunctionArgs = {
       type: "CODE_EXECUTION",
       src: 'def add_numbers(a: int, b: int) -> int:\n    """\n    Add two numbers together.\n    """\n    return a + b\n',
@@ -272,10 +258,22 @@ describe("ToolCallingNode", () => {
         }),
       ];
 
-      const functionsAttribute = createFunctionAttribute([
-        codeExecutionFunction,
-        inlineWorkflowFunction,
-      ]);
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...codeExecutionFunction,
+            id: "code-exec-function-id",
+            name: "add_numbers",
+          },
+          {
+            ...inlineWorkflowFunction,
+            id: "workflow-function-id",
+            name: "subtract",
+          },
+        ]
+      );
 
       const nodeData = toolCallingNodeFactory({
         nodePorts: nodePortData,
@@ -303,10 +301,22 @@ describe("ToolCallingNode", () => {
         }),
       ];
 
-      const functionsAttribute = createFunctionAttribute([
-        inlineWorkflowFunction,
-        codeExecutionFunction,
-      ]);
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...inlineWorkflowFunction,
+            id: "workflow-function-id",
+            name: "subtract",
+          },
+          {
+            ...codeExecutionFunction,
+            id: "code-exec-function-id",
+            name: "add_numbers",
+          },
+        ]
+      );
 
       const nodeData = toolCallingNodeFactory({
         nodePorts: nodePortData,
@@ -328,19 +338,6 @@ describe("ToolCallingNode", () => {
     });
   });
   describe("inline workflow", () => {
-    const createFunctionAttribute = <T>(
-      functions: Array<T>
-    ): NodeAttribute => ({
-      id: "functions-attr-id",
-      name: "functions",
-      value: {
-        type: "CONSTANT_VALUE",
-        value: {
-          type: "JSON",
-          value: functions,
-        },
-      },
-    });
     it("should generate inline workflow function name", async () => {
       const nodePortData: NodePort[] = [
         nodePortFactory({
@@ -348,27 +345,35 @@ describe("ToolCallingNode", () => {
         }),
       ];
 
-      const functions = [
-        {
-          name: "subtract",
-          type: "INLINE_WORKFLOW",
-          description: "subtract two numbers",
-          exec_config: {
-            runner_config: {},
-            input_variables: [],
-            state_variables: [],
-            output_variables: [],
-            workflow_raw_data: {
-              edges: [],
-              nodes: [],
-              definition: null, // Testing null definition
-              output_values: [],
-            },
+      const functions = {
+        name: "subtract",
+        type: "INLINE_WORKFLOW",
+        description: "subtract two numbers",
+        exec_config: {
+          runner_config: {},
+          input_variables: [],
+          state_variables: [],
+          output_variables: [],
+          workflow_raw_data: {
+            edges: [],
+            nodes: [],
+            definition: null, // Testing null definition
+            output_values: [],
           },
         },
-      ];
+      };
 
-      const functionsAttribute = createFunctionAttribute(functions);
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...functions,
+            id: "workflow-function-id",
+            name: "subtract",
+          },
+        ]
+      );
 
       const nodeData = toolCallingNodeFactory({
         nodePorts: nodePortData,
@@ -391,20 +396,6 @@ describe("ToolCallingNode", () => {
   });
 
   describe("deployment workflow", () => {
-    const createFunctionAttribute = <T>(
-      functions: Array<T>
-    ): NodeAttribute => ({
-      id: "functions-attr-id",
-      name: "functions",
-      value: {
-        type: "CONSTANT_VALUE",
-        value: {
-          type: "JSON",
-          value: functions,
-        },
-      },
-    });
-
     const deploymentWorkflowFunction: DeploymentWorkflowFunctionArgs = {
       type: "WORKFLOW_DEPLOYMENT",
       name: "deployment_1",
@@ -420,9 +411,17 @@ describe("ToolCallingNode", () => {
         }),
       ];
 
-      const functionsAttribute = createFunctionAttribute([
-        deploymentWorkflowFunction,
-      ]);
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...deploymentWorkflowFunction,
+            id: "deployment-workflow-function-id",
+            name: "deployment-workflow-function-name",
+          },
+        ]
+      );
 
       const nodeData = toolCallingNodeFactory({
         nodePorts: nodePortData,
