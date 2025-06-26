@@ -390,6 +390,7 @@ describe("InlinePromptNode", () => {
         workflowContext,
         nodeContext,
       });
+
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

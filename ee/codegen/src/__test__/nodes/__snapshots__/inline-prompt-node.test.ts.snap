@@ -50,11 +50,12 @@ exports[`InlinePromptNode > CHAT_MESSAGE block type > basic > getNodeFile for CH
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(
@@ -142,11 +143,12 @@ exports[`InlinePromptNode > CHAT_MESSAGE block type > legacy prompt variant > ge
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(
@@ -242,12 +244,13 @@ exports[`InlinePromptNode > CHAT_MESSAGE block type > reject on error enabled > 
 )
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @TryNode.wrap()
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(
@@ -329,11 +332,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > basic > getNodeFile for FUNCTION_DEFINITION block type 1`] = `
 "from vellum import FunctionDefinition, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = []
     prompt_inputs = {
@@ -400,11 +404,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > legacy prompt variant > getNodeFile for FUNCTION_DEFINITION block type 1`] = `
 "from vellum import FunctionDefinition, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = []
     prompt_inputs = {
@@ -479,12 +484,13 @@ exports[`InlinePromptNode > FUNCTION_DEFINITION block type > reject on error ena
 "from vellum import FunctionDefinition, PromptParameters
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @TryNode.wrap()
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = []
     prompt_inputs = {
@@ -551,11 +557,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > JINJA block type > basic > getNodeFile for JINJA block type 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -621,11 +628,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > JINJA block type > legacy prompt variant > getNodeFile for JINJA block type 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -699,12 +707,13 @@ exports[`InlinePromptNode > JINJA block type > reject on error enabled > getNode
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @TryNode.wrap()
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -770,11 +779,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > RICH_TEXT block type > basic > getNodeFile for RICH_TEXT block type 1`] = `
 "from vellum import PlainTextPromptBlock, PromptParameters, RichTextPromptBlock
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""Hello World!""")]),
@@ -840,11 +850,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > RICH_TEXT block type > legacy prompt variant > getNodeFile for RICH_TEXT block type 1`] = `
 "from vellum import PlainTextPromptBlock, PromptParameters, RichTextPromptBlock
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""Hello World!""")]),
@@ -918,12 +929,13 @@ exports[`InlinePromptNode > RICH_TEXT block type > reject on error enabled > get
 "from vellum import PlainTextPromptBlock, PromptParameters, RichTextPromptBlock
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @TryNode.wrap()
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""Hello World!""")]),
@@ -989,11 +1001,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > VARIABLE block type > basic > getNodeFile for VARIABLE block type 1`] = `
 "from vellum import PromptParameters, VariablePromptBlock
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         VariablePromptBlock(input_variable="text"),
@@ -1059,11 +1072,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > VARIABLE block type > legacy prompt variant > getNodeFile for VARIABLE block type 1`] = `
 "from vellum import PromptParameters, VariablePromptBlock
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         VariablePromptBlock(input_variable="text"),
@@ -1137,12 +1151,13 @@ exports[`InlinePromptNode > VARIABLE block type > reject on error enabled > getN
 "from vellum import PromptParameters, VariablePromptBlock
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @TryNode.wrap()
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         VariablePromptBlock(input_variable="text"),
@@ -1166,11 +1181,12 @@ class PromptNode(InlinePromptNode):
 
 exports[`InlinePromptNode > basic with custom, same module, base > getNodeFile 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
+from vellum.workflows.state import BaseState
 
 from .my_inline_prompt import MyInlinePrompt
 
 
-class PromptNode(MyInlinePrompt):
+class PromptNode(MyInlinePrompt[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -1196,7 +1212,7 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 from ..state import State
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[State]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -1221,11 +1237,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > basic with stream setting false > getNodeFile 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters, PromptSettings
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -1251,11 +1268,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > basic with undefined template > should generate node file 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(state="DISABLED", template=""),
@@ -1280,11 +1298,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > should generate cache config correctly 1`] = `
 "from vellum import EphemeralPromptCacheConfig, JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(
@@ -1312,11 +1331,12 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptNode > should generate prompt parameters correctly 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -1390,11 +1410,12 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > with ml model node attribute defined > getNodeFile 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),

@@ -135,10 +135,11 @@ exports[`WorkflowProjectGenerator > adornments > should correctly generate code 
 )
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 
 @RetryNode.wrap(max_attempts=5)
-class Prompt(InlinePromptNode):
+class Prompt(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(
@@ -181,11 +182,12 @@ exports[`WorkflowProjectGenerator > adornments > should correctly generate defau
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 
 @TryNode.wrap()
 @RetryNode.wrap(max_attempts=1)
-class Prompt(InlinePromptNode):
+class Prompt(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = []
     parameters = PromptParameters(
@@ -207,10 +209,11 @@ exports[`WorkflowProjectGenerator > adornments > should correctly handle error c
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 
 @TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW, custom_message="This is a regular string")
-class Prompt(InlinePromptNode):
+class Prompt(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = []
     parameters = PromptParameters(
@@ -232,10 +235,11 @@ exports[`WorkflowProjectGenerator > adornments > should generate try adornment n
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.state import BaseState
 
 
 @TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW)
-class Prompt(InlinePromptNode):
+class Prompt(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = []
     parameters = PromptParameters(

@@ -173,9 +173,10 @@ exports[`InlinePromptNode with prompt inputs generating lazy reference > getNode
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
 from vellum.workflows.references import LazyReference
+from vellum.workflows.state import BaseState
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[BaseState]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),

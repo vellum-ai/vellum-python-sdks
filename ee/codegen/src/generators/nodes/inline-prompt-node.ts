@@ -5,6 +5,7 @@ import { isNil } from "lodash";
 import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
+import { BaseState } from "src/generators/base-state";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { FunctionDefinition } from "src/generators/function-definition";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -25,6 +26,28 @@ export class InlinePromptNode extends BaseNode<
   InlinePromptNodeType,
   InlinePromptNodeContext
 > {
+  protected getNodeBaseGenericTypes(): AstNode[] {
+    const [firstStateVariableContext] = Array.from(
+      this.workflowContext.stateVariableContextsById.values()
+    );
+
+    if (firstStateVariableContext) {
+      return [
+        python.Type.reference(
+          python.reference({
+            name: firstStateVariableContext.definition.name,
+            modulePath: firstStateVariableContext.definition.module,
+          })
+        )
+      ];
+    } else {
+      return [
+        new BaseState({
+          workflowContext: this.workflowContext,
+        })
+      ];
+    }
+  }
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
   }
