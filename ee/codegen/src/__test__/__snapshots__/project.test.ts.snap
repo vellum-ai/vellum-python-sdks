@@ -75,7 +75,7 @@ class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
     label = "Second Node"
     node_id = UUID("6bdede82-bcd6-42ab-8f6b-b3988fc6648f")
     output_display = {
-        SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("a3ad3551-f9fd-487d-82fd-fcecf8954d41"), name="output")
+        SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("bd71c32b-0762-4556-a1bc-2c36b15f6428"), name="output")
     }
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
 "
