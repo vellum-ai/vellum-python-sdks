@@ -38,12 +38,14 @@ logger = logging.getLogger(__name__)
 
 def setup_environment_variables():
     """Set up environment variables with staging fallbacks if needed"""
-    if not os.getenv("VELLUM_API_KEY") and os.getenv("STAGING_VELLUM_API_KEY"):
-        os.environ["VELLUM_API_KEY"] = os.getenv("STAGING_VELLUM_API_KEY")
+    staging_api_key = os.getenv("STAGING_VELLUM_API_KEY")
+    if not os.getenv("VELLUM_API_KEY") and staging_api_key:
+        os.environ["VELLUM_API_KEY"] = staging_api_key
         logger.info("Using STAGING_VELLUM_API_KEY as VELLUM_API_KEY")
 
-    if not os.getenv("VELLUM_API_URL") and os.getenv("STAGING_VELLUM_API_URL"):
-        os.environ["VELLUM_API_URL"] = os.getenv("STAGING_VELLUM_API_URL")
+    staging_api_url = os.getenv("STAGING_VELLUM_API_URL")
+    if not os.getenv("VELLUM_API_URL") and staging_api_url:
+        os.environ["VELLUM_API_URL"] = staging_api_url
         logger.info("Using STAGING_VELLUM_API_URL as VELLUM_API_URL")
 
 
