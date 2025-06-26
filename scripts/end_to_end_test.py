@@ -94,14 +94,6 @@ class WorkflowE2ETester:
     def load_workflow_class(self, module_name: str) -> Optional[Type[BaseWorkflow]]:
         """Load a workflow class from a module name"""
         try:
-            current_dir = os.getcwd()
-            examples_dir = os.path.join(current_dir, "examples")
-            workflows_dir = os.path.join(examples_dir, "workflows")
-
-            for path in [current_dir, examples_dir, workflows_dir]:
-                if path not in sys.path:
-                    sys.path.insert(0, path)
-
             return BaseWorkflow.load_from_module(module_name)
         except Exception as e:
             logger.error(f"Failed to load workflow {module_name}: {e}")
@@ -143,7 +135,12 @@ class WorkflowE2ETester:
     def push_workflow_to_vellum(self, workflow_class: Type[BaseWorkflow]) -> bool:
         """Push workflow to Vellum"""
         try:
-            logger.info(f"Pushing workflow {workflow_class.__name__} to Vellum")
+            from ee.vellum_cli.push import push_command
+
+            module_name = workflow_class.__module__
+            logger.info(f"Pushing workflow {workflow_class.__name__} (module: {module_name}) to Vellum")
+
+            push_command(module=module_name)
             return True
         except Exception as e:
             logger.error(f"Failed to push workflow to Vellum: {e}")
