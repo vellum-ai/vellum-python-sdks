@@ -15,9 +15,9 @@ from ...nodes.guardrail_node import GuardrailNode
 
 
 class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
-    target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
     label = "Guardrail Node"
     node_id = UUID("metric")
+    target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
     node_input_ids_by_name = {
         "metric_inputs.expected": UUID("3f917af8-03a4-4ca4-8d40-fa662417fe9c"),
         "metric_inputs.actual": UUID("bed55ada-923e-46ef-8340-1a5b0b563dc1"),
@@ -55,9 +55,9 @@ from ...nodes.guardrail_node import GuardrailNode
 
 
 class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
-    target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
     label = "Guardrail Node"
     node_id = UUID("metric")
+    target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
     node_input_ids_by_name = {
         "metric_inputs.expected": UUID("3f917af8-03a4-4ca4-8d40-fa662417fe9c"),
         "metric_inputs.actual": UUID("bed55ada-923e-46ef-8340-1a5b0b563dc1"),
@@ -143,9 +143,9 @@ from ...nodes.guardrail_node import GuardrailNode
     error_output_id=UUID("38361ff1-c826-49b8-aa8d-28179c3684cc"),
 )
 class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
-    target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
     label = "Guardrail Node"
     node_id = UUID("metric")
+    target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
     node_input_ids_by_name = {
         "metric_inputs.expected": UUID("3f917af8-03a4-4ca4-8d40-fa662417fe9c"),
         "metric_inputs.actual": UUID("bed55ada-923e-46ef-8340-1a5b0b563dc1"),

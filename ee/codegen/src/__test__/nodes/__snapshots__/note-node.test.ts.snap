@@ -10,14 +10,14 @@ from ...nodes.note_node import NoteNode
 
 
 class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):
+    label = "Note Node"
+    node_id = UUID("<note-node-id>")
     text = "This is a note"
     style = {
         "color": "red",
         "fontSize": 12,
         "fontWeight": "bold",
     }
-    label = "Note Node"
-    node_id = UUID("<note-node-id>")
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0), width=None, height=None
     )

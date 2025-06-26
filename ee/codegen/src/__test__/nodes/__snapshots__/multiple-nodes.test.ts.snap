@@ -57,6 +57,8 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
         0: UUID("63345ab5-1a4d-48a1-ad33-91bec41f92a5"),
@@ -84,8 +86,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
         ConditionId(id="ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60", rule_group_id=None),
     ]
-    label = "Conditional Node"
-    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(
             "2cb6582e-c329-4952-8598-097830b766c7"
@@ -131,9 +131,9 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {
         "inputs.text": UUID("9feb7b5e-5947-496d-b56f-1e2627730796"),
         "template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616"),
@@ -211,9 +211,9 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {
         "inputs.text": UUID("9feb7b5e-5947-496d-b56f-1e2627730796"),
         "template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616"),
@@ -263,6 +263,8 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
         0: UUID("63345ab5-1a4d-48a1-ad33-91bec41f92a5"),
@@ -290,8 +292,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
         ConditionId(id="ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60", rule_group_id=None),
     ]
-    label = "Conditional Node"
-    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(
             "2cb6582e-c329-4952-8598-097830b766c7"
@@ -323,6 +323,8 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
         0: UUID("63345ab5-1a4d-48a1-ad33-91bec41f92a5"),
@@ -350,8 +352,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
         ConditionId(id="ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60", rule_group_id=None),
     ]
-    label = "Conditional Node"
-    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(
             "2cb6582e-c329-4952-8598-097830b766c7"
@@ -383,6 +383,8 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
+    label = "Conditional Node"
+    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
         0: UUID("63345ab5-1a4d-48a1-ad33-91bec41f92a5"),
@@ -410,8 +412,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
         ConditionId(id="ea63ccd5-3fe3-4371-ba3c-6d3ec7ca2b60", rule_group_id=None),
     ]
-    label = "Conditional Node"
-    node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     node_input_ids_by_name = {
         "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field": UUID(
             "2cb6582e-c329-4952-8598-097830b766c7"

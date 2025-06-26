@@ -8,9 +8,9 @@ from .....nodes.subworkflow_node.nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    target_handle_id = UUID("d2e2e4e4-a2a4-4a5d-a8fa-d51a1f9d9818")
     label = "Search Node"
     node_id = UUID("e413adc6-40f8-4772-8b28-769954d68d26")
+    target_handle_id = UUID("d2e2e4e4-a2a4-4a5d-a8fa-d51a1f9d9818")
     node_input_ids_by_name = {
         "query": UUID("73c73ee1-3310-4376-8546-86c13de8ff15"),
         "document_index_id": UUID("eb40b4bd-2fe8-4f8b-868f-494679952220"),

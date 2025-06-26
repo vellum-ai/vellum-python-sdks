@@ -8,9 +8,9 @@ from ...nodes.subworkflow_node import SubworkflowNode
 
 
 class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNode]):
-    target_handle_id = UUID("d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2")
     label = "Subworkflow Node"
     node_id = UUID("ddb58eb1-f089-4bb0-b4b9-f630411c0acf")
+    target_handle_id = UUID("d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2")
     node_input_ids_by_name = {"subworkflow_inputs.chat_history": UUID("76519b3c-285d-425d-ba7a-ce7300e4ed9c")}
     output_display = {
         SubworkflowNode.Outputs.chat_history: NodeOutputDisplay(

@@ -16,9 +16,9 @@ from ...nodes.prompt_deployment_node import PromptDeploymentNode
 class PromptDeploymentNodeDisplay(
     BasePromptDeploymentNodeDisplay[PromptDeploymentNode]
 ):
-    target_handle_id = UUID("e1f8a351-ab12-4167-93ee-d2dd72c8d15c")
     label = "Prompt Deployment Node"
     node_id = UUID("947cc337-9a53-4c12-9a38-4f65c04c6317")
+    target_handle_id = UUID("e1f8a351-ab12-4167-93ee-d2dd72c8d15c")
     output_display = {
         PromptDeploymentNode.Outputs.text: NodeOutputDisplay(
             id=UUID("fa015382-7e5b-404e-b073-1c5f01832169"), name="text"
@@ -112,9 +112,9 @@ from ...nodes.prompt_deployment_node import PromptDeploymentNode
 class PromptDeploymentNodeDisplay(
     BasePromptDeploymentNodeDisplay[PromptDeploymentNode]
 ):
-    target_handle_id = UUID("e1f8a351-ab12-4167-93ee-d2dd72c8d15c")
     label = "Prompt Deployment Node"
     node_id = UUID("947cc337-9a53-4c12-9a38-4f65c04c6317")
+    target_handle_id = UUID("e1f8a351-ab12-4167-93ee-d2dd72c8d15c")
     output_display = {
         PromptDeploymentNode.Outputs.text: NodeOutputDisplay(
             id=UUID("fa015382-7e5b-404e-b073-1c5f01832169"), name="text"

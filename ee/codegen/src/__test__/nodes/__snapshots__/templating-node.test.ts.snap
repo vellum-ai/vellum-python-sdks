@@ -14,9 +14,9 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {"template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
     output_display = {
         TemplatingNode.Outputs.result: NodeOutputDisplay(
@@ -59,9 +59,9 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {"template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
     output_display = {
         TemplatingNode.Outputs.result: NodeOutputDisplay(
@@ -105,9 +105,9 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {"template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
     output_display = {
         TemplatingNode.Outputs.result: NodeOutputDisplay(
@@ -162,9 +162,9 @@ from ...nodes.templating_node import TemplatingNode
     error_output_id=UUID("e7a1fbea-f5a7-4b31-a9ff-0d26c3de021f"),
 )
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
+    target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {"template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}
     output_display = {
         TemplatingNode.Outputs.result: NodeOutputDisplay(

@@ -14,11 +14,11 @@ from ...nodes.code_execution_node import CodeExecutionNode
 
 
 class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
+    label = "Code Execution Node"
+    node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
     output_id = UUID("81b270c0-4deb-4db3-aae5-138f79531b2b")
     log_output_id = UUID("46abb839-400b-4766-997e-9c463b526139")
-    label = "Code Execution Node"
-    node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     node_input_ids_by_name = {
         "code": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc"),
         "runtime": UUID("c38a71f6-3ffb-45fa-9eea-93c6984a9e3e"),
@@ -229,10 +229,10 @@ from ...nodes.code_execution_node import CodeExecutionNode
 
 
 class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
-    target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
-    output_id = UUID("81b270c0-4deb-4db3-aae5-138f79531b2b")
     label = "Code Execution Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
+    target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
+    output_id = UUID("81b270c0-4deb-4db3-aae5-138f79531b2b")
     node_input_ids_by_name = {
         "code": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc"),
         "runtime": UUID("c38a71f6-3ffb-45fa-9eea-93c6984a9e3e"),

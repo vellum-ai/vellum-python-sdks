@@ -15,9 +15,9 @@ from .workflow import *
 
 
 class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
-    target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     label = "Map Node"
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
+    target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     node_input_ids_by_name = {"items": UUID("f34872c2-5c0e-45a3-b204-3af22d1028d3")}
     output_display = {
         MapNode.Outputs.final_output: NodeOutputDisplay(
@@ -74,9 +74,9 @@ from .workflow import *
 
 
 class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
-    target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     label = "Map Node"
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
+    target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     node_input_ids_by_name = {"items": UUID("f34872c2-5c0e-45a3-b204-3af22d1028d3")}
     output_display = {
         MapNode.Outputs.first_output: NodeOutputDisplay(

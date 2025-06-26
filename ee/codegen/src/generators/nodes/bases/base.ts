@@ -605,10 +605,6 @@ export abstract class BaseNode<
       decorators: decorators.length > 0 ? decorators : undefined,
     });
 
-    this.getNodeDisplayClassBodyStatements().forEach((statement) =>
-      nodeClass.add(statement)
-    );
-
     nodeClass.add(
       python.field({
         name: "label",
@@ -621,6 +617,10 @@ export abstract class BaseNode<
         name: "node_id",
         initializer: python.TypeInstantiation.uuid(this.nodeData.id),
       })
+    );
+
+    this.getNodeDisplayClassBodyStatements().forEach((statement) =>
+      nodeClass.add(statement)
     );
 
     if (this.nodeInputsByKey.size > 0) {

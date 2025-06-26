@@ -8,9 +8,9 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    target_handle_id = UUID("62e924f8-3f80-475f-b6f0-bda3420a50bc")
     label = "Templating Node"
     node_id = UUID("d0538e54-b623-4a71-a5cd-24b1ed5ce223")
+    target_handle_id = UUID("62e924f8-3f80-475f-b6f0-bda3420a50bc")
     node_input_ids_by_name = {
         "inputs.example_var_1": UUID("5e8396fe-1803-405f-ab1b-95132b592552"),
         "template": UUID("e7904d49-cb35-4bc8-8dd6-3c8e243353d2"),

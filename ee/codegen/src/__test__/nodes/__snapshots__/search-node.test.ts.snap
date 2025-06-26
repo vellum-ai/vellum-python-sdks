@@ -52,6 +52,8 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
+    label = "Search Node"
+    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
@@ -61,8 +63,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             "c539a2e2-0873-43b0-ae21-81790bb1c4cb"
         ),
     }
-    label = "Search Node"
-    node_id = UUID("search")
     node_input_ids_by_name = {
         "query": UUID("f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a"),
         "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
@@ -196,6 +196,8 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
+    label = "Search Node"
+    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("500ce391-ee26-4588-a5a0-2dfa6b70add5"): UUID(
@@ -214,8 +216,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             "4f88fdee-4bee-40d8-a998-bbbc7255029c"
         ),
     }
-    label = "Search Node"
-    node_id = UUID("search")
     node_input_ids_by_name = {
         "query": UUID("f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a"),
         "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
@@ -310,6 +310,8 @@ from ...nodes.search_node import SearchNode
     error_output_id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"),
 )
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
+    label = "Search Node"
+    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
@@ -319,8 +321,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             "c539a2e2-0873-43b0-ae21-81790bb1c4cb"
         ),
     }
-    label = "Search Node"
-    node_id = UUID("search")
     node_input_ids_by_name = {
         "query": UUID("f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a"),
         "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
@@ -414,6 +414,8 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
+    label = "Search Node"
+    node_id = UUID("search")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {
         UUID("a6322ca2-8b65-4d26-b3a1-f926dcada0fa"): UUID(
@@ -423,8 +425,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             "c539a2e2-0873-43b0-ae21-81790bb1c4cb"
         ),
     }
-    label = "Search Node"
-    node_id = UUID("search")
     node_input_ids_by_name = {
         "query": UUID("f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a"),
         "weights": UUID("1daf3180-4b92-472a-8665-a7703c84a94e"),
@@ -511,10 +511,10 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
-    metadata_filter_input_id_by_operand_id = {}
     label = "Search Node"
     node_id = UUID("search")
+    target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
+    metadata_filter_input_id_by_operand_id = {}
     node_input_ids_by_name = {
         "query": UUID("2f5bc81d-6ee8-4101-9a55-4ddeae954425"),
         "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
@@ -564,10 +564,10 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
-    metadata_filter_input_id_by_operand_id = {}
     label = "Search Node"
     node_id = UUID("search")
+    target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
+    metadata_filter_input_id_by_operand_id = {}
     node_input_ids_by_name = {
         "query": UUID("2f5bc81d-6ee8-4101-9a55-4ddeae954425"),
         "document_index_id": UUID("b49bc1ab-2ad5-4cf2-8966-5cc87949900d"),
