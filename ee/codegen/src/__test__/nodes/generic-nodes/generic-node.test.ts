@@ -46,7 +46,10 @@ describe("GenericNode", () => {
           id: "2544f9e4-d6e6-4475-b6a9-13393115d77c",
         }),
       ];
-      const nodeData = genericNodeFactory({ nodePorts: nodePortData });
+      const nodeData = genericNodeFactory({
+        nodePorts: nodePortData,
+        id: "9dc95b5d-1467-4b17-abb0-449d1aac6aec",
+      });
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -123,6 +126,7 @@ describe("GenericNode", () => {
       ];
 
       const nodeData = genericNodeFactory({
+        id: "bed8d22e-4835-41d9-ad81-e78a4b0e7ae0",
         label: "MyCustomNode",
         nodeAttributes: nodeAttributes,
         nodePorts: nodePortData,
@@ -307,6 +311,7 @@ describe("GenericNode", () => {
       ];
 
       const nodeData = genericNodeFactory({
+        id: "75ce71d3-d50b-4c8f-9b38-eee8c8362a92",
         label: "MyCustomNode",
         adornments: adornments,
         nodePorts: nodePortData,
