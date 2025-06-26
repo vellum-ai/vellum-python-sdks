@@ -127,10 +127,9 @@ class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
 
 exports[`InlineSubworkflowNode > name collision > should handle subworkflow with same name as internal node 3`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode
-from vellum.workflows.state import BaseState
 
 
-class MyNode1(TemplatingNode[BaseState, str]):
+class MyNode1(TemplatingNode[str]):
     template = """Hello, World!"""
     inputs = {}
 "

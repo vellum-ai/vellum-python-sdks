@@ -6,12 +6,11 @@ from vellum import (
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 from .api_node import APINode
 
 
-class PromptNode18(InlinePromptNode[BaseState]):
+class PromptNode18(InlinePromptNode):
     ml_model = "claude-3-5-sonnet-20241022"
     blocks = [
         ChatMessagePromptBlock(

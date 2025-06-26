@@ -1,9 +1,8 @@
 from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, PromptParameters, RichTextPromptBlock
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 
-class PromptNode19(InlinePromptNode[BaseState]):
+class PromptNode19(InlinePromptNode):
     ml_model = "gpt-4o-2024-05-13"
     blocks = [
         ChatMessagePromptBlock(

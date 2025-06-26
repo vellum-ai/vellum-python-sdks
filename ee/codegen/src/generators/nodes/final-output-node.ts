@@ -3,7 +3,6 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
-import { BaseState } from "src/generators/base-state";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
@@ -14,15 +13,11 @@ export class FinalOutputNode extends BaseNode<
   FinalOutputNodeContext
 > {
   protected getNodeBaseGenericTypes(): AstNode[] {
-    const baseStateClassReference = new BaseState({
-      workflowContext: this.workflowContext,
-    });
-
+    const baseTypes = super.getNodeBaseGenericTypes() || [];
     const primitiveOutputType = getVellumVariablePrimitiveType(
       this.nodeData.data.outputType
     );
-
-    return [baseStateClassReference, primitiveOutputType];
+    return [...baseTypes, primitiveOutputType];
   }
 
   getNodeClassBodyStatements(): AstNode[] {

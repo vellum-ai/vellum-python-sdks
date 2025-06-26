@@ -1,7 +1,6 @@
 from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     template = """Hello, world!"""
     inputs = {}

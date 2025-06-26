@@ -135,11 +135,10 @@ exports[`WorkflowProjectGenerator > adornments > should correctly generate code 
 )
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 
 @RetryNode.wrap(max_attempts=5)
-class Prompt(InlinePromptNode[BaseState]):
+class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(
@@ -182,12 +181,11 @@ exports[`WorkflowProjectGenerator > adornments > should correctly generate defau
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 
 @TryNode.wrap()
 @RetryNode.wrap(max_attempts=1)
-class Prompt(InlinePromptNode[BaseState]):
+class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
     parameters = PromptParameters(
@@ -209,11 +207,10 @@ exports[`WorkflowProjectGenerator > adornments > should correctly handle error c
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 
 @TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW, custom_message="This is a regular string")
-class Prompt(InlinePromptNode[BaseState]):
+class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
     parameters = PromptParameters(
@@ -235,11 +232,10 @@ exports[`WorkflowProjectGenerator > adornments > should generate try adornment n
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 
 @TryNode.wrap(on_error_code=WorkflowErrorCode.INVALID_WORKFLOW)
-class Prompt(InlinePromptNode[BaseState]):
+class Prompt(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
     parameters = PromptParameters(
@@ -264,10 +260,9 @@ baz = foo + bar
 
 exports[`WorkflowProjectGenerator > combinator normalization > should normalize AND to OR combinators > code/nodes/final_output.py 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 
-class FinalOutput(FinalOutputNode[BaseState, str]):
+class FinalOutput(FinalOutputNode[str]):
     class Outputs(FinalOutputNode.Outputs):
         value = 3
 "
@@ -275,10 +270,9 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
 
 exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to find invalid ports and target nodes > code/nodes/bad_node.py 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode
-from vellum.workflows.state import BaseState
 
 
-class BadNode(TemplatingNode[BaseState, str]):
+class BadNode(TemplatingNode[str]):
     template = """foo"""
     inputs = {}
 "
@@ -286,10 +280,9 @@ class BadNode(TemplatingNode[BaseState, str]):
 
 exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to generate > code/nodes/bad_node.py 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode
-from vellum.workflows.state import BaseState
 
 
-class BadNode(TemplatingNode[BaseState, str]):
+class BadNode(TemplatingNode[str]):
     template = """foo"""
     inputs = {}
 "
@@ -470,12 +463,11 @@ __all__ = [
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/final_output.py 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
-class FinalOutput(FinalOutputNode[BaseState, str]):
+class FinalOutput(FinalOutputNode[str]):
     class Outputs(FinalOutputNode.Outputs):
         value = Inputs.city
 "
@@ -483,12 +475,11 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/final_output_1.py 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 from .tool_call_get_current_weather_node import GetCurrentWeatherNode
 
 
-class FinalOutput1(FinalOutputNode[BaseState, str]):
+class FinalOutput1(FinalOutputNode[str]):
     class Outputs(FinalOutputNode.Outputs):
         value = GetCurrentWeatherNode.Outputs.text
 "
@@ -499,12 +490,11 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 
 from vellum import ChatMessage
 from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 from .tool_call_get_current_weather_node import GetCurrentWeatherNode
 
 
-class FinalOutput2(FinalOutputNode[BaseState, List[ChatMessage]]):
+class FinalOutput2(FinalOutputNode[List[ChatMessage]]):
     class Outputs(FinalOutputNode.Outputs):
         value = GetCurrentWeatherNode.Outputs.chat_history
 "
@@ -592,12 +582,11 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from typing import Union
 
 from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 from .tool_call_start_node import StartNode
 
 
-class FinalOutput3(FinalOutputNode[BaseState, Union[float, int]]):
+class FinalOutput3(FinalOutputNode[Union[float, int]]):
     class Outputs(FinalOutputNode.Outputs):
         value = StartNode.Outputs.temperature
 "
@@ -605,12 +594,11 @@ class FinalOutput3(FinalOutputNode[BaseState, Union[float, int]]):
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/final_output_1.py 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 from .tool_call_start_node import StartNode
 
 
-class FinalOutput4(FinalOutputNode[BaseState, str]):
+class FinalOutput4(FinalOutputNode[str]):
     class Outputs(FinalOutputNode.Outputs):
         value = StartNode.Outputs.reasoning
 "
@@ -734,10 +722,9 @@ runner.run()
 
 exports[`WorkflowProjectGenerator > initialization case > should handle workflow with only ENTRYPOINT and TERMINAL nodes > code/nodes/final_output.py 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 
-class FinalOutput(FinalOutputNode[BaseState, str]):
+class FinalOutput(FinalOutputNode[str]):
     class Outputs(FinalOutputNode.Outputs):
         pass
 "
@@ -745,10 +732,9 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
 
 exports[`WorkflowProjectGenerator > modules > should generate code in the same module as the project > my/module/nodes/templating_node.py 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     template = """foo"""
     inputs = {}
 "
@@ -756,12 +742,11 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 
 exports[`WorkflowProjectGenerator > nodes with output values > should prioritize terminal node data over output values > code/nodes/final_output.py 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
-from vellum.workflows.state import BaseState
 
 from .templating_node import TemplatingNode
 
 
-class FinalOutput(FinalOutputNode[BaseState, str]):
+class FinalOutput(FinalOutputNode[str]):
     class Outputs(FinalOutputNode.Outputs):
         value = TemplatingNode.Outputs.result
 "
@@ -780,10 +765,9 @@ class Workflow(BaseWorkflow):
 
 exports[`WorkflowProjectGenerator > should escape special characters > should handle node comments with quotes at the beginning and end > code/nodes/templating_node.py 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     """\\"Hello" "World\\""""
 
     template = """test template"""
@@ -793,10 +777,9 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 
 exports[`WorkflowProjectGenerator > should escape special characters > should not escape single quotes in node comments > code/nodes/templating_node.py 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     """'Hello' 'World'"""
 
     template = """test template"""

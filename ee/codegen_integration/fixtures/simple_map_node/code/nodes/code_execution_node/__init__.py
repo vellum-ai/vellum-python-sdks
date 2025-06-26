@@ -1,10 +1,9 @@
 from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
-from vellum.workflows.state import BaseState
 
 from ...inputs import Inputs
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {
         "arg1": Inputs.test,

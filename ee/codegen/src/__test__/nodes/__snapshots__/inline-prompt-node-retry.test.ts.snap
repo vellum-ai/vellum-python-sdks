@@ -49,13 +49,12 @@ exports[`InlinePromptRetryNode > basic > getNodeFile 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @RetryNode.wrap(max_attempts=3)
-class PromptNode(InlinePromptNode[BaseState]):
+class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -132,14 +131,13 @@ exports[`InlinePromptRetryNode > basic retry adornment and try adornment > getNo
 from vellum.workflows.nodes.core import TryNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @RetryNode.wrap(max_attempts=3, delay=2)
 @TryNode.wrap()
-class PromptNode(InlinePromptNode[BaseState]):
+class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -210,13 +208,12 @@ exports[`InlinePromptRetryNode > basic retry adornment with delay > getNodeFile 
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 from ..inputs import Inputs
 
 
 @RetryNode.wrap(max_attempts=3, delay=2)
-class PromptNode(InlinePromptNode[BaseState]):
+class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),

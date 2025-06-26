@@ -48,10 +48,9 @@ exports[`CodeExecutionNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -65,10 +64,9 @@ exports[`CodeExecutionNode > basic representation > should accept int and float 
 from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, Union[float, int]]):
+class CodeExecutionNode(BaseCodeExecutionNode[Union[float, int]]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -81,10 +79,9 @@ exports[`CodeExecutionNode > basic secret node > secret ids should show names 1`
     CodeExecutionNode as BaseCodeExecutionNode,
 )
 from vellum.workflows.references import VellumSecretReference
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {
         "secret_arg": VellumSecretReference("test-secret"),
@@ -99,10 +96,9 @@ exports[`CodeExecutionNode > basic secret node > should be resilient to invalid 
     CodeExecutionNode as BaseCodeExecutionNode,
 )
 from vellum.workflows.references import VellumSecretReference
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {
         "secret_arg": VellumSecretReference("5678"),
@@ -118,10 +114,9 @@ exports[`CodeExecutionNode > basic with ports > with ports referencing current n
 )
 from vellum.workflows.ports import Port
 from vellum.workflows.references import LazyReference
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -142,12 +137,11 @@ exports[`CodeExecutionNode > basic with ports > with ports referencing upstream 
     CodeExecutionNode as BaseCodeExecutionNode,
 )
 from vellum.workflows.ports import Port
-from vellum.workflows.state import BaseState
 
 from .upstream_code_node import UpstreamCodeNode
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -161,10 +155,9 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 
 exports[`CodeExecutionNode > code representation: Base case > should generate the correct node class 1`] = `
 "from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -174,10 +167,9 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 
 exports[`CodeExecutionNode > code representation: Escaped case > should generate the correct node class 1`] = `
 "from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -189,10 +181,9 @@ exports[`CodeExecutionNode > failure cases > fallback to python 3.11.6 if runtim
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -204,10 +195,9 @@ exports[`CodeExecutionNode > failure cases > fallback to python 3.11.6 if runtim
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -259,10 +249,9 @@ exports[`CodeExecutionNode > with runtime set > should generate the correct stan
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
@@ -274,10 +263,9 @@ exports[`CodeExecutionNode > with runtime set > should generate the correct stan
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
 )
-from vellum.workflows.state import BaseState
 
 
-class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+class CodeExecutionNode(BaseCodeExecutionNode[str]):
     filepath = "./script.ts"
     code_inputs = {}
     runtime = "TYPESCRIPT_5_3_3"

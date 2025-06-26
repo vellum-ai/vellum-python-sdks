@@ -30,12 +30,11 @@ class ConditionalNode(BaseConditionalNode):
 
 exports[`InlinePromptNode json output referenced by TemplatingNode > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 from .prompt_node import PromptNode
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     template = """{{ output[0].type }}"""
     inputs = {
         "var_1": PromptNode.Outputs.json,
@@ -156,12 +155,11 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
 
 exports[`InlinePromptNode referenced by Templating Node > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 from .prompt_node import PromptNode
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     template = """{{ output[0].type }}"""
     inputs = {
         "text": PromptNode.Outputs.text,
@@ -173,10 +171,9 @@ exports[`InlinePromptNode with prompt inputs generating lazy reference > getNode
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
 from vellum.workflows.references import LazyReference
-from vellum.workflows.state import BaseState
 
 
-class PromptNode(InlinePromptNode[BaseState]):
+class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
@@ -237,12 +234,11 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
 
 exports[`Non-existent Subworkflow Deployment Node referenced by Templating Node > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 from .prompt_node import PromptNode
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     template = """{{ output[0].type }}"""
     inputs = {
         "text": PromptNode.Outputs.text,
@@ -474,12 +470,11 @@ class ConditionalNode(BaseConditionalNode):
 
 exports[`PromptDeploymentNode json output referenced by TemplatingNode > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
-from vellum.workflows.state import BaseState
 
 from .prompt_deployment_node import PromptDeploymentNode
 
 
-class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+class TemplatingNode(BaseTemplatingNode[str]):
     template = """{{ var_1.type }}"""
     inputs = {
         "var_1": PromptDeploymentNode.Outputs.json,

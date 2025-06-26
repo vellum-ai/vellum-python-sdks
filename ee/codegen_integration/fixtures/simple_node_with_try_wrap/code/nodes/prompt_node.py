@@ -7,11 +7,10 @@ from vellum import (
 )
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 
 @TryNode.wrap()
-class PromptNode(InlinePromptNode[BaseState]):
+class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(

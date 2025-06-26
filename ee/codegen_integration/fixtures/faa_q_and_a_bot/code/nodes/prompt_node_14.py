@@ -6,12 +6,11 @@ from vellum import (
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 from .subworkflow_node import SubworkflowNode
 
 
-class PromptNode14(InlinePromptNode[BaseState]):
+class PromptNode14(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(

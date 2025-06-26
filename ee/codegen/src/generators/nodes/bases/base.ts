@@ -95,6 +95,21 @@ export abstract class BaseNode<
 
   // Override if the node implementation's base class needs to include generic types
   protected getNodeBaseGenericTypes(): AstNode[] | undefined {
+    const [firstStateVariableContext] = Array.from(
+      this.workflowContext.stateVariableContextsById.values()
+    );
+
+    if (firstStateVariableContext) {
+      return [
+        python.Type.reference(
+          python.reference({
+            name: firstStateVariableContext.definition.name,
+            modulePath: firstStateVariableContext.definition.module,
+          })
+        ),
+      ];
+    }
+
     return undefined;
   }
 
