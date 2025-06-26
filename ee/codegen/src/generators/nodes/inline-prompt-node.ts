@@ -38,13 +38,13 @@ export class InlinePromptNode extends BaseNode<
             name: firstStateVariableContext.definition.name,
             modulePath: firstStateVariableContext.definition.module,
           })
-        )
+        ),
       ];
     } else {
       return [
         new BaseState({
           workflowContext: this.workflowContext,
-        })
+        }),
       ];
     }
   }
