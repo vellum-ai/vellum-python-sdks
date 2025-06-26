@@ -82,6 +82,16 @@
       "target_directory": null
     },
     {
+      "module": "mcp_demo",
+      "workflow_sandbox_id": "f530e95a-c752-4c17-bbfc-309eed234502",
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": "sdk-examples-utils",
+      "container_image_tag": "1.0.8",
+      "workspace": "default",
+      "target_directory": null
+    },
+    {
       "module": "re_act_agent",
       "workflow_sandbox_id": "1ae53c7b-f95d-4d5c-a13e-697f5183a9fc",
       "ignore": "sandbox.py",
@@ -125,16 +135,6 @@
       "module": "trust_center_q_a",
       "workflow_sandbox_id": "f0662f3a-af4f-44a8-85c4-eefe0a1c1c3a",
       "ignore": "sandbox.py",
-      "deployments": [],
-      "container_image_name": null,
-      "container_image_tag": null,
-      "workspace": "default",
-      "target_directory": null
-    },
-    {
-      "module": "mcp_demo",
-      "workflow_sandbox_id": "f530e95a-c752-4c17-bbfc-309eed234502",
-      "ignore": null,
       "deployments": [],
       "container_image_name": null,
       "container_image_tag": null,
