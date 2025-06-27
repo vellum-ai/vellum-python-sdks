@@ -96,7 +96,7 @@ def test_serialize_workflow(vellum_client):
                 "value": [
                     {
                         "type": "WORKFLOW_DEPLOYMENT",
-                        "name": "deployment_1",
+                        "name": "test-name",
                         "description": "test-description",
                         "deployment": "deployment_1",
                         "release_tag": "LATEST",
