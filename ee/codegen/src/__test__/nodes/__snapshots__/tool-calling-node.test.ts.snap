@@ -81,7 +81,7 @@ from vellum.workflows.types.definition import DeploymentDefinition
 
 
 class ToolCallingNode(BaseToolCallingNode):
-    functions = [DeploymentDefinition(deployment="deployment_1")]
+    functions = [DeploymentDefinition(deployment="deployment_workflow_function_name")]
 "
 `;
 
