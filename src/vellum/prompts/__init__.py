@@ -1,3 +1,3 @@
-from .blocks import BasicSystemMessage, BasicUserMessage
+from .blocks import TextSystemMessage, TextUserMessage
 
-__all__ = ["BasicSystemMessage", "BasicUserMessage"]
+__all__ = ["TextSystemMessage", "TextUserMessage"]
