@@ -139,7 +139,8 @@ export class InlinePromptNode extends BaseNode<
       (attr) => attr.name === "functions"
     );
 
-    if (functionsAttribute) {
+    if (functionsAttribute && functionsAttribute.value?.type !== "CONSTANT_VALUE" ||
+        (functionsAttribute?.value?.type === "CONSTANT_VALUE" && functionsAttribute.value.value?.value !== null)) {
       statements.push(
         python.field({
           name: "functions",
