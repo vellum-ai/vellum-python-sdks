@@ -42,4 +42,10 @@ export const NODE_ATTRIBUTES: Record<
       type: AttributeType.Functions,
     },
   },
+  InlinePromptNode: {
+    functions: {
+      defaultValue: null,
+      type: AttributeType.Functions,
+    },
+  },
 };
