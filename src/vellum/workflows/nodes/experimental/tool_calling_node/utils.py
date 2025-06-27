@@ -253,7 +253,10 @@ def create_function_node(
         # For regular functions, use CodeExecutionNode approach
         # function tool must be put in another file (no need to have the same name)
         source_path = inspect.getmodule(function)
-        function_source = inspect.getsource(source_path)
+        if source_path is not None:
+            function_source = inspect.getsource(source_path)
+        else:
+            function_source = f"<source code not available for {function.__name__}>"
         function_name = function.__name__
 
         code = f'''

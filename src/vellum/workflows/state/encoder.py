@@ -61,11 +61,11 @@ class DefaultStateEncoder(JSONEncoder):
 
         if callable(obj):
             function_definition = compile_function_definition(obj)
-            try:
-                source_path = inspect.getsourcefile(obj)
+            source_path = inspect.getsourcefile(obj)
+            if source_path is not None:
                 with open(source_path, "r") as f:
                     source_code = f.read()
-            except Exception:
+            else:
                 source_code = f"<source code not available for {obj.__name__}>"
 
             return {
