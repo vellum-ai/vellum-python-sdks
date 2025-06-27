@@ -148,13 +148,25 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   break;
                 }
                 case "WORKFLOW_DEPLOYMENT": {
-                  deploymentWorkflowFunctions.push(
-                    f as DeploymentWorkflowFunctionArgs
+                  const workflowDeployment: DeploymentWorkflowFunctionArgs = {
+                    type: "WORKFLOW_DEPLOYMENT",
+                    name: f.name,
+                    description: f.description,
+                    deployment: f.deployment,
+                    release_tag: f.release_tag,
+                  };
+                  deploymentWorkflowFunctions.push(workflowDeployment);
+                  const workflowDeploymentName = toPythonSafeSnakeCase(
+                    workflowDeployment.name ??
+                      workflowDeployment.deployment ??
+                      "workflow_deployment"
                   );
                   const args = [
                     python.methodArgument({
                       name: "deployment",
-                      value: python.TypeInstantiation.str(f.deployment),
+                      value: python.TypeInstantiation.str(
+                        workflowDeploymentName
+                      ),
                     }),
                   ];
 
