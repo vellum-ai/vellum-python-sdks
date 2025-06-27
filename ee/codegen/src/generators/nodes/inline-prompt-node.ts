@@ -343,7 +343,9 @@ export class InlinePromptNode extends BaseNode<
     return this.nodeData.data.errorOutputId;
   }
 
-  private shouldIncludeFunctionsAttribute(functionsAttribute: NodeAttribute): boolean {
+  private shouldIncludeFunctionsAttribute(
+    functionsAttribute: NodeAttribute
+  ): boolean {
     if (
       functionsAttribute.value?.type === "CONSTANT_VALUE" &&
       functionsAttribute.value.value?.type === "JSON" &&
