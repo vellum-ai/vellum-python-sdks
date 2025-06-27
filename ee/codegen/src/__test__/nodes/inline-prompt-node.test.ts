@@ -424,16 +424,14 @@ describe("InlinePromptNode", () => {
   });
 
   describe("with functions attribute", () => {
-    it("should generate functions field with WorkflowValueDescriptor for non-null constant", async () => {
+    it("should generate functions field with WorkflowValueDescriptor for upstream node output", async () => {
       const functionsAttribute: NodeAttributeType = {
         id: uuidv4(),
         name: "functions",
         value: {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "JSON",
-            value: [{ name: "test_function", description: "A test function" }],
-          },
+          type: "NODE_OUTPUT",
+          nodeId: "upstream-node-id",
+          nodeOutputId: "functions-output-id",
         },
       };
 
@@ -455,35 +453,5 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-    it("should not generate functions field for null constant value", async () => {
-      const functionsAttribute: NodeAttributeType = {
-        id: uuidv4(),
-        name: "functions",
-        value: {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "JSON",
-            value: null,
-          },
-        },
-      };
-
-      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
-        .withAttributes([functionsAttribute])
-        .build();
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as InlinePromptNodeContext;
-
-      const node = new InlinePromptNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      node.getNodeFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
   });
 });

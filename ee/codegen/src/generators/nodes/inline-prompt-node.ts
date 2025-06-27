@@ -140,10 +140,7 @@ export class InlinePromptNode extends BaseNode<
       (attr) => attr.name === "functions"
     );
 
-    if (
-      functionsAttribute &&
-      this.shouldIncludeFunctionsAttribute(functionsAttribute)
-    ) {
+    if (functionsAttribute) {
       statements.push(
         python.field({
           name: "functions",
@@ -343,16 +340,4 @@ export class InlinePromptNode extends BaseNode<
     return this.nodeData.data.errorOutputId;
   }
 
-  private shouldIncludeFunctionsAttribute(
-    functionsAttribute: NodeAttribute
-  ): boolean {
-    if (
-      functionsAttribute.value?.type === "CONSTANT_VALUE" &&
-      functionsAttribute.value.value?.type === "JSON" &&
-      functionsAttribute.value.value.value === null
-    ) {
-      return false;
-    }
-    return true;
-  }
 }
