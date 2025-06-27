@@ -42,6 +42,9 @@ file ?= .
 test-raw:
 	poetry run pytest -rEf -s -vv $(file) && echo '"make test-raw" is DEPRECATED. Use "make test" instead'
 
+test-ci:
+	poetry run pytest -rEf -s -vv $(file) --cov --cov-report=html --cov-report=term-missing
+
 
 ################################
 # Linting
