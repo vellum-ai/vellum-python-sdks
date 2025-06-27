@@ -6,6 +6,7 @@ import { beforeEach } from "vitest";
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import {
+  genericNodeFactory,
   inlinePromptNodeDataInlineVariantFactory,
   inlinePromptNodeDataLegacyVariantFactory,
   nodeInputFactory,
@@ -425,6 +426,17 @@ describe("InlinePromptNode", () => {
 
   describe("with functions attribute", () => {
     it("should generate functions field with WorkflowValueDescriptor for upstream node output", async () => {
+      await createNodeContext({
+        workflowContext,
+        nodeData: genericNodeFactory({
+          id: "upstream-node-id",
+          label: "FunctionsProviderNode",
+          nodeOutputs: [
+            { id: "functions-output-id", name: "functions", type: "JSON" },
+          ],
+        }),
+      });
+
       const functionsAttribute: NodeAttributeType = {
         id: uuidv4(),
         name: "functions",
