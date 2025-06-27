@@ -325,12 +325,12 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private getInlineWorkflowFunctionName(
     workflow: InlineWorkflowFunctionArgs
   ): string {
+    if (workflow.name) {
+      return toPythonSafeSnakeCase(workflow.name);
+    }
     const definition = workflow.exec_config.workflowRawData.definition;
     if (definition?.name) {
       return toPythonSafeSnakeCase(definition.name);
-    }
-    if (workflow.name) {
-      return toPythonSafeSnakeCase(`${workflow.name} Workflow`);
     }
     this.workflowContext.addError(
       new NodeDefinitionGenerationError(
