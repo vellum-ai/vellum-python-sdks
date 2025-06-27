@@ -19,7 +19,11 @@ import {
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
-import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
+import {
+  AttributeConfig,
+  AttributeType,
+  NODE_ATTRIBUTES,
+} from "src/generators/nodes/constants";
 import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
@@ -744,27 +748,34 @@ export abstract class BaseNode<
     return undefined;
   }
 
+  protected isAttributeDefault(
+    attributeValue: WorkflowValueDescriptorType | null | undefined,
+    attributeConfig: AttributeConfig
+  ) {
+    if (attributeValue === undefined) {
+      return true;
+    }
+
+    if (attributeValue === null) {
+      return attributeConfig.defaultValue === null;
+    }
+
+    const extractedValue = this.extractConstantValue(attributeValue);
+    return attributeConfig.defaultValue === extractedValue;
+  }
+
   private filterAttribute(
     nodeName: string,
     attributeName: string,
     attributeValue?: WorkflowValueDescriptorType | null
   ): boolean {
-    if (attributeValue === undefined) {
-      return true;
-    }
-
     const nodeConfig = NODE_ATTRIBUTES[nodeName];
     const attrConfig = nodeConfig?.[attributeName];
     if (!attrConfig) {
       return true;
     }
 
-    if (attributeValue === null) {
-      return attrConfig.defaultValue !== null;
-    }
-
-    const extractedValue = this.extractConstantValue(attributeValue);
-    return attrConfig.defaultValue !== extractedValue;
+    return !this.isAttributeDefault(attributeValue, attrConfig);
   }
 
   private extractConstantValue(

@@ -6,6 +6,7 @@ import { beforeEach } from "vitest";
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import {
+  genericNodeFactory,
   inlinePromptNodeDataInlineVariantFactory,
   inlinePromptNodeDataLegacyVariantFactory,
   nodeInputFactory,
@@ -418,6 +419,48 @@ describe("InlinePromptNode", () => {
         workflowContext,
         nodeContext,
       });
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("with functions attribute", () => {
+    it("should generate functions field with WorkflowValueDescriptor for upstream node output", async () => {
+      await createNodeContext({
+        workflowContext,
+        nodeData: genericNodeFactory({
+          id: "upstream-node-id",
+          label: "FunctionsProviderNode",
+          nodeOutputs: [
+            { id: "functions-output-id", name: "functions", type: "JSON" },
+          ],
+        }),
+      });
+
+      const functionsAttribute: NodeAttributeType = {
+        id: uuidv4(),
+        name: "functions",
+        value: {
+          type: "NODE_OUTPUT",
+          nodeId: "upstream-node-id",
+          nodeOutputId: "functions-output-id",
+        },
+      };
+
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
+        .withAttributes([functionsAttribute])
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

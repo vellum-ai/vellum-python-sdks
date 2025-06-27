@@ -135,7 +135,25 @@ export class InlinePromptNode extends BaseNode<
       );
     }
 
-    if (functionDefinitions.length > 0) {
+    const functionsAttribute = this.nodeData.attributes?.find(
+      (attr) => attr.name === "functions"
+    );
+
+    if (
+      functionsAttribute &&
+      !this.isAttributeDefault(functionsAttribute.value, { defaultValue: null })
+    ) {
+      statements.push(
+        python.field({
+          name: "functions",
+          initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+            workflowValueDescriptor: functionsAttribute.value,
+          }),
+        })
+      );
+    } else if (functionDefinitions.length > 0) {
       statements.push(
         python.field({
           name: "functions",
