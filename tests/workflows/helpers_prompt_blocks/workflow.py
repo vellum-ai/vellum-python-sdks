@@ -1,4 +1,4 @@
-from vellum.prompts.blocks import SystemMessage, UserMessage
+from vellum.prompts.blocks import BasicSystemMessage, BasicUserMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable import InlinePromptNode
@@ -13,8 +13,8 @@ class WorkflowInputs(BaseInputs):
 class PromptNodeWithHelpers(InlinePromptNode):
     ml_model = "gpt-4o"
     blocks = [
-        SystemMessage("What color is the item?"),
-        UserMessage("Here is the user query: {{user_query}}"),
+        BasicSystemMessage("What color is the item?"),
+        BasicUserMessage("Here is the user query: {{user_query}}"),
     ]
     prompt_inputs = {
         "user_query": WorkflowInputs.user_query,

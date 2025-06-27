@@ -1,3 +1,3 @@
-from .helpers import SystemMessage, UserMessage
+from .helpers import BasicSystemMessage, BasicUserMessage
 
-__all__ = ["SystemMessage", "UserMessage"]
+__all__ = ["BasicSystemMessage", "BasicUserMessage"]

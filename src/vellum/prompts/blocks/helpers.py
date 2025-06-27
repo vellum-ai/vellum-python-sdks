@@ -1,9 +1,9 @@
 from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock
 
 
-def SystemMessage(content: str) -> ChatMessagePromptBlock:
+def BasicSystemMessage(content: str) -> ChatMessagePromptBlock:
     """
-    Create a system message that autocasts to ChatMessagePromptBlock.
+    Create a basic system message that autocasts to ChatMessagePromptBlock.
 
     Args:
         content: The text content for the system message
@@ -16,9 +16,9 @@ def SystemMessage(content: str) -> ChatMessagePromptBlock:
     )
 
 
-def UserMessage(content: str) -> ChatMessagePromptBlock:
+def BasicUserMessage(content: str) -> ChatMessagePromptBlock:
     """
-    Create a user message that autocasts to ChatMessagePromptBlock.
+    Create a basic user message that autocasts to ChatMessagePromptBlock.
 
     Args:
         content: The text content for the user message
