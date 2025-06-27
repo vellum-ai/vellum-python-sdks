@@ -85,7 +85,6 @@ types-requests = "2.32.0.20240712"
 [tool.pytest.ini_options]
 testpaths = [ "tests" ]
 asyncio_mode = "auto"
-addopts = "--cov --cov-report=html --cov-report=term-missing"
 filterwarnings = [
     "ignore::pytest.PytestCollectionWarning"
 ]
