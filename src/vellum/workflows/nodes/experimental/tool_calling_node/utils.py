@@ -251,7 +251,9 @@ def create_function_node(
         )
     else:
         # For regular functions, use CodeExecutionNode approach
-        function_source = inspect.getsource(function)
+        # function tool must be put in another file (no limit on filename but codegen will generate a file with the same name as the function)
+        source_path = inspect.getmodule(function)
+        function_source = inspect.getsource(source_path)
         function_name = function.__name__
 
         code = f'''
