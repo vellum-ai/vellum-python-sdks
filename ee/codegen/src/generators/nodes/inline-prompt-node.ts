@@ -15,7 +15,6 @@ import {
   FunctionDefinitionPromptTemplateBlock,
   InlinePromptNodeData,
   InlinePromptNode as InlinePromptNodeType,
-  NodeAttribute,
   PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -140,7 +139,10 @@ export class InlinePromptNode extends BaseNode<
       (attr) => attr.name === "functions"
     );
 
-    if (functionsAttribute) {
+    if (
+      functionsAttribute &&
+      !this.isAttributeDefault(functionsAttribute.value, { defaultValue: null })
+    ) {
       statements.push(
         python.field({
           name: "functions",
@@ -339,5 +341,4 @@ export class InlinePromptNode extends BaseNode<
   protected getErrorOutputId(): string | undefined {
     return this.nodeData.data.errorOutputId;
   }
-
 }

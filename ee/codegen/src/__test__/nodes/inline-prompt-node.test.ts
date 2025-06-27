@@ -464,6 +464,5 @@ describe("InlinePromptNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-
   });
 });
