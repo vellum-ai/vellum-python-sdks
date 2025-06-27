@@ -15,6 +15,7 @@ import {
   FunctionDefinitionPromptTemplateBlock,
   InlinePromptNodeData,
   InlinePromptNode as InlinePromptNodeType,
+  NodeAttribute,
   PlainTextPromptTemplateBlock,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -342,7 +343,7 @@ export class InlinePromptNode extends BaseNode<
     return this.nodeData.data.errorOutputId;
   }
 
-  private shouldIncludeFunctionsAttribute(functionsAttribute: any): boolean {
+  private shouldIncludeFunctionsAttribute(functionsAttribute: NodeAttribute): boolean {
     if (
       functionsAttribute.value?.type === "CONSTANT_VALUE" &&
       functionsAttribute.value.value?.type === "JSON" &&
