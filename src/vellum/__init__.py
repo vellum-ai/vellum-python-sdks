@@ -630,7 +630,6 @@ from .resources import (
 )
 from .client import AsyncVellum, Vellum
 from .environment import VellumEnvironment
-from .prompts.blocks.autocasting import SystemMessage, UserMessage
 from .version import __version__
 
 __all__ = [
@@ -1034,7 +1033,6 @@ __all__ = [
     "SubmitWorkflowExecutionActualRequest",
     "SubworkflowNodeResult",
     "SubworkflowNodeResultData",
-    "SystemMessage",
     "TemplatingNodeArrayResult",
     "TemplatingNodeChatHistoryResult",
     "TemplatingNodeErrorResult",
@@ -1136,7 +1134,6 @@ __all__ = [
     "UnitEnum",
     "UploadDocumentResponse",
     "UpsertTestSuiteTestCaseRequest",
-    "UserMessage",
     "VariablePromptBlock",
     "Vellum",
     "VellumAudio",

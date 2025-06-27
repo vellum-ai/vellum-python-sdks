@@ -1,4 +1,4 @@
-from vellum import SystemMessage, UserMessage
+from vellum.prompts.blocks import SystemMessage, UserMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable import InlinePromptNode
