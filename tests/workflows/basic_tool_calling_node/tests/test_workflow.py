@@ -30,7 +30,7 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants impor
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
 
 
-def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client, mock_uuid4_generator):
+def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, mock_uuid4_generator):
     """
     Test that the GetCurrentWeatherWorkflow returns the expected outputs.
     """
