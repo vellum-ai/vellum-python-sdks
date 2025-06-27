@@ -346,14 +346,20 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         }
 
     if isinstance(value, DeploymentDefinition):
+        workflow_deployment_release = display_context.client.release_reviews.retrieve_workflow_deployment_release(
+            value.deployment, value.release_tag
+        )
+        name = workflow_deployment_release.deployment.name or value.deployment
+        description = workflow_deployment_release.description or f"Workflow Deployment for {name}"
+
         return {
             "type": "CONSTANT_VALUE",
             "value": {
                 "type": "JSON",
                 "value": {
                     "type": "WORKFLOW_DEPLOYMENT",
-                    "name": value.deployment,
-                    "description": f"Workflow deployment for {value.deployment}",
+                    "name": name,
+                    "description": description,
                     "deployment": value.deployment,
                     "release_tag": value.release_tag,
                 },
