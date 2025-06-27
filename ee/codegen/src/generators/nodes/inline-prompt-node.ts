@@ -139,8 +139,7 @@ export class InlinePromptNode extends BaseNode<
       (attr) => attr.name === "functions"
     );
 
-    if (functionsAttribute && functionsAttribute.value?.type !== "CONSTANT_VALUE" ||
-        (functionsAttribute?.value?.type === "CONSTANT_VALUE" && functionsAttribute.value.value?.value !== null)) {
+    if (functionsAttribute && this.shouldIncludeFunctionsAttribute(functionsAttribute)) {
       statements.push(
         python.field({
           name: "functions",
@@ -338,5 +337,14 @@ export class InlinePromptNode extends BaseNode<
 
   protected getErrorOutputId(): string | undefined {
     return this.nodeData.data.errorOutputId;
+  }
+
+  private shouldIncludeFunctionsAttribute(functionsAttribute: any): boolean {
+    if (functionsAttribute.value?.type === "CONSTANT_VALUE" &&
+        functionsAttribute.value.value?.type === "JSON" &&
+        functionsAttribute.value.value.value === null) {
+      return false;
+    }
+    return true;
   }
 }
