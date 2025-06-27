@@ -16,13 +16,13 @@ from vellum import (
 )
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
-from tests.workflows.helpers_prompt_blocks.workflow import AutocastingPromptWorkflow, WorkflowInputs
+from tests.workflows.helpers_prompt_blocks.workflow import WorkflowInputs, WorkflowWithPromptBlockHelpers
 
 
 def test_autocasting_blocks_compile_to_correct_api_schema(vellum_adhoc_prompt_client, mock_uuid4_generator):
     """Test that SystemMessage and UserMessage autocast to correct ChatMessagePromptBlock API schema"""
 
-    workflow = AutocastingPromptWorkflow()
+    workflow = WorkflowWithPromptBlockHelpers()
 
     expected_outputs: List[PromptOutput] = [
         StringVellumValue(value="The item is blue."),

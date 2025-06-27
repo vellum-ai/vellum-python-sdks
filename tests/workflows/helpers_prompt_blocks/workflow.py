@@ -10,7 +10,7 @@ class WorkflowInputs(BaseInputs):
     user_query: str
 
 
-class AutocastingPromptNode(InlinePromptNode):
+class PromptNodeWithHelpers(InlinePromptNode):
     ml_model = "gpt-4o"
     blocks = [
         SystemMessage("What color is the item?"),
@@ -21,8 +21,8 @@ class AutocastingPromptNode(InlinePromptNode):
     }
 
 
-class AutocastingPromptWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
-    graph = AutocastingPromptNode
+class WorkflowWithPromptBlockHelpers(BaseWorkflow[WorkflowInputs, BaseState]):
+    graph = PromptNodeWithHelpers
 
     class Outputs(BaseOutputs):
-        results = AutocastingPromptNode.Outputs.results
+        results = PromptNodeWithHelpers.Outputs.results
