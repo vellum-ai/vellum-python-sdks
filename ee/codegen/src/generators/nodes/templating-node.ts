@@ -4,7 +4,6 @@ import { VellumVariableType } from "vellum-ai/api/types";
 
 import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
-import { BaseState } from "src/generators/base-state";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
@@ -26,15 +25,11 @@ export class TemplatingNode extends BaseNode<
   }
 
   protected getNodeBaseGenericTypes(): AstNode[] {
-    const baseStateClassReference = new BaseState({
-      workflowContext: this.workflowContext,
-    });
-
+    const stateType = this.getStateTypeOrBaseState();
     const primitiveOutputType = this.generateOutputType(
       this.nodeData.data.outputType
     );
-
-    return [baseStateClassReference, primitiveOutputType];
+    return [stateType, primitiveOutputType];
   }
 
   protected getNodeClassBodyStatements(): AstNode[] {

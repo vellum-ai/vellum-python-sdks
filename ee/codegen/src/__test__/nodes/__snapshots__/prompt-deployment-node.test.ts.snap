@@ -60,7 +60,7 @@ exports[`PromptDeploymentNode > basic with node inputs and the prompt_inputs att
 from ..state import State
 
 
-class PromptDeploymentNode(BasePromptDeploymentNode):
+class PromptDeploymentNode(BasePromptDeploymentNode[State]):
     deployment = "some-unique-deployment-name"
     release_tag = "LATEST"
     prompt_inputs = {

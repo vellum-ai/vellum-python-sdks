@@ -11,6 +11,7 @@ import {
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { BaseState } from "src/generators/base-state";
 import {
   BaseCodegenError,
   NodeAttributeGenerationError,
@@ -95,7 +96,41 @@ export abstract class BaseNode<
 
   // Override if the node implementation's base class needs to include generic types
   protected getNodeBaseGenericTypes(): AstNode[] | undefined {
+    const [firstStateVariableContext] = Array.from(
+      this.workflowContext.stateVariableContextsById.values()
+    );
+
+    if (firstStateVariableContext) {
+      return [
+        python.Type.reference(
+          python.reference({
+            name: firstStateVariableContext.definition.name,
+            modulePath: firstStateVariableContext.definition.module,
+          })
+        ),
+      ];
+    }
+
     return undefined;
+  }
+
+  protected getStateTypeOrBaseState(): AstNode {
+    const [firstStateVariableContext] = Array.from(
+      this.workflowContext.stateVariableContextsById.values()
+    );
+
+    if (firstStateVariableContext) {
+      return python.Type.reference(
+        python.reference({
+          name: firstStateVariableContext.definition.name,
+          modulePath: firstStateVariableContext.definition.module,
+        })
+      );
+    }
+
+    return new BaseState({
+      workflowContext: this.workflowContext,
+    });
   }
 
   protected getNodeBaseClass(): python.Reference {

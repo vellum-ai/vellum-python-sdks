@@ -1196,7 +1196,7 @@ from vellum.workflows.nodes.displayable import InlinePromptNode
 from ..state import State
 
 
-class PromptNode(InlinePromptNode):
+class PromptNode(InlinePromptNode[State]):
     ml_model = "gpt-4o-mini"
     blocks = [
         JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
