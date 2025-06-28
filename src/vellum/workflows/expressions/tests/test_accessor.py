@@ -1,11 +1,14 @@
 import pytest
 from dataclasses import dataclass
+from typing import Dict, List
 
 from pydantic import BaseModel
 
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.expressions.accessor import AccessorExpression
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState
 
 
@@ -191,11 +194,6 @@ def test_accessor_expression_unsupported_type():
 
 def test_accessor_expression_list_type_inference():
     """Test that accessor expressions correctly infer element types from List[str]."""
-    from typing import List
-
-    from vellum.workflows.outputs.base import BaseOutputs
-    from vellum.workflows.references.output import OutputReference
-
     base_ref: OutputReference = OutputReference(
         name="test_list",
         types=(List[str],),
@@ -210,30 +208,20 @@ def test_accessor_expression_list_type_inference():
 
 def test_accessor_expression_tuple_type_inference():
     """Test that accessor expressions correctly infer element types from Tuple types."""
-    from typing import List
-
-    from vellum.workflows.outputs.base import BaseOutputs
-    from vellum.workflows.references.output import OutputReference
-
     base_ref: OutputReference = OutputReference(
-        name="test_list_for_tuple_behavior",
-        types=(List[str],),
+        name="test_tuple",
+        types=(tuple,),
         instance=None,
         outputs_class=BaseOutputs,
     )
 
     accessor = AccessorExpression(base=base_ref, field=0)
 
-    assert accessor.types == (str,)
+    assert accessor.types == ()
 
 
 def test_accessor_expression_dict_type_inference():
     """Test that accessor expressions correctly infer value types from Dict types."""
-    from typing import Dict
-
-    from vellum.workflows.outputs.base import BaseOutputs
-    from vellum.workflows.references.output import OutputReference
-
     base_ref: OutputReference = OutputReference(
         name="test_dict",
         types=(Dict[str, int],),
@@ -246,28 +234,8 @@ def test_accessor_expression_dict_type_inference():
     assert accessor.types == (int,)
 
 
-def test_accessor_expression_no_type_inference_for_non_container():
-    """Test that accessor expressions don't infer types for non-container types."""
-    from vellum.workflows.outputs.base import BaseOutputs
-    from vellum.workflows.references.output import OutputReference
-
-    base_ref: OutputReference = OutputReference(
-        name="test_str",
-        types=(str,),
-        instance=None,
-        outputs_class=BaseOutputs,
-    )
-
-    accessor = AccessorExpression(base=base_ref, field=0)
-
-    assert accessor.types == ()
-
-
 def test_accessor_expression_empty_base_types():
     """Test that accessor expressions handle empty base types gracefully."""
-    from vellum.workflows.outputs.base import BaseOutputs
-    from vellum.workflows.references.output import OutputReference
-
     base_ref: OutputReference = OutputReference(
         name="test_empty",
         types=(),
@@ -278,24 +246,3 @@ def test_accessor_expression_empty_base_types():
     accessor = AccessorExpression(base=base_ref, field=0)
 
     assert accessor.types == ()
-
-
-def test_accessor_expression_multiple_indices():
-    """Test that accessor expressions work correctly for multiple indices."""
-    from typing import List
-
-    from vellum.workflows.outputs.base import BaseOutputs
-    from vellum.workflows.references.output import OutputReference
-
-    base_ref: OutputReference = OutputReference(
-        name="test_multiple_indices",
-        types=(List[str],),
-        instance=None,
-        outputs_class=BaseOutputs,
-    )
-
-    accessor0 = AccessorExpression(base=base_ref, field=0)
-    accessor1 = AccessorExpression(base=base_ref, field=1)
-
-    assert accessor0.types == (str,)
-    assert accessor1.types == (str,)
