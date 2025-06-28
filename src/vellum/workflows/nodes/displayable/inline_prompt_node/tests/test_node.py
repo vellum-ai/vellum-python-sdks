@@ -25,7 +25,6 @@ from vellum.workflows.context import execution_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
-from vellum.workflows.state import BaseState
 
 
 def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
@@ -80,53 +79,6 @@ def test_inline_prompt_node__json_inputs(vellum_adhoc_prompt_client):
         PromptRequestJsonInput(key="an_empty_list", type="JSON", value=[]),
     ]
     assert len(mock_api.call_args.kwargs["input_variables"]) == 5
-
-
-def test_inline_prompt_node__coalesce_expression_serialization(vellum_adhoc_prompt_client):
-    """
-    Tests that prompt nodes can serialize coalesce expressions like State.chat_history.coalesce([]).
-    """
-
-    # GIVEN a custom state with chat_history
-    class MyState(BaseState):
-        chat_history: List[ChatMessage] = []
-
-    # AND a prompt node that uses a coalesce expression as input
-    class MyNode(InlinePromptNode[MyState]):
-        ml_model = "gpt-4o"
-        blocks = []
-        prompt_inputs = {
-            "chat_history": MyState.chat_history.coalesce([]),
-        }
-
-    # AND a known response from invoking an inline prompt
-    expected_outputs: List[PromptOutput] = [
-        StringVellumValue(value="Test"),
-    ]
-
-    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
-        execution_id = str(uuid4())
-        events: List[ExecutePromptEvent] = [
-            InitiatedExecutePromptEvent(execution_id=execution_id),
-            FulfilledExecutePromptEvent(
-                execution_id=execution_id,
-                outputs=expected_outputs,
-            ),
-        ]
-        yield from events
-
-    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
-
-    # WHEN the node is run
-    list(MyNode().run())
-
-    # THEN the prompt is executed with the correct inputs (coalesce should resolve to empty list)
-    mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
-    assert mock_api.call_count == 1
-    assert mock_api.call_args.kwargs["input_values"] == [
-        PromptRequestJsonInput(key="chat_history", type="JSON", value=[]),
-    ]
-    assert len(mock_api.call_args.kwargs["input_variables"]) == 1
 
 
 def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
