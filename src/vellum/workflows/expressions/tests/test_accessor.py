@@ -187,3 +187,119 @@ def test_accessor_expression_unsupported_type():
         accessor.resolve(state)
 
     assert "Cannot get field field from 42" in str(exc_info.value)
+
+
+def test_accessor_expression_list_type_inference():
+    """Test that accessor expressions correctly infer element types from List[str]."""
+    from typing import List
+
+    from vellum.workflows.outputs.base import BaseOutputs
+    from vellum.workflows.references.output import OutputReference
+
+    base_ref = OutputReference(
+        name="test_list",
+        types=(List[str],),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field=0)
+
+    assert accessor.types == (str,)
+
+
+def test_accessor_expression_tuple_type_inference():
+    """Test that accessor expressions correctly infer element types from Tuple types."""
+    from typing import Tuple
+
+    from vellum.workflows.outputs.base import BaseOutputs
+    from vellum.workflows.references.output import OutputReference
+
+    base_ref = OutputReference(
+        name="test_tuple",
+        types=(Tuple[str, int, bool],),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor0 = AccessorExpression(base=base_ref, field=0)
+    accessor1 = AccessorExpression(base=base_ref, field=1)
+    accessor2 = AccessorExpression(base=base_ref, field=2)
+
+    assert accessor0.types == (str,)
+    assert accessor1.types == (int,)
+    assert accessor2.types == (bool,)
+
+
+def test_accessor_expression_dict_type_inference():
+    """Test that accessor expressions correctly infer value types from Dict types."""
+    from typing import Dict
+
+    from vellum.workflows.outputs.base import BaseOutputs
+    from vellum.workflows.references.output import OutputReference
+
+    base_ref = OutputReference(
+        name="test_dict",
+        types=(Dict[str, int],),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field="some_key")
+
+    assert accessor.types == (int,)
+
+
+def test_accessor_expression_no_type_inference_for_non_container():
+    """Test that accessor expressions don't infer types for non-container types."""
+    from vellum.workflows.outputs.base import BaseOutputs
+    from vellum.workflows.references.output import OutputReference
+
+    base_ref = OutputReference(
+        name="test_str",
+        types=(str,),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field=0)
+
+    assert accessor.types == ()
+
+
+def test_accessor_expression_empty_base_types():
+    """Test that accessor expressions handle empty base types gracefully."""
+    from vellum.workflows.outputs.base import BaseOutputs
+    from vellum.workflows.references.output import OutputReference
+
+    base_ref = OutputReference(
+        name="test_empty",
+        types=(),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field=0)
+
+    assert accessor.types == ()
+
+
+def test_accessor_expression_homogeneous_tuple_type_inference():
+    """Test that accessor expressions correctly infer element types from homogeneous Tuple[T, ...]."""
+    from typing import Tuple
+
+    from vellum.workflows.outputs.base import BaseOutputs
+    from vellum.workflows.references.output import OutputReference
+
+    base_ref = OutputReference(
+        name="test_homogeneous_tuple",
+        types=(Tuple[str, ...],),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor0 = AccessorExpression(base=base_ref, field=0)
+    accessor1 = AccessorExpression(base=base_ref, field=1)
+
+    assert accessor0.types == (str,)
+    assert accessor1.types == (str,)
