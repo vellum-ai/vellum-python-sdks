@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, Type
 from pydantic import BaseModel
 
 from vellum.workflows.constants import undefined
+from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
@@ -21,6 +22,10 @@ class DefaultStateEncoder(JSONEncoder):
     encoders: Dict[Type, Callable] = {}
 
     def default(self, obj: Any) -> Any:
+        if isinstance(obj, CoalesceExpression):
+            empty_state = BaseState()
+            return self.default(obj.resolve(empty_state))
+
         if isinstance(obj, BaseState):
             return dict(obj)
 

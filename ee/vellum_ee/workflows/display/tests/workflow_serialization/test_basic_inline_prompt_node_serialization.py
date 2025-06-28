@@ -1,6 +1,9 @@
+from typing import List
+
 from deepdiff import DeepDiff
 
 from vellum import ChatMessagePromptBlock, FunctionDefinition, JinjaPromptBlock
+from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import InlinePromptNode
@@ -554,3 +557,52 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
             "type": "DICTIONARY_REFERENCE",
         }
     ]
+
+
+def test_inline_prompt_node__coalesce_expression_serialization():
+    """
+    Tests that prompt nodes can serialize coalesce expressions like State.chat_history.coalesce([]).
+    """
+
+    # GIVEN a custom state with chat_history
+    class MyState(BaseState):
+        chat_history: List[ChatMessage] = []
+
+    # AND a prompt node that uses a coalesce expression as input
+    class MyNode(InlinePromptNode[MyState]):
+        ml_model = "gpt-4o"
+        blocks = []
+        prompt_inputs = {
+            "chat_history": MyState.chat_history.coalesce([]),
+        }
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, MyState]):
+        graph = MyNode
+
+    # WHEN the node is serialized
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized: dict = workflow_display.serialize()
+
+    # THEN the prompt is serialized with the correct inputs
+    prompt_nodes = [node for node in serialized["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    prompt_node = prompt_nodes[0]
+
+    prompt_inputs_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "prompt_inputs"), None)
+    assert prompt_inputs_attr
+    assert prompt_inputs_attr["value"]["type"] == "DICTIONARY_REFERENCE"
+    chat_history_entry = prompt_inputs_attr["value"]["entries"][0]
+
+    assert chat_history_entry["key"] == "chat_history"
+    assert chat_history_entry["value"]["type"] == "BINARY_EXPRESSION"
+    assert chat_history_entry["value"]["operator"] == "coalesce"
+    assert chat_history_entry["value"]["lhs"] == {
+        "type": "WORKFLOW_STATE",
+        "state_variable_id": "6012a4f7-a8ff-464d-bd62-7c41fde06fa4",
+    }
+    assert chat_history_entry["value"]["rhs"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {
+            "type": "JSON",
+            "value": [],
+        },
+    }
