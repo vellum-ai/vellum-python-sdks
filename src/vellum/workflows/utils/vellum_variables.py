@@ -142,7 +142,7 @@ def _collapse_types(types: List[Type]) -> List[Type]:
     What remains are the "most specific" types.
     """
 
-    new_types = []
+    new_types: List[Type] = []
     for target_type in types:
         if any(_is_subtype(source_type, target_type) for source_type in new_types):
             continue

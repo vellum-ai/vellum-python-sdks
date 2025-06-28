@@ -588,6 +588,7 @@ def test_inline_prompt_node__coalesce_expression_serialization():
     prompt_node = prompt_nodes[0]
 
     prompt_inputs_attr = next((attr for attr in prompt_node["attributes"] if attr["name"] == "prompt_inputs"), None)
+    assert prompt_inputs_attr
     assert prompt_inputs_attr["value"]["type"] == "DICTIONARY_REFERENCE"
     chat_history_entry = prompt_inputs_attr["value"]["entries"][0]
 
