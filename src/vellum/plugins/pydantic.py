@@ -71,7 +71,10 @@ class OnValidatePython(ValidatePythonHandlerProtocol):
                 self.tracked_descriptors[key] = value
                 # TODO: This does not yet work for descriptors that map to more complex types
                 # https://app.shortcut.com/vellum/story/4636
-                input[key] = value.types[0]()
+                if len(value.types) == 0:
+                    input[key] = dict()
+                else:
+                    input[key] = value.types[0]()
 
     def on_success(self, result: Any) -> None:
         if self.tracked_descriptors:
