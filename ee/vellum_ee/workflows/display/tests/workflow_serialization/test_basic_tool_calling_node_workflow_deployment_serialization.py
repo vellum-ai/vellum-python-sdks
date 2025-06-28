@@ -1,5 +1,16 @@
+from datetime import datetime
+
 from deepdiff import DeepDiff
 
+from vellum.client.types.release_environment import ReleaseEnvironment
+from vellum.client.types.release_release_tag import ReleaseReleaseTag
+from vellum.client.types.release_review_reviewer import ReleaseReviewReviewer
+from vellum.client.types.slim_release_review import SlimReleaseReview
+from vellum.client.types.workflow_deployment_release import WorkflowDeploymentRelease
+from vellum.client.types.workflow_deployment_release_workflow_deployment import (
+    WorkflowDeploymentReleaseWorkflowDeployment,
+)
+from vellum.client.types.workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_tool_calling_node_workflow_deployment.workflow import (
@@ -7,7 +18,41 @@ from tests.workflows.basic_tool_calling_node_workflow_deployment.workflow import
 )
 
 
-def test_serialize_workflow():
+def test_serialize_workflow(vellum_client):
+    vellum_client.release_reviews.retrieve_workflow_deployment_release.return_value = WorkflowDeploymentRelease(
+        id="test-id",
+        created=datetime.now(),
+        environment=ReleaseEnvironment(
+            id="test-id",
+            name="test-name",
+            label="test-label",
+        ),
+        created_by=None,
+        workflow_version=WorkflowDeploymentReleaseWorkflowVersion(
+            id="test-id",
+            input_variables=[],
+            output_variables=[],
+        ),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(name="test-name"),
+        description="test-description",  # main mock
+        release_tags=[
+            ReleaseReleaseTag(
+                name="test-name",
+                source="USER",
+            )
+        ],
+        reviews=[
+            SlimReleaseReview(
+                id="test-id",
+                created=datetime.now(),
+                reviewer=ReleaseReviewReviewer(
+                    id="test-id",
+                    full_name="test-name",
+                ),
+                state="APPROVED",
+            )
+        ],
+    )
     # GIVEN a Workflow that uses a generic node
     # WHEN we serialize it
     workflow_display = get_workflow_display(workflow_class=BasicToolCallingNodeWorkflowDeploymentWorkflow)
@@ -51,8 +96,8 @@ def test_serialize_workflow():
                 "value": [
                     {
                         "type": "WORKFLOW_DEPLOYMENT",
-                        "name": "deployment_1",
-                        "description": "Workflow deployment for deployment_1",
+                        "name": "test-name",
+                        "description": "test-description",
                         "deployment": "deployment_1",
                         "release_tag": "LATEST",
                     }
