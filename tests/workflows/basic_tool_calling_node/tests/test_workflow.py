@@ -132,7 +132,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         "input_values": [
             JsonInput(name="arguments", type="JSON", value={"location": "San Francisco", "unit": "celsius"})
         ],
-        "code": '\ndef get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n\n\ndef main(arguments):\n    """Main function that calls the original function with the provided arguments."""\n    return get_current_weather(**arguments)\n',  # noqa: E501
+        "code": '\nimport math\n\n\ndef get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of {get_temperature(70.1)} degrees {unit}."\n\n\ndef get_temperature(temperature: float) -> int:\n    """\n    Get the temperature in a given location.\n    """\n    return math.floor(temperature)\n\n\ndef main(arguments):\n    """Main function that calls the original function with the provided arguments."""\n    return get_current_weather(**arguments)\n',  # noqa: E501
         "runtime": "PYTHON_3_11_6",
         "output_type": "STRING",
         "packages": [CodeExecutionPackage(version="2.26.0", name="requests")],

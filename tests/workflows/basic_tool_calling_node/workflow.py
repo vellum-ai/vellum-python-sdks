@@ -7,12 +7,7 @@ from vellum.workflows.nodes.experimental.tool_calling_node import ToolCallingNod
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseInputs, BaseWorkflow
 
-
-def get_current_weather(location: str, unit: str) -> str:
-    """
-    Get the current weather in a given location.
-    """
-    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
+from .get_current_weather import get_current_weather
 
 
 class Inputs(BaseInputs):
