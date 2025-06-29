@@ -25,6 +25,9 @@ class ExecuteActionNode(BaseNode[State]):
         if self.action.type != "FUNCTION_CALL":
             raise ValueError(f"Action is not a function call: {self.action}")
 
+        if self.state.chat_history is None:
+            self.state.chat_history = []
+
         self.state.chat_history.append(
             ChatMessage(
                 role="ASSISTANT",

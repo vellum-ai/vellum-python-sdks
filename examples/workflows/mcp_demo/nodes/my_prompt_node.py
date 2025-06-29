@@ -37,7 +37,7 @@ class MyPromptNode(InlinePromptNode):
     ]
     prompt_inputs = {
         "query": Inputs.query,
-        "chat_history": State.chat_history,
+        "chat_history": State.chat_history.coalesce([]),
     }
     # Our mypy plugin is not handling list of pydantic models properly
     functions = MCPClientNode.Outputs.tools  # type: ignore[assignment]
