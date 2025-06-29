@@ -1,11 +1,14 @@
 import pytest
 from dataclasses import dataclass
+from typing import Dict, List
 
 from pydantic import BaseModel
 
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.expressions.accessor import AccessorExpression
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState
 
 
@@ -187,3 +190,59 @@ def test_accessor_expression_unsupported_type():
         accessor.resolve(state)
 
     assert "Cannot get field field from 42" in str(exc_info.value)
+
+
+def test_accessor_expression_list_type_inference():
+    """Test that accessor expressions correctly infer element types from List[str]."""
+    base_ref: OutputReference = OutputReference(
+        name="test_list",
+        types=(List[str],),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field=0)
+
+    assert accessor.types == (str,)
+
+
+def test_accessor_expression_tuple_type_inference():
+    """Test that accessor expressions correctly infer element types from Tuple types."""
+    base_ref: OutputReference = OutputReference(
+        name="test_tuple",
+        types=(tuple,),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field=0)
+
+    assert accessor.types == ()
+
+
+def test_accessor_expression_dict_type_inference():
+    """Test that accessor expressions correctly infer value types from Dict types."""
+    base_ref: OutputReference = OutputReference(
+        name="test_dict",
+        types=(Dict[str, int],),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field="some_key")
+
+    assert accessor.types == (int,)
+
+
+def test_accessor_expression_empty_base_types():
+    """Test that accessor expressions handle empty base types gracefully."""
+    base_ref: OutputReference = OutputReference(
+        name="test_empty",
+        types=(),
+        instance=None,
+        outputs_class=BaseOutputs,
+    )
+
+    accessor = AccessorExpression(base=base_ref, field=0)
+
+    assert accessor.types == ()

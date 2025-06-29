@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 import dataclasses
-from typing import Any, Sequence, Type, TypeVar, Union
+from typing import Any, Sequence, Type, TypeVar, Union, get_args, get_origin
 
 from pydantic import BaseModel, GetCoreSchemaHandler
 from pydantic_core import core_schema
@@ -22,11 +22,40 @@ class AccessorExpression(BaseDescriptor[Any]):
     ) -> None:
         super().__init__(
             name=f"{base.name}.{field}",
-            types=(),
+            types=self._infer_accessor_types(base, field),
             instance=None,
         )
         self._base = base
         self._field = field
+
+    def _infer_accessor_types(self, base: BaseDescriptor[LHS], field: Union[str, int]) -> tuple[Type, ...]:
+        """
+        Infer the types for this accessor expression based on the base descriptor's types
+        and the field being accessed.
+        """
+        if not base.types:
+            return ()
+
+        inferred_types = []
+
+        for base_type in base.types:
+            origin = get_origin(base_type)
+            args = get_args(base_type)
+
+            if isinstance(field, int) and origin in (list, tuple) and args:
+                if origin is list:
+                    inferred_types.append(args[0])
+                elif origin is tuple and len(args) == 2 and args[1] is ...:
+                    inferred_types.append(args[0])
+                elif origin is tuple and len(args) > abs(field):
+                    if field >= 0:
+                        inferred_types.append(args[field])
+                    else:
+                        inferred_types.append(args[field])
+            elif isinstance(field, str) and origin in (dict,) and len(args) >= 2:
+                inferred_types.append(args[1])  # Value type from Dict[K, V]
+
+        return tuple(set(inferred_types)) if inferred_types else ()
 
     def resolve(self, state: "BaseState") -> Any:
         base = resolve_value(self._base, state)
