@@ -17,15 +17,37 @@ export class ConditionalNodeContext extends BaseNodeContext<ConditionalNode> {
   }
 
   createPortContexts(): PortContext[] {
+    const conditionTypeCounts = new Map<string, number>();
+
     return this.nodeData.data.conditions.map(
-      (condition, idx) =>
-        new PortContext({
+      (condition, idx) => {
+        const conditionType = condition.type;
+        const currentCount = conditionTypeCounts.get(conditionType) || 0;
+        conditionTypeCounts.set(conditionType, currentCount + 1);
+
+        const portName = this.generateSemanticPortName(conditionType, currentCount + 1);
+
+        return new PortContext({
           workflowContext: this.workflowContext,
           nodeContext: this,
           portId: condition.sourceHandleId,
-          portName: `branch_${idx + 1}`,
+          portName: portName,
           isDefault: false,
-        })
+        });
+      }
     );
+  }
+
+  private generateSemanticPortName(conditionType: string, index: number): string {
+    switch (conditionType) {
+      case "IF":
+        return `if_${index}`;
+      case "ELIF":
+        return `elif_${index}`;
+      case "ELSE":
+        return `else_${index}`;
+      default:
+        return `branch_${index}`;
+    }
   }
 }
