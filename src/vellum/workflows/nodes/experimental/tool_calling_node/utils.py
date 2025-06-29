@@ -256,7 +256,11 @@ def create_function_node(
         if source_path is not None:
             function_source = inspect.getsource(source_path)
         else:
-            function_source = f"<source code not available for {function.__name__}>"
+            raise NodeException(
+                message=f"Source code not available for function '{function.__name__}'. "
+                f"Function must be defined in a file that can be inspected.",
+                code=WorkflowErrorCode.INVALID_CODE,
+            )
         function_name = function.__name__
 
         code = f'''
