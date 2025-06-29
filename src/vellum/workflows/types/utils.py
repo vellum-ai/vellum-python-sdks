@@ -49,9 +49,12 @@ def resolve_combined_types(
     lhs_types = resolve_types(lhs)
     rhs_types = resolve_types(rhs)
 
-    unique_results = set(lhs_types) | set(rhs_types)
+    result_types: List[Union[Type[_LHS], Type[_RHS]]] = list(lhs_types)
+    for rhs_type in rhs_types:
+        if rhs_type not in result_types:
+            result_types.append(rhs_type)
 
-    return tuple(unique_results)
+    return tuple(result_types)
 
 
 def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]] = None) -> Tuple[Type, ...]:
