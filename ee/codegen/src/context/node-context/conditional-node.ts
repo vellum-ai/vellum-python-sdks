@@ -19,26 +19,30 @@ export class ConditionalNodeContext extends BaseNodeContext<ConditionalNode> {
   createPortContexts(): PortContext[] {
     const conditionTypeCounts = new Map<string, number>();
 
-    return this.nodeData.data.conditions.map(
-      (condition, idx) => {
-        const conditionType = condition.type;
-        const currentCount = conditionTypeCounts.get(conditionType) || 0;
-        conditionTypeCounts.set(conditionType, currentCount + 1);
+    return this.nodeData.data.conditions.map((condition, idx) => {
+      const conditionType = condition.type;
+      const currentCount = conditionTypeCounts.get(conditionType) || 0;
+      conditionTypeCounts.set(conditionType, currentCount + 1);
 
-        const portName = this.generateSemanticPortName(conditionType, currentCount + 1);
+      const portName = this.generateSemanticPortName(
+        conditionType,
+        currentCount + 1
+      );
 
-        return new PortContext({
-          workflowContext: this.workflowContext,
-          nodeContext: this,
-          portId: condition.sourceHandleId,
-          portName: portName,
-          isDefault: false,
-        });
-      }
-    );
+      return new PortContext({
+        workflowContext: this.workflowContext,
+        nodeContext: this,
+        portId: condition.sourceHandleId,
+        portName: portName,
+        isDefault: false,
+      });
+    });
   }
 
-  private generateSemanticPortName(conditionType: string, index: number): string {
+  private generateSemanticPortName(
+    conditionType: string,
+    index: number
+  ): string {
     switch (conditionType) {
       case "IF":
         return `if_${index}`;
