@@ -8,6 +8,7 @@ from uuid import UUID
 from typing import List, Optional
 
 from dotenv import load_dotenv
+from pydantic import ValidationError
 
 from vellum.client.core.api_error import ApiError
 from vellum.resources.workflows.client import OMIT
@@ -129,12 +130,26 @@ def push_command(
             workflow_config.deployments[0] if workflow_config.deployments else WorkflowDeploymentConfig()
         )
 
-        deployment_config = WorkflowPushDeploymentConfigRequest(
-            label=deployment_label or cli_deployment_config.label,
-            name=deployment_name or cli_deployment_config.name,
-            description=deployment_description or cli_deployment_config.description,
-            release_tags=release_tags or cli_deployment_config.release_tags,
-        )
+        try:
+            deployment_config = WorkflowPushDeploymentConfigRequest(
+                label=deployment_label or cli_deployment_config.label,
+                name=deployment_name or cli_deployment_config.name,
+                description=deployment_description or cli_deployment_config.description,
+                release_tags=release_tags or cli_deployment_config.release_tags,
+            )
+        except ValidationError as e:
+            for error in e.errors():
+                if "release_tags" in str(error.get("loc", [])):
+                    handle_cli_error(
+                        logger,
+                        title="Invalid release tag format",
+                        message="Release tags must be provided as separate arguments. "
+                        "Use: --release-tag tag1 --release-tag tag2",
+                    )
+                    return
+
+            # Re-raise if it's not a release_tags validation error
+            raise e
 
         # We should check with fern if we could auto-serialize typed fields for us
         # https://app.shortcut.com/vellum/story/5568

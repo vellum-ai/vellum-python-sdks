@@ -979,3 +979,26 @@ def test_push__use_default_workspace_if_not_specified__multiple_workflows_config
         config = configs[0]
         assert config["workflow_sandbox_id"] == workflow_sandbox_id
         assert config["workspace"] == "default"
+
+
+def test_push__deploy_with_release_tag_shows_friendly_validation_error(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call would return successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+    )
+
+    # WHEN calling `vellum workflows push` with --deploy and --release-tag
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy", "--release-tag", "v1.0.0-testing"])
+
+    # THEN it should show the friendly error message instead of a raw Pydantic traceback
+    assert "Invalid release tag format" in result.output
+    assert "Release tags must be provided as separate arguments" in result.output
+    assert "--release-tag tag1 --release-tag tag2" in result.output
