@@ -48,6 +48,7 @@ def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_subproces
     mock_docker_from_env.return_value = mock_docker_client
 
     mock_subprocess_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -100,6 +101,7 @@ def test_image_push__self_hosted_happy_path__workspace_option(
     mock_docker_from_env.return_value = mock_docker_client
 
     mock_subprocess_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -189,6 +191,7 @@ def test_image_push_with_source_success(
     mock_docker_client.images.push.return_value = [b'{"status": "Pushed"}']
 
     mock_subprocess_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(args="", returncode=0, stdout=b"Build successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
@@ -205,7 +208,7 @@ def test_image_push_with_source_success(
 
     assert result.exit_code == 0, result.output
 
-    build_call = mock_subprocess_run.call_args_list[0]
+    build_call = mock_subprocess_run.call_args_list[1]
     assert build_call[0][0] == [
         "docker",
         "buildx",
@@ -246,6 +249,7 @@ def test_image_push_with_source_build_fails(mock_subprocess_run, monkeypatch, mo
         f.write("FROM alpine:latest\n")
 
     mock_subprocess_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(args="", returncode=1, stderr=b"Build failed: missing dependency"),
     ]
 
@@ -279,9 +283,9 @@ def test_image_push_includes_docker_prune(mock_docker_from_env, mock_subprocess_
         subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
     ]
 
-    # WHEN the user runs the image push command with a python-workflow-runtime image
+    # WHEN the user runs the image push command with any image
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["image", "push", "myrepo.net/python-workflow-runtime:latest"])
+    result = runner.invoke(cli_main, ["image", "push", "myrepo.net/myimage:latest"])
 
     # THEN the command exits successfully
     assert result.exit_code == 0, result.output
@@ -315,9 +319,9 @@ def test_image_push_continues_if_prune_fails(mock_docker_from_env, mock_subproce
         subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
     ]
 
-    # WHEN the user runs the image push command with a python-workflow-runtime image
+    # WHEN the user runs the image push command with any image
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["image", "push", "myrepo.net/python-workflow-runtime:latest"])
+    result = runner.invoke(cli_main, ["image", "push", "myrepo.net/myimage:latest"])
 
     # THEN the command exits successfully despite pruning failure
     assert result.exit_code == 0, result.output
@@ -327,43 +331,3 @@ def test_image_push_continues_if_prune_fails(mock_docker_from_env, mock_subproce
 
     # AND the success message is still shown
     assert "Image successfully pushed" in result.output
-
-
-@pytest.mark.usefixtures("vellum_client", "info_log_level")
-def test_image_push_skips_prune_for_non_python_workflow_runtime(mock_docker_from_env, mock_subprocess_run, monkeypatch):
-    """
-    Tests that image_push_command skips pruning for non-python-workflow-runtime images.
-    """
-    # GIVEN a self hosted vellum api URL env var
-    monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
-    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
-
-    # AND a mock Docker client
-    mock_docker_client = MagicMock()
-    mock_docker_from_env.return_value = mock_docker_client
-
-    mock_subprocess_run.side_effect = [
-        subprocess.CompletedProcess(
-            args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
-        ),
-        subprocess.CompletedProcess(args="", returncode=0, stdout=b"manifest"),
-        subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
-    ]
-
-    # WHEN the user runs the image push command with a non-python-workflow-runtime image
-    runner = CliRunner()
-    result = runner.invoke(cli_main, ["image", "push", "myrepo.net/myimage:latest"])
-
-    # THEN the command exits successfully
-    assert result.exit_code == 0, result.output
-
-    prune_call_found = False
-    for call in mock_subprocess_run.call_args_list:
-        if call[0][0] == ["docker", "image", "prune", "-f"]:
-            prune_call_found = True
-            break
-
-    assert not prune_call_found, "docker image prune should not be called for non-python-workflow-runtime images"
-
-    # AND the skipping message is logged
-    assert "Skipping Docker image pruning for non-python-workflow-runtime image" in result.output
