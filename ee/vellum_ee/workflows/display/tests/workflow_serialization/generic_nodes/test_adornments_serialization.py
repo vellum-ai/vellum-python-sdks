@@ -271,6 +271,21 @@ def test_serialize_node__stacked():
             "ports": [{"id": "408cd5fb-3a3e-4eb2-9889-61111bd6a129", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
+                    "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
+                    "label": "TryNode",
+                    "base": {
+                        "name": "TryNode",
+                        "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"],
+                    },
+                    "attributes": [
+                        {
+                            "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
+                            "name": "on_error_code",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        }
+                    ],
+                },
+                {
                     "id": "5be7d260-74f7-4734-b31b-a46a94539586",
                     "label": "RetryNode",
                     "base": {
@@ -298,21 +313,6 @@ def test_serialize_node__stacked():
                             "name": "retry_on_condition",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
-                    ],
-                },
-                {
-                    "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
-                    "label": "TryNode",
-                    "base": {
-                        "name": "TryNode",
-                        "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"],
-                    },
-                    "attributes": [
-                        {
-                            "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
-                            "name": "on_error_code",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
-                        }
                     ],
                 },
             ],

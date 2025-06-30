@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, cast
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import get_wrapped_node
-from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -94,8 +94,8 @@ class BaseAdornmentNodeDisplay(BaseNodeDisplay[_BaseAdornmentNodeType], Generic[
         additional_kwargs = get_additional_kwargs(wrapped_node_display.node_id) if get_additional_kwargs else {}
         serialized_wrapped_node = wrapped_node_display.serialize(display_context, **kwargs, **additional_kwargs)
 
-        adornments = cast(JsonArray, serialized_wrapped_node.get("adornments")) or []
-        serialized_wrapped_node["adornments"] = adornments + [adornment] if adornment else adornments
+        adornments = cast(list, serialized_wrapped_node.get("adornments")) or []
+        serialized_wrapped_node["adornments"] = [adornment] + adornments if adornment else adornments
 
         return serialized_wrapped_node
 
