@@ -1840,6 +1840,18 @@ baz = foo + bar
               inputs: [],
               outputs: [],
               trigger: {},
+              definition: {
+                name: "TryNode",
+                module: [
+                  "code",
+                  "nodes",
+                  "prompt",
+                  "Prompt",
+                  "<adornment>",
+                  "RetryNode",
+                  "<adornment>",
+                ],
+              },
               adornments: [
                 {
                   id: "c204055c-fc9f-4fb5-9c58-babada7b0d89",

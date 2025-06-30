@@ -60,6 +60,29 @@ describe("getGeneratedNodeModuleInfo", () => {
         expectedNodeClassName: "MyNode",
       },
     ],
+    // Node definition containing multiple adornments is defined
+    [
+      {
+        nodeLabel: "My Node",
+        nodeDefinition: {
+          module: [
+            "my_project",
+            "nodes",
+            "my_node",
+            "MyNode",
+            "<adornment>",
+            "RetryNode",
+            "<adornment>",
+          ],
+          name: "TryNode",
+        },
+      },
+      {
+        expectedModuleName: "my_node",
+        expectedModulePath: ["my_project", "nodes", "my_node"],
+        expectedNodeClassName: "MyNode",
+      },
+    ],
   ] as const;
 
   it.each(testCases)(
