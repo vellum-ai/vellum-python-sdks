@@ -67,7 +67,7 @@ with the provided module or be available for use. The Workflow Sandbox must also
 @click.option("--deployment-label", type=str, help="Label to use for the Deployment")
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
-@click.option("--release-tag", type=list, help="Release Tag for the Deployment", multiple=True)
+@click.option("--release-tag", help="Release Tag for the Deployment", multiple=True)
 @click.option(
     "--dry-run",
     is_flag=True,
@@ -117,7 +117,7 @@ def workflows_push(
 @click.option("--deployment-label", type=str, help="Label to use for the Deployment")
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
-@click.option("--release-tag", type=list, help="Release Tag for the Deployment", multiple=True)
+@click.option("--release-tag", help="Release Tag for the Deployment", multiple=True)
 @click.option(
     "--dry-run",
     is_flag=True,

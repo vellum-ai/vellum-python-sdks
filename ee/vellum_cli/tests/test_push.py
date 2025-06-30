@@ -981,7 +981,7 @@ def test_push__use_default_workspace_if_not_specified__multiple_workflows_config
         assert config["workspace"] == "default"
 
 
-def test_push__deploy_with_release_tag_shows_friendly_validation_error(mock_module, vellum_client):
+def test_push__deploy_with_malformed_release_tags_shows_friendly_validation_error(mock_module, vellum_client):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
     module = mock_module.module
@@ -996,9 +996,46 @@ def test_push__deploy_with_release_tag_shows_friendly_validation_error(mock_modu
 
     # WHEN calling `vellum workflows push` with --deploy and --release-tag
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy", "--release-tag", "v1.0.0-testing"])
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy", "--release-tag", None])  # type: ignore
 
     # THEN it should show the friendly error message instead of a raw Pydantic traceback
     assert "Invalid release tag format" in result.output
     assert "Release tags must be provided as separate arguments" in result.output
     assert "--release-tag tag1 --release-tag tag2" in result.output
+
+
+@pytest.mark.usefixtures("info_log_level")
+def test_push__deploy_with_release_tags_success(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully
+    workflow_deployment_id = str(uuid4())
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        workflow_deployment_id=workflow_deployment_id,
+    )
+
+    # WHEN calling `vellum workflows push` with --deploy and --release-tag
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy", "--release-tag", "v1.0.0"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the push API with the correct deployment config
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+
+    # AND the deployment_config should contain the release tags
+    deployment_config_str = call_args["deployment_config"]
+    deployment_config = json.loads(deployment_config_str)
+    assert deployment_config["release_tags"] == ["v1.0.0"]
+
+    # AND should show success message
+    assert "Successfully pushed" in result.output
+    assert "Updated vellum.lock.json file." in result.output
