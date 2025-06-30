@@ -291,7 +291,7 @@ def test_image_push_includes_docker_prune(mock_docker_from_env, mock_subprocess_
     assert result.exit_code == 0, result.output
 
     prune_call = mock_subprocess_run.call_args_list[0]
-    assert prune_call[0][0] == ["docker", "image", "prune", "-f"]
+    assert prune_call[0][0] == ["docker", "image", "prune", "-f", "--filter", "reference=*python-workflow-runtime*"]
 
     # AND the success message includes pruning completion
     assert "Docker image pruning completed successfully" in result.output
@@ -311,7 +311,9 @@ def test_image_push_continues_if_prune_fails(mock_docker_from_env, mock_subproce
     mock_docker_from_env.return_value = mock_docker_client
 
     mock_subprocess_run.side_effect = [
-        subprocess.CalledProcessError(1, ["docker", "image", "prune", "-f"]),
+        subprocess.CalledProcessError(
+            1, ["docker", "image", "prune", "-f", "--filter", "reference=*python-workflow-runtime*"]
+        ),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
