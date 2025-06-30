@@ -129,19 +129,21 @@ export class CodeExecutionNode extends BaseNode<
                     }),
                     ...(package_.repository
                       ? [
-                        python.methodArgument({
-                          name: 'repository',
-                          value: python.TypeInstantiation.str(package_.repository)
-                        })
-                      ]
-                      : [])
+                          python.methodArgument({
+                            name: "repository",
+                            value: python.TypeInstantiation.str(
+                              package_.repository
+                            ),
+                          }),
+                        ]
+                      : []),
                   ],
                 })
               ),
-            {
-              endWithComma: true
-            }
-          )
+              {
+                endWithComma: true,
+              }
+            )
           : python.TypeInstantiation.none(),
       })
     );

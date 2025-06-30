@@ -14,7 +14,8 @@ import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   AdornmentNode,
   ApiNode,
-  CodeExecutionNode, CodeExecutionPackage,
+  CodeExecutionNode,
+  CodeExecutionPackage,
   ConditionalNode,
   ConditionalNodeConditionData,
   ConstantValuePointer,
@@ -40,8 +41,8 @@ import {
   TemplatingNode,
   VellumLogicalConditionGroup,
   WorkflowDataNode,
-  WorkflowNodeType
-} from 'src/types/vellum';
+  WorkflowNodeType,
+} from "src/types/vellum";
 
 export function entrypointNodeDataFactory(): EntrypointNode {
   return {
