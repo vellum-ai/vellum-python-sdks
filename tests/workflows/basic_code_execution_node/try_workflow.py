@@ -15,6 +15,7 @@ class SimpleCodeExecutionNode(CodeExecutionNode[BaseState, int]):
         CodeExecutionPackage(
             name="openai",
             version="1.0.0",
+            repository="test-repo",
         )
     ]
 

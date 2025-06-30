@@ -505,6 +505,7 @@ export interface GuardrailNode extends BaseDisplayableWorkflowNode {
 export type CodeExecutionPackage = {
   version: string;
   name: string;
+  repository?: string | null;
 };
 
 export interface CodeExecutionNodeData {

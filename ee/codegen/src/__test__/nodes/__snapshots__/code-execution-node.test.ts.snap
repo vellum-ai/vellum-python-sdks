@@ -160,7 +160,8 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 `;
 
 exports[`CodeExecutionNode > code representation: Base case > should generate the correct node class 1`] = `
-"from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
+"from vellum.types import CodeExecutionPackage
+from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
 from vellum.workflows.state import BaseState
 
 
@@ -168,12 +169,15 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
-    packages = None
+    packages = [
+        CodeExecutionPackage(name="my-package", version="1.0.0", repository="test-repo"),
+    ]
 "
 `;
 
 exports[`CodeExecutionNode > code representation: Escaped case > should generate the correct node class 1`] = `
-"from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
+"from vellum.types import CodeExecutionPackage
+from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
 from vellum.workflows.state import BaseState
 
 
@@ -181,7 +185,9 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     filepath = "./script.py"
     code_inputs = {}
     runtime = "PYTHON_3_11_6"
-    packages = None
+    packages = [
+        CodeExecutionPackage(name="my-package", version="1.0.0", repository="test-repo"),
+    ]
 "
 `;
 

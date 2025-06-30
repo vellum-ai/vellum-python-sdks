@@ -14,7 +14,7 @@ import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   AdornmentNode,
   ApiNode,
-  CodeExecutionNode,
+  CodeExecutionNode, CodeExecutionPackage,
   ConditionalNode,
   ConditionalNodeConditionData,
   ConstantValuePointer,
@@ -40,8 +40,8 @@ import {
   TemplatingNode,
   VellumLogicalConditionGroup,
   WorkflowDataNode,
-  WorkflowNodeType,
-} from "src/types/vellum";
+  WorkflowNodeType
+} from 'src/types/vellum';
 
 export function entrypointNodeDataFactory(): EntrypointNode {
   return {
@@ -1314,6 +1314,7 @@ export function codeExecutionNodeFactory({
   runtimeInput,
   generateLogOutputId = true,
   code,
+  packages,
 }: {
   id?: string;
   outputId?: string;
@@ -1323,6 +1324,7 @@ export function codeExecutionNodeFactory({
   runtimeInput?: NodeInput;
   generateLogOutputId?: boolean;
   code?: string;
+  packages?: CodeExecutionPackage[];
 } = {}): NodeDataFactoryBuilder<CodeExecutionNode> {
   const runtime =
     runtimeInput ??
@@ -1342,6 +1344,7 @@ export function codeExecutionNodeFactory({
         ],
       },
     } as NodeInput);
+
   const nodeData: CodeExecutionNode = {
     id: id ?? "2cd960a3-cb8a-43ed-9e3f-f003fc480951",
     type: "CODE_EXECUTION",
@@ -1356,6 +1359,7 @@ export function codeExecutionNodeFactory({
       runtimeInputId: runtime.id,
       targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
+      packages: packages,
     },
     inputs: [
       {

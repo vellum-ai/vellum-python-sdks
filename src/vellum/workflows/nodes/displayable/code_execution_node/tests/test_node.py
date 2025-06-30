@@ -109,6 +109,7 @@ def main(word: str) -> int:
             CodeExecutionPackage(
                 name="openai",
                 version="1.0.0",
+                repository="test-repo",
             )
         ]
 
@@ -150,6 +151,7 @@ def main(word: str) -> int:
             CodeExecutionPackage(
                 name="openai",
                 version="1.0.0",
+                repository="test-repo",
             )
         ],
         request_options=None,

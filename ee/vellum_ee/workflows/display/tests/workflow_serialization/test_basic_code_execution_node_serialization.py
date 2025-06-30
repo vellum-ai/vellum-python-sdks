@@ -561,7 +561,7 @@ def test_serialize_workflow__try_wrapped():
             "code_input_id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
             "runtime_input_id": "19d64948-f22b-4103-a7f5-3add184b31cc",
             "output_type": "NUMBER",
-            "packages": [{"name": "openai", "version": "1.0.0"}],
+            "packages": [{"name": "openai", "version": "1.0.0", "repository": "test-repo"}],
             "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
