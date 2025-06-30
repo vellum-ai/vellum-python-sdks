@@ -9,8 +9,8 @@ from .guardrail_node import GuardrailNode
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(GuardrailNode.Outputs.score.equals(1))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(GuardrailNode.Outputs.score.equals(1))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -23,8 +23,8 @@ from .subworkflow_with_try import SubworkflowWithTry
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(SubworkflowWithTry.Outputs.error.equals("testtest"))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(SubworkflowWithTry.Outputs.error.equals("testtest"))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -112,8 +112,8 @@ from .prompt_node import PromptNode
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(PromptNode.Outputs.error.equals("testtest"))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(PromptNode.Outputs.error.equals("testtest"))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -438,8 +438,8 @@ from .prompt_deployment_node import PromptDeploymentNode
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(PromptDeploymentNode.Outputs.results.equals("testtest"))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(PromptDeploymentNode.Outputs.results.equals("testtest"))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -452,8 +452,8 @@ from .prompt_deployment_node import PromptDeploymentNode
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(PromptDeploymentNode.Outputs.error.equals("testtest"))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(PromptDeploymentNode.Outputs.error.equals("testtest"))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -466,8 +466,8 @@ from .prompt_deployment_node import PromptDeploymentNode
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(PromptDeploymentNode.Outputs.text.equals("testtest"))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(PromptDeploymentNode.Outputs.text.equals("testtest"))
+        else_1 = Port.on_else()
 "
 `;
 

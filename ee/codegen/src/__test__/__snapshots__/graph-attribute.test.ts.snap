@@ -74,8 +74,8 @@ exports[`Workflow > graph > should be able to create a proper else edge when the
 
 exports[`Workflow > graph > should be correct for a basic conditional node case 1`] = `
 "{
-    ConditionalNode.Ports.branch_1 >> TemplatingNode,
-    ConditionalNode.Ports.branch_2 >> TemplatingNode2,
+    ConditionalNode.Ports.if_1 >> TemplatingNode,
+    ConditionalNode.Ports.else_1 >> TemplatingNode2,
 }
 "
 `;
@@ -142,10 +142,10 @@ exports[`Workflow > graph > should be correct for a longer branch 1`] = `
 
 exports[`Workflow > graph > should be correct for a nested conditional node within a set 1`] = `
 "{
-    ConditionalNode.Ports.branch_1 >> TemplatingNode,
-    ConditionalNode.Ports.branch_2
+    ConditionalNode.Ports.if_1 >> TemplatingNode,
+    ConditionalNode.Ports.else_1
     >> {
-        ConditionalNode2.Ports.branch_2
+        ConditionalNode2.Ports.else_1
         >> {
             TemplatingNode3,
             TemplatingNode4,
@@ -177,7 +177,7 @@ exports[`Workflow > graph > should be correct for a node to a set to a node 1`] 
 `;
 
 exports[`Workflow > graph > should be correct for a single port pointing to a set 1`] = `
-"ConditionalNode.Ports.branch_1 >> {
+"ConditionalNode.Ports.if_1 >> {
     TemplatingNode,
     TemplatingNode2,
 }
@@ -186,8 +186,8 @@ exports[`Workflow > graph > should be correct for a single port pointing to a se
 
 exports[`Workflow > graph > should be correct for port within set to a set 1`] = `
 "{
-    ConditionalNode.Ports.branch_1 >> TemplatingNode,
-    ConditionalNode.Ports.branch_2
+    ConditionalNode.Ports.if_1 >> TemplatingNode,
+    ConditionalNode.Ports.else_1
     >> {
         TemplatingNode2,
         TemplatingNode3,
@@ -235,13 +235,13 @@ exports[`Workflow > graph > should be correct for two branches from the same nod
 
 exports[`Workflow > graph > should be correct for two branches merging from sets 1`] = `
 "{
-    ConditionalNode.Ports.branch_1
+    ConditionalNode.Ports.if_1
     >> TemplatingNode
     >> {
         TemplatingNode3 >> TemplatingNode4,
         TemplatingNode5,
     },
-    ConditionalNode.Ports.branch_2 >> TemplatingNode2 >> TemplatingNode3,
+    ConditionalNode.Ports.else_1 >> TemplatingNode2 >> TemplatingNode3,
 }
 "
 `;

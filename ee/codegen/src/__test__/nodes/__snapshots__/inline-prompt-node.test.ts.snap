@@ -1343,41 +1343,6 @@ class PromptNode(InlinePromptNode):
 "
 `;
 
-exports[`InlinePromptNode > with functions attribute > should generate functions field with WorkflowValueDescriptor for non-null constant 1`] = `
-"from vellum import JinjaPromptBlock, PromptParameters
-from vellum.workflows.nodes.displayable import InlinePromptNode
-
-from ..inputs import Inputs
-
-
-class PromptNode(InlinePromptNode):
-    ml_model = "gpt-4o-mini"
-    blocks = [
-        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
-    ]
-    prompt_inputs = {
-        "text": Inputs.text,
-    }
-    functions = [
-        {
-            "name": "test_function",
-            "description": "A test function",
-        },
-    ]
-    parameters = PromptParameters(
-        stop=[],
-        temperature=0,
-        max_tokens=1000,
-        top_p=1,
-        top_k=0,
-        frequency_penalty=0,
-        presence_penalty=0,
-        logit_bias={},
-        custom_parameters={},
-    )
-"
-`;
-
 exports[`InlinePromptNode > with functions attribute > should generate functions field with WorkflowValueDescriptor for upstream node output 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
@@ -1395,35 +1360,6 @@ class PromptNode(InlinePromptNode):
         "text": Inputs.text,
     }
     functions = FunctionsProviderNode.Outputs.functions
-    parameters = PromptParameters(
-        stop=[],
-        temperature=0,
-        max_tokens=1000,
-        top_p=1,
-        top_k=0,
-        frequency_penalty=0,
-        presence_penalty=0,
-        logit_bias={},
-        custom_parameters={},
-    )
-"
-`;
-
-exports[`InlinePromptNode > with functions attribute > should not generate functions field for null constant value 1`] = `
-"from vellum import JinjaPromptBlock, PromptParameters
-from vellum.workflows.nodes.displayable import InlinePromptNode
-
-from ..inputs import Inputs
-
-
-class PromptNode(InlinePromptNode):
-    ml_model = "gpt-4o-mini"
-    blocks = [
-        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
-    ]
-    prompt_inputs = {
-        "text": Inputs.text,
-    }
     parameters = PromptParameters(
         stop=[],
         temperature=0,
