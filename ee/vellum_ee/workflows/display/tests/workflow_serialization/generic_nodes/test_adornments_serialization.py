@@ -1,4 +1,5 @@
 from uuid import uuid4
+from typing import Any, Dict, List, cast
 
 from deepdiff import DeepDiff
 
@@ -338,19 +339,17 @@ def test_serialize_node__adornment_order_matches_decorator_order():
 
     # WHEN we serialize the workflow
     workflow_display = get_workflow_display(workflow_class=MyWorkflow)
-    exec_config = workflow_display.serialize()
+    exec_config = cast(Dict[str, Any], workflow_display.serialize())
 
     # THEN the workflow should serialize successfully
     assert isinstance(exec_config["workflow_raw_data"], dict)
     assert isinstance(exec_config["workflow_raw_data"]["nodes"], list)
 
     # AND we should find our decorated node
-    my_node = [
-        node
-        for node in exec_config["workflow_raw_data"]["nodes"]
-        if isinstance(node, dict) and node["type"] == "GENERIC"
-    ][0]
+    nodes = cast(List[Dict[str, Any]], exec_config["workflow_raw_data"]["nodes"])
+    my_node = [node for node in nodes if isinstance(node, dict) and node["type"] == "GENERIC"][0]
 
-    assert len(my_node["adornments"]) == 2
-    assert my_node["adornments"][0]["label"] == "TryNode"
-    assert my_node["adornments"][1]["label"] == "RetryNode"
+    adornments = cast(List[Dict[str, Any]], my_node["adornments"])
+    assert len(adornments) == 2
+    assert adornments[0]["label"] == "TryNode"
+    assert adornments[1]["label"] == "RetryNode"
