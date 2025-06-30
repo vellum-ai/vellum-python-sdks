@@ -320,3 +320,37 @@ def test_serialize_node__stacked():
         },
         inner_stacked_generic_node,
     )
+
+
+def test_serialize_node__adornment_order_matches_decorator_order():
+    """
+    Tests that adornments are serialized in the same order as decorators are applied.
+    """
+
+    @TryNode.wrap()
+    @RetryNode.wrap(max_attempts=3)
+    class MyNode(BaseNode):
+        pass
+
+    # AND a workflow that uses the decorated node
+    class MyWorkflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    exec_config = workflow_display.serialize()
+
+    # THEN the workflow should serialize successfully
+    assert isinstance(exec_config["workflow_raw_data"], dict)
+    assert isinstance(exec_config["workflow_raw_data"]["nodes"], list)
+
+    # AND we should find our decorated node
+    my_node = [
+        node
+        for node in exec_config["workflow_raw_data"]["nodes"]
+        if isinstance(node, dict) and node["type"] == "GENERIC"
+    ][0]
+
+    assert len(my_node["adornments"]) == 2
+    assert my_node["adornments"][0]["label"] == "TryNode"
+    assert my_node["adornments"][1]["label"] == "RetryNode"
