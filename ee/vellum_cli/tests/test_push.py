@@ -996,7 +996,7 @@ def test_push__deploy_with_malformed_release_tags_shows_friendly_validation_erro
 
     # WHEN calling `vellum workflows push` with --deploy and --release-tag
     runner = CliRunner()
-    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy", "--release-tag", None])
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy", "--release-tag", None])  # type: ignore
 
     # THEN it should show the friendly error message instead of a raw Pydantic traceback
     assert "Invalid release tag format" in result.output
