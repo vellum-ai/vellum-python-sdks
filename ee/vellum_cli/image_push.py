@@ -26,7 +26,7 @@ def image_push_command(
 
     logger.info("Pruning dangling python-workflow-runtime Docker images...")
     try:
-        subprocess.run(["docker", "image", "prune", "-f"], check=True)
+        subprocess.run(["docker", "image", "prune", "-f", "--filter", "label=your-label-key"], check=True)
         logger.info("Docker image pruning completed successfully")
     except subprocess.CalledProcessError as e:
         logger.warning(f"Docker image pruning failed: {e}")
