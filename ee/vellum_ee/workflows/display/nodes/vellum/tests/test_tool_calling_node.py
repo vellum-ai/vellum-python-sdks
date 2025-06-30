@@ -139,8 +139,8 @@ def test_serialize_node__function_configs():
             "foo": {
                 "runtime": "PYTHON_3_11_6",
                 "packages": [
-                    CodeExecutionPackage(name="first_package", version="1.0.0"),
-                    CodeExecutionPackage(name="second_package", version="2.0.0"),
+                    CodeExecutionPackage(name="first_package", version="1.0.0", repository="test-repo"),
+                    CodeExecutionPackage(name="second_package", version="2.0.0", repository="test-repo"),
                 ],
             },
             "bar": {
@@ -179,11 +179,14 @@ def test_serialize_node__function_configs():
                     "foo": {
                         "runtime": "PYTHON_3_11_6",
                         "packages": [
-                            {"version": "1.0.0", "name": "first_package"},
-                            {"version": "2.0.0", "name": "second_package"},
+                            {"version": "1.0.0", "name": "first_package", "repository": "test-repo"},
+                            {"version": "2.0.0", "name": "second_package", "repository": "test-repo"},
                         ],
                     },
-                    "bar": {"runtime": "PYTHON_3_11_6", "packages": [{"version": "3.0.0", "name": "third_package"}]},
+                    "bar": {
+                        "runtime": "PYTHON_3_11_6",
+                        "packages": [{"version": "3.0.0", "name": "third_package", "repository": None}],
+                    },
                 },
             },
         },
