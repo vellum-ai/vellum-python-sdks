@@ -24,10 +24,10 @@ def image_push_command(
     logger = load_cli_logger()
     config = load_vellum_cli_config()
 
-    logger.info("Pruning dangling python-workflow-runtime Docker images...")
+    logger.info("Cleaning up unused Docker images...")
     try:
         subprocess.run(
-            ["docker", "image", "prune", "-f", "--filter", "reference=*python-workflow-runtime*"], check=True
+            ["docker", "image", "prune", "--all", "-f", "--filter", "label!=storage=do_not_delete"], check=True
         )
         logger.info("Docker image pruning completed successfully")
     except subprocess.CalledProcessError as e:
