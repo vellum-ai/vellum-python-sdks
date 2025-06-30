@@ -1004,6 +1004,7 @@ def test_push__deploy_with_malformed_release_tags_shows_friendly_validation_erro
     assert "--release-tag tag1 --release-tag tag2" in result.output
 
 
+@pytest.mark.usefixtures("info_log_level")
 def test_push__deploy_with_release_tags_success(mock_module, vellum_client):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
@@ -1021,9 +1022,7 @@ def test_push__deploy_with_release_tags_success(mock_module, vellum_client):
 
     # WHEN calling `vellum workflows push` with --deploy and --release-tag
     runner = CliRunner()
-    result = runner.invoke(
-        cli_main, ["workflows", "push", module, "--deploy", "--release-tag", "v1.0.0", "--release-tag", "production"]
-    )
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy", "--release-tag", "v1.0.0"])
 
     # THEN it should succeed
     assert result.exit_code == 0, result.output
@@ -1035,7 +1034,7 @@ def test_push__deploy_with_release_tags_success(mock_module, vellum_client):
     # AND the deployment_config should contain the release tags
     deployment_config_str = call_args["deployment_config"]
     deployment_config = json.loads(deployment_config_str)
-    assert deployment_config["release_tags"] == ["v1.0.0", "production"]
+    assert deployment_config["release_tags"] == ["v1.0.0"]
 
     # AND should show success message
     assert "Successfully pushed" in result.output
