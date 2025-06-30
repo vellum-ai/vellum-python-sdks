@@ -17,6 +17,11 @@ from vellum_cli.logger import handle_cli_error, load_cli_logger
 _SUPPORTED_ARCHITECTURE = "amd64"
 
 
+def _is_python_workflow_runtime_image(image: str) -> bool:
+    """Check if the given image is a python-workflow-runtime image."""
+    return "python-workflow-runtime" in image
+
+
 def image_push_command(
     image: str, tags: Optional[List[str]] = None, workspace: Optional[str] = None, source: Optional[str] = None
 ) -> None:
@@ -66,12 +71,15 @@ def image_push_command(
         )
         exit(1)
 
-    logger.info("Pruning dangling Docker images...")
-    try:
-        subprocess.run(["docker", "image", "prune", "-f"], check=True)
-        logger.info("Docker image pruning completed successfully")
-    except subprocess.CalledProcessError as e:
-        logger.warning(f"Docker image pruning failed: {e}")
+    if _is_python_workflow_runtime_image(image):
+        logger.info("Pruning dangling Docker images for python-workflow-runtime image...")
+        try:
+            subprocess.run(["docker", "image", "prune", "-f"], check=True)
+            logger.info("Docker image pruning completed successfully")
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"Docker image pruning failed: {e}")
+    else:
+        logger.info(f"Skipping Docker image pruning for non-python-workflow-runtime image: {image}")
 
     # We're using docker python SDK here instead of subprocess since it connects to the docker host directly
     # instead of using the command line so it seemed like it would possibly be a little more robust since
