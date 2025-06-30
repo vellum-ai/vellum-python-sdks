@@ -48,6 +48,7 @@ def test_image_push__self_hosted_happy_path(mock_docker_from_env, mock_subproces
     mock_docker_from_env.return_value = mock_docker_client
 
     mock_subprocess_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -100,6 +101,7 @@ def test_image_push__self_hosted_happy_path__workspace_option(
     mock_docker_from_env.return_value = mock_docker_client
 
     mock_subprocess_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -190,6 +192,7 @@ def test_image_push_with_source_success(
 
     mock_subprocess_run.side_effect = [
         subprocess.CompletedProcess(args="", returncode=0, stdout=b"Build successful"),
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -255,3 +258,75 @@ def test_image_push_with_source_build_fails(mock_subprocess_run, monkeypatch, mo
     assert result.exit_code == 1
     assert "Docker build failed" in result.output
     assert "Build failed: missing dependency" in result.output
+
+
+@pytest.mark.usefixtures("vellum_client", "info_log_level")
+def test_image_push_includes_docker_prune(mock_docker_from_env, mock_subprocess_run, monkeypatch):
+    """
+    Tests that image_push_command calls docker image prune before validation.
+    """
+    # GIVEN a self hosted vellum api URL env var
+    monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    # AND a mock Docker client
+    mock_docker_client = MagicMock()
+    mock_docker_from_env.return_value = mock_docker_client
+
+    mock_subprocess_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
+        subprocess.CompletedProcess(
+            args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
+        ),
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"manifest"),
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
+    ]
+
+    # WHEN the user runs the image push command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myrepo.net/myimage:latest"])
+
+    # THEN the command exits successfully
+    assert result.exit_code == 0, result.output
+
+    prune_call = mock_subprocess_run.call_args_list[0]
+    assert prune_call[0][0] == ["docker", "image", "prune", "-f"]
+
+    # AND the success message includes pruning completion
+    assert "Docker image pruning completed successfully" in result.output
+
+
+@pytest.mark.usefixtures("vellum_client", "info_log_level")
+def test_image_push_continues_if_prune_fails(mock_docker_from_env, mock_subprocess_run, monkeypatch):
+    """
+    Tests that image_push_command continues if docker image prune fails.
+    """
+    # GIVEN a self hosted vellum api URL env var
+    monkeypatch.setenv("VELLUM_API_URL", "mycompany.api.com")
+    monkeypatch.setenv("VELLUM_API_KEY", "123456abcdef")
+
+    # AND a mock Docker client
+    mock_docker_client = MagicMock()
+    mock_docker_from_env.return_value = mock_docker_client
+
+    mock_subprocess_run.side_effect = [
+        subprocess.CalledProcessError(1, ["docker", "image", "prune", "-f"]),
+        subprocess.CompletedProcess(
+            args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
+        ),
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"manifest"),
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"sha256:hellosha"),
+    ]
+
+    # WHEN the user runs the image push command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["image", "push", "myrepo.net/myimage:latest"])
+
+    # THEN the command exits successfully despite pruning failure
+    assert result.exit_code == 0, result.output
+
+    # AND the warning message about pruning failure is shown
+    assert "Docker image pruning failed" in result.output
+
+    # AND the success message is still shown
+    assert "Image successfully pushed" in result.output

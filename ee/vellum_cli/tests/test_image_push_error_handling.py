@@ -18,6 +18,7 @@ def test_image_push_docker_service_token_401_error(mock_docker_from_env, mock_ru
     mock_docker_client.images.get.return_value.id = "test-image-id"
 
     mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -43,6 +44,7 @@ def test_image_push_docker_service_token_500_error(mock_docker_from_env, mock_ru
     mock_docker_client.images.get.return_value.id = "test-image-id"
 
     mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -70,6 +72,7 @@ def test_image_push_docker_service_token_other_error(mock_docker_from_env, mock_
     mock_docker_client.images.get.return_value.id = "test-image-id"
 
     mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -98,6 +101,7 @@ def test_image_push_container_image_401_error(mock_docker_from_env, mock_run, ve
     mock_docker_client.images.push.return_value = ["pushed"]
 
     mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -129,6 +133,7 @@ def test_image_push_container_image_500_error(mock_docker_from_env, mock_run, ve
     mock_docker_client.images.push.return_value = ["pushed"]
 
     mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),
@@ -162,6 +167,7 @@ def test_image_push_container_image_other_error(mock_docker_from_env, mock_run, 
     mock_docker_client.images.push.return_value = ["pushed"]
 
     mock_run.side_effect = [
+        subprocess.CompletedProcess(args="", returncode=0, stdout=b"Pruning successful"),
         subprocess.CompletedProcess(
             args="", returncode=0, stdout=b'{"manifests": [{"platform": {"architecture": "amd64"}}]}'
         ),

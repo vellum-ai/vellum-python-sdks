@@ -66,6 +66,13 @@ def image_push_command(
         )
         exit(1)
 
+    logger.info("Pruning dangling Docker images...")
+    try:
+        subprocess.run(["docker", "image", "prune", "-f"], check=True)
+        logger.info("Docker image pruning completed successfully")
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"Docker image pruning failed: {e}")
+
     # We're using docker python SDK here instead of subprocess since it connects to the docker host directly
     # instead of using the command line so it seemed like it would possibly be a little more robust since
     # it might avoid peoples' wonky paths, unfortunately it doesn't support the manifest command which we need for
