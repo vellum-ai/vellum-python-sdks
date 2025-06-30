@@ -162,7 +162,7 @@ def test_serialize_workflow():
                         "value": {
                             "get_current_weather": {
                                 "runtime": "PYTHON_3_11_6",
-                                "packages": [{"version": "2.26.0", "name": "requests"}],
+                                "packages": [{"version": "2.26.0", "name": "requests", "repository": None}],
                             }
                         },
                     },
