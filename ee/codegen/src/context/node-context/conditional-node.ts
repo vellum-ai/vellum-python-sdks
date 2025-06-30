@@ -19,7 +19,7 @@ export class ConditionalNodeContext extends BaseNodeContext<ConditionalNode> {
   createPortContexts(): PortContext[] {
     const conditionTypeCounts = new Map<string, number>();
 
-    return this.nodeData.data.conditions.map((condition, idx) => {
+    return this.nodeData.data.conditions.map((condition) => {
       const conditionType = condition.type;
       const currentCount = conditionTypeCounts.get(conditionType) || 0;
       conditionTypeCounts.set(conditionType, currentCount + 1);
