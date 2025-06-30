@@ -136,12 +136,12 @@ from .nodes.top_node import TopNode
 
 class TestWorkflow(BaseWorkflow):
     graph = {
-        StartNode.Ports.branch_1 >> TopNode,
-        StartNode.Ports.branch_2,
+        StartNode.Ports.if_1 >> TopNode,
+        StartNode.Ports.else_1,
     } >> Graph.from_set(
         {
-            LoopCheckNode.Ports.branch_1 >> StartNode,
-            LoopCheckNode.Ports.branch_2 >> FinalOutputNode,
+            LoopCheckNode.Ports.if_1 >> StartNode,
+            LoopCheckNode.Ports.else_1 >> FinalOutputNode,
         }
     )
 "

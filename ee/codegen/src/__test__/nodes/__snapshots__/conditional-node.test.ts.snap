@@ -7,8 +7,8 @@ from vellum.workflows.ports import Port
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(None)
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(None)
+        else_1 = Port.on_else()
 "
 `;
 
@@ -19,8 +19,8 @@ from vellum.workflows.ports import Port
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(None)
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(None)
+        else_1 = Port.on_else()
 "
 `;
 
@@ -32,7 +32,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(
+        if_1 = Port.on_if(
             ConstantValueReference("text").equals("val-1")
             & ConstantValueReference("text").equals("val-2")
         )
@@ -59,7 +59,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(
+        if_1 = Port.on_if(
             ConstantValueReference("text").equals("val-1")
             | ConstantValueReference("text").equals("val-2")
         )
@@ -74,7 +74,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(ConstantValueReference("hello").between("world,hello"))
+        if_1 = Port.on_if(ConstantValueReference("hello").between("world,hello"))
 "
 `;
 
@@ -86,7 +86,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(ConstantValueReference("hello").equals("world"))
+        if_1 = Port.on_if(ConstantValueReference("hello").equals("world"))
 "
 `;
 
@@ -99,8 +99,8 @@ from ..inputs import Inputs
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(Inputs.lhs.equals(200))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(Inputs.lhs.equals(200))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -113,8 +113,8 @@ from .api_node import APINode
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(APINode.Outputs.status_code.equals(200))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(APINode.Outputs.status_code.equals(200))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -127,7 +127,7 @@ from ..inputs import Inputs
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(Inputs.rhs.greater_than(0.5))
+        if_1 = Port.on_if(Inputs.rhs.greater_than(0.5))
 "
 `;
 
@@ -218,9 +218,9 @@ from ..inputs import Inputs
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(Inputs.field.equals("testtest"))
-        branch_2 = Port.on_elif(Inputs.field.is_not_null())
-        branch_3 = Port.on_else()
+        if_1 = Port.on_if(Inputs.field.equals("testtest"))
+        elif_1 = Port.on_elif(Inputs.field.is_not_null())
+        else_1 = Port.on_else()
 "
 `;
 
@@ -231,8 +231,8 @@ from vellum.workflows.ports import Port
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(None)
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(None)
+        else_1 = Port.on_else()
 "
 `;
 
@@ -301,8 +301,8 @@ from ..inputs import Inputs
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(Inputs.field.equals(Inputs.field))
-        branch_2 = Port.on_else()
+        if_1 = Port.on_if(Inputs.field.equals(Inputs.field))
+        else_1 = Port.on_else()
 "
 `;
 
@@ -378,7 +378,7 @@ from .templating_node import TemplatingNode
 
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
-        branch_1 = Port.on_if(
+        if_1 = Port.on_if(
             Inputs.field.is_null() & TemplatingNode.Outputs.result.is_nil()
         )
 "
