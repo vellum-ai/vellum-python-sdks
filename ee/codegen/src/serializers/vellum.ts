@@ -1505,12 +1505,14 @@ export const CodeExecutionPackageSerializer: ObjectSchema<
 > = objectSchema({
   version: stringSchema(),
   name: stringSchema(),
+  repository: stringSchema().optional().nullable(),
 });
 
 export declare namespace CodeExecutionPackageSerializer {
   interface Raw {
     version: string;
     name: string;
+    repository?: string | null;
   }
 }
 

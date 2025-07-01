@@ -102,6 +102,9 @@ describe("CodeExecutionNode", () => {
 
       const nodeData = codeExecutionNodeFactory({
         code,
+        packages: [
+          { name: "my-package", version: "1.0.0", repository: "test-repo" },
+        ],
       }).build();
 
       const nodeContext = (await createNodeContext({

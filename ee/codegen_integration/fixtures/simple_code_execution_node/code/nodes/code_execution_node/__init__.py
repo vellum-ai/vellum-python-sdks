@@ -14,5 +14,5 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     }
     runtime = "PYTHON_3_11_6"
     packages = [
-        CodeExecutionPackage(name="requests", version="2.26.0"),
+        CodeExecutionPackage(name="requests", version="2.26.0", repository="test-repo"),
     ]
