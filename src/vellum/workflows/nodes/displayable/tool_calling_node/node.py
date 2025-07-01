@@ -10,7 +10,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.experimental.tool_calling_node.utils import (
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
     create_tool_router_node,
     get_function_name,
@@ -19,7 +19,6 @@ from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface, Tool
-from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class ToolCallingNode(BaseNode):
@@ -68,6 +67,8 @@ class ToolCallingNode(BaseNode):
             class ToolCallingState(BaseState):
                 chat_history: List[ChatMessage] = []
                 prompt_iterations: int = 0
+
+            from vellum.workflows.workflows.base import BaseWorkflow
 
             class ToolCallingWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
                 graph = self._graph

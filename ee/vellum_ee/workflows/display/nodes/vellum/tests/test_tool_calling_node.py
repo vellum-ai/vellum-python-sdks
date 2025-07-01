@@ -2,7 +2,7 @@ from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
-from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 

@@ -48,7 +48,7 @@ def test_serialize_workflow():
         },
         "base": {
             "name": "ToolCallingNode",
-            "module": ["vellum", "workflows", "nodes", "experimental", "tool_calling_node", "node"],
+            "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "node"],
         },
         "definition": {
             "name": "GetCurrentWeatherNode",

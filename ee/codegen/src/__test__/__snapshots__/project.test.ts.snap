@@ -341,7 +341,7 @@ from .get_current_weather import get_current_weather
 from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
@@ -392,7 +392,7 @@ exports[`WorkflowProjectGenerator > function > should generate deployment workfl
 "from typing import List
 
 from vellum import ChatMessage
-from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.types.definition import DeploymentDefinition
 
 
@@ -412,7 +412,7 @@ exports[`WorkflowProjectGenerator > function > should generate empty function ar
 "from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
@@ -511,7 +511,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes.experimental.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
 from ...inputs import Inputs
 

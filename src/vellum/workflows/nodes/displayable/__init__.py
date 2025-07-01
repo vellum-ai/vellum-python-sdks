@@ -13,6 +13,7 @@ from .note_node import NoteNode
 from .prompt_deployment_node import PromptDeploymentNode
 from .search_node import SearchNode
 from .subworkflow_deployment_node import SubworkflowDeploymentNode
+from .tool_calling_node import ToolCallingNode
 
 __all__ = [
     "APINode",
@@ -29,5 +30,6 @@ __all__ = [
     "PromptDeploymentNode",
     "SearchNode",
     "TemplatingNode",
+    "ToolCallingNode",
     "FinalOutputNode",
 ]

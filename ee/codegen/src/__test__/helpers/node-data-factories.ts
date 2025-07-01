@@ -1775,7 +1775,7 @@ export function toolCallingNodeFactory({
         "vellum",
         "workflows",
         "nodes",
-        "experimental",
+        "displayable",
         "tool_calling_node",
       ],
     },
