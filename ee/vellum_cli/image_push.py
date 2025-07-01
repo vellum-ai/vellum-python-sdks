@@ -24,6 +24,16 @@ def image_push_command(
     logger = load_cli_logger()
     config = load_vellum_cli_config()
 
+    logger.info("Cleaning up unused Docker images...")
+    try:
+        subprocess.run(
+            ["docker", "image", "prune", "--all", "-f", "--filter", "label=image-type=python-workflow-runtime"],
+            check=True,
+        )
+        logger.info("Docker image pruning completed successfully")
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"Docker image pruning failed: {e}")
+
     if source:
         logger.info(f"Building Docker image from Dockerfile: {source}")
 
