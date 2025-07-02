@@ -1,5 +1,4 @@
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
-from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
@@ -47,18 +46,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         ),
     ]
     functions = [get_current_weather]
-    # For testing purposes
-    function_configs = {
-        "get_current_weather": {
-            "runtime": "PYTHON_3_11_6",
-            "packages": [
-                CodeExecutionPackage(
-                    name="requests",
-                    version="2.26.0",
-                )
-            ],
-        },
-    }
     prompt_inputs = {
         "question": Inputs.query,
     }

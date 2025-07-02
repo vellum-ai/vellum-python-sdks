@@ -1,14 +1,9 @@
-from collections.abc import Sequence
-import inspect
 import json
-import types
 from typing import Any, Iterator, List, Optional, Type, cast
 
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
-from vellum.client.types.code_execution_package import CodeExecutionPackage
-from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -16,13 +11,11 @@ from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
-from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
@@ -141,19 +134,16 @@ def create_tool_router_node(
 def create_function_node(
     function: Tool,
     tool_router_node: Type[ToolRouterNode],
-    packages: Optional[Sequence[CodeExecutionPackage]] = None,
-    runtime: CodeExecutionRuntime = "PYTHON_3_11_6",
 ) -> Type[FunctionNode]:
     """
     Create a FunctionNode class for a given function.
 
     For workflow functions: BaseNode
-    For regular functions: CodeExecutionNode with embedded function
+    For regular functions: BaseNode with direct function call
+
     Args:
         function: The function to create a node for
         tool_router_node: The tool router node class
-        packages: Optional list of packages to install for code execution (only used for regular functions)
-        runtime: The runtime to use for code execution (default: "PYTHON_3_11_6")
     """
     if isinstance(function, DeploymentDefinition):
         deployment = function.deployment_id or function.deployment_name
@@ -250,28 +240,8 @@ def create_function_node(
             },
         )
     else:
-        # For regular functions, use CodeExecutionNode approach
-        # function tool must be put in another file (no need to have the same name)
-        source_path = inspect.getmodule(function)
-        if source_path is not None:
-            function_source = inspect.getsource(source_path)
-        else:
-            raise NodeException(
-                message=f"Source code not available for function '{function.__name__}'. "
-                f"Function must be defined in a file that can be inspected.",
-                code=WorkflowErrorCode.INVALID_CODE,
-            )
-        function_name = function.__name__
-
-        code = f'''
-{function_source}
-
-def main(arguments):
-    """Main function that calls the original function with the provided arguments."""
-    return {function_name}(**arguments)
-'''
-
-        def execute_code_execution_function(self) -> BaseNode.Outputs:
+        # For regular functions, call them directly
+        def execute_regular_function(self) -> BaseNode.Outputs:
             # Get the function call from the tool router output
             function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
             if function_call_output and len(function_call_output) > 0:
@@ -280,42 +250,33 @@ def main(arguments):
             else:
                 arguments = {}
 
-            self.code_inputs = {"arguments": arguments}
+            # Call the function directly
+            try:
+                result = function(**arguments)
+            except Exception as e:
+                raise NodeException(
+                    message=f"Error executing function '{function.__name__}': {str(e)}",
+                    code=WorkflowErrorCode.NODE_EXECUTION,
+                )
 
-            outputs = base_class.run(self)
-
+            # Add the result to the chat history
             self.state.chat_history.append(
                 ChatMessage(
                     role="FUNCTION",
-                    content=StringChatMessageContent(value=json.dumps(outputs.result, cls=DefaultStateEncoder)),
+                    content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
                 )
             )
 
             return self.Outputs()
 
-        # Create the properly typed base class with explicit type annotation
-        def get_function_output_type() -> Type:
-            return function.__annotations__.get("return", Any)
-
-        output_type = get_function_output_type()
-
-        base_class: Type[CodeExecutionNode] = CodeExecutionNode[BaseState, output_type]  # type: ignore[valid-type]
-
-        # Create the class with basic attributes
-        node = types.new_class(
-            f"CodeExecutionNode_{function.__name__}",
-            (base_class,),
-            {},
-            lambda ns: ns.update(
-                {
-                    "code": code,
-                    "code_inputs": {},  # No inputs needed since we handle function call extraction in run()
-                    "run": execute_code_execution_function,
-                    "runtime": runtime,
-                    "packages": packages,
-                    "__module__": __name__,
-                }
-            ),
+        # Create BaseNode for regular functions
+        node = type(
+            f"RegularFunctionNode_{function.__name__}",
+            (FunctionNode,),
+            {
+                "run": execute_regular_function,
+                "__module__": __name__,
+            },
         )
 
     return node
