@@ -168,10 +168,13 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
         return;
       }
 
-      throw new NodeOutputNotFoundError(
-        `Failed to find ${this.nodeClassName} Output with id '${outputId}'`,
-        "WARNING"
+      this.workflowContext.addError(
+        new NodeOutputNotFoundError(
+          `Failed to find ${this.nodeClassName} Output with id '${outputId}'`,
+          "WARNING"
+        )
       );
+      return;
     }
 
     return toValidPythonIdentifier(nodeOutputName, "output");
