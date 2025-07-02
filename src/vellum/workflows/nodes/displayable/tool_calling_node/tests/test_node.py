@@ -8,7 +8,7 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.experimental.tool_calling_node.utils import create_function_node, create_tool_router_node
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_function_node, create_tool_router_node
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext

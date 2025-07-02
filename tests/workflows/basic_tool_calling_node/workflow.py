@@ -3,7 +3,7 @@ from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
-from vellum.workflows.nodes.experimental.tool_calling_node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseInputs, BaseWorkflow
 

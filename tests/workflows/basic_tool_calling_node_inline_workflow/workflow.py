@@ -5,7 +5,7 @@ from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.experimental.tool_calling_node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 

@@ -40,7 +40,7 @@ from vellum import (
     RichTextPromptBlock,
     VariablePromptBlock,
 )
-from vellum.workflows.nodes.experimental.tool_calling_node import (
+from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 
@@ -74,7 +74,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > deployment workflow > should generate latest release tag if release_tag is null 1`] = `
-"from vellum.workflows.nodes.experimental.tool_calling_node import (
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 from vellum.workflows.types.definition import DeploymentDefinition
@@ -89,7 +89,7 @@ exports[`ToolCallingNode > function ordering > should preserve order: code-exec,
 "from .add_numbers import add_numbers
 from .subtract.workflow import Subtract
 
-from vellum.workflows.nodes.experimental.tool_calling_node import (
+from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 
@@ -103,7 +103,7 @@ exports[`ToolCallingNode > function ordering > should preserve order: workflow, 
 "from .add_numbers import add_numbers
 from .subtract.workflow import Subtract
 
-from vellum.workflows.nodes.experimental.tool_calling_node import (
+from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 
@@ -116,7 +116,7 @@ class ToolCallingNode(BaseToolCallingNode):
 exports[`ToolCallingNode > inline workflow > should generate inline workflow function name 1`] = `
 "from .subtract.workflow import Subtract
 
-from vellum.workflows.nodes.experimental.tool_calling_node import (
+from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 
@@ -133,7 +133,7 @@ exports[`ToolCallingNode > input variables > should generate input variables 1`]
     RichTextPromptBlock,
     VariablePromptBlock,
 )
-from vellum.workflows.nodes.experimental.tool_calling_node import (
+from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 
