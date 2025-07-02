@@ -1,9 +1,6 @@
-from collections.abc import Sequence
-from typing import Any, ClassVar, Dict, List, Optional, cast
+from typing import ClassVar, List, Optional
 
 from vellum import ChatMessage, PromptBlock
-from vellum.client.types.code_execution_package import CodeExecutionPackage
-from vellum.client.types.code_execution_runtime import CodeExecutionRuntime
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -30,7 +27,6 @@ class ToolCallingNode(BaseNode):
         blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)
         functions: List[Tool] - The functions that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
-        function_configs: Optional[Dict[str, Dict[str, Any]]] - Mapping of function names to their configuration
         max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping
     """
 
@@ -38,7 +34,6 @@ class ToolCallingNode(BaseNode):
     blocks: ClassVar[List[PromptBlock]] = []
     functions: ClassVar[List[Tool]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
-    function_configs: ClassVar[Optional[Dict[str, Dict[str, Any]]]] = None
     max_prompt_iterations: ClassVar[Optional[int]] = 5
 
     class Outputs(BaseOutputs):
@@ -113,23 +108,10 @@ class ToolCallingNode(BaseNode):
         self._function_nodes = {}
         for function in self.functions:
             function_name = get_function_name(function)
-            # Get configuration for this function
-            config = {}
-            if callable(function) and self.function_configs and function.__name__ in self.function_configs:
-                config = self.function_configs[function.__name__]
-
-            packages = config.get("packages", None)
-            if packages is not None:
-                packages = cast(Sequence[CodeExecutionPackage], packages)
-
-            runtime_raw = config.get("runtime", "PYTHON_3_11_6")
-            runtime = cast(CodeExecutionRuntime, runtime_raw)
 
             self._function_nodes[function_name] = create_function_node(
                 function=function,
                 tool_router_node=self.tool_router_node,
-                packages=packages,
-                runtime=runtime,
             )
 
         graph_set = set()

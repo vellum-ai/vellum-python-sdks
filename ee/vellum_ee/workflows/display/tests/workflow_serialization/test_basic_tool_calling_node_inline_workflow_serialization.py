@@ -408,11 +408,6 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "a4e3bc9f-7112-4d2f-94fb-7362a85db27a",
-                "name": "function_configs",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
-            },
-            {
                 "id": "1668419e-a193-43a5-8a97-3394e89bf278",
                 "name": "max_prompt_iterations",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5.0}},
