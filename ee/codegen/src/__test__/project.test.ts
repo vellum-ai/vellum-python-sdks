@@ -335,7 +335,9 @@ describe("WorkflowProjectGenerator", () => {
         },
       });
 
-      vi.spyOn(project, 'generateAssets' as any).mockRejectedValue(new Error("Asset generation failed"));
+      vi.spyOn(project, "generateAssets" as any).mockRejectedValue(
+        new Error("Asset generation failed")
+      );
 
       await project.generateCode();
 
@@ -343,7 +345,7 @@ describe("WorkflowProjectGenerator", () => {
 
       const moduleDir = join(tempDir, "test_module");
       const files = await readdir(moduleDir).catch(() => []);
-      expect(files.filter((f: string) => f.endsWith('.py')).length).toBe(0);
+      expect(files.filter((f: string) => f.endsWith(".py")).length).toBe(0);
     });
 
     it("should generate code even if a node fails to find invalid ports and target nodes", async () => {
