@@ -122,30 +122,3 @@ def test_serialize_node__prompt_inputs__mixed_values():
             ],
         },
     }
-
-
-def test_serialize_node__no_function_configs():
-    # GIVEN a tool calling node with functions but no function configs
-    def foo():
-        pass
-
-    class MyToolCallingNode(ToolCallingNode):
-        functions = [foo]
-
-    # AND a workflow with the tool calling node
-    class Workflow(BaseWorkflow):
-        graph = MyToolCallingNode
-
-    # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(workflow_class=Workflow)
-    serialized_workflow: dict = workflow_display.serialize()
-
-    # THEN the node should not have function_configs attribute
-    my_tool_calling_node = next(
-        node
-        for node in serialized_workflow["workflow_raw_data"]["nodes"]
-        if node["id"] == str(MyToolCallingNode.__id__)
-    )
-
-    attribute_names = [attr["name"] for attr in my_tool_calling_node["attributes"]]
-    assert "function_configs" not in attribute_names

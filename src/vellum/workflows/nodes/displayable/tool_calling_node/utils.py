@@ -271,7 +271,7 @@ def create_function_node(
 
         # Create BaseNode for regular functions
         node = type(
-            f"RegularFunctionNode_{function.__name__}",
+            f"FunctionNode_{function.__name__}",
             (FunctionNode,),
             {
                 "run": execute_regular_function,
