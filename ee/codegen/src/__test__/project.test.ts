@@ -335,9 +335,10 @@ describe("WorkflowProjectGenerator", () => {
         },
       });
 
-      vi.spyOn(project, "generateAssets" as any).mockRejectedValue(
-        new Error("Asset generation failed")
-      );
+      vi.spyOn(
+        project as unknown as { generateAssets: () => Promise<unknown> },
+        "generateAssets"
+      ).mockRejectedValue(new Error("Asset generation failed"));
 
       await project.generateCode();
 
