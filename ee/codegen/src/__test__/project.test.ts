@@ -1,4 +1,4 @@
-import { mkdir, rm } from "fs/promises";
+import { mkdir, readdir, rm } from "fs/promises";
 import * as fs from "node:fs";
 import { join } from "path";
 
@@ -298,6 +298,12 @@ describe("WorkflowProjectGenerator", () => {
     });
 
     it("should create output directory even when generateAssets fails", async () => {
+      /**
+       * Tests that the module directory is created even when generateAssets() throws an error.
+       * This prevents 500 errors in the codegen service when asset generation fails.
+       */
+
+      // GIVEN a minimal workflow configuration
       const displayData = {
         workflow_raw_data: {
           nodes: [
@@ -334,6 +340,10 @@ describe("WorkflowProjectGenerator", () => {
       await project.generateCode();
 
       expectProjectFileToExist(["test_module"]);
+
+      const moduleDir = join(tempDir, "test_module");
+      const files = await readdir(moduleDir).catch(() => []);
+      expect(files.filter((f: string) => f.endsWith('.py')).length).toBe(0);
     });
 
     it("should generate code even if a node fails to find invalid ports and target nodes", async () => {
