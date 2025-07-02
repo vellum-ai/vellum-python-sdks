@@ -297,6 +297,45 @@ describe("WorkflowProjectGenerator", () => {
       );
     });
 
+    it("should create output directory even when generateAssets fails", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+          ],
+          edges: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "test_module",
+        vellumApiKey: "<TEST_API_KEY>",
+        options: {
+          disableFormatting: true,
+        },
+      });
+
+      vi.spyOn(project, 'generateAssets' as any).mockRejectedValue(new Error("Asset generation failed"));
+
+      await project.generateCode();
+
+      expectProjectFileToExist(["test_module"]);
+    });
+
     it("should generate code even if a node fails to find invalid ports and target nodes", async () => {
       displayData = {
         workflow_raw_data: {

@@ -179,6 +179,15 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   public async generateCode(): Promise<void> {
+    const absolutePathToModuleDirectory = join(
+      this.workflowContext.absolutePathToOutputDirectory,
+      ...this.getModulePath()
+    );
+
+    await mkdir(absolutePathToModuleDirectory, {
+      recursive: true,
+    });
+
     const assets = await this.generateAssets().catch((error) => {
       if (error instanceof BaseCodegenError) {
         this.workflowContext.addError(error);
@@ -202,15 +211,6 @@ ${errors.slice(0, 3).map((err) => {
 
     const state = codegen.state({
       workflowContext: this.workflowContext,
-    });
-
-    const absolutePathToModuleDirectory = join(
-      this.workflowContext.absolutePathToOutputDirectory,
-      ...this.getModulePath()
-    );
-
-    await mkdir(absolutePathToModuleDirectory, {
-      recursive: true,
     });
 
     await Promise.all([
