@@ -125,6 +125,7 @@ from .execution_json_vellum_value import ExecutionJsonVellumValue
 from .execution_number_vellum_value import ExecutionNumberVellumValue
 from .execution_search_results_vellum_value import ExecutionSearchResultsVellumValue
 from .execution_string_vellum_value import ExecutionStringVellumValue
+from .execution_thinking_vellum_value import ExecutionThinkingVellumValue
 from .execution_vellum_value import ExecutionVellumValue
 from .external_input_descriptor import ExternalInputDescriptor
 from .external_test_case_execution import ExternalTestCaseExecution
@@ -511,6 +512,8 @@ from .test_suite_test_case_replace_bulk_operation_request import TestSuiteTestCa
 from .test_suite_test_case_replaced_bulk_result import TestSuiteTestCaseReplacedBulkResult
 from .test_suite_test_case_replaced_bulk_result_data import TestSuiteTestCaseReplacedBulkResultData
 from .test_suite_test_case_upsert_bulk_operation_request import TestSuiteTestCaseUpsertBulkOperationRequest
+from .thinking_vellum_value import ThinkingVellumValue
+from .thinking_vellum_value_request import ThinkingVellumValueRequest
 from .token_overlapping_window_chunker_config import TokenOverlappingWindowChunkerConfig
 from .token_overlapping_window_chunker_config_request import TokenOverlappingWindowChunkerConfigRequest
 from .token_overlapping_window_chunking import TokenOverlappingWindowChunking
@@ -741,6 +744,7 @@ __all__ = [
     "ExecutionNumberVellumValue",
     "ExecutionSearchResultsVellumValue",
     "ExecutionStringVellumValue",
+    "ExecutionThinkingVellumValue",
     "ExecutionVellumValue",
     "ExternalInputDescriptor",
     "ExternalTestCaseExecution",
@@ -1107,6 +1111,8 @@ __all__ = [
     "TestSuiteTestCaseReplacedBulkResult",
     "TestSuiteTestCaseReplacedBulkResultData",
     "TestSuiteTestCaseUpsertBulkOperationRequest",
+    "ThinkingVellumValue",
+    "ThinkingVellumValueRequest",
     "TokenOverlappingWindowChunkerConfig",
     "TokenOverlappingWindowChunkerConfigRequest",
     "TokenOverlappingWindowChunking",

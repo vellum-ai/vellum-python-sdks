@@ -63,6 +63,9 @@ class InlinePromptNode(BaseInlinePromptNode[StateType]):
                 json_output = output.value
             elif output.type == "FUNCTION_CALL":
                 string_outputs.append(output.value.model_dump_json(indent=4))
+            elif output.type == "THINKING":
+                thinking_strings = [item.value for item in output.value if item.value is not None]
+                string_outputs.append("\n".join(thinking_strings))
             else:
                 string_outputs.append(output.value.message)
 

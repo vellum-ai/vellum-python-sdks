@@ -9,6 +9,7 @@ from .execution_search_results_vellum_value import ExecutionSearchResultsVellumV
 from .execution_error_vellum_value import ExecutionErrorVellumValue
 from .execution_array_vellum_value import ExecutionArrayVellumValue
 from .execution_function_call_vellum_value import ExecutionFunctionCallVellumValue
+from .execution_thinking_vellum_value import ExecutionThinkingVellumValue
 
 ExecutionVellumValue = typing.Union[
     ExecutionStringVellumValue,
@@ -19,4 +20,5 @@ ExecutionVellumValue = typing.Union[
     ExecutionErrorVellumValue,
     ExecutionArrayVellumValue,
     ExecutionFunctionCallVellumValue,
+    ExecutionThinkingVellumValue,
 ]

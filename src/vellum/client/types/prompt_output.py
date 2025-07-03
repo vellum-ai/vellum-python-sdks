@@ -5,5 +5,8 @@ from .string_vellum_value import StringVellumValue
 from .json_vellum_value import JsonVellumValue
 from .error_vellum_value import ErrorVellumValue
 from .function_call_vellum_value import FunctionCallVellumValue
+from .thinking_vellum_value import ThinkingVellumValue
 
-PromptOutput = typing.Union[StringVellumValue, JsonVellumValue, ErrorVellumValue, FunctionCallVellumValue]
+PromptOutput = typing.Union[
+    StringVellumValue, JsonVellumValue, ErrorVellumValue, FunctionCallVellumValue, ThinkingVellumValue
+]

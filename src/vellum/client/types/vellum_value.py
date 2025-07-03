@@ -12,6 +12,7 @@ from .function_call_vellum_value import FunctionCallVellumValue
 from .error_vellum_value import ErrorVellumValue
 from .chat_history_vellum_value import ChatHistoryVellumValue
 from .search_results_vellum_value import SearchResultsVellumValue
+from .thinking_vellum_value import ThinkingVellumValue
 import typing
 
 if typing.TYPE_CHECKING:
@@ -28,4 +29,5 @@ VellumValue = typing.Union[
     "ArrayVellumValue",
     ChatHistoryVellumValue,
     SearchResultsVellumValue,
+    ThinkingVellumValue,
 ]
