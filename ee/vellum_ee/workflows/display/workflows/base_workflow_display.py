@@ -919,6 +919,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                         if fnmatch.fnmatch(relative_path, serialized_pattern) or fnmatch.fnmatch(
                             filename, serialized_pattern
                         ):
+                            if relative_path == "utils/__init__.py":
+                                continue
                             should_ignore = True
                             break
 
