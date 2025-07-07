@@ -916,14 +916,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
                 if not should_ignore:
                     for serialized_pattern in self._serialized_files:
-                        if serialized_pattern in ["__init__.py", "workflow.py", "inputs.py", "state.py"]:
-                            if relative_path == serialized_pattern:
-                                should_ignore = True
-                                break
-                        else:
+                        if "*" in serialized_pattern:
                             if fnmatch.fnmatch(relative_path, serialized_pattern) or fnmatch.fnmatch(
                                 filename, serialized_pattern
                             ):
+                                should_ignore = True
+                                break
+                        else:
+                            if relative_path == serialized_pattern:
                                 should_ignore = True
                                 break
 
