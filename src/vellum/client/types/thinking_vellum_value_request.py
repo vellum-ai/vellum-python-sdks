@@ -13,7 +13,7 @@ class ThinkingVellumValueRequest(UniversalBaseModel):
     """
 
     type: typing.Literal["THINKING"] = "THINKING"
-    value: typing.List[StringVellumValueRequest]
+    value: StringVellumValueRequest
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

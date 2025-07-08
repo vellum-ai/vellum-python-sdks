@@ -16,6 +16,7 @@ from .google_vertex_ai_vectorizer_text_embedding_004_request import GoogleVertex
 from .google_vertex_ai_vectorizer_text_multilingual_embedding_002_request import (
     GoogleVertexAiVectorizerTextMultilingualEmbedding002Request,
 )
+from .google_vertex_ai_vectorizer_gemini_embedding_001_request import GoogleVertexAiVectorizerGeminiEmbedding001Request
 from .fast_embed_vectorizer_baai_bge_small_en_v_15_request import FastEmbedVectorizerBaaiBgeSmallEnV15Request
 
 IndexingConfigVectorizerRequest = typing.Union[
@@ -28,5 +29,6 @@ IndexingConfigVectorizerRequest = typing.Union[
     HkunlpInstructorXlVectorizerRequest,
     GoogleVertexAiVectorizerTextEmbedding004Request,
     GoogleVertexAiVectorizerTextMultilingualEmbedding002Request,
+    GoogleVertexAiVectorizerGeminiEmbedding001Request,
     FastEmbedVectorizerBaaiBgeSmallEnV15Request,
 ]

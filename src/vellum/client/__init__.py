@@ -129,7 +129,9 @@ class Vellum:
         follow_redirects: typing.Optional[bool] = True,
         httpx_client: typing.Optional[httpx.Client] = None,
     ):
-        _defaulted_timeout = timeout if timeout is not None else None if httpx_client is None else None
+        _defaulted_timeout = (
+            timeout if timeout is not None else None if httpx_client is None else httpx_client.timeout.read
+        )
         self._client_wrapper = SyncClientWrapper(
             environment=environment,
             api_key=api_key,
@@ -210,13 +212,13 @@ class Vellum:
                 "url": url,
                 "method": method,
                 "body": convert_and_respect_annotation_metadata(
-                    object_=body, annotation=ExecuteApiRequestBody, direction="write"
+                    object_=body, annotation=typing.Optional[ExecuteApiRequestBody], direction="write"
                 ),
                 "headers": convert_and_respect_annotation_metadata(
                     object_=headers, annotation=typing.Dict[str, ExecuteApiRequestHeadersValue], direction="write"
                 ),
                 "bearer_token": convert_and_respect_annotation_metadata(
-                    object_=bearer_token, annotation=ExecuteApiRequestBearerToken, direction="write"
+                    object_=bearer_token, annotation=typing.Optional[ExecuteApiRequestBearerToken], direction="write"
                 ),
             },
             headers={
@@ -423,10 +425,14 @@ class Vellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=PromptDeploymentExpandMetaRequest, direction="write"
+                    object_=expand_meta,
+                    annotation=typing.Optional[PromptDeploymentExpandMetaRequest],
+                    direction="write",
                 ),
                 "raw_overrides": convert_and_respect_annotation_metadata(
-                    object_=raw_overrides, annotation=RawPromptExecutionOverridesRequest, direction="write"
+                    object_=raw_overrides,
+                    annotation=typing.Optional[RawPromptExecutionOverridesRequest],
+                    direction="write",
                 ),
                 "expand_raw": expand_raw,
                 "metadata": metadata,
@@ -576,10 +582,14 @@ class Vellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=PromptDeploymentExpandMetaRequest, direction="write"
+                    object_=expand_meta,
+                    annotation=typing.Optional[PromptDeploymentExpandMetaRequest],
+                    direction="write",
                 ),
                 "raw_overrides": convert_and_respect_annotation_metadata(
-                    object_=raw_overrides, annotation=RawPromptExecutionOverridesRequest, direction="write"
+                    object_=raw_overrides,
+                    annotation=typing.Optional[RawPromptExecutionOverridesRequest],
+                    direction="write",
                 ),
                 "expand_raw": expand_raw,
                 "metadata": metadata,
@@ -723,7 +733,7 @@ class Vellum:
                     object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=WorkflowExpandMetaRequest, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[WorkflowExpandMetaRequest], direction="write"
                 ),
                 "workflow_deployment_id": workflow_deployment_id,
                 "workflow_deployment_name": workflow_deployment_name,
@@ -858,7 +868,7 @@ class Vellum:
                     object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=WorkflowExpandMetaRequest, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[WorkflowExpandMetaRequest], direction="write"
                 ),
                 "workflow_deployment_id": workflow_deployment_id,
                 "workflow_deployment_name": workflow_deployment_name,
@@ -988,7 +998,7 @@ class Vellum:
                     object_=requests, annotation=typing.Sequence[GenerateRequest], direction="write"
                 ),
                 "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=GenerateOptionsRequest, direction="write"
+                    object_=options, annotation=typing.Optional[GenerateOptionsRequest], direction="write"
                 ),
             },
             headers={
@@ -1116,7 +1126,7 @@ class Vellum:
                     object_=requests, annotation=typing.Sequence[GenerateRequest], direction="write"
                 ),
                 "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=GenerateOptionsRequest, direction="write"
+                    object_=options, annotation=typing.Optional[GenerateOptionsRequest], direction="write"
                 ),
             },
             headers={
@@ -1245,7 +1255,7 @@ class Vellum:
                 "index_name": index_name,
                 "query": query,
                 "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=SearchRequestOptionsRequest, direction="write"
+                    object_=options, annotation=typing.Optional[SearchRequestOptionsRequest], direction="write"
                 ),
                 "document_index": document_index,
             },
@@ -1505,7 +1515,9 @@ class AsyncVellum:
         follow_redirects: typing.Optional[bool] = True,
         httpx_client: typing.Optional[httpx.AsyncClient] = None,
     ):
-        _defaulted_timeout = timeout if timeout is not None else None if httpx_client is None else None
+        _defaulted_timeout = (
+            timeout if timeout is not None else None if httpx_client is None else httpx_client.timeout.read
+        )
         self._client_wrapper = AsyncClientWrapper(
             environment=environment,
             api_key=api_key,
@@ -1594,13 +1606,13 @@ class AsyncVellum:
                 "url": url,
                 "method": method,
                 "body": convert_and_respect_annotation_metadata(
-                    object_=body, annotation=ExecuteApiRequestBody, direction="write"
+                    object_=body, annotation=typing.Optional[ExecuteApiRequestBody], direction="write"
                 ),
                 "headers": convert_and_respect_annotation_metadata(
                     object_=headers, annotation=typing.Dict[str, ExecuteApiRequestHeadersValue], direction="write"
                 ),
                 "bearer_token": convert_and_respect_annotation_metadata(
-                    object_=bearer_token, annotation=ExecuteApiRequestBearerToken, direction="write"
+                    object_=bearer_token, annotation=typing.Optional[ExecuteApiRequestBearerToken], direction="write"
                 ),
             },
             headers={
@@ -1823,10 +1835,14 @@ class AsyncVellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=PromptDeploymentExpandMetaRequest, direction="write"
+                    object_=expand_meta,
+                    annotation=typing.Optional[PromptDeploymentExpandMetaRequest],
+                    direction="write",
                 ),
                 "raw_overrides": convert_and_respect_annotation_metadata(
-                    object_=raw_overrides, annotation=RawPromptExecutionOverridesRequest, direction="write"
+                    object_=raw_overrides,
+                    annotation=typing.Optional[RawPromptExecutionOverridesRequest],
+                    direction="write",
                 ),
                 "expand_raw": expand_raw,
                 "metadata": metadata,
@@ -1984,10 +2000,14 @@ class AsyncVellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=PromptDeploymentExpandMetaRequest, direction="write"
+                    object_=expand_meta,
+                    annotation=typing.Optional[PromptDeploymentExpandMetaRequest],
+                    direction="write",
                 ),
                 "raw_overrides": convert_and_respect_annotation_metadata(
-                    object_=raw_overrides, annotation=RawPromptExecutionOverridesRequest, direction="write"
+                    object_=raw_overrides,
+                    annotation=typing.Optional[RawPromptExecutionOverridesRequest],
+                    direction="write",
                 ),
                 "expand_raw": expand_raw,
                 "metadata": metadata,
@@ -2139,7 +2159,7 @@ class AsyncVellum:
                     object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=WorkflowExpandMetaRequest, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[WorkflowExpandMetaRequest], direction="write"
                 ),
                 "workflow_deployment_id": workflow_deployment_id,
                 "workflow_deployment_name": workflow_deployment_name,
@@ -2282,7 +2302,7 @@ class AsyncVellum:
                     object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=WorkflowExpandMetaRequest, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[WorkflowExpandMetaRequest], direction="write"
                 ),
                 "workflow_deployment_id": workflow_deployment_id,
                 "workflow_deployment_name": workflow_deployment_name,
@@ -2420,7 +2440,7 @@ class AsyncVellum:
                     object_=requests, annotation=typing.Sequence[GenerateRequest], direction="write"
                 ),
                 "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=GenerateOptionsRequest, direction="write"
+                    object_=options, annotation=typing.Optional[GenerateOptionsRequest], direction="write"
                 ),
             },
             headers={
@@ -2556,7 +2576,7 @@ class AsyncVellum:
                     object_=requests, annotation=typing.Sequence[GenerateRequest], direction="write"
                 ),
                 "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=GenerateOptionsRequest, direction="write"
+                    object_=options, annotation=typing.Optional[GenerateOptionsRequest], direction="write"
                 ),
             },
             headers={
@@ -2693,7 +2713,7 @@ class AsyncVellum:
                 "index_name": index_name,
                 "query": query,
                 "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=SearchRequestOptionsRequest, direction="write"
+                    object_=options, annotation=typing.Optional[SearchRequestOptionsRequest], direction="write"
                 ),
                 "document_index": document_index,
             },

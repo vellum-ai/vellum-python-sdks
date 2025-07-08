@@ -31,6 +31,11 @@ class DocumentRead(UniversalBaseModel):
     * `ACTIVE` - Active
     """
 
+    keywords: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    A list of keywords that'll be associated with the document. Used as part of keyword search.
+    """
+
     original_file_url: typing.Optional[str] = None
     document_to_document_indexes: typing.List[DocumentDocumentToDocumentIndex]
     metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)

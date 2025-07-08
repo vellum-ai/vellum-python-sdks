@@ -3497,6 +3497,14 @@ The current status of the document
 <dl>
 <dd>
 
+**keywords:** `typing.Optional[typing.Sequence[str]]` — A list of keywords that'll be associated with the document. Used as part of keyword search.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — A JSON object containing any metadata associated with the document that you'd like to filter upon later.
     
 </dd>

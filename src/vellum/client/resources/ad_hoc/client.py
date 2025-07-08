@@ -121,16 +121,18 @@ class AdHocClient:
                     object_=parameters, annotation=PromptParameters, direction="write"
                 ),
                 "settings": convert_and_respect_annotation_metadata(
-                    object_=settings, annotation=PromptSettings, direction="write"
+                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
                 ),
                 "blocks": convert_and_respect_annotation_metadata(
                     object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
                 ),
                 "functions": convert_and_respect_annotation_metadata(
-                    object_=functions, annotation=typing.Sequence[FunctionDefinition], direction="write"
+                    object_=functions,
+                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
+                    direction="write",
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
                 ),
             },
             headers={
@@ -277,16 +279,18 @@ class AdHocClient:
                     object_=parameters, annotation=PromptParameters, direction="write"
                 ),
                 "settings": convert_and_respect_annotation_metadata(
-                    object_=settings, annotation=PromptSettings, direction="write"
+                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
                 ),
                 "blocks": convert_and_respect_annotation_metadata(
                     object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
                 ),
                 "functions": convert_and_respect_annotation_metadata(
-                    object_=functions, annotation=typing.Sequence[FunctionDefinition], direction="write"
+                    object_=functions,
+                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
+                    direction="write",
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
                 ),
             },
             headers={
@@ -452,16 +456,18 @@ class AsyncAdHocClient:
                     object_=parameters, annotation=PromptParameters, direction="write"
                 ),
                 "settings": convert_and_respect_annotation_metadata(
-                    object_=settings, annotation=PromptSettings, direction="write"
+                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
                 ),
                 "blocks": convert_and_respect_annotation_metadata(
                     object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
                 ),
                 "functions": convert_and_respect_annotation_metadata(
-                    object_=functions, annotation=typing.Sequence[FunctionDefinition], direction="write"
+                    object_=functions,
+                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
+                    direction="write",
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
                 ),
             },
             headers={
@@ -616,16 +622,18 @@ class AsyncAdHocClient:
                     object_=parameters, annotation=PromptParameters, direction="write"
                 ),
                 "settings": convert_and_respect_annotation_metadata(
-                    object_=settings, annotation=PromptSettings, direction="write"
+                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
                 ),
                 "blocks": convert_and_respect_annotation_metadata(
                     object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
                 ),
                 "functions": convert_and_respect_annotation_metadata(
-                    object_=functions, annotation=typing.Sequence[FunctionDefinition], direction="write"
+                    object_=functions,
+                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
+                    direction="write",
                 ),
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=AdHocExpandMeta, direction="write"
+                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
                 ),
             },
             headers={

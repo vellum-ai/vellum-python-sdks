@@ -530,7 +530,9 @@ class DeploymentsClient:
                 ),
                 "release_tag": release_tag,
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=CompilePromptDeploymentExpandMetaRequest, direction="write"
+                    object_=expand_meta,
+                    annotation=typing.Optional[CompilePromptDeploymentExpandMetaRequest],
+                    direction="write",
                 ),
             },
             headers={
@@ -1159,7 +1161,9 @@ class AsyncDeploymentsClient:
                 ),
                 "release_tag": release_tag,
                 "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=CompilePromptDeploymentExpandMetaRequest, direction="write"
+                    object_=expand_meta,
+                    annotation=typing.Optional[CompilePromptDeploymentExpandMetaRequest],
+                    direction="write",
                 ),
             },
             headers={

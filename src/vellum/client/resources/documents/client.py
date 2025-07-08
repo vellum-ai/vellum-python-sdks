@@ -192,6 +192,7 @@ class DocumentsClient:
         *,
         label: typing.Optional[str] = OMIT,
         status: typing.Optional[DocumentStatus] = OMIT,
+        keywords: typing.Optional[typing.Sequence[str]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentRead:
@@ -209,6 +210,9 @@ class DocumentsClient:
             The current status of the document
 
             * `ACTIVE` - Active
+
+        keywords : typing.Optional[typing.Sequence[str]]
+            A list of keywords that'll be associated with the document. Used as part of keyword search.
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             A JSON object containing any metadata associated with the document that you'd like to filter upon later.
@@ -239,6 +243,7 @@ class DocumentsClient:
             json={
                 "label": label,
                 "status": status,
+                "keywords": keywords,
                 "metadata": metadata,
             },
             headers={
@@ -573,6 +578,7 @@ class AsyncDocumentsClient:
         *,
         label: typing.Optional[str] = OMIT,
         status: typing.Optional[DocumentStatus] = OMIT,
+        keywords: typing.Optional[typing.Sequence[str]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentRead:
@@ -590,6 +596,9 @@ class AsyncDocumentsClient:
             The current status of the document
 
             * `ACTIVE` - Active
+
+        keywords : typing.Optional[typing.Sequence[str]]
+            A list of keywords that'll be associated with the document. Used as part of keyword search.
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             A JSON object containing any metadata associated with the document that you'd like to filter upon later.
@@ -628,6 +637,7 @@ class AsyncDocumentsClient:
             json={
                 "label": label,
                 "status": status,
+                "keywords": keywords,
                 "metadata": metadata,
             },
             headers={

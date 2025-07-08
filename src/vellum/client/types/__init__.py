@@ -174,6 +174,8 @@ from .generate_stream_result import GenerateStreamResult
 from .generate_stream_result_data import GenerateStreamResultData
 from .google_vertex_ai_vectorizer_config import GoogleVertexAiVectorizerConfig
 from .google_vertex_ai_vectorizer_config_request import GoogleVertexAiVectorizerConfigRequest
+from .google_vertex_ai_vectorizer_gemini_embedding_001 import GoogleVertexAiVectorizerGeminiEmbedding001
+from .google_vertex_ai_vectorizer_gemini_embedding_001_request import GoogleVertexAiVectorizerGeminiEmbedding001Request
 from .google_vertex_ai_vectorizer_text_embedding_004 import GoogleVertexAiVectorizerTextEmbedding004
 from .google_vertex_ai_vectorizer_text_embedding_004_request import GoogleVertexAiVectorizerTextEmbedding004Request
 from .google_vertex_ai_vectorizer_text_multilingual_embedding_002 import (
@@ -793,6 +795,8 @@ __all__ = [
     "GenerateStreamResultData",
     "GoogleVertexAiVectorizerConfig",
     "GoogleVertexAiVectorizerConfigRequest",
+    "GoogleVertexAiVectorizerGeminiEmbedding001",
+    "GoogleVertexAiVectorizerGeminiEmbedding001Request",
     "GoogleVertexAiVectorizerTextEmbedding004",
     "GoogleVertexAiVectorizerTextEmbedding004Request",
     "GoogleVertexAiVectorizerTextMultilingualEmbedding002",

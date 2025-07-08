@@ -11,6 +11,8 @@ class WorkflowSandboxExample(UniversalBaseModel):
     label: str
     description: typing.Optional[str] = None
     icon_name: typing.Optional[str] = None
+    ui_image_url: typing.Optional[str] = None
+    code_image_url: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
