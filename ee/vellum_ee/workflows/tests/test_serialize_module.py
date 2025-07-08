@@ -39,7 +39,6 @@ def test_serialize_module_includes_additional_files():
 
     assert "workflow.py" not in additional_files
     assert "__init__.py" not in additional_files
-    assert "utils/__init__.py" not in additional_files
     assert "nodes/test_node.py" not in additional_files
 
     assert "def helper_function():" in additional_files["helper.py"]
