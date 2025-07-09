@@ -365,12 +365,16 @@ def test_run_workflow__emits_subworkflow_events_with_tool_call(vellum_adhoc_prom
     assert len(main_workflow_events) >= 2
 
     # AND we should see subworkflow events from the ToolCallingNode's internal workflow
-    subworkflow_events = [e for e in events if e.parent is not None and e.parent.type == "WORKFLOW_NODE"]
+    subworkflow_events = [
+        e for e in events if e.parent is not None and hasattr(e.parent, "type") and e.parent.type == "WORKFLOW_NODE"
+    ]
 
     assert len(subworkflow_events) > 0
 
     # AND the subworkflow events should have the correct parent structure
     for event in subworkflow_events:
+        assert event.parent is not None
         assert event.parent.type == "WORKFLOW_NODE"
+        assert event.parent.parent is not None
         assert event.parent.parent.type == "WORKFLOW"
         assert event.parent.parent.workflow_definition.name == "BasicToolCallingNodeWorkflow"
