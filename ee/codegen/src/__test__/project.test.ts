@@ -260,9 +260,6 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -284,9 +281,6 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
         strict: true,
       });
 
@@ -330,9 +324,6 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "test_module",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       vi.spyOn(
@@ -422,9 +413,6 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -525,9 +513,6 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
         sandboxInputs: [
           [
             {
@@ -668,9 +653,6 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -784,9 +766,6 @@ describe("WorkflowProjectGenerator", () => {
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -883,9 +862,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
         strict: true,
       });
 
@@ -1005,9 +981,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
         strict: false,
       });
 
@@ -1152,9 +1125,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
         strict: true,
       });
 
@@ -1245,9 +1215,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
         strict: false,
       });
 
@@ -1394,9 +1361,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -1453,9 +1417,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -1730,9 +1691,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -1827,9 +1785,6 @@ baz = foo + bar
         moduleName: "generic_test",
         vellumApiKey: "<TEST_API_KEY>",
         workflowVersionExecConfigData: displayData,
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -1988,9 +1943,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -2096,9 +2048,6 @@ baz = foo + bar
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
         workflowVersionExecConfigData: displayData,
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -2183,9 +2132,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -2275,9 +2221,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -2365,9 +2308,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -2435,9 +2375,6 @@ baz = foo + bar
         moduleName: "generic_test",
         vellumApiKey: "<TEST_API_KEY>",
         workflowVersionExecConfigData: displayData,
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -2515,9 +2452,6 @@ baz = foo + bar
         moduleName: "generic_test",
         vellumApiKey: "<TEST_API_KEY>",
         workflowVersionExecConfigData: displayData,
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -2698,9 +2632,6 @@ baz = foo + bar
         moduleName: "generic_test",
         vellumApiKey: "<TEST_API_KEY>",
         workflowVersionExecConfigData: displayData,
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -3401,9 +3332,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "my.module",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -3496,9 +3424,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -3727,9 +3652,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -3934,9 +3856,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -5043,9 +4962,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -5124,9 +5040,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayData,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
@@ -5165,9 +5078,6 @@ baz = foo + bar
         workflowVersionExecConfigData: displayDataWithEmptyFiles,
         moduleName: "code",
         vellumApiKey: "<TEST_API_KEY>",
-        options: {
-          disableFormatting: true,
-        },
       });
 
       await project.generateCode();
