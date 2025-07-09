@@ -1,8 +1,9 @@
-from typing import ClassVar, List, Optional
+from typing import ClassVar, Iterator, List, Optional, Set
 
 from vellum import ChatMessage, PromptBlock
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
@@ -12,10 +13,11 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_tool_router_node,
     get_function_name,
 )
-from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface, Tool
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
 class ToolCallingNode(BaseNode):
@@ -47,12 +49,12 @@ class ToolCallingNode(BaseNode):
         text: str
         chat_history: List[ChatMessage]
 
-    def run(self) -> Outputs:
+    def run(self) -> Iterator[BaseOutput]:
         """
-        Run the tool calling workflow.
+        Run the tool calling workflow with streaming support.
 
         This dynamically builds a graph with router and function nodes,
-        then executes the workflow.
+        then executes the workflow and streams chat_history updates.
         """
 
         self._build_graph()
@@ -77,24 +79,55 @@ class ToolCallingNode(BaseNode):
                 context=WorkflowContext.create_from(self._context),
             )
 
-            terminal_event = subworkflow.run()
+            subworkflow_stream = subworkflow.stream(
+                event_filter=all_workflow_event_filter,
+                node_output_mocks=self._context._get_all_node_output_mocks(),
+            )
 
-            if terminal_event.name == "workflow.execution.paused":
-                raise NodeException(
-                    code=WorkflowErrorCode.INVALID_OUTPUTS,
-                    message="Subworkflow unexpectedly paused",
+        outputs: Optional[BaseOutputs] = None
+        exception: Optional[NodeException] = None
+        fulfilled_output_names: Set[str] = set()
+
+        # Yield initiated event for chat_history
+        yield BaseOutput(name="chat_history")
+
+        for event in subworkflow_stream:
+            self._context._emit_subworkflow_event(event)
+
+            if not is_workflow_event(event):
+                continue
+            if event.workflow_definition != ToolCallingWorkflow:
+                continue
+
+            if event.name == "workflow.execution.streaming":
+                if event.output.name == "chat_history":
+                    if event.output.is_fulfilled:
+                        fulfilled_output_names.add(event.output.name)
+                    yield event.output
+                elif event.output.name == "text":
+                    if event.output.is_fulfilled:
+                        fulfilled_output_names.add(event.output.name)
+                    yield event.output
+            elif event.name == "workflow.execution.fulfilled":
+                outputs = event.outputs
+            elif event.name == "workflow.execution.rejected":
+                exception = NodeException.of(event.error)
+
+        if exception:
+            raise exception
+
+        if outputs is None:
+            raise NodeException(
+                message="Expected to receive outputs from Tool Calling Workflow",
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+            )
+
+        for output_descriptor, output_value in outputs:
+            if output_descriptor.name not in fulfilled_output_names:
+                yield BaseOutput(
+                    name=output_descriptor.name,
+                    value=output_value,
                 )
-            elif terminal_event.name == "workflow.execution.fulfilled":
-                node_outputs = self.Outputs(
-                    text=terminal_event.outputs.text,
-                    chat_history=terminal_event.outputs.chat_history,
-                )
-
-                return node_outputs
-            elif terminal_event.name == "workflow.execution.rejected":
-                raise NodeException(message=terminal_event.error.message, code=terminal_event.error.code)
-
-            raise Exception(f"Unexpected workflow event: {terminal_event.name}")
 
     def _build_graph(self) -> None:
         self.tool_router_node = create_tool_router_node(
