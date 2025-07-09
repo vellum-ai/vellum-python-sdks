@@ -1,3 +1,4 @@
+import pytest
 from unittest import mock
 from uuid import uuid4
 from typing import Iterator, List
@@ -23,6 +24,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
 
@@ -324,3 +326,51 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         "expand_meta": None,
         "request_options": mock.ANY,
     }
+
+
+@pytest.mark.skip(reason="Testing events emission will be implemented in a follow up PR")
+def test_run_workflow__emits_subworkflow_events_with_tool_call(vellum_adhoc_prompt_client, mock_uuid4_generator):
+    """
+    Test that the ToolCallingNode properly emits subworkflow events via _emit_subworkflow_event.
+    This test should FAIL when _emit_subworkflow_event is commented out in the ToolCallingNode.
+    """
+    # GIVEN a get current weather workflow
+    workflow = BasicToolCallingNodeWorkflow()
+
+    # AND we know what events will be returned
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        expected_outputs = [StringVellumValue(value="The current temperature in New York is 75 degrees fahrenheit.")]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the workflow is streamed with all event filter to capture subworkflow events
+    events = list(
+        workflow.stream(
+            inputs=Inputs(query="What's the weather like in New York?"), event_filter=all_workflow_event_filter
+        )
+    )
+
+    # THEN we should see events from the main workflow
+    main_workflow_events = [e for e in events if e.parent is None]
+    assert len(main_workflow_events) >= 2
+
+    # AND we should see subworkflow events from the ToolCallingNode's internal workflow
+    subworkflow_events = [e for e in events if e.parent is not None and e.parent.type == "WORKFLOW_NODE"]
+
+    assert len(subworkflow_events) > 0
+
+    # AND the subworkflow events should have the correct parent structure
+    for event in subworkflow_events:
+        assert event.parent.type == "WORKFLOW_NODE"
+        assert event.parent.parent.type == "WORKFLOW"
+        assert event.parent.parent.workflow_definition.name == "BasicToolCallingNodeWorkflow"
