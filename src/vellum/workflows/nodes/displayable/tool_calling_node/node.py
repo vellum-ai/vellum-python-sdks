@@ -87,6 +87,11 @@ class ToolCallingNode(BaseNode):
         outputs: Optional[BaseOutputs] = None
         fulfilled_output_names: Set[str] = set()
 
+        # Yield initiated event for chat_history
+        yield BaseOutput(name="chat_history")
+
+        current_chat_history: List[ChatMessage] = []
+
         for event in subworkflow_stream:
             self._context._emit_subworkflow_event(event)
 
@@ -97,9 +102,16 @@ class ToolCallingNode(BaseNode):
 
             if event.name == "workflow.execution.streaming":
                 if event.output.name == "chat_history":
+                    new_chat_history = event.output.value
+                    if new_chat_history and len(new_chat_history) > len(current_chat_history):
+                        for i in range(1, len(new_chat_history) + 1):
+                            partial_history = new_chat_history[:i]
+                            yield BaseOutput(name="chat_history", delta=partial_history)
+                        current_chat_history = list(new_chat_history)
+
                     if event.output.is_fulfilled:
                         fulfilled_output_names.add(event.output.name)
-                    yield event.output
+                        yield BaseOutput(name="chat_history", value=current_chat_history)
                 elif event.output.name == "text":
                     if event.output.is_fulfilled:
                         fulfilled_output_names.add(event.output.name)
