@@ -27,11 +27,11 @@ class StateWritingNode(BaseNode[State]):
             self.state.messages.append(new_message)
             yield BaseOutput(name="final_messages", delta=new_message)
 
-        yield BaseOutput(name="final_messages", value=self.state.messages)
+        return self.Outputs(final_messages=self.state.messages)
 
 
 class StateArrayStreamingWorkflow(BaseWorkflow[Inputs, State]):
     graph = StateWritingNode
 
     class Outputs(BaseOutputs):
-        final_messages = StateWritingNode.Outputs.final_messages
+        final_messages = State.messages

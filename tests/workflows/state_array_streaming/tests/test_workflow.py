@@ -21,13 +21,13 @@ def test_stream_workflow__state_array_writes():
     assert final_messages_events[0].output.is_initiated
 
     assert final_messages_events[1].output.is_streaming
-    assert len(final_messages_events[1].output.delta) > 0
+    assert final_messages_events[1].output.delta == "Hello - write 1"
 
     assert final_messages_events[2].output.is_streaming
-    assert len(final_messages_events[2].output.delta) > 0
+    assert final_messages_events[2].output.delta == "Hello - write 2"
 
     assert final_messages_events[3].output.is_streaming
-    assert len(final_messages_events[3].output.delta) > 0
+    assert final_messages_events[3].output.delta == "Hello - write 3"
 
     assert final_messages_events[4].output.is_fulfilled
     assert len(final_messages_events[4].output.value) == 3
