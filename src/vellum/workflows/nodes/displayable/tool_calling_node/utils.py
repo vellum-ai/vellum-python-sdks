@@ -48,7 +48,6 @@ class ToolRouterNode(InlinePromptNode):
                 if values and len(values) > 0:
                     if values[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
-                        yield BaseOutput(name="chat_history", value=list(self.state.chat_history))
                     elif values[0].type == "FUNCTION_CALL":
                         self.state.prompt_iterations += 1
 
@@ -66,7 +65,6 @@ class ToolRouterNode(InlinePromptNode):
                                     ),
                                 )
                             )
-                            yield BaseOutput(name="chat_history", value=list(self.state.chat_history))
             yield output
 
 
@@ -151,7 +149,7 @@ def create_function_node(
         deployment = function.deployment_id or function.deployment_name
         release_tag = function.release_tag
 
-        def execute_workflow_deployment_function(self) -> Iterator[BaseOutput]:
+        def execute_workflow_deployment_function(self) -> BaseNode.Outputs:
             function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
             if function_call_output and len(function_call_output) > 0:
                 function_call = function_call_output[0]
@@ -186,8 +184,6 @@ def create_function_node(
                 )
             )
 
-            yield BaseOutput(name="chat_history", value=list(self.state.chat_history))
-
             return self.Outputs()
 
         node = type(
@@ -203,7 +199,7 @@ def create_function_node(
 
     elif is_workflow_class(function):
         # Create a class-level wrapper that calls the original function
-        def execute_inline_workflow_function(self) -> Iterator[BaseOutput]:
+        def execute_inline_workflow_function(self) -> BaseNode.Outputs:
             outputs = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
 
             outputs = json.loads(outputs)
@@ -232,8 +228,6 @@ def create_function_node(
                 )
             )
 
-            yield BaseOutput(name="chat_history", value=list(self.state.chat_history))
-
             return self.Outputs()
 
         # Create BaseNode for workflow functions
@@ -247,7 +241,7 @@ def create_function_node(
         )
     else:
         # For regular functions, call them directly
-        def execute_regular_function(self) -> Iterator[BaseOutput]:
+        def execute_regular_function(self) -> BaseNode.Outputs:
             # Get the function call from the tool router output
             function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
             if function_call_output and len(function_call_output) > 0:
@@ -272,8 +266,6 @@ def create_function_node(
                     content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
                 )
             )
-
-            yield BaseOutput(name="chat_history", value=list(self.state.chat_history))
 
             return self.Outputs()
 

@@ -114,7 +114,7 @@ def test_tool_calling_node_inline_workflow_context():
     function_node.state = TestState(meta=StateMeta(node_outputs={tool_router_node.Outputs.text: '{"arguments": {}}'}))
 
     # WHEN the function node runs
-    outputs = function_node.run()
+    outputs = list(function_node.run())
 
     # THEN the workflow should have run successfully
     assert outputs is not None
