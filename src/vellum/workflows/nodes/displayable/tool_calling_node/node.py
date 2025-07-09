@@ -85,6 +85,7 @@ class ToolCallingNode(BaseNode):
             )
 
         outputs: Optional[BaseOutputs] = None
+        exception: Optional[NodeException] = None
         fulfilled_output_names: Set[str] = set()
 
         # Yield initiated event for chat_history
@@ -110,7 +111,10 @@ class ToolCallingNode(BaseNode):
             elif event.name == "workflow.execution.fulfilled":
                 outputs = event.outputs
             elif event.name == "workflow.execution.rejected":
-                raise NodeException.of(event.error)
+                exception = NodeException.of(event.error)
+
+        if exception:
+            raise exception
 
         if outputs is None:
             raise NodeException(
