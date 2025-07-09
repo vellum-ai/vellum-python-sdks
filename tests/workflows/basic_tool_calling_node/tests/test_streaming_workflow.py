@@ -59,11 +59,26 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     streaming_events = [e for e in events if e.name == "workflow.execution.streaming"]
     chat_history_events = [e for e in streaming_events if e.output.name == "chat_history"]
 
-    assert len(chat_history_events) >= 1
+    assert len(chat_history_events) == 5
 
-    final_chat_event = chat_history_events[-1]
-    assert final_chat_event.output.is_fulfilled
-    final_chat_history = final_chat_event.output.value
+    first_event = chat_history_events[0]
+    assert first_event.output.is_initiated
+
+    streaming_event_1 = chat_history_events[1]
+    assert streaming_event_1.output.is_streaming
+    assert len(streaming_event_1.output.value) == 1
+
+    streaming_event_2 = chat_history_events[2]
+    assert streaming_event_2.output.is_streaming
+    assert len(streaming_event_2.output.value) == 2
+
+    streaming_event_3 = chat_history_events[3]
+    assert streaming_event_3.output.is_streaming
+    assert len(streaming_event_3.output.value) == 3
+
+    final_event = chat_history_events[4]
+    assert final_event.output.is_fulfilled
+    final_chat_history = final_event.output.value
     assert len(final_chat_history) == 3
 
     assert final_chat_history[0].role == "ASSISTANT"
