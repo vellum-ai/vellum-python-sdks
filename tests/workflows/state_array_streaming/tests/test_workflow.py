@@ -14,20 +14,14 @@ def test_stream_workflow__state_array_writes():
     events = list(workflow.stream(event_filter=all_workflow_event_filter, inputs=inputs))
 
     streaming_events = [e for e in events if e.name == "workflow.execution.streaming"]
-    final_messages_events = [e for e in streaming_events if e.output.name == "final_messages"]
 
-    assert len(final_messages_events) == 5
+    assert streaming_events[0].output.is_streaming
+    assert streaming_events[0].output.delta == ["Hello - write 1"]
 
-    assert final_messages_events[0].output.is_initiated
+    assert streaming_events[1].output.is_streaming
+    assert streaming_events[1].output.delta == ["Hello - write 1", "Hello - write 2"]
 
-    assert final_messages_events[1].output.is_streaming
-    assert final_messages_events[1].output.delta == "Hello - write 1"
+    assert streaming_events[2].output.is_streaming
+    assert streaming_events[2].output.delta == ["Hello - write 1", "Hello - write 2", "Hello - write 3"]
 
-    assert final_messages_events[2].output.is_streaming
-    assert final_messages_events[2].output.delta == "Hello - write 2"
-
-    assert final_messages_events[3].output.is_streaming
-    assert final_messages_events[3].output.delta == "Hello - write 3"
-
-    assert final_messages_events[4].output.is_fulfilled
-    assert len(final_messages_events[4].output.value) == 3
+    assert len(streaming_events) == 3
