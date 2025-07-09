@@ -3947,7 +3947,14 @@ baz = foo + bar
         "__init__.py",
       ]);
     });
-    it("should generate inline workflow tool", async () => {
+
+    it.each([
+      { name: "no packages", packages: [] },
+      {
+        name: "with packages",
+        packages: [{ name: "requests", version: "2.32.3" }],
+      },
+    ])("should generate inline workflow tool $name", async ({ packages }) => {
       const displayData = {
         workflow_raw_data: {
           edges: [
@@ -4251,7 +4258,7 @@ baz = foo + bar
                                   data: {
                                     label: "Code Execution Node",
                                     filepath: null,
-                                    packages: [],
+                                    packages,
                                     output_id:
                                       "f2ea61aa-256e-41b0-8ab4-aa3a22e489dd",
                                     output_type: "NUMBER",
@@ -4851,6 +4858,8 @@ baz = foo + bar
         vellumApiKey: "<TEST_API_KEY>",
       });
       await project.generateCode();
+
+      expect(project.workflowContext.getErrors()).toHaveLength(0);
       const expectedFiles = [
         ["code", "inputs.py"],
         ["code", "nodes", "__init__.py"],
