@@ -79,7 +79,6 @@ export interface WorkflowProjectGeneratorOptions {
    *  be inlined as a node attribute.
    */
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
-  disableFormatting?: boolean;
 }
 
 export declare namespace WorkflowProjectGenerator {
@@ -164,7 +163,6 @@ ${errors.slice(0, 3).map((err) => {
         vellumApiEnvironment: rest.vellumApiEnvironment,
         workflowRawData: this.workflowVersionExecConfig.workflowRawData,
         strict: rest.strict ?? false,
-        disableFormatting: rest.options?.disableFormatting ?? false,
       });
       this.sandboxInputs = rest.sandboxInputs;
     }

@@ -62,7 +62,6 @@ export declare namespace WorkflowContext {
     workflowRawData: WorkflowRawData;
     inputsClassDefinition?: CodeResourceDefinition;
     strict: boolean;
-    disableFormatting: boolean;
     classNames?: Set<string>;
     nestedWorkflowModuleName?: string;
   };
@@ -143,8 +142,6 @@ export class WorkflowContext {
 
   public readonly workflowRawData: WorkflowRawData;
 
-  public readonly disableFormatting: boolean;
-
   // Track what class names are used within this workflow so that we can ensure name uniqueness
   public readonly classNames: Set<string>;
 
@@ -169,7 +166,6 @@ export class WorkflowContext {
     vellumApiEnvironment,
     workflowRawData,
     strict,
-    disableFormatting,
     classNames,
     nestedWorkflowModuleName,
   }: WorkflowContext.Args) {
@@ -222,8 +218,6 @@ export class WorkflowContext {
     this.strict = strict;
     this.errors = [];
 
-    this.disableFormatting = disableFormatting;
-
     this.outputVariableContextsById = new Map();
     this.globalOutputVariableContextsById =
       globalOutputVariableContextsById ?? new Map();
@@ -267,7 +261,6 @@ export class WorkflowContext {
       vellumApiEnvironment: this.vellumApiEnvironment,
       workflowRawData,
       strict: this.strict,
-      disableFormatting: this.disableFormatting,
       classNames,
       nestedWorkflowModuleName,
     });
