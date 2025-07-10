@@ -11,16 +11,7 @@ def test_run_workflow__happy_path():
     inputs = Inputs(foo="Hello")
     events = list(workflow.stream(event_filter=all_workflow_event_filter, inputs=inputs))
 
-    # THEN the workflow should have emitted 14 events
-    #
-    # This is a very verbose breakdown of all of the events we emit. It embodies the concept that
-    # - A workflow is made up of one or more nodes, each of which emit initiated/streaming/fulfilled/rejected states
-    # - A node is made up of one or more outputs, each of which emit initiated/streaming/fulfilled/rejected states
-    #
-    # This allows end users to have the option to either use values as they stream available or use just the end result.
-    assert len(events) == 15
-
-    # AND each event should have the expected data
+    # THEN each event should have the expected data
     assert events[0].name == "workflow.execution.initiated"
     assert events[0].inputs.foo == "Hello"
 
@@ -98,3 +89,12 @@ def test_run_workflow__happy_path():
         "Hello, world! 1",
         "Hello, world! 2",
     ]
+
+    # AND the workflow should have emitted 15 events
+    #
+    # This is a very verbose breakdown of all of the events we emit. It embodies the concept that
+    # - A workflow is made up of one or more nodes, each of which emit initiated/streaming/fulfilled/rejected states
+    # - A node is made up of one or more outputs, each of which emit initiated/streaming/fulfilled/rejected states
+    #
+    # This allows end users to have the option to either use values as they stream available or use just the end result.
+    assert len(events) == 15

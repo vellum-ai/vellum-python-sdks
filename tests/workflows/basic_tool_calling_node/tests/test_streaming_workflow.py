@@ -62,7 +62,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     first_event = chat_history_events[0]
     assert first_event.output.is_initiated
 
-    # TODO: Blocked by https://app.devin.ai/sessions/0d448d5731d54463b7e4938e04671337
+    # TODO: Followup on these events to have the correct chat history here
     # streaming_event_1 = chat_history_events[1]
     # assert streaming_event_1.output.is_streaming
     # assert len(streaming_event_1.output.value) == 1
@@ -80,5 +80,4 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     final_chat_history = final_event.output.value
     assert len(final_chat_history) == 3
 
-    # assert len(chat_history_events) == 5
-    assert len(chat_history_events) == 2
+    assert len(chat_history_events) == 5

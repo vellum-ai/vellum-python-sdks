@@ -15,6 +15,7 @@ from typing import (
     Generic,
     Iterable,
     Iterator,
+    List,
     Optional,
     Sequence,
     Set,
@@ -67,7 +68,9 @@ from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference, OutputReference
+from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.state.delta import StateDelta
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 if TYPE_CHECKING:
@@ -175,12 +178,16 @@ class WorkflowRunner(Generic[StateType]):
         setattr(
             self._initial_state,
             "__snapshot_callback__",
-            lambda s: self._snapshot_state(s),
+            lambda s, d: self._snapshot_state(s, d),
         )
         self.workflow.context._register_event_queue(self._workflow_event_inner_queue)
         self.workflow.context._register_node_output_mocks(node_output_mocks or [])
 
-    def _snapshot_state(self, state: StateType) -> StateType:
+        self._outputs_listening_to_state = [
+            descriptor for descriptor in self.workflow.Outputs if isinstance(descriptor.instance, StateValueReference)
+        ]
+
+    def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
         self._workflow_event_inner_queue.put(
             WorkflowExecutionSnapshottedEvent(
                 trace_id=self._execution_context.trace_id,
@@ -192,6 +199,31 @@ class WorkflowRunner(Generic[StateType]):
                 parent=self._execution_context.parent_context,
             )
         )
+
+        delta_names = [d.name for d in deltas]
+        for descriptor in self._outputs_listening_to_state:
+            if not isinstance(descriptor.instance, StateValueReference):
+                continue
+
+            if descriptor.instance.name not in delta_names:
+                continue
+
+            resolved_delta = descriptor.instance.resolve(state)
+            if resolved_delta is undefined:
+                continue
+
+            self._workflow_event_outer_queue.put(
+                self._stream_workflow_event(
+                    BaseOutput(
+                        name=descriptor.name,
+                        # We may want to switch this to using the delta from the state delta
+                        # instead of the state value. In the short term, we need to show
+                        # the full conversation of the tool calling node's delta's.
+                        delta=resolved_delta,
+                    )
+                )
+            )
+
         self.workflow._store.append_state_snapshot(state)
         self._background_thread_queue.put(state)
         return state

@@ -2,11 +2,12 @@ import pytest
 from copy import deepcopy
 import json
 from queue import Queue
-from typing import Dict, cast
+from typing import Dict, List, cast
 
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.state.delta import SetStateDelta, StateDelta
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
 
@@ -28,7 +29,7 @@ class MockState(BaseState):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.__snapshot_callback__ = lambda _: self.__mock_snapshot__()
+        self.__snapshot_callback__ = lambda _, __: self.__mock_snapshot__()
 
     def __mock_snapshot__(self) -> None:
         self.__snapshot_count__ += 1
@@ -201,7 +202,7 @@ def test_state_snapshot__deepcopy_fails__logs_error(mock_deepcopy, mock_logger):
     # AND we have a snapshot callback that we are tracking
     snapshot_count = 0
 
-    def __snapshot_callback__(state: "BaseState") -> None:
+    def __snapshot_callback__(state: "BaseState", deltas: List[StateDelta]) -> None:
         nonlocal snapshot_count
         snapshot_count += 1
 
@@ -220,8 +221,8 @@ def test_state_snapshot__deepcopy_fails__logs_error(mock_deepcopy, mock_logger):
     mock_deepcopy.side_effect = side_effect
 
     # WHEN we snapshot the state twice
-    state.__snapshot__()
-    state.__snapshot__()
+    state.__snapshot__(SetStateDelta(name="foo", delta="bar"))
+    state.__snapshot__(SetStateDelta(name="foo", delta="baz"))
 
     # THEN we were able to invoke the callback once
     assert snapshot_count == 1
