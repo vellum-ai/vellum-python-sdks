@@ -62,18 +62,17 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     first_event = chat_history_events[0]
     assert first_event.output.is_initiated
 
-    # TODO: Followup on these events to have the correct chat history here
-    # streaming_event_1 = chat_history_events[1]
-    # assert streaming_event_1.output.is_streaming
-    # assert len(streaming_event_1.output.value) == 1
+    streaming_event_1 = chat_history_events[1]
+    assert streaming_event_1.output.is_streaming
+    assert len(streaming_event_1.output.delta) == 1
 
-    # streaming_event_2 = chat_history_events[2]
-    # assert streaming_event_2.output.is_streaming
-    # assert len(streaming_event_2.output.value) == 2
+    streaming_event_2 = chat_history_events[2]
+    assert streaming_event_2.output.is_streaming
+    assert len(streaming_event_2.output.delta) == 2
 
-    # streaming_event_3 = chat_history_events[3]
-    # assert streaming_event_3.output.is_streaming
-    # assert len(streaming_event_3.output.value) == 3
+    streaming_event_3 = chat_history_events[3]
+    assert streaming_event_3.output.is_streaming
+    assert len(streaming_event_3.output.delta) == 3
 
     final_event = chat_history_events[-1]
     assert final_event.output.is_fulfilled
