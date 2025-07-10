@@ -77,6 +77,8 @@ from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
 
+logger = logging.getLogger(__name__)
+
 
 class _BaseWorkflowMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
@@ -180,7 +182,6 @@ class _BaseWorkflowMeta(type):
 
         overlap = graph_nodes & unused_nodes
         if overlap:
-            logger = logging.getLogger(__name__)
             node_names = [node.__name__ for node in overlap]
             logger.warning(
                 f"Node(s) {', '.join(node_names)} appear in both graph and unused_graphs. Removing from unused_graphs."
