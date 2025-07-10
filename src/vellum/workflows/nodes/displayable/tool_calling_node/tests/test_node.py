@@ -1,7 +1,7 @@
 import json
-from typing import Any, List
+from typing import Any, List, cast
 
-from vellum import ChatMessage
+from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -140,3 +140,64 @@ def test_deployment_definition_release_tag_defaults_to_latest():
 
     # THEN the release_tag should default to "LATEST"
     assert deployment_config.release_tag == "LATEST"
+
+
+def test_create_tool_router_node_preserves_user_chat_history_block():
+    """
+    Test that create_tool_router_node doesn't duplicate chat_history blocks when user provides one.
+    """
+    from vellum.client.types.variable_prompt_block import VariablePromptBlock
+
+    # GIVEN a user-provided chat history block
+    user_chat_history_block = VariablePromptBlock(
+        block_type="VARIABLE",
+        input_variable="chat_history",
+        state=None,
+        cache_config=None,
+    )
+
+    original_blocks: List[PromptBlock] = [user_chat_history_block]
+
+    # WHEN creating a tool router node with that block
+    create_tool_router_node(
+        ml_model="test-model",
+        blocks=cast(List[PromptBlock], original_blocks),
+        functions=[first_function],
+        prompt_inputs={"chat_history": [ChatMessage(role="USER", text="Hello from user")]},
+        max_prompt_iterations=5,
+    )
+
+    # THEN the original blocks list should contain only one chat_history block
+    chat_history_blocks = [
+        block
+        for block in original_blocks
+        if hasattr(block, "input_variable") and block.input_variable == "chat_history"
+    ]
+    assert len(chat_history_blocks) == 1
+
+    assert chat_history_blocks[0] is user_chat_history_block
+
+
+def test_create_tool_router_node_adds_chat_history_block_when_missing():
+    """
+    Test that create_tool_router_node adds a chat_history block when user doesn't provide one.
+    """
+    # GIVEN no user-provided chat history block
+    original_blocks: List[PromptBlock] = []
+
+    # WHEN creating a tool router node without a chat_history block
+    create_tool_router_node(
+        ml_model="test-model",
+        blocks=cast(List[PromptBlock], original_blocks),
+        functions=[first_function],
+        prompt_inputs=None,
+        max_prompt_iterations=5,
+    )
+
+    # THEN the original blocks list should contain exactly one chat_history block
+    chat_history_blocks = [
+        block
+        for block in original_blocks
+        if hasattr(block, "input_variable") and block.input_variable == "chat_history"
+    ]
+    assert len(chat_history_blocks) == 1

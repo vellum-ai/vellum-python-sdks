@@ -102,15 +102,20 @@ def create_tool_router_node(
         # If no functions exist, create a simple Ports class with just a default port
         Ports = type("Ports", (), {"default": Port(default=True)})
 
-    # Add a chat history block to blocks
-    blocks.append(
-        VariablePromptBlock(
-            block_type="VARIABLE",
-            input_variable="chat_history",
-            state=None,
-            cache_config=None,
-        )
+    # Add a chat history block to blocks only if one doesn't already exist
+    has_chat_history_block = any(
+        hasattr(block, "input_variable") and block.input_variable == "chat_history" for block in blocks
     )
+
+    if not has_chat_history_block:
+        blocks.append(
+            VariablePromptBlock(
+                block_type="VARIABLE",
+                input_variable="chat_history",
+                state=None,
+                cache_config=None,
+            )
+        )
 
     node = cast(
         Type[ToolRouterNode],
