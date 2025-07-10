@@ -1,0 +1,33 @@
+# This GitHub Action is managed by the Vellum SDK Generator Repo and copied into each SDK repository.
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.18.0"
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ee/automation
+
+      - name: Create release
+        env:
+          VELLUM_AUTOMATION_APP_ID: ${{ secrets.VELLUM_AUTOMATION_APP_ID }}
+          VELLUM_AUTOMATION_PRIVATE_KEY: ${{ secrets.VELLUM_AUTOMATION_PRIVATE_KEY }}
+          VELLUM_AUTOMATION_INSTALLATION_ID: ${{ secrets.VELLUM_AUTOMATION_INSTALLATION_ID }}
+        run: npm run create-release
+        working-directory: ee/automation
