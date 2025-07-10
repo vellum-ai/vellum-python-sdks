@@ -1,10 +1,14 @@
 import json
+from uuid import uuid4
 from typing import Any, Iterator, List
 
 from vellum import ChatMessage
+from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
+from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
+from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -165,12 +169,6 @@ def test_tool_calling_node_with_user_provided_chat_history_block(vellum_adhoc_pr
         max_prompt_iterations = 1
 
     def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[Any]:
-        from uuid import uuid4
-
-        from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
-        from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
-        from vellum.client.types.string_vellum_value import StringVellumValue
-
         execution_id = str(uuid4())
         events = [
             InitiatedExecutePromptEvent(execution_id=execution_id),
@@ -183,13 +181,8 @@ def test_tool_calling_node_with_user_provided_chat_history_block(vellum_adhoc_pr
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
-    # AND a state with user-provided chat history
-    class TestState(BaseState):
-        chat_history: List[ChatMessage] = []
-        prompt_iterations: int = 0
-
-    initial_chat_history = [ChatMessage(role="USER", text="Hello from user")]
-    state = TestState(chat_history=initial_chat_history)
+    # AND a state
+    state = BaseState()
 
     # WHEN the ToolCallingNode runs
     node = TestToolCallingNode(state=state)
@@ -204,7 +197,7 @@ def test_tool_calling_node_with_user_provided_chat_history_block(vellum_adhoc_pr
     blocks = call_kwargs["blocks"]
 
     chat_history_blocks = [
-        block for block in blocks if hasattr(block, "input_variable") and block.input_variable == "chat_history"
+        block for block in blocks if block.block_type == "VARIABLE" and block.input_variable == "chat_history"
     ]
     assert len(chat_history_blocks) == 1
 
@@ -213,4 +206,4 @@ def test_tool_calling_node_with_user_provided_chat_history_block(vellum_adhoc_pr
     chat_history_inputs = [
         input_val for input_val in input_values if hasattr(input_val, "key") and input_val.key == "chat_history"
     ]
-    assert len(chat_history_inputs) >= 1
+    assert len(chat_history_inputs) == 1
