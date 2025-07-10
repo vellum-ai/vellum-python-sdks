@@ -2,6 +2,7 @@ from datetime import datetime
 from functools import lru_cache
 import importlib
 import inspect
+import logging
 from threading import Event as ThreadingEvent
 from uuid import UUID, uuid4
 from typing import (
@@ -76,6 +77,8 @@ from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
 
+logger = logging.getLogger(__name__)
+
 
 class _BaseWorkflowMeta(type):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
@@ -123,13 +126,70 @@ class _BaseWorkflowMeta(type):
                 raise TypeError(f"Unexpected graph type: {graph_item.__class__}")
             return nodes
 
+        def filter_overlapping_nodes_from_unused_graphs(
+            unused_graphs: Set[GraphAttribute], overlapping_nodes: Set[Type[BaseNode]]
+        ) -> Set[GraphAttribute]:
+            filtered_graphs: Set[GraphAttribute] = set()
+
+            for item in unused_graphs:
+                if isinstance(item, Graph):
+                    graph_nodes = set(item.nodes)
+                    overlapping_in_graph = graph_nodes & overlapping_nodes
+
+                    if not overlapping_in_graph:
+                        filtered_graphs.add(item)
+                    else:
+                        non_overlapping_nodes = graph_nodes - overlapping_nodes
+                        for node in non_overlapping_nodes:
+                            filtered_graphs.add(node)
+
+                elif isinstance(item, set):
+                    filtered_nodes: Set[Type[BaseNode]] = set()
+                    filtered_graphs_in_set: Set[Graph] = set()
+
+                    for subitem in item:
+                        if isinstance(subitem, Graph):
+                            graph_nodes = set(subitem.nodes)
+                            overlapping_in_graph = graph_nodes & overlapping_nodes
+
+                            if not overlapping_in_graph:
+                                filtered_graphs_in_set.add(subitem)
+                            else:
+                                non_overlapping_nodes = graph_nodes - overlapping_nodes
+                                filtered_nodes.update(non_overlapping_nodes)
+                        elif isinstance(subitem, type) and issubclass(subitem, BaseNode):
+                            if subitem not in overlapping_nodes:
+                                filtered_nodes.add(subitem)
+                        else:
+                            raise TypeError(f"Unexpected item type in unused_graphs set: {subitem.__class__}")
+
+                    # Add non-empty sets back to filtered_graphs
+                    if filtered_nodes:
+                        filtered_graphs.add(filtered_nodes)
+                    if filtered_graphs_in_set:
+                        filtered_graphs.add(filtered_graphs_in_set)
+
+                elif isinstance(item, type) and issubclass(item, BaseNode):
+                    if item not in overlapping_nodes:
+                        filtered_graphs.add(item)
+                else:
+                    filtered_graphs.add(item)
+
+            return filtered_graphs
+
         graph_nodes = collect_nodes(dct.get("graph", set()))
         unused_nodes = collect_nodes(dct.get("unused_graphs", set()))
 
         overlap = graph_nodes & unused_nodes
         if overlap:
             node_names = [node.__name__ for node in overlap]
-            raise ValueError(f"Node(s) {', '.join(node_names)} cannot appear in both graph and unused_graphs")
+            logger.warning(
+                f"Node(s) {', '.join(node_names)} appear in both graph and unused_graphs. Removing from unused_graphs."
+            )
+
+            # Filter out overlapping nodes from unused_graphs
+            if "unused_graphs" in dct:
+                dct["unused_graphs"] = filter_overlapping_nodes_from_unused_graphs(dct["unused_graphs"], overlap)
 
         cls = super().__new__(mcs, name, bases, dct)
         workflow_class = cast(Type["BaseWorkflow"], cls)
