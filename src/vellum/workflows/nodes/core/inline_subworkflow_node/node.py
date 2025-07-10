@@ -84,10 +84,13 @@ class InlineSubworkflowNode(
             )
 
         outputs: Optional[BaseOutputs] = None
+        exception: Optional[NodeException] = None
         fulfilled_output_names: Set[str] = set()
 
         for event in subworkflow_stream:
             self._context._emit_subworkflow_event(event)
+            if exception:
+                continue
 
             if not is_workflow_event(event):
                 continue
@@ -101,12 +104,15 @@ class InlineSubworkflowNode(
             elif event.name == "workflow.execution.fulfilled":
                 outputs = event.outputs
             elif event.name == "workflow.execution.rejected":
-                raise NodeException.of(event.error)
+                exception = NodeException.of(event.error)
             elif event.name == "workflow.execution.paused":
-                raise NodeException(
+                exception = NodeException(
                     code=WorkflowErrorCode.INVALID_OUTPUTS,
                     message="Subworkflow unexpectedly paused",
                 )
+
+        if exception:
+            raise exception
 
         if outputs is None:
             raise NodeException(
