@@ -2,6 +2,7 @@ from datetime import datetime
 from functools import lru_cache
 import importlib
 import inspect
+import logging
 from threading import Event as ThreadingEvent
 from uuid import UUID, uuid4
 from typing import (
@@ -123,13 +124,66 @@ class _BaseWorkflowMeta(type):
                 raise TypeError(f"Unexpected graph type: {graph_item.__class__}")
             return nodes
 
+        def filter_overlapping_nodes_from_unused_graphs(
+            unused_graphs: Set[GraphAttribute], overlapping_nodes: Set[Type[BaseNode]]
+        ) -> Set[GraphAttribute]:
+            filtered_graphs = set()
+
+            for item in unused_graphs:
+                if isinstance(item, Graph):
+                    graph_nodes = set(item.nodes)
+                    overlapping_in_graph = graph_nodes & overlapping_nodes
+
+                    if not overlapping_in_graph:
+                        filtered_graphs.add(item)
+                    else:
+                        non_overlapping_nodes = graph_nodes - overlapping_nodes
+                        for node in non_overlapping_nodes:
+                            filtered_graphs.add(node)
+
+                elif isinstance(item, set):
+                    filtered_set = set()
+                    for subitem in item:
+                        if isinstance(subitem, Graph):
+                            graph_nodes = set(subitem.nodes)
+                            overlapping_in_graph = graph_nodes & overlapping_nodes
+
+                            if not overlapping_in_graph:
+                                filtered_set.add(subitem)
+                            else:
+                                non_overlapping_nodes = graph_nodes - overlapping_nodes
+                                for node in non_overlapping_nodes:
+                                    filtered_set.add(node)
+                        elif isinstance(subitem, type) and issubclass(subitem, BaseNode):
+                            if subitem not in overlapping_nodes:
+                                filtered_set.add(subitem)
+                        else:
+                            filtered_set.add(subitem)
+                    if filtered_set:
+                        filtered_graphs.add(frozenset(filtered_set) if isinstance(filtered_set, set) else filtered_set)
+
+                elif isinstance(item, type) and issubclass(item, BaseNode):
+                    if item not in overlapping_nodes:
+                        filtered_graphs.add(item)
+                else:
+                    filtered_graphs.add(item)
+
+            return filtered_graphs
+
         graph_nodes = collect_nodes(dct.get("graph", set()))
         unused_nodes = collect_nodes(dct.get("unused_graphs", set()))
 
         overlap = graph_nodes & unused_nodes
         if overlap:
+            logger = logging.getLogger(__name__)
             node_names = [node.__name__ for node in overlap]
-            raise ValueError(f"Node(s) {', '.join(node_names)} cannot appear in both graph and unused_graphs")
+            logger.warning(
+                f"Node(s) {', '.join(node_names)} appear in both graph and unused_graphs. Removing from unused_graphs."
+            )
+
+            # Filter out overlapping nodes from unused_graphs
+            if "unused_graphs" in dct:
+                dct["unused_graphs"] = filter_overlapping_nodes_from_unused_graphs(dct["unused_graphs"], overlap)
 
         cls = super().__new__(mcs, name, bases, dct)
         workflow_class = cast(Type["BaseWorkflow"], cls)

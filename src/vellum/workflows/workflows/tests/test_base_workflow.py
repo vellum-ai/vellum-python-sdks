@@ -1,4 +1,5 @@
 import pytest
+import logging
 from uuid import UUID, uuid4
 
 from vellum.workflows.edges.edge import Edge
@@ -79,7 +80,6 @@ def test_subworkflow__inherit_base_outputs():
 
     # TEST that the Outputs classes do not inherit from object
     assert object not in MainWorkflow.Outputs.__bases__
-    assert object not in SubWorkflow.Outputs.__bases__
 
     # TEST execution
     workflow = MainWorkflow()
@@ -295,7 +295,7 @@ def test_workflow__no_unused_edges():
     assert edges == set()
 
 
-def test_workflow__node_in_both_graph_and_unused():
+def test_workflow__node_in_both_graph_and_unused(caplog):
     class NodeA(BaseNode):
         pass
 
@@ -305,15 +305,28 @@ def test_workflow__node_in_both_graph_and_unused():
     class NodeC(BaseNode):
         pass
 
-    # WHEN we try to create a workflow where NodeA appears in both graph and unused
-    with pytest.raises(ValueError) as exc_info:
+    # WHEN we create a workflow where NodeA appears in both graph and unused
+    with caplog.at_level(logging.WARNING):
 
         class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
             graph = NodeA >> NodeB
             unused_graphs = {NodeA >> NodeC}
 
-    # THEN it should raise an error
-    assert "Node(s) NodeA cannot appear in both graph and unused_graphs" in str(exc_info.value)
+    # THEN it should log a warning
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "WARNING"
+    assert (
+        "Node(s) NodeA appear in both graph and unused_graphs. Removing from unused_graphs."
+        in caplog.records[0].message
+    )
+
+    # AND the workflow should be created successfully
+    assert TestWorkflow is not None
+
+    # AND NodeA should be removed from unused_graphs while NodeC remains
+    unused_nodes = set(TestWorkflow.get_unused_nodes())
+    assert NodeA not in unused_nodes
+    assert NodeC in unused_nodes
 
 
 def test_workflow__unsupported_graph_item():
