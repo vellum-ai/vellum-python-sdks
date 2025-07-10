@@ -102,6 +102,11 @@ class InlineSubworkflowNode(
                 outputs = event.outputs
             elif event.name == "workflow.execution.rejected":
                 raise NodeException.of(event.error)
+            elif event.name == "workflow.execution.paused":
+                raise NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message="Subworkflow unexpectedly paused",
+                )
 
         if outputs is None:
             raise NodeException(
