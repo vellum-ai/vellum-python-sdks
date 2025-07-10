@@ -127,7 +127,7 @@ class _BaseWorkflowMeta(type):
         def filter_overlapping_nodes_from_unused_graphs(
             unused_graphs: Set[GraphAttribute], overlapping_nodes: Set[Type[BaseNode]]
         ) -> Set[GraphAttribute]:
-            filtered_graphs = set()
+            filtered_graphs: Set[GraphAttribute] = set()
 
             for item in unused_graphs:
                 if isinstance(item, Graph):
@@ -142,25 +142,30 @@ class _BaseWorkflowMeta(type):
                             filtered_graphs.add(node)
 
                 elif isinstance(item, set):
-                    filtered_set = set()
+                    filtered_nodes: Set[Type[BaseNode]] = set()
+                    filtered_graphs_in_set: Set[Graph] = set()
+
                     for subitem in item:
                         if isinstance(subitem, Graph):
                             graph_nodes = set(subitem.nodes)
                             overlapping_in_graph = graph_nodes & overlapping_nodes
 
                             if not overlapping_in_graph:
-                                filtered_set.add(subitem)
+                                filtered_graphs_in_set.add(subitem)
                             else:
                                 non_overlapping_nodes = graph_nodes - overlapping_nodes
-                                for node in non_overlapping_nodes:
-                                    filtered_set.add(node)
+                                filtered_nodes.update(non_overlapping_nodes)
                         elif isinstance(subitem, type) and issubclass(subitem, BaseNode):
                             if subitem not in overlapping_nodes:
-                                filtered_set.add(subitem)
+                                filtered_nodes.add(subitem)
                         else:
-                            filtered_set.add(subitem)
-                    if filtered_set:
-                        filtered_graphs.add(frozenset(filtered_set) if isinstance(filtered_set, set) else filtered_set)
+                            raise TypeError(f"Unexpected item type in unused_graphs set: {subitem.__class__}")
+
+                    # Add non-empty sets back to filtered_graphs
+                    if filtered_nodes:
+                        filtered_graphs.add(filtered_nodes)
+                    if filtered_graphs_in_set:
+                        filtered_graphs.add(filtered_graphs_in_set)
 
                 elif isinstance(item, type) and issubclass(item, BaseNode):
                     if item not in overlapping_nodes:
