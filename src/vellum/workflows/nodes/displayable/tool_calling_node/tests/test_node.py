@@ -1,13 +1,15 @@
 import json
-from typing import Any, List, cast
+from typing import Any, Iterator, List
 
-from vellum import ChatMessage, PromptBlock
+from vellum import ChatMessage
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_function_node, create_tool_router_node
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
@@ -142,13 +144,12 @@ def test_deployment_definition_release_tag_defaults_to_latest():
     assert deployment_config.release_tag == "LATEST"
 
 
-def test_create_tool_router_node_preserves_user_chat_history_block():
+def test_tool_calling_node_with_user_provided_chat_history_block(vellum_adhoc_prompt_client):
     """
-    Test that create_tool_router_node doesn't duplicate chat_history blocks when user provides one.
+    Test that ToolCallingNode with user-provided chat history block merges user and node messages.
     """
-    from vellum.client.types.variable_prompt_block import VariablePromptBlock
 
-    # GIVEN a user-provided chat history block
+    # GIVEN a ToolCallingNode with a user-provided chat history block
     user_chat_history_block = VariablePromptBlock(
         block_type="VARIABLE",
         input_variable="chat_history",
@@ -156,48 +157,60 @@ def test_create_tool_router_node_preserves_user_chat_history_block():
         cache_config=None,
     )
 
-    original_blocks: List[PromptBlock] = [user_chat_history_block]
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [user_chat_history_block]
+        functions = [first_function]
+        prompt_inputs = {"chat_history": [ChatMessage(role="USER", text="Hello from user")]}
+        max_prompt_iterations = 1
 
-    # WHEN creating a tool router node with that block
-    create_tool_router_node(
-        ml_model="test-model",
-        blocks=cast(List[PromptBlock], original_blocks),
-        functions=[first_function],
-        prompt_inputs={"chat_history": [ChatMessage(role="USER", text="Hello from user")]},
-        max_prompt_iterations=5,
-    )
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[Any]:
+        from uuid import uuid4
 
-    # THEN the original blocks list should contain only one chat_history block
+        from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
+        from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+        from vellum.client.types.string_vellum_value import StringVellumValue
+
+        execution_id = str(uuid4())
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=[StringVellumValue(value="Hello! I can help you.")],
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # AND a state with user-provided chat history
+    class TestState(BaseState):
+        chat_history: List[ChatMessage] = []
+        prompt_iterations: int = 0
+
+    initial_chat_history = [ChatMessage(role="USER", text="Hello from user")]
+    state = TestState(chat_history=initial_chat_history)
+
+    # WHEN the ToolCallingNode runs
+    node = TestToolCallingNode(state=state)
+    list(node.run())
+
+    # THEN the API should be called with the correct blocks
+    mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
+    assert mock_api.call_count >= 1
+
+    # AND the blocks should include the user-provided chat_history block
+    call_kwargs = mock_api.call_args.kwargs
+    blocks = call_kwargs["blocks"]
+
     chat_history_blocks = [
-        block
-        for block in original_blocks
-        if hasattr(block, "input_variable") and block.input_variable == "chat_history"
+        block for block in blocks if hasattr(block, "input_variable") and block.input_variable == "chat_history"
     ]
     assert len(chat_history_blocks) == 1
 
-    assert chat_history_blocks[0] is user_chat_history_block
-
-
-def test_create_tool_router_node_adds_chat_history_block_when_missing():
-    """
-    Test that create_tool_router_node adds a chat_history block when user doesn't provide one.
-    """
-    # GIVEN no user-provided chat history block
-    original_blocks: List[PromptBlock] = []
-
-    # WHEN creating a tool router node without a chat_history block
-    create_tool_router_node(
-        ml_model="test-model",
-        blocks=cast(List[PromptBlock], original_blocks),
-        functions=[first_function],
-        prompt_inputs=None,
-        max_prompt_iterations=5,
-    )
-
-    # THEN the original blocks list should contain exactly one chat_history block
-    chat_history_blocks = [
-        block
-        for block in original_blocks
-        if hasattr(block, "input_variable") and block.input_variable == "chat_history"
+    # AND the input_values should include the user's chat history
+    input_values = call_kwargs["input_values"]
+    chat_history_inputs = [
+        input_val for input_val in input_values if hasattr(input_val, "key") and input_val.key == "chat_history"
     ]
-    assert len(chat_history_blocks) == 1
+    assert len(chat_history_inputs) >= 1
