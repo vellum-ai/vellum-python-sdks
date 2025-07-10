@@ -71,8 +71,8 @@ class ToolCallingNode(BaseNode):
                 graph = self._graph
 
                 class Outputs(BaseWorkflow.Outputs):
-                    text: str = self.tool_router_node.Outputs.text
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
+                    text: str = self.tool_router_node.Outputs.text
 
             subworkflow = ToolCallingWorkflow(
                 parent_state=self.state,
@@ -87,6 +87,7 @@ class ToolCallingNode(BaseNode):
         outputs: Optional[BaseOutputs] = None
         exception: Optional[NodeException] = None
         fulfilled_output_names: Set[str] = set()
+        streaming_outputs: dict[str, BaseOutput] = {}
 
         # Yield initiated event for chat_history
         yield BaseOutput(name="chat_history")
@@ -100,14 +101,33 @@ class ToolCallingNode(BaseNode):
                 continue
 
             if event.name == "workflow.execution.streaming":
-                if event.output.name == "chat_history":
+                if event.output.name in ["chat_history", "text"]:
                     if event.output.is_fulfilled:
                         fulfilled_output_names.add(event.output.name)
-                    yield event.output
-                elif event.output.name == "text":
-                    if event.output.is_fulfilled:
-                        fulfilled_output_names.add(event.output.name)
-                    yield event.output
+
+                    streaming_outputs[event.output.name] = event.output
+
+                    chat_history_output = streaming_outputs.get("chat_history")
+                    text_output = streaming_outputs.get("text")
+
+                    if chat_history_output and chat_history_output.is_streaming:
+                        yield chat_history_output
+                        if text_output:
+                            yield text_output
+                        streaming_outputs.clear()
+                    # If we have fulfilled outputs, prioritize text first
+                    elif (
+                        text_output
+                        and text_output.is_fulfilled
+                        and chat_history_output
+                        and chat_history_output.is_fulfilled
+                    ):
+                        yield text_output
+                        yield chat_history_output
+                        streaming_outputs.clear()
+                    elif len(streaming_outputs) == 1:
+                        yield from streaming_outputs.values()
+                        streaming_outputs.clear()
             elif event.name == "workflow.execution.fulfilled":
                 outputs = event.outputs
             elif event.name == "workflow.execution.rejected":
@@ -122,12 +142,26 @@ class ToolCallingNode(BaseNode):
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
             )
 
-        for output_descriptor, output_value in outputs:
-            if output_descriptor.name not in fulfilled_output_names:
-                yield BaseOutput(
-                    name=output_descriptor.name,
-                    value=output_value,
-                )
+        output_list = list(outputs)
+        text_outputs = [
+            (desc, val) for desc, val in output_list if desc.name == "text" and desc.name not in fulfilled_output_names
+        ]
+        chat_history_outputs = [
+            (desc, val)
+            for desc, val in output_list
+            if desc.name == "chat_history" and desc.name not in fulfilled_output_names
+        ]
+        other_outputs = [
+            (desc, val)
+            for desc, val in output_list
+            if desc.name not in ["text", "chat_history"] and desc.name not in fulfilled_output_names
+        ]
+
+        for output_descriptor, output_value in text_outputs + chat_history_outputs + other_outputs:
+            yield BaseOutput(
+                name=output_descriptor.name,
+                value=output_value,
+            )
 
     def _build_graph(self) -> None:
         self.tool_router_node = create_tool_router_node(

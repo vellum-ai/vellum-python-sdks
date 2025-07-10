@@ -80,3 +80,9 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     assert len(final_chat_history) == 3
 
     assert len(chat_history_events) == 5
+
+    first_streaming_event = next((e for e in streaming_events if e.output.is_streaming), None)
+    if first_streaming_event:
+        assert (
+            first_streaming_event.output.name == "chat_history"
+        ), "Expected chat_history to be prioritized during streaming"
