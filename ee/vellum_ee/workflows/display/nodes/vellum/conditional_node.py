@@ -50,7 +50,6 @@ class BaseConditionalNodeDisplay(BaseNodeDisplay[_ConditionalNodeType], Generic[
         node_id = self.node_id
 
         node_inputs: List[NodeInput] = []
-        source_handle_ids = self._get_source_handle_ids() or {}
         condition_ids = self._get_condition_ids()
 
         ports_size = sum(1 for _ in node.Ports)
@@ -60,6 +59,9 @@ class BaseConditionalNodeDisplay(BaseNodeDisplay[_ConditionalNodeType], Generic[
                 f"""Too many defined condition ids. Ports are size {ports_size} \
 but the defined conditions have length {len(condition_ids)}"""
             )
+
+        ports = self.serialize_ports(display_context)
+        ports_by_index = {idx: port for idx, port in enumerate(ports)}
 
         def serialize_rule(
             descriptor: BaseDescriptor, path: List[int], rule_id_map: Optional[RuleIdMap]
@@ -166,7 +168,7 @@ but the defined conditions have length {len(condition_ids)}"""
             rule_group_id = str(
                 condition_ids[idx].rule_group_id if condition_ids else uuid4_from_hash(f"{condition_id}|rule_group")
             )
-            source_handle_id = str(source_handle_ids.get(idx) or uuid4_from_hash(f"{node_id}|handles|{idx}"))
+            source_handle_id = ports_by_index[idx]["id"]
 
             if port._condition is None:
                 if port._condition_type == ConditionType.ELSE:
