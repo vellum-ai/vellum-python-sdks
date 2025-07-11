@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, List, Optional, Tuple, TypeVar, Union
+from typing import Any, ClassVar, Dict, Generic, List, Optional, Tuple, TypeVar, Union, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.and_ import AndExpression
@@ -50,6 +50,7 @@ class BaseConditionalNodeDisplay(BaseNodeDisplay[_ConditionalNodeType], Generic[
         node_id = self.node_id
 
         node_inputs: List[NodeInput] = []
+        source_handle_ids = self._get_source_handle_ids() or {}
         condition_ids = self._get_condition_ids()
 
         ports_size = sum(1 for _ in node.Ports)
@@ -168,7 +169,11 @@ but the defined conditions have length {len(condition_ids)}"""
             rule_group_id = str(
                 condition_ids[idx].rule_group_id if condition_ids else uuid4_from_hash(f"{condition_id}|rule_group")
             )
-            source_handle_id = ports_by_index[idx]["id"]
+            source_handle_id = (
+                str(source_handle_ids.get(idx))
+                if source_handle_ids.get(idx)
+                else cast(JsonObject, ports_by_index[idx])["id"]
+            )
 
             if port._condition is None:
                 if port._condition_type == ConditionType.ELSE:
