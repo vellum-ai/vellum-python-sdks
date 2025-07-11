@@ -1,0 +1,379 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "type": "ENTRYPOINT",
+        "inputs": [],
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba"
+        },
+        "display_data": {
+          "position": {
+            "x": 0.0,
+            "y": -50.0
+          }
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "ee9b5234-247b-49d1-bed4-490312f18838",
+        "type": "TEMPLATING",
+        "inputs": [
+          {
+            "id": "e56f4285-b660-4f23-a38a-e2d27f4d8d42",
+            "key": "template",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "{{ text }} World!!!!"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "98bc8616-6eea-4fcd-8795-0522441748cd",
+            "key": "text",
+            "value": {
+              "rules": [
+                {
+                  "type": "INPUT_VARIABLE",
+                  "data": {
+                    "input_variable_id": "bbd9e32f-7496-449e-9654-645e4024ad81"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Templating Node",
+          "output_id": "47f3f53d-d7a5-4332-a55f-cf8667ed55d6",
+          "error_output_id": null,
+          "source_handle_id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
+          "target_handle_id": "005e1cd2-5452-4e1f-be6a-ac9fe3c02b9b",
+          "template_node_input_id": "e56f4285-b660-4f23-a38a-e2d27f4d8d42",
+          "output_type": "STRING"
+        },
+        "display_data": {
+          "position": {
+            "x": 200.0,
+            "y": -50.0
+          }
+        },
+        "base": {
+          "name": "TemplatingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "templating_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "TemplatingNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "conditional_node_without_display",
+            "code",
+            "nodes",
+            "templating_node"
+          ]
+        },
+        "ports": [
+          {
+            "id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
+      },
+      {
+        "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+        "type": "CONDITIONAL",
+        "inputs": [
+          {
+            "id": "9808cef8-0c0c-4320-a497-1b08144d6dcd",
+            "key": "8c5057ea-5ca2-4a78-9276-ad26f6ae6794.field",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
+                    "output_id": "47f3f53d-d7a5-4332-a55f-cf8667ed55d6"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          },
+          {
+            "id": "139e3aab-43cc-4ac1-9578-2ced863014ff",
+            "key": "8c5057ea-5ca2-4a78-9276-ad26f6ae6794.value",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "hello!"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "data": {
+          "label": "Conditional Node",
+          "target_handle_id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
+          "conditions": [
+            {
+              "id": "bc3aa54a-5b5d-4df9-81c7-86f190a89f51",
+              "type": "IF",
+              "source_handle_id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
+              "data": {
+                "id": "bd9e4223-4602-4fe4-9f78-f9774504da62",
+                "rules": [
+                  {
+                    "id": "8c5057ea-5ca2-4a78-9276-ad26f6ae6794",
+                    "rules": null,
+                    "combinator": null,
+                    "negated": false,
+                    "field_node_input_id": "9808cef8-0c0c-4320-a497-1b08144d6dcd",
+                    "operator": "!=",
+                    "value_node_input_id": "139e3aab-43cc-4ac1-9578-2ced863014ff"
+                  }
+                ],
+                "combinator": "AND",
+                "negated": false,
+                "field_node_input_id": null,
+                "operator": null,
+                "value_node_input_id": null
+              }
+            },
+            {
+              "id": "a044cfd7-0a8c-4893-a22c-1971f839e3dc",
+              "type": "ELSE",
+              "source_handle_id": "067343a4-3784-497f-867c-210927f6f5fe",
+              "data": null
+            }
+          ],
+          "version": "2"
+        },
+        "display_data": {
+          "position": {
+            "x": 400.0,
+            "y": -50.0
+          }
+        },
+        "base": {
+          "name": "ConditionalNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "conditional_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "ConditionalNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "conditional_node_without_display",
+            "code",
+            "nodes",
+            "conditional_node"
+          ]
+        },
+        "ports": [
+          {
+            "id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
+            "name": "if_1",
+            "type": "IF",
+            "expression": {
+              "type": "BINARY_EXPRESSION",
+              "lhs": {
+                "type": "NODE_OUTPUT",
+                "node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
+                "node_output_id": "47f3f53d-d7a5-4332-a55f-cf8667ed55d6"
+              },
+              "operator": "!=",
+              "rhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                  "type": "STRING",
+                  "value": "hello!"
+                }
+              }
+            }
+          },
+          {
+            "id": "067343a4-3784-497f-867c-210927f6f5fe",
+            "name": "else_1",
+            "type": "ELSE",
+            "expression": null
+          }
+        ]
+      },
+      {
+        "id": "2c368766-015e-4d2f-8f57-01937038a4b2",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "final_output",
+          "target_handle_id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+          "output_id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+          "output_type": "STRING",
+          "node_input_id": "287431be-000d-498d-9dd0-b8dddbce5a5a"
+        },
+        "inputs": [
+          {
+            "id": "287431be-000d-498d-9dd0-b8dddbce5a5a",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
+                    "output_id": "47f3f53d-d7a5-4332-a55f-cf8667ed55d6"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 600.0,
+            "y": -50.0
+          }
+        },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "FinalOutput",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "conditional_node_without_display",
+            "code",
+            "nodes",
+            "final_output"
+          ]
+        },
+        "outputs": [
+          {
+            "id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+            "name": "value",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
+              "node_output_id": "47f3f53d-d7a5-4332-a55f-cf8667ed55d6"
+            }
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "type": "DEFAULT",
+        "id": "3ad3c79d-1edd-4524-9419-57a85f493b46",
+        "source_node_id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+        "source_handle_id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
+        "target_node_id": "2c368766-015e-4d2f-8f57-01937038a4b2",
+        "target_handle_id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4"
+      },
+      {
+        "type": "DEFAULT",
+        "id": "23c59540-24a2-4de2-bd41-3ce3e598d0eb",
+        "source_node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
+        "source_handle_id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
+        "target_node_id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+        "target_handle_id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0"
+      },
+      {
+        "type": "DEFAULT",
+        "id": "b4ac99ee-b85a-400b-bc36-00aa12e8f9d4",
+        "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+        "target_node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
+        "target_handle_id": "005e1cd2-5452-4e1f-be6a-ac9fe3c02b9b"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": 0.0,
+        "y": 0.0,
+        "zoom": 1.0
+      }
+    },
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "conditional_node_without_display",
+        "code",
+        "workflow"
+      ]
+    },
+    "output_values": [
+      {
+        "output_variable_id": "16b9fa94-c99b-4290-a57c-2acb5283051f",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "2c368766-015e-4d2f-8f57-01937038a4b2",
+          "node_output_id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283"
+        }
+      }
+    ]
+  },
+  "input_variables": [
+    {
+      "id": "bbd9e32f-7496-449e-9654-645e4024ad81",
+      "key": "text",
+      "type": "STRING",
+      "required": true,
+      "default": null,
+      "extensions": {
+        "color": null
+      }
+    }
+  ],
+  "state_variables": [],
+  "output_variables": [
+    {
+      "id": "16b9fa94-c99b-4290-a57c-2acb5283051f",
+      "key": "final_output",
+      "type": "STRING"
+    }
+  ]
+}

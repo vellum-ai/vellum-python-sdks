@@ -177,13 +177,13 @@ describe("WorkflowProjectGenerator", () => {
       }
     );
   });
-  describe.skip("generateCodeNodeDirectoryOnly", () => {
+  describe("generateCodeNodeDirectoryOnly", () => {
     const excludeFilesAtPaths: RegExp[] = [/\.pyc$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];
 
     it.each(
       getFixturesForProjectTest({
-        includeFixtures: [""],
+        includeFixtures: ["conditional_node_without_display"],
         fixtureMocks: {},
       })
     )(
@@ -214,12 +214,12 @@ describe("WorkflowProjectGenerator", () => {
         // Filter out display directory files from generated
         const generatedFilesNoDisplay = Object.fromEntries(
           Object.entries(generatedFiles).filter(
-            ([path]) => !path.startsWith("display/")
+            ([path]) => !path.startsWith("display/") && path !== "__init__.py"
           )
         );
         const expectedFilesNoDisplay = Object.fromEntries(
           Object.entries(expectedFiles).filter(
-            ([path]) => !path.startsWith("display/")
+            ([path]) => !path.startsWith("display/") && path !== "__init__.py"
           )
         );
 
