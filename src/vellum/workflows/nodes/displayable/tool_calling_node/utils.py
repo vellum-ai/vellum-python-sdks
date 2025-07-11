@@ -105,7 +105,6 @@ def create_tool_router_node(
         Ports = type("Ports", (), {"default": Port(default=True)})
 
     # Add a chat history block to blocks only if one doesn't already exist
-    CHAT_HISTORY_VARIABLE = "chat_history"
     has_chat_history_block = any(
         block.block_type == "VARIABLE" and block.input_variable == CHAT_HISTORY_VARIABLE for block in blocks
     )
