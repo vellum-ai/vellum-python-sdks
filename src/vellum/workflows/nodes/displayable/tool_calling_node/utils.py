@@ -42,7 +42,10 @@ class ToolRouterNode(InlinePromptNode):
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
-        self.prompt_inputs = {**self.prompt_inputs, CHAT_HISTORY_VARIABLE: self.state.chat_history}  # type: ignore
+        # Merge user-provided chat history with node's chat history
+        user_chat_history = self.prompt_inputs.get(CHAT_HISTORY_VARIABLE, []) if self.prompt_inputs else []
+        merged_chat_history = user_chat_history + self.state.chat_history
+        self.prompt_inputs = {**self.prompt_inputs, CHAT_HISTORY_VARIABLE: merged_chat_history}  # type: ignore
         generator = super().run()
         for output in generator:
             if output.name == "results" and output.value:

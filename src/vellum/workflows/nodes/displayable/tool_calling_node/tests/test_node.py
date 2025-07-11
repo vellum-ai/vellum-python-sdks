@@ -207,4 +207,4 @@ def test_tool_calling_node_with_user_provided_chat_history_block(vellum_adhoc_pr
         input_val for input_val in input_values if hasattr(input_val, "key") and input_val.key == "chat_history"
     ]
     assert len(chat_history_inputs) == 1
-    assert chat_history_inputs[0].value == []
+    assert chat_history_inputs[0].value == [ChatMessage(role="USER", text="Hello from user")]
