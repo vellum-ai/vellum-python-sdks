@@ -33,6 +33,7 @@ class WorkflowEventExecutionRead(UniversalBaseModel):
     metric_results: typing.List[WorkflowExecutionViewOnlineEvalMetricResult]
     usage_results: typing.Optional[typing.List[WorkflowExecutionUsageResult]] = None
     spans: typing.List[VellumSpan]
+    state: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
