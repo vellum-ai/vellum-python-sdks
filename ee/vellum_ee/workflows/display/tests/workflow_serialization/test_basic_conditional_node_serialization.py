@@ -285,7 +285,7 @@ def test_serialize_workflow():
                     {
                         "id": "de7b0b4e-7803-4d36-a275-2e7e3f60342b",
                         "type": "IF",
-                        "source_handle_id": "561b4e3a-8db3-448a-8933-1115937082ff",
+                        "source_handle_id": "3a45b81f-95e4-4cbd-8997-bfdbe30251e8",
                         "data": {
                             "id": "2ccd0730-26d1-4fb4-baa9-1a2a182dd9a0",
                             "rules": [
@@ -309,7 +309,7 @@ def test_serialize_workflow():
                     {
                         "id": "5e783d17-6808-441a-ac6c-33a4e184f4e0",
                         "type": "ELIF",
-                        "source_handle_id": "0644f22e-2680-441a-9554-eedf1d3d22a9",
+                        "source_handle_id": "7202f702-1ebc-4067-ab1e-ec67e49158ee",
                         "data": {
                             "id": "cc3f0d92-b603-42cc-b2e9-83e3b23b3bcb",
                             "rules": [
@@ -333,7 +333,7 @@ def test_serialize_workflow():
                     {
                         "id": "6bd2f643-9cf5-4e7f-9113-f90e5c8057be",
                         "type": "ELIF",
-                        "source_handle_id": "2a48d274-ecfc-4f40-95ac-bc697663f10c",
+                        "source_handle_id": "cf45705d-1a47-43a6-9d24-a7fdf78baae0",
                         "data": {
                             "id": "a5a0f391-7052-452f-9fe1-a5781a491591",
                             "rules": [
@@ -357,7 +357,7 @@ def test_serialize_workflow():
                     {
                         "id": "0a058485-18a4-4e20-8a30-6da8196ac46f",
                         "type": "ELIF",
-                        "source_handle_id": "90fc9dc8-0a74-4a98-b6ac-55ffce4a2881",
+                        "source_handle_id": "f04610dd-61cf-41b0-b337-2235e101cdb0",
                         "data": {
                             "id": "efe7a851-2a67-4189-99ec-bc193242b270",
                             "rules": [
@@ -409,7 +409,7 @@ def test_serialize_workflow():
                     {
                         "id": "c2fa8a44-923b-462a-b0d2-fa800a152e52",
                         "type": "ELSE",
-                        "source_handle_id": "493024f4-8010-4e1a-abae-b6adbc6fb208",
+                        "source_handle_id": "f9dde637-ea90-465f-a871-caf8380ae377",
                         "data": None,
                     },
                 ],
@@ -913,7 +913,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                     {
                         "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
                         "type": "IF",
-                        "source_handle_id": "8124a6cf-4a34-4149-adc0-68696c11bd4e",
+                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
                         "data": {
                             "id": "650e7105-3e76-43ca-858f-b290970b438b",
                             "rules": [
@@ -937,7 +937,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                     {
                         "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
                         "type": "ELSE",
-                        "source_handle_id": "4df924c0-7bed-4f4a-9db4-2bfe51841755",
+                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
                         "data": None,
                     },
                 ],
@@ -1024,7 +1024,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                     {
                         "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
                         "type": "IF",
-                        "source_handle_id": "8124a6cf-4a34-4149-adc0-68696c11bd4e",
+                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
                         "data": {
                             "id": "650e7105-3e76-43ca-858f-b290970b438b",
                             "rules": [
@@ -1048,7 +1048,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                     {
                         "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
                         "type": "ELSE",
-                        "source_handle_id": "4df924c0-7bed-4f4a-9db4-2bfe51841755",
+                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
                         "data": None,
                     },
                 ],
@@ -1147,7 +1147,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                     {
                         "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
                         "type": "IF",
-                        "source_handle_id": "8124a6cf-4a34-4149-adc0-68696c11bd4e",
+                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
                         "data": {
                             "id": "650e7105-3e76-43ca-858f-b290970b438b",
                             "rules": [
@@ -1171,7 +1171,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                     {
                         "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
                         "type": "ELSE",
-                        "source_handle_id": "4df924c0-7bed-4f4a-9db4-2bfe51841755",
+                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
                         "data": None,
                     },
                 ],
