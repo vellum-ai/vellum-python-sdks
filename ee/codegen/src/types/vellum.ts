@@ -819,6 +819,10 @@ export interface DictionaryWorkflowReferenceEntry {
 export interface DictionaryWorkflowReference {
   type: "DICTIONARY_REFERENCE";
   entries: DictionaryWorkflowReferenceEntry[];
+  dataclassType?: {
+    name: string;
+    module: string;
+  };
 }
 
 export interface ArrayWorkflowReference {

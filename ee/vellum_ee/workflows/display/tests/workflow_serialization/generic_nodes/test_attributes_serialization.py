@@ -670,3 +670,51 @@ def test_serialize_node__pydantic_with_node_output_reference(serialize_node):
     assert any(
         entry["key"] == "node_ref" and entry["value"]["type"] == "NODE_OUTPUT" for entry in attr_value["entries"]
     )
+
+
+def test_serialize_node__dataclass_with_preserved_type_metadata(serialize_node):
+    """Test that dataclass type metadata is preserved during serialization."""
+
+    @dataclass
+    class CustomOutputType:
+        name: str
+        value: int
+
+    class NodeWithCustomDataclass(BaseNode):
+        attr = CustomOutputType(name="test", value=42)
+
+    serialized_node = serialize_node(node_class=NodeWithCustomDataclass)
+
+    attr_value = serialized_node["attributes"][0]["value"]
+    assert attr_value["type"] == "DICTIONARY_REFERENCE"
+
+    assert "dataclass_type" in attr_value
+    assert attr_value["dataclass_type"]["name"] == "CustomOutputType"
+    expected_module = (
+        "vellum_ee.workflows.display.tests.workflow_serialization.generic_nodes.test_attributes_serialization"
+    )
+    assert attr_value["dataclass_type"]["module"] == expected_module
+
+
+def test_serialize_node__dataclass_output_with_preserved_type_metadata(serialize_node):
+    """Test that dataclass outputs preserve type metadata during serialization."""
+
+    @dataclass
+    class CustomDataclassOutput:
+        result: str
+        count: int
+
+    class NodeWithDataclassOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            custom_output: CustomDataclassOutput
+
+    serialized_node = serialize_node(node_class=NodeWithDataclassOutput)
+
+    output = serialized_node["outputs"][0]
+    assert output["name"] == "custom_output"
+    assert output["type"] == "JSON"
+
+    if output["value"] is not None:
+        assert output["value"]["type"] == "DICTIONARY_REFERENCE"
+        assert "dataclass_type" in output["value"]
+        assert output["value"]["dataclass_type"]["name"] == "CustomDataclassOutput"
