@@ -2,4 +2,4 @@
 
 import typing
 
-ApiVersionEnum = typing.Literal["2024-10-25"]
+ApiVersionEnum = typing.Union[typing.Literal["2024-10-25", "2025-07-30"], typing.Any]

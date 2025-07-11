@@ -66,9 +66,8 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
             elif output.type == "FUNCTION_CALL":
                 string_outputs.append(output.value.model_dump_json(indent=4))
             elif output.type == "THINKING":
-                for thinking_item in output.value:
-                    if thinking_item.type == "STRING":
-                        string_outputs.append(thinking_item.value)
+                if output.value.type == "STRING":
+                    string_outputs.append(output.value.value)
             else:
                 string_outputs.append(output.value.message)
 
