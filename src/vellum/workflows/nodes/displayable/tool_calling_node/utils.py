@@ -22,6 +22,8 @@ from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, To
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
+CHAT_HISTORY_VARIABLE = "chat_history"
+
 
 class FunctionNode(BaseNode):
     """Node that executes a specific function."""
@@ -40,7 +42,10 @@ class ToolRouterNode(InlinePromptNode):
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
-        self.prompt_inputs = {**self.prompt_inputs, "chat_history": self.state.chat_history}  # type: ignore
+        # Merge user-provided chat history with node's chat history
+        user_chat_history = self.prompt_inputs.get(CHAT_HISTORY_VARIABLE, []) if self.prompt_inputs else []
+        merged_chat_history = user_chat_history + self.state.chat_history
+        self.prompt_inputs = {**self.prompt_inputs, CHAT_HISTORY_VARIABLE: merged_chat_history}  # type: ignore
         generator = super().run()
         for output in generator:
             if output.name == "results" and output.value:
@@ -102,15 +107,20 @@ def create_tool_router_node(
         # If no functions exist, create a simple Ports class with just a default port
         Ports = type("Ports", (), {"default": Port(default=True)})
 
-    # Add a chat history block to blocks
-    blocks.append(
-        VariablePromptBlock(
-            block_type="VARIABLE",
-            input_variable="chat_history",
-            state=None,
-            cache_config=None,
-        )
+    # Add a chat history block to blocks only if one doesn't already exist
+    has_chat_history_block = any(
+        block.block_type == "VARIABLE" and block.input_variable == CHAT_HISTORY_VARIABLE for block in blocks
     )
+
+    if not has_chat_history_block:
+        blocks.append(
+            VariablePromptBlock(
+                block_type="VARIABLE",
+                input_variable=CHAT_HISTORY_VARIABLE,
+                state=None,
+                cache_config=None,
+            )
+        )
 
     node = cast(
         Type[ToolRouterNode],
