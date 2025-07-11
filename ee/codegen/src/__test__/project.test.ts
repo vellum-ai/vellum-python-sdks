@@ -177,6 +177,95 @@ describe("WorkflowProjectGenerator", () => {
       }
     );
   });
+  describe.skip("generateCodeNodeDirectoryOnly", () => {
+    const excludeFilesAtPaths: RegExp[] = [/\.pyc$/];
+    const ignoreContentsOfFilesAtPaths: RegExp[] = [];
+
+    it.each(
+      getFixturesForProjectTest({
+        includeFixtures: [""],
+        fixtureMocks: {},
+      })
+    )(
+      "should correctly generate code without display directory for fixture $fixtureName",
+      async ({ displayFile, codeDir }) => {
+        const displayData: unknown = JSON.parse(
+          fs.readFileSync(displayFile, "utf-8")
+        );
+
+        const project = new WorkflowProjectGenerator({
+          absolutePathToOutputDirectory: tempDir,
+          workflowVersionExecConfigData: displayData,
+          moduleName: "code",
+          vellumApiKey: "<TEST_API_KEY>",
+          options: {
+            codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
+          },
+          strict: true,
+        });
+
+        await project.generateCode();
+
+        const generatedFiles = getAllFilesInDir(
+          join(tempDir, ...project.getModulePath())
+        );
+        const expectedFiles = getAllFilesInDir(codeDir, excludeFilesAtPaths);
+
+        // Filter out display directory files from generated
+        const generatedFilesNoDisplay = Object.fromEntries(
+          Object.entries(generatedFiles).filter(
+            ([path]) => !path.startsWith("display/")
+          )
+        );
+        const expectedFilesNoDisplay = Object.fromEntries(
+          Object.entries(expectedFiles).filter(
+            ([path]) => !path.startsWith("display/")
+          )
+        );
+
+        const extraFilePaths = difference(
+          Object.keys(generatedFilesNoDisplay),
+          Object.keys(expectedFilesNoDisplay)
+        );
+        const extraFiles = extraFilePaths.map(
+          (path) => generatedFilesNoDisplay[path]
+        );
+        expect(extraFiles.length, `Found extra file(s): ${extraFiles}`).toBe(0);
+
+        for (const [
+          expectedRelativePath,
+          expectedAbsolutePath,
+        ] of Object.entries(expectedFilesNoDisplay)) {
+          const generatedAbsolutePath =
+            generatedFilesNoDisplay[expectedRelativePath];
+
+          if (!generatedAbsolutePath) {
+            throw new Error(
+              `Expected to have generated a file at the path: ${expectedRelativePath}`
+            );
+          }
+
+          if (
+            ignoreContentsOfFilesAtPaths.some((regex) =>
+              regex.test(expectedRelativePath)
+            )
+          ) {
+            continue;
+          }
+
+          const generatedFileContents = fs.readFileSync(
+            generatedAbsolutePath,
+            "utf-8"
+          );
+
+          expect(generatedFileContents).toMatchFileSnapshot(
+            expectedAbsolutePath,
+            `File contents don't match snapshot: ${expectedRelativePath}`
+          );
+        }
+      }
+    );
+  });
   describe("failure cases", () => {
     let displayData = {
       workflow_raw_data: {
