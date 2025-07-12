@@ -670,3 +670,54 @@ def test_serialize_node__pydantic_with_node_output_reference(serialize_node):
     assert any(
         entry["key"] == "node_ref" and entry["value"]["type"] == "NODE_OUTPUT" for entry in attr_value["entries"]
     )
+
+
+def test_serialize_workflow__dataclass_output_with_preserved_type_metadata():
+    """Test that dataclass outputs preserve type metadata during workflow serialization."""
+
+    @dataclass
+    class CustomDataclassOutput:
+        result: str
+        count: int
+
+    class NodeWithDataclassOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            custom_output: CustomDataclassOutput
+
+    class Workflow(BaseWorkflow):
+        graph = NodeWithDataclassOutput
+
+    from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+
+    serialized_workflow = workflow_display.serialize()
+
+    # THEN the workflow should be serialized with dataclass type metadata preserved
+    assert "workflow_raw_data" in serialized_workflow
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+
+    nodes = workflow_raw_data["nodes"]
+    dataclass_node = None
+    for node in nodes:
+        definition = node.get("definition")
+        if definition and definition.get("name") == "NodeWithDataclassOutput":
+            dataclass_node = node
+            break
+
+    assert dataclass_node is not None, "Could not find NodeWithDataclassOutput in serialized nodes"
+
+    outputs = dataclass_node.get("outputs", [])
+    custom_output = None
+    for output in outputs:
+        if output.get("name") == "custom_output":
+            custom_output = output
+            break
+
+    assert custom_output is not None, "Could not find custom_output in node outputs"
+    assert custom_output["type"] == "JSON"
+
+    if custom_output.get("value") is not None:
+        assert custom_output["value"]["type"] == "DICTIONARY_REFERENCE"
+        assert "dataclass_type" in custom_output["value"]
+        assert custom_output["value"]["dataclass_type"]["name"] == "CustomDataclassOutput"
