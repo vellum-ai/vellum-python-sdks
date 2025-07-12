@@ -812,22 +812,11 @@ export const DictionaryWorkflowReferenceSerializer: ObjectSchema<
   Omit<DictionaryWorkflowReference, "type">
 > = objectSchema({
   entries: listSchema(DictionaryWorkflowReferenceEntrySerializer),
-  dataclassType: propertySchema(
-    "dataclass_type",
-    objectSchema({
-      name: stringSchema(),
-      module: stringSchema(),
-    }).optional()
-  ),
 });
 
 export declare namespace DictionaryWorkflowReferenceSerializer {
   interface Raw {
     entries: DictionaryWorkflowReferenceEntrySerializer.Raw[];
-    dataclass_type?: {
-      name: string;
-      module: string;
-    } | null;
   }
 }
 

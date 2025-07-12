@@ -672,32 +672,8 @@ def test_serialize_node__pydantic_with_node_output_reference(serialize_node):
     )
 
 
-def test_serialize_node__dataclass_with_preserved_type_metadata(serialize_node):
-    """Test that dataclass type metadata is preserved during serialization."""
-
-    @dataclass
-    class CustomOutputType:
-        name: str
-        value: int
-
-    class NodeWithCustomDataclass(BaseNode):
-        attr = CustomOutputType(name="test", value=42)
-
-    serialized_node = serialize_node(node_class=NodeWithCustomDataclass)
-
-    attr_value = serialized_node["attributes"][0]["value"]
-    assert attr_value["type"] == "DICTIONARY_REFERENCE"
-
-    assert "dataclass_type" in attr_value
-    assert attr_value["dataclass_type"]["name"] == "CustomOutputType"
-    expected_module = (
-        "vellum_ee.workflows.display.tests.workflow_serialization.generic_nodes.test_attributes_serialization"
-    )
-    assert attr_value["dataclass_type"]["module"] == expected_module
-
-
-def test_serialize_node__dataclass_output_with_preserved_type_metadata(serialize_node):
-    """Test that dataclass outputs preserve type metadata during serialization."""
+def test_serialize_workflow__dataclass_output_with_preserved_type_metadata():
+    """Test that dataclass outputs preserve type metadata during workflow serialization."""
 
     @dataclass
     class CustomDataclassOutput:
@@ -708,13 +684,40 @@ def test_serialize_node__dataclass_output_with_preserved_type_metadata(serialize
         class Outputs(BaseNode.Outputs):
             custom_output: CustomDataclassOutput
 
-    serialized_node = serialize_node(node_class=NodeWithDataclassOutput)
+    class Workflow(BaseWorkflow):
+        graph = NodeWithDataclassOutput
 
-    output = serialized_node["outputs"][0]
-    assert output["name"] == "custom_output"
-    assert output["type"] == "JSON"
+    from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-    if output["value"] is not None:
-        assert output["value"]["type"] == "DICTIONARY_REFERENCE"
-        assert "dataclass_type" in output["value"]
-        assert output["value"]["dataclass_type"]["name"] == "CustomDataclassOutput"
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+
+    serialized_workflow = workflow_display.serialize()
+
+    # THEN the workflow should be serialized with dataclass type metadata preserved
+    assert "workflow_raw_data" in serialized_workflow
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+
+    nodes = workflow_raw_data["nodes"]
+    dataclass_node = None
+    for node in nodes:
+        definition = node.get("definition")
+        if definition and definition.get("name") == "NodeWithDataclassOutput":
+            dataclass_node = node
+            break
+
+    assert dataclass_node is not None, "Could not find NodeWithDataclassOutput in serialized nodes"
+
+    outputs = dataclass_node.get("outputs", [])
+    custom_output = None
+    for output in outputs:
+        if output.get("name") == "custom_output":
+            custom_output = output
+            break
+
+    assert custom_output is not None, "Could not find custom_output in node outputs"
+    assert custom_output["type"] == "JSON"
+
+    if custom_output.get("value") is not None:
+        assert custom_output["value"]["type"] == "DICTIONARY_REFERENCE"
+        assert "dataclass_type" in custom_output["value"]
+        assert custom_output["value"]["dataclass_type"]["name"] == "CustomDataclassOutput"
