@@ -6,6 +6,7 @@ from pydash import snake_case
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
+from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.context import execution_context, get_parent_context
@@ -75,6 +76,48 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
                                 )
                             )
             yield output
+
+
+class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState]):
+    """Node that executes a deployment definition with function call output."""
+
+    function_call_output: List[PromptOutput]
+
+    def run(self) -> Iterator[BaseOutput]:
+        if self.function_call_output and len(self.function_call_output) > 0:
+            function_call = self.function_call_output[0]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
+        else:
+            arguments = {}
+
+        # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
+        # we do in the `__init__` method. Long term, instead of the function_call_output attribute above, we
+        # want to do:
+        # ```python
+        # subworkflow_inputs = tool_router_node.Outputs.results[0]['value']['arguments'].if_(
+        #     tool_router_node.Outputs.results[0]['type'].equals('FUNCTION_CALL'),
+        #     {},
+        # )
+        # ```
+        self.subworkflow_inputs = arguments  # type:ignore[misc]
+
+        # Call the parent run method to execute the subworkflow
+        outputs = {}
+        for output in super().run():
+            if output.is_fulfilled:
+                outputs[output.name] = output.value
+            yield output
+
+        # Add the result to the chat history
+        self.state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
+            )
+        )
 
 
 def create_tool_router_node(
@@ -163,48 +206,13 @@ def create_function_node(
         deployment = function.deployment_id or function.deployment_name
         release_tag = function.release_tag
 
-        def execute_workflow_deployment_function(self) -> BaseNode.Outputs:
-            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
-            if function_call_output and len(function_call_output) > 0:
-                function_call = function_call_output[0]
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-
-            subworkflow_node = type(
-                f"DynamicSubworkflowNode_{deployment}",
-                (SubworkflowDeploymentNode,),
-                {
-                    "deployment": deployment,
-                    "release_tag": release_tag,
-                    "subworkflow_inputs": arguments,
-                    "__module__": __name__,
-                },
-            )
-
-            node_instance = subworkflow_node(
-                context=WorkflowContext.create_from(self._context),
-                state=self.state,
-            )
-
-            outputs = {}
-            for output in node_instance.run():
-                outputs[output.name] = output.value
-
-            self.state.chat_history.append(
-                ChatMessage(
-                    role="FUNCTION",
-                    content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
-                )
-            )
-
-            return self.Outputs()
-
         node = type(
-            f"WorkflowDeploymentNode_{deployment}",
-            (FunctionNode,),
+            f"DynamicSubworkflowDeploymentNode_{deployment}",
+            (DynamicSubworkflowDeploymentNode,),
             {
-                "run": execute_workflow_deployment_function,
+                "deployment": deployment,
+                "release_tag": release_tag,
+                "function_call_output": tool_router_node.Outputs.results,
                 "__module__": __name__,
             },
         )
