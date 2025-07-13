@@ -2,6 +2,8 @@
 
 import typing
 from .environment import VellumEnvironment
+from .types.api_version_enum import ApiVersionEnum
+import os
 import httpx
 from .core.client_wrapper import SyncClientWrapper
 from .resources.ad_hoc.client import AdHocClient
@@ -101,6 +103,7 @@ class Vellum:
 
 
 
+    api_version : typing.Optional[ApiVersionEnum]
     api_key : str
     timeout : typing.Optional[float]
         The timeout to be used, in seconds, for requests. By default there is no timeout set, unless a custom httpx client is used, in which case this default is not enforced.
@@ -116,6 +119,7 @@ class Vellum:
     from vellum import Vellum
 
     client = Vellum(
+        api_version="YOUR_API_VERSION",
         api_key="YOUR_API_KEY",
     )
     """
@@ -124,6 +128,7 @@ class Vellum:
         self,
         *,
         environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
+        api_version: typing.Optional[ApiVersionEnum] = os.getenv("VELLUM_API_VERSION", "2024-10-25"),
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -134,6 +139,7 @@ class Vellum:
         )
         self._client_wrapper = SyncClientWrapper(
             environment=environment,
+            api_version=api_version,
             api_key=api_key,
             httpx_client=httpx_client
             if httpx_client is not None
@@ -198,10 +204,11 @@ class Vellum:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.execute_api(
-            url="url",
+            url="x",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -277,22 +284,31 @@ class Vellum:
         from vellum import CodeExecutionPackage, StringInput, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.execute_code(
-            code="code",
+            code="x",
             runtime="PYTHON_3_11_6",
             input_values=[
                 StringInput(
-                    name="name",
+                    name="x",
                     value="value",
-                )
+                ),
+                StringInput(
+                    name="x",
+                    value="value",
+                ),
             ],
             packages=[
                 CodeExecutionPackage(
                     version="version",
                     name="name",
-                )
+                ),
+                CodeExecutionPackage(
+                    version="version",
+                    name="name",
+                ),
             ],
             output_type="STRING",
         )
@@ -401,14 +417,19 @@ class Vellum:
         from vellum import StringInputRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.execute_prompt(
             inputs=[
                 StringInputRequest(
-                    name="name",
+                    name="x",
                     value="value",
-                )
+                ),
+                StringInputRequest(
+                    name="x",
+                    value="value",
+                ),
             ],
         )
         """
@@ -556,14 +577,19 @@ class Vellum:
         from vellum import StringInputRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         response = client.execute_prompt_stream(
             inputs=[
                 StringInputRequest(
-                    name="name",
+                    name="x",
                     value="value",
-                )
+                ),
+                StringInputRequest(
+                    name="x",
+                    value="value",
+                ),
             ],
         )
         for chunk in response:
@@ -713,14 +739,19 @@ class Vellum:
         from vellum import Vellum, WorkflowRequestStringInputRequest
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.execute_workflow(
             inputs=[
                 WorkflowRequestStringInputRequest(
-                    name="name",
+                    name="x",
                     value="value",
-                )
+                ),
+                WorkflowRequestStringInputRequest(
+                    name="x",
+                    value="value",
+                ),
             ],
         )
         """
@@ -846,14 +877,19 @@ class Vellum:
         from vellum import Vellum, WorkflowRequestStringInputRequest
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         response = client.execute_workflow_stream(
             inputs=[
                 WorkflowRequestStringInputRequest(
-                    name="name",
+                    name="x",
                     value="value",
-                )
+                ),
+                WorkflowRequestStringInputRequest(
+                    name="x",
+                    value="value",
+                ),
             ],
         )
         for chunk in response:
@@ -977,13 +1013,17 @@ class Vellum:
         from vellum import GenerateRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.generate(
             requests=[
                 GenerateRequest(
-                    input_values={"key": "value"},
-                )
+                    input_values={"input_values": {"key": "value"}},
+                ),
+                GenerateRequest(
+                    input_values={"input_values": {"key": "value"}},
+                ),
             ],
         )
         """
@@ -1103,13 +1143,17 @@ class Vellum:
         from vellum import GenerateRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         response = client.generate_stream(
             requests=[
                 GenerateRequest(
-                    input_values={"key": "value"},
-                )
+                    input_values={"input_values": {"key": "value"}},
+                ),
+                GenerateRequest(
+                    input_values={"input_values": {"key": "value"}},
+                ),
             ],
         )
         for chunk in response:
@@ -1240,10 +1284,11 @@ class Vellum:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.search(
-            query="query",
+            query="x",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1343,10 +1388,11 @@ class Vellum:
         from vellum import SubmitCompletionActualRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.submit_completion_actuals(
-            actuals=[SubmitCompletionActualRequest()],
+            actuals=[SubmitCompletionActualRequest(), SubmitCompletionActualRequest()],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1440,10 +1486,14 @@ class Vellum:
         from vellum import Vellum, WorkflowExecutionActualStringRequest
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.submit_workflow_execution_actuals(
-            actuals=[WorkflowExecutionActualStringRequest()],
+            actuals=[
+                WorkflowExecutionActualStringRequest(),
+                WorkflowExecutionActualStringRequest(),
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1487,6 +1537,7 @@ class AsyncVellum:
 
 
 
+    api_version : typing.Optional[ApiVersionEnum]
     api_key : str
     timeout : typing.Optional[float]
         The timeout to be used, in seconds, for requests. By default there is no timeout set, unless a custom httpx client is used, in which case this default is not enforced.
@@ -1502,6 +1553,7 @@ class AsyncVellum:
     from vellum import AsyncVellum
 
     client = AsyncVellum(
+        api_version="YOUR_API_VERSION",
         api_key="YOUR_API_KEY",
     )
     """
@@ -1510,6 +1562,7 @@ class AsyncVellum:
         self,
         *,
         environment: VellumEnvironment = VellumEnvironment.PRODUCTION,
+        api_version: typing.Optional[ApiVersionEnum] = os.getenv("VELLUM_API_VERSION", "2024-10-25"),
         api_key: str,
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
@@ -1520,6 +1573,7 @@ class AsyncVellum:
         )
         self._client_wrapper = AsyncClientWrapper(
             environment=environment,
+            api_version=api_version,
             api_key=api_key,
             httpx_client=httpx_client
             if httpx_client is not None
@@ -1586,13 +1640,14 @@ class AsyncVellum:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.execute_api(
-                url="url",
+                url="x",
             )
 
 
@@ -1673,25 +1728,34 @@ class AsyncVellum:
         from vellum import AsyncVellum, CodeExecutionPackage, StringInput
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.execute_code(
-                code="code",
+                code="x",
                 runtime="PYTHON_3_11_6",
                 input_values=[
                     StringInput(
-                        name="name",
+                        name="x",
                         value="value",
-                    )
+                    ),
+                    StringInput(
+                        name="x",
+                        value="value",
+                    ),
                 ],
                 packages=[
                     CodeExecutionPackage(
                         version="version",
                         name="name",
-                    )
+                    ),
+                    CodeExecutionPackage(
+                        version="version",
+                        name="name",
+                    ),
                 ],
                 output_type="STRING",
             )
@@ -1805,6 +1869,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, StringInputRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1813,9 +1878,13 @@ class AsyncVellum:
             await client.execute_prompt(
                 inputs=[
                     StringInputRequest(
-                        name="name",
+                        name="x",
                         value="value",
-                    )
+                    ),
+                    StringInputRequest(
+                        name="x",
+                        value="value",
+                    ),
                 ],
             )
 
@@ -1968,6 +2037,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, StringInputRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1976,9 +2046,13 @@ class AsyncVellum:
             response = await client.execute_prompt_stream(
                 inputs=[
                     StringInputRequest(
-                        name="name",
+                        name="x",
                         value="value",
-                    )
+                    ),
+                    StringInputRequest(
+                        name="x",
+                        value="value",
+                    ),
                 ],
             )
             async for chunk in response:
@@ -2133,6 +2207,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, WorkflowRequestStringInputRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -2141,9 +2216,13 @@ class AsyncVellum:
             await client.execute_workflow(
                 inputs=[
                     WorkflowRequestStringInputRequest(
-                        name="name",
+                        name="x",
                         value="value",
-                    )
+                    ),
+                    WorkflowRequestStringInputRequest(
+                        name="x",
+                        value="value",
+                    ),
                 ],
             )
 
@@ -2274,6 +2353,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, WorkflowRequestStringInputRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -2282,9 +2362,13 @@ class AsyncVellum:
             response = await client.execute_workflow_stream(
                 inputs=[
                     WorkflowRequestStringInputRequest(
-                        name="name",
+                        name="x",
                         value="value",
-                    )
+                    ),
+                    WorkflowRequestStringInputRequest(
+                        name="x",
+                        value="value",
+                    ),
                 ],
             )
             async for chunk in response:
@@ -2413,6 +2497,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, GenerateRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -2421,8 +2506,11 @@ class AsyncVellum:
             await client.generate(
                 requests=[
                     GenerateRequest(
-                        input_values={"key": "value"},
-                    )
+                        input_values={"input_values": {"key": "value"}},
+                    ),
+                    GenerateRequest(
+                        input_values={"input_values": {"key": "value"}},
+                    ),
                 ],
             )
 
@@ -2547,6 +2635,7 @@ class AsyncVellum:
         from vellum import AsyncVellum, GenerateRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -2555,8 +2644,11 @@ class AsyncVellum:
             response = await client.generate_stream(
                 requests=[
                     GenerateRequest(
-                        input_values={"key": "value"},
-                    )
+                        input_values={"input_values": {"key": "value"}},
+                    ),
+                    GenerateRequest(
+                        input_values={"input_values": {"key": "value"}},
+                    ),
                 ],
             )
             async for chunk in response:
@@ -2692,13 +2784,14 @@ class AsyncVellum:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.search(
-                query="query",
+                query="x",
             )
 
 
@@ -2803,13 +2896,17 @@ class AsyncVellum:
         from vellum import AsyncVellum, SubmitCompletionActualRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.submit_completion_actuals(
-                actuals=[SubmitCompletionActualRequest()],
+                actuals=[
+                    SubmitCompletionActualRequest(),
+                    SubmitCompletionActualRequest(),
+                ],
             )
 
 
@@ -2908,13 +3005,17 @@ class AsyncVellum:
         from vellum import AsyncVellum, WorkflowExecutionActualStringRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.submit_workflow_execution_actuals(
-                actuals=[WorkflowExecutionActualStringRequest()],
+                actuals=[
+                    WorkflowExecutionActualStringRequest(),
+                    WorkflowExecutionActualStringRequest(),
+                ],
             )
 
 

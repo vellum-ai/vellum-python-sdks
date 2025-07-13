@@ -123,17 +123,6 @@ class WorkflowsClient:
         -------
         WorkflowPushResponse
 
-
-        Examples
-        --------
-        from vellum import Vellum
-
-        client = Vellum(
-            api_key="YOUR_API_KEY",
-        )
-        client.workflows.push(
-            exec_config="exec_config",
-        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/workflows/push",
@@ -272,25 +261,6 @@ class AsyncWorkflowsClient:
         -------
         WorkflowPushResponse
 
-
-        Examples
-        --------
-        import asyncio
-
-        from vellum import AsyncVellum
-
-        client = AsyncVellum(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.workflows.push(
-                exec_config="exec_config",
-            )
-
-
-        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/workflows/push",

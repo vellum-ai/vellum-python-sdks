@@ -52,15 +52,20 @@ class MetricDefinitionsClient:
         from vellum import StringInput, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.metric_definitions.execute_metric_definition(
             id="id",
             inputs=[
                 StringInput(
-                    name="name",
+                    name="x",
                     value="value",
-                )
+                ),
+                StringInput(
+                    name="x",
+                    value="value",
+                ),
             ],
         )
         """
@@ -119,6 +124,7 @@ class MetricDefinitionsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.metric_definitions.metric_definition_history_item_retrieve(
@@ -184,6 +190,7 @@ class AsyncMetricDefinitionsClient:
         from vellum import AsyncVellum, StringInput
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -193,9 +200,13 @@ class AsyncMetricDefinitionsClient:
                 id="id",
                 inputs=[
                     StringInput(
-                        name="name",
+                        name="x",
                         value="value",
-                    )
+                    ),
+                    StringInput(
+                        name="x",
+                        value="value",
+                    ),
                 ],
             )
 
@@ -259,6 +270,7 @@ class AsyncMetricDefinitionsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

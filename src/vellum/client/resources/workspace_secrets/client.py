@@ -40,6 +40,7 @@ class WorkspaceSecretsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workspace_secrets.retrieve(
@@ -99,6 +100,7 @@ class WorkspaceSecretsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workspace_secrets.partial_update(
@@ -164,6 +166,7 @@ class AsyncWorkspaceSecretsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -231,6 +234,7 @@ class AsyncWorkspaceSecretsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

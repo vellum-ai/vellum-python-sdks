@@ -5,22 +5,33 @@ import typing
 import httpx
 
 from ..environment import VellumEnvironment
+from ..types.api_version_enum import ApiVersionEnum
 from .http_client import AsyncHttpClient, HttpClient
 
 
 class BaseClientWrapper:
-    def __init__(self, *, api_key: str, environment: VellumEnvironment, timeout: typing.Optional[float] = None):
+    def __init__(
+        self,
+        *,
+        api_version: typing.Optional[ApiVersionEnum] = None,
+        api_key: str,
+        environment: VellumEnvironment,
+        timeout: typing.Optional[float] = None,
+    ):
+        self._api_version = api_version
         self.api_key = api_key
         self._environment = environment
         self._timeout = timeout
 
     def get_headers(self) -> typing.Dict[str, str]:
         headers: typing.Dict[str, str] = {
-            "User-Agent": "vellum-ai/0.14.88",
+            "User-Agent": "vellum-ai/0.14.89",
             "X-Fern-Language": "Python",
             "X-Fern-SDK-Name": "vellum-ai",
-            "X-Fern-SDK-Version": "0.14.88",
+            "X-Fern-SDK-Version": "0.14.89",
         }
+        if self._api_version is not None:
+            headers["X-API-Version"] = self._api_version
         headers["X-API-KEY"] = self.api_key
         return headers
 
@@ -35,12 +46,13 @@ class SyncClientWrapper(BaseClientWrapper):
     def __init__(
         self,
         *,
+        api_version: typing.Optional[ApiVersionEnum] = None,
         api_key: str,
         environment: VellumEnvironment,
         timeout: typing.Optional[float] = None,
         httpx_client: httpx.Client,
     ):
-        super().__init__(api_key=api_key, environment=environment, timeout=timeout)
+        super().__init__(api_version=api_version, api_key=api_key, environment=environment, timeout=timeout)
         self.httpx_client = HttpClient(
             httpx_client=httpx_client, base_headers=self.get_headers, base_timeout=self.get_timeout
         )
@@ -50,12 +62,13 @@ class AsyncClientWrapper(BaseClientWrapper):
     def __init__(
         self,
         *,
+        api_version: typing.Optional[ApiVersionEnum] = None,
         api_key: str,
         environment: VellumEnvironment,
         timeout: typing.Optional[float] = None,
         httpx_client: httpx.AsyncClient,
     ):
-        super().__init__(api_key=api_key, environment=environment, timeout=timeout)
+        super().__init__(api_version=api_version, api_key=api_key, environment=environment, timeout=timeout)
         self.httpx_client = AsyncHttpClient(
             httpx_client=httpx_client, base_headers=self.get_headers, base_timeout=self.get_timeout
         )

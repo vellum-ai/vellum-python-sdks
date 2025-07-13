@@ -55,6 +55,7 @@ class ContainerImagesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.container_images.list()
@@ -106,6 +107,7 @@ class ContainerImagesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.container_images.retrieve(
@@ -149,6 +151,7 @@ class ContainerImagesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.container_images.docker_service_token()
@@ -203,12 +206,13 @@ class ContainerImagesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.container_images.push_container_image(
-            name="name",
-            sha="sha",
-            tags=["tags"],
+            name="x",
+            sha="x",
+            tags=["tags", "tags"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -282,6 +286,7 @@ class AsyncContainerImagesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -341,6 +346,7 @@ class AsyncContainerImagesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -394,6 +400,7 @@ class AsyncContainerImagesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -456,15 +463,16 @@ class AsyncContainerImagesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.container_images.push_container_image(
-                name="name",
-                sha="sha",
-                tags=["tags"],
+                name="x",
+                sha="x",
+                tags=["tags", "tags"],
             )
 
 

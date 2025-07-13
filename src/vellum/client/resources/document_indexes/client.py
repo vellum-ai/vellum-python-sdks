@@ -69,6 +69,7 @@ class DocumentIndexesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.list()
@@ -144,32 +145,21 @@ class DocumentIndexesClient:
         --------
         from vellum import (
             DocumentIndexIndexingConfigRequest,
-            HkunlpInstructorXlVectorizerRequest,
-            InstructorVectorizerConfigRequest,
-            SentenceChunkerConfigRequest,
-            SentenceChunkingRequest,
+            OpenAiVectorizerConfigRequest,
+            OpenAiVectorizerTextEmbedding3SmallRequest,
             Vellum,
         )
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.create(
-            label="My Document Index",
-            name="my-document-index",
+            label="x",
+            name="x",
             indexing_config=DocumentIndexIndexingConfigRequest(
-                vectorizer=HkunlpInstructorXlVectorizerRequest(
-                    config=InstructorVectorizerConfigRequest(
-                        instruction_domain="",
-                        instruction_query_text_type="plain_text",
-                        instruction_document_text_type="plain_text",
-                    ),
-                ),
-                chunking=SentenceChunkingRequest(
-                    chunker_config=SentenceChunkerConfigRequest(
-                        character_limit=1000,
-                        min_overlap_ratio=0.5,
-                    ),
+                vectorizer=OpenAiVectorizerTextEmbedding3SmallRequest(
+                    config=OpenAiVectorizerConfigRequest(),
                 ),
             ),
         )
@@ -229,6 +219,7 @@ class DocumentIndexesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.retrieve(
@@ -293,11 +284,12 @@ class DocumentIndexesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.update(
             id="id",
-            label="label",
+            label="x",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -349,6 +341,7 @@ class DocumentIndexesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.destroy(
@@ -407,6 +400,7 @@ class DocumentIndexesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.partial_update(
@@ -467,6 +461,7 @@ class DocumentIndexesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.add_document(
@@ -514,6 +509,7 @@ class DocumentIndexesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.document_indexes.remove_document(
@@ -588,6 +584,7 @@ class AsyncDocumentIndexesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -672,34 +669,23 @@ class AsyncDocumentIndexesClient:
         from vellum import (
             AsyncVellum,
             DocumentIndexIndexingConfigRequest,
-            HkunlpInstructorXlVectorizerRequest,
-            InstructorVectorizerConfigRequest,
-            SentenceChunkerConfigRequest,
-            SentenceChunkingRequest,
+            OpenAiVectorizerConfigRequest,
+            OpenAiVectorizerTextEmbedding3SmallRequest,
         )
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.document_indexes.create(
-                label="My Document Index",
-                name="my-document-index",
+                label="x",
+                name="x",
                 indexing_config=DocumentIndexIndexingConfigRequest(
-                    vectorizer=HkunlpInstructorXlVectorizerRequest(
-                        config=InstructorVectorizerConfigRequest(
-                            instruction_domain="",
-                            instruction_query_text_type="plain_text",
-                            instruction_document_text_type="plain_text",
-                        ),
-                    ),
-                    chunking=SentenceChunkingRequest(
-                        chunker_config=SentenceChunkerConfigRequest(
-                            character_limit=1000,
-                            min_overlap_ratio=0.5,
-                        ),
+                    vectorizer=OpenAiVectorizerTextEmbedding3SmallRequest(
+                        config=OpenAiVectorizerConfigRequest(),
                     ),
                 ),
             )
@@ -764,6 +750,7 @@ class AsyncDocumentIndexesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -836,6 +823,7 @@ class AsyncDocumentIndexesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -843,7 +831,7 @@ class AsyncDocumentIndexesClient:
         async def main() -> None:
             await client.document_indexes.update(
                 id="id",
-                label="label",
+                label="x",
             )
 
 
@@ -900,6 +888,7 @@ class AsyncDocumentIndexesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -966,6 +955,7 @@ class AsyncDocumentIndexesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1034,6 +1024,7 @@ class AsyncDocumentIndexesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1089,6 +1080,7 @@ class AsyncDocumentIndexesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

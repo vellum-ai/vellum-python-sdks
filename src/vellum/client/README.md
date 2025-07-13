@@ -30,14 +30,19 @@ Instantiate and use the client with the following:
 from vellum import StringInputRequest, Vellum
 
 client = Vellum(
+    api_version="YOUR_API_VERSION",
     api_key="YOUR_API_KEY",
 )
 client.execute_prompt(
     inputs=[
         StringInputRequest(
-            name="name",
+            name="x",
             value="value",
-        )
+        ),
+        StringInputRequest(
+            name="x",
+            value="value",
+        ),
     ],
 )
 ```
@@ -52,6 +57,7 @@ import asyncio
 from vellum import AsyncVellum, StringInputRequest
 
 client = AsyncVellum(
+    api_version="YOUR_API_VERSION",
     api_key="YOUR_API_KEY",
 )
 
@@ -60,9 +66,13 @@ async def main() -> None:
     await client.execute_prompt(
         inputs=[
             StringInputRequest(
-                name="name",
+                name="x",
                 value="value",
-            )
+            ),
+            StringInputRequest(
+                name="x",
+                value="value",
+            ),
         ],
     )
 
@@ -99,28 +109,41 @@ from vellum import (
 )
 
 client = Vellum(
+    api_version="YOUR_API_VERSION",
     api_key="YOUR_API_KEY",
 )
 response = client.ad_hoc.adhoc_execute_prompt_stream(
-    ml_model="ml_model",
+    ml_model="x",
     input_values=[
         PromptRequestStringInput(
-            key="key",
+            key="x",
             value="value",
-        )
+        ),
+        PromptRequestStringInput(
+            key="x",
+            value="value",
+        ),
     ],
     input_variables=[
         VellumVariable(
-            id="id",
+            id="x",
             key="key",
             type="STRING",
-        )
+        ),
+        VellumVariable(
+            id="x",
+            key="key",
+            type="STRING",
+        ),
     ],
     parameters=PromptParameters(),
     blocks=[
         JinjaPromptBlock(
             template="template",
-        )
+        ),
+        JinjaPromptBlock(
+            template="template",
+        ),
     ],
 )
 for chunk in response:

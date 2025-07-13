@@ -80,28 +80,41 @@ class AdHocClient:
         )
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.ad_hoc.adhoc_execute_prompt(
-            ml_model="ml_model",
+            ml_model="x",
             input_values=[
                 PromptRequestStringInput(
-                    key="key",
+                    key="x",
                     value="value",
-                )
+                ),
+                PromptRequestStringInput(
+                    key="x",
+                    value="value",
+                ),
             ],
             input_variables=[
                 VellumVariable(
-                    id="id",
+                    id="x",
                     key="key",
                     type="STRING",
-                )
+                ),
+                VellumVariable(
+                    id="x",
+                    key="key",
+                    type="STRING",
+                ),
             ],
             parameters=PromptParameters(),
             blocks=[
                 JinjaPromptBlock(
                     template="template",
-                )
+                ),
+                JinjaPromptBlock(
+                    template="template",
+                ),
             ],
         )
         """
@@ -236,28 +249,41 @@ class AdHocClient:
         )
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         response = client.ad_hoc.adhoc_execute_prompt_stream(
-            ml_model="ml_model",
+            ml_model="x",
             input_values=[
                 PromptRequestStringInput(
-                    key="key",
+                    key="x",
                     value="value",
-                )
+                ),
+                PromptRequestStringInput(
+                    key="x",
+                    value="value",
+                ),
             ],
             input_variables=[
                 VellumVariable(
-                    id="id",
+                    id="x",
                     key="key",
                     type="STRING",
-                )
+                ),
+                VellumVariable(
+                    id="x",
+                    key="key",
+                    type="STRING",
+                ),
             ],
             parameters=PromptParameters(),
             blocks=[
                 JinjaPromptBlock(
                     template="template",
-                )
+                ),
+                JinjaPromptBlock(
+                    template="template",
+                ),
             ],
         )
         for chunk in response:
@@ -409,31 +435,44 @@ class AsyncAdHocClient:
         )
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.ad_hoc.adhoc_execute_prompt(
-                ml_model="ml_model",
+                ml_model="x",
                 input_values=[
                     PromptRequestStringInput(
-                        key="key",
+                        key="x",
                         value="value",
-                    )
+                    ),
+                    PromptRequestStringInput(
+                        key="x",
+                        value="value",
+                    ),
                 ],
                 input_variables=[
                     VellumVariable(
-                        id="id",
+                        id="x",
                         key="key",
                         type="STRING",
-                    )
+                    ),
+                    VellumVariable(
+                        id="x",
+                        key="key",
+                        type="STRING",
+                    ),
                 ],
                 parameters=PromptParameters(),
                 blocks=[
                     JinjaPromptBlock(
                         template="template",
-                    )
+                    ),
+                    JinjaPromptBlock(
+                        template="template",
+                    ),
                 ],
             )
 
@@ -573,31 +612,44 @@ class AsyncAdHocClient:
         )
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             response = await client.ad_hoc.adhoc_execute_prompt_stream(
-                ml_model="ml_model",
+                ml_model="x",
                 input_values=[
                     PromptRequestStringInput(
-                        key="key",
+                        key="x",
                         value="value",
-                    )
+                    ),
+                    PromptRequestStringInput(
+                        key="x",
+                        value="value",
+                    ),
                 ],
                 input_variables=[
                     VellumVariable(
-                        id="id",
+                        id="x",
                         key="key",
                         type="STRING",
-                    )
+                    ),
+                    VellumVariable(
+                        id="x",
+                        key="key",
+                        type="STRING",
+                    ),
                 ],
                 parameters=PromptParameters(),
                 blocks=[
                     JinjaPromptBlock(
                         template="template",
-                    )
+                    ),
+                    JinjaPromptBlock(
+                        template="template",
+                    ),
                 ],
             )
             async for chunk in response:

@@ -33,6 +33,7 @@ class WorkspacesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workspaces.workspace_identity()
@@ -83,6 +84,7 @@ class AsyncWorkspacesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

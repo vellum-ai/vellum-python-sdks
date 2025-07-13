@@ -72,6 +72,7 @@ class DeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.list()
@@ -124,6 +125,7 @@ class DeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.retrieve(
@@ -178,6 +180,7 @@ class DeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.deployment_history_item_retrieve(
@@ -247,6 +250,7 @@ class DeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.list_deployment_release_tags(
@@ -306,6 +310,7 @@ class DeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.retrieve_deployment_release_tag(
@@ -368,6 +373,7 @@ class DeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.update_deployment_release_tag(
@@ -429,6 +435,7 @@ class DeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.retrieve_prompt_deployment_release(
@@ -507,14 +514,19 @@ class DeploymentsClient:
         from vellum import StringInputRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.deployments.retrieve_provider_payload(
             inputs=[
                 StringInputRequest(
-                    name="name",
+                    name="x",
                     value="value",
-                )
+                ),
+                StringInputRequest(
+                    name="x",
+                    value="value",
+                ),
             ],
         )
         """
@@ -641,6 +653,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -701,6 +714,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -763,6 +777,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -840,6 +855,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -907,6 +923,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -977,6 +994,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1046,6 +1064,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1132,6 +1151,7 @@ class AsyncDeploymentsClient:
         from vellum import AsyncVellum, StringInputRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1140,9 +1160,13 @@ class AsyncDeploymentsClient:
             await client.deployments.retrieve_provider_payload(
                 inputs=[
                     StringInputRequest(
-                        name="name",
+                        name="x",
                         value="value",
-                    )
+                    ),
+                    StringInputRequest(
+                        name="x",
+                        value="value",
+                    ),
                 ],
             )
 

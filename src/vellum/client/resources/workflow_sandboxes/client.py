@@ -69,6 +69,7 @@ class WorkflowSandboxesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_sandboxes.deploy_workflow(
@@ -145,6 +146,7 @@ class WorkflowSandboxesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_sandboxes.list_workflow_sandbox_examples()
@@ -231,6 +233,7 @@ class AsyncWorkflowSandboxesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -315,6 +318,7 @@ class AsyncWorkflowSandboxesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

@@ -68,6 +68,7 @@ class DocumentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.documents.list()
@@ -120,6 +121,7 @@ class DocumentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.documents.retrieve(
@@ -166,6 +168,7 @@ class DocumentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.documents.destroy(
@@ -230,6 +233,7 @@ class DocumentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.documents.partial_update(
@@ -309,17 +313,6 @@ class DocumentsClient:
         -------
         UploadDocumentResponse
 
-
-        Examples
-        --------
-        from vellum import Vellum
-
-        client = Vellum(
-            api_key="YOUR_API_KEY",
-        )
-        client.documents.upload(
-            label="label",
-        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/upload-document",
@@ -432,6 +425,7 @@ class AsyncDocumentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -492,6 +486,7 @@ class AsyncDocumentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -546,6 +541,7 @@ class AsyncDocumentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -618,6 +614,7 @@ class AsyncDocumentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -703,25 +700,6 @@ class AsyncDocumentsClient:
         -------
         UploadDocumentResponse
 
-
-        Examples
-        --------
-        import asyncio
-
-        from vellum import AsyncVellum
-
-        client = AsyncVellum(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.documents.upload(
-                label="label",
-            )
-
-
-        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/upload-document",

@@ -53,6 +53,7 @@ class PromptsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.prompts.pull(
@@ -148,6 +149,7 @@ class PromptsClient:
         )
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.prompts.push(
@@ -155,16 +157,24 @@ class PromptsClient:
                 ml_model="ml_model",
                 input_variables=[
                     VellumVariable(
-                        id="id",
+                        id="x",
                         key="key",
                         type="STRING",
-                    )
+                    ),
+                    VellumVariable(
+                        id="x",
+                        key="key",
+                        type="STRING",
+                    ),
                 ],
                 parameters=PromptParameters(),
                 blocks=[
                     JinjaPromptBlock(
                         template="template",
-                    )
+                    ),
+                    JinjaPromptBlock(
+                        template="template",
+                    ),
                 ],
             ),
         )
@@ -259,6 +269,7 @@ class AsyncPromptsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -362,6 +373,7 @@ class AsyncPromptsClient:
         )
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -372,16 +384,24 @@ class AsyncPromptsClient:
                     ml_model="ml_model",
                     input_variables=[
                         VellumVariable(
-                            id="id",
+                            id="x",
                             key="key",
                             type="STRING",
-                        )
+                        ),
+                        VellumVariable(
+                            id="x",
+                            key="key",
+                            type="STRING",
+                        ),
                     ],
                     parameters=PromptParameters(),
                     blocks=[
                         JinjaPromptBlock(
                             template="template",
-                        )
+                        ),
+                        JinjaPromptBlock(
+                            template="template",
+                        ),
                     ],
                 ),
             )

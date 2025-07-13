@@ -60,6 +60,7 @@ class TestSuiteRunsClient:
         )
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.test_suite_runs.create(
@@ -123,6 +124,7 @@ class TestSuiteRunsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.test_suite_runs.retrieve(
@@ -189,6 +191,7 @@ class TestSuiteRunsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.test_suite_runs.list_executions(
@@ -266,6 +269,7 @@ class AsyncTestSuiteRunsClient:
         )
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -337,6 +341,7 @@ class AsyncTestSuiteRunsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -411,6 +416,7 @@ class AsyncTestSuiteRunsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

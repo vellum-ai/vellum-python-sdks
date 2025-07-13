@@ -59,6 +59,7 @@ class TestSuitesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.test_suites.list_test_suite_test_cases(
@@ -139,40 +140,29 @@ class TestSuitesClient:
 
         Examples
         --------
-        from vellum import (
-            NamedTestCaseArrayVariableValueRequest,
-            NamedTestCaseStringVariableValueRequest,
-            StringVellumValueRequest,
-            Vellum,
-        )
+        from vellum import NamedTestCaseStringVariableValueRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.test_suites.upsert_test_suite_test_case(
             id_="id",
-            label="Test Case 1",
             input_values=[
                 NamedTestCaseStringVariableValueRequest(
-                    value="What are your favorite colors?",
-                    name="var_1",
-                )
+                    name="x",
+                ),
+                NamedTestCaseStringVariableValueRequest(
+                    name="x",
+                ),
             ],
             evaluation_values=[
-                NamedTestCaseArrayVariableValueRequest(
-                    value=[
-                        StringVellumValueRequest(
-                            value="Red",
-                        ),
-                        StringVellumValueRequest(
-                            value="Green",
-                        ),
-                        StringVellumValueRequest(
-                            value="Blue",
-                        ),
-                    ],
-                    name="var_2",
-                )
+                NamedTestCaseStringVariableValueRequest(
+                    name="x",
+                ),
+                NamedTestCaseStringVariableValueRequest(
+                    name="x",
+                ),
             ],
         )
         """
@@ -247,6 +237,7 @@ class TestSuitesClient:
         )
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         response = client.test_suites.test_suite_test_cases_bulk(
@@ -257,16 +248,43 @@ class TestSuitesClient:
                     data=CreateTestSuiteTestCaseRequest(
                         input_values=[
                             NamedTestCaseStringVariableValueRequest(
-                                name="name",
-                            )
+                                name="x",
+                            ),
+                            NamedTestCaseStringVariableValueRequest(
+                                name="x",
+                            ),
                         ],
                         evaluation_values=[
                             NamedTestCaseStringVariableValueRequest(
-                                name="name",
-                            )
+                                name="x",
+                            ),
+                            NamedTestCaseStringVariableValueRequest(
+                                name="x",
+                            ),
                         ],
                     ),
-                )
+                ),
+                TestSuiteTestCaseCreateBulkOperationRequest(
+                    id="id",
+                    data=CreateTestSuiteTestCaseRequest(
+                        input_values=[
+                            NamedTestCaseStringVariableValueRequest(
+                                name="x",
+                            ),
+                            NamedTestCaseStringVariableValueRequest(
+                                name="x",
+                            ),
+                        ],
+                        evaluation_values=[
+                            NamedTestCaseStringVariableValueRequest(
+                                name="x",
+                            ),
+                            NamedTestCaseStringVariableValueRequest(
+                                name="x",
+                            ),
+                        ],
+                    ),
+                ),
             ],
         )
         for chunk in response:
@@ -330,6 +348,7 @@ class TestSuitesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.test_suites.delete_test_suite_test_case(
@@ -393,6 +412,7 @@ class AsyncTestSuitesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -481,14 +501,10 @@ class AsyncTestSuitesClient:
         --------
         import asyncio
 
-        from vellum import (
-            AsyncVellum,
-            NamedTestCaseArrayVariableValueRequest,
-            NamedTestCaseStringVariableValueRequest,
-            StringVellumValueRequest,
-        )
+        from vellum import AsyncVellum, NamedTestCaseStringVariableValueRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -496,28 +512,21 @@ class AsyncTestSuitesClient:
         async def main() -> None:
             await client.test_suites.upsert_test_suite_test_case(
                 id_="id",
-                label="Test Case 1",
                 input_values=[
                     NamedTestCaseStringVariableValueRequest(
-                        value="What are your favorite colors?",
-                        name="var_1",
-                    )
+                        name="x",
+                    ),
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
                 ],
                 evaluation_values=[
-                    NamedTestCaseArrayVariableValueRequest(
-                        value=[
-                            StringVellumValueRequest(
-                                value="Red",
-                            ),
-                            StringVellumValueRequest(
-                                value="Green",
-                            ),
-                            StringVellumValueRequest(
-                                value="Blue",
-                            ),
-                        ],
-                        name="var_2",
-                    )
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
                 ],
             )
 
@@ -597,6 +606,7 @@ class AsyncTestSuitesClient:
         )
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -610,16 +620,43 @@ class AsyncTestSuitesClient:
                         data=CreateTestSuiteTestCaseRequest(
                             input_values=[
                                 NamedTestCaseStringVariableValueRequest(
-                                    name="name",
-                                )
+                                    name="x",
+                                ),
+                                NamedTestCaseStringVariableValueRequest(
+                                    name="x",
+                                ),
                             ],
                             evaluation_values=[
                                 NamedTestCaseStringVariableValueRequest(
-                                    name="name",
-                                )
+                                    name="x",
+                                ),
+                                NamedTestCaseStringVariableValueRequest(
+                                    name="x",
+                                ),
                             ],
                         ),
-                    )
+                    ),
+                    TestSuiteTestCaseCreateBulkOperationRequest(
+                        id="id",
+                        data=CreateTestSuiteTestCaseRequest(
+                            input_values=[
+                                NamedTestCaseStringVariableValueRequest(
+                                    name="x",
+                                ),
+                                NamedTestCaseStringVariableValueRequest(
+                                    name="x",
+                                ),
+                            ],
+                            evaluation_values=[
+                                NamedTestCaseStringVariableValueRequest(
+                                    name="x",
+                                ),
+                                NamedTestCaseStringVariableValueRequest(
+                                    name="x",
+                                ),
+                            ],
+                        ),
+                    ),
                 ],
             )
             async for chunk in response:
@@ -688,6 +725,7 @@ class AsyncTestSuitesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

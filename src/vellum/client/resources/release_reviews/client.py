@@ -42,6 +42,7 @@ class ReleaseReviewsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.release_reviews.retrieve_workflow_deployment_release(
@@ -103,6 +104,7 @@ class AsyncReleaseReviewsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

@@ -72,6 +72,7 @@ class FolderEntitiesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.folder_entities.list(
@@ -138,6 +139,7 @@ class FolderEntitiesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.folder_entities.add_entity_to_folder(
@@ -226,6 +228,7 @@ class AsyncFolderEntitiesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -300,6 +303,7 @@ class AsyncFolderEntitiesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

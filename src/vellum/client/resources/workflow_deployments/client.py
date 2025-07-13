@@ -65,6 +65,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.list()
@@ -117,6 +118,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.retrieve(
@@ -178,6 +180,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.list_workflow_deployment_event_executions(
@@ -232,6 +235,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.workflow_deployment_event_execution(
@@ -287,6 +291,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.workflow_deployment_history_item_retrieve(
@@ -356,6 +361,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.list_workflow_release_tags(
@@ -415,6 +421,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.retrieve_workflow_release_tag(
@@ -477,6 +484,7 @@ class WorkflowDeploymentsClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.workflow_deployments.update_workflow_release_tag(
@@ -557,6 +565,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -619,6 +628,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -688,6 +698,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -750,6 +761,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -813,6 +825,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -890,6 +903,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -957,6 +971,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -1027,6 +1042,7 @@ class AsyncWorkflowDeploymentsClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 

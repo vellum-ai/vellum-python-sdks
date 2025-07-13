@@ -70,6 +70,7 @@ class SandboxesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.sandboxes.deploy_prompt(
@@ -152,19 +153,17 @@ class SandboxesClient:
         from vellum import NamedScenarioInputStringVariableValueRequest, Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.sandboxes.upsert_sandbox_scenario(
             id="id",
-            label="Scenario 1",
             inputs=[
                 NamedScenarioInputStringVariableValueRequest(
-                    value="Hello, world!",
-                    name="var_1",
+                    name="x",
                 ),
                 NamedScenarioInputStringVariableValueRequest(
-                    value="Why hello, there!",
-                    name="var_2",
+                    name="x",
                 ),
             ],
         )
@@ -226,6 +225,7 @@ class SandboxesClient:
         from vellum import Vellum
 
         client = Vellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
         client.sandboxes.delete_sandbox_scenario(
@@ -303,6 +303,7 @@ class AsyncSandboxesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -393,6 +394,7 @@ class AsyncSandboxesClient:
         from vellum import AsyncVellum, NamedScenarioInputStringVariableValueRequest
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
@@ -400,15 +402,12 @@ class AsyncSandboxesClient:
         async def main() -> None:
             await client.sandboxes.upsert_sandbox_scenario(
                 id="id",
-                label="Scenario 1",
                 inputs=[
                     NamedScenarioInputStringVariableValueRequest(
-                        value="Hello, world!",
-                        name="var_1",
+                        name="x",
                     ),
                     NamedScenarioInputStringVariableValueRequest(
-                        value="Why hello, there!",
-                        name="var_2",
+                        name="x",
                     ),
                 ],
             )
@@ -475,6 +474,7 @@ class AsyncSandboxesClient:
         from vellum import AsyncVellum
 
         client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
             api_key="YOUR_API_KEY",
         )
 
