@@ -296,32 +296,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     if is_dataclass(value) and not isinstance(value, type):
         dict_value = asdict(value)
-        serialized_dict = serialize_value(display_context, dict_value)
-
-        dataclass_type_info = {
-            "name": value.__class__.__name__,
-            "module": value.__class__.__module__,
-        }
-
-        if serialized_dict["type"] == "DICTIONARY_REFERENCE":
-            serialized_dict["dataclass_type"] = dataclass_type_info
-        elif serialized_dict["type"] == "CONSTANT_VALUE":
-            if isinstance(dict_value, dict):
-                serialized_entries: List[Dict[str, Any]] = [
-                    {
-                        "id": str(uuid4_from_hash(f"{key}|{val}")),
-                        "key": serialize_key(key),
-                        "value": serialize_value(display_context, val),
-                    }
-                    for key, val in dict_value.items()
-                ]
-                return {
-                    "type": "DICTIONARY_REFERENCE",
-                    "entries": cast(JsonArray, serialized_entries),
-                    "dataclass_type": dataclass_type_info,
-                }
-
-        return serialized_dict
+        return serialize_value(display_context, dict_value)
 
     if isinstance(value, dict):
         serialized_entries: List[Dict[str, Any]] = [

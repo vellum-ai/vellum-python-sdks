@@ -717,7 +717,15 @@ def test_serialize_workflow__dataclass_output_with_preserved_type_metadata():
     assert custom_output is not None, "Could not find custom_output in node outputs"
     assert custom_output["type"] == "JSON"
 
+    assert "type_definitions" in workflow_raw_data
+    type_definitions = workflow_raw_data["type_definitions"]
+    assert len(type_definitions) > 0
+
     if custom_output.get("value") is not None:
-        assert custom_output["value"]["type"] == "DICTIONARY_REFERENCE"
-        assert "dataclass_type" in custom_output["value"]
-        assert custom_output["value"]["dataclass_type"]["name"] == "CustomDataclassOutput"
+        assert custom_output["value"]["type"] == "TYPE_REFERENCE"
+        assert "type_definition_id" in custom_output["value"]
+
+        type_def_id = custom_output["value"]["type_definition_id"]
+        matching_type_def = next((td for td in type_definitions if td["id"] == type_def_id), None)
+        assert matching_type_def is not None
+        assert matching_type_def["name"] == "CustomDataclassOutput"

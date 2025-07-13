@@ -194,6 +194,42 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 else None
             )
 
+            from dataclasses import MISSING, fields, is_dataclass
+
+            from vellum.workflows.utils.uuids import uuid4_from_hash as uuid_hash
+
+            if value is None and output.types and len(output.types) > 0 and is_dataclass(output.types[0]):
+                dataclass_type = output.types[0]
+                type_name = dataclass_type.__name__
+                type_module = dataclass_type.__module__
+                type_id = str(uuid_hash(f"{type_module}.{type_name}"))
+
+                schema = {}
+                for field in fields(dataclass_type):
+                    field_type = "string"
+                    if field.type == int:
+                        field_type = "integer"
+                    elif field.type == float:
+                        field_type = "number"
+                    elif field.type == bool:
+                        field_type = "boolean"
+
+                    schema[field.name] = {
+                        "type": field_type,
+                        "required": field.default == MISSING and field.default_factory == MISSING,
+                    }
+
+                type_definition = {"id": type_id, "name": type_name, "schema": schema}
+
+                if not hasattr(display_context, "type_definitions"):
+                    display_context.type_definitions = []
+
+                existing_def = next((td for td in display_context.type_definitions if td["id"] == type_id), None)
+                if not existing_def:
+                    display_context.type_definitions.append(type_definition)
+
+                value = {"type": "TYPE_REFERENCE", "type_definition_id": type_id}
+
             outputs.append(
                 {
                     "id": str(uuid4_from_hash(f"{node_id}|{output.name}")),

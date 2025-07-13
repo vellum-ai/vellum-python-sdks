@@ -370,6 +370,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             except Exception as e:
                 self.add_error(e)
 
+        type_definitions = getattr(self.display_context, "type_definitions", [])
+
         return {
             "workflow_raw_data": {
                 "nodes": cast(JsonArray, nodes_dict_list),
@@ -380,6 +382,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "module": cast(JsonArray, self._workflow.__module__.split(".")),
                 },
                 "output_values": output_values,
+                "type_definitions": type_definitions,
             },
             "input_variables": input_variables,
             "state_variables": state_variables,
@@ -584,7 +587,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 workflow_output_display or self._generate_workflow_output_display(workflow_output)
             )
 
-        return WorkflowDisplayContext(
+        display_context = WorkflowDisplayContext(
             client=self._client,
             workflow_display=workflow_meta_display,
             workflow_input_displays=workflow_input_displays,
@@ -600,6 +603,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             port_displays=port_displays,
             workflow_display_class=self.__class__,
         )
+        display_context.type_definitions = []
+        return display_context
 
     def _generate_workflow_meta_display(self) -> WorkflowMetaDisplay:
         overrides = self.workflow_display

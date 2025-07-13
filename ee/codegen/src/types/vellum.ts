@@ -720,12 +720,19 @@ export interface WorkflowOutputValue {
   value?: WorkflowValueDescriptor;
 }
 
+export interface LocalTypeDefinition {
+  id: string;
+  name: string;
+  schema: Record<string, any>;
+}
+
 export interface WorkflowRawData {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
   displayData?: WorkflowDisplayData;
   definition?: CodeResourceDefinition;
   outputValues?: WorkflowOutputValue[];
+  typeDefinitions?: LocalTypeDefinition[];
 }
 
 export interface RunnerConfig {
