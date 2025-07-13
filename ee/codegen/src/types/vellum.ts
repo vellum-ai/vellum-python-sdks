@@ -723,7 +723,7 @@ export interface WorkflowOutputValue {
 export interface LocalTypeDefinition {
   id: string;
   name: string;
-  schema: Record<string, any>;
+  schema: Record<string, unknown>;
 }
 
 export interface WorkflowRawData {
