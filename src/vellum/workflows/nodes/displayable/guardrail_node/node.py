@@ -3,7 +3,7 @@ from typing import Any, ClassVar, Dict, Generic, List, Optional, Union, cast
 
 from vellum import ChatHistoryInput, ChatMessage, JsonInput, MetricDefinitionInput, NumberInput, StringInput
 from vellum.client import ApiError
-from vellum.core import RequestOptions
+from vellum.client.core import RequestOptions
 from vellum.workflows.constants import LATEST_RELEASE_TAG
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException

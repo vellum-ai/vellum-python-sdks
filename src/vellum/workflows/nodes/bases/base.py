@@ -289,6 +289,7 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
             state: StateType,
             dependencies: Set["Type[BaseNode]"],
             node_span_id: UUID,
+            invoked_by: Optional[UUID] = None,
         ) -> bool:
             """
             Determines whether a Node's execution should be initiated. Override this method to define custom
@@ -301,22 +302,15 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
                 for descriptor in cls.node_class:
                     if not descriptor.instance:
                         continue
-
                     resolved_value = resolve_value(descriptor.instance, state, path=descriptor.name)
                     if is_unresolved(resolved_value):
                         return False
-
                 return True
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
                 return True
 
             if cls.merge_behavior == MergeBehavior.AWAIT_ALL:
-                """
-                A node utilizing an AWAIT_ALL merge strategy will only be considered ready
-                when all of its dependencies have invoked this node.
-                """
-                # Check if all dependencies have invoked this node
                 dependencies_invoked = state.meta.node_execution_cache._dependencies_invoked.get(node_span_id, set())
                 node_classes_invoked = {
                     state.meta.node_execution_cache.__node_execution_lookup__[dep]
@@ -325,7 +319,6 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
                 }
                 if len(node_classes_invoked) != len(dependencies):
                     return False
-
                 all_deps_invoked = all(dep in node_classes_invoked for dep in dependencies)
                 return all_deps_invoked
 
@@ -340,11 +333,8 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
         ) -> UUID:
             """
             Queues a future execution of a node, returning the span id of the execution.
-
-            We may combine this into the should_initiate method, but we'll keep it separate for now to avoid
-            breaking changes until the 0.15.0 release.
+            Integrated from the original method for 0.15.0 breaking changes.
             """
-
             execution_id = uuid4()
             if not invoked_by:
                 return execution_id
@@ -353,53 +343,31 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
                 return execution_id
 
             if cls.merge_behavior not in {MergeBehavior.AWAIT_ANY, MergeBehavior.AWAIT_ALL}:
-                # Keep track of the dependencies that have invoked this node
-                # This would be needed while climbing the history in the loop
                 state.meta.node_execution_cache._dependencies_invoked[execution_id].add(invoked_by)
                 return execution_id
 
-            # For AWAIT_ANY in workflows, we need to detect if the node is in a loop
-            # If the node is in a loop, we can trigger the node again
+            # For AWAIT_ANY in workflows, detect if the node is in a loop
             in_loop = False
             if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
-                # Get the latest fulfilled execution ID of current node
                 fulfilled_stack = state.meta.node_execution_cache._node_executions_fulfilled[cls.node_class]
                 current_latest_fulfilled_id = fulfilled_stack.peek() if not fulfilled_stack.is_empty() else None
-                # If the current node has not been fulfilled yet, we don't need to check for loop
                 if current_latest_fulfilled_id is not None:
-                    # Trace back through the dependency chain to detect if this node triggers itself
                     visited = set()
                     current_execution_id = invoked_by
-
-                    # Walk backwards through the dependency chain
                     while current_execution_id and current_execution_id not in visited:
                         visited.add(current_execution_id)
-
-                        # Get the dependencies that triggered this execution
                         dependencies_for_current = state.meta.node_execution_cache._dependencies_invoked.get(
                             current_execution_id, set()
                         )
-
-                        # If we've reached the end of the chain, it means the node is not in a loop
-                        # we can break out of the loop
                         if not dependencies_for_current:
                             break
-
-                        # Move to the previous node in the dependency chain
                         current_execution_id = next(iter(dependencies_for_current))
-
                         current_node_class = state.meta.node_execution_cache.__node_execution_lookup__.get(
                             current_execution_id
                         )
-
-                        # If we've found our target node class in the chain
                         if current_node_class == cls.node_class:
-                            # Check if the execution id is the same as the latest fulfilled execution id
-                            # If yes, we're in a loop
                             if current_execution_id == current_latest_fulfilled_id:
                                 in_loop = True
-                            # If not, current node has been triggered by other node,
-                            # we can break out of the loop
                             break
 
             for queued_node_execution_id in state.meta.node_execution_cache._node_executions_queued[cls.node_class]:

@@ -27,7 +27,7 @@ from typing_extensions import dataclass_transform
 from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
 from pydantic_core import core_schema
 
-from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
 from vellum.workflows.inputs.base import BaseInputs

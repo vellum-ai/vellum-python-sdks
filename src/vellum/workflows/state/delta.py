@@ -1,6 +1,6 @@
 from typing import Any, Literal, Union
 
-from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 
 
 class BaseStateDelta(UniversalBaseModel):

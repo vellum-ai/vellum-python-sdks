@@ -6,7 +6,7 @@ from typing import Annotated, Any, Literal, Optional, Union, get_args
 from pydantic import Field, GetCoreSchemaHandler, Tag, ValidationInfo
 from pydantic_core import CoreSchema, core_schema
 
-from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.types.utils import datetime_now

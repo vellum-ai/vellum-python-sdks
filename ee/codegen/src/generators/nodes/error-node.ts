@@ -26,28 +26,6 @@ export class ErrorNode extends BaseNode<ErrorNodeType, ErrorNodeContext> {
   getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    if (this.nodeData.data.name) {
-      // DEPRECATED: To be removed in the 0.15.0 release
-      statements.push(
-        python.field({
-          name: "name",
-          initializer: python.TypeInstantiation.str(this.nodeData.data.name),
-        })
-      );
-    }
-
-    if (this.nodeData.data.errorOutputId) {
-      // DEPRECATED: To be removed in the 0.15.0 release
-      statements.push(
-        python.field({
-          name: "error_output_id",
-          initializer: python.TypeInstantiation.uuid(
-            this.nodeData.data.errorOutputId
-          ),
-        })
-      );
-    }
-
     statements.push(
       python.field({
         name: "target_handle_id",

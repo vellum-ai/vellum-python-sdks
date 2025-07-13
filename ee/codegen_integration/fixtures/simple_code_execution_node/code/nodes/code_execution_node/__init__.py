@@ -1,4 +1,4 @@
-from vellum.types import CodeExecutionPackage
+from vellum.client.types import CodeExecutionPackage
 from vellum.workflows.nodes.displayable import CodeExecutionNode as BaseCodeExecutionNode
 from vellum.workflows.state import BaseState
 

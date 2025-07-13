@@ -4,7 +4,7 @@
 
 import typing_extensions
 import typing_extensions
-from vellum.core.serialization import FieldMetadata
+from vellum.client.core.serialization import FieldMetadata
 
 
 class SquareParams(typing_extensions.TypedDict):

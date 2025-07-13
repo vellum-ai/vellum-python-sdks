@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 from pydantic import ValidationError
 
 from vellum.client.core.api_error import ApiError
+from vellum.client.types import WorkflowPushDeploymentConfigRequest
 from vellum.resources.workflows.client import OMIT
-from vellum.types import WorkflowPushDeploymentConfigRequest
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
 from vellum_cli.logger import handle_cli_error, load_cli_logger

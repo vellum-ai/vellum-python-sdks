@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any, Dict, Generic, List, Literal, Optional, S
 
 from pydantic import SerializerFunctionWrapHandler, field_serializer, model_serializer
 
-from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
 from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.outputs.base import BaseOutput

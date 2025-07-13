@@ -12,9 +12,9 @@ from vellum import (
     WorkflowRequestNumberInputRequest,
     WorkflowRequestStringInputRequest,
 )
+from vellum.client.core import RequestOptions
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.chat_message_request import ChatMessageRequest
-from vellum.core import RequestOptions
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode

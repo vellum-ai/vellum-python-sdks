@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from uuid import UUID
 from typing import List, Literal, Optional
 
-from vellum.core import UniversalBaseModel
+from vellum.client.core import UniversalBaseModel
 from vellum_ee.workflows.display.base import (
     EdgeDisplayOverrides,
     EntrypointDisplayOverrides,

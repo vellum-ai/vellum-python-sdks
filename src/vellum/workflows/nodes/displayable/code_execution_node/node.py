@@ -20,9 +20,9 @@ from vellum import (
     VellumError,
     VellumValue,
 )
+from vellum.client.core import RequestOptions
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
-from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
