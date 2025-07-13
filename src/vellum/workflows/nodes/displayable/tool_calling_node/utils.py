@@ -11,6 +11,7 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
@@ -19,6 +20,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCalli
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
+from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
 from vellum.workflows.types.definition import DeploymentDefinition
@@ -117,7 +119,7 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
         )
 
 
-class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, Any, Any]):
+class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState]):
     """Node that executes an inline subworkflow with function call output."""
 
     function_call_output: List[PromptOutput]
@@ -136,11 +138,9 @@ class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, Any, 
 
         # Call the parent run method to execute the subworkflow with proper streaming
         outputs = {}
-        fulfilled_output_names = set()
 
         for output in super().run():
             if output.is_fulfilled:
-                fulfilled_output_names.add(output.name)
                 outputs[output.name] = output.value
             yield output
 
