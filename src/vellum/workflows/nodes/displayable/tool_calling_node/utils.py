@@ -15,6 +15,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
+from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
@@ -34,7 +35,7 @@ class FunctionNode(BaseNode):
     pass
 
 
-class ToolRouterNode(InlinePromptNode):
+class ToolRouterNode(InlinePromptNode[ToolCallingState]):
     max_prompt_iterations: Optional[int] = 5
 
     class Trigger(InlinePromptNode.Trigger):
