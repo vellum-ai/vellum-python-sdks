@@ -1,7 +1,7 @@
 import pytest
 from dataclasses import dataclass
 from uuid import uuid4
-from typing import List
+from typing import List, cast
 
 from deepdiff import DeepDiff
 from pydantic import BaseModel
@@ -695,38 +695,47 @@ def test_serialize_workflow__dataclass_output_with_preserved_type_metadata():
 
     # THEN the workflow should be serialized with dataclass type metadata preserved
     assert "workflow_raw_data" in serialized_workflow
-    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    workflow_raw_data = cast(dict, serialized_workflow["workflow_raw_data"])
 
-    nodes = workflow_raw_data["nodes"]
+    nodes = cast(list, workflow_raw_data["nodes"])
     dataclass_node = None
     for node in nodes:
         if node is not None and isinstance(node, dict):
-            definition = node.get("definition")
+            definition = cast(dict, node.get("definition"))
             if definition is not None and definition.get("name") == "NodeWithDataclassOutput":
-                dataclass_node = node
+                dataclass_node = cast(dict, node)
                 break
     assert dataclass_node is not None, "Could not find NodeWithDataclassOutput in serialized nodes"
 
-    outputs = dataclass_node.get("outputs", [])
-    custom_output = next((output for output in outputs if output.get("name") == "custom_output"), None)
+    outputs = cast(list, dataclass_node.get("outputs", []))
+    custom_output = None
+    for output in outputs:
+        if isinstance(output, dict) and output.get("name") == "custom_output":
+            custom_output = cast(dict, output)
+            break
     assert custom_output is not None, "Could not find custom_output in node outputs"
 
     assert "type_definitions" in workflow_raw_data
-    type_definitions = workflow_raw_data["type_definitions"]
+    type_definitions = cast(list, workflow_raw_data["type_definitions"])
     assert len(type_definitions) > 0
 
     assert custom_output.get("value") is not None
-    assert custom_output["value"]["type"] == "TYPE_REFERENCE"
-    assert "type_definition_id" in custom_output["value"]
+    custom_output_value = cast(dict, custom_output["value"])
+    assert custom_output_value["type"] == "TYPE_REFERENCE"
+    assert "type_definition_id" in custom_output_value
 
-    type_def_id = custom_output["value"]["type_definition_id"]
-    matching_type_def = next((td for td in type_definitions if td["id"] == type_def_id), None)
+    type_def_id = cast(str, custom_output_value["type_definition_id"])
+    matching_type_def = None
+    for td in type_definitions:
+        if isinstance(td, dict) and td.get("id") == type_def_id:
+            matching_type_def = cast(dict, td)
+            break
     assert matching_type_def is not None
 
     expected_type_def = {
         "id": type_def_id,
         "name": "CustomDataclassOutput",
-        "schema": {"result": {"type": "string", "required": True}, "count": {"type": "integer", "required": True}},
+        "type_schema": {"result": {"type": "string", "required": True}, "count": {"type": "integer", "required": True}},
     }
     assert matching_type_def == expected_type_def
 

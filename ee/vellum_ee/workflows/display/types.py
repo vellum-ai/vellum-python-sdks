@@ -51,3 +51,4 @@ class WorkflowDisplayContext:
     workflow_output_displays: WorkflowOutputDisplays = field(default_factory=dict)
     edge_displays: EdgeDisplays = field(default_factory=dict)
     port_displays: PortDisplays = field(default_factory=dict)
+    type_definitions: list = field(default_factory=list)

@@ -398,10 +398,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         }
 
         if type_definitions:
-            workflow_raw_data["type_definitions"] = type_definitions
+            workflow_raw_data["type_definitions"] = cast(JsonArray, type_definitions)
 
         return {
-            "workflow_raw_data": workflow_raw_data,
+            "workflow_raw_data": cast(JsonObject, workflow_raw_data),
             "input_variables": input_variables,
             "state_variables": state_variables,
             "output_variables": output_variables,

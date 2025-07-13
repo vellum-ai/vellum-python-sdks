@@ -201,7 +201,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 type_module = dataclass_type.__module__
                 type_id = str(uuid4_from_hash(f"{type_module}.{type_name}"))
 
-                schema = {}
+                type_schema = {}
                 for field in fields(dataclass_type):
                     field_type = "string"
                     if field.type == int:
@@ -211,12 +211,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                     elif field.type == bool:
                         field_type = "boolean"
 
-                    schema[field.name] = {
+                    type_schema[field.name] = {
                         "type": field_type,
                         "required": field.default == MISSING and field.default_factory == MISSING,
                     }
 
-                type_definition = {"id": type_id, "name": type_name, "schema": schema}
+                type_definition = {"id": type_id, "name": type_name, "type_schema": type_schema}
 
                 if not hasattr(display_context, "type_definitions"):
                     display_context.type_definitions = []

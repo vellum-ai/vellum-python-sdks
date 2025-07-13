@@ -6,4 +6,4 @@ from pydantic import BaseModel
 class LocalTypeDefinition(BaseModel):
     id: str
     name: str
-    schema: Dict[str, Any]
+    type_schema: Dict[str, Any]
