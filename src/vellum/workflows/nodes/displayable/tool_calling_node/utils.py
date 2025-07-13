@@ -9,23 +9,22 @@ from vellum.client.types.function_call_chat_message_content_value import Functio
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
-from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
-from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
-from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
-from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 CHAT_HISTORY_VARIABLE = "chat_history"
 
@@ -106,6 +105,40 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
 
         # Call the parent run method to execute the subworkflow
         outputs = {}
+        for output in super().run():
+            if output.is_fulfilled:
+                outputs[output.name] = output.value
+            yield output
+
+        # Add the result to the chat history
+        self.state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
+            )
+        )
+
+
+class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState]):
+    """Node that executes an inline subworkflow with function call output."""
+
+    function_call_output: List[PromptOutput]
+
+    def run(self) -> Iterator[BaseOutput]:
+        if self.function_call_output and len(self.function_call_output) > 0:
+            function_call = self.function_call_output[0]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
+        else:
+            arguments = {}
+
+        self.subworkflow_inputs = arguments  # type: ignore[misc]
+
+        # Call the parent run method to execute the subworkflow with proper streaming
+        outputs = {}
+
         for output in super().run():
             if output.is_fulfilled:
                 outputs[output.name] = output.value
@@ -220,78 +253,12 @@ def create_function_node(
         return node
 
     elif is_workflow_class(function):
-        # Create a class-level wrapper that calls the original function
-        def execute_inline_workflow_function(self) -> BaseNode.Outputs:
-            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
-            if function_call_output and len(function_call_output) > 0:
-                function_call = function_call_output[0]
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-
-            # Call the function based on its type
-            inputs_instance = function.get_inputs_class()(**arguments)
-
-            with execution_context(parent_context=get_parent_context()):
-                workflow = function(
-                    parent_state=self.state,
-                    context=WorkflowContext.create_from(self._context),
-                )
-                subworkflow_stream = workflow.stream(
-                    inputs=inputs_instance,
-                    event_filter=all_workflow_event_filter,
-                    node_output_mocks=self._context._get_all_node_output_mocks(),
-                )
-
-            outputs: Optional[BaseOutputs] = None
-            exception: Optional[NodeException] = None
-
-            for event in subworkflow_stream:
-                self._context._emit_subworkflow_event(event)
-                if exception:
-                    continue
-
-                if not is_workflow_event(event):
-                    continue
-                if event.workflow_definition != function:
-                    continue
-
-                if event.name == "workflow.execution.fulfilled":
-                    outputs = event.outputs
-                elif event.name == "workflow.execution.rejected":
-                    exception = NodeException.of(event.error)
-                elif event.name == "workflow.execution.paused":
-                    exception = NodeException(
-                        code=WorkflowErrorCode.INVALID_OUTPUTS,
-                        message="Subworkflow unexpectedly paused",
-                    )
-
-            if exception:
-                raise exception
-
-            if outputs is None:
-                raise NodeException(
-                    message="Expected to receive outputs from inline subworkflow",
-                    code=WorkflowErrorCode.INVALID_OUTPUTS,
-                )
-
-            result = outputs
-
-            self.state.chat_history.append(
-                ChatMessage(
-                    role="FUNCTION",
-                    content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
-                )
-            )
-
-            return self.Outputs()
-
-        # Create BaseNode for workflow functions
         node = type(
-            f"InlineWorkflowNode_{function.__name__}",
-            (FunctionNode,),
+            f"DynamicInlineSubworkflowNode_{function.__name__}",
+            (DynamicInlineSubworkflowNode,),
             {
-                "run": execute_inline_workflow_function,
+                "subworkflow": function,
+                "function_call_output": tool_router_node.Outputs.results,
                 "__module__": __name__,
             },
         )
