@@ -102,6 +102,11 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
         yield WorkflowExecutionWorkflowResultEvent(
             execution_id="mock-execution-id",
             type="WORKFLOW",
+            data=WorkflowResultEvent(id="mock-event-id", state="STREAMING", ts="2024-01-01T00:00:00Z"),
+        )
+        yield WorkflowExecutionWorkflowResultEvent(
+            execution_id="mock-execution-id",
+            type="WORKFLOW",
             data=WorkflowResultEvent(
                 id="mock-event-id",
                 state="FULFILLED",
