@@ -78,7 +78,7 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             yield output
 
 
-class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState]):
     """Node that executes a deployment definition with function call output."""
 
     function_call_output: List[PromptOutput]
@@ -93,7 +93,7 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode):
         else:
             arguments = {}
 
-        # Create a new instance with updated subworkflow_inputs
+        # Update subworkflow_inputs with the extracted arguments
         self.__dict__["subworkflow_inputs"] = arguments
 
         # Call the parent run method to execute the subworkflow
