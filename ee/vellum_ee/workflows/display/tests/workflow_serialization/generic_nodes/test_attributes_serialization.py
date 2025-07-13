@@ -700,32 +700,40 @@ def test_serialize_workflow__dataclass_output_with_preserved_type_metadata():
     nodes = workflow_raw_data["nodes"]
     dataclass_node = None
     for node in nodes:
-        definition = node.get("definition")
-        if definition and definition.get("name") == "NodeWithDataclassOutput":
-            dataclass_node = node
-            break
-
+        if node is not None and isinstance(node, dict):
+            definition = node.get("definition")
+            if definition is not None and definition.get("name") == "NodeWithDataclassOutput":
+                dataclass_node = node
+                break
     assert dataclass_node is not None, "Could not find NodeWithDataclassOutput in serialized nodes"
 
     outputs = dataclass_node.get("outputs", [])
-    custom_output = None
-    for output in outputs:
-        if output.get("name") == "custom_output":
-            custom_output = output
-            break
-
+    custom_output = next((output for output in outputs if output.get("name") == "custom_output"), None)
     assert custom_output is not None, "Could not find custom_output in node outputs"
-    assert custom_output["type"] == "JSON"
 
     assert "type_definitions" in workflow_raw_data
     type_definitions = workflow_raw_data["type_definitions"]
     assert len(type_definitions) > 0
 
-    if custom_output.get("value") is not None:
-        assert custom_output["value"]["type"] == "TYPE_REFERENCE"
-        assert "type_definition_id" in custom_output["value"]
+    assert custom_output.get("value") is not None
+    assert custom_output["value"]["type"] == "TYPE_REFERENCE"
+    assert "type_definition_id" in custom_output["value"]
 
-        type_def_id = custom_output["value"]["type_definition_id"]
-        matching_type_def = next((td for td in type_definitions if td["id"] == type_def_id), None)
-        assert matching_type_def is not None
-        assert matching_type_def["name"] == "CustomDataclassOutput"
+    type_def_id = custom_output["value"]["type_definition_id"]
+    matching_type_def = next((td for td in type_definitions if td["id"] == type_def_id), None)
+    assert matching_type_def is not None
+
+    expected_type_def = {
+        "id": type_def_id,
+        "name": "CustomDataclassOutput",
+        "schema": {"result": {"type": "string", "required": True}, "count": {"type": "integer", "required": True}},
+    }
+    assert matching_type_def == expected_type_def
+
+    expected_custom_output = {
+        "id": custom_output["id"],
+        "name": "custom_output",
+        "type": "JSON",
+        "value": {"type": "TYPE_REFERENCE", "type_definition_id": type_def_id},
+    }
+    assert custom_output == expected_custom_output

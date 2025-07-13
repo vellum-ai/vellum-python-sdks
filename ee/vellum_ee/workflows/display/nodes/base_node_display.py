@@ -1,3 +1,4 @@
+from dataclasses import MISSING, fields, is_dataclass
 from functools import cached_property
 import inspect
 from uuid import UUID
@@ -194,15 +195,11 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 else None
             )
 
-            from dataclasses import MISSING, fields, is_dataclass
-
-            from vellum.workflows.utils.uuids import uuid4_from_hash as uuid_hash
-
             if value is None and output.types and len(output.types) > 0 and is_dataclass(output.types[0]):
                 dataclass_type = output.types[0]
                 type_name = dataclass_type.__name__
                 type_module = dataclass_type.__module__
-                type_id = str(uuid_hash(f"{type_module}.{type_name}"))
+                type_id = str(uuid4_from_hash(f"{type_module}.{type_name}"))
 
                 schema = {}
                 for field in fields(dataclass_type):
