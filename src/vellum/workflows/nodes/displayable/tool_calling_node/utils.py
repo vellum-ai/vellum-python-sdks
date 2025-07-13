@@ -153,6 +153,46 @@ class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseI
         )
 
 
+class DynamicFunctionNode(FunctionNode):
+    """Node that executes a regular Python function with function call output."""
+
+    function_call_output: List[PromptOutput]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._function = self.__class__._function_ref
+
+    def run(self) -> Iterator[BaseOutput]:
+        if self.function_call_output and len(self.function_call_output) > 0:
+            function_call = self.function_call_output[0]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
+        else:
+            arguments = {}
+
+        # Call the function directly
+        try:
+            result = self._function(**arguments)
+        except Exception as e:
+            function_name = getattr(self._function, "__name__", str(self._function))
+            raise NodeException(
+                message=f"Error executing function '{function_name}': {str(e)}",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        # Add the result to the chat history
+        self.state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+            )
+        )
+
+        yield from []
+
+
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
@@ -263,41 +303,13 @@ def create_function_node(
             },
         )
     else:
-        # For regular functions, call them directly
-        def execute_regular_function(self) -> BaseNode.Outputs:
-            # Get the function call from the tool router output
-            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
-            if function_call_output and len(function_call_output) > 0:
-                function_call = function_call_output[0]
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-
-            # Call the function directly
-            try:
-                result = function(**arguments)
-            except Exception as e:
-                raise NodeException(
-                    message=f"Error executing function '{function.__name__}': {str(e)}",
-                    code=WorkflowErrorCode.NODE_EXECUTION,
-                )
-
-            # Add the result to the chat history
-            self.state.chat_history.append(
-                ChatMessage(
-                    role="FUNCTION",
-                    content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
-                )
-            )
-
-            return self.Outputs()
-
-        # Create BaseNode for regular functions
+        # For regular functions, use DynamicFunctionNode
         node = type(
-            f"FunctionNode_{function.__name__}",
-            (FunctionNode,),
+            f"DynamicFunctionNode_{function.__name__}",
+            (DynamicFunctionNode,),
             {
-                "run": execute_regular_function,
+                "_function_ref": function,
+                "function_call_output": tool_router_node.Outputs.results,
                 "__module__": __name__,
             },
         )
