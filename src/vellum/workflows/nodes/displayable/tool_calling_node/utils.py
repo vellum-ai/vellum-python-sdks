@@ -86,15 +86,15 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode):
     def run(self) -> Iterator[BaseOutput]:
         if self.function_call_output and len(self.function_call_output) > 0:
             function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL":
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
                 arguments = function_call.value.arguments
             else:
                 arguments = {}
         else:
             arguments = {}
 
-        # Update subworkflow_inputs with the extracted arguments
-        self.subworkflow_inputs = arguments
+        # Create a new instance with updated subworkflow_inputs
+        self.__dict__["subworkflow_inputs"] = arguments
 
         # Call the parent run method to execute the subworkflow
         outputs = {}
