@@ -1,6 +1,6 @@
 {
   "name": "@vellum-ai/vellum-codegen",
-  "version": "0.14.88",
+  "version": "0.14.89",
   "main": "lib/src/index.js",
   "typings": "lib/src/index.d.ts",
   "files": [
