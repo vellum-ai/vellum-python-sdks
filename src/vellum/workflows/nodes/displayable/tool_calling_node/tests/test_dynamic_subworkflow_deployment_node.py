@@ -1,5 +1,7 @@
 from unittest.mock import Mock
+from typing import List
 
+from vellum import ChatMessage
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -13,7 +15,7 @@ def test_dynamic_subworkflow_deployment_node__with_function_call_output():
     Test that DynamicSubworkflowDeploymentNode correctly processes function call output.
     """
 
-    function_call_output = [
+    function_call_output: List[FunctionCallVellumValue] = [
         FunctionCallVellumValue(
             value=FunctionCall(
                 arguments={"input1": "value1", "input2": "value2"},
@@ -44,9 +46,11 @@ def test_dynamic_subworkflow_deployment_node__with_function_call_output():
         ]
     )
 
+    class TestState(BaseState):
+        chat_history: List[ChatMessage] = []
+
     context = WorkflowContext(vellum_client=mock_client)
-    state = BaseState()
-    state.chat_history = []
+    state = TestState()
     state.meta = StateMeta()
     state.meta.node_outputs = {mock_outputs.results: function_call_output}
 
@@ -63,7 +67,7 @@ def test_dynamic_subworkflow_deployment_node__empty_function_call_output():
     Test that DynamicSubworkflowDeploymentNode handles empty function call output.
     """
 
-    function_call_output = []
+    function_call_output: List[FunctionCallVellumValue] = []
 
     mock_outputs = Mock()
     mock_outputs.results = Mock()
@@ -82,9 +86,11 @@ def test_dynamic_subworkflow_deployment_node__empty_function_call_output():
         ]
     )
 
+    class TestState(BaseState):
+        chat_history: List[ChatMessage] = []
+
     context = WorkflowContext(vellum_client=mock_client)
-    state = BaseState()
-    state.chat_history = []
+    state = TestState()
     state.meta = StateMeta()
     state.meta.node_outputs = {mock_outputs.results: function_call_output}
 
