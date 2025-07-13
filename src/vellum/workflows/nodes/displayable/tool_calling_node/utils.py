@@ -42,14 +42,12 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
-        if self.max_prompt_iterations is not None and self.state.prompt_iterations >= self.max_prompt_iterations:
+        if self.state.prompt_iterations >= self.max_prompt_iterations:
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
         # Merge user-provided chat history with node's chat history
         user_chat_history = self.prompt_inputs.get(CHAT_HISTORY_VARIABLE, []) if self.prompt_inputs else []
-        if not isinstance(user_chat_history, list):
-            user_chat_history = []
         merged_chat_history = user_chat_history + self.state.chat_history
         self.prompt_inputs = {**self.prompt_inputs, CHAT_HISTORY_VARIABLE: merged_chat_history}  # type: ignore
         generator = super().run()
