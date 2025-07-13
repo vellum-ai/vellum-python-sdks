@@ -213,10 +213,12 @@ def create_function_node(
     elif is_workflow_class(function):
         # Create a class-level wrapper that calls the original function
         def execute_inline_workflow_function(self) -> BaseNode.Outputs:
-            text_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
-
-            parsed_output = json.loads(text_output)
-            arguments = parsed_output["arguments"]
+            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
+            if function_call_output and len(function_call_output) > 0:
+                function_call = function_call_output[0]
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
 
             # Call the function based on its type
             inputs_instance = function.get_inputs_class()(**arguments)

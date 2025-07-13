@@ -23,6 +23,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_tool_calling_node_inline_workflow.workflow import (
     BasicToolCallingNodeInlineWorkflowWorkflow,
@@ -374,7 +375,8 @@ def test_workflow_stream_initiated_events(vellum_adhoc_prompt_client, mock_uuid4
     stream = workflow.stream(
         inputs=WorkflowInputs(
             query="What's the weather like in San Francisco?",
-        )
+        ),
+        event_filter=all_workflow_event_filter,
     )
     events = list(stream)
 
