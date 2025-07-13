@@ -23,6 +23,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_tool_calling_node_inline_workflow.workflow import (
     BasicToolCallingNodeInlineWorkflowWorkflow,
@@ -325,3 +326,59 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
         "expand_meta": None,
         "request_options": mock.ANY,
     }
+
+
+def test_workflow_stream_initiated_events(vellum_adhoc_prompt_client, mock_uuid4_generator):
+    """
+    Tests that streaming the workflow generates exactly 3 workflow.execution.initiated events.
+    """
+
+    def generate_prompt_events(*args, **kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"city": "San Francisco", "date": "2025-01-01"},
+                        id="call_7115tNTmEACTsQRGwKpJipJK",
+                        name="basic_inline_subworkflow_workflow",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [
+                StringVellumValue(
+                    value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
+                )
+            ]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    # GIVEN a workflow that combines tool calling with a subworkflow
+    workflow = BasicToolCallingNodeInlineWorkflowWorkflow()
+
+    # AND the mock is set up to return our events
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the workflow is streamed
+    stream = workflow.stream(
+        inputs=WorkflowInputs(
+            query="What's the weather like in San Francisco?",
+        ),
+        event_filter=all_workflow_event_filter,
+    )
+    events = list(stream)
+
+    workflow_initiated_events = [e for e in events if e.name == "workflow.execution.initiated"]
+    assert len(workflow_initiated_events) == 3

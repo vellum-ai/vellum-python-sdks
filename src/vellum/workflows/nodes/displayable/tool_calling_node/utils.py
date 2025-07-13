@@ -8,12 +8,14 @@ from vellum.client.types.function_call_chat_message_content import FunctionCallC
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
-from vellum.workflows.outputs.base import BaseOutput
+from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.context import WorkflowContext
@@ -21,6 +23,7 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 CHAT_HISTORY_VARIABLE = "chat_history"
 
@@ -210,26 +213,60 @@ def create_function_node(
     elif is_workflow_class(function):
         # Create a class-level wrapper that calls the original function
         def execute_inline_workflow_function(self) -> BaseNode.Outputs:
-            outputs = self.state.meta.node_outputs.get(tool_router_node.Outputs.text)
-
-            outputs = json.loads(outputs)
-            arguments = outputs["arguments"]
+            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
+            if function_call_output and len(function_call_output) > 0:
+                function_call = function_call_output[0]
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
 
             # Call the function based on its type
             inputs_instance = function.get_inputs_class()(**arguments)
-            workflow = function(context=WorkflowContext.create_from(self._context))
-            terminal_event = workflow.run(
-                inputs=inputs_instance,
-            )
-            if terminal_event.name == "workflow.execution.paused":
-                raise NodeException(
-                    code=WorkflowErrorCode.INVALID_OUTPUTS,
-                    message="Subworkflow unexpectedly paused",
+
+            with execution_context(parent_context=get_parent_context()):
+                workflow = function(
+                    parent_state=self.state,
+                    context=WorkflowContext.create_from(self._context),
                 )
-            elif terminal_event.name == "workflow.execution.fulfilled":
-                result = terminal_event.outputs
-            elif terminal_event.name == "workflow.execution.rejected":
-                raise NodeException(message=terminal_event.error.message, code=terminal_event.error.code)
+                subworkflow_stream = workflow.stream(
+                    inputs=inputs_instance,
+                    event_filter=all_workflow_event_filter,
+                    node_output_mocks=self._context._get_all_node_output_mocks(),
+                )
+
+            outputs: Optional[BaseOutputs] = None
+            exception: Optional[NodeException] = None
+
+            for event in subworkflow_stream:
+                self._context._emit_subworkflow_event(event)
+                if exception:
+                    continue
+
+                if not is_workflow_event(event):
+                    continue
+                if event.workflow_definition != function:
+                    continue
+
+                if event.name == "workflow.execution.fulfilled":
+                    outputs = event.outputs
+                elif event.name == "workflow.execution.rejected":
+                    exception = NodeException.of(event.error)
+                elif event.name == "workflow.execution.paused":
+                    exception = NodeException(
+                        code=WorkflowErrorCode.INVALID_OUTPUTS,
+                        message="Subworkflow unexpectedly paused",
+                    )
+
+            if exception:
+                raise exception
+
+            if outputs is None:
+                raise NodeException(
+                    message="Expected to receive outputs from inline subworkflow",
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                )
+
+            result = outputs
 
             self.state.chat_history.append(
                 ChatMessage(
