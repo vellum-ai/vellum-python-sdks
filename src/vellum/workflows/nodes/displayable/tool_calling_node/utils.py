@@ -93,8 +93,16 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
         else:
             arguments = {}
 
-        # Update subworkflow_inputs with the extracted arguments
-        self.__dict__["subworkflow_inputs"] = arguments
+        # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
+        # we do in the `__init__` method. Long term, instead of the function_call_output attribute above, we
+        # want to do:
+        # ```python
+        # subworkflow_inputs = tool_router_node.Outputs.results[0]['value']['arguments'].if_(
+        #     tool_router_node.Outputs.results[0]['type'].equals('FUNCTION_CALL'),
+        #     {},
+        # )
+        # ```
+        self.subworkflow_inputs = arguments  # type:ignore[misc]
 
         # Call the parent run method to execute the subworkflow
         outputs = {}
