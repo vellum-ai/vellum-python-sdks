@@ -82,7 +82,7 @@ def _compile_default_value(default: Any) -> Any:
     if isinstance(default, BaseModel):
         return {
             field_name: _compile_default_value(getattr(default, field_name))
-            for field_name in default.model_fields.keys()
+            for field_name in default.__class__.model_fields.keys()
         }
 
     return default

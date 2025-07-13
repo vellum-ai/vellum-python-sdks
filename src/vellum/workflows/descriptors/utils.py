@@ -103,7 +103,7 @@ def is_unresolved(value: Any) -> bool:
         return any(is_unresolved(getattr(value, field.name)) for field in dataclasses.fields(value))
 
     if isinstance(value, BaseModel):
-        return any(is_unresolved(getattr(value, key)) for key in value.model_fields.keys())
+        return any(is_unresolved(getattr(value, key)) for key in value.__class__.model_fields.keys())
 
     if isinstance(value, Mapping):
         return any(is_unresolved(item) for item in value.values())
