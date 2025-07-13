@@ -6,6 +6,7 @@ from pydash import snake_case
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
+from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.context import execution_context, get_parent_context
@@ -75,6 +76,56 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
                                 )
                             )
             yield output
+
+
+class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+    """Node that executes a deployment definition with function call output."""
+
+    tool_router_node_class: Type[ToolRouterNode]
+
+    def run(self) -> Iterator[BaseOutput]:
+        function_call_output = self.state.meta.node_outputs.get(self.tool_router_node_class.Outputs.results)
+        if function_call_output and len(function_call_output) > 0:
+            function_call = function_call_output[0]
+            if (
+                isinstance(function_call, FunctionCallVellumValue)
+                and function_call.value is not None
+                and hasattr(function_call.value, "arguments")
+            ):
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
+        else:
+            arguments = {}
+
+        # Create a dynamic subworkflow node with the extracted arguments
+        subworkflow_node = type(
+            f"DynamicSubworkflowNode_{self.deployment}",
+            (SubworkflowDeploymentNode,),
+            {
+                "deployment": self.deployment,
+                "release_tag": self.release_tag,
+                "subworkflow_inputs": arguments,
+                "__module__": __name__,
+            },
+        )
+
+        node_instance = subworkflow_node(
+            context=WorkflowContext.create_from(self._context),
+            state=self.state,
+        )
+
+        outputs = {}
+        for output in node_instance.run():
+            outputs[output.name] = output.value
+            yield output
+
+        self.state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
+            )
+        )
 
 
 def create_tool_router_node(
@@ -163,48 +214,13 @@ def create_function_node(
         deployment = function.deployment_id or function.deployment_name
         release_tag = function.release_tag
 
-        def execute_workflow_deployment_function(self) -> BaseNode.Outputs:
-            function_call_output = self.state.meta.node_outputs.get(tool_router_node.Outputs.results)
-            if function_call_output and len(function_call_output) > 0:
-                function_call = function_call_output[0]
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-
-            subworkflow_node = type(
-                f"DynamicSubworkflowNode_{deployment}",
-                (SubworkflowDeploymentNode,),
-                {
-                    "deployment": deployment,
-                    "release_tag": release_tag,
-                    "subworkflow_inputs": arguments,
-                    "__module__": __name__,
-                },
-            )
-
-            node_instance = subworkflow_node(
-                context=WorkflowContext.create_from(self._context),
-                state=self.state,
-            )
-
-            outputs = {}
-            for output in node_instance.run():
-                outputs[output.name] = output.value
-
-            self.state.chat_history.append(
-                ChatMessage(
-                    role="FUNCTION",
-                    content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
-                )
-            )
-
-            return self.Outputs()
-
         node = type(
-            f"WorkflowDeploymentNode_{deployment}",
-            (FunctionNode,),
+            f"DynamicSubworkflowDeploymentNode_{deployment}",
+            (DynamicSubworkflowDeploymentNode,),
             {
-                "run": execute_workflow_deployment_function,
+                "deployment": deployment,
+                "release_tag": release_tag,
+                "tool_router_node_class": tool_router_node,
                 "__module__": __name__,
             },
         )
