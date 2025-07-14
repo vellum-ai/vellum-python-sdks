@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -86,3 +86,64 @@ def test_serialize_node__inline_subworkflow_inputs():
     assert optional_input_with_default_var["required"] is False
     assert optional_input_with_default_var["default"] == {"type": "STRING", "value": "optional_default"}
     assert optional_input_with_default_var["type"] == "STRING"
+
+
+def test_serialize_workflow_input_required_field_edge_cases():
+    """
+    Test that the required field is correctly determined for various input type scenarios.
+    """
+
+    # GIVEN a workflow with various input type edge cases
+    class EdgeCaseInputs(BaseInputs):
+        required_str: str
+        required_int: int
+        optional_str: Optional[str]
+        optional_int: Optional[int]
+        str_with_default: str = "default_value"
+        int_with_default: int = 42
+        optional_str_with_default: Optional[str] = "optional_default"
+        optional_int_with_default: Optional[int] = 100
+        optional_str_none_default: Optional[str] = None
+        optional_int_none_default: Optional[int] = None
+        union_with_none: Union[str, None] = None
+
+    class EdgeCaseNode(BaseNode):
+        required_str = EdgeCaseInputs.required_str
+        required_int = EdgeCaseInputs.required_int
+
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(result="test")
+
+    class EdgeCaseWorkflow(BaseWorkflow[EdgeCaseInputs, BaseState]):
+        graph = EdgeCaseNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = EdgeCaseNode.Outputs.result
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=EdgeCaseWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the input variables should have correct required field values
+    input_variables = serialized_workflow["input_variables"]
+    input_vars_by_key = {var["key"]: var for var in input_variables}
+
+    assert input_vars_by_key["required_str"]["required"] is True
+    assert input_vars_by_key["required_int"]["required"] is True
+
+    assert input_vars_by_key["optional_str"]["required"] is False
+    assert input_vars_by_key["optional_int"]["required"] is False
+
+    assert input_vars_by_key["str_with_default"]["required"] is False
+    assert input_vars_by_key["int_with_default"]["required"] is False
+
+    assert input_vars_by_key["optional_str_with_default"]["required"] is False
+    assert input_vars_by_key["optional_int_with_default"]["required"] is False
+
+    assert input_vars_by_key["optional_str_none_default"]["required"] is False
+    assert input_vars_by_key["optional_int_none_default"]["required"] is False
+
+    assert input_vars_by_key["union_with_none"]["required"] is False
