@@ -851,9 +851,10 @@ def test_serialize_workflow__input_variables():
     # THEN the inputs should be serialized correctly
     assert "input_variables" in data
     input_variables = data["input_variables"]
+    assert isinstance(input_variables, list)
     assert len(input_variables) == 4
 
-    input_1 = next(var for var in input_variables if var["key"] == "input_1")
+    input_1 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_1")
     assert input_1 == {
         "id": "13bd7980-3fbd-486c-9ebd-a29d84f7bda0",
         "key": "input_1",
@@ -863,7 +864,7 @@ def test_serialize_workflow__input_variables():
         "extensions": {"color": None},
     }
 
-    input_2 = next(var for var in input_variables if var["key"] == "input_2")
+    input_2 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_2")
     assert input_2 == {
         "id": "13847952-beab-408d-945e-cfa079e6e124",
         "key": "input_2",
@@ -873,7 +874,7 @@ def test_serialize_workflow__input_variables():
         "extensions": {"color": None},
     }
 
-    input_3 = next(var for var in input_variables if var["key"] == "input_3")
+    input_3 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_3")
     assert input_3 == {
         "id": "2e38e1a4-09ff-4bb8-a12e-9bf54d4f3a5e",
         "key": "input_3",
@@ -883,7 +884,7 @@ def test_serialize_workflow__input_variables():
         "extensions": {"color": None},
     }
 
-    input_4 = next(var for var in input_variables if var["key"] == "input_4")
+    input_4 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_4")
     assert input_4 == {
         "id": "d945b6ae-2490-4bfb-9b1c-b1e484dfd4f6",
         "key": "input_4",
