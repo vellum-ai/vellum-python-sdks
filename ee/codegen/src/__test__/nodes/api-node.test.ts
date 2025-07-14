@@ -351,4 +351,156 @@ describe("ApiNode", () => {
       expect(error?.severity).toBe("WARNING");
     });
   });
+
+  describe("timeout functionality", () => {
+    it("should generate timeout field when timeoutInputId is provided", async () => {
+      const nodeData = apiNodeFactory({
+        timeout: nodeInputFactory({
+          key: "timeout",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "NUMBER",
+              value: 30,
+            },
+          },
+        }),
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      const node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should not generate timeout field when timeout is null", async () => {
+      const nodeData = apiNodeFactory({
+        timeout: nodeInputFactory({
+          key: "timeout",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "NULL",
+              value: null,
+            },
+          },
+        }),
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      const node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should not generate timeout field when timeoutInputId is undefined", async () => {
+      const nodeData = apiNodeFactory({
+        timeout: null,
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      const node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should generate timeout_input_id in display class when timeoutInputId is provided", async () => {
+      const nodeData = apiNodeFactory({
+        timeout: nodeInputFactory({
+          key: "timeout",
+          value: {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "NUMBER",
+              value: 30,
+            },
+          },
+        }),
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      const node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should throw error when timeoutInputId is provided but input is missing", async () => {
+      const nodeData = apiNodeFactory().build();
+      // Manually set timeoutInputId without adding corresponding input
+      nodeData.data.timeoutInputId = "missing-timeout-input-id";
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      const node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      expect(() => {
+        node.getNodeFile().write(writer);
+      }).toThrow('No inputs have timeout id of missing-timeout-input-id');
+    });
+
+    it("should support timeout with input variable reference", async () => {
+      const nodeData = apiNodeFactory({
+        timeout: nodeInputFactory({
+          key: "timeout",
+          value: {
+            type: "INPUT_VARIABLE",
+            data: {
+              inputVariableId: "5f64210f-ec43-48ce-ae40-40a9ba4c4c11",
+            },
+          },
+        }),
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      const node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

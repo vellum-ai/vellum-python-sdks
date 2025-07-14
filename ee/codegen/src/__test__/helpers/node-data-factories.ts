@@ -1018,6 +1018,7 @@ export interface ApiNodeFactoryProps {
   body?: Record<string, unknown> | null;
   statusCodeOutputId?: string;
   id?: string;
+  timeout?: NodeInput | null;
 }
 
 export function apiNodeFactory({
@@ -1031,6 +1032,7 @@ export function apiNodeFactory({
   url = "https://example.vellum.ai",
   method = "POST",
   body = {},
+  timeout,
 }: ApiNodeFactoryProps = {}): NodeDataFactoryBuilder<ApiNode> {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
@@ -1264,6 +1266,7 @@ export function apiNodeFactory({
     },
     apiKeyHeaderValueInput,
     ...additionalHeaderInputs.flatMap(({ key, value }) => [key, value]),
+    ...(timeout ? [timeout] : []),
   ];
 
   const nodeData: ApiNode = {
@@ -1292,6 +1295,7 @@ export function apiNodeFactory({
       errorOutputId,
       targetHandleId: "06573a05-e6f0-48b9-bc6e-07e06d0bc1b1",
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
+      timeoutInputId: timeout?.id,
     },
     inputs: inputs,
     displayData: {
