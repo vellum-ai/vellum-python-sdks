@@ -1,3 +1,3 @@
-from ..displayable.tool_calling_node import ToolCallingNode
+from .openai_chat_completion_node import OpenAIChatCompletionNode
 
-__all__ = ["ToolCallingNode"]
+__all__ = ["OpenAIChatCompletionNode"]
