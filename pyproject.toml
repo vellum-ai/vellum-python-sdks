@@ -92,6 +92,7 @@ filterwarnings = [
 [tool.mypy]
 plugins = [
     "pydantic.mypy",
+    "vellum.plugins.vellum_mypy",
 ]
 check_untyped_defs = true
 exclude = ["venv", "examples/workflows"]
@@ -145,9 +146,11 @@ ignore = "E203, W503, E704, U100, U101"
 source = ["src/vellum", "ee/vellum_cli", "ee/vellum_ee"]
 omit = [
     "src/vellum/client/*",
+    "src/vellum/core/*",
     "src/vellum/environment.py",
     "src/vellum/errors/*",
     "src/vellum/resources/*",
+    "src/vellum/types/*",
     "tests/*",
     "examples/*",
     "scripts/*",

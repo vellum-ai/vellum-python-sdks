@@ -289,7 +289,6 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
             state: StateType,
             dependencies: Set["Type[BaseNode]"],
             node_span_id: UUID,
-            invoked_by: Optional[UUID] = None,
         ) -> bool:
             """
             Determines whether a Node's execution should be initiated. Override this method to define custom
@@ -333,7 +332,9 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
         ) -> UUID:
             """
             Queues a future execution of a node, returning the span id of the execution.
-            Integrated from the original method for 0.15.0 breaking changes.
+
+            We may combine this into the should_initiate method, but we'll keep it separate for now to avoid
+            breaking changes until the 0.15.0 release.
             """
             execution_id = uuid4()
             if not invoked_by:
@@ -343,17 +344,25 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
                 return execution_id
 
             if cls.merge_behavior not in {MergeBehavior.AWAIT_ANY, MergeBehavior.AWAIT_ALL}:
+                # Keep track of the dependencies that have invoked this node
+                # This would be needed while climbing the history in the loop
                 state.meta.node_execution_cache._dependencies_invoked[execution_id].add(invoked_by)
                 return execution_id
 
-            # For AWAIT_ANY in workflows, detect if the node is in a loop
+            # For AWAIT_ANY in workflows, we need to detect if the node is in a loop
+            # If the node is in a loop, we can trigger the node again
             in_loop = False
             if cls.merge_behavior == MergeBehavior.AWAIT_ANY:
+                # Get the latest fulfilled execution ID of current node
                 fulfilled_stack = state.meta.node_execution_cache._node_executions_fulfilled[cls.node_class]
                 current_latest_fulfilled_id = fulfilled_stack.peek() if not fulfilled_stack.is_empty() else None
+                # If the current node has not been fulfilled yet, we don't need to check for loop
                 if current_latest_fulfilled_id is not None:
+                    # Trace back through the dependency chain to detect if this node triggers itself
                     visited = set()
                     current_execution_id = invoked_by
+
+                    # Walk backwards through the dependency chain
                     while current_execution_id and current_execution_id not in visited:
                         visited.add(current_execution_id)
                         dependencies_for_current = state.meta.node_execution_cache._dependencies_invoked.get(
