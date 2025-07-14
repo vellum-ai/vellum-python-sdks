@@ -172,6 +172,32 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
       }
     }
 
+    if (this.nodeData.data.timeoutInputId) {
+      const timeoutInput = this.nodeData.inputs.find(
+        (input) => input.id === this.nodeData.data.timeoutInputId
+      );
+      if (!timeoutInput) {
+        throw new NodeAttributeGenerationError(
+          `No inputs have timeout id of ${this.nodeData.data.timeoutInputId}`
+        );
+      }
+      const timeout = this.nodeInputsByKey.get(timeoutInput.key);
+      if (!timeout) {
+        throw new NodeAttributeGenerationError(
+          `No inputs have key of ${timeoutInput.key}`
+        );
+      }
+      // Only add timeout field if it's not the default value (null)
+      if (timeout.toString() !== "None") {
+        statements.push(
+          python.field({
+            name: "timeout",
+            initializer: timeout,
+          })
+        );
+      }
+    }
+
     return statements;
   }
 
@@ -186,6 +212,20 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
         ),
       })
     );
+
+    if (this.nodeData.data.timeoutInputId) {
+      const timeoutInput = this.nodeData.inputs.find(
+        (input) => input.id === this.nodeData.data.timeoutInputId
+      );
+      if (timeoutInput) {
+        statements.push(
+          python.field({
+            name: "timeout_input_id",
+            initializer: python.TypeInstantiation.uuid(this.nodeData.data.timeoutInputId),
+          })
+        );
+      }
+    }
 
     if (!isNil(this.nodeData.data.additionalHeaders)) {
       statements.push(

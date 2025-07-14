@@ -621,6 +621,7 @@ export interface ApiNodeData {
   errorOutputId?: string;
   targetHandleId: string;
   sourceHandleId: string;
+  timeoutInputId?: string;
 }
 
 export interface ApiNode extends BaseDisplayableWorkflowNode {

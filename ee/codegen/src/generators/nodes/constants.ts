@@ -1,3 +1,5 @@
+import { ApiNode } from "./api-node";
+
 export enum AttributeType {
   WorkflowErrorCode = "WorkflowErrorCode",
   PromptBlocks = "PromptBlocks",
@@ -40,6 +42,11 @@ export const NODE_ATTRIBUTES: Record<
     functions: {
       defaultValue: null,
       type: AttributeType.Functions,
+    },
+  },
+  ApiNode: {
+    timeout: {
+      defaultValue: null,
     },
   },
 };
