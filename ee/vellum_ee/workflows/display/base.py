@@ -44,6 +44,7 @@ class WorkflowInputsDisplay:
     id: UUID
     name: Optional[str] = None
     color: Optional[str] = None
+    required: Optional[bool] = None
 
 
 @dataclass
