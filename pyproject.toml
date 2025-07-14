@@ -138,7 +138,7 @@ exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows)
 
 [tool.flake8]
 max-line-length = 120
-exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/environment.py,src/vellum/errors,src/vellum/resources,tests/client,examples/workflows"
+exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/resources,src/vellum/types,tests/client,examples/workflows"
 ignore = "E203, W503, E704, U100, U101"
 
 [tool.coverage.run]

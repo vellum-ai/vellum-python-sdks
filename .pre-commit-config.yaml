@@ -57,6 +57,7 @@ repos:
         name: flake8
         entry: bash -c "poetry run flake8"
         language: system
+        exclude: (src/vellum/types|src/vellum/core)
 
   - repo: local
     hooks:
