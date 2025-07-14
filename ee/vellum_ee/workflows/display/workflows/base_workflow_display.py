@@ -142,7 +142,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "key": workflow_input_display.name or workflow_input_reference.name,
                     "type": infer_vellum_variable_type(workflow_input_reference),
                     "default": default.dict() if default else None,
-                    "required": workflow_input_reference.instance is undefined,
+                    "required": (
+                        workflow_input_reference.instance is undefined
+                        and type(None) not in workflow_input_reference.types
+                    ),
                     "extensions": {"color": workflow_input_display.color},
                 }
             )
