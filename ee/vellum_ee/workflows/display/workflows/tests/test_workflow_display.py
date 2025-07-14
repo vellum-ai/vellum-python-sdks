@@ -1,6 +1,8 @@
 import pytest
 from uuid import uuid4
+from typing import Optional
 
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
@@ -8,6 +10,7 @@ from vellum.workflows.nodes.core.templating_node.node import TemplatingNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.references.lazy import LazyReference
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
@@ -828,3 +831,64 @@ def test_serialize_workflow__empty_rules_indexerror():
     terminal_nodes = [node for node in nodes if node.get("type") == "TERMINAL"]
     assert len(terminal_nodes) == 1
     assert terminal_nodes[0]["data"]["name"] == "problematic_output"
+
+
+def test_serialize_workflow__inputs():
+    # GIVEN a workflow with inputs
+    class Inputs(BaseInputs):
+        input_1: str
+        input_2: Optional[str]
+        input_3: int = 1
+        input_4: Optional[int] = 2
+
+    class MyWorkflow(BaseWorkflow[Inputs, BaseState]):
+        pass
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN the inputs should be serialized correctly
+    assert "input_variables" in data
+    input_variables = data["input_variables"]
+    assert len(input_variables) == 4
+
+    input_1 = next(var for var in input_variables if var["key"] == "input_1")
+    assert input_1 == {
+        "id": "9ece9299-871c-4d1b-b259-080c0646fcd8",
+        "key": "input_1",
+        "type": "STRING",
+        "default": None,
+        "required": True,
+        "extensions": {"color": None},
+    }
+
+    input_2 = next(var for var in input_variables if var["key"] == "input_2")
+    assert input_2 == {
+        "id": "67158aa4-a322-4087-883b-f39b4587e8b1",
+        "key": "input_2",
+        "type": "STRING",
+        "default": None,
+        "required": False,
+        "extensions": {"color": None},
+    }
+
+    input_3 = next(var for var in input_variables if var["key"] == "input_3")
+    assert input_3 == {
+        "id": "2a7daabc-d9be-4e2c-bccb-707c3f34e91e",
+        "key": "input_3",
+        "type": "NUMBER",
+        "default": {"type": "NUMBER", "value": 1.0},
+        "required": False,
+        "extensions": {"color": None},
+    }
+
+    input_4 = next(var for var in input_variables if var["key"] == "input_4")
+    assert input_4 == {
+        "id": "a8104215-83e5-43f5-8396-20de5c325c9d",
+        "key": "input_4",
+        "type": "NUMBER",
+        "default": {"type": "NUMBER", "value": 2.0},
+        "required": False,
+        "extensions": {"color": None},
+    }

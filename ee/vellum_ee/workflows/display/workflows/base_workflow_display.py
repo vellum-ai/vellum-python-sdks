@@ -136,13 +136,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 if workflow_input_reference.instance
                 else None
             )
+
+            # An input is required if it has no default value AND is not optional
+            has_default = workflow_input_reference.instance is not undefined
+            is_optional = type(None) in workflow_input_reference.types
+            is_required = not has_default and not is_optional
+
             input_variables.append(
                 {
                     "id": str(workflow_input_display.id),
                     "key": workflow_input_display.name or workflow_input_reference.name,
                     "type": infer_vellum_variable_type(workflow_input_reference),
                     "default": default.dict() if default else None,
-                    "required": workflow_input_reference.instance is undefined,
+                    "required": is_required,
                     "extensions": {"color": workflow_input_display.color},
                 }
             )
