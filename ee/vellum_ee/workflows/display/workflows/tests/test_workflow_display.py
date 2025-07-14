@@ -855,7 +855,7 @@ def test_serialize_workflow__input_variables():
 
     input_1 = next(var for var in input_variables if var["key"] == "input_1")
     assert input_1 == {
-        "id": "9ece9299-871c-4d1b-b259-080c0646fcd8",
+        "id": "13bd7980-3fbd-486c-9ebd-a29d84f7bda0",
         "key": "input_1",
         "type": "STRING",
         "default": None,
@@ -865,7 +865,7 @@ def test_serialize_workflow__input_variables():
 
     input_2 = next(var for var in input_variables if var["key"] == "input_2")
     assert input_2 == {
-        "id": "67158aa4-a322-4087-883b-f39b4587e8b1",
+        "id": "13847952-beab-408d-945e-cfa079e6e124",
         "key": "input_2",
         "type": "STRING",
         "default": None,
@@ -875,7 +875,7 @@ def test_serialize_workflow__input_variables():
 
     input_3 = next(var for var in input_variables if var["key"] == "input_3")
     assert input_3 == {
-        "id": "2a7daabc-d9be-4e2c-bccb-707c3f34e91e",
+        "id": "2e38e1a4-09ff-4bb8-a12e-9bf54d4f3a5e",
         "key": "input_3",
         "type": "NUMBER",
         "default": {"type": "NUMBER", "value": 1.0},
@@ -885,7 +885,7 @@ def test_serialize_workflow__input_variables():
 
     input_4 = next(var for var in input_variables if var["key"] == "input_4")
     assert input_4 == {
-        "id": "a8104215-83e5-43f5-8396-20de5c325c9d",
+        "id": "d945b6ae-2490-4bfb-9b1c-b1e484dfd4f6",
         "key": "input_4",
         "type": "NUMBER",
         "default": {"type": "NUMBER", "value": 2.0},
