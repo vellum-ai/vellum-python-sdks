@@ -2,8 +2,8 @@ import pytest
 from uuid import UUID
 from typing import Optional, Set
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
-from vellum.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.tests.test_utils import FixtureState
 from vellum.workflows.inputs.base import BaseInputs

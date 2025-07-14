@@ -9,7 +9,7 @@ from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.client import Vellum as VellumClient
-from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor

@@ -3,7 +3,7 @@ from .plugins.utils import load_runtime_plugins
 
 load_runtime_plugins()
 
-from .types import (
+from .client.types import (
     AdHocExecutePromptEvent,
     AdHocExpandMeta,
     AdHocFulfilledPromptExecutionMeta,

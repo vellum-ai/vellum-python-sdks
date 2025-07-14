@@ -1047,9 +1047,15 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 exports[`WorkflowProjectGenerator > state > should generate a state.py file > code/display/workflow.py 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, StateValueDisplay, WorkflowMetaDisplay
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    StateValueDisplay,
+    WorkflowDisplayData,
+    WorkflowDisplayDataViewport,
+    WorkflowMetaDisplay,
+)
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.vellum import WorkflowDisplayData, WorkflowDisplayDataViewport
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..nodes.templating_node import TemplatingNode

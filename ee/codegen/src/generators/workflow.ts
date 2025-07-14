@@ -215,9 +215,7 @@ export class Workflow {
               value: python.instantiateClass({
                 classReference: python.reference({
                   name: "WorkflowDisplayData",
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .VELLUM_TYPES_MODULE_PATH,
+                  modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                 }),
                 arguments_: [
                   python.methodArgument({
@@ -225,9 +223,7 @@ export class Workflow {
                     value: python.instantiateClass({
                       classReference: python.reference({
                         name: "WorkflowDisplayDataViewport",
-                        modulePath:
-                          this.workflowContext.sdkModulePathNames
-                            .VELLUM_TYPES_MODULE_PATH,
+                        modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                       }),
                       arguments_: [
                         python.methodArgument({

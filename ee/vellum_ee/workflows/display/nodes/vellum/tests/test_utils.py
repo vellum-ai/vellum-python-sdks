@@ -8,6 +8,7 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.references import LazyReference
+from vellum_ee.workflows.display.base import WorkflowInputsDisplay, WorkflowMetaDisplay
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
@@ -21,7 +22,6 @@ from vellum_ee.workflows.display.utils.vellum import (
     NodeOutputData,
     NodeOutputPointer,
 )
-from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplayOverrides, WorkflowMetaVellumDisplay
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
@@ -110,13 +110,13 @@ def test_create_node_input_value_pointer_rules(
         descriptor,
         WorkflowDisplayContext(
             workflow_display_class=BaseWorkflowDisplay,
-            workflow_display=WorkflowMetaVellumDisplay(
+            workflow_display=WorkflowMetaDisplay(
                 entrypoint_node_id=uuid4(),
                 entrypoint_node_source_handle_id=uuid4(),
                 entrypoint_node_display=NodeDisplayData(),
             ),
             global_workflow_input_displays={
-                Inputs.example_workflow_input: WorkflowInputsVellumDisplayOverrides(
+                Inputs.example_workflow_input: WorkflowInputsDisplay(
                     id=UUID("a154c29d-fac0-4cd0-ba88-bc52034f5470"),
                 ),
             },

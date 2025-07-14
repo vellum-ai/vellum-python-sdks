@@ -1,6 +1,6 @@
 from typing import Any
 
-from vellum.types import CodeExecutionPackage
+from vellum.client.types import CodeExecutionPackage
 from vellum.workflows.nodes.displayable import CodeExecutionNode
 from vellum.workflows.references import VellumSecretReference
 from vellum.workflows.state import BaseState

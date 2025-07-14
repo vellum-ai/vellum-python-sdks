@@ -5,7 +5,7 @@
 import typing_extensions
 import typing
 import typing_extensions
-from vellum.core.serialization import FieldMetadata
+from vellum.client.core.serialization import FieldMetadata
 import datetime as dt
 import uuid
 from .color import Color

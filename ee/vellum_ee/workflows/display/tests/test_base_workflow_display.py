@@ -7,7 +7,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.vellum import WorkflowInputsVellumDisplayOverrides
+from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -64,9 +64,7 @@ def test_vellum_workflow_display__serialize_input_variables_with_capitalized_var
 
     class ExampleWorkflowDisplay(BaseWorkflowDisplay[ExampleWorkflow]):
         inputs_display = {
-            Inputs.foo: WorkflowInputsVellumDisplayOverrides(
-                id=UUID("97b63d71-5413-417f-9cf5-49e1b4fd56e4"), name="Foo", required=True
-            )
+            Inputs.foo: WorkflowInputsDisplay(id=UUID("97b63d71-5413-417f-9cf5-49e1b4fd56e4"), name="Foo")
         }
 
     display = get_workflow_display(

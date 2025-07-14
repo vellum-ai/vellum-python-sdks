@@ -4,7 +4,7 @@ from typing_extensions import TypeGuard
 
 from pydantic import field_serializer
 
-from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references import ExternalInputReference

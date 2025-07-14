@@ -7,7 +7,7 @@ from typing import Dict, List, Literal, Optional, Union
 
 import tomli
 
-from vellum.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
 LOCKFILE_PATH = "vellum.lock.json"

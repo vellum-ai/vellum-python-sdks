@@ -40,28 +40,10 @@ class WorkflowMetaDisplay:
 
 
 @dataclass
-class WorkflowMetaDisplayOverrides(WorkflowMetaDisplay):
-    """
-    DEPRECATED: Use WorkflowMetaDisplay instead. Will be removed in 0.15.0
-    """
-
-    pass
-
-
-@dataclass
 class WorkflowInputsDisplay:
     id: UUID
     name: Optional[str] = None
     color: Optional[str] = None
-
-
-@dataclass
-class WorkflowInputsDisplayOverrides(WorkflowInputsDisplay):
-    """
-    DEPRECATED: Use WorkflowInputsDisplay instead. Will be removed in 0.15.0
-    """
-
-    pass
 
 
 @dataclass
@@ -72,26 +54,8 @@ class StateValueDisplay:
 
 
 @dataclass
-class StateValueDisplayOverrides(StateValueDisplay):
-    """
-    DEPRECATED: Use StateValueDisplay instead. Will be removed in 0.15.0
-    """
-
-    pass
-
-
-@dataclass
 class EdgeDisplay:
     id: UUID
-
-
-@dataclass
-class EdgeDisplayOverrides(EdgeDisplay):
-    """
-    DEPRECATED: Use EdgeDisplay instead. Will be removed in 0.15.0
-    """
-
-    pass
 
 
 @dataclass
@@ -101,24 +65,6 @@ class EntrypointDisplay:
 
 
 @dataclass
-class EntrypointDisplayOverrides(EntrypointDisplay):
-    """
-    DEPRECATED: Use EntrypointDisplay instead. Will be removed in 0.15.0
-    """
-
-    pass
-
-
-@dataclass
 class WorkflowOutputDisplay:
     id: UUID
     name: str
-
-
-@dataclass
-class WorkflowOutputDisplayOverrides(WorkflowOutputDisplay):
-    """
-    DEPRECATED: Use WorkflowOutputDisplay instead. Will be removed in 0.15.0
-    """
-
-    pass

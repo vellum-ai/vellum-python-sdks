@@ -8,11 +8,7 @@ from typing import Callable, Generator, Iterable, List, cast
 
 from vellum import TestSuiteRunMetricNumberOutput, TestSuiteRunRead
 from vellum.client import OMIT, Vellum
-from vellum.evaluations.constants import DEFAULT_MAX_POLLING_DURATION_MS, DEFAULT_POLLING_INTERVAL_MS
-from vellum.evaluations.exceptions import TestSuiteRunResultsException
-from vellum.evaluations.utils.env import get_api_key
-from vellum.evaluations.utils.paginator import PaginatedResults, get_all_results
-from vellum.types import (
+from vellum.client.types import (
     ExternalTestCaseExecutionRequest,
     NamedTestCaseVariableValueRequest,
     TestCaseVariableValue,
@@ -22,6 +18,10 @@ from vellum.types import (
     TestSuiteRunMetricOutput,
     TestSuiteRunState,
 )
+from vellum.evaluations.constants import DEFAULT_MAX_POLLING_DURATION_MS, DEFAULT_POLLING_INTERVAL_MS
+from vellum.evaluations.exceptions import TestSuiteRunResultsException
+from vellum.evaluations.utils.env import get_api_key
+from vellum.evaluations.utils.paginator import PaginatedResults, get_all_results
 from vellum.utils.typing import cast_not_optional
 from vellum.utils.uuid import is_valid_uuid
 

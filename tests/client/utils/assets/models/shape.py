@@ -6,7 +6,7 @@ from __future__ import annotations
 import typing_extensions
 import typing_extensions
 import typing
-from vellum.core.serialization import FieldMetadata
+from vellum.client.core.serialization import FieldMetadata
 
 
 class Base(typing_extensions.TypedDict):

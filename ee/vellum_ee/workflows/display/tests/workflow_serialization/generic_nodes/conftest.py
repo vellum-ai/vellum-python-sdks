@@ -4,6 +4,7 @@ from typing import Type
 
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import NodeType
+from vellum_ee.workflows.display.base import WorkflowMetaDisplay
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.types import (
@@ -13,7 +14,6 @@ from vellum_ee.workflows.display.types import (
     WorkflowDisplayContext,
     WorkflowInputsDisplays,
 )
-from vellum_ee.workflows.display.vellum import WorkflowMetaVellumDisplay
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
@@ -31,7 +31,7 @@ def serialize_node():
 
         context: WorkflowDisplayContext = WorkflowDisplayContext(
             workflow_display_class=BaseWorkflowDisplay,
-            workflow_display=WorkflowMetaVellumDisplay(
+            workflow_display=WorkflowMetaDisplay(
                 entrypoint_node_id=uuid4(),
                 entrypoint_node_source_handle_id=uuid4(),
                 entrypoint_node_display=NodeDisplayData(),

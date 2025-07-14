@@ -2,8 +2,8 @@ from abc import abstractmethod
 from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Union
 
 from vellum import AdHocExecutePromptEvent, ExecutePromptEvent, PromptOutput
+from vellum.client.core import RequestOptions
 from vellum.client.core.api_error import ApiError
-from vellum.core import RequestOptions
 from vellum.workflows.errors.types import WorkflowErrorCode, vellum_error_to_workflow_error
 from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
