@@ -4,7 +4,10 @@ import { join } from "path";
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { PromptBlock as PromptBlockSerializer } from "vellum-ai/serialization";
+import {
+  PromptBlock as PromptBlockSerializer,
+  PromptParameters as PromptParametersSerializer,
+} from "vellum-ai/serialization";
 
 import {
   GENERATED_WORKFLOW_MODULE_NAME,
@@ -19,6 +22,7 @@ import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
+import { PromptParameters } from "src/generators/prompt-parameters-request";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
@@ -280,6 +284,38 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     endWithComma: true,
                   }
                 ),
+              })
+            );
+          }
+          break;
+        }
+        case AttributeType.Parameters: {
+          if (
+            attribute.value &&
+            attribute.value.type === "CONSTANT_VALUE" &&
+            attribute.value.value?.type === "JSON"
+          ) {
+            const parseResult = PromptParametersSerializer.parse(
+              attribute.value.value.value
+            );
+            if (!parseResult.ok) {
+              this.workflowContext.addError(
+                new NodeDefinitionGenerationError(
+                  `Failed to parse parameters attribute: ${JSON.stringify(
+                    parseResult.errors
+                  )}`,
+                  "WARNING"
+                )
+              );
+              break;
+            }
+            const promptParameters = parseResult.value;
+            nodeAttributesStatements.push(
+              python.field({
+                name: "parameters",
+                initializer: new PromptParameters({
+                  promptParametersRequest: promptParameters,
+                }),
               })
             );
           }
