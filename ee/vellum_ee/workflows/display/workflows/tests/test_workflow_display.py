@@ -833,7 +833,7 @@ def test_serialize_workflow__empty_rules_indexerror():
     assert terminal_nodes[0]["data"]["name"] == "problematic_output"
 
 
-def test_serialize_workflow__inputs():
+def test_serialize_workflow__input_variables():
     # GIVEN a workflow with inputs
     class Inputs(BaseInputs):
         input_1: str
