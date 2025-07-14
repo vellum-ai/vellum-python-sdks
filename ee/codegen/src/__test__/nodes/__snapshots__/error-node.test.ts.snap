@@ -12,8 +12,6 @@ from ...nodes.error_node import ErrorNode
 class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
     label = "Error Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
-    name = "error-node"
-    error_output_id = UUID("69250713-617d-42a4-9326-456c70d0ef20")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     node_input_ids_by_name = {
         "error_source_input_id": UUID("d2287fee-98fb-421c-9464-e54d8f70f046")
@@ -46,8 +44,6 @@ from ...nodes.error_node import ErrorNode
 class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
     label = "Error Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
-    name = "error-node"
-    error_output_id = UUID("69250713-617d-42a4-9326-456c70d0ef20")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0), width=None, height=None

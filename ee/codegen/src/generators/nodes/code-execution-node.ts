@@ -116,7 +116,7 @@ export class CodeExecutionNode extends BaseNode<
                 python.instantiateClass({
                   classReference: python.reference({
                     name: "CodeExecutionPackage",
-                    modulePath: ["vellum", "types"],
+                    modulePath: ["vellum", "client", "types"],
                   }),
                   arguments_: [
                     python.methodArgument({
