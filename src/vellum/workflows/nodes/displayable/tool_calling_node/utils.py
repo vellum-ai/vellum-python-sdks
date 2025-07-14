@@ -1,5 +1,5 @@
 import json
-from typing import Any, Iterator, List, Optional, Type, cast
+from typing import Any, Callable, Iterator, List, Optional, Type, cast
 
 from pydash import snake_case
 
@@ -27,12 +27,6 @@ from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
 CHAT_HISTORY_VARIABLE = "chat_history"
-
-
-class FunctionNode(BaseNode):
-    """Node that executes a specific function."""
-
-    pass
 
 
 class ToolRouterNode(InlinePromptNode[ToolCallingState]):
@@ -153,14 +147,11 @@ class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseI
         )
 
 
-class DynamicFunctionNode(FunctionNode):
+class FunctionNode(BaseNode[ToolCallingState]):
     """Node that executes a regular Python function with function call output."""
 
     function_call_output: List[PromptOutput]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._function = self.__class__._function_ref
+    function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
         if self.function_call_output and len(self.function_call_output) > 0:
@@ -172,11 +163,10 @@ class DynamicFunctionNode(FunctionNode):
         else:
             arguments = {}
 
-        # Call the function directly
         try:
-            result = self._function(**arguments)
+            result = self.function_definition(**arguments)
         except Exception as e:
-            function_name = getattr(self._function, "__name__", str(self._function))
+            function_name = self.function_definition.__name__
             raise NodeException(
                 message=f"Error executing function '{function_name}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
@@ -305,10 +295,10 @@ def create_function_node(
     else:
         # For regular functions, use DynamicFunctionNode
         node = type(
-            f"DynamicFunctionNode_{function.__name__}",
-            (DynamicFunctionNode,),
+            f"FunctionNode_{function.__name__}",
+            (FunctionNode,),
             {
-                "_function_ref": function,
+                "function_definition": function,
                 "function_call_output": tool_router_node.Outputs.results,
                 "__module__": __name__,
             },
