@@ -3,16 +3,13 @@ from uuid import UUID
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
     EntrypointDisplay,
+    WorkflowDisplayData,
+    WorkflowDisplayDataViewport,
     WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.vellum import (
-    NodeDisplayData,
-    NodeDisplayPosition,
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-)
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
@@ -31,9 +28,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         ),
     )
     inputs_display = {
-        Inputs.input_value: WorkflowInputsDisplay(
-            id=UUID("2268a996-bd17-4832-b3ff-f5662d54b306"), name="input-value", required=True
-        )
+        Inputs.input_value: WorkflowInputsDisplay(id=UUID("2268a996-bd17-4832-b3ff-f5662d54b306"), name="input-value")
     }
     entrypoint_displays = {
         TemplatingNode: EntrypointDisplay(
