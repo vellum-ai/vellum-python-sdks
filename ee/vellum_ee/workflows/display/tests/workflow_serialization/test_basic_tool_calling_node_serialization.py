@@ -170,6 +170,27 @@ def test_serialize_workflow():
                 },
             },
             {
+                "id": "229cd1ca-dc2f-4586-b933-c4d4966f7bd1",
+                "name": "parameters",
+                "value": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "JSON",
+                        "value": {
+                            "stop": [],
+                            "temperature": 0.0,
+                            "max_tokens": 4096.0,
+                            "top_p": 1.0,
+                            "top_k": 0.0,
+                            "frequency_penalty": 0.0,
+                            "presence_penalty": 0.0,
+                            "logit_bias": None,
+                            "custom_parameters": None,
+                        },
+                    },
+                },
+            },
+            {
                 "id": "1668419e-a193-43a5-8a97-3394e89bf278",
                 "name": "max_prompt_iterations",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5.0}},

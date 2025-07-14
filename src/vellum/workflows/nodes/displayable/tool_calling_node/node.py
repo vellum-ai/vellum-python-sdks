@@ -1,6 +1,7 @@
 from typing import ClassVar, Iterator, List, Optional, Set
 
 from vellum import ChatMessage, PromptBlock
+from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.workflow import is_workflow_event
@@ -8,6 +9,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
@@ -29,6 +31,7 @@ class ToolCallingNode(BaseNode):
         blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)
         functions: List[Tool] - The functions that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
+        parameters: PromptParameters - The parameters for the Prompt
         max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping
     """
 
@@ -36,6 +39,7 @@ class ToolCallingNode(BaseNode):
     blocks: ClassVar[List[PromptBlock]] = []
     functions: ClassVar[List[Tool]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
+    parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     max_prompt_iterations: ClassVar[Optional[int]] = 5
 
     class Outputs(BaseOutputs):
@@ -131,6 +135,7 @@ class ToolCallingNode(BaseNode):
             blocks=self.blocks,
             functions=self.functions,
             prompt_inputs=self.prompt_inputs,
+            parameters=self.parameters,
             max_prompt_iterations=self.max_prompt_iterations,
         )
 
