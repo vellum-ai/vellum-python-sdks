@@ -254,7 +254,7 @@ def create_tool_router_node(
 def create_function_node(
     function: Tool,
     tool_router_node: Type[ToolRouterNode],
-) -> Type[FunctionNode]:
+) -> Type[BaseNode]:
     """
     Create a FunctionNode class for a given function.
 
@@ -293,12 +293,12 @@ def create_function_node(
             },
         )
     else:
-        # For regular functions, use DynamicFunctionNode
+        # For regular functions, use FunctionNode
         node = type(
             f"FunctionNode_{function.__name__}",
             (FunctionNode,),
             {
-                "function_definition": function,
+                "function_definition": lambda self, **kwargs: function(**kwargs),
                 "function_call_output": tool_router_node.Outputs.results,
                 "__module__": __name__,
             },
