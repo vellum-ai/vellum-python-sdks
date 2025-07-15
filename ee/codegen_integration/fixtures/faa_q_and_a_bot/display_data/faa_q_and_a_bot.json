@@ -1946,6 +1946,16 @@
             "name": "default",
             "type": "DEFAULT"
           }
+        ],
+        "attributes": [
+          {
+            "id": "bd625080-9c90-43b5-8093-d12977814df8",
+            "name": "timeout",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {"type": "JSON", "value": null}
+            }
+          }
         ]
       },
       {

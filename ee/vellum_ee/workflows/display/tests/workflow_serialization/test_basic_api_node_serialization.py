@@ -162,6 +162,16 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
             ],
+            "attributes": [
+                {
+                    "id": "ad719e65-0032-4012-a0bd-9b5162194bce",
+                    "name": "timeout",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {"type": "JSON", "value": None},
+                    },
+                },
+            ],
             "data": {
                 "label": "Simple A P I Node",
                 "error_output_id": None,

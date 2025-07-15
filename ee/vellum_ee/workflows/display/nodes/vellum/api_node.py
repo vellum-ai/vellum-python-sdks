@@ -31,6 +31,19 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         APINode.authorization_type,
     }
 
+    # TODO: Only serialize attributes not inputs
+    __unserializable_attributes__ = {
+        APINode.data,
+        APINode.url,
+        APINode.method,
+        APINode.json,
+        APINode.headers,
+        APINode.api_key_header_key,
+        APINode.api_key_header_value,
+        APINode.bearer_token_value,
+        APINode.authorization_type,
+    }
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
     ) -> JsonObject:
@@ -171,7 +184,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             cast(OutputReference, node.Outputs.status_code)
         ]
 
-        return {
+        serialized_node: JsonObject = {
             "id": str(node_id),
             "type": "API",
             "inputs": [input.dict() for input in inputs],
@@ -205,3 +218,9 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             "definition": self.get_definition().dict(),
             "ports": self.serialize_ports(display_context),
         }
+
+        attributes = self._serialize_attributes(display_context)
+        if attributes:
+            serialized_node["attributes"] = attributes
+
+        return serialized_node

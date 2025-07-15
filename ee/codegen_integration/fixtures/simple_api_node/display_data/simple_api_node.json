@@ -267,6 +267,16 @@
             "name": "default",
             "type": "DEFAULT"
           }
+        ],
+        "attributes": [
+          {
+            "id": "63c3fb19-534a-4a75-b868-35e42a9e866b",
+            "name": "timeout",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {"type": "JSON", "value": null}
+            }
+          }
         ]
       },
       {
