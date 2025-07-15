@@ -1,4 +1,4 @@
-from vellum.client.types.prompt_parameters import PromptParameters
+from vellum import PromptParameters
 
 DEFAULT_PROMPT_PARAMETERS = PromptParameters(
     stop=[],
