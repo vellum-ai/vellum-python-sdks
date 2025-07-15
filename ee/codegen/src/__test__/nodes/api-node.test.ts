@@ -388,7 +388,7 @@ describe("ApiNode", () => {
           value: {
             type: "CONSTANT_VALUE",
             data: {
-              type: "NULL",
+              type: "NUMBER",
               value: null,
             },
           },
