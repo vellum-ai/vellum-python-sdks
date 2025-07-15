@@ -8,6 +8,20 @@ from vellum.workflows.types.core import VellumSecret
 class TestAPINodeTimeout:
     """Test timeout functionality in BaseAPINode."""
 
+    def _setup_vellum_mocks(self, node):
+        """Helper method to set up common vellum client mocks."""
+        mock_context = Mock()
+        mock_vellum_client = Mock()
+        mock_vellum_response = Mock()
+        mock_vellum_response.json_ = {"result": "success"}
+        mock_vellum_response.headers = {"content-type": "application/json"}
+        mock_vellum_response.status_code = 200
+        mock_vellum_response.text = '{"result": "success"}'
+        mock_vellum_client.execute_api.return_value = mock_vellum_response
+        mock_context.vellum_client = mock_vellum_client
+        node._context = mock_context
+        return mock_vellum_client, mock_vellum_response
+
     @patch("vellum.workflows.nodes.displayable.bases.api_node.node.Session")
     def test_local_execute_api_with_timeout(self, mock_session):
         """Test that timeout is passed to local requests session."""
@@ -44,18 +58,7 @@ class TestAPINodeTimeout:
     def test_vellum_execute_api_with_timeout(self):
         """Test that timeout creates RequestOptions for vellum client."""
         node = BaseAPINode()
-
-        # Mock the vellum client
-        mock_context = Mock()
-        mock_vellum_client = Mock()
-        mock_vellum_response = Mock()
-        mock_vellum_response.json_ = {"result": "success"}
-        mock_vellum_response.headers = {"content-type": "application/json"}
-        mock_vellum_response.status_code = 200
-        mock_vellum_response.text = '{"result": "success"}'
-        mock_vellum_client.execute_api.return_value = mock_vellum_response
-        mock_context.vellum_client = mock_vellum_client
-        node._context = mock_context
+        mock_vellum_client, mock_vellum_response = self._setup_vellum_mocks(node)
 
         result = node._vellum_execute_api(
             bearer_token=None,
@@ -79,18 +82,7 @@ class TestAPINodeTimeout:
     def test_vellum_execute_api_with_bearer_token_and_timeout(self):
         """Test that timeout works with bearer token authentication."""
         node = BaseAPINode()
-
-        # Mock the vellum client
-        mock_context = Mock()
-        mock_vellum_client = Mock()
-        mock_vellum_response = Mock()
-        mock_vellum_response.json_ = {"result": "success"}
-        mock_vellum_response.headers = {"content-type": "application/json"}
-        mock_vellum_response.status_code = 200
-        mock_vellum_response.text = '{"result": "success"}'
-        mock_vellum_client.execute_api.return_value = mock_vellum_response
-        mock_context.vellum_client = mock_vellum_client
-        node._context = mock_context
+        mock_vellum_client, mock_vellum_response = self._setup_vellum_mocks(node)
 
         bearer_token = VellumSecret(name="test_token")
 
