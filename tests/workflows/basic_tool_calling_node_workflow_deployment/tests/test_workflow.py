@@ -27,7 +27,7 @@ from vellum.client.types.workflow_execution_workflow_result_event import Workflo
 from vellum.client.types.workflow_output_string import WorkflowOutputString
 from vellum.client.types.workflow_request_string_input_request import WorkflowRequestStringInputRequest
 from vellum.client.types.workflow_result_event import WorkflowResultEvent
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 
 from tests.workflows.basic_tool_calling_node_workflow_deployment.workflow import (
     BasicToolCallingNodeWorkflowDeploymentWorkflow,

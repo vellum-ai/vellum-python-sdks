@@ -14,7 +14,7 @@ from vellum import (
     StringVellumValue,
     VellumVariable,
 )
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 
 from tests.workflows.helpers_prompt_blocks.workflow import WorkflowInputs, WorkflowWithPromptBlockHelpers
 
