@@ -31,7 +31,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         APINode.authorization_type,
     }
 
-    # HACK: Only serialize timeout attribute, exclude all others
+    # TODO: Only serialize attributes not inputs
     __unserializable_attributes__ = {
         APINode.data,
         APINode.url,
