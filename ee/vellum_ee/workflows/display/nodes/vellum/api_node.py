@@ -184,7 +184,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             cast(OutputReference, node.Outputs.status_code)
         ]
 
-        serialized_node = {
+        serialized_node: JsonObject = {
             "id": str(node_id),
             "type": "API",
             "inputs": [input.dict() for input in inputs],

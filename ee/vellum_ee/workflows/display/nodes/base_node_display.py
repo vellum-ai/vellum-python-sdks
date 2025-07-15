@@ -247,9 +247,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return ports
 
-    def _serialize_attributes(self, display_context: "WorkflowDisplayContext"):
+    def _serialize_attributes(self, display_context: "WorkflowDisplayContext") -> JsonArray:
         """Serialize node attributes, skipping unserializable ones."""
-        attributes = []
+        attributes: JsonArray = []
         for attribute in self._node:
             if attribute in self.__unserializable_attributes__:
                 continue
@@ -260,13 +260,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
             )
             try:
-                attributes.append(
-                    {
-                        "id": id,
-                        "name": attribute.name,
-                        "value": serialize_value(display_context, attribute.instance),
-                    }
-                )
+                attribute_dict: JsonObject = {
+                    "id": id,
+                    "name": attribute.name,
+                    "value": serialize_value(display_context, attribute.instance),
+                }
+                attributes.append(attribute_dict)
             except ValueError as e:
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
