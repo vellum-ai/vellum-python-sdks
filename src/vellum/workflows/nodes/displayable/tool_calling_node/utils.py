@@ -7,6 +7,7 @@ from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.prompt_output import PromptOutput
+from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -188,6 +189,7 @@ def create_tool_router_node(
     blocks: List[PromptBlock],
     functions: List[Tool],
     prompt_inputs: Optional[EntityInputsInterface],
+    parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
@@ -242,6 +244,7 @@ def create_tool_router_node(
                 "blocks": blocks,
                 "functions": functions,
                 "prompt_inputs": prompt_inputs,
+                "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
                 "Ports": Ports,
                 "__module__": __name__,
