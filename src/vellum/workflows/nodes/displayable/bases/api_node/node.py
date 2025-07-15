@@ -34,7 +34,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     data: Optional[str] = None
     json: Optional[Json] = None
     headers: Optional[Dict[str, Union[str, VellumSecret]]] = None
-    timeout: Optional[Union[int, float]] = None
+    timeout: Optional[int] = None
 
     class Outputs(BaseOutputs):
         json: Optional[Json]
@@ -59,7 +59,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         json: Any = None,
         headers: Any = None,
         bearer_token: Optional[VellumSecret] = None,
-        timeout: Optional[Union[int, float]] = None,
+        timeout: Optional[int] = None,
     ) -> Outputs:
         self._validate()
 

@@ -1,8 +1,5 @@
 import requests_mock.mocker
 
-from vellum.workflows.constants import APIRequestMethod
-from vellum.workflows.nodes.displayable import APINode
-
 from tests.workflows.basic_api_node_with_timeout.workflow import (
     APINodeWithoutTimeoutWorkflow,
     APINodeWithTimeoutWorkflow,
@@ -73,25 +70,3 @@ def test_api_node_with_timeout__timeout_respected():
     # THEN the timeout should be set correctly in the class definition
     assert hasattr(APINodeWithTimeout, "timeout")
     assert APINodeWithTimeout.timeout.instance == 30
-
-
-def test_api_node_timeout_attribute_types():
-    """Test that timeout attribute can handle different value types."""
-
-    class APINodeWithIntTimeout(APINode):
-        method = APIRequestMethod.POST
-        url = "https://api.vellum.ai"
-        timeout = 60  # integer
-        json = {"test": "data"}
-
-    class APINodeWithFloatTimeout(APINode):
-        method = APIRequestMethod.POST
-        url = "https://api.vellum.ai"
-        timeout = 30.5  # float
-        json = {"test": "data"}
-
-    # Test integer timeout
-    assert APINodeWithIntTimeout.timeout.instance == 60
-
-    # Test float timeout
-    assert APINodeWithFloatTimeout.timeout.instance == 30.5
