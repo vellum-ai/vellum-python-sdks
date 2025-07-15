@@ -893,3 +893,65 @@ def test_serialize_workflow__input_variables():
         "required": False,
         "extensions": {"color": None},
     }
+
+
+def test_serialize_workflow__state_variables():
+    # GIVEN a workflow with state variables
+    class State(BaseState):
+        state_1: str = "hello"
+        state_2: Optional[str] = None
+        state_3: int = 1
+        state_4: Optional[int] = 2
+
+    class MyWorkflow(BaseWorkflow[BaseInputs, State]):
+        pass
+
+    # WHEN we serialize it
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    data = workflow_display.serialize()
+
+    # THEN the state variables should be serialized correctly
+    assert "state_variables" in data
+    state_variables = data["state_variables"]
+    assert isinstance(state_variables, list)
+    assert len(state_variables) == 4
+
+    state_1 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_1")
+    assert state_1 == {
+        "id": "83c5b71d-56eb-42a5-84df-97e3591370c2",
+        "key": "state_1",
+        "type": "STRING",
+        "default": {"type": "STRING", "value": "hello"},
+        "required": False,
+        "extensions": {"color": None},
+    }
+
+    state_2 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_2")
+    assert state_2 == {
+        "id": "9b0cfeec-aa66-42b3-8f31-aa7eb8ac30ea",
+        "key": "state_2",
+        "type": "STRING",
+        "default": None,
+        "required": False,
+        "extensions": {"color": None},
+    }
+
+    state_3 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_3")
+    assert state_3 == {
+        "id": "3e19c570-6b46-4eab-ad81-d8d97028496f",
+        "key": "state_3",
+        "type": "NUMBER",
+        "default": {"type": "NUMBER", "value": 1.0},
+        "required": False,
+        "extensions": {"color": None},
+    }
+
+    state_4 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_4")
+    assert state_4 == {
+        "id": "50c735de-f269-4d0a-b511-c9a1104451bb",
+        "key": "state_4",
+        "type": "NUMBER",
+        "default": {"type": "NUMBER", "value": 2.0},
+        "required": False,
+        "extensions": {"color": None},
+    }

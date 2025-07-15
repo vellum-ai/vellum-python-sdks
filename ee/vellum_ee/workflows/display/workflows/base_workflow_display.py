@@ -158,13 +158,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             default = (
                 primitive_to_vellum_value(state_value_reference.instance) if state_value_reference.instance else None
             )
+
+            # A state variable is required if it has no default value AND is not optional
+            has_default = state_value_reference.instance is not undefined
+            is_optional = type(None) in state_value_reference.types
+            is_required = not has_default and not is_optional
+
             state_variables.append(
                 {
                     "id": str(state_value_display.id),
                     "key": state_value_display.name or state_value_reference.name,
                     "type": infer_vellum_variable_type(state_value_reference),
                     "default": default.dict() if default else None,
-                    "required": state_value_reference.instance is undefined,
+                    "required": is_required,
                     "extensions": {"color": state_value_display.color},
                 }
             )
