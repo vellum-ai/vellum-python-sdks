@@ -4,10 +4,12 @@ from typing import ClassVar, Dict, Generic, Optional, TypeVar, cast
 from vellum.workflows.nodes.displayable import APINode
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.vellum import WorkspaceSecretPointer
 
 _APINodeType = TypeVar("_APINodeType", bound=APINode)
@@ -171,7 +173,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             cast(OutputReference, node.Outputs.status_code)
         ]
 
-        return {
+        serialized_node = {
             "id": str(node_id),
             "type": "API",
             "inputs": [input.dict() for input in inputs],
@@ -205,3 +207,33 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             "definition": self.get_definition().dict(),
             "ports": self.serialize_ports(display_context),
         }
+
+        attributes = self._serialize_attributes(display_context)
+        if attributes:
+            serialized_node["attributes"] = attributes
+
+        return serialized_node
+
+    def _serialize_attributes(self, display_context: "WorkflowDisplayContext"):
+        attributes = []
+        for attribute in self._node:
+            if attribute in self.__unserializable_attributes__:
+                continue
+
+            id = (
+                str(self.attribute_ids_by_name[attribute.name])
+                if self.attribute_ids_by_name.get(attribute.name)
+                else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
+            )
+            try:
+                attributes.append(
+                    {
+                        "id": id,
+                        "name": attribute.name,
+                        "value": serialize_value(display_context, attribute.instance),
+                    }
+                )
+            except ValueError as e:
+                raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
+
+        return attributes
