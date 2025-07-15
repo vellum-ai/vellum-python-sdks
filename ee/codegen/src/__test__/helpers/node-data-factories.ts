@@ -1904,6 +1904,27 @@ export function toolCallingNodeFactory({
         },
       },
       {
+        id: "a7f8a575-a7ce-40b9-8bc9-546303f511c1",
+        name: "parameters",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: {
+              stop: [],
+              top_k: 0,
+              top_p: 1,
+              logit_bias: {},
+              max_tokens: 1000,
+              temperature: 0,
+              presence_penalty: 0,
+              custom_parameters: { tool_choice: "AUTO" },
+              frequency_penalty: 0,
+            },
+          },
+        },
+      },
+      {
         id: "723f614a-be30-4f27-90d0-896c740e58d3",
         name: "max_tool_calls",
         value: {

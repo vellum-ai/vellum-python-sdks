@@ -18,6 +18,7 @@ class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
         "blocks": UUID("beec5344-2eff-47d2-b920-b90367370d79"),
         "functions": UUID("7b1ab802-3228-43b3-a493-734c94794710"),
         "prompt_inputs": UUID("38cf126e-a186-4a63-8e30-47c4507413cd"),
+        "parameters": UUID("a7f8a575-a7ce-40b9-8bc9-546303f511c1"),
         "max_tool_calls": UUID("723f614a-be30-4f27-90d0-896c740e58d3"),
     }
     port_displays = {
@@ -37,6 +38,7 @@ exports[`ToolCallingNode > basic > getNodeFile 1`] = `
 from vellum import (
     ChatMessagePromptBlock,
     PlainTextPromptBlock,
+    PromptParameters,
     RichTextPromptBlock,
     VariablePromptBlock,
 )
@@ -69,6 +71,19 @@ class ToolCallingNode(BaseToolCallingNode):
     prompt_inputs = {
         "question": "What's the weather like in San Francisco?",
     }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0,
+        max_tokens=1000,
+        top_p=1,
+        top_k=0,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logit_bias={},
+        custom_parameters={
+            "tool_choice": "AUTO",
+        },
+    )
     max_tool_calls = 1
 "
 `;
