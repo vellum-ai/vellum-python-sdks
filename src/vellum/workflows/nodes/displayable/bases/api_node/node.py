@@ -4,6 +4,7 @@ from requests import Request, RequestException, Session
 from requests.exceptions import JSONDecodeError
 
 from vellum.client import ApiError
+from vellum.client.core.request_options import RequestOptions
 from vellum.client.types.vellum_secret import VellumSecret as ClientVellumSecret
 from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -100,10 +101,13 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     def _vellum_execute_api(self, bearer_token, data, headers, method, url, timeout):
         client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
         try:
-            # Note: timeout parameter may not be supported by vellum_client.execute_api
-            # This would need to be implemented in the Vellum API client
             vellum_response = self._context.vellum_client.execute_api(
-                url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
+                url=url,
+                method=method.value,
+                body=data,
+                headers=headers,
+                bearer_token=client_vellum_secret,
+                request_options=RequestOptions(timeout_in_seconds=timeout),
             )
         except ApiError as e:
             raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.NODE_EXECUTION)

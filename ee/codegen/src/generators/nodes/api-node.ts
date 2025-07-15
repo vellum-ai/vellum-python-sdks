@@ -221,7 +221,9 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
         statements.push(
           python.field({
             name: "timeout_input_id",
-            initializer: python.TypeInstantiation.uuid(this.nodeData.data.timeoutInputId),
+            initializer: python.TypeInstantiation.uuid(
+              this.nodeData.data.timeoutInputId
+            ),
           })
         );
       }
