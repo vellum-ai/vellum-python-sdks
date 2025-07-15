@@ -1949,14 +1949,6 @@
         ],
         "attributes": [
           {
-            "id": "e96c33a1-3fac-4273-95cf-a2074820edfd",
-            "name": "data",
-            "value": {
-              "type": "CONSTANT_VALUE",
-              "value": {"type": "JSON", "value": null}
-            }
-          },
-          {
             "id": "bd625080-9c90-43b5-8093-d12977814df8",
             "name": "timeout",
             "value": {
