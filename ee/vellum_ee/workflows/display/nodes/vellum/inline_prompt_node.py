@@ -11,7 +11,6 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import NodeInput
 
@@ -173,7 +172,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             }
 
         elif prompt_block.block_type == "CHAT_MESSAGE":
-
             chat_properties: JsonObject = {
                 "chat_role": prompt_block.chat_role,
                 "chat_source": prompt_block.chat_source,
@@ -247,30 +245,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             block["state"] = "ENABLED"
 
         return block
-
-    def _serialize_attributes(self, display_context: "WorkflowDisplayContext"):
-        attributes = []
-        for attribute in self._node:
-            if attribute in self.__unserializable_attributes__:
-                continue
-
-            id = (
-                str(self.attribute_ids_by_name[attribute.name])
-                if self.attribute_ids_by_name.get(attribute.name)
-                else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
-            )
-            try:
-                attributes.append(
-                    {
-                        "id": id,
-                        "name": attribute.name,
-                        "value": serialize_value(display_context, attribute.instance),
-                    }
-                )
-            except ValueError as e:
-                raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
-
-        return attributes
 
     def _serialize_parameters(self, parameters, display_context: "WorkflowDisplayContext") -> JsonObject:
         """Serialize parameters, returning empty object when nested descriptors are detected."""
