@@ -33,6 +33,18 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         APINode.authorization_type,
     }
 
+    # HACK: Only serialize timeout attribute, exclude all others
+    __unserializable_attributes__ = {
+        APINode.url,
+        APINode.method,
+        APINode.json,
+        APINode.headers,
+        APINode.api_key_header_key,
+        APINode.api_key_header_value,
+        APINode.bearer_token_value,
+        APINode.authorization_type,
+    }
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
     ) -> JsonObject:
