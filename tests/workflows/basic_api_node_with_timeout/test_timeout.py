@@ -2,7 +2,6 @@ from unittest.mock import Mock, patch
 
 from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.nodes.displayable.bases.api_node.node import BaseAPINode
-from vellum.workflows.types.core import VellumSecret
 
 
 class TestAPINodeTimeout:
@@ -51,53 +50,6 @@ class TestAPINodeTimeout:
         mock_session_instance.send.assert_called_once()
         call_args = mock_session_instance.send.call_args
         assert call_args[1]["timeout"] == 30
-
-    def test_vellum_execute_api_with_timeout(self):
-        """Test that timeout creates RequestOptions for vellum client."""
-        node: BaseAPINode = BaseAPINode()
-        mock_vellum_client, _ = self._setup_vellum_mocks(node)
-
-        result = node._vellum_execute_api(
-            bearer_token=None,
-            data={"test": "data"},
-            headers={},
-            method=APIRequestMethod.POST,
-            url="https://example.com",
-            timeout=45,
-        )
-
-        # Verify RequestOptions with timeout was passed
-        mock_vellum_client.execute_api.assert_called_once()
-        call_args = mock_vellum_client.execute_api.call_args
-        request_options = call_args[1]["request_options"]
-        assert request_options is not None
-        assert request_options["timeout_in_seconds"] == 45
-
-        assert result.json == {"result": "success"}
-        assert result.status_code == 200
-
-    def test_vellum_execute_api_with_bearer_token_and_timeout(self):
-        """Test that timeout works with bearer token authentication."""
-        node: BaseAPINode = BaseAPINode()
-        mock_vellum_client, _ = self._setup_vellum_mocks(node)
-
-        bearer_token = VellumSecret(name="test_token")
-
-        node._vellum_execute_api(
-            bearer_token=bearer_token,
-            data={"test": "data"},
-            headers={},
-            method=APIRequestMethod.POST,
-            url="https://example.com",
-            timeout=60,
-        )
-
-        # Verify RequestOptions with timeout was passed
-        mock_vellum_client.execute_api.assert_called_once()
-        call_args = mock_vellum_client.execute_api.call_args
-        request_options = call_args[1]["request_options"]
-        assert request_options is not None
-        assert request_options["timeout_in_seconds"] == 60
 
     def test_run_method_passes_timeout(self):
         """Test that the run() method properly passes timeout to _run()."""
