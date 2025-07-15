@@ -233,3 +233,33 @@ def test_api_node_raises_error_for_whitespace_url():
 
     assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "URL is required and must be a non-empty string" in str(excinfo.value)
+
+
+def test_api_node_passes_timeout_to_vellum_client(vellum_client):
+    """Test that timeout is passed to vellum client as RequestOptions."""
+    vellum_client.execute_api.return_value = ExecuteApiResponse(
+        status_code=200,
+        text='{"result": "success"}',
+        json_={"result": "success"},
+        headers={"content-type": "application/json"},
+    )
+
+    # GIVEN an API node configured with a timeout value of 25 seconds
+    class APINodeWithTimeout(APINode):
+        method = APIRequestMethod.GET
+        authorization_type = AuthorizationType.BEARER_TOKEN
+        url = "https://example.com"
+        timeout = 25
+        bearer_token_value = VellumSecret(name="secret")
+
+    # WHEN the API node is executed
+    node = APINodeWithTimeout()
+    node.run()
+
+    # THEN the vellum client should be called exactly once
+    assert vellum_client.execute_api.call_count == 1
+    call_args = vellum_client.execute_api.call_args
+    request_options = call_args.kwargs["request_options"]
+    # AND the call should include RequestOptions with the correct timeout
+    assert request_options is not None
+    assert request_options["timeout_in_seconds"] == 25

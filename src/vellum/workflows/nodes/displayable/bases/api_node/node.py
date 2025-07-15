@@ -4,6 +4,7 @@ from requests import Request, RequestException, Session
 from requests.exceptions import JSONDecodeError
 
 from vellum.client import ApiError
+from vellum.client.core.request_options import RequestOptions
 from vellum.client.types.vellum_secret import VellumSecret as ClientVellumSecret
 from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -23,6 +24,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     data: Optional[str] - The data to send in the request body.
     json: Optional["JsonObject"] - The JSON data to send in the request body.
     headers: Optional[Dict[str, Union[str, VellumSecret]]] - The headers to send in the request.
+    timeout: Optional[int] - The timeout in seconds for the API request.
     """
 
     class Trigger(BaseNode.Trigger):
@@ -33,6 +35,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     data: Optional[str] = None
     json: Optional[Json] = None
     headers: Optional[Dict[str, Union[str, VellumSecret]]] = None
+    timeout: Optional[int] = None
 
     class Outputs(BaseOutputs):
         json: Optional[Json]
@@ -45,7 +48,9 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             raise NodeException("URL is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS)
 
     def run(self) -> Outputs:
-        return self._run(method=self.method, url=self.url, data=self.data, json=self.json, headers=self.headers)
+        return self._run(
+            method=self.method, url=self.url, data=self.data, json=self.json, headers=self.headers, timeout=self.timeout
+        )
 
     def _run(
         self,
@@ -55,6 +60,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         json: Any = None,
         headers: Any = None,
         bearer_token: Optional[VellumSecret] = None,
+        timeout: Optional[int] = None,
     ) -> Outputs:
         self._validate()
 
@@ -63,11 +69,11 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             if isinstance(headers[header], VellumSecret):
                 vellum_instance = True
         if vellum_instance or bearer_token:
-            return self._vellum_execute_api(bearer_token, json, headers, method, url)
+            return self._vellum_execute_api(bearer_token, json, headers, method, url, timeout)
         else:
-            return self._local_execute_api(data, headers, json, method, url)
+            return self._local_execute_api(data, headers, json, method, url, timeout)
 
-    def _local_execute_api(self, data, headers, json, method, url):
+    def _local_execute_api(self, data, headers, json, method, url, timeout):
         try:
             if data is not None:
                 prepped = Request(method=method.value, url=url, data=data, headers=headers).prepare()
@@ -79,25 +85,36 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
         try:
             with Session() as session:
-                response = session.send(prepped)
+                response = session.send(prepped, timeout=timeout)
         except RequestException as e:
             raise NodeException(f"HTTP request failed: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
         try:
-            json = response.json()
+            json_response = response.json()
         except JSONDecodeError:
-            json = None
+            json_response = None
         return self.Outputs(
-            json=json,
+            json=json_response,
             headers={header: value for header, value in response.headers.items()},
             status_code=response.status_code,
             text=response.text,
         )
 
-    def _vellum_execute_api(self, bearer_token, data, headers, method, url):
+    def _vellum_execute_api(self, bearer_token, data, headers, method, url, timeout):
         client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
+
+        # Create request_options if timeout is specified
+        request_options = None
+        if timeout is not None:
+            request_options = RequestOptions(timeout_in_seconds=timeout)
+
         try:
             vellum_response = self._context.vellum_client.execute_api(
-                url=url, method=method.value, body=data, headers=headers, bearer_token=client_vellum_secret
+                url=url,
+                method=method.value,
+                body=data,
+                headers=headers,
+                bearer_token=client_vellum_secret,
+                request_options=request_options,
             )
         except ApiError as e:
             raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.NODE_EXECUTION)

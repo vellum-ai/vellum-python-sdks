@@ -65,4 +65,5 @@ class APINode(BaseAPINode):
             json=self.json,
             headers=final_headers,
             bearer_token=bearer_token,
+            timeout=self.timeout,
         )
