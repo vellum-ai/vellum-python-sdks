@@ -35,7 +35,7 @@ class TestAPINodeTimeout:
         mock_response.text = '{"result": "success"}'
         mock_session_instance.send.return_value = mock_response
 
-        node = BaseAPINode()
+        node: BaseAPINode = BaseAPINode()
         node.url = "https://example.com"
 
         result = node._local_execute_api(
@@ -57,7 +57,7 @@ class TestAPINodeTimeout:
 
     def test_vellum_execute_api_with_timeout(self):
         """Test that timeout creates RequestOptions for vellum client."""
-        node = BaseAPINode()
+        node: BaseAPINode = BaseAPINode()
         mock_vellum_client, mock_vellum_response = self._setup_vellum_mocks(node)
 
         result = node._vellum_execute_api(
@@ -81,8 +81,8 @@ class TestAPINodeTimeout:
 
     def test_vellum_execute_api_with_bearer_token_and_timeout(self):
         """Test that timeout works with bearer token authentication."""
-        node = BaseAPINode()
-        mock_vellum_client, mock_vellum_response = self._setup_vellum_mocks(node)
+        node: BaseAPINode = BaseAPINode()
+        mock_vellum_client, _ = self._setup_vellum_mocks(node)
 
         bearer_token = VellumSecret(name="test_token")
 
@@ -109,7 +109,7 @@ class TestAPINodeTimeout:
 
     def test_run_method_passes_timeout(self):
         """Test that the run() method properly passes timeout to _run()."""
-        node = BaseAPINode()
+        node: BaseAPINode = BaseAPINode()
         node.url = "https://example.com"
         node.method = APIRequestMethod.GET
         node.timeout = 25
