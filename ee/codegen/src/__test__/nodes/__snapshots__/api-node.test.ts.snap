@@ -1,5 +1,66 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`ApiNode > api node with timeout > should generate timeout field when timeout attribute is present 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://example.vellum.ai"
+    method = APIRequestMethod.POST
+    headers = {
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
+    }
+    api_key_header_key = None
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
+    timeout = 30
+"
+`;
+
+exports[`ApiNode > api node with timeout > should not generate timeout field when timeout attribute is not present 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://example.vellum.ai"
+    method = APIRequestMethod.POST
+    headers = {
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
+    }
+    api_key_header_key = None
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
+"
+`;
+
+exports[`ApiNode > api node with timeout > should not generate timeout field when timeout attribute is null 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://example.vellum.ai"
+    method = APIRequestMethod.POST
+    headers = {
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
+    }
+    api_key_header_key = None
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
+"
+`;
+
 exports[`ApiNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

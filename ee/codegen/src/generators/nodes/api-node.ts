@@ -7,6 +7,7 @@ import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { BaseNode } from "src/generators/nodes/bases/base";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";
 
 const BODY_INPUT_KEY = "body";
@@ -170,6 +171,26 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
           })
         );
       }
+    }
+
+    const timeoutAttribute = this.nodeData.attributes?.find(
+      (attr) => attr.name === "timeout"
+    );
+
+    if (
+      timeoutAttribute &&
+      !this.isAttributeDefault(timeoutAttribute.value, { defaultValue: null })
+    ) {
+      statements.push(
+        python.field({
+          name: "timeout",
+          initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+            workflowValueDescriptor: timeoutAttribute.value,
+          }),
+        })
+      );
     }
 
     return statements;

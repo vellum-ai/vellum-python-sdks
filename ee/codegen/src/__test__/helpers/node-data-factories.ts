@@ -1018,6 +1018,7 @@ export interface ApiNodeFactoryProps {
   body?: Record<string, unknown> | null;
   statusCodeOutputId?: string;
   id?: string;
+  attributes?: NodeAttribute[];
 }
 
 export function apiNodeFactory({
@@ -1031,6 +1032,7 @@ export function apiNodeFactory({
   url = "https://example.vellum.ai",
   method = "POST",
   body = {},
+  attributes,
 }: ApiNodeFactoryProps = {}): NodeDataFactoryBuilder<ApiNode> {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
@@ -1294,6 +1296,7 @@ export function apiNodeFactory({
       sourceHandleId: "c38a71f6-3ffb-45fa-9eea-93c6984a9e3e",
     },
     inputs: inputs,
+    attributes: attributes,
     displayData: {
       width: 462,
       height: 288,
