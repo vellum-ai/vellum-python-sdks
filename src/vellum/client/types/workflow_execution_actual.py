@@ -12,7 +12,7 @@ import pydantic
 class WorkflowExecutionActual(UniversalBaseModel):
     output: ExecutionVellumValue
     timestamp: dt.datetime
-    quality: float
+    quality: typing.Optional[float] = None
     metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
 
     if IS_PYDANTIC_V2:

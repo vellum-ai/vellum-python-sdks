@@ -295,6 +295,7 @@ from .open_ai_vectorizer_text_embedding_3_small import OpenAiVectorizerTextEmbed
 from .open_ai_vectorizer_text_embedding_3_small_request import OpenAiVectorizerTextEmbedding3SmallRequest
 from .open_ai_vectorizer_text_embedding_ada_002 import OpenAiVectorizerTextEmbeddingAda002
 from .open_ai_vectorizer_text_embedding_ada_002_request import OpenAiVectorizerTextEmbeddingAda002Request
+from .organization_limit_config import OrganizationLimitConfig
 from .organization_read import OrganizationRead
 from .paginated_container_image_read_list import PaginatedContainerImageReadList
 from .paginated_deployment_release_tag_read_list import PaginatedDeploymentReleaseTagReadList
@@ -335,6 +336,7 @@ from .prompt_request_json_input import PromptRequestJsonInput
 from .prompt_request_string_input import PromptRequestStringInput
 from .prompt_settings import PromptSettings
 from .prompt_version_build_config_sandbox import PromptVersionBuildConfigSandbox
+from .quota import Quota
 from .raw_prompt_execution_overrides_request import RawPromptExecutionOverridesRequest
 from .reducto_chunker_config import ReductoChunkerConfig
 from .reducto_chunker_config_request import ReductoChunkerConfigRequest
@@ -548,6 +550,7 @@ from .vellum_variable import VellumVariable
 from .vellum_variable_extensions import VellumVariableExtensions
 from .vellum_variable_type import VellumVariableType
 from .vellum_workflow_execution_event import VellumWorkflowExecutionEvent
+from .vembda_service_tier_enum import VembdaServiceTierEnum
 from .workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from .workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
@@ -912,6 +915,7 @@ __all__ = [
     "OpenAiVectorizerTextEmbedding3SmallRequest",
     "OpenAiVectorizerTextEmbeddingAda002",
     "OpenAiVectorizerTextEmbeddingAda002Request",
+    "OrganizationLimitConfig",
     "OrganizationRead",
     "PaginatedContainerImageReadList",
     "PaginatedDeploymentReleaseTagReadList",
@@ -952,6 +956,7 @@ __all__ = [
     "PromptRequestStringInput",
     "PromptSettings",
     "PromptVersionBuildConfigSandbox",
+    "Quota",
     "RawPromptExecutionOverridesRequest",
     "ReductoChunkerConfig",
     "ReductoChunkerConfigRequest",
@@ -1149,6 +1154,7 @@ __all__ = [
     "VellumVariableExtensions",
     "VellumVariableType",
     "VellumWorkflowExecutionEvent",
+    "VembdaServiceTierEnum",
     "WorkflowDeploymentEventExecutionsResponse",
     "WorkflowDeploymentHistoryItem",
     "WorkflowDeploymentParentContext",
