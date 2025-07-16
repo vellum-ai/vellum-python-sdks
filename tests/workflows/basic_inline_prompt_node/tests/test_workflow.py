@@ -15,7 +15,7 @@ from vellum import (
     VellumVariable,
 )
 from vellum.client.types.prompt_settings import PromptSettings
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 
 from tests.workflows.basic_inline_prompt_node.workflow import BasicInlinePromptWorkflow, WorkflowInputs
 

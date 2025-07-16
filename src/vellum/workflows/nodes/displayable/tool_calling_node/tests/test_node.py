@@ -10,10 +10,10 @@ from vellum.client.types.initiated_execute_prompt_event import InitiatedExecuteP
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_function_node, create_tool_router_node
 from vellum.workflows.outputs.base import BaseOutputs

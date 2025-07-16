@@ -17,8 +17,8 @@ from vellum import (
 )
 from vellum.client.types.metric_definition_execution import MetricDefinitionExecution
 from vellum.client.types.prompt_settings import PromptSettings
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.constants import LATEST_RELEASE_TAG
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 
 from tests.workflows.basic_retry_node_annotation.workflow_with_retry_and_guardrail_nodes import (
     WorkflowInputs,

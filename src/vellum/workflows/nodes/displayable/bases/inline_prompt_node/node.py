@@ -21,13 +21,13 @@ from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.prompt_exec_config import PromptExecConfig
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.rich_text_child_block import RichTextChildBlock
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.definition import DeploymentDefinition

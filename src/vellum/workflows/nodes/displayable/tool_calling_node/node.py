@@ -2,6 +2,7 @@ from typing import ClassVar, Iterator, List, Optional, Set
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.prompt_parameters import PromptParameters
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.workflow import is_workflow_event
@@ -9,7 +10,6 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
