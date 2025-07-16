@@ -26,6 +26,7 @@ def test_ping__happy_path(vellum_client):
         name="Test Organization",
         new_member_join_behavior="AUTO_ACCEPT_FROM_SHARED_DOMAIN",
         allow_staff_access=True,
+        limit_config={},
     )
 
     # WHEN calling `vellum ping`
