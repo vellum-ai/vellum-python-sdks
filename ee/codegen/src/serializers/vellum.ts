@@ -1935,6 +1935,7 @@ export const ApiNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  attributes: listSchema(NodeAttributeSerializer).optional(),
 });
 
 export declare namespace ApiNodeSerializer {
