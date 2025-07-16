@@ -137,10 +137,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 else None
             )
 
-            # An input is required if it has no default value AND is not optional
-            has_default = workflow_input_reference.instance is not undefined
-            is_optional = type(None) in workflow_input_reference.types
-            is_required = not has_default and not is_optional
+            is_required = self._is_reference_required(workflow_input_reference)
 
             input_variables.append(
                 {
@@ -159,10 +156,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 primitive_to_vellum_value(state_value_reference.instance) if state_value_reference.instance else None
             )
 
-            # A state variable is required if it has no default value AND is not optional
-            has_default = state_value_reference.instance is not undefined
-            is_optional = type(None) in state_value_reference.types
-            is_required = not has_default and not is_optional
+            is_required = self._is_reference_required(state_value_reference)
 
             state_variables.append(
                 {
@@ -949,6 +943,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     continue
 
         return additional_files
+
+    @staticmethod
+    def _is_reference_required(reference: BaseDescriptor) -> bool:
+        has_default = reference.instance is not undefined
+        is_optional = type(None) in reference.types
+        is_required = not has_default and not is_optional
+        return is_required
 
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
