@@ -351,4 +351,76 @@ describe("ApiNode", () => {
       expect(error?.severity).toBe("WARNING");
     });
   });
+
+  describe("api node with timeout", () => {
+    it("should generate timeout field when timeout attribute is present", async () => {
+      const nodeData = apiNodeFactory({
+        attributes: [
+          {
+            id: "timeout-attr-id",
+            name: "timeout",
+            value: {
+              type: "CONSTANT_VALUE",
+              value: { type: "NUMBER", value: 30 },
+            },
+          },
+        ],
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      node = new ApiNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should not generate timeout field when timeout attribute is not present", async () => {
+      const nodeData = apiNodeFactory().build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      node = new ApiNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should not generate timeout field when timeout attribute is null", async () => {
+      const nodeData = apiNodeFactory({
+        attributes: [
+          {
+            id: "timeout-attr-id",
+            name: "timeout",
+            value: null,
+          },
+        ],
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      node = new ApiNode({
+        workflowContext: workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
