@@ -87,6 +87,11 @@ export class Expression extends AstNode {
       rawLhs = this.generateLhsAsConstantReference(base);
     }
     this.inheritReferences(rawLhs);
+
+    if (operator === "coalesce") {
+      return `${rawLhs.toString()}.coalesce(${rhs.toString()})`;
+    }
+
     return `${rawLhs.toString()}.${operator}(${lhs.toString()}, ${rhs.toString()})`;
   }
 
@@ -115,6 +120,18 @@ export class Expression extends AstNode {
         return `${rawLhs.toString()}[""]`;
       }
       return `${rawLhs.toString()}[${rhs.toString()}]`;
+    }
+
+    if (operator === "coalesce") {
+      if (!rhs) {
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            "rhs must be defined if operator is coalesce"
+          )
+        );
+        return `${rawLhs.toString()}.coalesce(None)`;
+      }
+      return `${rawLhs.toString()}.coalesce(${rhs.toString()})`;
     }
 
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";

@@ -465,4 +465,60 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("with dynamic ml model coalesce expression", () => {
+    let node: InlinePromptNode;
+    beforeEach(async () => {
+      await createNodeContext({
+        workflowContext,
+        nodeData: genericNodeFactory({
+          id: "upstream-model-node-id",
+          label: "ModelProviderNode",
+          nodeOutputs: [
+            { id: "model-output-id", name: "model", type: "STRING" },
+          ],
+        }),
+      });
+
+      const mlModelCoalesceAttribute: NodeAttributeType = {
+        id: uuidv4(),
+        name: "ml_model",
+        value: {
+          type: "BINARY_EXPRESSION",
+          operator: "coalesce",
+          lhs: {
+            type: "NODE_OUTPUT",
+            nodeId: "upstream-model-node-id",
+            nodeOutputId: "model-output-id",
+          },
+          rhs: {
+            type: "CONSTANT_VALUE",
+            value: {
+              type: "STRING",
+              value: "gpt-4o-mini",
+            },
+          },
+        },
+      };
+
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
+        .withAttributes([mlModelCoalesceAttribute])
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should generate ml_model with coalesce expression correctly", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
