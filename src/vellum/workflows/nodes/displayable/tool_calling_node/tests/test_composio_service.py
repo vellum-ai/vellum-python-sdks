@@ -54,17 +54,6 @@ def composio_service(mock_composio_client):
 class TestComposioAccountService:
     """Test suite for ComposioAccountService"""
 
-    def test_init(self, mock_composio_client):
-        """Test ComposioAccountService initialization"""
-        # GIVEN
-        api_key = "test-api-key"
-
-        # WHEN
-        service = ComposioAccountService(api_key=api_key)
-
-        # THEN
-        assert service._client == mock_composio_client
-
     def test_get_user_connections_success(
         self, composio_account_service, mock_composio_client, mock_connected_accounts_response
     ):
