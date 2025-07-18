@@ -1,7 +1,11 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ComposioService, ConnectionInfo
+from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import (
+    ComposioCoreService,
+    ComposioService,
+    ConnectionInfo,
+)
 
 
 @pytest.fixture
@@ -35,9 +39,33 @@ def mock_connected_accounts_response():
 
 
 @pytest.fixture
-def composio_service(mock_composio_client):
-    """Create ComposioService with mocked client"""
+def mock_composio_core_client():
+    """Mock the composio-core Composio client"""
+    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.Composio") as mock_composio:
+        yield mock_composio.return_value
+
+
+@pytest.fixture
+def mock_action():
+    """Mock the Action class and specific actions"""
+    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.Action") as mock_action_class:
+        # Mock a specific action
+        mock_hackernews_action = Mock()
+        mock_action_class.HACKERNEWS_GET_USER = mock_hackernews_action
+        mock_action_class.GITHUB_GET_USER = Mock()
+        yield mock_action_class
+
+
+@pytest.fixture
+def composio_service(mock_composio_client, mock_composio_core_client):
+    """Create ComposioService with mocked clients"""
     return ComposioService(api_key="test-key")
+
+
+@pytest.fixture
+def composio_core_service(mock_composio_core_client):
+    """Create ComposioCoreService with mocked client"""
+    return ComposioCoreService(api_key="test-key")
 
 
 class TestComposioAccountService:
@@ -82,3 +110,81 @@ class TestComposioAccountService:
 
         # THEN we get an empty list
         assert result == []
+
+
+class TestComposioCoreService:
+    """Test suite for ComposioCoreService"""
+
+    def test_execute_tool_success(self, composio_core_service, mock_composio_core_client, mock_action):
+        """Test successful tool execution"""
+        # GIVEN a mock response from composio execute
+        expected_result = {"user": {"username": "pg", "karma": 155040}}
+        mock_composio_core_client.actions.execute.return_value = expected_result
+
+        # WHEN we execute a tool
+        result = composio_core_service.execute_tool("HACKERNEWS_GET_USER", {"username": "pg"})
+
+        # THEN the correct action is called and result is returned
+        mock_composio_core_client.actions.execute.assert_called_once_with(
+            mock_action.HACKERNEWS_GET_USER, params={"username": "pg"}
+        )
+        assert result == expected_result
+
+    def test_execute_tool_different_action(self, composio_core_service, mock_composio_core_client, mock_action):
+        """Test executing a different tool with different arguments"""
+        # GIVEN a mock response for a GitHub action
+        expected_result = {"user": {"login": "octocat", "id": 583231}}
+        mock_composio_core_client.actions.execute.return_value = expected_result
+
+        # WHEN we execute a different tool
+        result = composio_core_service.execute_tool("GITHUB_GET_USER", {"username": "octocat"})
+
+        # THEN the correct action is called
+        mock_composio_core_client.actions.execute.assert_called_once_with(
+            mock_action.GITHUB_GET_USER, params={"username": "octocat"}
+        )
+        assert result == expected_result
+
+    def test_execute_tool_with_complex_arguments(self, composio_core_service, mock_composio_core_client, mock_action):
+        """Test executing a tool with complex argument structure"""
+        # GIVEN complex arguments and a mock response
+        complex_args = {"filters": {"status": "active"}, "limit": 10, "sort": "created_at"}
+        expected_result = {"items": [], "total": 0}
+        mock_composio_core_client.actions.execute.return_value = expected_result
+
+        # WHEN we execute a tool with complex arguments
+        result = composio_core_service.execute_tool("HACKERNEWS_GET_USER", complex_args)
+
+        # THEN the arguments are passed through correctly
+        mock_composio_core_client.actions.execute.assert_called_once_with(
+            mock_action.HACKERNEWS_GET_USER, params=complex_args
+        )
+        assert result == expected_result
+
+
+class TestComposioService:
+    """Test suite for the unified ComposioService"""
+
+    def test_execute_tool_delegates_to_core(self, composio_service, mock_composio_core_client, mock_action):
+        """Test that ComposioService.execute_tool delegates to ComposioCoreService"""
+        # GIVEN a mock response
+        expected_result = {"success": True}
+        mock_composio_core_client.actions.execute.return_value = expected_result
+
+        # WHEN we execute a tool through the unified service
+        result = composio_service.execute_tool("HACKERNEWS_GET_USER", {"username": "test"})
+
+        # THEN it delegates to the core service
+        mock_composio_core_client.actions.execute.assert_called_once_with(
+            mock_action.HACKERNEWS_GET_USER, params={"username": "test"}
+        )
+        assert result == expected_result
+
+    def test_unified_service_has_both_capabilities(self, composio_service):
+        """Test that ComposioService provides both account and core functionality"""
+        # GIVEN a ComposioService instance
+        # THEN it should have both accounts and core services
+        assert hasattr(composio_service, "accounts")
+        assert hasattr(composio_service, "core")
+        assert hasattr(composio_service, "get_user_connections")
+        assert hasattr(composio_service, "execute_tool")
