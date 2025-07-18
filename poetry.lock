@@ -265,6 +265,28 @@ files = [
 ]
 
 [[package]]
+name = "composio-client"
+version = "1.5.0"
+description = "The official Python library for the composio API"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "composio_client-1.5.0-py3-none-any.whl", hash = "sha256:3fee2ffd36375d40d4448a689e3c099ebbb19e5092a2f2fb9d7896d2a3f954b7"},
+    {file = "composio_client-1.5.0.tar.gz", hash = "sha256:022d9399cc3c8d0bb298fff8296f56d8baa60cabaf872b00a52e92772553a99c"},
+]
+
+[package.dependencies]
+anyio = ">=3.5.0,<5"
+distro = ">=1.7.0,<2"
+httpx = ">=0.23.0,<1"
+pydantic = ">=1.9.0,<3"
+sniffio = "*"
+typing-extensions = ">=4.10,<5"
+
+[package.extras]
+aiohttp = ["aiohttp", "httpx-aiohttp (>=0.1.6)"]
+
+[[package]]
 name = "coverage"
 version = "7.9.2"
 description = "Code coverage measurement for Python"
@@ -1943,4 +1965,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "8bcbb24487af2ce93fcf7ce89170d4475d73eabea1652ca46748232380f36386"
+content-hash = "53601d1fc8f4c50b0e678f2cc5046290398a64d3aa90f98e011daee54f9165e6"
