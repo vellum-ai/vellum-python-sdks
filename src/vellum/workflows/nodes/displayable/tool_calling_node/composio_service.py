@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import List
 
 from composio_client import Composio as ComposioClient
 
@@ -13,15 +13,6 @@ class ConnectionInfo:
     created_at: str
     updated_at: str
     status: str = "ACTIVE"  # TODO: Use enum if we end up supporting integrations that the user has not yet connected to
-
-
-@dataclass
-class ToolExecutionResult:
-    """Result of a tool execution"""
-
-    success: bool
-    data: Any = None
-    error: Optional[str] = None
 
 
 class ComposioAccountService:
