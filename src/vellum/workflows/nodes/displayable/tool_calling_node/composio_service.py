@@ -1,16 +1,7 @@
 from dataclasses import dataclass
-from enum import Enum
 from typing import Any, List, Optional
 
 from composio_client import Composio as ComposioClient
-
-
-class ConnectionStatus(Enum):
-    """Status of a user's connection to a service"""
-
-    ACTIVE = "ACTIVE"
-    INACTIVE = "INACTIVE"
-    DISABLED = "DISABLED"
 
 
 @dataclass
@@ -19,9 +10,9 @@ class ConnectionInfo:
 
     connection_id: str
     integration_name: str
-    status: ConnectionStatus
     created_at: str
     updated_at: str
+    status: str = "ACTIVE"  # TODO: Use enum if we end up supporting integrations that the user has not yet connected to
 
 
 @dataclass
@@ -47,7 +38,7 @@ class ComposioAccountService:
             ConnectionInfo(
                 connection_id=item.id,
                 integration_name=item.toolkit.slug,
-                status=ConnectionStatus(item.status),
+                status=item.status,
                 created_at=item.created_at,
                 updated_at=item.updated_at,
             )
