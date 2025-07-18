@@ -1,12 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import (
-    ComposioAccountService,
-    ComposioService,
-    ConnectionInfo,
-    ConnectionStatus,
-)
+from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ComposioService, ConnectionInfo
 
 
 @pytest.fixture
@@ -40,12 +35,6 @@ def mock_connected_accounts_response():
 
 
 @pytest.fixture
-def composio_account_service(mock_composio_client):
-    """Create ComposioAccountService with mocked client"""
-    return ComposioAccountService(api_key="test-key")
-
-
-@pytest.fixture
 def composio_service(mock_composio_client):
     """Create ComposioService with mocked client"""
     return ComposioService(api_key="test-key")
@@ -55,41 +44,41 @@ class TestComposioAccountService:
     """Test suite for ComposioAccountService"""
 
     def test_get_user_connections_success(
-        self, composio_account_service, mock_composio_client, mock_connected_accounts_response
+        self, composio_service, mock_composio_client, mock_connected_accounts_response
     ):
         """Test successful retrieval of user connections"""
-        # GIVEN
+        # GIVEN the Composio client returns a valid response with two connections
         mock_composio_client.connected_accounts.list.return_value = mock_connected_accounts_response
 
-        # WHEN
-        result = composio_account_service.get_user_connections()
+        # WHEN we request user connections
+        result = composio_service.get_user_connections()
 
-        # THEN
+        # THEN we get two properly formatted ConnectionInfo objects
         assert len(result) == 2
         assert isinstance(result[0], ConnectionInfo)
         assert result[0].connection_id == "conn-123"
         assert result[0].integration_name == "github"
-        assert result[0].status == ConnectionStatus.ACTIVE
+        assert result[0].status == "ACTIVE"
         assert result[0].created_at == "2023-01-01T00:00:00Z"
         assert result[0].updated_at == "2023-01-15T10:30:00Z"
 
         assert result[1].connection_id == "conn-456"
         assert result[1].integration_name == "slack"
-        assert result[1].status == ConnectionStatus.ACTIVE
+        assert result[1].status == "ACTIVE"
         assert result[1].created_at == "2023-01-01T00:00:00Z"
         assert result[1].updated_at == "2023-01-10T08:00:00Z"
 
         mock_composio_client.connected_accounts.list.assert_called_once()
 
-    def test_get_user_connections_empty_response(self, composio_account_service, mock_composio_client):
+    def test_get_user_connections_empty_response(self, composio_service, mock_composio_client):
         """Test handling of empty connections response"""
-        # GIVEN
+        # GIVEN the Composio client returns an empty response
         mock_response = Mock()
         mock_response.items = []
         mock_composio_client.connected_accounts.list.return_value = mock_response
 
-        # WHEN
-        result = composio_account_service.get_user_connections()
+        # WHEN we request user connections
+        result = composio_service.get_user_connections()
 
-        # THEN
+        # THEN we get an empty list
         assert result == []

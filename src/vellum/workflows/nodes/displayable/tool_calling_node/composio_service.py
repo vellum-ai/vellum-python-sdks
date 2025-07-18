@@ -28,11 +28,11 @@ class ComposioAccountService:
     """Manages user authorized connections using composio-client"""
 
     def __init__(self, api_key: str):
-        self._client = ComposioClient(api_key=api_key)
+        self.client = ComposioClient(api_key=api_key)
 
     def get_user_connections(self) -> List[ConnectionInfo]:
         """Get all authorized connections for the user"""
-        response = self._client.connected_accounts.list()
+        response = self.client.connected_accounts.list()
 
         return [
             ConnectionInfo(
