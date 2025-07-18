@@ -12,8 +12,8 @@ class ConcatExpression(BaseDescriptor[list], Generic[LHS, RHS]):
     def __init__(
         self,
         *,
-        lhs: Union[BaseDescriptor[LHS], Sequence[LHS]],
-        rhs: Union[BaseDescriptor[RHS], Sequence[RHS]],
+        lhs: Sequence[LHS],
+        rhs: Sequence[RHS],
     ) -> None:
         super().__init__(name=f"{lhs} + {rhs}", types=(list,))
         self._lhs = lhs
