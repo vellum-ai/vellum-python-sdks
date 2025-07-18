@@ -53,6 +53,7 @@ pyyaml = ">=6.0.0,<7.0.0"
 requests = ">=2.31.0,<3.0.0"
 tomli = ">=2.0.0,<3.0.0"
 typing_extensions = ">= 4.0.0"
+composio-client = "^1.5.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "1.11.1"
