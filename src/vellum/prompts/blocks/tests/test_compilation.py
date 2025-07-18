@@ -10,6 +10,7 @@ from vellum import (
     VariablePromptBlock,
     VellumVariable,
 )
+from vellum.client.types.prompt_block import PromptBlock
 from vellum.client.types.json_vellum_value import JsonVellumValue
 from vellum.client.types.number_input import NumberInput
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
@@ -154,7 +155,7 @@ def test_compile_prompt_blocks__empty_json_variable_with_chat_message_blocks():
     """Test JSON variable handling logic, specifically the empty array skipping behavior."""
 
     # GIVEN empty array with chat message blocks
-    blocks_with_chat = [
+    blocks_with_chat: list[PromptBlock] = [
         ChatMessagePromptBlock(
             chat_role="USER",
             blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="User message")])],
@@ -184,7 +185,7 @@ def test_compile_prompt_blocks__non_empty_json_variable_with_chat_message_blocks
     """Test that non-empty JSON variables are included even when there are chat message blocks."""
 
     # GIVEN non-empty JSON with chat message blocks
-    blocks_with_chat = [
+    blocks_with_chat: list[PromptBlock] = [
         ChatMessagePromptBlock(
             chat_role="USER",
             blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="User message")])],
