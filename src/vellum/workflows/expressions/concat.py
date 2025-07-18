@@ -1,4 +1,4 @@
-from typing import Generic, Sequence, TypeVar, Union
+from typing import Generic, Sequence, TypeVar
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
