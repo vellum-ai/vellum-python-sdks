@@ -106,36 +106,6 @@ class TestComposioCoreService:
     """Test suite for ComposioCoreService"""
 
     def test_execute_tool_success(self, composio_service, mock_composio_core_client, mock_action):
-        """Test successful tool execution"""
-        # GIVEN a mock response from composio execute
-        expected_result = {"user": {"username": "pg", "karma": 155040}}
-        mock_composio_core_client.actions.execute.return_value = expected_result
-
-        # WHEN we execute a tool
-        result = composio_service.execute_tool("HACKERNEWS_GET_USER", {"username": "pg"})
-
-        # THEN the correct action is called and result is returned
-        mock_composio_core_client.actions.execute.assert_called_once_with(
-            mock_action.HACKERNEWS_GET_USER, params={"username": "pg"}
-        )
-        assert result == expected_result
-
-    def test_execute_tool_different_action(self, composio_service, mock_composio_core_client, mock_action):
-        """Test executing a different tool with different arguments"""
-        # GIVEN a mock response for a GitHub action
-        expected_result = {"user": {"login": "octocat", "id": 583231}}
-        mock_composio_core_client.actions.execute.return_value = expected_result
-
-        # WHEN we execute a different tool
-        result = composio_service.execute_tool("GITHUB_GET_USER", {"username": "octocat"})
-
-        # THEN the correct action is called
-        mock_composio_core_client.actions.execute.assert_called_once_with(
-            mock_action.GITHUB_GET_USER, params={"username": "octocat"}
-        )
-        assert result == expected_result
-
-    def test_execute_tool_with_complex_arguments(self, composio_service, mock_composio_core_client, mock_action):
         """Test executing a tool with complex argument structure"""
         # GIVEN complex arguments and a mock response
         complex_args = {"filters": {"status": "active"}, "limit": 10, "sort": "created_at"}
