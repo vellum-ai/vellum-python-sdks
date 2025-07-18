@@ -280,6 +280,7 @@ from .node_output_compiled_json_value import NodeOutputCompiledJsonValue
 from .node_output_compiled_number_value import NodeOutputCompiledNumberValue
 from .node_output_compiled_search_results_value import NodeOutputCompiledSearchResultsValue
 from .node_output_compiled_string_value import NodeOutputCompiledStringValue
+from .node_output_compiled_thinking_value import NodeOutputCompiledThinkingValue
 from .node_output_compiled_value import NodeOutputCompiledValue
 from .node_parent_context import NodeParentContext
 from .normalized_log_probs import NormalizedLogProbs
@@ -565,6 +566,7 @@ from .workflow_execution_actual import WorkflowExecutionActual
 from .workflow_execution_actual_chat_history_request import WorkflowExecutionActualChatHistoryRequest
 from .workflow_execution_actual_json_request import WorkflowExecutionActualJsonRequest
 from .workflow_execution_actual_string_request import WorkflowExecutionActualStringRequest
+from .workflow_execution_detail import WorkflowExecutionDetail
 from .workflow_execution_event_error_code import WorkflowExecutionEventErrorCode
 from .workflow_execution_event_type import WorkflowExecutionEventType
 from .workflow_execution_fulfilled_body import WorkflowExecutionFulfilledBody
@@ -900,6 +902,7 @@ __all__ = [
     "NodeOutputCompiledNumberValue",
     "NodeOutputCompiledSearchResultsValue",
     "NodeOutputCompiledStringValue",
+    "NodeOutputCompiledThinkingValue",
     "NodeOutputCompiledValue",
     "NodeParentContext",
     "NormalizedLogProbs",
@@ -1169,6 +1172,7 @@ __all__ = [
     "WorkflowExecutionActualChatHistoryRequest",
     "WorkflowExecutionActualJsonRequest",
     "WorkflowExecutionActualStringRequest",
+    "WorkflowExecutionDetail",
     "WorkflowExecutionEventErrorCode",
     "WorkflowExecutionEventType",
     "WorkflowExecutionFulfilledBody",

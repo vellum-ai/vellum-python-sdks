@@ -6033,6 +6033,64 @@ client.release_reviews.retrieve_workflow_deployment_release(
 </dl>
 </details>
 
+## WorkflowExecutions
+<details><summary><code>client.workflow_executions.<a href="src/vellum/resources/workflow_executions/client.py">retrieve_workflow_execution_detail</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.workflow_executions.retrieve_workflow_execution_detail(
+    execution_id="execution_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**execution_id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## WorkflowSandboxes
 <details><summary><code>client.workflow_sandboxes.<a href="src/vellum/resources/workflow_sandboxes/client.py">deploy_workflow</a>(...)</code></summary>
 <dl>
