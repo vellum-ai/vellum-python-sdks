@@ -376,17 +376,38 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             except Exception as e:
                 self.add_error(e)
 
-        return {
-            "workflow_raw_data": {
-                "nodes": cast(JsonArray, nodes_dict_list),
-                "edges": edges,
-                "display_data": self.display_context.workflow_display.display_data.dict(),
-                "definition": {
-                    "name": self._workflow.__name__,
-                    "module": cast(JsonArray, self._workflow.__module__.split(".")),
-                },
-                "output_values": output_values,
+        type_definitions = []
+        for node_dict in nodes_dict_list:
+            if isinstance(node_dict, dict) and "outputs" in node_dict:
+                for output in node_dict["outputs"]:
+                    if (
+                        isinstance(output, dict)
+                        and output.get("value")
+                        and isinstance(output["value"], dict)
+                        and output["value"].get("type") == "TYPE_REFERENCE"
+                    ):
+                        type_def_id = output["value"].get("type_definition_id")
+                        if type_def_id and hasattr(self.display_context, "type_definitions"):
+                            for type_def in self.display_context.type_definitions:
+                                if type_def["id"] == type_def_id and type_def not in type_definitions:
+                                    type_definitions.append(type_def)
+
+        workflow_raw_data = {
+            "nodes": cast(JsonArray, nodes_dict_list),
+            "edges": edges,
+            "display_data": self.display_context.workflow_display.display_data.dict(),
+            "definition": {
+                "name": self._workflow.__name__,
+                "module": cast(JsonArray, self._workflow.__module__.split(".")),
             },
+            "output_values": output_values,
+        }
+
+        if type_definitions:
+            workflow_raw_data["type_definitions"] = cast(JsonArray, type_definitions)
+
+        return {
+            "workflow_raw_data": cast(JsonObject, workflow_raw_data),
             "input_variables": input_variables,
             "state_variables": state_variables,
             "output_variables": output_variables,

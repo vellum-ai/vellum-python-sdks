@@ -1,7 +1,7 @@
 import pytest
 from dataclasses import dataclass
 from uuid import uuid4
-from typing import List
+from typing import List, cast
 
 from deepdiff import DeepDiff
 from pydantic import BaseModel
@@ -670,3 +670,79 @@ def test_serialize_node__pydantic_with_node_output_reference(serialize_node):
     assert any(
         entry["key"] == "node_ref" and entry["value"]["type"] == "NODE_OUTPUT" for entry in attr_value["entries"]
     )
+
+
+def test_serialize_workflow__dataclass_output_with_preserved_type_metadata():
+    """Test that dataclass outputs preserve type metadata during workflow serialization."""
+
+    @dataclass
+    class CustomDataclassOutput:
+        result: str
+        count: int
+
+    class NodeWithDataclassOutput(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            custom_output: CustomDataclassOutput
+
+    class Workflow(BaseWorkflow):
+        graph = NodeWithDataclassOutput
+
+    from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+
+    serialized_workflow = workflow_display.serialize()
+
+    # THEN the workflow should be serialized with dataclass type metadata preserved
+    assert "workflow_raw_data" in serialized_workflow
+    workflow_raw_data = cast(dict, serialized_workflow["workflow_raw_data"])
+
+    nodes = cast(list, workflow_raw_data["nodes"])
+    dataclass_node = None
+    for node in nodes:
+        if node is not None and isinstance(node, dict):
+            definition = cast(dict, node.get("definition"))
+            if definition is not None and definition.get("name") == "NodeWithDataclassOutput":
+                dataclass_node = cast(dict, node)
+                break
+    assert dataclass_node is not None, "Could not find NodeWithDataclassOutput in serialized nodes"
+
+    outputs = cast(list, dataclass_node.get("outputs", []))
+    custom_output = None
+    for output in outputs:
+        if isinstance(output, dict) and output.get("name") == "custom_output":
+            custom_output = cast(dict, output)
+            break
+    assert custom_output is not None, "Could not find custom_output in node outputs"
+
+    assert "type_definitions" in workflow_raw_data
+    type_definitions = cast(list, workflow_raw_data["type_definitions"])
+    assert len(type_definitions) > 0
+
+    assert custom_output.get("value") is not None
+    custom_output_value = cast(dict, custom_output["value"])
+    assert custom_output_value["type"] == "TYPE_REFERENCE"
+    assert "type_definition_id" in custom_output_value
+
+    type_def_id = cast(str, custom_output_value["type_definition_id"])
+    matching_type_def = None
+    for td in type_definitions:
+        if isinstance(td, dict) and td.get("id") == type_def_id:
+            matching_type_def = cast(dict, td)
+            break
+    assert matching_type_def is not None
+
+    expected_type_def = {
+        "id": type_def_id,
+        "name": "CustomDataclassOutput",
+        "type_schema": {"result": {"type": "string", "required": True}, "count": {"type": "integer", "required": True}},
+    }
+    assert matching_type_def == expected_type_def
+
+    expected_custom_output = {
+        "id": custom_output["id"],
+        "name": "custom_output",
+        "type": "JSON",
+        "value": {"type": "TYPE_REFERENCE", "type_definition_id": type_def_id},
+    }
+    assert custom_output == expected_custom_output
