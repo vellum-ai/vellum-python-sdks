@@ -10,9 +10,9 @@ from vellum import (
     VariablePromptBlock,
     VellumVariable,
 )
-from vellum.client.types.prompt_block import PromptBlock
 from vellum.client.types.json_vellum_value import JsonVellumValue
 from vellum.client.types.number_input import NumberInput
+from vellum.client.types.prompt_block import PromptBlock
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.prompts.blocks.compilation import compile_prompt_blocks
 from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, CompiledValuePromptBlock
