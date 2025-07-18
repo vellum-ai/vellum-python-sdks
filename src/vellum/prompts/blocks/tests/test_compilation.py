@@ -10,7 +10,9 @@ from vellum import (
     VariablePromptBlock,
     VellumVariable,
 )
+from vellum.client.types.json_vellum_value import JsonVellumValue
 from vellum.client.types.number_input import NumberInput
+from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.prompts.blocks.compilation import compile_prompt_blocks
 from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, CompiledValuePromptBlock
 
@@ -146,3 +148,64 @@ def test_compile_prompt_blocks__happy(blocks, inputs, input_variables, expected)
     actual = compile_prompt_blocks(blocks=blocks, inputs=inputs, input_variables=input_variables)
 
     assert actual == expected
+
+
+def test_compile_prompt_blocks__empty_json_variable_with_chat_message_blocks():
+    """Test JSON variable handling logic, specifically the empty array skipping behavior."""
+
+    # GIVEN empty array with chat message blocks
+    blocks_with_chat = [
+        ChatMessagePromptBlock(
+            chat_role="USER",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="User message")])],
+        ),
+        VariablePromptBlock(input_variable="json_data"),
+    ]
+
+    inputs_with_empty_json = [PromptRequestJsonInput(key="json_data", value=[], type="JSON")]
+
+    input_variables = [VellumVariable(id="901ec2d6-430c-4341-b963-ca689006f5cc", type="JSON", key="json_data")]
+
+    # THEN the empty JSON array should be skipped when there are chat message blocks
+    expected_with_chat = [
+        CompiledChatMessagePromptBlock(
+            role="USER",
+            blocks=[CompiledValuePromptBlock(content=StringVellumValue(value="User message"))],
+        ),
+    ]
+
+    actual = compile_prompt_blocks(
+        blocks=blocks_with_chat, inputs=inputs_with_empty_json, input_variables=input_variables
+    )
+    assert actual == expected_with_chat
+
+
+def test_compile_prompt_blocks__non_empty_json_variable_with_chat_message_blocks():
+    """Test that non-empty JSON variables are included even when there are chat message blocks."""
+
+    # GIVEN non-empty JSON with chat message blocks
+    blocks_with_chat = [
+        ChatMessagePromptBlock(
+            chat_role="USER",
+            blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="User message")])],
+        ),
+        VariablePromptBlock(input_variable="json_data"),
+    ]
+
+    inputs_with_non_empty_json = [PromptRequestJsonInput(key="json_data", value={"key": "value"}, type="JSON")]
+
+    input_variables = [VellumVariable(id="901ec2d6-430c-4341-b963-ca689006f5cc", type="JSON", key="json_data")]
+
+    # THEN the non-empty JSON should be included
+    expected_with_non_empty = [
+        CompiledChatMessagePromptBlock(
+            role="USER",
+            blocks=[CompiledValuePromptBlock(content=StringVellumValue(value="User message"))],
+        ),
+        CompiledValuePromptBlock(content=JsonVellumValue(value={"key": "value"})),
+    ]
+
+    actual = compile_prompt_blocks(
+        blocks=blocks_with_chat, inputs=inputs_with_non_empty_json, input_variables=input_variables
+    )
+    assert actual == expected_with_non_empty
