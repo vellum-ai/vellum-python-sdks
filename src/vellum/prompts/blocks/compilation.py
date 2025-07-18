@@ -105,7 +105,11 @@ def compile_prompt_blocks(
                         cache_config=block.cache_config,
                     )
                 )
-            elif compiled_input == "JSON":
+            elif compiled_input.type == "JSON":
+                # Skip empty JSON arrays when there are chat message blocks present
+                if compiled_input.value == [] and any(block.block_type == "CHAT_MESSAGE" for block in compiled_blocks):
+                    continue
+
                 compiled_blocks.append(
                     CompiledValuePromptBlock(
                         content=JsonVellumValue(value=compiled_input.value),
