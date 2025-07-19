@@ -328,6 +328,171 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
     }
 
 
+def test_tool_router_node_emits_chat_history_in_prompt_inputs(
+    vellum_adhoc_prompt_client, vellum_client, mock_uuid4_generator
+):
+    """
+    Test that the ToolRouterNode emits the chat history in the prompt inputs.
+    """
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"location": "San Francisco", "unit": "celsius"},
+                        id="call_7115tNTmEACTsQRGwKpJipJK",
+                        name="get_current_weather",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        elif call_count == 2:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"location": "San Diego", "unit": "celsius"},
+                        id="call_7115tNTmEACTsQRGwKpJipJK",
+                        name="get_current_weather",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [
+                StringVellumValue(
+                    value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
+                )
+            ]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    # Set up the mock to return our events
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+
+    # GIVEN a get current weather workflow
+    workflow = BasicToolCallingNodeWorkflow()
+
+    # WHEN the workflow is executed
+    events = list(
+        workflow.stream(
+            Inputs(query="What's the weather like in San Francisco?"), event_filter=all_workflow_event_filter
+        )
+    )
+
+    tool_router_node_initiated_events = [
+        e
+        for e in events
+        if e.name == "node.execution.initiated"
+        and hasattr(e.body, "node_definition")
+        and "ToolRouterNode" in str(e.body.node_definition)
+    ]
+
+    assert len(tool_router_node_initiated_events) == 3
+
+    first_event = tool_router_node_initiated_events[0]
+    first_key = list(first_event.body.inputs.keys())[0]
+    first_chat_history = first_event.body.inputs[first_key]
+    assert first_chat_history == []
+
+    second_event = tool_router_node_initiated_events[1]
+    second_key = list(second_event.body.inputs.keys())[0]
+    second_chat_history = second_event.body.inputs[second_key]
+    assert second_chat_history == [
+        ChatMessage(
+            text=None,
+            role="ASSISTANT",
+            content=FunctionCallChatMessageContent(
+                type="FUNCTION_CALL",
+                value=FunctionCallChatMessageContentValue(
+                    name="get_current_weather",
+                    arguments={"location": "San Francisco", "unit": "celsius"},
+                    id="call_7115tNTmEACTsQRGwKpJipJK",
+                ),
+            ),
+            source=None,
+        ),
+        ChatMessage(
+            text=None,
+            role="FUNCTION",
+            content=StringChatMessageContent(
+                type="STRING",
+                value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',
+            ),
+            source=None,
+        ),
+    ]
+
+    third_event = tool_router_node_initiated_events[2]
+    third_key = list(third_event.body.inputs.keys())[0]
+    third_chat_history = third_event.body.inputs[third_key]
+    assert third_chat_history == [
+        ChatMessage(
+            text=None,
+            role="ASSISTANT",
+            content=FunctionCallChatMessageContent(
+                type="FUNCTION_CALL",
+                value=FunctionCallChatMessageContentValue(
+                    name="get_current_weather",
+                    arguments={"location": "San Francisco", "unit": "celsius"},
+                    id="call_7115tNTmEACTsQRGwKpJipJK",
+                ),
+            ),
+            source=None,
+        ),
+        ChatMessage(
+            text=None,
+            role="FUNCTION",
+            content=StringChatMessageContent(
+                type="STRING",
+                value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',
+            ),
+            source=None,
+        ),
+        ChatMessage(
+            text=None,
+            role="ASSISTANT",
+            content=FunctionCallChatMessageContent(
+                type="FUNCTION_CALL",
+                value=FunctionCallChatMessageContentValue(
+                    name="get_current_weather",
+                    arguments={"location": "San Diego", "unit": "celsius"},
+                    id="call_7115tNTmEACTsQRGwKpJipJK",
+                ),
+            ),
+            source=None,
+        ),
+        ChatMessage(
+            text=None,
+            role="FUNCTION",
+            content=StringChatMessageContent(
+                type="STRING",
+                value='"The current weather in San Diego is sunny with a temperature of 70 degrees celsius."',
+            ),
+            source=None,
+        ),
+    ]
+
+
 @pytest.mark.skip(reason="Testing events emission will be implemented in a follow up PR")
 def test_run_workflow__emits_subworkflow_events_with_tool_call(vellum_adhoc_prompt_client, mock_uuid4_generator):
     """
