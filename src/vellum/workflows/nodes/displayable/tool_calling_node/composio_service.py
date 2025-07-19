@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, Dict, List
 
+from composio import Action, Composio
 from composio_client import Composio as ComposioClient
 
 
@@ -37,12 +38,46 @@ class ComposioAccountService:
         ]
 
 
+class ComposioCoreService:
+    """Handles tool execution using composio-core"""
+
+    def __init__(self, api_key: str):
+        self.client = Composio(api_key=api_key)
+
+    def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
+        """Execute a tool using composio-core
+
+        Args:
+            tool_name: The name of the tool to execute (e.g., "HACKERNEWS_GET_USER")
+            arguments: Dictionary of arguments to pass to the tool
+
+        Returns:
+            The result of the tool execution
+        """
+        # Convert tool name string to Action enum
+        action = getattr(Action, tool_name)
+        return self.client.actions.execute(action, params=arguments)
+
+
 class ComposioService:
     """Unified interface for Composio operations"""
 
     def __init__(self, api_key: str):
         self.accounts = ComposioAccountService(api_key)
+        self.core = ComposioCoreService(api_key)
 
     def get_user_connections(self) -> List[ConnectionInfo]:
         """Get user's authorized connections"""
         return self.accounts.get_user_connections()
+
+    def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
+        """Execute a tool using composio-core
+
+        Args:
+            tool_name: The name of the tool to execute (e.g., "HACKERNEWS_GET_USER")
+            arguments: Dictionary of arguments to pass to the tool
+
+        Returns:
+            The result of the tool execution
+        """
+        return self.core.execute_tool(tool_name, arguments)

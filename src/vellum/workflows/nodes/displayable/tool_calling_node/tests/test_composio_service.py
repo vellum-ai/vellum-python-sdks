@@ -35,8 +35,26 @@ def mock_connected_accounts_response():
 
 
 @pytest.fixture
-def composio_service(mock_composio_client):
-    """Create ComposioService with mocked client"""
+def mock_composio_core_client():
+    """Mock the composio-core Composio client"""
+    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.Composio") as mock_composio:
+        yield mock_composio.return_value
+
+
+@pytest.fixture
+def mock_action():
+    """Mock the Action class and specific actions"""
+    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.Action") as mock_action_class:
+        # Mock a specific action
+        mock_hackernews_action = Mock()
+        mock_action_class.HACKERNEWS_GET_USER = mock_hackernews_action
+        mock_action_class.GITHUB_GET_USER = Mock()
+        yield mock_action_class
+
+
+@pytest.fixture
+def composio_service(mock_composio_client, mock_composio_core_client):
+    """Create ComposioService with mocked clients"""
     return ComposioService(api_key="test-key")
 
 
@@ -82,3 +100,23 @@ class TestComposioAccountService:
 
         # THEN we get an empty list
         assert result == []
+
+
+class TestComposioCoreService:
+    """Test suite for ComposioCoreService"""
+
+    def test_execute_tool_success(self, composio_service, mock_composio_core_client, mock_action):
+        """Test executing a tool with complex argument structure"""
+        # GIVEN complex arguments and a mock response
+        complex_args = {"filters": {"status": "active"}, "limit": 10, "sort": "created_at"}
+        expected_result = {"items": [], "total": 0}
+        mock_composio_core_client.actions.execute.return_value = expected_result
+
+        # WHEN we execute a tool with complex arguments
+        result = composio_service.execute_tool("HACKERNEWS_GET_USER", complex_args)
+
+        # THEN the arguments are passed through correctly
+        mock_composio_core_client.actions.execute.assert_called_once_with(
+            mock_action.HACKERNEWS_GET_USER, params=complex_args
+        )
+        assert result == expected_result
