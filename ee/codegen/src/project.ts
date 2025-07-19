@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "fs/promises";
-import { join } from "path";
 import * as path from "path";
+import { join } from "path";
 
 import { python } from "@fern-api/python-ast";
 import { Comment } from "@fern-api/python-ast/Comment";
@@ -283,26 +283,34 @@ ${errors.slice(0, 3).map((err) => {
 
     const parentNode = this.workflowContext.parentNode;
     if (parentNode) {
-      let parentModulePath: string[] = [];
       if (this.workflowContext.nestedWorkflowModuleName) {
-        parentModulePath = [
-          ...parentNode.getNodeDisplayModulePath().slice(0, 1),
-        ];
+        imports.push(
+          python.starImport({
+            modulePath: [".nodes"],
+          })
+        );
+
+        imports.push(
+          python.starImport({
+            modulePath: [".workflow"],
+          })
+        );
+        comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
       } else {
-        parentModulePath = [...parentNode.getNodeDisplayModulePath()];
+        const parentModulePath = [...parentNode.getNodeDisplayModulePath()];
+        imports.push(
+          python.starImport({
+            modulePath: [...parentModulePath, "nodes"],
+          })
+        );
+        imports.push(
+          python.starImport({
+            modulePath: [...parentModulePath, "workflow"],
+          })
+        );
+        statements.push(...parentNode.generateNodeDisplayClasses());
+        comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
       }
-      statements.push(...parentNode.generateNodeDisplayClasses());
-      comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
-      imports.push(
-        python.starImport({
-          modulePath: [...parentModulePath, "nodes"],
-        })
-      );
-      imports.push(
-        python.starImport({
-          modulePath: [...parentModulePath, "workflow"],
-        })
-      );
     } else {
       comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
@@ -328,7 +336,12 @@ ${errors.slice(0, 3).map((err) => {
     const rootDisplayInitFile = codegen.initFile({
       workflowContext: this.workflowContext,
       modulePath: this.workflowContext.parentNode
-        ? this.workflowContext.parentNode.getNodeDisplayModulePath()
+        ? this.workflowContext.nestedWorkflowModuleName
+          ? [
+              ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
+              this.workflowContext.nestedWorkflowModuleName,
+            ]
+          : this.workflowContext.parentNode.getNodeDisplayModulePath()
         : [...this.getModulePath(), GENERATED_DISPLAY_MODULE_NAME],
       statements,
       imports,
@@ -735,17 +748,34 @@ ${errors.slice(0, 3).map((err) => {
 
     const rootNodesInitFile = codegen.initFile({
       workflowContext: this.workflowContext,
-      modulePath: [...this.getModulePath(), GENERATED_NODES_MODULE_NAME],
+      modulePath: this.workflowContext.parentNode
+        ? this.workflowContext.nestedWorkflowModuleName
+          ? [
+              ...this.workflowContext.parentNode.nodeContext.nodeModulePath,
+              this.workflowContext.nestedWorkflowModuleName,
+              GENERATED_NODES_MODULE_NAME,
+            ]
+          : [
+              ...this.workflowContext.parentNode.nodeContext.nodeModulePath,
+              GENERATED_NODES_MODULE_NAME,
+            ]
+        : [...this.getModulePath(), GENERATED_NODES_MODULE_NAME],
       statements: rootNodesInitFileStatements,
     });
 
     const rootDisplayNodesInitFile = codegen.initFile({
       workflowContext: this.workflowContext,
       modulePath: this.workflowContext.parentNode
-        ? [
-            ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
-            GENERATED_NODES_MODULE_NAME,
-          ]
+        ? this.workflowContext.nestedWorkflowModuleName
+          ? [
+              ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
+              this.workflowContext.nestedWorkflowModuleName,
+              GENERATED_NODES_MODULE_NAME,
+            ]
+          : [
+              ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
+              GENERATED_NODES_MODULE_NAME,
+            ]
         : [
             ...this.getModulePath(),
             GENERATED_DISPLAY_MODULE_NAME,
