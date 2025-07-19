@@ -1,5 +1,6 @@
 import pytest
 
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.references.constant import ConstantValueReference
@@ -15,7 +16,7 @@ def test_concat_expression_happy_path():
     state = TestState()
     lhs_ref = ConstantValueReference([1, 2, 3])
     rhs_ref = ConstantValueReference([4, 5, 6])
-    concat_expr = ConcatExpression(lhs=lhs_ref, rhs=rhs_ref)
+    concat_expr: BaseDescriptor[list] = ConcatExpression(lhs=lhs_ref, rhs=rhs_ref)
 
     # WHEN we resolve the expression
     result = concat_expr.resolve(state)
@@ -29,7 +30,7 @@ def test_concat_expression_lhs_fail():
     state = TestState()
     lhs_ref = ConstantValueReference(0)
     rhs_ref = ConstantValueReference([4, 5, 6])
-    concat_expr = ConcatExpression(lhs=lhs_ref, rhs=rhs_ref)
+    concat_expr: BaseDescriptor[list] = ConcatExpression(lhs=lhs_ref, rhs=rhs_ref)  # type: ignore[arg-type]
 
     # WHEN we attempt to resolve the expression
     with pytest.raises(InvalidExpressionException) as exc_info:
@@ -44,7 +45,7 @@ def test_concat_expression_rhs_fail():
     state = TestState()
     lhs_ref = ConstantValueReference([1, 2, 3])
     rhs_ref = ConstantValueReference(False)
-    concat_expr = ConcatExpression(lhs=lhs_ref, rhs=rhs_ref)
+    concat_expr: BaseDescriptor[list] = ConcatExpression(lhs=lhs_ref, rhs=rhs_ref)  # type: ignore[arg-type]
 
     # WHEN we attempt to resolve the expression
     with pytest.raises(InvalidExpressionException) as exc_info:
