@@ -12,6 +12,7 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
@@ -41,10 +42,6 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
-        # Merge user-provided chat history with node's chat history
-        user_chat_history = self.prompt_inputs.get(CHAT_HISTORY_VARIABLE, []) if self.prompt_inputs else []
-        merged_chat_history = user_chat_history + self.state.chat_history
-        self.prompt_inputs = {**self.prompt_inputs, CHAT_HISTORY_VARIABLE: merged_chat_history}  # type: ignore
         generator = super().run()
         for output in generator:
             if output.name == "results" and output.value:
@@ -234,6 +231,14 @@ def create_tool_router_node(
             )
         )
 
+    node_prompt_inputs = {
+        **(prompt_inputs or {}),
+        CHAT_HISTORY_VARIABLE: ConcatExpression(
+            lhs=(prompt_inputs or {}).get(CHAT_HISTORY_VARIABLE, []),
+            rhs=ToolCallingState.chat_history,
+        ),
+    }
+
     node = cast(
         Type[ToolRouterNode],
         type(
@@ -243,7 +248,7 @@ def create_tool_router_node(
                 "ml_model": ml_model,
                 "blocks": blocks,
                 "functions": functions,
-                "prompt_inputs": prompt_inputs,
+                "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
                 "Ports": Ports,
