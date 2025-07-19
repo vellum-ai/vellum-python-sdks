@@ -233,9 +233,13 @@ def create_tool_router_node(
 
     node_prompt_inputs = {
         **(prompt_inputs or {}),
-        CHAT_HISTORY_VARIABLE: ConcatExpression(
-            lhs=(prompt_inputs or {}).get(CHAT_HISTORY_VARIABLE, []),
-            rhs=ToolCallingState.chat_history,
+        CHAT_HISTORY_VARIABLE: (
+            ConcatExpression(
+                lhs=prompt_inputs[CHAT_HISTORY_VARIABLE],
+                rhs=ToolCallingState.chat_history,
+            )
+            if CHAT_HISTORY_VARIABLE in (prompt_inputs or {})
+            else ToolCallingState.chat_history
         ),
     }
 
