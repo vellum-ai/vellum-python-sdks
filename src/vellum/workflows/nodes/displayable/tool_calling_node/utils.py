@@ -233,7 +233,7 @@ def create_tool_router_node(
 
     node_prompt_inputs = {
         **(prompt_inputs or {}),
-        CHAT_HISTORY_VARIABLE: ConcatExpression(
+        CHAT_HISTORY_VARIABLE: ConcatExpression[List[ChatMessage], List[ChatMessage]](
             lhs=(prompt_inputs or {}).get(CHAT_HISTORY_VARIABLE, []),
             rhs=ToolCallingState.chat_history,
         ),
