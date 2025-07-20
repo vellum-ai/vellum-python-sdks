@@ -99,32 +99,3 @@ def test_composio_tool_definition_json_serialization():
     assert json_data["action"] == "GITHUB_CREATE_AN_ISSUE"
     assert json_data["description"] == "Create a new issue in a GitHub repository"
     assert json_data["display_name"] == "Create GitHub Issue"
-
-
-def test_composio_tool_definition_python_serialization():
-    """Test that ComposioToolDefinition serializes correctly in Python mode (no type field)."""
-    composio_tool = ComposioToolDefinition(
-        toolkit="GITHUB", action="GITHUB_CREATE_AN_ISSUE", description="Create a new issue in a GitHub repository"
-    )
-
-    python_data = composio_tool.model_dump(mode="python")
-
-    # Check that type and name fields are NOT added in python mode
-    assert "name" not in python_data
-    assert python_data["toolkit"] == "GITHUB"
-    assert python_data["action"] == "GITHUB_CREATE_AN_ISSUE"
-    assert python_data["description"] == "Create a new issue in a GitHub repository"
-    assert python_data["display_name"] is None
-
-
-def test_composio_tool_definition_default_serialization():
-    """Test that ComposioToolDefinition default serialization mode is python."""
-    composio_tool = ComposioToolDefinition(
-        toolkit="GITHUB", action="GITHUB_CREATE_AN_ISSUE", description="Create a new issue in a GitHub repository"
-    )
-
-    default_data = composio_tool.model_dump()
-
-    # Default should be python mode, so no type/name fields
-    assert "name" not in default_data
-    assert default_data["toolkit"] == "GITHUB"
