@@ -1,4 +1,4 @@
-from typing import Generic, Sequence, TypeVar, Union
+from typing import Generic, TypeVar, Union
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
@@ -13,8 +13,8 @@ class ConcatExpression(BaseDescriptor[list], Generic[LHS, RHS]):
     def __init__(
         self,
         *,
-        lhs: Union[BaseDescriptor[Sequence[LHS]], Sequence[LHS]],
-        rhs: Union[BaseDescriptor[Sequence[RHS]], Sequence[RHS]],
+        lhs: Union[BaseDescriptor[LHS], LHS],
+        rhs: Union[BaseDescriptor[RHS], RHS],
     ) -> None:
         super().__init__(name=f"{lhs} + {rhs}", types=(list,))
         self._lhs = lhs
