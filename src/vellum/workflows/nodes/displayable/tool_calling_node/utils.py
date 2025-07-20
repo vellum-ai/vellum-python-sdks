@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Any, Callable, Iterator, List, Optional, Type, cast
 
 from pydash import snake_case
@@ -18,6 +19,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
+from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ComposioService
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
@@ -25,7 +27,7 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
-from vellum.workflows.types.definition import DeploymentDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
 CHAT_HISTORY_VARIABLE = "chat_history"
@@ -181,6 +183,60 @@ class FunctionNode(BaseNode[ToolCallingState]):
         yield from []
 
 
+class ComposioFunctionNode(BaseNode[ToolCallingState]):
+    """Node that executes a Composio tool with function call output."""
+
+    function_call_output: List[PromptOutput]
+    composio_tool: ComposioToolDefinition
+
+    def run(self) -> Iterator[BaseOutput]:
+        # Extract arguments from function call
+        if self.function_call_output and len(self.function_call_output) > 0:
+            function_call = self.function_call_output[0]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                arguments = function_call.value.arguments
+            else:
+                arguments = {}
+        else:
+            arguments = {}
+
+        # Get Composio API key from environment variables
+        # TODO: Replace with proper VellumSecretReference handling
+        composio_api_key = None
+        for key, value in os.environ.items():
+            if "composio" in key.lower():
+                composio_api_key = value
+                break
+
+        if not composio_api_key:
+            # TODO: Add proper error handling
+            raise NodeException(
+                message="No Composio API key found in environment variables",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        try:
+            # Execute using ComposioService
+            composio_service = ComposioService(api_key=composio_api_key)
+            result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
+        except Exception as e:
+            # TODO: Add proper error handling and logging
+            raise NodeException(
+                message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        # Add result to chat history
+        self.state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+            )
+        )
+
+        yield from []
+
+
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
@@ -268,6 +324,7 @@ def create_function_node(
 
     For workflow functions: BaseNode
     For regular functions: BaseNode with direct function call
+    For ComposioToolDefinition: ComposioFunctionNode
 
     Args:
         function: The function to create a node for
@@ -288,6 +345,19 @@ def create_function_node(
             },
         )
 
+        return node
+
+    elif isinstance(function, ComposioToolDefinition):
+        # Create ComposioFunctionNode
+        node = type(
+            f"ComposioFunctionNode_{function.name}",
+            (ComposioFunctionNode,),
+            {
+                "composio_tool": function,
+                "function_call_output": tool_router_node.Outputs.results,
+                "__module__": __name__,
+            },
+        )
         return node
 
     elif is_workflow_class(function):
@@ -319,5 +389,7 @@ def get_function_name(function: Tool) -> str:
     if isinstance(function, DeploymentDefinition):
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
+    elif isinstance(function, ComposioToolDefinition):
+        return function.name  # Use the property we defined
     else:
         return snake_case(function.__name__)

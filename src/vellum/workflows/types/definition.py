@@ -97,3 +97,29 @@ class DeploymentDefinition(UniversalBaseModel):
         if not self._is_uuid():
             return self.deployment
         return None
+
+
+class ComposioToolDefinition(UniversalBaseModel):
+    """Represents a specific Composio action that can be used in Tool Calling Node"""
+
+    # Core identification
+    toolkit: str  # "GITHUB", "SLACK", etc.
+    action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
+    description: str
+
+    # Optional cached metadata
+    display_name: Optional[str] = None
+
+    @property
+    def name(self) -> str:
+        """Generate a function name for this tool"""
+        # Convert action to a clean function name
+        return f"{self.toolkit.lower()}_{self.action.lower().replace('_', '_')}"
+
+    def model_dump(self, mode: str = "python", **kwargs) -> Dict[str, Any]:
+        data = super().model_dump(mode=mode, **kwargs)
+        if mode == "json":
+            # Add type field for JSON serialization
+            data["type"] = "COMPOSIO"
+            data["name"] = self.name
+        return data
