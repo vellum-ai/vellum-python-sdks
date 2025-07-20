@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.begins_with import BeginsWithExpression
     from vellum.workflows.expressions.between import BetweenExpression
     from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
+    from vellum.workflows.expressions.concat import ConcatExpression
     from vellum.workflows.expressions.contains import ContainsExpression
     from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
     from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
@@ -364,3 +365,14 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.is_error import IsErrorExpression
 
         return IsErrorExpression(expression=self)
+
+    @overload
+    def concat(self, other: "BaseDescriptor[_O]") -> "ConcatExpression[_T, _O]": ...
+
+    @overload
+    def concat(self, other: _O) -> "ConcatExpression[_T, _O]": ...
+
+    def concat(self, other: "Union[BaseDescriptor[_O], _O]") -> "ConcatExpression[_T, _O]":
+        from vellum.workflows.expressions.concat import ConcatExpression
+
+        return ConcatExpression(lhs=self, rhs=other)
