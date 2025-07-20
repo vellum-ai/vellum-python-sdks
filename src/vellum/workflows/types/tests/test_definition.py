@@ -63,10 +63,10 @@ def test_composio_tool_definition_with_optional_fields():
 @pytest.mark.parametrize(
     "toolkit, action, expected_name",
     [
-        ("GITHUB", "GITHUB_CREATE_AN_ISSUE", "github_github_create_an_issue"),
-        ("SLACK", "SLACK_SEND_MESSAGE", "slack_slack_send_message"),
-        ("GMAIL", "GMAIL_CREATE_EMAIL_DRAFT", "gmail_gmail_create_email_draft"),
-        ("NOTION", "NOTION_CREATE_PAGE", "notion_notion_create_page"),
+        ("GITHUB", "GITHUB_CREATE_AN_ISSUE", "github_create_an_issue"),
+        ("SLACK", "SLACK_SEND_MESSAGE", "slack_send_message"),
+        ("GMAIL", "GMAIL_CREATE_EMAIL_DRAFT", "gmail_create_email_draft"),
+        ("NOTION", "NOTION_CREATE_PAGE", "notion_create_page"),
     ],
     ids=[
         "github_action",
@@ -99,7 +99,7 @@ def test_composio_tool_definition_json_serialization():
     assert json_data["action"] == "GITHUB_CREATE_AN_ISSUE"
     assert json_data["description"] == "Create a new issue in a GitHub repository"
     assert json_data["display_name"] == "Create GitHub Issue"
-    assert json_data["name"] == "github_github_create_an_issue"
+    assert json_data["name"] == "github_create_an_issue"
 
 
 def test_composio_tool_definition_python_serialization():

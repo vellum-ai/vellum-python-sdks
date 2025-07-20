@@ -113,8 +113,10 @@ class ComposioToolDefinition(UniversalBaseModel):
     @property
     def name(self) -> str:
         """Generate a function name for this tool"""
-        # Convert action to a clean function name
-        return f"{self.toolkit.lower()}_{self.action.lower().replace('_', '_')}"
+        action_part = self.action
+        if self.action.startswith(f"{self.toolkit}_"):
+            action_part = self.action[len(f"{self.toolkit}_") :]
+        return f"{self.toolkit.lower()}_{action_part.lower()}"
 
     def model_dump(self, mode: str = "python", **kwargs) -> Dict[str, Any]:
         data = super().model_dump(mode=mode, **kwargs)
