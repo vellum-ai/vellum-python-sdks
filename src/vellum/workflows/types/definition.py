@@ -2,7 +2,7 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Optional, Union
+from typing import Annotated, Any, Dict, Literal, Optional, Union
 
 from pydantic import BeforeValidator
 
@@ -102,6 +102,8 @@ class DeploymentDefinition(UniversalBaseModel):
 class ComposioToolDefinition(UniversalBaseModel):
     """Represents a specific Composio action that can be used in Tool Calling Node"""
 
+    type: Literal["COMPOSIO"] = "COMPOSIO"
+
     # Core identification
     toolkit: str  # "GITHUB", "SLACK", etc.
     action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
@@ -113,15 +115,4 @@ class ComposioToolDefinition(UniversalBaseModel):
     @property
     def name(self) -> str:
         """Generate a function name for this tool"""
-        action_part = self.action
-        if self.action.startswith(f"{self.toolkit}_"):
-            action_part = self.action[len(f"{self.toolkit}_") :]
-        return f"{self.toolkit.lower()}_{action_part.lower()}"
-
-    def model_dump(self, mode: str = "python", **kwargs) -> Dict[str, Any]:
-        data = super().model_dump(mode=mode, **kwargs)
-        if mode == "json":
-            # Add type field for JSON serialization
-            data["type"] = "COMPOSIO"
-            data["name"] = self.name
-        return data
+        return self.action.lower()
