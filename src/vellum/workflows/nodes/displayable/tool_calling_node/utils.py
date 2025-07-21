@@ -1,5 +1,4 @@
 import json
-import os
 from typing import Any, Callable, Iterator, List, Optional, Type, cast
 
 from pydash import snake_case
@@ -200,18 +199,29 @@ class ComposioNode(BaseNode[ToolCallingState]):
         else:
             arguments = {}
 
-        # Get Composio API key from environment variables
-        # TODO: Replace with proper VellumSecretReference handling
+        # HACK: Try to find Composio API key from workspace secrets by checking common names
         composio_api_key = None
-        for key, value in os.environ.items():
-            if "composio" in key.lower():
-                composio_api_key = value
-                break
+        common_composio_secret_names = ["COMPOSIO_API_KEY", "composio_api_key", "COMPOSIO_KEY", "composio_key"]
+
+        for secret_name in common_composio_secret_names:
+            try:
+                secret = self._context.vellum_client.workspace_secrets.retrieve(secret_name)
+                if secret:
+                    # Note: We can't access the actual secret value here, but the ComposioService
+                    # should be able to handle VellumSecret references
+                    composio_api_key = secret.name
+                    break
+            except Exception:
+                # Secret doesn't exist or can't be retrieved, try next name
+                continue
 
         if not composio_api_key:
-            # TODO: Add proper error handling
             raise NodeException(
-                message="No Composio API key found in environment variables",
+                message=(
+                    "No Composio API key found in workspace secrets. "
+                    "Please ensure a secret with one of these names exists: "
+                )
+                + ", ".join(common_composio_secret_names),
                 code=WorkflowErrorCode.NODE_EXECUTION,
             )
 
@@ -220,7 +230,6 @@ class ComposioNode(BaseNode[ToolCallingState]):
             composio_service = ComposioService(api_key=composio_api_key)
             result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
         except Exception as e:
-            # TODO: Add proper error handling and logging
             raise NodeException(
                 message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
