@@ -3,7 +3,7 @@ name = "vellum-ai"
 
 [tool.poetry]
 name = "vellum-ai"
-version = "1.0.3"
+version = "1.0.4"
 description = ""
 readme = "README.md"
 authors = []
@@ -38,6 +38,8 @@ packages = [
 python = "^3.9"
 Jinja2 = ">=3.1.0,<4.0.0"
 click = ">=8.1.7,<9.0.0"
+composio-client = ">=1.5.0,<2.0.0"
+composio-core = ">=0.7.20,<1.0.0"
 docker = ">=7.1.0,<8.0.0"
 httpx = ">=0.21.2"
 openai = ">=1.0.0,<2.0.0"
@@ -53,8 +55,6 @@ pyyaml = ">=6.0.0,<7.0.0"
 requests = ">=2.31.0,<3.0.0"
 tomli = ">=2.0.0,<3.0.0"
 typing_extensions = ">= 4.0.0"
-composio-client = "^1.5.0"
-composio-core = "^0.7.20"
 
 [tool.poetry.dev-dependencies]
 mypy = "1.11.1"

@@ -573,13 +573,13 @@ files = [
 
 [[package]]
 name = "composio-client"
-version = "1.5.0"
+version = "1.6.0"
 description = "The official Python library for the composio API"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "composio_client-1.5.0-py3-none-any.whl", hash = "sha256:3fee2ffd36375d40d4448a689e3c099ebbb19e5092a2f2fb9d7896d2a3f954b7"},
-    {file = "composio_client-1.5.0.tar.gz", hash = "sha256:022d9399cc3c8d0bb298fff8296f56d8baa60cabaf872b00a52e92772553a99c"},
+    {file = "composio_client-1.6.0-py3-none-any.whl", hash = "sha256:e32055eeae8b49e7b94329808604f849e74bc557a453d3e37b37fe5cb627930b"},
+    {file = "composio_client-1.6.0.tar.gz", hash = "sha256:2adaf9bdaf449384d1d32f9361af20009c0675c68381cd9e9a4234f08969ab23"},
 ]
 
 [package.dependencies]
@@ -591,7 +591,7 @@ sniffio = "*"
 typing-extensions = ">=4.10,<5"
 
 [package.extras]
-aiohttp = ["aiohttp", "httpx-aiohttp (>=0.1.6)"]
+aiohttp = ["aiohttp", "httpx-aiohttp (>=0.1.8)"]
 
 [[package]]
 name = "composio-core"
@@ -2965,13 +2965,13 @@ files = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.33.0"
+version = "2.33.1"
 description = "Python client for Sentry (https://sentry.io)"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "sentry_sdk-2.33.0-py2.py3-none-any.whl", hash = "sha256:a762d3f19a1c240e16c98796f2a5023f6e58872997d5ae2147ac3ed378b23ec2"},
-    {file = "sentry_sdk-2.33.0.tar.gz", hash = "sha256:cdceed05e186846fdf80ceea261fe0a11ebc93aab2f228ed73d076a07804152e"},
+    {file = "sentry_sdk-2.33.1-py2.py3-none-any.whl", hash = "sha256:a870f406d4c7041e7b47aaa6a1d21d005ba0f285dfdd39e7e7e5210c38f2955c"},
+    {file = "sentry_sdk-2.33.1.tar.gz", hash = "sha256:3ae544cf8841a519722872a63da1432ab007ef7ffb3dd43d15d1924cde9a07b4"},
 ]
 
 [package.dependencies]
@@ -3062,13 +3062,13 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "starlette"
-version = "0.47.1"
+version = "0.47.2"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "starlette-0.47.1-py3-none-any.whl", hash = "sha256:5e11c9f5c7c3f24959edbf2dffdc01bba860228acf657129467d8a7468591527"},
-    {file = "starlette-0.47.1.tar.gz", hash = "sha256:aef012dd2b6be325ffa16698f9dc533614fb1cebd593a906b90dc1025529a79b"},
+    {file = "starlette-0.47.2-py3-none-any.whl", hash = "sha256:c5847e96134e5c5371ee9fac6fdf1a67336d5815e09eb2a01fdb57a351ef915b"},
+    {file = "starlette-0.47.2.tar.gz", hash = "sha256:6ae9aa5db235e4846decc1e7b79c4f346adf41e9777aebeb49dfd09bbd7023d8"},
 ]
 
 [package.dependencies]
@@ -3276,13 +3276,13 @@ standard = ["colorama (>=0.4)", "httptools (>=0.6.3)", "python-dotenv (>=0.13)",
 
 [[package]]
 name = "virtualenv"
-version = "20.31.2"
+version = "20.32.0"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "virtualenv-20.31.2-py3-none-any.whl", hash = "sha256:36efd0d9650ee985f0cad72065001e66d49a6f24eb44d98980f630686243cf11"},
-    {file = "virtualenv-20.31.2.tar.gz", hash = "sha256:e10c0a9d02835e592521be48b332b6caee6887f332c111aa79a09b9e79efc2af"},
+    {file = "virtualenv-20.32.0-py3-none-any.whl", hash = "sha256:2c310aecb62e5aa1b06103ed7c2977b81e042695de2697d01017ff0f1034af56"},
+    {file = "virtualenv-20.32.0.tar.gz", hash = "sha256:886bf75cadfdc964674e6e33eb74d787dff31ca314ceace03ca5810620f4ecf0"},
 ]
 
 [package.dependencies]
@@ -3461,4 +3461,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "ca79806ca13ab4a2aa70f0937f5d2fd5b7d99ca441c755f839e8a0ccc01336c6"
+content-hash = "e89a1f23f87138fa36a02bfeffc184582c36389eb8ca013251c45e9f225b2fc6"

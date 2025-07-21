@@ -13,6 +13,7 @@ class OrganizationLimitConfig(UniversalBaseModel):
     prompt_executions_quota: typing.Optional[Quota] = None
     workflow_executions_quota: typing.Optional[Quota] = None
     workflow_runtime_seconds_quota: typing.Optional[Quota] = None
+    max_workflow_runtime_seconds: typing.Optional[int] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
