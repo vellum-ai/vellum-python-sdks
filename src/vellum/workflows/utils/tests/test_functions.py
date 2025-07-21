@@ -592,8 +592,9 @@ def test_compile_workflow_deployment_function_definition__defaults():
     ],
 )
 def test_compile_function_definition__literal(annotation, expected_schema):
-    def my_function(a: annotation):
+    def my_function(a: annotation):  # type: ignore
         pass
 
     compiled_function = compile_function_definition(my_function)
+    assert isinstance(compiled_function.parameters, dict)
     assert compiled_function.parameters["properties"]["a"] == expected_schema
