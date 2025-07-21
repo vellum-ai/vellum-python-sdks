@@ -112,6 +112,12 @@ class ComposioToolDefinition(UniversalBaseModel):
     # Optional cached metadata
     display_name: Optional[str] = None
 
+    #
+    def __init__(self, **data):
+        super().__init__(**data)
+        # Set __doc__ directly to avoid mypy property override issues
+        self.__doc__ = self.description
+
     @property
     def name(self) -> str:
         """Generate a function name for this tool"""
@@ -121,10 +127,6 @@ class ComposioToolDefinition(UniversalBaseModel):
     def __name__(self) -> str:
         """Function name attribute expected by function compilation system"""
         return self.name
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.__doc__ = self.description
 
     def __call__(self, **kwargs) -> dict:
         """
