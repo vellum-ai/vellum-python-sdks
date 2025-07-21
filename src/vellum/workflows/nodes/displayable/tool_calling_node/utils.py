@@ -33,6 +33,30 @@ from vellum.workflows.types.generics import is_workflow_class
 CHAT_HISTORY_VARIABLE = "chat_history"
 
 
+class FunctionCallNodeMixin:
+    """Mixin providing common functionality for nodes that handle function calls."""
+
+    function_call_output: List[PromptOutput]
+    state: ToolCallingState
+
+    def extract_function_arguments(self) -> dict:
+        """Extract arguments from function call output."""
+        if self.function_call_output and len(self.function_call_output) > 0:
+            function_call = self.function_call_output[0]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                return function_call.value.arguments or {}
+        return {}
+
+    def add_function_result_to_chat_history(self, result: Any) -> None:
+        """Add function execution result to chat history."""
+        self.state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+            )
+        )
+
+
 class ToolRouterNode(InlinePromptNode[ToolCallingState]):
     max_prompt_iterations: Optional[int] = 5
 
@@ -71,20 +95,11 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             yield output
 
 
-class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState]):
+class DynamicSubworkflowDeploymentNode(FunctionCallNodeMixin, SubworkflowDeploymentNode[ToolCallingState]):
     """Node that executes a deployment definition with function call output."""
 
-    function_call_output: List[PromptOutput]
-
     def run(self) -> Iterator[BaseOutput]:
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-        else:
-            arguments = {}
+        arguments = self.extract_function_arguments()
 
         # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
         # we do in the `__init__` method. Long term, instead of the function_call_output attribute above, we
@@ -105,28 +120,16 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
             yield output
 
         # Add the result to the chat history
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
-            )
-        )
+        self.add_function_result_to_chat_history(outputs)
 
 
-class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState]):
+class DynamicInlineSubworkflowNode(
+    FunctionCallNodeMixin, InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState]
+):
     """Node that executes an inline subworkflow with function call output."""
 
-    function_call_output: List[PromptOutput]
-
     def run(self) -> Iterator[BaseOutput]:
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-        else:
-            arguments = {}
+        arguments = self.extract_function_arguments()
 
         self.subworkflow_inputs = arguments  # type: ignore[misc]
 
@@ -139,29 +142,16 @@ class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseI
             yield output
 
         # Add the result to the chat history
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
-            )
-        )
+        self.add_function_result_to_chat_history(outputs)
 
 
-class FunctionNode(BaseNode[ToolCallingState]):
+class FunctionNode(FunctionCallNodeMixin, BaseNode[ToolCallingState]):
     """Node that executes a regular Python function with function call output."""
 
-    function_call_output: List[PromptOutput]
     function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-        else:
-            arguments = {}
+        arguments = self.extract_function_arguments()
 
         try:
             result = self.function_definition(**arguments)
@@ -173,32 +163,19 @@ class FunctionNode(BaseNode[ToolCallingState]):
             )
 
         # Add the result to the chat history
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
-            )
-        )
+        self.add_function_result_to_chat_history(result)
 
         yield from []
 
 
-class ComposioNode(BaseNode[ToolCallingState]):
+class ComposioNode(FunctionCallNodeMixin, BaseNode[ToolCallingState]):
     """Node that executes a Composio tool with function call output."""
 
-    function_call_output: List[PromptOutput]
     composio_tool: ComposioToolDefinition
 
     def run(self) -> Iterator[BaseOutput]:
         # Extract arguments from function call
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-        else:
-            arguments = {}
+        arguments = self.extract_function_arguments()
 
         # HACK: Use first Composio API key found in environment variables
         composio_api_key = None
@@ -231,12 +208,7 @@ class ComposioNode(BaseNode[ToolCallingState]):
             )
 
         # Add result to chat history
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
-            )
-        )
+        self.add_function_result_to_chat_history(result)
 
         yield from []
 
