@@ -37,9 +37,8 @@ class FunctionCallNodeMixin:
     """Mixin providing common functionality for nodes that handle function calls."""
 
     function_call_output: List[PromptOutput]
-    state: Any  # Will be properly typed by the inheriting node class
 
-    def extract_function_arguments(self) -> dict:
+    def _extract_function_arguments(self) -> dict:
         """Extract arguments from function call output."""
         if self.function_call_output and len(self.function_call_output) > 0:
             function_call = self.function_call_output[0]
@@ -47,9 +46,9 @@ class FunctionCallNodeMixin:
                 return function_call.value.arguments or {}
         return {}
 
-    def add_function_result_to_chat_history(self, result: Any) -> None:
+    def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
         """Add function execution result to chat history."""
-        self.state.chat_history.append(
+        state.chat_history.append(
             ChatMessage(
                 role="FUNCTION",
                 content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
@@ -95,11 +94,11 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             yield output
 
 
-class DynamicSubworkflowDeploymentNode(FunctionCallNodeMixin, SubworkflowDeploymentNode[ToolCallingState]):
+class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a deployment definition with function call output."""
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self.extract_function_arguments()
+        arguments = self._extract_function_arguments()
 
         # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
         # we do in the `__init__` method. Long term, instead of the function_call_output attribute above, we
@@ -120,16 +119,16 @@ class DynamicSubworkflowDeploymentNode(FunctionCallNodeMixin, SubworkflowDeploym
             yield output
 
         # Add the result to the chat history
-        self.add_function_result_to_chat_history(outputs)
+        self._add_function_result_to_chat_history(outputs, self.state)
 
 
 class DynamicInlineSubworkflowNode(
-    FunctionCallNodeMixin, InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState]
+    InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState], FunctionCallNodeMixin
 ):
     """Node that executes an inline subworkflow with function call output."""
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self.extract_function_arguments()
+        arguments = self._extract_function_arguments()
 
         self.subworkflow_inputs = arguments  # type: ignore[misc]
 
@@ -142,16 +141,16 @@ class DynamicInlineSubworkflowNode(
             yield output
 
         # Add the result to the chat history
-        self.add_function_result_to_chat_history(outputs)
+        self._add_function_result_to_chat_history(outputs, self.state)
 
 
-class FunctionNode(FunctionCallNodeMixin, BaseNode[ToolCallingState]):
+class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a regular Python function with function call output."""
 
     function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self.extract_function_arguments()
+        arguments = self._extract_function_arguments()
 
         try:
             result = self.function_definition(**arguments)
@@ -163,19 +162,19 @@ class FunctionNode(FunctionCallNodeMixin, BaseNode[ToolCallingState]):
             )
 
         # Add the result to the chat history
-        self.add_function_result_to_chat_history(result)
+        self._add_function_result_to_chat_history(result, self.state)
 
         yield from []
 
 
-class ComposioNode(FunctionCallNodeMixin, BaseNode[ToolCallingState]):
+class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a Composio tool with function call output."""
 
     composio_tool: ComposioToolDefinition
 
     def run(self) -> Iterator[BaseOutput]:
         # Extract arguments from function call
-        arguments = self.extract_function_arguments()
+        arguments = self._extract_function_arguments()
 
         # HACK: Use first Composio API key found in environment variables
         composio_api_key = None
@@ -208,7 +207,7 @@ class ComposioNode(FunctionCallNodeMixin, BaseNode[ToolCallingState]):
             )
 
         # Add result to chat history
-        self.add_function_result_to_chat_history(result)
+        self._add_function_result_to_chat_history(result, self.state)
 
         yield from []
 
