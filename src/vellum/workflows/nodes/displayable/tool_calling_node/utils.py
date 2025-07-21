@@ -37,7 +37,7 @@ class FunctionCallNodeMixin:
     """Mixin providing common functionality for nodes that handle function calls."""
 
     function_call_output: List[PromptOutput]
-    state: ToolCallingState
+    state: Any  # Will be properly typed by the inheriting node class
 
     def extract_function_arguments(self) -> dict:
         """Extract arguments from function call output."""
