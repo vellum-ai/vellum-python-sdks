@@ -25,7 +25,7 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
-from vellum.workflows.types.definition import DeploymentDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
 CHAT_HISTORY_VARIABLE = "chat_history"
@@ -290,6 +290,21 @@ def create_function_node(
 
         return node
 
+    elif isinstance(function, ComposioToolDefinition):
+        # ComposioToolDefinition execution not yet implemented
+        def composio_not_implemented(**kwargs):
+            raise NotImplementedError("ComposioToolDefinition execution not yet implemented")
+
+        node = type(
+            f"ComposioNode_{function.name}",
+            (FunctionNode,),
+            {
+                "function_definition": composio_not_implemented,
+                "function_call_output": tool_router_node.Outputs.results,
+                "__module__": __name__,
+            },
+        )
+
     elif is_workflow_class(function):
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",
@@ -319,5 +334,7 @@ def get_function_name(function: Tool) -> str:
     if isinstance(function, DeploymentDefinition):
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
+    elif isinstance(function, ComposioToolDefinition):
+        return function.name
     else:
         return snake_case(function.__name__)

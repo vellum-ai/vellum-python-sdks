@@ -2,7 +2,7 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Optional, Union
+from typing import Annotated, Any, Dict, Literal, Optional, Union
 
 from pydantic import BeforeValidator
 
@@ -97,3 +97,22 @@ class DeploymentDefinition(UniversalBaseModel):
         if not self._is_uuid():
             return self.deployment
         return None
+
+
+class ComposioToolDefinition(UniversalBaseModel):
+    """Represents a specific Composio action that can be used in Tool Calling Node"""
+
+    type: Literal["COMPOSIO"] = "COMPOSIO"
+
+    # Core identification
+    toolkit: str  # "GITHUB", "SLACK", etc.
+    action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
+    description: str
+
+    # Optional cached metadata
+    display_name: Optional[str] = None
+
+    @property
+    def name(self) -> str:
+        """Generate a function name for this tool"""
+        return self.action.lower()
