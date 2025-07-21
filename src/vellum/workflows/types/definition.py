@@ -1,6 +1,5 @@
 import importlib
 import inspect
-import os
 from types import FrameType
 from uuid import UUID
 from typing import Annotated, Any, Dict, Literal, Optional, Union
@@ -9,8 +8,6 @@ from pydantic import BeforeValidator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
-from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import NodeException
 
 
 def serialize_type_encoder(obj: type) -> Dict[str, Any]:
@@ -125,10 +122,9 @@ class ComposioToolDefinition(UniversalBaseModel):
         """Function name attribute expected by function compilation system"""
         return self.name
 
-    @property
-    def __doc__(self) -> str:
-        """Function docstring expected by function compilation system"""
-        return self.description
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.__doc__ = self.description
 
     def __call__(self, **kwargs) -> dict:
         """
@@ -138,20 +134,7 @@ class ComposioToolDefinition(UniversalBaseModel):
         The actual execution goes through ComposioNode via the routing graph.
         This exists only so the prompt layer can validate that functions are callable.
         """
-        # Import here to avoid circular imports
-        from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ComposioService
-
-        # Get API key with precedence: COMPOSIO_API_KEY > COMPOSIO_KEY
-        api_key = os.getenv("COMPOSIO_API_KEY") or os.getenv("COMPOSIO_KEY")
-        if not api_key:
-            raise NodeException(
-                message="No Composio API key found. Set COMPOSIO_API_KEY or COMPOSIO_KEY environment variable.",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            )
-
-        # Handle case where arguments might be None or empty
-        arguments = kwargs or {}
-
-        # Create service and execute tool
-        service = ComposioService(api_key=api_key)
-        return service.execute_tool(tool_name=self.action, arguments=arguments)
+        raise RuntimeError(
+            "ComposioToolDefinition.__call__() should not be invoked directly. "
+            "Execution should go through ComposioNode. This suggests a routing issue."
+        )
