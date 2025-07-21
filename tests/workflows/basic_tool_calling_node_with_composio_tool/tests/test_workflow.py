@@ -1,10 +1,11 @@
 from unittest import mock
 from uuid import uuid4
-from typing import Iterator, List
+from typing import Iterator, List, cast
 
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
@@ -105,19 +106,25 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         # Function call message
         function_call_msg = terminal_event.outputs.chat_history[0]
         assert function_call_msg.role == "ASSISTANT"
+        assert function_call_msg.content is not None
         assert function_call_msg.content.type == "FUNCTION_CALL"
-        assert function_call_msg.content.value.name == "github_create_an_issue"
+
+        # Cast to the specific type to help mypy
+        function_content = cast(FunctionCallChatMessageContent, function_call_msg.content)
+        assert function_content.value.name == "github_create_an_issue"
 
         # Function result message
         function_result_msg = terminal_event.outputs.chat_history[1]
         assert function_result_msg.role == "FUNCTION"
+        assert function_result_msg.content is not None
         assert function_result_msg.content.type == "STRING"
         # The result should be the JSON serialized version of mock_composio_result
-        assert mock_composio_result["issue"]["id"] == 123  # Verify the mock result is in the response
+        assert mock_composio_result["issue"]["id"] == 123
 
         # Final assistant message
         final_msg = terminal_event.outputs.chat_history[2]
         assert final_msg.role == "ASSISTANT"
+        assert final_msg.text is not None
         assert "successfully created" in final_msg.text
 
         # THEN the ComposioService was called correctly
