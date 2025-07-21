@@ -1,0 +1,352 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "type": "ENTRYPOINT",
+        "inputs": [],
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba"
+        },
+        "display_data": {
+          "position": {
+            "x": 0.0,
+            "y": -50.0
+          }
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "label": "ComposioToolCallingNode",
+        "type": "GENERIC",
+        "display_data": {
+          "position": {
+            "x": 200.0,
+            "y": -50.0
+          },
+          "comment": {
+            "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    "
+          }
+        },
+        "base": {
+          "name": "ToolCallingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "tool_calling_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "ComposioToolCallingNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_composio_tool_calling_node",
+            "code",
+            "workflow"
+          ]
+        },
+        "trigger": {
+          "id": "8f664dfb-0542-434c-ab85-ff59151bf488",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": [
+          {
+            "id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ],
+        "adornments": null,
+        "attributes": [
+          {
+            "id": "53408f92-55c3-4026-9d30-6e4b48749d28",
+            "name": "ml_model",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o-mini"
+              }
+            }
+          },
+          {
+            "id": "8a2bbdb1-2cf3-42f9-a5f1-8bcae4f9984c",
+            "name": "functions",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": [
+                  {
+                    "type": "COMPOSIO",
+                    "toolkit": "GITHUB",
+                    "action": "GITHUB_CREATE_AN_ISSUE",
+                    "description": "Create a new issue in a GitHub repository",
+                    "display_name": "Create GitHub Issue"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "41d5256a-a581-4d60-8423-d2430bd1fd28",
+            "name": "blocks",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": []
+              }
+            }
+          },
+          {
+            "id": "15eb0342-8217-4dd9-98f3-59cbf04cf67d",
+            "name": "prompt_inputs",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": null
+              }
+            }
+          },
+          {
+            "id": "ca41b03b-77fa-4e73-aee6-aff160ba90d5",
+            "name": "parameters",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": {
+                  "stop": [],
+                  "temperature": 0.0,
+                  "max_tokens": 4096.0,
+                  "top_p": 1.0,
+                  "top_k": 0.0,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "logit_bias": null,
+                  "custom_parameters": null
+                }
+              }
+            }
+          },
+          {
+            "id": "e48b9774-d67b-4ef6-b28a-e97a41961131",
+            "name": "max_prompt_iterations",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "NUMBER",
+                "value": 5.0
+              }
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "id": "e05cc145-34ca-4007-bba9-2eed26cadda6",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "5625e421-ca8f-4477-8312-e7c99172be32",
+            "name": "chat_history",
+            "type": "CHAT_HISTORY",
+            "value": null
+          }
+        ]
+      },
+      {
+        "id": "88e59503-f7fb-48cc-b535-3cd1db07627a",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "text",
+          "target_handle_id": "645fee43-832a-4622-89fd-b2ead42a2ec0",
+          "output_id": "9a233225-16ef-48b4-8cf6-d8a6c1ae72ce",
+          "output_type": "STRING",
+          "node_input_id": "a622d76c-6cc3-4353-8d09-ca4cdaf0dc1c"
+        },
+        "inputs": [
+          {
+            "id": "a622d76c-6cc3-4353-8d09-ca4cdaf0dc1c",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+                    "output_id": "e05cc145-34ca-4007-bba9-2eed26cadda6"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 400.0,
+            "y": 75.0
+          }
+        },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": null
+      },
+      {
+        "id": "8834dd6c-d3cc-49fa-aec8-6a6d23ca2d6a",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "chat_history",
+          "target_handle_id": "0e22c690-31a4-4e70-b0ad-c351e862d644",
+          "output_id": "5ebf2c00-cb24-421b-9a23-5e0e2673f1ef",
+          "output_type": "CHAT_HISTORY",
+          "node_input_id": "e52e08eb-28fc-44ef-b61b-2ab273413592"
+        },
+        "inputs": [
+          {
+            "id": "e52e08eb-28fc-44ef-b61b-2ab273413592",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+                    "output_id": "5625e421-ca8f-4477-8312-e7c99172be32"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 400.0,
+            "y": -175.0
+          }
+        },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": null
+      }
+    ],
+    "edges": [
+      {
+        "id": "b234c076-43ad-4572-ba2e-5fee370ccf4a",
+        "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+        "target_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "target_handle_id": "8f664dfb-0542-434c-ab85-ff59151bf488",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "6a6ac98a-faf5-4ddf-aac1-4bfec7b69e24",
+        "source_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "source_handle_id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+        "target_node_id": "88e59503-f7fb-48cc-b535-3cd1db07627a",
+        "target_handle_id": "645fee43-832a-4622-89fd-b2ead42a2ec0",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "de285875-d306-4b45-87b5-1c9fc4123f8c",
+        "source_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "source_handle_id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+        "target_node_id": "8834dd6c-d3cc-49fa-aec8-6a6d23ca2d6a",
+        "target_handle_id": "0e22c690-31a4-4e70-b0ad-c351e862d644",
+        "type": "DEFAULT"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": 0.0,
+        "y": 0.0,
+        "zoom": 1.0
+      }
+    },
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "simple_composio_tool_calling_node",
+        "code",
+        "workflow"
+      ]
+    },
+    "output_values": [
+      {
+        "output_variable_id": "9a233225-16ef-48b4-8cf6-d8a6c1ae72ce",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+          "node_output_id": "e05cc145-34ca-4007-bba9-2eed26cadda6"
+        }
+      },
+      {
+        "output_variable_id": "5ebf2c00-cb24-421b-9a23-5e0e2673f1ef",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+          "node_output_id": "5625e421-ca8f-4477-8312-e7c99172be32"
+        }
+      }
+    ]
+  },
+  "input_variables": [
+    {
+      "id": "604ca902-7f24-44ea-bd4c-49b297cda0f0",
+      "key": "query",
+      "type": "STRING",
+      "default": null,
+      "required": true,
+      "extensions": {
+        "color": null
+      }
+    }
+  ],
+  "state_variables": [],
+  "output_variables": [
+    {
+      "id": "9a233225-16ef-48b4-8cf6-d8a6c1ae72ce",
+      "key": "text",
+      "type": "STRING"
+    },
+    {
+      "id": "5ebf2c00-cb24-421b-9a23-5e0e2673f1ef",
+      "key": "chat_history",
+      "type": "CHAT_HISTORY"
+    }
+  ]
+}
