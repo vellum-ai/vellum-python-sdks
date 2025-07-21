@@ -1,6 +1,7 @@
+import pytest
 from dataclasses import dataclass
 from unittest.mock import Mock
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel
 
@@ -581,3 +582,18 @@ def test_compile_workflow_deployment_function_definition__defaults():
             "required": ["no_default"],
         },
     )
+
+
+@pytest.mark.parametrize(
+    "annotation,expected_schema",
+    [
+        (Literal["a", "b"], {"type": "string", "enum": ["a", "b"]}),
+        (Literal["a", 1], {"enum": ["a", 1]}),
+    ],
+)
+def test_compile_function_definition__literal(annotation, expected_schema):
+    def my_function(a: annotation):
+        pass
+
+    compiled_function = compile_function_definition(my_function)
+    assert compiled_function.parameters["properties"]["a"] == expected_schema
