@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Any, Callable, Iterator, List, Optional, Type, cast
 
 from pydash import snake_case
@@ -199,29 +200,23 @@ class ComposioNode(BaseNode[ToolCallingState]):
         else:
             arguments = {}
 
-        # HACK: Try to find Composio API key from workspace secrets by checking common names
+        # HACK: Use first Composio API key found in environment variables
         composio_api_key = None
-        common_composio_secret_names = ["COMPOSIO_API_KEY", "composio_api_key", "COMPOSIO_KEY", "composio_key"]
+        common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
 
-        for secret_name in common_composio_secret_names:
-            try:
-                secret = self._context.vellum_client.workspace_secrets.retrieve(secret_name)
-                if secret:
-                    # Note: We can't access the actual secret value here, but the ComposioService
-                    # should be able to handle VellumSecret references
-                    composio_api_key = secret.name
-                    break
-            except Exception:
-                # Secret doesn't exist or can't be retrieved, try next name
-                continue
+        for env_var_name in common_env_var_names:
+            value = os.environ.get(env_var_name)
+            if value:
+                composio_api_key = value
+                break
 
         if not composio_api_key:
             raise NodeException(
                 message=(
-                    "No Composio API key found in workspace secrets. "
-                    "Please ensure a secret with one of these names exists: "
+                    "No Composio API key found in environment variables. "
+                    "Please ensure one of these environment variables is set: "
                 )
-                + ", ".join(common_composio_secret_names),
+                + ", ".join(common_env_var_names),
                 code=WorkflowErrorCode.NODE_EXECUTION,
             )
 
