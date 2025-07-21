@@ -322,7 +322,6 @@ def create_function_node(
         return node
 
     elif isinstance(function, ComposioToolDefinition):
-        # Create ComposioNode
         node = type(
             f"ComposioNode_{function.name}",
             (ComposioNode,),
@@ -333,7 +332,6 @@ def create_function_node(
             },
         )
         return node
-
     elif is_workflow_class(function):
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",
