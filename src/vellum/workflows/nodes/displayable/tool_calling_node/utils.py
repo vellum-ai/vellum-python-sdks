@@ -183,7 +183,7 @@ class FunctionNode(BaseNode[ToolCallingState]):
         yield from []
 
 
-class ComposioFunctionNode(BaseNode[ToolCallingState]):
+class ComposioNode(BaseNode[ToolCallingState]):
     """Node that executes a Composio tool with function call output."""
 
     function_call_output: List[PromptOutput]
@@ -347,10 +347,10 @@ def create_function_node(
         return node
 
     elif isinstance(function, ComposioToolDefinition):
-        # Create ComposioFunctionNode
+        # Create ComposioNode
         node = type(
-            f"ComposioFunctionNode_{function.name}",
-            (ComposioFunctionNode,),
+            f"ComposioNode_{function.name}",
+            (ComposioNode,),
             {
                 "composio_tool": function,
                 "function_call_output": tool_router_node.Outputs.results,
