@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Any, Callable, Iterator, List, Optional, Type, cast
 
 from pydash import snake_case
@@ -18,6 +19,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
+from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ComposioService
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
@@ -29,6 +31,29 @@ from vellum.workflows.types.definition import ComposioToolDefinition, Deployment
 from vellum.workflows.types.generics import is_workflow_class
 
 CHAT_HISTORY_VARIABLE = "chat_history"
+
+
+class FunctionCallNodeMixin:
+    """Mixin providing common functionality for nodes that handle function calls."""
+
+    function_call_output: List[PromptOutput]
+
+    def _extract_function_arguments(self) -> dict:
+        """Extract arguments from function call output."""
+        if self.function_call_output and len(self.function_call_output) > 0:
+            function_call = self.function_call_output[0]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                return function_call.value.arguments or {}
+        return {}
+
+    def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
+        """Add function execution result to chat history."""
+        state.chat_history.append(
+            ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+            )
+        )
 
 
 class ToolRouterNode(InlinePromptNode[ToolCallingState]):
@@ -69,20 +94,11 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             yield output
 
 
-class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState]):
+class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a deployment definition with function call output."""
 
-    function_call_output: List[PromptOutput]
-
     def run(self) -> Iterator[BaseOutput]:
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-        else:
-            arguments = {}
+        arguments = self._extract_function_arguments()
 
         # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
         # we do in the `__init__` method. Long term, instead of the function_call_output attribute above, we
@@ -103,28 +119,16 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
             yield output
 
         # Add the result to the chat history
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
-            )
-        )
+        self._add_function_result_to_chat_history(outputs, self.state)
 
 
-class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState]):
+class DynamicInlineSubworkflowNode(
+    InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState], FunctionCallNodeMixin
+):
     """Node that executes an inline subworkflow with function call output."""
 
-    function_call_output: List[PromptOutput]
-
     def run(self) -> Iterator[BaseOutput]:
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-        else:
-            arguments = {}
+        arguments = self._extract_function_arguments()
 
         self.subworkflow_inputs = arguments  # type: ignore[misc]
 
@@ -137,29 +141,16 @@ class DynamicInlineSubworkflowNode(InlineSubworkflowNode[ToolCallingState, BaseI
             yield output
 
         # Add the result to the chat history
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
-            )
-        )
+        self._add_function_result_to_chat_history(outputs, self.state)
 
 
-class FunctionNode(BaseNode[ToolCallingState]):
+class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a regular Python function with function call output."""
 
-    function_call_output: List[PromptOutput]
     function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments
-            else:
-                arguments = {}
-        else:
-            arguments = {}
+        arguments = self._extract_function_arguments()
 
         try:
             result = self.function_definition(**arguments)
@@ -171,14 +162,71 @@ class FunctionNode(BaseNode[ToolCallingState]):
             )
 
         # Add the result to the chat history
-        self.state.chat_history.append(
-            ChatMessage(
-                role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
-            )
-        )
+        self._add_function_result_to_chat_history(result, self.state)
 
         yield from []
+
+
+class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
+    """Node that executes a Composio tool with function call output."""
+
+    composio_tool: ComposioToolDefinition
+
+    def run(self) -> Iterator[BaseOutput]:
+        # Extract arguments from function call
+        arguments = self._extract_function_arguments()
+
+        # HACK: Use first Composio API key found in environment variables
+        composio_api_key = None
+        common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
+
+        for env_var_name in common_env_var_names:
+            value = os.environ.get(env_var_name)
+            if value:
+                composio_api_key = value
+                break
+
+        if not composio_api_key:
+            raise NodeException(
+                message=(
+                    "No Composio API key found in environment variables. "
+                    "Please ensure one of these environment variables is set: "
+                )
+                + ", ".join(common_env_var_names),
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        try:
+            # Execute using ComposioService
+            composio_service = ComposioService(api_key=composio_api_key)
+            result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
+        except Exception as e:
+            raise NodeException(
+                message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        # Add result to chat history
+        self._add_function_result_to_chat_history(result, self.state)
+
+        yield from []
+
+
+def create_composio_wrapper_function(tool_def: ComposioToolDefinition):
+    """Create a real Python function that wraps the Composio tool for prompt layer compatibility."""
+
+    def wrapper_function(**kwargs):
+        # This should never be called due to routing, but satisfies introspection
+        raise RuntimeError(
+            f"ComposioToolDefinition wrapper for '{tool_def.action}' should not be called directly. "
+            f"Execution should go through ComposioNode. This suggests a routing issue."
+        )
+
+    # Set proper function attributes for prompt layer introspection
+    wrapper_function.__name__ = tool_def.name
+    wrapper_function.__doc__ = tool_def.description
+
+    return wrapper_function
 
 
 def create_tool_router_node(
@@ -190,9 +238,18 @@ def create_tool_router_node(
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
-        # If we have functions, create dynamic ports for each function
+        # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
+        prompt_functions = []
+
         for function in functions:
+            # Convert ComposioToolDefinition to wrapper function for prompt layer
+            if isinstance(function, ComposioToolDefinition):
+                prompt_functions.append(create_composio_wrapper_function(function))
+            else:
+                prompt_functions.append(function)
+
+            # Create port for this function (using original function for get_function_name)
             function_name = get_function_name(function)
 
             # Avoid using lambda to capture function_name
@@ -215,6 +272,7 @@ def create_tool_router_node(
     else:
         # If no functions exist, create a simple Ports class with just a default port
         Ports = type("Ports", (), {"default": Port(default=True)})
+        prompt_functions = []
 
     # Add a chat history block to blocks only if one doesn't already exist
     has_chat_history_block = any(
@@ -247,7 +305,7 @@ def create_tool_router_node(
             {
                 "ml_model": ml_model,
                 "blocks": blocks,
-                "functions": functions,
+                "functions": prompt_functions,  # Use converted functions for prompt layer
                 "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
@@ -291,20 +349,16 @@ def create_function_node(
         return node
 
     elif isinstance(function, ComposioToolDefinition):
-        # ComposioToolDefinition execution not yet implemented
-        def composio_not_implemented(**kwargs):
-            raise NotImplementedError("ComposioToolDefinition execution not yet implemented")
-
         node = type(
             f"ComposioNode_{function.name}",
-            (FunctionNode,),
+            (ComposioNode,),
             {
-                "function_definition": composio_not_implemented,
+                "composio_tool": function,
                 "function_call_output": tool_router_node.Outputs.results,
                 "__module__": __name__,
             },
         )
-
+        return node
     elif is_workflow_class(function):
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",

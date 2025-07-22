@@ -1,10 +1,12 @@
+import pytest
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import get_function_name
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.types.definition import DeploymentDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition
 
 
 def test_get_function_name_callable():
@@ -56,3 +58,21 @@ def test_get_function_name_subworkflow_deployment_uuid():
     result = get_function_name(deployment_config)
 
     assert result == "57f09bebb46340e0bf9ec972e664352f"
+
+
+@pytest.mark.parametrize(
+    "toolkit,action,description,expected_result",
+    [
+        ("SLACK", "SLACK_SEND_MESSAGE", "Send message to Slack", "slack_send_message"),
+        ("GMAIL", "GMAIL_CREATE_EMAIL_DRAFT", "Create Gmail draft", "gmail_create_email_draft"),
+    ],
+)
+def test_get_function_name_composio_tool_definition_various_toolkits(
+    toolkit: str, action: str, description: str, expected_result: str
+):
+    """Test ComposioToolDefinition function name generation with various toolkits."""
+    composio_tool = ComposioToolDefinition(toolkit=toolkit, action=action, description=description)
+
+    result = get_function_name(composio_tool)
+
+    assert result == expected_result
