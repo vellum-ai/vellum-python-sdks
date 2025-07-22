@@ -97,8 +97,6 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a deployment definition with function call output."""
 
-    function_call_output: List[PromptOutput]
-
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
 
@@ -129,8 +127,6 @@ class DynamicInlineSubworkflowNode(
 ):
     """Node that executes an inline subworkflow with function call output."""
 
-    function_call_output: List[PromptOutput]
-
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
 
@@ -151,7 +147,6 @@ class DynamicInlineSubworkflowNode(
 class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a regular Python function with function call output."""
 
-    function_call_output: List[PromptOutput]
     function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
@@ -243,7 +238,7 @@ def create_tool_router_node(
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
-        # If we have functions, create dynamic ports for each function
+        # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
         prompt_functions = []
 
