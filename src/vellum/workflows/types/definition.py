@@ -112,31 +112,7 @@ class ComposioToolDefinition(UniversalBaseModel):
     # Optional cached metadata
     display_name: Optional[str] = None
 
-    #
-    def __init__(self, **data):
-        super().__init__(**data)
-        # Set __doc__ directly to avoid mypy property override issues
-        self.__doc__ = self.description
-
     @property
     def name(self) -> str:
         """Generate a function name for this tool"""
         return self.action.lower()
-
-    @property
-    def __name__(self) -> str:
-        """Function name attribute expected by function compilation system"""
-        return self.name
-
-    def __call__(self, **kwargs) -> dict:
-        """
-        Make this definition callable for prompt layer compatibility.
-
-        NOTE: This should never actually be called during normal execution.
-        The actual execution goes through ComposioNode via the routing graph.
-        This exists only so the prompt layer can validate that functions are callable.
-        """
-        raise RuntimeError(
-            "ComposioToolDefinition.__call__() should not be invoked directly. "
-            "Execution should go through ComposioNode. This suggests a routing issue."
-        )

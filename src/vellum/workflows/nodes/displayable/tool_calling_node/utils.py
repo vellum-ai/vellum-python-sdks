@@ -212,6 +212,23 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         yield from []
 
 
+def create_composio_wrapper_function(tool_def: ComposioToolDefinition):
+    """Create a real Python function that wraps the Composio tool for prompt layer compatibility."""
+
+    def wrapper_function(**kwargs):
+        # This should never be called due to routing, but satisfies introspection
+        raise RuntimeError(
+            f"ComposioToolDefinition wrapper for '{tool_def.action}' should not be called directly. "
+            f"Execution should go through ComposioNode. This suggests a routing issue."
+        )
+
+    # Set proper function attributes for prompt layer introspection
+    wrapper_function.__name__ = tool_def.name
+    wrapper_function.__doc__ = tool_def.description
+
+    return wrapper_function
+
+
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
@@ -221,9 +238,18 @@ def create_tool_router_node(
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
-        # If we have functions, create dynamic ports for each function
+        # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
+        prompt_functions = []
+
         for function in functions:
+            # Convert ComposioToolDefinition to wrapper function for prompt layer
+            if isinstance(function, ComposioToolDefinition):
+                prompt_functions.append(create_composio_wrapper_function(function))
+            else:
+                prompt_functions.append(function)
+
+            # Create port for this function (using original function for get_function_name)
             function_name = get_function_name(function)
 
             # Avoid using lambda to capture function_name
@@ -246,6 +272,7 @@ def create_tool_router_node(
     else:
         # If no functions exist, create a simple Ports class with just a default port
         Ports = type("Ports", (), {"default": Port(default=True)})
+        prompt_functions = []
 
     # Add a chat history block to blocks only if one doesn't already exist
     has_chat_history_block = any(
@@ -278,7 +305,7 @@ def create_tool_router_node(
             {
                 "ml_model": ml_model,
                 "blocks": blocks,
-                "functions": functions,
+                "functions": prompt_functions,  # Use converted functions for prompt layer
                 "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
