@@ -119,30 +119,6 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
-exports[`ToolCallingNode > function ordering > should preserve order: code-exec, composio, workflow 1`] = `
-"from .add_numbers import add_numbers
-from .subtract.workflow import Subtract
-
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
-from vellum.workflows.types.definition import ComposioToolDefinition
-
-
-class ToolCallingNode(BaseToolCallingNode):
-    functions = [
-        add_numbers,
-        ComposioToolDefinition(
-            toolkit="GITHUB",
-            action="GITHUB_CREATE_AN_ISSUE",
-            description="Create a new issue in a GitHub repository",
-            display_name="Create GitHub Issue",
-        ),
-        Subtract,
-    ]
-"
-`;
-
 exports[`ToolCallingNode > function ordering > should preserve order: code-exec, workflow 1`] = `
 "from .add_numbers import add_numbers
 from .subtract.workflow import Subtract
@@ -157,28 +133,6 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
-exports[`ToolCallingNode > function ordering > should preserve order: composio, code-exec 1`] = `
-"from .add_numbers import add_numbers
-
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
-from vellum.workflows.types.definition import ComposioToolDefinition
-
-
-class ToolCallingNode(BaseToolCallingNode):
-    functions = [
-        ComposioToolDefinition(
-            toolkit="GITHUB",
-            action="GITHUB_CREATE_AN_ISSUE",
-            description="Create a new issue in a GitHub repository",
-            display_name="Create GitHub Issue",
-        ),
-        add_numbers,
-    ]
-"
-`;
-
 exports[`ToolCallingNode > function ordering > should preserve order: workflow, code-exec 1`] = `
 "from .add_numbers import add_numbers
 from .subtract.workflow import Subtract
@@ -190,28 +144,6 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [Subtract, add_numbers]
-"
-`;
-
-exports[`ToolCallingNode > function ordering > should preserve order: workflow, composio 1`] = `
-"from .subtract.workflow import Subtract
-
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
-from vellum.workflows.types.definition import ComposioToolDefinition
-
-
-class ToolCallingNode(BaseToolCallingNode):
-    functions = [
-        Subtract,
-        ComposioToolDefinition(
-            toolkit="GITHUB",
-            action="GITHUB_CREATE_AN_ISSUE",
-            description="Create a new issue in a GitHub repository",
-            display_name="Create GitHub Issue",
-        ),
-    ]
 "
 `;
 
