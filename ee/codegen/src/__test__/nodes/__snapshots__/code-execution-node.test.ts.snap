@@ -272,7 +272,7 @@ from vellum.workflows.state import BaseState
 class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     filepath = "./script.py"
     code_inputs = {
-        "firecrawl": EnvironmentVariableReference("TEST_ENV_VAR"),
+        "test_env_var": EnvironmentVariableReference("TEST_ENV_VAR"),
     }
     runtime = "PYTHON_3_11_6"
     packages = None

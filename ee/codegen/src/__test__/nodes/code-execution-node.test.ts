@@ -499,7 +499,7 @@ describe("CodeExecutionNode", () => {
       const nodeData = codeExecutionNodeFactory().build();
       nodeData.inputs.push({
         id: "b23a576d-bea6-4dbc-84aa-72038793a85d",
-        key: "firecrawl",
+        key: "test_env_var",
         value: {
           rules: [
             {
