@@ -37,7 +37,11 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         values = list(get_args(annotation))
         types = {type(value) for value in values}
         if len(types) == 1:
-            return {"type": type_map[types.pop()], "enum": values}
+            value_type = types.pop()
+            if value_type in type_map:
+                return {"type": type_map[value_type], "enum": values}
+            else:
+                return {"enum": values}
         else:
             return {"enum": values}
 
