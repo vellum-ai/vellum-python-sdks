@@ -1,6 +1,6 @@
 import dataclasses
 import inspect
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Type, Union, get_args, get_origin
+from typing import TYPE_CHECKING, Any, Callable, Dict, Literal, Optional, Type, Union, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -32,6 +32,18 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
 
     if get_origin(annotation) is Union:
         return {"anyOf": [compile_annotation(a, defs) for a in get_args(annotation)]}
+
+    if get_origin(annotation) is Literal:
+        values = list(get_args(annotation))
+        types = {type(value) for value in values}
+        if len(types) == 1:
+            value_type = types.pop()
+            if value_type in type_map:
+                return {"type": type_map[value_type], "enum": values}
+            else:
+                return {"enum": values}
+        else:
+            return {"enum": values}
 
     if get_origin(annotation) is dict:
         _, value_type = get_args(annotation)

@@ -1,6 +1,8 @@
+import pytest
 from dataclasses import dataclass
+from enum import Enum
 from unittest.mock import Mock
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel
 
@@ -581,3 +583,32 @@ def test_compile_workflow_deployment_function_definition__defaults():
             "required": ["no_default"],
         },
     )
+
+
+@pytest.mark.parametrize(
+    "annotation,expected_schema",
+    [
+        (Literal["a", "b"], {"type": "string", "enum": ["a", "b"]}),
+        (Literal["a", 1], {"enum": ["a", 1]}),
+    ],
+)
+def test_compile_function_definition__literal(annotation, expected_schema):
+    def my_function(a: annotation):  # type: ignore
+        pass
+
+    compiled_function = compile_function_definition(my_function)
+    assert isinstance(compiled_function.parameters, dict)
+    assert compiled_function.parameters["properties"]["a"] == expected_schema
+
+
+def test_compile_function_definition__literal_type_not_in_map():
+    class MyEnum(Enum):
+        FOO = "foo"
+        BAR = "bar"
+
+    def my_function(a: Literal[MyEnum.FOO, MyEnum.BAR]):
+        pass
+
+    compiled_function = compile_function_definition(my_function)
+    assert isinstance(compiled_function.parameters, dict)
+    assert compiled_function.parameters["properties"]["a"] == {"enum": [MyEnum.FOO, MyEnum.BAR]}
