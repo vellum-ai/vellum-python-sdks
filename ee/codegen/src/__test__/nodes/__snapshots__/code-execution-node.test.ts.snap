@@ -261,6 +261,24 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
 "
 `;
 
+exports[`CodeExecutionNode > with environment variable input > should generate environment variable input 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {
+        "firecrawl": EnvironmentVariableReference("TEST_ENV_VAR"),
+    }
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
 exports[`CodeExecutionNode > with runtime set > should generate the correct standalone file PYTHON_3_11_6 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,

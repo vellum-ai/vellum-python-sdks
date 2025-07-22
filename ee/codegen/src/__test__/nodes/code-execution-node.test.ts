@@ -494,4 +494,37 @@ describe("CodeExecutionNode", () => {
       });
     });
   });
+  describe("with environment variable input", () => {
+    it("should generate environment variable input", async () => {
+      const nodeData = codeExecutionNodeFactory().build();
+      nodeData.inputs.push({
+        id: "b23a576d-bea6-4dbc-84aa-72038793a85d",
+        key: "firecrawl",
+        value: {
+          rules: [
+            {
+              data: {
+                environmentVariable: "TEST_ENV_VAR",
+              },
+              type: "ENVIRONMENT_VARIABLE",
+            },
+          ],
+          combinator: "OR",
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      node = new CodeExecutionNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
