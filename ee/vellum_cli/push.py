@@ -16,6 +16,7 @@ from vellum.resources.workflows.client import OMIT
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
 from vellum_cli.logger import handle_cli_error, load_cli_logger
+from vellum_ee.workflows.display.nodes.utils import to_kebab_case
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
@@ -131,9 +132,10 @@ def push_command(
         )
 
         try:
+            module_name = workflow_config.module.split(".")[-1]
             deployment_config = WorkflowPushDeploymentConfigRequest(
                 label=deployment_label or cli_deployment_config.label,
-                name=deployment_name or cli_deployment_config.name,
+                name=deployment_name or cli_deployment_config.name or to_kebab_case(module_name),
                 description=deployment_description or cli_deployment_config.description,
                 release_tags=release_tags or cli_deployment_config.release_tags,
             )
@@ -274,7 +276,14 @@ Visit at: {base_url}/workflow-sandboxes/{response.workflow_sandbox_id}"""
         workflow_config.workflow_sandbox_id = response.workflow_sandbox_id
 
     if not workflow_config.deployments and response.workflow_deployment_id:
-        workflow_config.deployments.append(WorkflowDeploymentConfig(id=UUID(response.workflow_deployment_id)))
+        stored_deployment_config = WorkflowDeploymentConfig(
+            id=UUID(response.workflow_deployment_id),
+            label=deployment_config.label if deploy else None,
+            name=deployment_config.name if deploy else None,
+            description=deployment_config.description if deploy else None,
+            release_tags=deployment_config.release_tags if deploy else None,
+        )
+        workflow_config.deployments.append(stored_deployment_config)
 
     config.save()
     logger.info("Updated vellum.lock.json file.")

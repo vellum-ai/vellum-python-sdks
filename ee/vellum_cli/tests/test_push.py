@@ -13,6 +13,7 @@ from vellum.client.core.api_error import ApiError
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
 from vellum.utils.uuid import is_valid_uuid
 from vellum_cli import main as cli_main
+from vellum_ee.workflows.display.nodes.utils import to_kebab_case
 
 
 def _extract_tar_gz(tar_gz_bytes: bytes) -> dict[str, str]:
@@ -391,7 +392,9 @@ def test_push__deployment(mock_module, vellum_client, base_command):
     assert json.loads(call_args["exec_config"])["workflow_raw_data"]["definition"]["name"] == "ExampleWorkflow"
     assert is_valid_uuid(call_args["workflow_sandbox_id"])
     assert call_args["artifact"].name == expected_artifact_name
-    assert call_args["deployment_config"] == "{}"
+    expected_deployment_name = to_kebab_case(module.split(".")[-1])
+    deployment_config = json.loads(call_args["deployment_config"])
+    assert deployment_config["name"] == expected_deployment_name
 
     extracted_files = _extract_tar_gz(call_args["artifact"].read())
     assert extracted_files["workflow.py"] == workflow_py_file_content
@@ -1039,3 +1042,56 @@ def test_push__deploy_with_release_tags_success(mock_module, vellum_client):
     # AND should show success message
     assert "Successfully pushed" in result.output
     assert "Updated vellum.lock.json file." in result.output
+
+
+def test_push__deploy_stores_deployment_config_in_lock_file(mock_module, vellum_client):
+    # GIVEN a single workflow
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully with a deployment
+    workflow_deployment_id = str(uuid4())
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        workflow_deployment_id=workflow_deployment_id,
+    )
+
+    # WHEN calling `vellum workflows push --deploy` for the first time
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND the deployment config should be stored in the lock file with the deployment ID and module name
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_data = json.loads(f.read())
+        assert len(lock_data["workflows"][0]["deployments"]) == 1
+        deployment = lock_data["workflows"][0]["deployments"][0]
+        assert str(deployment["id"]) == workflow_deployment_id
+        assert deployment["name"] == "test-push-deploy-stores-deployment-config-in-lock-file"
+        assert deployment.get("label") is None
+        assert deployment.get("description") is None
+        assert deployment.get("release_tags") is None
+
+    # AND when we do a second push
+    vellum_client.workflows.push.reset_mock()
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        workflow_deployment_id=workflow_deployment_id,
+    )
+
+    result = runner.invoke(cli_main, ["workflows", "push", module, "--deploy"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the push API with the module name as deployment name
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    deployment_config_str = call_args["deployment_config"]
+    deployment_config = json.loads(deployment_config_str)
+    assert deployment_config["name"] == "test-push-deploy-stores-deployment-config-in-lock-file"
