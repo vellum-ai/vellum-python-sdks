@@ -12,6 +12,7 @@ import {
 import {
   GENERATED_WORKFLOW_MODULE_NAME,
   OUTPUTS_CLASS_NAME,
+  VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH,
 } from "src/constants";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
@@ -27,6 +28,7 @@ import { WorkflowValueDescriptor } from "src/generators/workflow-value-descripto
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
+  ComposioToolFunctionArgs,
   DeploymentWorkflowFunctionArgs,
   FunctionArgs,
   GenericNode as GenericNodeType,
@@ -79,6 +81,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               | FunctionArgs
               | InlineWorkflowFunctionArgs
               | DeploymentWorkflowFunctionArgs
+              | ComposioToolFunctionArgs
             > = value.value.value;
 
             const codeExecutionFunctions: FunctionArgs[] = [];
@@ -199,11 +202,54 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   );
                   break;
                 }
+                case "COMPOSIO": {
+                  const composioTool = f as ComposioToolFunctionArgs;
+                  const args = [
+                    python.methodArgument({
+                      name: "toolkit",
+                      value: python.TypeInstantiation.str(composioTool.toolkit),
+                    }),
+                    python.methodArgument({
+                      name: "action",
+                      value: python.TypeInstantiation.str(composioTool.action),
+                    }),
+                    python.methodArgument({
+                      name: "description",
+                      value: python.TypeInstantiation.str(
+                        composioTool.description
+                      ),
+                    }),
+                  ];
+
+                  if (composioTool.display_name) {
+                    args.push(
+                      python.methodArgument({
+                        name: "display_name",
+                        value: python.TypeInstantiation.str(
+                          composioTool.display_name
+                        ),
+                      })
+                    );
+                  }
+
+                  functionReferences.push(
+                    python.instantiateClass({
+                      classReference: python.reference({
+                        name: "ComposioToolDefinition",
+                        modulePath: VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH,
+                      }),
+                      arguments_: args,
+                    })
+                  );
+                  break;
+                }
 
                 default:
                   this.workflowContext.addError(
                     new NodeDefinitionGenerationError(
-                      `Unsupported function type. Only CODE_EXECUTION, INLINE_WORKFLOW, and WORKFLOW_DEPLOYMENT are supported.`,
+                      `Unsupported function type: ${JSON.stringify(
+                        f
+                      )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, and COMPOSIO are supported.`,
                       "WARNING"
                     )
                   );

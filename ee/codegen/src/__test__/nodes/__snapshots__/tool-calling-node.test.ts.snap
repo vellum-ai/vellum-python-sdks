@@ -88,6 +88,25 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > composio tool > should generate composio tool 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.types.definition import ComposioToolDefinition
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        ComposioToolDefinition(
+            toolkit="GITHUB",
+            action="GITHUB_CREATE_AN_ISSUE",
+            description="Create a new issue in a GitHub repository",
+            display_name="Create GitHub Issue",
+        )
+    ]
+"
+`;
+
 exports[`ToolCallingNode > deployment workflow > should generate latest release tag if release_tag is null 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,

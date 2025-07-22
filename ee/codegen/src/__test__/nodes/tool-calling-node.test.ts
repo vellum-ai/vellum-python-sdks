@@ -12,6 +12,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
 import {
+  ComposioToolFunctionArgs,
   DeploymentWorkflowFunctionArgs,
   FunctionArgs,
   NodePort,
@@ -135,6 +136,55 @@ describe("ToolCallingNode", () => {
             },
           },
         ],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("composio tool", () => {
+    const composioToolFunction: ComposioToolFunctionArgs = {
+      type: "COMPOSIO",
+      name: "github_create_an_issue",
+      toolkit: "GITHUB",
+      action: "GITHUB_CREATE_AN_ISSUE",
+      description: "Create a new issue in a GitHub repository",
+      display_name: "Create GitHub Issue",
+    };
+
+    it("should generate composio tool", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...composioToolFunction,
+            id: "composio-tool-function-id",
+            name: "github_create_an_issue",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
       });
 
       const nodeContext = (await createNodeContext({

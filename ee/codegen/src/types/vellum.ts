@@ -916,3 +916,11 @@ export type DeploymentWorkflowFunctionArgs = {
   deployment: string;
   release_tag: string | null;
 } & NameDescription;
+
+export type ComposioToolFunctionArgs = {
+  type: "COMPOSIO";
+  toolkit: string;
+  action: string;
+  description: string;
+  display_name?: string | null;
+} & NameDescription;
