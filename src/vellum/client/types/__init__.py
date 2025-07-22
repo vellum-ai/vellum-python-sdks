@@ -225,6 +225,7 @@ from .metric_node_result import MetricNodeResult
 from .ml_model_read import MlModelRead
 from .ml_model_usage import MlModelUsage
 from .ml_model_usage_wrapper import MlModelUsageWrapper
+from .name_enum import NameEnum
 from .named_scenario_input_chat_history_variable_value_request import NamedScenarioInputChatHistoryVariableValueRequest
 from .named_scenario_input_json_variable_value_request import NamedScenarioInputJsonVariableValueRequest
 from .named_scenario_input_request import NamedScenarioInputRequest
@@ -847,6 +848,7 @@ __all__ = [
     "MlModelRead",
     "MlModelUsage",
     "MlModelUsageWrapper",
+    "NameEnum",
     "NamedScenarioInputChatHistoryVariableValueRequest",
     "NamedScenarioInputJsonVariableValueRequest",
     "NamedScenarioInputRequest",
