@@ -12,6 +12,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
 import {
+  ComposioToolFunctionArgs,
   DeploymentWorkflowFunctionArgs,
   FunctionArgs,
   NodePort,
@@ -152,6 +153,55 @@ describe("ToolCallingNode", () => {
     });
   });
 
+  describe("composio tool", () => {
+    const composioToolFunction: ComposioToolFunctionArgs = {
+      type: "COMPOSIO",
+      name: "github_create_an_issue",
+      toolkit: "GITHUB",
+      action: "GITHUB_CREATE_AN_ISSUE",
+      description: "Create a new issue in a GitHub repository",
+      display_name: "Create GitHub Issue",
+    };
+
+    it("should generate composio tool", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...composioToolFunction,
+            id: "composio-tool-function-id",
+            name: "github_create_an_issue",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
   describe("function ordering", () => {
     const codeExecutionFunction: FunctionArgs = {
       type: "CODE_EXECUTION",
@@ -169,6 +219,15 @@ describe("ToolCallingNode", () => {
           },
         },
       },
+    };
+
+    const composioToolFunction: ComposioToolFunctionArgs = {
+      type: "COMPOSIO",
+      name: "github_create_an_issue",
+      toolkit: "GITHUB",
+      action: "GITHUB_CREATE_AN_ISSUE",
+      description: "Create a new issue in a GitHub repository",
+      display_name: "Create GitHub Issue",
     };
 
     const inlineWorkflowFunction = {
@@ -314,6 +373,140 @@ describe("ToolCallingNode", () => {
             ...codeExecutionFunction,
             id: "code-exec-function-id",
             name: "add_numbers",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should preserve order: composio, code-exec", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...composioToolFunction,
+            id: "composio-tool-function-id",
+            name: "github_create_an_issue",
+          },
+          {
+            ...codeExecutionFunction,
+            id: "code-exec-function-id",
+            name: "add_numbers",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should preserve order: code-exec, composio, workflow", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...codeExecutionFunction,
+            id: "code-exec-function-id",
+            name: "add_numbers",
+          },
+          {
+            ...composioToolFunction,
+            id: "composio-tool-function-id",
+            name: "github_create_an_issue",
+          },
+          {
+            ...inlineWorkflowFunction,
+            id: "workflow-function-id",
+            name: "subtract",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should preserve order: workflow, composio", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...inlineWorkflowFunction,
+            id: "workflow-function-id",
+            name: "subtract",
+          },
+          {
+            ...composioToolFunction,
+            id: "composio-tool-function-id",
+            name: "github_create_an_issue",
           },
         ]
       );
