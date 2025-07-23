@@ -103,6 +103,7 @@ overrides = [
     { module = "deepdiff.*", ignore_missing_imports = true },
     { module = "docker.*", ignore_missing_imports = true },
     { module = "setuptools.*", ignore_missing_imports = true },
+    { module = "wrapt.*", ignore_missing_imports = true },
 ]
 [tool.ruff]
 line-length = 120
