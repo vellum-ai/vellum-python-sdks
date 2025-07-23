@@ -216,6 +216,10 @@ def create_composio_wrapper_function(tool_def: ComposioToolDefinition):
     """Create a real Python function that wraps the Composio tool for prompt layer compatibility."""
 
     def wrapper_function(**kwargs):
+        # Validate arguments against schema if available
+        if tool_def.parameters and not tool_def.validate_arguments(kwargs):
+            raise ValueError(f"Invalid arguments for {tool_def.action}: arguments do not match expected schema")
+
         # This should never be called due to routing, but satisfies introspection
         raise RuntimeError(
             f"ComposioToolDefinition wrapper for '{tool_def.action}' should not be called directly. "

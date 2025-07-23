@@ -1,13 +1,18 @@
 import importlib
 import inspect
+import logging
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Literal, Optional, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
+import jsonschema
 from pydantic import BeforeValidator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
+from vellum.client.types.function_definition import FunctionDefinition
+
+logger = logging.getLogger(__name__)
 
 
 def serialize_type_encoder(obj: type) -> Dict[str, Any]:
@@ -109,10 +114,64 @@ class ComposioToolDefinition(UniversalBaseModel):
     action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
     description: str
 
-    # Optional cached metadata
+    # Enhanced metadata and parameter schema
     display_name: Optional[str] = None
+    parameters: Optional[Dict[str, Any]] = None  # JSON Schema for parameters
+    version: Optional[str] = None
+    tags: Optional[List[str]] = None
 
     @property
     def name(self) -> str:
         """Generate a function name for this tool"""
         return self.action.lower()
+
+    def validate_arguments(self, arguments: Dict[str, Any]) -> bool:
+        """Validate arguments against parameter schema"""
+        if not self.parameters:
+            return True
+
+        try:
+            jsonschema.validate(instance=arguments, schema=self.parameters)
+            return True
+        except jsonschema.ValidationError as e:
+            logger.warning(f"Validation failed for {self.action}: {e.message}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected validation error for {self.action}: {str(e)}")
+            return False
+
+    def to_function_definition(self) -> FunctionDefinition:
+        """Convert to FunctionDefinition for API compatibility"""
+        return FunctionDefinition(
+            name=self.name,
+            description=self.description,
+            parameters=self.parameters,
+            forced=None,
+            strict=None,
+            state=None,
+            cache_config=None,
+        )
+
+    @classmethod
+    def from_composio_api(cls, api_response: Any) -> "ComposioToolDefinition":
+        """Create instance from Composio API response"""
+        # Handle both dictionary and ActionModel objects
+        if hasattr(api_response, "model_dump"):
+            # If it's a Pydantic model (like ActionModel), convert to dict
+            response_dict = api_response.model_dump()
+        elif hasattr(api_response, "__dict__"):
+            # If it's an object with attributes, convert to dict
+            response_dict = api_response.__dict__
+        else:
+            # Assume it's already a dictionary
+            response_dict = api_response
+
+        return cls(
+            toolkit=response_dict.get("app_name", ""),
+            action=response_dict.get("name", ""),
+            description=response_dict.get("description", ""),
+            display_name=response_dict.get("display_name"),
+            parameters=response_dict.get("parameters", {}),
+            version=response_dict.get("version"),
+            tags=response_dict.get("tags", []),
+        )

@@ -1,8 +1,13 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List
+import logging
+from typing import Any, Dict, List, Optional
 
 from composio import Action, Composio
 from composio_client import Composio as ComposioClient
+
+from vellum.workflows.types.definition import ComposioToolDefinition
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,7 +44,7 @@ class ComposioAccountService:
 
 
 class ComposioCoreService:
-    """Handles tool execution using composio-core"""
+    """Handles tool execution and tool definition retrieval using composio-core"""
 
     def __init__(self, api_key: str):
         self.client = Composio(api_key=api_key)
@@ -57,6 +62,30 @@ class ComposioCoreService:
         # Convert tool name string to Action enum
         action = getattr(Action, tool_name)
         return self.client.actions.execute(action, params=arguments)
+
+    def get_tool_definition(self, tool_name: str) -> Optional[ComposioToolDefinition]:
+        """Fetch tool definition from Composio API
+
+        Args:
+            tool_name: The name of the tool to get definition for (e.g., "GITHUB_CREATE_AN_ISSUE")
+
+        Returns:
+            ComposioToolDefinition instance or None if tool not found
+        """
+        try:
+            # Use composio.Composio.actions.get() to retrieve tool details
+            tool_info = self.client.actions.get(tool_name)
+
+            if not tool_info:
+                logger.warning(f"Tool '{tool_name}' not found in Composio API")
+                return None
+
+            # Convert the API response to our ComposioToolDefinition
+            return ComposioToolDefinition.from_composio_api(tool_info)
+
+        except Exception as e:
+            logger.error(f"Failed to fetch tool definition for '{tool_name}': {str(e)}")
+            return None
 
 
 class ComposioService:
@@ -81,3 +110,33 @@ class ComposioService:
             The result of the tool execution
         """
         return self.core.execute_tool(tool_name, arguments)
+
+    def get_tool_definition(self, tool_name: str) -> Optional[ComposioToolDefinition]:
+        """Fetch tool definition from Composio API
+
+        Args:
+            tool_name: The name of the tool to get definition for
+
+        Returns:
+            ComposioToolDefinition instance or None if not found
+        """
+        return self.core.get_tool_definition(tool_name)
+
+    def create_tool_definition_from_api(self, toolkit: str, action: str) -> Optional[ComposioToolDefinition]:
+        """Create a ComposioToolDefinition by fetching from API
+
+        Args:
+            toolkit: The toolkit name (e.g., "GITHUB")
+            action: The action name (e.g., "GITHUB_CREATE_AN_ISSUE")
+
+        Returns:
+            ComposioToolDefinition instance with API-fetched schema, or None if failed
+        """
+        tool_definition = self.get_tool_definition(action)
+
+        if tool_definition:
+            # Ensure toolkit and action are set correctly
+            tool_definition.toolkit = toolkit
+            tool_definition.action = action
+
+        return tool_definition
