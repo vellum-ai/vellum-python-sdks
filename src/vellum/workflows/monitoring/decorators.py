@@ -2,7 +2,7 @@
 
 import fnmatch
 from uuid import UUID, uuid4
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, cast
 
 import wrapt
 
@@ -156,14 +156,14 @@ class MonitorDecorator:
                 span_id=uuid4(),
                 type="WORKFLOW",
                 workflow_definition=resource_def,
-                parent=current_parent,
+                parent=cast(Optional[ParentContext], current_parent),
             )
         else:
             return NodeParentContext(
                 span_id=uuid4(),
                 type="WORKFLOW_NODE",
                 node_definition=resource_def,
-                parent=current_parent,
+                parent=cast(Optional[ParentContext], current_parent),
             )
 
     def _infer_context_type(self, instance: Any) -> str:
