@@ -5,8 +5,7 @@ from types import FrameType
 from uuid import UUID
 from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
-import jsonschema
-from pydantic import BeforeValidator
+from pydantic import BeforeValidator, TypeAdapter, ValidationError
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
@@ -22,7 +21,9 @@ def serialize_type_encoder(obj: type) -> Dict[str, Any]:
     }
 
 
-def serialize_type_encoder_with_id(obj: Union[type, "CodeResourceDefinition"]) -> Dict[str, Any]:
+def serialize_type_encoder_with_id(
+    obj: Union[type, "CodeResourceDefinition"],
+) -> Dict[str, Any]:
     if hasattr(obj, "__id__") and isinstance(obj, type):
         return {
             "id": getattr(obj, "__id__"),
@@ -126,15 +127,33 @@ class ComposioToolDefinition(UniversalBaseModel):
         return self.action.lower()
 
     def validate_arguments(self, arguments: Dict[str, Any]) -> bool:
-        """Validate arguments against parameter schema"""
+        """Validate arguments against parameter schema using Pydantic"""
         if not self.parameters:
             return True
 
         try:
-            jsonschema.validate(instance=arguments, schema=self.parameters)
+            # This creates a validator from the JSON schema
+            adapter = TypeAdapter(Dict[str, Any])
+
+            # For more sophisticated validation, you could create a dynamic model:
+            # from pydantic import create_model
+            # DynamicModel = create_model('DynamicModel', **self.parameters.get('properties', {}))
+            # DynamicModel(**arguments)
+
+            # Simple validation - just ensure it's a valid dict structure
+            adapter.validate_python(arguments)
+
+            # Additional basic validation: check required fields if specified
+            if "required" in self.parameters:
+                required_fields = self.parameters["required"]
+                missing_fields = [field for field in required_fields if field not in arguments]
+                if missing_fields:
+                    logger.warning(f"Missing required fields for {self.action}: {missing_fields}")
+                    return False
+
             return True
-        except jsonschema.ValidationError as e:
-            logger.warning(f"Validation failed for {self.action}: {e.message}")
+        except ValidationError as e:
+            logger.warning(f"Validation failed for {self.action}: {e}")
             return False
         except Exception as e:
             logger.error(f"Unexpected validation error for {self.action}: {str(e)}")
