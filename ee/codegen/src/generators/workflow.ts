@@ -754,10 +754,16 @@ class WorkflowDisplayFile extends BasePersistedFile {
 
   public getModulePath(): string[] {
     if (this.workflowContext.parentNode) {
-      return [
-        ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
-        GENERATED_WORKFLOW_MODULE_NAME,
-      ];
+      return this.workflowContext.nestedWorkflowModuleName
+        ? [
+            ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
+            this.workflowContext.nestedWorkflowModuleName,
+            GENERATED_WORKFLOW_MODULE_NAME,
+          ]
+        : [
+            ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
+            GENERATED_WORKFLOW_MODULE_NAME,
+          ];
     } else {
       return [
         ...this.workflowContext.modulePath.slice(0, -1),
