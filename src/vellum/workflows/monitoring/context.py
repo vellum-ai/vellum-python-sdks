@@ -182,6 +182,7 @@ def monitoring_execution_context(
         set_trace_id = current_exec_context.trace_id or default_uuid
 
     # Determine parent context to use
+    set_parent_context: Optional[ParentContext]
     if parent_context is not None:
         set_parent_context = parent_context
     elif prev_context.parent_context is not None:
