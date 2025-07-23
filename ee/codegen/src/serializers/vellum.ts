@@ -53,8 +53,9 @@ import {
   DictionaryWorkflowReferenceEntry,
   ElifConditionNodePort,
   ElseConditionNodePort,
-  EnvironmentVariableWorkflowReference,
   EntrypointNode,
+  EnvironmentVariablePointer,
+  EnvironmentVariableWorkflowReference,
   ErrorNode,
   ExecutionCounterPointer,
   ExecutionCounterWorkflowReference,
@@ -470,6 +471,23 @@ export declare namespace ExecutionCounterPointerSerializer {
   }
 }
 
+export const EnvironmentVariablePointerSerializer: ObjectSchema<
+  EnvironmentVariablePointerSerializer.Raw,
+  Omit<EnvironmentVariablePointer, "type">
+> = objectSchema({
+  data: objectSchema({
+    environmentVariable: propertySchema("environment_variable", stringSchema()),
+  }),
+});
+
+export declare namespace EnvironmentVariablePointerSerializer {
+  interface Raw {
+    data: {
+      environment_variable: string;
+    };
+  }
+}
+
 export const NodeInputValuePointerRuleSerializer: Schema<
   NodeInputValuePointerRuleSerializer.Raw,
   NodeInputValuePointerRule
@@ -479,6 +497,7 @@ export const NodeInputValuePointerRuleSerializer: Schema<
   CONSTANT_VALUE: ConstantValuePointerSerializer,
   WORKSPACE_SECRET: WorkspaceSecretPointerSerializer,
   EXECUTION_COUNTER: ExecutionCounterPointerSerializer,
+  ENVIRONMENT_VARIABLE: EnvironmentVariablePointerSerializer,
 });
 
 export declare namespace NodeInputValuePointerRuleSerializer {
@@ -487,7 +506,8 @@ export declare namespace NodeInputValuePointerRuleSerializer {
     | InputVariablePointerSerializer.Raw
     | ConstantValuePointerSerializer.Raw
     | WorkspaceSecretPointerSerializer.Raw
-    | ExecutionCounterPointerSerializer.Raw;
+    | ExecutionCounterPointerSerializer.Raw
+    | EnvironmentVariablePointerSerializer.Raw;
 }
 
 export const NodeInputSerializer: ObjectSchema<
