@@ -167,9 +167,9 @@ describe("ToolCallingNode", () => {
           title: { type: "string" },
           body: { type: "string" },
           owner: { type: "string" },
-          repo: { type: "string" }
+          repo: { type: "string" },
         },
-        required: ["title", "owner", "repo"]
+        required: ["title", "owner", "repo"],
       },
     };
 
@@ -207,6 +207,58 @@ describe("ToolCallingNode", () => {
         nodeContext,
       });
 
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should handle composio tool with missing toolkit/action fields", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      // This simulates the problematic data structure that causes the TypeError
+      const problematicComposioTool = {
+        type: "COMPOSIO",
+        name: "GMAIL_CREATE_EMAIL_DRAFT",
+        tool_name: "Create email draft",
+        tool_slug: "GMAIL_CREATE_EMAIL_DRAFT",
+        description:
+          "Creates a gmail email draft, supporting to/cc/bcc, subject, plain/html body (ensure `is html=true` for html), attachments, and threading.",
+        connection_id: "ca_QoaKIKPlluHk",
+        integration_name: "gmail",
+        // Note: toolkit and action are missing, which causes the TypeError
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...problematicComposioTool,
+            id: "composio-tool-function-id",
+            name: "GMAIL_CREATE_EMAIL_DRAFT",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // This should not throw a TypeError
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

@@ -919,9 +919,14 @@ export type DeploymentWorkflowFunctionArgs = {
 
 export type ComposioToolFunctionArgs = {
   type: "COMPOSIO";
-  toolkit: string;
-  action: string;
+  toolkit?: string;
+  action?: string;
   description: string;
   display_name?: string | null;
-  parameters?: Record<string, any> | null;
+  parameters?: Record<string, unknown> | null;
+  // Additional fields that may be present in the current data structure
+  tool_name?: string;
+  tool_slug?: string;
+  connection_id?: string;
+  integration_name?: string;
 } & NameDescription;
