@@ -82,46 +82,24 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
-        logger.info("=" * 80)
-        logger.info("TOOL ROUTER NODE EXECUTION STARTED")
-        logger.info("=" * 80)
-        logger.info(f"Current prompt iterations: {self.state.prompt_iterations}")
-        logger.info(f"Max prompt iterations: {self.max_prompt_iterations}")
-
         if self.state.prompt_iterations >= self.max_prompt_iterations:
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
-            logger.error(f"Max iterations reached: {max_iterations_message}")
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
-        logger.info("Calling parent InlinePromptNode.run()...")
         generator = super().run()
         for output in generator:
-            logger.info(f"ToolRouterNode received output: name='{output.name}', value_type={type(output.value)}")
-
             if output.name == "results" and output.value:
                 values = cast(List[Any], output.value)
-                logger.info(f"Processing results output with {len(values)} values")
 
                 if values and len(values) > 0:
-                    logger.info(f"First result type: {values[0].type}")
-
                     if values[0].type == "STRING":
-                        logger.info(f"Processing STRING result: {values[0].value[:100]}...")
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
 
                     elif values[0].type == "FUNCTION_CALL":
-                        logger.info("Processing FUNCTION_CALL result")
                         self.state.prompt_iterations += 1
-                        logger.info(f"Incremented prompt iterations to: {self.state.prompt_iterations}")
 
                         function_call = values[0].value
                         if function_call is not None:
-                            logger.info(f"Function call details:")
-                            logger.info(f"  - Name: {function_call.name}")
-                            logger.info(f"  - ID: {function_call.id}")
-                            logger.info(f"  - State: {getattr(function_call, 'state', 'NOT_SET')}")
-                            logger.info(f"  - Arguments: {function_call.arguments}")
-
                             self.state.chat_history.append(
                                 ChatMessage(
                                     role="ASSISTANT",
@@ -134,7 +112,6 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
                                     ),
                                 )
                             )
-                            logger.info("Added function call to chat history")
             yield output
 
 
@@ -217,38 +194,20 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     composio_tool: ComposioToolDefinition
 
     def run(self) -> Iterator[BaseOutput]:
-        logger.info("!" * 80)
-        logger.info("COMPOSIO NODE EXECUTION STARTED")
-        logger.info("!" * 80)
-        logger.info(f"Composio tool: {self.composio_tool.action}")
-        logger.info(f"Tool name: {self.composio_tool.name}")
-        logger.info(f"Function call output available: {hasattr(self, 'function_call_output')}")
-
-        if hasattr(self, "function_call_output"):
-            logger.info(f"Function call output length: {len(self.function_call_output)}")
-            if self.function_call_output:
-                logger.info(f"First function call output type: {self.function_call_output[0].type}")
-
         # Extract arguments from function call
-        logger.info("Extracting function arguments...")
         arguments = self._extract_function_arguments()
-        logger.info(f"Extracted arguments: {arguments}")
 
-        # HACK: Use first Composio API key found in environment variables
+        # Get Composio API key from environment variables
         composio_api_key = None
         common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
-        logger.info("Searching for Composio API key...")
 
         for env_var_name in common_env_var_names:
             value = os.environ.get(env_var_name)
-            logger.info(f"Checking {env_var_name}: {'SET' if value else 'NOT_SET'}")
             if value:
                 composio_api_key = value
-                logger.info(f"Found API key in {env_var_name}")
                 break
 
         if not composio_api_key:
-            logger.error("No Composio API key found!")
             raise NodeException(
                 message=(
                     "No Composio API key found in environment variables. "
@@ -260,58 +219,43 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
         try:
             # Execute using ComposioService
-            logger.info(f"Creating ComposioService with API key (length: {len(composio_api_key)})...")
             composio_service = ComposioService(api_key=composio_api_key)
-            logger.info("ComposioService created successfully")
 
             # Get all user connections and find matching one for the toolkit
-            logger.info("Getting user connections to find matching connection...")
             connections = composio_service.get_user_connections()
             matching_connection = None
 
             for connection in connections:
-                logger.info(f"Checking connection: {connection.integration_name} (status: {connection.status})")
                 if (
                     connection.integration_name.upper() == self.composio_tool.toolkit.upper()
                     and connection.status == "ACTIVE"
                 ):
                     matching_connection = connection
-                    logger.info(f"Found matching active connection: {connection.connection_id}")
                     break
 
             if not matching_connection:
-                logger.error(f"No active connection found for toolkit '{self.composio_tool.toolkit}'")
                 raise NodeException(
-                    message=f"No active connection found for toolkit '{self.composio_tool.toolkit}'. Please ensure you have an active connection for this integration.",
+                    message=(
+                        f"No active connection found for toolkit '{self.composio_tool.toolkit}'. "
+                        f"Please ensure you have an active connection for this integration."
+                    ),
                     code=WorkflowErrorCode.NODE_EXECUTION,
                 )
 
-            logger.info(
-                f"Calling composio_service.execute_tool(tool_name='{self.composio_tool.action}', arguments={arguments}, connection_id='{matching_connection.connection_id}')"
-            )
             result = composio_service.execute_tool(
                 tool_name=self.composio_tool.action,
                 arguments=arguments,
                 connection_id=matching_connection.connection_id,
             )
-            logger.info(f"ComposioService.execute_tool returned: {result}")
 
         except Exception as e:
-            logger.error(f"Exception during Composio tool execution: {str(e)}")
-            logger.error(f"Exception type: {type(e)}")
-            import traceback
-
-            logger.error(f"Traceback: {traceback.format_exc()}")
             raise NodeException(
                 message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
             )
 
         # Add result to chat history
-        logger.info("Adding result to chat history...")
         self._add_function_result_to_chat_history(result, self.state)
-        logger.info("COMPOSIO NODE EXECUTION COMPLETED")
-        logger.info("!" * 80)
 
         yield from []
 
@@ -506,43 +450,36 @@ def get_composio_metadata_from_function_definition(function_def: FunctionDefinit
 def create_composio_wrapper_function(tool_def: ComposioToolDefinition):
     """Create a real Python function that wraps the Composio tool for prompt layer compatibility."""
 
-    # If no parameters are set, try to fetch them
-    if not tool_def.parameters:
-        logger.info(f"No parameters found for {tool_def.action}, attempting to fetch schema...")
-        try:
-            # Get API key from environment
-            api_key = os.environ.get("COMPOSIO_API_KEY") or os.environ.get("COMPOSIO_KEY")
-            if api_key:
-                composio_service = ComposioService(api_key)
+    try:
+        # Get API key from environment
+        api_key = os.environ.get("COMPOSIO_API_KEY") or os.environ.get("COMPOSIO_KEY")
+        if api_key:
+            composio_service = ComposioService(api_key)
 
-                # Fetch the real schema
-                actions = composio_service.core_client.actions.get(actions=[tool_def.action], limit=1)
-                if actions and len(actions) > 0:
-                    tool_details = actions[0]
+            # Fetch the real schema
+            actions = composio_service.core_client.actions.get(actions=[tool_def.action], limit=1)
+            if actions and len(actions) > 0:
+                tool_details = actions[0]
 
-                    if hasattr(tool_details, "parameters") and tool_details.parameters:
-                        param_properties = tool_details.parameters.properties
-                        required_params = tool_details.parameters.required
+                if hasattr(tool_details, "parameters") and tool_details.parameters:
+                    param_properties = tool_details.parameters.properties
+                    required_params = tool_details.parameters.required
 
-                        # Update the tool definition with real schema
-                        tool_def.parameters = {
-                            "type": "object",
-                            "properties": {},
-                            "required": required_params or [],
+                    # Update the tool definition with real schema
+                    tool_def.parameters = {
+                        "type": "object",
+                        "properties": {},
+                        "required": required_params or [],
+                    }
+
+                    for param_name, param_info in param_properties.items():
+                        tool_def.parameters["properties"][param_name] = {
+                            "type": param_info.get("type", "string"),
+                            "description": param_info.get("description", ""),
                         }
 
-                        for param_name, param_info in param_properties.items():
-                            tool_def.parameters["properties"][param_name] = {
-                                "type": param_info.get("type", "string"),
-                                "description": param_info.get("description", ""),
-                            }
-
-                        logger.info(
-                            f"Updated {tool_def.action} with parameters: {list(tool_def.parameters['properties'].keys())}"
-                        )
-
-        except Exception as e:
-            logger.warning(f"Could not fetch schema for {tool_def.action}: {e}")
+    except Exception as e:
+        logger.warning(f"Could not fetch schema for {tool_def.action}: {e}")
 
     def wrapper_function(**kwargs):
         # Validate arguments against schema if available
@@ -578,38 +515,26 @@ def create_tool_router_node(
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
-    logger.info("%" * 80)
-    logger.info("CREATE TOOL ROUTER NODE CALLED")
-    logger.info("%" * 80)
-    logger.info(f"ML Model: {ml_model}")
-    logger.info(f"Functions count: {len(functions)}")
-    logger.info(f"Max prompt iterations: {max_prompt_iterations}")
-
     if functions and len(functions) > 0:
         # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
         prompt_functions = []
-        logger.info("Creating ports for functions...")
 
-        for i, function in enumerate(functions):
+        for function in functions:
             # Convert ComposioToolDefinition to FunctionDefinition for prompt layer
             if isinstance(function, ComposioToolDefinition):
-                logger.info(f"  [{i}] Creating FunctionDefinition for ComposioToolDefinition: {function.action}")
                 function_def = wrap_composio_tool_as_function(function)
                 prompt_functions.append(function_def)
             else:
-                logger.info(f"  [{i}] Using regular function: {getattr(function, '__name__', str(function))}")
                 prompt_functions.append(function)
 
             # Create port for this function (using original function for get_function_name)
             function_name = get_function_name(function)
-            logger.info(f"  [{i}] Function name for port: {function_name}")
 
             # Avoid using lambda to capture function_name
             # lambda will capture the function_name by reference,
             # and if the function_name is changed, the port_condition will also change.
             def create_port_condition(fn_name):
-                logger.info(f"  Creating port condition for function: {fn_name}")
                 return LazyReference(
                     lambda: (
                         node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
@@ -620,14 +545,11 @@ def create_tool_router_node(
             port_condition = create_port_condition(function_name)
             port = Port.on_if(port_condition)
             setattr(Ports, function_name, port)
-            logger.info(f"  [{i}] Created port '{function_name}' with condition")
 
         # Add the else port for when no function conditions match
         setattr(Ports, "default", Port.on_else())
-        logger.info("Created 'default' port for non-matching cases")
     else:
         # If no functions exist, create a simple Ports class with just a default port
-        logger.info("No functions provided, creating simple default port")
         Ports = type("Ports", (), {"default": Port(default=True)})
         prompt_functions = []
 
@@ -689,14 +611,8 @@ def create_function_node(
         function: The function to create a node for
         tool_router_node: The tool router node class
     """
-    logger.info("^" * 80)
-    logger.info("CREATE FUNCTION NODE CALLED")
-    logger.info("^" * 80)
-    logger.info(f"Function type: {type(function).__name__}")
-
     # Check if this is a FunctionDefinition representing a Composio tool
     if isinstance(function, FunctionDefinition) and is_composio_function_definition(function):
-        logger.info("Detected Composio FunctionDefinition, creating ComposioNode...")
         composio_metadata = get_composio_metadata_from_function_definition(function)
 
         if composio_metadata:
@@ -709,10 +625,7 @@ def create_function_node(
                 parameters=function.parameters,
             )
 
-            logger.info(f"Reconstructed ComposioToolDefinition: {composio_tool.action}")
-
             node_name = f"ComposioNode_{composio_tool.name}"
-            logger.info(f"Creating dynamic ComposioNode class: {node_name}")
 
             node = type(
                 node_name,
@@ -723,8 +636,6 @@ def create_function_node(
                     "__module__": __name__,
                 },
             )
-            logger.info(f"Created ComposioNode from FunctionDefinition: {node}")
-            logger.info("^" * 80)
             return node
         else:
             logger.warning(
@@ -733,10 +644,8 @@ def create_function_node(
             # Fall through to regular FunctionDefinition handling
 
     if isinstance(function, DeploymentDefinition):
-        logger.info("Creating DynamicSubworkflowDeploymentNode...")
         deployment = function.deployment_id or function.deployment_name
         release_tag = function.release_tag
-        logger.info(f"Deployment: {deployment}, Release tag: {release_tag}")
 
         node = type(
             f"DynamicSubworkflowDeploymentNode_{deployment}",
@@ -748,16 +657,10 @@ def create_function_node(
                 "__module__": __name__,
             },
         )
-        logger.info(f"Created DynamicSubworkflowDeploymentNode: {node}")
         return node
 
     elif isinstance(function, ComposioToolDefinition):
-        logger.info("Creating ComposioNode...")
-        logger.info(f"ComposioToolDefinition action: {function.action}")
-        logger.info(f"ComposioToolDefinition name: {function.name}")
-
         node_name = f"ComposioNode_{function.name}"
-        logger.info(f"Creating dynamic class: {node_name}")
 
         node = type(
             node_name,
@@ -768,12 +671,8 @@ def create_function_node(
                 "__module__": __name__,
             },
         )
-        logger.info(f"Created ComposioNode: {node}")
-        logger.info(f"ComposioNode class attributes: composio_tool={getattr(node, 'composio_tool', 'NOT_SET')}")
-        logger.info("^" * 80)
         return node
     elif is_workflow_class(function):
-        logger.info("Creating DynamicInlineSubworkflowNode...")
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",
             (DynamicInlineSubworkflowNode,),
@@ -783,11 +682,9 @@ def create_function_node(
                 "__module__": __name__,
             },
         )
-        logger.info(f"Created DynamicInlineSubworkflowNode: {node}")
         return node
     elif isinstance(function, FunctionDefinition):
         # For non-Composio FunctionDefinition objects, create a simple function node
-        logger.info("Creating FunctionNode for FunctionDefinition...")
         function_name = function.name or "unknown_function"
 
         def function_wrapper(**kwargs):
@@ -802,11 +699,9 @@ def create_function_node(
                 "__module__": __name__,
             },
         )
-        logger.info(f"Created FunctionNode for FunctionDefinition: {node}")
         return node
     else:
         # For regular functions, use FunctionNode
-        logger.info("Creating FunctionNode for regular function...")
         if callable(function):
             node = type(
                 f"FunctionNode_{function.__name__}",
@@ -817,10 +712,8 @@ def create_function_node(
                     "__module__": __name__,
                 },
             )
-            logger.info(f"Created FunctionNode: {node}")
             return node
         else:
-            logger.error(f"Cannot create function node for non-callable object: {function}")
             raise ValueError(f"Cannot create function node for non-callable object: {function}")
 
 
