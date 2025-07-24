@@ -1,3 +1,7 @@
+import base64
+import hashlib
+import hmac
+import time
 from typing import Any, Dict, Generic, Optional, Union
 
 from requests import Request, RequestException, Session
@@ -83,6 +87,10 @@ class BaseAPINode(BaseNode, Generic[StateType]):
                 prepped = Request(method=method.value, url=url, headers=headers).prepare()
         except Exception as e:
             raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
+
+        if hasattr(self._context, "workspace_hmac_secret") and self._context.workspace_hmac_secret:
+            self._sign_request_with_hmac(prepped, self._context.workspace_hmac_secret)
+
         try:
             with Session() as session:
                 response = session.send(prepped, timeout=timeout)
@@ -97,6 +105,25 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             headers={header: value for header, value in response.headers.items()},
             status_code=response.status_code,
             text=response.text,
+        )
+
+    def _sign_request_with_hmac(self, request, hmac_secret: str) -> None:
+        """Sign request using workspace HMAC secret"""
+        timestamp = str(int(time.time()))
+
+        body = request.body or b""
+        if isinstance(body, str):
+            body = body.encode()
+
+        message = f"{timestamp}\n{request.method}\n{request.url}\n".encode() + body
+        signature = hmac.new(hmac_secret.encode("utf-8"), message, hashlib.sha256)
+        signature_b64 = base64.b64encode(signature.digest()).decode("utf-8")
+
+        request.headers.update(
+            {
+                "X-Vellum-Timestamp": timestamp,
+                "X-Vellum-Signature": signature_b64,
+            }
         )
 
     def _vellum_execute_api(self, bearer_token, data, headers, method, url, timeout):
