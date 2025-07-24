@@ -18,8 +18,8 @@ class ConnectionInfo:
     status: str = "ACTIVE"
 
 
-class ComposioAccountService:
-    """Manages user authorized connections using direct API requests"""
+class ComposioService:
+    """Composio API client for managing connections and executing tools"""
 
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -65,39 +65,6 @@ class ComposioAccountService:
             for item in response.get("items", [])
         ]
 
-
-class ComposioCoreService:
-    """Handles tool execution using direct API requests"""
-
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.base_url = "https://backend.composio.dev/api/v3"
-
-    def _make_request(
-        self, endpoint: str, method: str = "GET", params: Optional[dict] = None, json_data: Optional[dict] = None
-    ) -> dict:
-        """Make a request to the Composio API"""
-        headers = {
-            "x-api-key": self.api_key,
-            "Content-Type": "application/json",
-        }
-
-        url = f"{self.base_url}{endpoint}"
-
-        try:
-            if method == "GET":
-                response = requests.get(url, headers=headers, params=params or {}, timeout=30)
-            elif method == "POST":
-                response = requests.post(url, headers=headers, json=json_data or {}, timeout=30)
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
-
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            logger.error(f"Composio API request failed: {e}")
-            raise
-
     def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
         """Execute a tool using direct API request
 
@@ -108,33 +75,6 @@ class ComposioCoreService:
         Returns:
             The result of the tool execution
         """
-        # Use the tool execution endpoint from the docs
         endpoint = f"/tools/execute/{tool_name}"
         response = self._make_request(endpoint, method="POST", json_data=arguments)
-
-        # Return the data from the response, following the API response format
         return response.get("data", response)
-
-
-class ComposioService:
-    """Unified interface for Composio operations"""
-
-    def __init__(self, api_key: str):
-        self.accounts = ComposioAccountService(api_key)
-        self.core = ComposioCoreService(api_key)
-
-    def get_user_connections(self) -> List[ConnectionInfo]:
-        """Get user's authorized connections"""
-        return self.accounts.get_user_connections()
-
-    def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
-        """Execute a tool using direct API request
-
-        Args:
-            tool_name: The name of the tool to execute (e.g., "HACKERNEWS_GET_USER")
-            arguments: Dictionary of arguments to pass to the tool
-
-        Returns:
-            The result of the tool execution
-        """
-        return self.core.execute_tool(tool_name, arguments)
