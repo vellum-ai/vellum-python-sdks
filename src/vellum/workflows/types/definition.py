@@ -124,7 +124,7 @@ class ComposioToolDefinition(UniversalBaseModel):
     @property
     def name(self) -> str:
         """Generate a function name for this tool"""
-        return self.action.lower()
+        return self.action
 
     def validate_arguments(self, arguments: Dict[str, Any]) -> bool:
         """Validate arguments against parameter schema using Pydantic"""

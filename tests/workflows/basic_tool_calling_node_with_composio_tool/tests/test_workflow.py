@@ -59,7 +59,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                                 "body": "There seems to be an issue with login functionality",
                             },
                             id="call_composio_github_create_issue",
-                            name="github_create_an_issue",
+                            name="GITHUB_CREATE_AN_ISSUE",
                             state="FULFILLED",
                         ),
                     ),
@@ -111,7 +111,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
 
         # Cast to the specific type to help mypy
         function_content = cast(FunctionCallChatMessageContent, function_call_msg.content)
-        assert function_content.value.name == "github_create_an_issue"
+        assert function_content.value.name == "GITHUB_CREATE_AN_ISSUE"
 
         # Function result message
         function_result_msg = terminal_event.outputs.chat_history[1]
@@ -156,7 +156,7 @@ def test_run_workflow__missing_api_key_raises_exception(vellum_adhoc_prompt_clie
                 value=FunctionCall(
                     arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                     id="call_composio_test",
-                    name="github_create_an_issue",
+                    name="GITHUB_CREATE_AN_ISSUE",
                     state="FULFILLED",
                 ),
             ),
@@ -209,7 +209,7 @@ def test_run_workflow__composio_api_key_precedence(vellum_adhoc_prompt_client, m
                     value=FunctionCall(
                         arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                         id="call_composio_test",
-                        name="github_create_an_issue",
+                        name="GITHUB_CREATE_AN_ISSUE",
                         state="FULFILLED",
                     ),
                 ),
@@ -262,7 +262,7 @@ def test_run_workflow__composio_key_fallback(vellum_adhoc_prompt_client, monkeyp
                     value=FunctionCall(
                         arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                         id="call_composio_test",
-                        name="github_create_an_issue",
+                        name="GITHUB_CREATE_AN_ISSUE",
                         state="FULFILLED",
                     ),
                 ),
@@ -312,7 +312,7 @@ def test_run_workflow__composio_tool_execution_error(vellum_adhoc_prompt_client,
                     value=FunctionCall(
                         arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                         id="call_composio_error_test",
-                        name="github_create_an_issue",
+                        name="GITHUB_CREATE_AN_ISSUE",
                         state="FULFILLED",
                     ),
                 ),
@@ -352,9 +352,9 @@ def test_tool_name_mapping_from_composio_definition():
     # WHEN we access the name property
     function_name = tool.name
 
-    # THEN it should be the lowercase version of the action
-    assert function_name == "github_create_an_issue"
-    assert function_name == tool.action.lower()
+    # THEN it should be the uppercase version of the action (the original action name)
+    assert function_name == "GITHUB_CREATE_AN_ISSUE"
+    assert function_name == tool.action
 
 
 def test_workflow_prompt_structure_includes_composio_tool_as_function(vellum_adhoc_prompt_client, monkeypatch):
@@ -394,7 +394,7 @@ def test_workflow_prompt_structure_includes_composio_tool_as_function(vellum_adh
         assert len(functions) == 1
         function_def = functions[0]
         assert isinstance(function_def, FunctionDefinition)
-        assert function_def.name == "github_create_an_issue"  # Should use the tool's name property
+        assert function_def.name == "GITHUB_CREATE_AN_ISSUE"  # Should use the tool's name property
         assert (
             function_def.description == "Create a new issue in a GitHub repository"
         )  # Should use the tool's description

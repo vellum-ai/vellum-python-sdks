@@ -43,7 +43,22 @@ class FunctionCallNodeMixin:
         if self.function_call_output and len(self.function_call_output) > 0:
             function_call = self.function_call_output[0]
             if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                return function_call.value.arguments or {}
+                arguments = function_call.value.arguments or {}
+
+                # Handle double-encoded arguments with kwargs wrapper (common with Composio tools)
+                if isinstance(arguments, dict) and "kwargs" in arguments and len(arguments) == 1:
+                    kwargs_value = arguments["kwargs"]
+                    if isinstance(kwargs_value, str):
+                        try:
+                            # Parse JSON-stringified kwargs
+                            parsed_kwargs = json.loads(kwargs_value)
+                            if isinstance(parsed_kwargs, dict):
+                                return parsed_kwargs
+                        except (json.JSONDecodeError, TypeError):
+                            # If parsing fails, fall back to original arguments
+                            pass
+
+                return arguments
         return {}
 
     def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
