@@ -2,7 +2,7 @@ import pytest
 from dataclasses import dataclass
 from enum import Enum
 from unittest.mock import Mock
-from typing import Annotated, Dict, List, Literal, Optional, Union
+from typing import Annotated, Dict, List, Literal, Optional, Tuple, Union
 
 from pydantic import BaseModel
 
@@ -699,3 +699,28 @@ def test_compile_function_definition__annotated_complex_types():
             "required": ["location", "items", "config"],
         },
     )
+@pytest.mark.parametrize(
+    "annotation,expected_schema",
+    [
+        (
+            Tuple[int, ...],
+            {"type": "array", "items": {"type": "integer"}},
+        ),
+        (
+            Tuple[int, str],
+            {
+                "type": "array",
+                "prefixItems": [{"type": "integer"}, {"type": "string"}],
+                "minItems": 2,
+                "maxItems": 2,
+            },
+        ),
+    ],
+)
+def test_compile_function_definition__tuples(annotation, expected_schema):
+    def my_function(a: annotation):  # type: ignore
+        pass
+
+    compiled_function = compile_function_definition(my_function)
+    assert isinstance(compiled_function.parameters, dict)
+    assert compiled_function.parameters["properties"]["a"] == expected_schema
