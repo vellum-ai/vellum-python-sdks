@@ -89,9 +89,9 @@ def test_mapnode_monitoring_context_flow():
         return original_decorator_setter(context)
 
     with patch(
-        "vellum.workflows.monitoring.context.set_monitoring_execution_context", side_effect=capture_monitoring_context
+        "vellum.workflows.events.context.set_monitoring_execution_context", side_effect=capture_monitoring_context
     ), patch(
-        "vellum.workflows.monitoring.decorators.set_monitoring_execution_context",
+        "vellum.workflows.events.decorators.set_monitoring_execution_context",
         side_effect=capture_monitoring_context_decorator,
     ):
         # Run workflow to capture parent context hierarchy
