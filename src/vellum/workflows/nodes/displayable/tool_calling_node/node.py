@@ -1,3 +1,4 @@
+import logging
 from typing import ClassVar, Iterator, List, Optional, Set
 
 from vellum import ChatMessage, PromptBlock
@@ -20,6 +21,8 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface, Tool
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
+
+logger = logging.getLogger(__name__)
 
 
 class ToolCallingNode(BaseNode):
@@ -64,7 +67,6 @@ class ToolCallingNode(BaseNode):
         self._build_graph()
 
         with execution_context(parent_context=get_parent_context()):
-
             from vellum.workflows.workflows.base import BaseWorkflow
 
             class ToolCallingWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
