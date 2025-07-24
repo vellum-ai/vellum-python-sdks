@@ -1,3 +1,4 @@
+import logging
 from typing import ClassVar, Iterator, List, Optional, Set
 
 from vellum import ChatMessage, PromptBlock
@@ -19,7 +20,10 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface, Tool
+from vellum.workflows.types.definition import ComposioToolDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
+
+logger = logging.getLogger(__name__)
 
 
 class ToolCallingNode(BaseNode):
@@ -60,11 +64,22 @@ class ToolCallingNode(BaseNode):
         This dynamically builds a graph with router and function nodes,
         then executes the workflow and streams chat_history updates.
         """
+        logger.info("=" * 80)
+        logger.info("TOOL CALLING NODE EXECUTION STARTED")
+        logger.info("=" * 80)
+        logger.info(f"Functions defined: {len(self.functions)}")
+        for i, func in enumerate(self.functions):
+            if isinstance(func, ComposioToolDefinition):
+                logger.info(f"  [{i}] ComposioToolDefinition: {func.action} (name: {func.name})")
+            else:
+                logger.info(f"  [{i}] Function: {getattr(func, '__name__', str(func))}")
+
+        logger.info(f"ML Model: {self.ml_model}")
+        logger.info(f"Max prompt iterations: {self.max_prompt_iterations}")
 
         self._build_graph()
 
         with execution_context(parent_context=get_parent_context()):
-
             from vellum.workflows.workflows.base import BaseWorkflow
 
             class ToolCallingWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
@@ -130,6 +145,8 @@ class ToolCallingNode(BaseNode):
                 )
 
     def _build_graph(self) -> None:
+        logger.info("Building workflow graph...")
+
         self.tool_router_node = create_tool_router_node(
             ml_model=self.ml_model,
             blocks=self.blocks,
@@ -138,25 +155,31 @@ class ToolCallingNode(BaseNode):
             parameters=self.parameters,
             max_prompt_iterations=self.max_prompt_iterations,
         )
+        logger.info(f"Created tool router node: {self.tool_router_node}")
 
         self._function_nodes = {}
         for function in self.functions:
             function_name = get_function_name(function)
+            logger.info(f"Creating function node for: {function_name}")
 
             self._function_nodes[function_name] = create_function_node(
                 function=function,
                 tool_router_node=self.tool_router_node,
             )
+            logger.info(f"Created function node: {self._function_nodes[function_name]}")
 
         graph_set = set()
 
         # Add connections from ports of router to function nodes and back to router
         for function_name, FunctionNodeClass in self._function_nodes.items():
             router_port = getattr(self.tool_router_node.Ports, function_name)
+            logger.info(f"Connecting port '{function_name}' -> {FunctionNodeClass.__name__} -> router")
             edge_graph = router_port >> FunctionNodeClass >> self.tool_router_node
             graph_set.add(edge_graph)
 
         default_port = getattr(self.tool_router_node.Ports, "default")
         graph_set.add(default_port)
+        logger.info("Added default port to graph")
 
         self._graph = Graph.from_set(graph_set)
+        logger.info(f"Built complete workflow graph with {len(graph_set)} edges")
