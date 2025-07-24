@@ -20,7 +20,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     Used to execute an API call.
 
     url: str - The URL to send the request to.
-    method: APIRequestMethod - The HTTP method to use for the request.
+    method: Union[APIRequestMethod, str] - The HTTP method to use for the request.
     data: Optional[str] - The data to send in the request body.
     json: Optional["JsonObject"] - The JSON data to send in the request body.
     headers: Optional[Dict[str, Union[str, VellumSecret]]] - The headers to send in the request.
@@ -31,7 +31,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
     url: str = ""
-    method: Optional[APIRequestMethod] = APIRequestMethod.GET
+    method: Optional[Union[APIRequestMethod, str]] = APIRequestMethod.GET
     data: Optional[str] = None
     json: Optional[Json] = None
     headers: Optional[Dict[str, Union[str, VellumSecret]]] = None
@@ -42,6 +42,34 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         headers: Dict[str, str]
         status_code: int
         text: str
+
+    def _normalize_http_method(self, method: Union[APIRequestMethod, str]) -> APIRequestMethod:
+        """
+        Normalize HTTP method to APIRequestMethod enum.
+
+        Args:
+            method: Either an APIRequestMethod enum or a string representing HTTP method
+
+        Returns:
+            APIRequestMethod enum
+
+        Raises:
+            NodeException: If the method is not a valid HTTP method
+        """
+        if isinstance(method, APIRequestMethod):
+            return method
+
+        if isinstance(method, str):
+            method_upper = method.upper()
+            try:
+                return APIRequestMethod(method_upper)
+            except ValueError:
+                raise NodeException(f"Invalid HTTP method '{method}'", code=WorkflowErrorCode.INVALID_INPUTS)
+
+        raise NodeException(
+            f"Method must be either APIRequestMethod enum or string, got {type(method)}",
+            code=WorkflowErrorCode.INVALID_INPUTS,
+        )
 
     def _validate(self) -> None:
         if not self.url or not isinstance(self.url, str) or not self.url.strip():
@@ -55,7 +83,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     def _run(
         self,
         url: str,
-        method: Optional[APIRequestMethod] = APIRequestMethod.GET,
+        method: Optional[Union[APIRequestMethod, str]] = APIRequestMethod.GET,
         data: Optional[Union[str, Any]] = None,
         json: Any = None,
         headers: Any = None,
@@ -64,14 +92,17 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     ) -> Outputs:
         self._validate()
 
+        # Normalize method to enum
+        normalized_method = self._normalize_http_method(method) if method is not None else APIRequestMethod.GET
+
         vellum_instance = False
         for header in headers or {}:
             if isinstance(headers[header], VellumSecret):
                 vellum_instance = True
         if vellum_instance or bearer_token:
-            return self._vellum_execute_api(bearer_token, json, headers, method, url, timeout)
+            return self._vellum_execute_api(bearer_token, json, headers, normalized_method, url, timeout)
         else:
-            return self._local_execute_api(data, headers, json, method, url, timeout)
+            return self._local_execute_api(data, headers, json, normalized_method, url, timeout)
 
     def _local_execute_api(self, data, headers, json, method, url, timeout):
         try:
