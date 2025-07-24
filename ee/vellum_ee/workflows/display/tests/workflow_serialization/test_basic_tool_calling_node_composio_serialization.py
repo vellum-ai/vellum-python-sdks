@@ -54,6 +54,9 @@ def test_serialize_workflow():
         "action": "GITHUB_CREATE_AN_ISSUE",
         "description": "Create a new issue in a GitHub repository",
         "display_name": "Create GitHub Issue",
+        "parameters": None,
+        "version": None,
+        "tags": None,
     }
 
     # AND the rest of the node structure should be correct

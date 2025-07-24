@@ -36,8 +36,20 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
     }
 
     with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+        # Mock connection data
+        from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ConnectionInfo
+
+        mock_connection = ConnectionInfo(
+            connection_id="test_connection_id",
+            integration_name="github",
+            status="ACTIVE",
+            created_at="2024-01-01T00:00:00Z",
+            updated_at="2024-01-01T00:00:00Z",
+        )
+
         mock_service_instance = mock.Mock()
         mock_service_instance.execute_tool.return_value = mock_composio_result
+        mock_service_instance.get_user_connections.return_value = [mock_connection]
         mock_service_class.return_value = mock_service_instance
 
         # Set API key via monkeypatch
@@ -59,7 +71,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                                 "body": "There seems to be an issue with login functionality",
                             },
                             id="call_composio_github_create_issue",
-                            name="github_create_an_issue",
+                            name="GITHUB_CREATE_AN_ISSUE",
                             state="FULFILLED",
                         ),
                     ),
@@ -111,7 +123,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
 
         # Cast to the specific type to help mypy
         function_content = cast(FunctionCallChatMessageContent, function_call_msg.content)
-        assert function_content.value.name == "github_create_an_issue"
+        assert function_content.value.name == "GITHUB_CREATE_AN_ISSUE"
 
         # Function result message
         function_result_msg = terminal_event.outputs.chat_history[1]
@@ -128,7 +140,8 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         assert "successfully created" in final_msg.text
 
         # THEN the ComposioService was called correctly
-        mock_service_class.assert_called_once_with(api_key="test_api_key_123")
+        # Note: ComposioService is called twice - once for schema fetching, once for execution
+        assert mock_service_class.call_count == 2
         mock_service_instance.execute_tool.assert_called_once_with(
             tool_name="GITHUB_CREATE_AN_ISSUE",
             arguments={
@@ -137,6 +150,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 "title": "Bug in authentication",
                 "body": "There seems to be an issue with login functionality",
             },
+            connection_id="test_connection_id",
         )
 
 
@@ -156,7 +170,7 @@ def test_run_workflow__missing_api_key_raises_exception(vellum_adhoc_prompt_clie
                 value=FunctionCall(
                     arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                     id="call_composio_test",
-                    name="github_create_an_issue",
+                    name="GITHUB_CREATE_AN_ISSUE",
                     state="FULFILLED",
                 ),
             ),
@@ -209,7 +223,7 @@ def test_run_workflow__composio_api_key_precedence(vellum_adhoc_prompt_client, m
                     value=FunctionCall(
                         arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                         id="call_composio_test",
-                        name="github_create_an_issue",
+                        name="GITHUB_CREATE_AN_ISSUE",
                         state="FULFILLED",
                     ),
                 ),
@@ -262,7 +276,7 @@ def test_run_workflow__composio_key_fallback(vellum_adhoc_prompt_client, monkeyp
                     value=FunctionCall(
                         arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                         id="call_composio_test",
-                        name="github_create_an_issue",
+                        name="GITHUB_CREATE_AN_ISSUE",
                         state="FULFILLED",
                     ),
                 ),
@@ -300,9 +314,21 @@ def test_run_workflow__composio_tool_execution_error(vellum_adhoc_prompt_client,
     monkeypatch.setenv("COMPOSIO_API_KEY", "test_api_key")
 
     with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+        # Mock connection data
+        from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ConnectionInfo
+
+        mock_connection = ConnectionInfo(
+            connection_id="test_connection_id",
+            integration_name="github",
+            status="ACTIVE",
+            created_at="2024-01-01T00:00:00Z",
+            updated_at="2024-01-01T00:00:00Z",
+        )
+
         mock_service_instance = mock.Mock()
         # Simulate an API error
         mock_service_instance.execute_tool.side_effect = Exception("API rate limit exceeded")
+        mock_service_instance.get_user_connections.return_value = [mock_connection]
         mock_service_class.return_value = mock_service_instance
 
         def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
@@ -312,7 +338,7 @@ def test_run_workflow__composio_tool_execution_error(vellum_adhoc_prompt_client,
                     value=FunctionCall(
                         arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
                         id="call_composio_error_test",
-                        name="github_create_an_issue",
+                        name="GITHUB_CREATE_AN_ISSUE",
                         state="FULFILLED",
                     ),
                 ),
@@ -352,9 +378,9 @@ def test_tool_name_mapping_from_composio_definition():
     # WHEN we access the name property
     function_name = tool.name
 
-    # THEN it should be the lowercase version of the action
-    assert function_name == "github_create_an_issue"
-    assert function_name == tool.action.lower()
+    # THEN it should be the uppercase version of the action (the original action name)
+    assert function_name == "GITHUB_CREATE_AN_ISSUE"
+    assert function_name == tool.action
 
 
 def test_workflow_prompt_structure_includes_composio_tool_as_function(vellum_adhoc_prompt_client, monkeypatch):
@@ -394,7 +420,7 @@ def test_workflow_prompt_structure_includes_composio_tool_as_function(vellum_adh
         assert len(functions) == 1
         function_def = functions[0]
         assert isinstance(function_def, FunctionDefinition)
-        assert function_def.name == "github_create_an_issue"  # Should use the tool's name property
+        assert function_def.name == "GITHUB_CREATE_AN_ISSUE"  # Should use the tool's name property
         assert (
             function_def.description == "Create a new issue in a GitHub repository"
         )  # Should use the tool's description
