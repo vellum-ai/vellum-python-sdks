@@ -8,6 +8,7 @@ import wrapt
 
 from vellum.workflows.context import ExecutionContext
 from vellum.workflows.events.context import (
+    DEFAULT_TRACE_ID,
     _monitoring_context_store,
     get_monitoring_execution_context,
     set_monitoring_execution_context,
@@ -40,20 +41,8 @@ class MonitorDecorator:
         if not self.enabled:
             return wrapped(*args, **kwargs)
 
-        # Get current monitoring context
+        # Get current monitoring context, either from monitoring context store  or our monitoring context
         current_monitoring = get_monitoring_execution_context()
-
-        # Try to find parent context using the current span_id stored globally
-        current_span_id = _monitoring_context_store.get_current_span_id()
-        if current_span_id:
-            parent_monitoring_context = _monitoring_context_store.retrieve_context_by_span_id(current_span_id)
-            if parent_monitoring_context:
-                # Use the parent context we found
-                current_monitoring = ExecutionContext(
-                    trace_id=current_monitoring.trace_id,
-                    parent_context=parent_monitoring_context,
-                    monitoring_enabled=self.enabled,
-                )
 
         # Get the best trace_id from monitoring system only
         trace_id_to_use = self._get_best_trace_id(current_monitoring)
@@ -66,18 +55,17 @@ class MonitorDecorator:
             monitor_name, current_monitoring, instance, wrapped
         )
 
-        # Store the new context for potential child calls
-        _monitoring_context_store.store_context(trace_id_to_use, new_monitoring_parent)
-
-        # Store the current span_id globally so child methods can find it
-        _monitoring_context_store.set_current_span_id(new_monitoring_parent.span_id)
-
         # Create and set the monitoring context for this execution
         new_monitoring_context = ExecutionContext(
             trace_id=trace_id_to_use,
             parent_context=new_monitoring_parent,
-            monitoring_enabled=self.enabled,
         )
+
+        # Store the new context for potential child calls
+        _monitoring_context_store.store_context(new_monitoring_context)
+
+        # Store the current span_id globally so child methods can find it
+        _monitoring_context_store.set_current_span_id(new_monitoring_parent.span_id)
 
         # Save previous context and set new one
         prev_monitoring_context = current_monitoring
@@ -104,16 +92,13 @@ class MonitorDecorator:
                 _monitoring_context_store.set_current_span_id(prev_span_id)
 
     def _get_best_trace_id(self, current_monitoring: ExecutionContext) -> UUID:
-        """Get the best trace_id from monitoring system only."""
-        default_uuid = UUID("00000000-0000-0000-0000-000000000000")
-
         # Priority 1: Use current monitoring context trace_id if not default
-        if current_monitoring.trace_id != default_uuid:
+        if current_monitoring.trace_id != DEFAULT_TRACE_ID:
             return current_monitoring.trace_id
 
         # Priority 2: Try global current trace_id from context store
         global_trace_id = _monitoring_context_store.get_current_trace_id()
-        if global_trace_id and global_trace_id != default_uuid:
+        if global_trace_id and global_trace_id != DEFAULT_TRACE_ID:
             return global_trace_id
 
         # Priority 3: Generate new UUID and store it globally for this execution
@@ -131,8 +116,6 @@ class MonitorDecorator:
         """Create new monitoring parent context for this call."""
         # Use current monitoring context as parent if it has one
         if current_monitoring.parent_context:
-            # Convert current monitoring's parent context into the parent for this new context
-            # This creates proper nesting: new_method -> current_method -> parent_method
             current_parent = current_monitoring.parent_context
         else:
             # If we have a workflow_class and no current parent, create workflow context as root
@@ -140,7 +123,7 @@ class MonitorDecorator:
             if hasattr(self, "workflow_class") and self.workflow_class:
                 workflow_resource_def = CodeResourceDefinition(
                     id=uuid4(),
-                    name=f"{self.workflow_class.__name__}.run",  # Include the run method name
+                    name=f"{self.workflow_class.__name__}",
                     module=(
                         [self.workflow_class.__module__]
                         if hasattr(self.workflow_class, "__module__")
@@ -168,14 +151,12 @@ class MonitorDecorator:
         if context_type == "WORKFLOW":
             return WorkflowParentContext(
                 span_id=uuid4(),
-                type="WORKFLOW",
                 workflow_definition=resource_def,
                 parent=cast(Optional[ParentContext], current_parent),
             )
         else:
             return NodeParentContext(
                 span_id=uuid4(),
-                type="WORKFLOW_NODE",
                 node_definition=resource_def,
                 parent=cast(Optional[ParentContext], current_parent),
             )
@@ -198,71 +179,13 @@ class MonitorDecorator:
         return "NODE"
 
 
-class SubworkflowMonitoringWrapper(wrapt.ObjectProxy):
-    """Wrapper that automatically monitors subworkflow method calls."""
-
-    def __init__(self, wrapped_instance, methods_to_monitor=None, workflow_class=None):
-        super().__init__(wrapped_instance)
-        self._self_wrapped_instance_name = wrapped_instance.__class__.__name__
-        self._self_methods_to_monitor = methods_to_monitor or {"run", "stream"}
-        self._self_workflow_class = workflow_class
-
-    def __getattribute__(self, name):
-        # Get the attribute normally first
-        attr = super().__getattribute__(name)
-
-        # If it's a callable method we want to monitor, wrap it
-        if callable(attr) and name in self._self_methods_to_monitor and not hasattr(attr, "__wrapped__"):
-            monitor_name = f"{self._self_wrapped_instance_name}.{name}"
-
-            # Subworkflows should appear as NODE context under their containing node
-            class SubworkflowNodeDecorator(MonitorDecorator):
-                def __init__(self, *args, **kwargs):
-                    super().__init__(*args, **kwargs)
-                    # Use workflow_class if needed, do not reference _self_workflow_class
-                    self.workflow_class = getattr(self, "workflow_class", None)
-
-                def _infer_context_type(self, instance: Any) -> str:
-                    return "NODE"
-
-            return SubworkflowNodeDecorator(name=monitor_name)(attr)
-
-        return attr
-
-
-def wrap_subworkflows_for_monitoring(node_class, methods_to_monitor=None, workflow_class=None):
-    """
-    Utility function to wrap subworkflows with monitoring for a given node class.
-
-    Args:
-        node_class: The node class to scan for subworkflows
-        methods_to_monitor: Set of method names to monitor (defaults to {'run', 'stream'})
-        workflow_class: Optional workflow class to pass to subworkflows for root parent context
-    """
-    methods_to_monitor = methods_to_monitor or {"run", "stream"}
-
-    # Instead of wrapping the subworkflow instance, wrap the subworkflow class methods directly
-    # This avoids descriptor resolution issues
-    for base in node_class.__mro__:
-        if hasattr(base, "subworkflow"):
-            subworkflow = getattr(base, "subworkflow")
-            if subworkflow is not None and hasattr(subworkflow, "__class__"):
-                # Wrap the subworkflow class methods directly with WORKFLOW context
-                wrap_classes_for_monitoring(
-                    [subworkflow.__class__],
-                    context_type="WORKFLOW",
-                    methods_to_monitor=methods_to_monitor,
-                    workflow_class=workflow_class,
-                )
-
-
-def wrap_classes_for_monitoring(classes, context_type="NODE", methods_to_monitor=None, workflow_class=None):
+def wrap_classes_for_monitoring(classes, parent_context_type="NODE", methods_to_monitor=None, workflow_class=None):
     """
     Utility function to wrap multiple classes with monitoring.
 
     Args:
         classes: Iterable of classes to wrap
-        context_type: Either "WORKFLOW" or "NODE" to determine the monitoring context
+        parent_context_type: Either "WORKFLOW" or "NODE" to determine the monitoring context
         methods_to_monitor: Set of method names to monitor. If None, uses smart detection.
         workflow_class: Optional workflow class to use as root parent context for nodes
     """
@@ -274,7 +197,7 @@ def wrap_classes_for_monitoring(classes, context_type="NODE", methods_to_monitor
             self.workflow_class = workflow_class
 
         def _infer_context_type(self, instance: Any) -> str:
-            return context_type
+            return parent_context_type
 
     def get_execution_methods(target_cls) -> set:
         """Smart detection of methods that should be monitored."""
@@ -284,7 +207,7 @@ def wrap_classes_for_monitoring(classes, context_type="NODE", methods_to_monitor
         execution_methods = set()
 
         # Standard execution methods
-        standard_methods = {"run", "stream", "execute"}
+        standard_methods = {"run", "stream"}
 
         # Check standard methods
         for method_name in standard_methods:
@@ -302,7 +225,7 @@ def wrap_classes_for_monitoring(classes, context_type="NODE", methods_to_monitor
             if hasattr(cls, method_name):
                 method = getattr(cls, method_name)
                 if callable(method) and not hasattr(method, "__wrapped__"):
-                    monitor_name = f"{cls.__name__}.{method_name}"
+                    monitor_name = f"{cls.__name__}"
                     decorator = ContextMonitorDecorator(name=monitor_name)
                     wrapped_method = decorator(method)
                     setattr(cls, method_name, wrapped_method)

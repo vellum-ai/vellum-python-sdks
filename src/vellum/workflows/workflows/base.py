@@ -377,7 +377,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
 
         # Wrap this workflow's nodes so they create WORKFLOW parent contexts
         all_nodes = list(cls.get_all_nodes())
-        wrap_classes_for_monitoring(all_nodes, context_type="WORKFLOW", workflow_class=root_workflow_class)
+        wrap_classes_for_monitoring(all_nodes, parent_context_type="WORKFLOW", workflow_class=root_workflow_class)
 
         # Discover and recursively initialize subworkflows
         for node_class in all_nodes:
@@ -407,10 +407,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                         continue
 
                 if subworkflow_class:
-                    # Wrap the subworkflow class itself with NODE context (becomes WORKFLOW_NODE)
-                    wrap_classes_for_monitoring(
-                        [subworkflow_class], context_type="NODE", workflow_class=root_workflow_class
-                    )
+                    wrap_classes_for_monitoring([subworkflow_class], parent_context_type="NODE")
 
                     # Recursively initialize the subworkflow's nodes
                     if hasattr(subworkflow_class, "_initialize_monitoring_recursive"):

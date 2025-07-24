@@ -1,6 +1,6 @@
 """Simple workflow for testing monitoring decorators - Production-style setup."""
 
-from typing import ClassVar, List
+from typing import List
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -15,8 +15,6 @@ class Inputs(BaseInputs):
 
 
 class Iteration(BaseNode):
-    _monitoring_initialized: ClassVar[bool] = False
-    _enable_monitoring: ClassVar[bool] = True
     item = MapNode.SubworkflowInputs.item
     index = MapNode.SubworkflowInputs.index
 
@@ -28,24 +26,20 @@ class Iteration(BaseNode):
 
 
 class IterationSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
-    _monitoring_initialized: ClassVar[bool] = False
-    _enable_monitoring: ClassVar[bool] = True
     graph = Iteration
+    _enable_monitoring = True
 
     class Outputs(BaseOutputs):
         count = Iteration.Outputs.count
 
 
 class MapFruitsNode(MapNode):
-    _monitoring_initialized: ClassVar[bool] = False
-    _enable_monitoring: ClassVar[bool] = True
     items = Inputs.fruits
     subworkflow = IterationSubworkflow
 
 
 class SimpleMapExample(BaseWorkflow[Inputs, BaseState]):
-    _monitoring_initialized: ClassVar[bool] = False
-    _enable_monitoring: ClassVar[bool] = True
+    _enable_monitoring = True
     graph = MapFruitsNode
 
     class Outputs(BaseOutputs):
