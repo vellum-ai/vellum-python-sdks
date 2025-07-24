@@ -923,4 +923,5 @@ export type ComposioToolFunctionArgs = {
   action: string;
   description: string;
   display_name?: string | null;
+  parameters?: Record<string, any> | null;
 } & NameDescription;
