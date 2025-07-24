@@ -5,7 +5,7 @@ from types import FrameType
 from uuid import UUID
 from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BeforeValidator, TypeAdapter, ValidationError
+from pydantic import BeforeValidator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
@@ -127,37 +127,19 @@ class ComposioToolDefinition(UniversalBaseModel):
         return self.action
 
     def validate_arguments(self, arguments: Dict[str, Any]) -> bool:
-        """Validate arguments against parameter schema using Pydantic"""
-        if not self.parameters:
+        """Basic argument validation."""
+        if not self.parameters or "required" not in self.parameters:
             return True
 
-        try:
-            # This creates a validator from the JSON schema
-            adapter = TypeAdapter(Dict[str, Any])
+        # Simple check for required fields
+        required_fields = self.parameters.get("required", [])
+        missing_fields = [field for field in required_fields if field not in arguments]
 
-            # For more sophisticated validation, you could create a dynamic model:
-            # from pydantic import create_model
-            # DynamicModel = create_model('DynamicModel', **self.parameters.get('properties', {}))
-            # DynamicModel(**arguments)
-
-            # Simple validation - just ensure it's a valid dict structure
-            adapter.validate_python(arguments)
-
-            # Additional basic validation: check required fields if specified
-            if "required" in self.parameters:
-                required_fields = self.parameters["required"]
-                missing_fields = [field for field in required_fields if field not in arguments]
-                if missing_fields:
-                    logger.warning(f"Missing required fields for {self.action}: {missing_fields}")
-                    return False
-
-            return True
-        except ValidationError as e:
-            logger.warning(f"Validation failed for {self.action}: {e}")
+        if missing_fields:
+            logger.warning(f"Missing required fields for {self.action}: {missing_fields}")
             return False
-        except Exception as e:
-            logger.error(f"Unexpected validation error for {self.action}: {str(e)}")
-            return False
+
+        return True
 
     def to_function_definition(self) -> FunctionDefinition:
         """Convert to FunctionDefinition for API compatibility"""
@@ -169,28 +151,4 @@ class ComposioToolDefinition(UniversalBaseModel):
             strict=None,
             state=None,
             cache_config=None,
-        )
-
-    @classmethod
-    def from_composio_api(cls, api_response: Any) -> "ComposioToolDefinition":
-        """Create instance from Composio API response"""
-        # Handle both dictionary and ActionModel objects
-        if hasattr(api_response, "model_dump"):
-            # If it's a Pydantic model (like ActionModel), convert to dict
-            response_dict = api_response.model_dump()
-        elif hasattr(api_response, "__dict__"):
-            # If it's an object with attributes, convert to dict
-            response_dict = api_response.__dict__
-        else:
-            # Assume it's already a dictionary
-            response_dict = api_response
-
-        return cls(
-            toolkit=response_dict.get("app_name", ""),
-            action=response_dict.get("name", ""),
-            description=response_dict.get("description", ""),
-            display_name=response_dict.get("display_name"),
-            parameters=response_dict.get("parameters", {}),
-            version=response_dict.get("version"),
-            tags=response_dict.get("tags", []),
         )

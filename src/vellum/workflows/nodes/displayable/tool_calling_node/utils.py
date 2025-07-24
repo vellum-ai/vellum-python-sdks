@@ -47,22 +47,7 @@ class FunctionCallNodeMixin:
         if self.function_call_output and len(self.function_call_output) > 0:
             function_call = self.function_call_output[0]
             if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                arguments = function_call.value.arguments or {}
-
-                # Handle double-encoded arguments with kwargs wrapper (common with Composio tools)
-                if isinstance(arguments, dict) and "kwargs" in arguments and len(arguments) == 1:
-                    kwargs_value = arguments["kwargs"]
-                    if isinstance(kwargs_value, str):
-                        try:
-                            # Parse JSON-stringified kwargs
-                            parsed_kwargs = json.loads(kwargs_value)
-                            if isinstance(parsed_kwargs, dict):
-                                return parsed_kwargs
-                        except (json.JSONDecodeError, TypeError):
-                            # If parsing fails, fall back to original arguments
-                            pass
-
-                return arguments
+                return function_call.value.arguments or {}
         return {}
 
     def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
@@ -193,61 +178,49 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
     composio_tool: ComposioToolDefinition
 
+    def _get_composio_api_key(self) -> str:
+        """Get Composio API key from environment variables."""
+        for env_var in ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]:
+            if value := os.environ.get(env_var):
+                return value
+
+        raise NodeException(
+            message="No Composio API key found. Please set COMPOSIO_API_KEY or COMPOSIO_KEY environment variable.",
+            code=WorkflowErrorCode.NODE_EXECUTION,
+        )
+
+    def _find_active_connection(self, connections, toolkit: str):
+        """Find an active connection for the given toolkit."""
+        for connection in connections:
+            if connection.integration_name.upper() == toolkit.upper() and connection.status == "ACTIVE":
+                return connection
+        return None
+
     def run(self) -> Iterator[BaseOutput]:
         # Extract arguments from function call
         arguments = self._extract_function_arguments()
 
-        # Get Composio API key from environment variables
-        composio_api_key = None
-        common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
-
-        for env_var_name in common_env_var_names:
-            value = os.environ.get(env_var_name)
-            if value:
-                composio_api_key = value
-                break
-
-        if not composio_api_key:
-            raise NodeException(
-                message=(
-                    "No Composio API key found in environment variables. "
-                    "Please ensure one of these environment variables is set: "
-                )
-                + ", ".join(common_env_var_names),
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            )
-
         try:
-            # Execute using ComposioService
-            composio_service = ComposioService(api_key=composio_api_key)
-
-            # Get all user connections and find matching one for the toolkit
+            # Initialize service and find connection
+            composio_service = ComposioService(api_key=self._get_composio_api_key())
             connections = composio_service.get_user_connections()
-            matching_connection = None
 
-            for connection in connections:
-                if (
-                    connection.integration_name.upper() == self.composio_tool.toolkit.upper()
-                    and connection.status == "ACTIVE"
-                ):
-                    matching_connection = connection
-                    break
-
+            matching_connection = self._find_active_connection(connections, self.composio_tool.toolkit)
             if not matching_connection:
                 raise NodeException(
-                    message=(
-                        f"No active connection found for toolkit '{self.composio_tool.toolkit}'. "
-                        f"Please ensure you have an active connection for this integration."
-                    ),
+                    message=f"No active connection found for toolkit '{self.composio_tool.toolkit}'.",
                     code=WorkflowErrorCode.NODE_EXECUTION,
                 )
 
+            # Execute the tool
             result = composio_service.execute_tool(
                 tool_name=self.composio_tool.action,
                 arguments=arguments,
                 connection_id=matching_connection.connection_id,
             )
 
+        except NodeException:
+            raise  # Re-raise NodeException as-is
         except Exception as e:
             raise NodeException(
                 message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
@@ -260,253 +233,6 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         yield from []
 
 
-def get_composio_api_key() -> str:
-    """Get the Composio API key from configuration
-
-    This retrieves the API key from environment variables.
-    Could be extended to support other configuration sources.
-    """
-    api_key = os.environ.get("COMPOSIO_API_KEY") or os.environ.get("COMPOSIO_KEY")
-    if not api_key:
-        raise ValueError("COMPOSIO_API_KEY or COMPOSIO_KEY environment variable not set")
-    return api_key
-
-
-def create_parameter_definition_from_composio(param_name: str, param_info: dict) -> dict:
-    """Create a parameter definition from Composio parameter info
-
-    Args:
-        param_name: Name of the parameter
-        param_info: Parameter information from Composio schema
-
-    Returns:
-        Parameter definition dict compatible with OpenAPI spec
-    """
-    # Map Composio types to OpenAPI types
-    type_mapping = {
-        "string": "string",
-        "boolean": "boolean",
-        "number": "number",
-        "integer": "integer",
-        "array": "array",
-        "object": "object",
-    }
-
-    param_type = type_mapping.get(param_info.get("type", "string"), "string")
-
-    param_def = {
-        "type": param_type,
-        "description": param_info.get("description", ""),
-    }
-
-    # Add default value if present
-    if "default" in param_info:
-        param_def["default"] = param_info["default"]
-
-    # Handle array item types if specified
-    if param_type == "array" and "items" in param_info:
-        param_def["items"] = param_info["items"]
-
-    # Handle object properties if specified
-    if param_type == "object" and "properties" in param_info:
-        param_def["properties"] = param_info["properties"]
-        if "required" in param_info:
-            param_def["required"] = param_info["required"]
-
-    # Add examples if present
-    if "examples" in param_info:
-        param_def["examples"] = param_info["examples"]
-
-    return param_def
-
-
-def create_function_definition_from_composio(
-    composio_tool: ComposioToolDefinition, composio_service: ComposioService
-) -> FunctionDefinition:
-    """Create a FunctionDefinition from ComposioToolDefinition with fresh parameters
-
-    Args:
-        composio_tool: The ComposioToolDefinition with basic tool info
-        composio_service: Service to fetch fresh parameter schema
-
-    Returns:
-        FunctionDefinition populated with tool info and fresh parameters
-    """
-    logger.info(f"Creating FunctionDefinition for Composio tool: {composio_tool.action}")
-
-    try:
-        # Get fresh parameter schema from Composio API
-        logger.info(f"Fetching fresh schema for {composio_tool.action}")
-        actions = composio_service.core_client.actions.get(actions=[composio_tool.action], limit=1)
-
-        if not actions or len(actions) == 0:
-            logger.error(f"Failed to fetch schema for {composio_tool.action}")
-            # Fallback to basic definition without parameters
-            return FunctionDefinition(
-                name=composio_tool.action,
-                description=composio_tool.description or f"Composio tool: {composio_tool.name}",
-                parameters=None,
-            )
-
-        tool_details = actions[0]
-        logger.info(f"Retrieved tool details for {composio_tool.action}")
-
-        # Extract parameter information
-        input_params = {}
-        required_params = []
-
-        if hasattr(tool_details, "parameters") and tool_details.parameters:
-            if hasattr(tool_details.parameters, "properties"):
-                input_params = tool_details.parameters.properties
-            if hasattr(tool_details.parameters, "required"):
-                required_params = tool_details.parameters.required or []
-
-        # Convert Composio parameters to OpenAPI parameter schema
-        parameter_properties = {}
-        for param_name, param_info in input_params.items():
-            # Convert param_info to dict if it's not already
-            if hasattr(param_info, "__dict__"):
-                param_info_dict = param_info.__dict__
-            elif hasattr(param_info, "model_dump"):
-                param_info_dict = param_info.model_dump()
-            else:
-                param_info_dict = param_info if isinstance(param_info, dict) else {}
-
-            parameter_properties[param_name] = create_parameter_definition_from_composio(param_name, param_info_dict)
-
-        logger.info(f"Created {len(parameter_properties)} parameter definitions")
-
-        # Create OpenAPI-style parameter schema
-        parameters_schema = None
-        if parameter_properties:
-            parameters_schema = {"type": "object", "properties": parameter_properties, "required": required_params}
-
-        # Create FunctionDefinition with all information
-        function_def = FunctionDefinition(
-            name=composio_tool.action,  # Use action slug as function name
-            description=composio_tool.description or getattr(tool_details, "description", ""),
-            parameters=parameters_schema,
-        )
-
-        # Store Composio-specific metadata using FunctionDefinition's extra field support
-        # The client FunctionDefinition allows extra fields, so we can add metadata
-        if hasattr(function_def, "__dict__"):
-            function_def.__dict__["composio_metadata"] = {
-                "tool_type": "COMPOSIO",
-                "tool_slug": composio_tool.action,
-                "tool_name": composio_tool.name,
-                "toolkit": composio_tool.toolkit,
-                "integration_name": getattr(composio_tool, "integration_name", composio_tool.toolkit),
-                "version": getattr(tool_details, "version", ""),
-            }
-
-        logger.info(f"Successfully created FunctionDefinition for {composio_tool.action}")
-        return function_def
-
-    except Exception as e:
-        logger.error(f"Error creating FunctionDefinition for {composio_tool.action}: {e}")
-        # Return a basic function definition as fallback
-        return FunctionDefinition(
-            name=composio_tool.action, description=f"Composio tool: {composio_tool.name}", parameters=None
-        )
-
-
-def wrap_composio_tool_as_function(composio_tool: ComposioToolDefinition) -> FunctionDefinition:
-    """Wrapper function to convert ComposioToolDefinition to FunctionDefinition
-
-    This function should be called wherever Composio tools need to be converted
-    to the standard FunctionDefinition format used by the workflow system.
-    """
-    try:
-        # Initialize ComposioService
-        api_key = get_composio_api_key()
-        composio_service = ComposioService(api_key)
-
-        return create_function_definition_from_composio(composio_tool, composio_service)
-
-    except Exception as e:
-        logger.error(f"Failed to create FunctionDefinition for {composio_tool.action}: {e}")
-        # Return fallback FunctionDefinition
-        return FunctionDefinition(
-            name=composio_tool.action, description=f"Composio tool: {composio_tool.name}", parameters=None
-        )
-
-
-def is_composio_function_definition(function_def: FunctionDefinition) -> bool:
-    """Check if a FunctionDefinition represents a Composio tool"""
-    if hasattr(function_def, "__dict__") and "composio_metadata" in function_def.__dict__:
-        return function_def.__dict__["composio_metadata"].get("tool_type") == "COMPOSIO"
-    return False
-
-
-def get_composio_metadata_from_function_definition(function_def: FunctionDefinition) -> Optional[dict]:
-    """Extract Composio metadata from a FunctionDefinition"""
-    if hasattr(function_def, "__dict__") and "composio_metadata" in function_def.__dict__:
-        return function_def.__dict__["composio_metadata"]
-    return None
-
-
-# Legacy function - updated to use FunctionDefinition approach for consistency
-def create_composio_wrapper_function(tool_def: ComposioToolDefinition):
-    """Create a real Python function that wraps the Composio tool for prompt layer compatibility."""
-
-    try:
-        # Get API key from environment
-        api_key = os.environ.get("COMPOSIO_API_KEY") or os.environ.get("COMPOSIO_KEY")
-        if api_key:
-            composio_service = ComposioService(api_key)
-
-            # Fetch the real schema
-            actions = composio_service.core_client.actions.get(actions=[tool_def.action], limit=1)
-            if actions and len(actions) > 0:
-                tool_details = actions[0]
-
-                if hasattr(tool_details, "parameters") and tool_details.parameters:
-                    param_properties = tool_details.parameters.properties
-                    required_params = tool_details.parameters.required
-
-                    # Update the tool definition with real schema
-                    tool_def.parameters = {
-                        "type": "object",
-                        "properties": {},
-                        "required": required_params or [],
-                    }
-
-                    for param_name, param_info in param_properties.items():
-                        tool_def.parameters["properties"][param_name] = {
-                            "type": param_info.get("type", "string"),
-                            "description": param_info.get("description", ""),
-                        }
-
-    except Exception as e:
-        logger.warning(f"Could not fetch schema for {tool_def.action}: {e}")
-
-    def wrapper_function(**kwargs):
-        # Validate arguments against schema if available
-        if tool_def.parameters and not tool_def.validate_arguments(kwargs):
-            raise ValueError(f"Invalid arguments for {tool_def.action}: arguments do not match expected schema")
-
-        # This should never be called due to routing, but satisfies introspection
-        raise RuntimeError(
-            f"ComposioToolDefinition wrapper for '{tool_def.action}' should not be called directly. "
-            f"Execution should go through ComposioNode. This suggests a routing issue."
-        )
-
-    # Set proper function attributes for prompt layer introspection
-    wrapper_function.__name__ = tool_def.name
-    wrapper_function.__doc__ = tool_def.description
-
-    # CRITICAL: Set the function schema so the prompt layer can generate correct OpenAI schema
-    if hasattr(tool_def, "to_function_definition"):
-        wrapper_function._function_definition = tool_def.to_function_definition()
-
-    # Also set parameters directly on the function for prompt layer to use
-    wrapper_function._parameters = tool_def.parameters
-
-    # return new FunctionDefinition
-    return wrapper_function
-
-
 def create_tool_router_node(
     ml_model: str,
     blocks: List[PromptBlock],
@@ -516,15 +242,14 @@ def create_tool_router_node(
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
     if functions and len(functions) > 0:
-        # Create dynamic ports and convert functions in a single loop
+        # Create dynamic ports
         Ports = type("Ports", (), {})
         prompt_functions = []
 
         for function in functions:
-            # Convert ComposioToolDefinition to FunctionDefinition for prompt layer
+            # Convert ComposioToolDefinition to FunctionDefinition for prompt layer only
             if isinstance(function, ComposioToolDefinition):
-                function_def = wrap_composio_tool_as_function(function)
-                prompt_functions.append(function_def)
+                prompt_functions.append(function.to_function_definition())
             else:
                 prompt_functions.append(function)
 
@@ -603,46 +328,10 @@ def create_function_node(
     """
     Create a FunctionNode class for a given function.
 
-    For workflow functions: BaseNode
-    For regular functions: BaseNode with direct function call
-    For Composio FunctionDefinitions: ComposioNode with extracted metadata
-
     Args:
         function: The function to create a node for
         tool_router_node: The tool router node class
     """
-    # Check if this is a FunctionDefinition representing a Composio tool
-    if isinstance(function, FunctionDefinition) and is_composio_function_definition(function):
-        composio_metadata = get_composio_metadata_from_function_definition(function)
-
-        if composio_metadata:
-            # Reconstruct ComposioToolDefinition from metadata
-            composio_tool = ComposioToolDefinition(
-                toolkit=composio_metadata["toolkit"],
-                action=composio_metadata["tool_slug"],
-                description=function.description or f"Composio tool: {composio_metadata['tool_name']}",
-                display_name=composio_metadata["tool_name"],
-                parameters=function.parameters,
-            )
-
-            node_name = f"ComposioNode_{composio_tool.name}"
-
-            node = type(
-                node_name,
-                (ComposioNode,),
-                {
-                    "composio_tool": composio_tool,
-                    "function_call_output": tool_router_node.Outputs.results,
-                    "__module__": __name__,
-                },
-            )
-            return node
-        else:
-            logger.warning(
-                "Could not extract Composio metadata from FunctionDefinition, treating as regular FunctionDefinition"
-            )
-            # Fall through to regular FunctionDefinition handling
-
     if isinstance(function, DeploymentDefinition):
         deployment = function.deployment_id or function.deployment_name
         release_tag = function.release_tag
@@ -660,7 +349,7 @@ def create_function_node(
         return node
 
     elif isinstance(function, ComposioToolDefinition):
-        node_name = f"ComposioNode_{function.name}"
+        node_name = f"ComposioNode_{function.action}"
 
         node = type(
             node_name,
@@ -683,38 +372,19 @@ def create_function_node(
             },
         )
         return node
-    elif isinstance(function, FunctionDefinition):
-        # For non-Composio FunctionDefinition objects, create a simple function node
-        function_name = function.name or "unknown_function"
-
-        def function_wrapper(**kwargs):
-            raise RuntimeError(f"FunctionDefinition '{function_name}' cannot be executed directly")
-
+    elif callable(function):
         node = type(
-            f"FunctionNode_{function_name}",
+            f"FunctionNode_{function.__name__}",
             (FunctionNode,),
             {
-                "function_definition": function_wrapper,
+                "function_definition": lambda self, **kwargs: function(**kwargs),
                 "function_call_output": tool_router_node.Outputs.results,
                 "__module__": __name__,
             },
         )
         return node
     else:
-        # For regular functions, use FunctionNode
-        if callable(function):
-            node = type(
-                f"FunctionNode_{function.__name__}",
-                (FunctionNode,),
-                {
-                    "function_definition": lambda self, **kwargs: function(**kwargs),
-                    "function_call_output": tool_router_node.Outputs.results,
-                    "__module__": __name__,
-                },
-            )
-            return node
-        else:
-            raise ValueError(f"Cannot create function node for non-callable object: {function}")
+        raise ValueError(f"Cannot create function node for: {function}")
 
 
 def get_function_name(function: Tool) -> str:
@@ -722,7 +392,7 @@ def get_function_name(function: Tool) -> str:
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
     elif isinstance(function, ComposioToolDefinition):
-        return function.name
+        return function.action  # Use action directly as the function name
     elif isinstance(function, FunctionDefinition):
         # For FunctionDefinition objects, use the name directly
         return function.name or "unknown_function"
