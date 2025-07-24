@@ -29,6 +29,7 @@ from typing import (
 from vellum.workflows.edges import Edge
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
+from vellum.workflows.events.decorators import wrap_classes_for_monitoring
 from vellum.workflows.events.node import (
     NodeExecutionFulfilledBody,
     NodeExecutionFulfilledEvent,
@@ -211,6 +212,8 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     unused_graphs: ClassVar[Set[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
     emitters: List[BaseWorkflowEmitter]
     resolvers: List[BaseWorkflowResolver]
+    _enable_monitoring: ClassVar[bool] = True
+    _monitoring_initialized: ClassVar[bool] = False
 
     class Outputs(BaseOutputs):
         pass
@@ -245,6 +248,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         self._context = context or WorkflowContext()
         self._store = store or Store()
         self._execution_context = self._context.execution_context
+
+        if self._enable_monitoring:
+            self._initialize_monitoring()
 
         self.validate()
 
@@ -348,6 +354,67 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     @classmethod
     def get_entrypoints(cls) -> Iterable[Type[BaseNode]]:
         return iter({e for g in cls.get_subgraphs() for e in g.entrypoints})
+
+    @classmethod
+    def _initialize_monitoring(cls) -> None:
+        """Enable monitoring for all nodes in the workflow graph by wrapping their execution methods."""
+        # Check if monitoring is already initialized for this workflow class
+        if hasattr(cls, "_monitoring_initialized") and cls._monitoring_initialized:
+            return
+
+        # Recursively discover and initialize monitoring for entire workflow hierarchy
+        cls._initialize_monitoring_recursive(set(), cls)
+
+        # Mark as initialized
+        cls._monitoring_initialized = True
+
+    @classmethod
+    def _initialize_monitoring_recursive(cls, visited_workflows, root_workflow_class):
+        """Recursively initialize monitoring for all workflows and nodes in the hierarchy."""
+        if cls in visited_workflows:
+            return
+        visited_workflows.add(cls)
+
+        # Wrap this workflow's nodes so they create WORKFLOW parent contexts
+        all_nodes = list(cls.get_all_nodes())
+        wrap_classes_for_monitoring(all_nodes, context_type="WORKFLOW", workflow_class=root_workflow_class)
+
+        # Discover and recursively initialize subworkflows
+        for node_class in all_nodes:
+            # Check if this node class has subworkflow attribute
+            if hasattr(node_class, "subworkflow"):
+                subworkflow_attr = getattr(node_class, "subworkflow")
+                subworkflow_class = None
+
+                # Handle different types of subworkflow attributes
+                if hasattr(subworkflow_attr, "default") and subworkflow_attr.default is not None:
+                    # This is a descriptor with a default value
+                    subworkflow_class = subworkflow_attr.default
+                elif inspect.isclass(subworkflow_attr):
+                    # This is directly a class (like in MapNode)
+                    subworkflow_class = subworkflow_attr
+                else:
+                    # For NodeReference and other descriptor types, we need to look at the node class's
+                    # actual subworkflow attribute that was set during class definition
+
+                    # Try to get the actual subworkflow class from the node's class dict
+                    if hasattr(node_class, "__dict__") and "subworkflow" in node_class.__dict__:
+                        raw_subworkflow = node_class.__dict__["subworkflow"]
+                        if inspect.isclass(raw_subworkflow):
+                            subworkflow_class = raw_subworkflow
+
+                    if not subworkflow_class:
+                        continue
+
+                if subworkflow_class:
+                    # Wrap the subworkflow class itself with NODE context (becomes WORKFLOW_NODE)
+                    wrap_classes_for_monitoring(
+                        [subworkflow_class], context_type="NODE", workflow_class=root_workflow_class
+                    )
+
+                    # Recursively initialize the subworkflow's nodes
+                    if hasattr(subworkflow_class, "_initialize_monitoring_recursive"):
+                        subworkflow_class._initialize_monitoring_recursive(visited_workflows, root_workflow_class)
 
     def run(
         self,

@@ -82,6 +82,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             current_execution_context = get_execution_context()
+
             for index, item in enumerate(self.items):
                 future = executor.submit(
                     self._context_run_subworkflow,
@@ -162,6 +163,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
     ) -> None:
         parent_context = current_execution_context.parent_context
         trace_id = current_execution_context.trace_id
+
         with execution_context(parent_context=parent_context, trace_id=trace_id):
             self._run_subworkflow(item=item, index=index)
 

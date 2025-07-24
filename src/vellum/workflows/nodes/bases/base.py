@@ -4,12 +4,13 @@ from functools import cached_property, reduce
 import inspect
 from types import MappingProxyType
 from uuid import UUID, uuid4
-from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
+from typing import Any, ClassVar, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.decorators import wrap_subworkflows_for_monitoring
 from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph import Graph
@@ -266,6 +267,8 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
     _inputs: MappingProxyType[NodeReference, Any]
+    _enable_monitoring: ClassVar[bool] = True
+    _monitoring_initialized: ClassVar[bool] = False
 
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference
@@ -467,6 +470,9 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
 
         self._inputs = MappingProxyType(all_inputs)
 
+        if self._enable_monitoring:
+            self.__class__._initialize_monitoring()
+
     def run(self) -> NodeRunResponse:
         return self.Outputs()
 
@@ -485,3 +491,18 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
         """
 
         return False
+
+    @classmethod
+    def _initialize_monitoring(cls) -> None:
+        """Enable monitoring for this node class by wrapping its execution methods and subworkflows."""
+
+        # Check if monitoring is already initialized for this node class
+        if hasattr(cls, "_monitoring_initialized") and cls._monitoring_initialized:
+            return
+
+        # If this node is being created outside a workflow context, wrap subworkflows without workflow class
+        # (If it's part of a workflow, the workflow will handle this with proper workflow class context)
+        wrap_subworkflows_for_monitoring(cls)
+
+        # Mark as initialized
+        cls._monitoring_initialized = True
