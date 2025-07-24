@@ -267,7 +267,7 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
     _inputs: MappingProxyType[NodeReference, Any]
-    _enable_monitoring: ClassVar[bool] = True
+    _enable_monitoring: ClassVar[bool] = False
     _monitoring_initialized: ClassVar[bool] = False
 
     class ExternalInputs(BaseInputs):

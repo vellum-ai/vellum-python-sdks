@@ -212,7 +212,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     unused_graphs: ClassVar[Set[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
     emitters: List[BaseWorkflowEmitter]
     resolvers: List[BaseWorkflowResolver]
-    _enable_monitoring: ClassVar[bool] = True
+    _enable_monitoring: ClassVar[bool] = False
     _monitoring_initialized: ClassVar[bool] = False
 
     class Outputs(BaseOutputs):
