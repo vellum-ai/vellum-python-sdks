@@ -393,7 +393,7 @@ def create_function_definition_from_composio(
     try:
         # Get fresh parameter schema from Composio API
         logger.info(f"Fetching fresh schema for {composio_tool.action}")
-        actions = composio_service.core.client.actions.get(actions=[composio_tool.action], limit=1)
+        actions = composio_service.core_client.actions.get(actions=[composio_tool.action], limit=1)
 
         if not actions or len(actions) == 0:
             logger.error(f"Failed to fetch schema for {composio_tool.action}")
@@ -516,7 +516,7 @@ def create_composio_wrapper_function(tool_def: ComposioToolDefinition):
                 composio_service = ComposioService(api_key)
 
                 # Fetch the real schema
-                actions = composio_service.core.client.actions.get(actions=[tool_def.action], limit=1)
+                actions = composio_service.core_client.actions.get(actions=[tool_def.action], limit=1)
                 if actions and len(actions) > 0:
                     tool_details = actions[0]
 
