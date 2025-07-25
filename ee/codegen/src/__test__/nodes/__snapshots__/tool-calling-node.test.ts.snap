@@ -107,7 +107,7 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
-exports[`ToolCallingNode > composio tool > should handle composio tool with missing toolkit/action fields 1`] = `
+exports[`ToolCallingNode > composio tool > should handle composio tool with integration_name & tool_slug fields 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
