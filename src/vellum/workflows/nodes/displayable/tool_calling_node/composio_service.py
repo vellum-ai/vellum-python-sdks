@@ -4,6 +4,8 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from vellum.workflows.exceptions import NodeException
+
 logger = logging.getLogger(__name__)
 
 
@@ -47,8 +49,7 @@ class ComposioService:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            logger.error(f"Composio API request failed: {e}")
-            raise
+            raise NodeException(f"Composio API request failed: {e}")
 
     def get_user_connections(self) -> List[ConnectionInfo]:
         """Get all authorized connections for the user"""
