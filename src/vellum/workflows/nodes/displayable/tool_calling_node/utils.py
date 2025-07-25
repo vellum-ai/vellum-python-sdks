@@ -287,7 +287,12 @@ def create_tool_router_node(
 
     # Add a chat history block to blocks only if one doesn't already exist
     has_chat_history_block = any(
-        block.block_type == "VARIABLE" and block.input_variable == CHAT_HISTORY_VARIABLE for block in blocks
+        (
+            (block.get("block_type") if isinstance(block, dict) else getattr(block, "block_type", None)) == "VARIABLE"
+            and (block.get("input_variable") if isinstance(block, dict) else getattr(block, "input_variable", None))
+            == CHAT_HISTORY_VARIABLE
+        )
+        for block in blocks
     )
 
     if not has_chat_history_block:
