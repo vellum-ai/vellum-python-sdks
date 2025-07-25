@@ -2,6 +2,7 @@ import inspect
 from uuid import UUID
 from typing import ClassVar, Generic, Optional, TypeVar
 
+from vellum.workflows.exceptions import NodeException, WorkflowErrorCode
 from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
 from vellum.workflows.types.core import JsonObject
@@ -40,6 +41,11 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
                 node_filepath=node_file_path,
                 script_filepath=filepath,
             )
+            if not file_code:
+                raise NodeException(
+                    message=f"Filepath '{filepath}' of node {node.__name__} does not exist",
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
             code_value = file_code
         else:
             code_value = ""

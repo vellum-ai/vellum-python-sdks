@@ -3,6 +3,7 @@ from uuid import UUID
 from typing import Type
 
 from vellum.client.core.api_error import ApiError
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -153,3 +154,19 @@ def test_serialize_node__with_unresolved_secret_references(vellum_client):
     # warnings = list(workflow_display.errors)
     # assert len(warnings) == 1
     # assert "Failed to resolve secret reference 'MY_API_KEY'" in str(warnings[0])
+
+
+def test_serialize_node__with_non_exist_code_input_path():
+    # GIVEN a code node with a non-existent code input path
+    class MyNode(CodeExecutionNode):
+        filepath = "non_existent_file.py"
+
+    # AND a workflow with the code node
+    class Workflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    with pytest.raises(NodeException) as exc_info:
+        workflow_display.serialize()
+    assert "Filepath 'non_existent_file.py' of node MyNode does not exist" in str(exc_info.value)
