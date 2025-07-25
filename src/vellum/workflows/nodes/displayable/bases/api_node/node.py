@@ -95,7 +95,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         headers = headers or {}
         if "User-Agent" not in headers:
             client_headers = self._context.vellum_client._client_wrapper.get_headers()
-            headers["User-Agent"] = client_headers.get("User-Agent", "vellum-ai/1.0.5")
+            headers["User-Agent"] = client_headers["User-Agent"]
         try:
             if data is not None:
                 prepped = Request(method=method, url=url, data=data, headers=headers).prepare()
@@ -127,7 +127,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         headers = headers or {}
         if "User-Agent" not in headers:
             client_headers = self._context.vellum_client._client_wrapper.get_headers()
-            headers["User-Agent"] = client_headers.get("User-Agent", "vellum-ai/1.0.5")
+            headers["User-Agent"] = client_headers["User-Agent"]
 
         # Create request_options if timeout is specified
         request_options = None
