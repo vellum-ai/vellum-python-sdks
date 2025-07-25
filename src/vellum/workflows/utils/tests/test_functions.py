@@ -2,7 +2,7 @@ import pytest
 from dataclasses import dataclass
 from enum import Enum
 from unittest.mock import Mock
-from typing import Dict, List, Literal, Optional, Union
+from typing import Annotated, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel
 
@@ -612,3 +612,86 @@ def test_compile_function_definition__literal_type_not_in_map():
     compiled_function = compile_function_definition(my_function)
     assert isinstance(compiled_function.parameters, dict)
     assert compiled_function.parameters["properties"]["a"] == {"enum": [MyEnum.FOO, MyEnum.BAR]}
+
+
+def test_compile_function_definition__annotated_descriptions():
+    # GIVEN a function with annotated parameters that include descriptions
+    def my_function(
+        bar: Annotated[str, "My bar parameter"],
+        other: Annotated[int, "My other parameter"],
+        regular_param: str,
+        optional_param: Annotated[bool, "Optional boolean parameter"] = True,
+    ):
+        """Test function with annotated parameters."""
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition with descriptions
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        description="Test function with annotated parameters.",
+        parameters={
+            "type": "object",
+            "properties": {
+                "bar": {"type": "string", "description": "My bar parameter"},
+                "other": {"type": "integer", "description": "My other parameter"},
+                "regular_param": {"type": "string"},
+                "optional_param": {"type": "boolean", "description": "Optional boolean parameter", "default": True},
+            },
+            "required": ["bar", "other", "regular_param"],
+        },
+    )
+
+
+def test_compile_function_definition__annotated_without_description():
+    # GIVEN a function with annotated parameters but no description metadata
+    def my_function(param: Annotated[str, None]):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition without description
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {
+                "param": {"type": "string"},
+            },
+            "required": ["param"],
+        },
+    )
+
+
+def test_compile_function_definition__annotated_types():
+    # GIVEN a function with annotated types
+    def my_function(
+        a: Annotated[str, "My string parameter"],
+        items: Annotated[List[str], "List of string items"],
+        config: Annotated[Dict[str, int], "Configuration mapping"],
+    ):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition with descriptions for complex types
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {
+                "a": {"type": "string", "description": "My string parameter"},
+                "items": {"type": "array", "items": {"type": "string"}, "description": "List of string items"},
+                "config": {
+                    "type": "object",
+                    "additionalProperties": {"type": "integer"},
+                    "description": "Configuration mapping",
+                },
+            },
+            "required": ["a", "items", "config"],
+        },
+    )

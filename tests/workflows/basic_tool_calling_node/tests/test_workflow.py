@@ -123,11 +123,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         "ml_model": "gpt-4o-mini",
         "input_values": [
             PromptRequestStringInput(key="question", type="STRING", value="What's the weather like in San Francisco?"),
-            PromptRequestJsonInput(
-                key="chat_history",
-                type="JSON",
-                value=[],
-            ),
+            PromptRequestJsonInput(key="chat_history", type="JSON", value=[]),
         ],
         "input_variables": [
             VellumVariable(
@@ -200,7 +196,10 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 description="\n    Get the current weather in a given location.\n    ",
                 parameters={
                     "type": "object",
-                    "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
+                    "properties": {
+                        "location": {"type": "string", "description": "The location to get the weather for"},
+                        "unit": {"type": "string", "description": "The unit of temperature"},
+                    },
                     "required": ["location", "unit"],
                 },
                 forced=None,
@@ -316,7 +315,10 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 description="\n    Get the current weather in a given location.\n    ",
                 parameters={
                     "type": "object",
-                    "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
+                    "properties": {
+                        "location": {"type": "string", "description": "The location to get the weather for"},
+                        "unit": {"type": "string", "description": "The unit of temperature"},
+                    },
                     "required": ["location", "unit"],
                 },
                 forced=None,

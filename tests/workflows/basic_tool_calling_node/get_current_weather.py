@@ -1,7 +1,10 @@
 import math
+from typing import Annotated
 
 
-def get_current_weather(location: str, unit: str) -> str:
+def get_current_weather(
+    location: Annotated[str, "The location to get the weather for"], unit: Annotated[str, "The unit of temperature"]
+) -> str:
     """
     Get the current weather in a given location.
     """
