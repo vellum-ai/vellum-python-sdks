@@ -3,7 +3,6 @@ from uuid import UUID
 from typing import Type
 
 from vellum.client.core.api_error import ApiError
-from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.workflows.base import BaseWorkflow

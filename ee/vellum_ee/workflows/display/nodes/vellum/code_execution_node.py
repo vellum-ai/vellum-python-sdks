@@ -2,7 +2,6 @@ import inspect
 from uuid import UUID
 from typing import ClassVar, Generic, Optional, TypeVar
 
-from vellum.workflows.exceptions import NodeException, WorkflowErrorCode
 from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
 from vellum.workflows.types.core import JsonObject
