@@ -666,10 +666,10 @@ def test_compile_function_definition__annotated_without_description():
     )
 
 
-def test_compile_function_definition__annotated_types():
+def test_compile_function_definition__annotated_complex_types():
     # GIVEN a function with annotated types
     def my_function(
-        a: Annotated[str, "My string parameter"],
+        location: Annotated[Literal["New York", "Portland"], "The location you found"],
         items: Annotated[List[str], "List of string items"],
         config: Annotated[Dict[str, int], "Configuration mapping"],
     ):
@@ -684,7 +684,11 @@ def test_compile_function_definition__annotated_types():
         parameters={
             "type": "object",
             "properties": {
-                "a": {"type": "string", "description": "My string parameter"},
+                "location": {
+                    "type": "string",
+                    "enum": ["New York", "Portland"],
+                    "description": "The location you found",
+                },
                 "items": {"type": "array", "items": {"type": "string"}, "description": "List of string items"},
                 "config": {
                     "type": "object",
@@ -692,6 +696,6 @@ def test_compile_function_definition__annotated_types():
                     "description": "Configuration mapping",
                 },
             },
-            "required": ["a", "items", "config"],
+            "required": ["location", "items", "config"],
         },
     )
