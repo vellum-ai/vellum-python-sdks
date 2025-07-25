@@ -1,6 +1,6 @@
 import dataclasses
 import inspect
-from typing import TYPE_CHECKING, Any, Callable, Dict, Literal, Optional, Type, Union, get_args, get_origin
+from typing import TYPE_CHECKING, Annotated, Any, Callable, Dict, Literal, Optional, Type, Union, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -127,7 +127,19 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     required = []
     defs: dict[str, Any] = {}
     for param in signature.parameters.values():
-        properties[param.name] = compile_annotation(param.annotation, defs)
+        # Check if parameter uses Annotated type hint
+        if get_origin(param.annotation) is Annotated:
+            args = get_args(param.annotation)
+            actual_type = args[0]
+            # Extract description from metadata
+            description = args[1] if len(args) > 1 and isinstance(args[1], str) else None
+
+            properties[param.name] = compile_annotation(actual_type, defs)
+            if description:
+                properties[param.name]["description"] = description
+        else:
+            properties[param.name] = compile_annotation(param.annotation, defs)
+
         if param.default is inspect.Parameter.empty:
             required.append(param.name)
         else:

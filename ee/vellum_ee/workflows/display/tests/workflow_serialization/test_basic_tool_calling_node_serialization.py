@@ -140,13 +140,19 @@ def test_serialize_workflow():
                                     "description": "\n    Get the current weather in a given location.\n    ",
                                     "parameters": {
                                         "type": "object",
-                                        "properties": {"location": {"type": "string"}, "unit": {"type": "string"}},
+                                        "properties": {
+                                            "location": {
+                                                "type": "string",
+                                                "description": "The location to get the weather for",
+                                            },
+                                            "unit": {"type": "string", "description": "The unit of temperature"},
+                                        },
                                         "required": ["location", "unit"],
                                     },
                                     "forced": None,
                                     "strict": None,
                                 },
-                                "src": 'import math\n\n\ndef get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of {get_temperature(70.1)} degrees {unit}."\n\n\ndef get_temperature(temperature: float) -> int:\n    """\n    Get the temperature in a given location.\n    """\n    return math.floor(temperature)\n',  # noqa: E501
+                                "src": 'import math\nfrom typing import Annotated\n\n\ndef get_current_weather(\n    location: Annotated[str, "The location to get the weather for"], unit: Annotated[str, "The unit of temperature"]\n) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of {get_temperature(70.1)} degrees {unit}."\n\n\ndef get_temperature(temperature: float) -> int:\n    """\n    Get the temperature in a given location.\n    """\n    return math.floor(temperature)\n',  # noqa: E501
                             }
                         ],
                     },
