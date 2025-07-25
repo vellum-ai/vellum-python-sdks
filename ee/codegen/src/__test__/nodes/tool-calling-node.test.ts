@@ -211,14 +211,15 @@ describe("ToolCallingNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-    it("should handle composio tool with missing toolkit/action fields", async () => {
+    // TODO: Combine this with the test above once attributes are finalized
+    // This test was written to repro a codegen bug that is now fixed
+    it("should handle composio tool with integration_name & tool_slug fields", async () => {
       const nodePortData: NodePort[] = [
         nodePortFactory({
           id: "port-id",
         }),
       ];
 
-      // This simulates the problematic data structure that causes the TypeError
       const composioToolFunction = {
         type: "COMPOSIO",
         name: "GMAIL_CREATE_EMAIL_DRAFT",
