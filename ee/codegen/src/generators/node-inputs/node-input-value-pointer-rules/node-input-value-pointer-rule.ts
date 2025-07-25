@@ -3,6 +3,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 import { ConstantValuePointerRule } from "./constant-value-pointer";
+import { EnvironmentVariablePointerRule } from "./environment-variable-pointer";
 import { InputVariablePointerRule } from "./input-variable-pointer";
 import { NodeOutputPointerRule } from "./node-output-pointer";
 
@@ -79,6 +80,11 @@ export class NodeInputValuePointerRule extends AstNode {
         });
       case "EXECUTION_COUNTER":
         return new ExecutionCounterPointerRule({
+          nodeContext: this.nodeContext,
+          nodeInputValuePointerRule: nodeInputValuePointerRuleData,
+        });
+      case "ENVIRONMENT_VARIABLE":
+        return new EnvironmentVariablePointerRule({
           nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });
