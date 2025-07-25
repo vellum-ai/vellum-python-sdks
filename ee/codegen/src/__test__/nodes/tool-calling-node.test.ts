@@ -158,7 +158,7 @@ describe("ToolCallingNode", () => {
       type: "COMPOSIO",
       name: "github_create_an_issue",
       integration_name: "GITHUB",
-      tool_name: "GITHUB_CREATE_AN_ISSUE",
+      tool_slug: "GITHUB_CREATE_AN_ISSUE",
       description: "Create a new issue in a GitHub repository",
       display_name: "Create GitHub Issue",
       parameters: {
