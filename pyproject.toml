@@ -53,6 +53,7 @@ pyyaml = ">=6.0.0,<7.0.0"
 requests = ">=2.31.0,<3.0.0"
 tomli = ">=2.0.0,<3.0.0"
 typing_extensions = ">= 4.0.0"
+wrapt = "^1.16.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "1.11.1"
@@ -100,6 +101,7 @@ overrides = [
     { module = "deepdiff.*", ignore_missing_imports = true },
     { module = "docker.*", ignore_missing_imports = true },
     { module = "setuptools.*", ignore_missing_imports = true },
+    { module = "wrapt.*", ignore_missing_imports = true },
 ]
 [tool.ruff]
 line-length = 120
