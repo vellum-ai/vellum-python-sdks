@@ -5,6 +5,7 @@ from requests.exceptions import JSONDecodeError
 
 from vellum.client import ApiError
 from vellum.client.core.request_options import RequestOptions
+from vellum.client.types.method_enum import MethodEnum
 from vellum.client.types.vellum_secret import VellumSecret as ClientVellumSecret
 from vellum.workflows.constants import APIRequestMethod
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -20,7 +21,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     Used to execute an API call.
 
     url: str - The URL to send the request to.
-    method: APIRequestMethod - The HTTP method to use for the request.
+    method: Union[APIRequestMethod, str] - The HTTP method to use for the request.
     data: Optional[str] - The data to send in the request body.
     json: Optional["JsonObject"] - The JSON data to send in the request body.
     headers: Optional[Dict[str, Union[str, VellumSecret]]] - The headers to send in the request.
@@ -31,7 +32,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
     url: str = ""
-    method: Optional[APIRequestMethod] = APIRequestMethod.GET
+    method: Optional[Union[APIRequestMethod, MethodEnum]] = APIRequestMethod.GET
     data: Optional[str] = None
     json: Optional[Json] = None
     headers: Optional[Dict[str, Union[str, VellumSecret]]] = None
@@ -42,6 +43,21 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         headers: Dict[str, str]
         status_code: int
         text: str
+
+    def _normalize_http_method(self, method: Union[APIRequestMethod, MethodEnum]) -> str:
+        if isinstance(method, APIRequestMethod):
+            method_str = method.value
+        elif isinstance(method, str):
+            method_str = method.upper()
+            valid_methods = {m.value for m in APIRequestMethod}
+            if method_str not in valid_methods:
+                raise NodeException(f"Invalid HTTP method '{method}'", code=WorkflowErrorCode.INVALID_INPUTS)
+        else:
+            raise NodeException(
+                f"Method must be either APIRequestMethod enum or string, got {type(method)}",
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
+        return method_str
 
     def _validate(self) -> None:
         if not self.url or not isinstance(self.url, str) or not self.url.strip():
@@ -55,7 +71,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     def _run(
         self,
         url: str,
-        method: Optional[APIRequestMethod] = APIRequestMethod.GET,
+        method: Optional[Union[APIRequestMethod, MethodEnum]] = APIRequestMethod.GET,
         data: Optional[Union[str, Any]] = None,
         json: Any = None,
         headers: Any = None,
@@ -64,23 +80,25 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     ) -> Outputs:
         self._validate()
 
+        normalized_method = self._normalize_http_method(method) if method is not None else APIRequestMethod.GET.value
+
         vellum_instance = False
         for header in headers or {}:
             if isinstance(headers[header], VellumSecret):
                 vellum_instance = True
         if vellum_instance or bearer_token:
-            return self._vellum_execute_api(bearer_token, json, headers, method, url, timeout)
+            return self._vellum_execute_api(bearer_token, json, headers, normalized_method, url, timeout)
         else:
-            return self._local_execute_api(data, headers, json, method, url, timeout)
+            return self._local_execute_api(data, headers, json, normalized_method, url, timeout)
 
     def _local_execute_api(self, data, headers, json, method, url, timeout):
         try:
             if data is not None:
-                prepped = Request(method=method.value, url=url, data=data, headers=headers).prepare()
+                prepped = Request(method=method, url=url, data=data, headers=headers).prepare()
             elif json is not None:
-                prepped = Request(method=method.value, url=url, json=json, headers=headers).prepare()
+                prepped = Request(method=method, url=url, json=json, headers=headers).prepare()
             else:
-                prepped = Request(method=method.value, url=url, headers=headers).prepare()
+                prepped = Request(method=method, url=url, headers=headers).prepare()
         except Exception as e:
             raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
         try:
@@ -110,7 +128,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
         try:
             vellum_response = self._context.vellum_client.execute_api(
                 url=url,
-                method=method.value,
+                method=method,
                 body=data,
                 headers=headers,
                 bearer_token=client_vellum_secret,

@@ -5,68 +5,61 @@ from vellum.workflows.nodes.displayable.tool_calling_node.composio_service impor
 
 
 @pytest.fixture
-def mock_composio_client():
-    """Mock the Composio client completely"""
-    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.ComposioClient") as mock_composio:
-        yield mock_composio.return_value
+def mock_requests():
+    """Mock requests module"""
+    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.requests") as mock_requests:
+        yield mock_requests
 
 
 @pytest.fixture
 def mock_connected_accounts_response():
-    """Mock response for connected accounts"""
-    mock_item1 = Mock()
-    mock_item1.id = "conn-123"
-    mock_item1.toolkit.slug = "github"
-    mock_item1.status = "ACTIVE"
-    mock_item1.created_at = "2023-01-01T00:00:00Z"
-    mock_item1.updated_at = "2023-01-15T10:30:00Z"
-
-    mock_item2 = Mock()
-    mock_item2.id = "conn-456"
-    mock_item2.toolkit.slug = "slack"
-    mock_item2.status = "ACTIVE"
-    mock_item2.created_at = "2023-01-01T00:00:00Z"
-    mock_item2.updated_at = "2023-01-10T08:00:00Z"
-
-    mock_response = Mock()
-    mock_response.items = [mock_item1, mock_item2]
-
-    return mock_response
-
-
-@pytest.fixture
-def mock_composio_core_client():
-    """Mock the composio-core Composio client"""
-    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.Composio") as mock_composio:
-        yield mock_composio.return_value
+    """Mock response for connected accounts API"""
+    return {
+        "items": [
+            {
+                "id": "conn-123",
+                "toolkit": {"slug": "github"},
+                "status": "ACTIVE",
+                "created_at": "2023-01-01T00:00:00Z",
+                "updated_at": "2023-01-15T10:30:00Z",
+            },
+            {
+                "id": "conn-456",
+                "toolkit": {"slug": "slack"},
+                "status": "ACTIVE",
+                "created_at": "2023-01-01T00:00:00Z",
+                "updated_at": "2023-01-10T08:00:00Z",
+            },
+        ]
+    }
 
 
 @pytest.fixture
-def mock_action():
-    """Mock the Action class and specific actions"""
-    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.Action") as mock_action_class:
-        # Mock a specific action
-        mock_hackernews_action = Mock()
-        mock_action_class.HACKERNEWS_GET_USER = mock_hackernews_action
-        mock_action_class.GITHUB_GET_USER = Mock()
-        yield mock_action_class
+def mock_tool_execution_response():
+    """Mock response for tool execution API"""
+    return {
+        "data": {"items": [], "total": 0},
+        "successful": True,
+        "error": None,
+    }
 
 
 @pytest.fixture
-def composio_service(mock_composio_client, mock_composio_core_client):
-    """Create ComposioService with mocked clients"""
+def composio_service():
+    """Create ComposioService with test API key"""
     return ComposioService(api_key="test-key")
 
 
 class TestComposioAccountService:
     """Test suite for ComposioAccountService"""
 
-    def test_get_user_connections_success(
-        self, composio_service, mock_composio_client, mock_connected_accounts_response
-    ):
+    def test_get_user_connections_success(self, composio_service, mock_requests, mock_connected_accounts_response):
         """Test successful retrieval of user connections"""
-        # GIVEN the Composio client returns a valid response with two connections
-        mock_composio_client.connected_accounts.list.return_value = mock_connected_accounts_response
+        # GIVEN the requests mock returns a valid response with two connections
+        mock_response = Mock()
+        mock_response.json.return_value = mock_connected_accounts_response
+        mock_response.raise_for_status.return_value = None
+        mock_requests.get.return_value = mock_response
 
         # WHEN we request user connections
         result = composio_service.get_user_connections()
@@ -86,14 +79,21 @@ class TestComposioAccountService:
         assert result[1].created_at == "2023-01-01T00:00:00Z"
         assert result[1].updated_at == "2023-01-10T08:00:00Z"
 
-        mock_composio_client.connected_accounts.list.assert_called_once()
+        # Verify the correct API endpoint was called
+        mock_requests.get.assert_called_once_with(
+            "https://backend.composio.dev/api/v3/connected_accounts",
+            headers={"x-api-key": "test-key", "Content-Type": "application/json"},
+            params={},
+            timeout=30,
+        )
 
-    def test_get_user_connections_empty_response(self, composio_service, mock_composio_client):
+    def test_get_user_connections_empty_response(self, composio_service, mock_requests):
         """Test handling of empty connections response"""
-        # GIVEN the Composio client returns an empty response
+        # GIVEN the requests mock returns an empty response
         mock_response = Mock()
-        mock_response.items = []
-        mock_composio_client.connected_accounts.list.return_value = mock_response
+        mock_response.json.return_value = {"items": []}
+        mock_response.raise_for_status.return_value = None
+        mock_requests.get.return_value = mock_response
 
         # WHEN we request user connections
         result = composio_service.get_user_connections()
@@ -105,18 +105,23 @@ class TestComposioAccountService:
 class TestComposioCoreService:
     """Test suite for ComposioCoreService"""
 
-    def test_execute_tool_success(self, composio_service, mock_composio_core_client, mock_action):
+    def test_execute_tool_success(self, composio_service, mock_requests, mock_tool_execution_response):
         """Test executing a tool with complex argument structure"""
         # GIVEN complex arguments and a mock response
         complex_args = {"filters": {"status": "active"}, "limit": 10, "sort": "created_at"}
-        expected_result = {"items": [], "total": 0}
-        mock_composio_core_client.actions.execute.return_value = expected_result
+        mock_response = Mock()
+        mock_response.json.return_value = mock_tool_execution_response
+        mock_response.raise_for_status.return_value = None
+        mock_requests.post.return_value = mock_response
 
         # WHEN we execute a tool with complex arguments
         result = composio_service.execute_tool("HACKERNEWS_GET_USER", complex_args)
 
-        # THEN the arguments are passed through correctly
-        mock_composio_core_client.actions.execute.assert_called_once_with(
-            mock_action.HACKERNEWS_GET_USER, params=complex_args
+        # THEN the arguments are passed through correctly and we get the expected result
+        mock_requests.post.assert_called_once_with(
+            "https://backend.composio.dev/api/v3/tools/execute/HACKERNEWS_GET_USER",
+            headers={"x-api-key": "test-key", "Content-Type": "application/json"},
+            json=complex_args,
+            timeout=30,
         )
-        assert result == expected_result
+        assert result == {"items": [], "total": 0}

@@ -137,12 +137,20 @@ export interface ExecutionCounterPointer {
   data: ExecutionCounterData;
 }
 
+export interface EnvironmentVariablePointer {
+  type: "ENVIRONMENT_VARIABLE";
+  data: {
+    environmentVariable: string;
+  };
+}
+
 export type NodeInputValuePointerRule =
   | NodeOutputPointer
   | InputVariablePointer
   | ConstantValuePointer
   | WorkspaceSecretPointer
-  | ExecutionCounterPointer;
+  | ExecutionCounterPointer
+  | EnvironmentVariablePointer;
 
 export interface NodeInputValuePointer {
   rules: NodeInputValuePointerRule[];
