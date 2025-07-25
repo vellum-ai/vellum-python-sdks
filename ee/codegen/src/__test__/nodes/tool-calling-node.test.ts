@@ -157,8 +157,8 @@ describe("ToolCallingNode", () => {
     const composioToolFunction: ComposioToolFunctionArgs = {
       type: "COMPOSIO",
       name: "github_create_an_issue",
-      toolkit: "GITHUB",
-      action: "GITHUB_CREATE_AN_ISSUE",
+      integration_name: "GITHUB",
+      tool_name: "GITHUB_CREATE_AN_ISSUE",
       description: "Create a new issue in a GitHub repository",
       display_name: "Create GitHub Issue",
       parameters: {
@@ -219,7 +219,7 @@ describe("ToolCallingNode", () => {
       ];
 
       // This simulates the problematic data structure that causes the TypeError
-      const problematicComposioTool = {
+      const composioToolFunction = {
         type: "COMPOSIO",
         name: "GMAIL_CREATE_EMAIL_DRAFT",
         tool_name: "Create email draft",
@@ -228,7 +228,6 @@ describe("ToolCallingNode", () => {
           "Creates a gmail email draft, supporting to/cc/bcc, subject, plain/html body (ensure `is html=true` for html), attachments, and threading.",
         connection_id: "ca_QoaKIKPlluHk",
         integration_name: "gmail",
-        // Note: toolkit and action are missing, which causes the TypeError
       };
 
       const functionsAttribute = nodeAttributeFactory(
@@ -236,9 +235,8 @@ describe("ToolCallingNode", () => {
         "functions",
         [
           {
-            ...problematicComposioTool,
+            ...composioToolFunction,
             id: "composio-tool-function-id",
-            name: "GMAIL_CREATE_EMAIL_DRAFT",
           },
         ]
       );
