@@ -204,30 +204,34 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 }
                 case "COMPOSIO": {
                   const composioTool = f as ComposioToolFunctionArgs;
+
+                  // Validate required fields and provide fallbacks for missing fields
+                  const toolkit = composioTool.integration_name || "UNKNOWN";
+                  const action = composioTool.tool_slug || "UNKNOWN";
+                  const description = composioTool.description || "UNKNOWN";
+
                   const args = [
                     python.methodArgument({
                       name: "toolkit",
-                      value: python.TypeInstantiation.str(composioTool.toolkit),
+                      value: python.TypeInstantiation.str(toolkit),
                     }),
                     python.methodArgument({
                       name: "action",
-                      value: python.TypeInstantiation.str(composioTool.action),
+                      value: python.TypeInstantiation.str(action),
                     }),
                     python.methodArgument({
                       name: "description",
-                      value: python.TypeInstantiation.str(
-                        composioTool.description
-                      ),
+                      value: python.TypeInstantiation.str(description),
                     }),
                   ];
 
-                  if (composioTool.display_name) {
+                  const displayName =
+                    composioTool.display_name || composioTool.tool_name;
+                  if (displayName) {
                     args.push(
                       python.methodArgument({
                         name: "display_name",
-                        value: python.TypeInstantiation.str(
-                          composioTool.display_name
-                        ),
+                        value: python.TypeInstantiation.str(displayName),
                       })
                     );
                   }

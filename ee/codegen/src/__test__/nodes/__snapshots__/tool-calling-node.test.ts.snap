@@ -107,6 +107,25 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > composio tool > should handle composio tool with integration_name & tool_slug fields 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.types.definition import ComposioToolDefinition
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        ComposioToolDefinition(
+            toolkit="gmail",
+            action="GMAIL_CREATE_EMAIL_DRAFT",
+            description="Creates a gmail email draft, supporting to/cc/bcc, subject, plain/html body (ensure \`is html=true\` for html), attachments, and threading.",
+            display_name="Create email draft",
+        )
+    ]
+"
+`;
+
 exports[`ToolCallingNode > deployment workflow > should generate latest release tag if release_tag is null 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,

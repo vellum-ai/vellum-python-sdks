@@ -157,10 +157,20 @@ describe("ToolCallingNode", () => {
     const composioToolFunction: ComposioToolFunctionArgs = {
       type: "COMPOSIO",
       name: "github_create_an_issue",
-      toolkit: "GITHUB",
-      action: "GITHUB_CREATE_AN_ISSUE",
+      integration_name: "GITHUB",
+      tool_slug: "GITHUB_CREATE_AN_ISSUE",
       description: "Create a new issue in a GitHub repository",
       display_name: "Create GitHub Issue",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          body: { type: "string" },
+          owner: { type: "string" },
+          repo: { type: "string" },
+        },
+        required: ["title", "owner", "repo"],
+      },
     };
 
     it("should generate composio tool", async () => {
@@ -197,6 +207,57 @@ describe("ToolCallingNode", () => {
         nodeContext,
       });
 
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    // TODO: Combine this with the test above once attributes are finalized
+    // This test was written to repro a codegen bug that is now fixed
+    it("should handle composio tool with integration_name & tool_slug fields", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const composioToolFunction = {
+        type: "COMPOSIO",
+        name: "GMAIL_CREATE_EMAIL_DRAFT",
+        tool_name: "Create email draft",
+        tool_slug: "GMAIL_CREATE_EMAIL_DRAFT",
+        description:
+          "Creates a gmail email draft, supporting to/cc/bcc, subject, plain/html body (ensure `is html=true` for html), attachments, and threading.",
+        connection_id: "ca_QoaKIKPlluHk",
+        integration_name: "gmail",
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...composioToolFunction,
+            id: "composio-tool-function-id",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // This should not throw a TypeError
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

@@ -2,7 +2,7 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Literal, Optional, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BeforeValidator
 
@@ -109,8 +109,10 @@ class ComposioToolDefinition(UniversalBaseModel):
     action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
     description: str
 
-    # Optional cached metadata
     display_name: Optional[str] = None
+    parameters: Optional[Dict[str, Any]] = None
+    version: Optional[str] = None
+    tags: Optional[List[str]] = None
 
     @property
     def name(self) -> str:
