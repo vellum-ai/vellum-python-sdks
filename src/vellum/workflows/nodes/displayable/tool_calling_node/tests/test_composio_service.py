@@ -121,7 +121,7 @@ class TestComposioCoreService:
         mock_requests.post.assert_called_once_with(
             "https://backend.composio.dev/api/v3/tools/execute/HACKERNEWS_GET_USER",
             headers={"x-api-key": "test-key", "Content-Type": "application/json"},
-            json=complex_args,
+            json={"arguments": complex_args},
             timeout=30,
         )
         assert result == {"items": [], "total": 0}
