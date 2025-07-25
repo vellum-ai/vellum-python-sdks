@@ -42,10 +42,7 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
                 script_filepath=filepath,
             )
             if not file_code:
-                raise NodeException(
-                    message=f"Filepath '{filepath}' of node {node.__name__} does not exist",
-                    code=WorkflowErrorCode.INVALID_INPUTS,
-                )
+                raise Exception(f"Filepath '{filepath}' of node {node.__name__} does not exist")
             code_value = file_code
         else:
             code_value = ""

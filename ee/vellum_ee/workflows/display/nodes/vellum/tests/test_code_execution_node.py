@@ -167,6 +167,6 @@ def test_serialize_node__with_non_exist_code_input_path():
 
     # WHEN we serialize the workflow
     workflow_display = get_workflow_display(workflow_class=Workflow)
-    with pytest.raises(NodeException) as exc_info:
+    with pytest.raises(Exception) as exc_info:
         workflow_display.serialize()
     assert "Filepath 'non_existent_file.py' of node MyNode does not exist" in str(exc_info.value)
