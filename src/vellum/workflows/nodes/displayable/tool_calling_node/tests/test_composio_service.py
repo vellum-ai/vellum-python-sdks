@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ComposioService, ConnectionInfo
+from vellum.workflows.integrations.composio_service import ComposioService, ConnectionInfo
 
 
 @pytest.fixture
 def mock_requests():
     """Mock requests module"""
-    with patch("vellum.workflows.nodes.displayable.tool_calling_node.composio_service.requests") as mock_requests:
+    with patch("vellum.workflows.integrations.composio_service.requests") as mock_requests:
         yield mock_requests
 
 

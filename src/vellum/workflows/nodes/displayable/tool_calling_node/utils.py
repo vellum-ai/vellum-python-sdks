@@ -16,11 +16,11 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
-from vellum.workflows.nodes.displayable.tool_calling_node.composio_service import ComposioService
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
