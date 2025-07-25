@@ -1,12 +1,13 @@
 import json
-import os
-from typing import Any, Callable, Iterator, List, Optional, Type, cast
+import logging
+from typing import Any, Callable, Iterator, List, Optional, Type, Union, cast
 
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
+from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -31,6 +32,9 @@ from vellum.workflows.types.definition import ComposioToolDefinition, Deployment
 from vellum.workflows.types.generics import is_workflow_class
 
 CHAT_HISTORY_VARIABLE = "chat_history"
+
+
+logger = logging.getLogger(__name__)
 
 
 class FunctionCallNodeMixin:
@@ -176,29 +180,9 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         # Extract arguments from function call
         arguments = self._extract_function_arguments()
 
-        # HACK: Use first Composio API key found in environment variables
-        composio_api_key = None
-        common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
-
-        for env_var_name in common_env_var_names:
-            value = os.environ.get(env_var_name)
-            if value:
-                composio_api_key = value
-                break
-
-        if not composio_api_key:
-            raise NodeException(
-                message=(
-                    "No Composio API key found in environment variables. "
-                    "Please ensure one of these environment variables is set: "
-                )
-                + ", ".join(common_env_var_names),
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            )
-
         try:
             # Execute using ComposioService
-            composio_service = ComposioService(api_key=composio_api_key)
+            composio_service = ComposioService()
             result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
         except Exception as e:
             raise NodeException(
@@ -212,21 +196,41 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         yield from []
 
 
-def create_composio_wrapper_function(tool_def: ComposioToolDefinition):
-    """Create a real Python function that wraps the Composio tool for prompt layer compatibility."""
+def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> ComposioToolDefinition:
+    """Hydrate a ComposioToolDefinition with detailed information from the Composio API.
 
-    def wrapper_function(**kwargs):
-        # This should never be called due to routing, but satisfies introspection
-        raise RuntimeError(
-            f"ComposioToolDefinition wrapper for '{tool_def.action}' should not be called directly. "
-            f"Execution should go through ComposioNode. This suggests a routing issue."
+    Args:
+        tool_def: The basic ComposioToolDefinition to enhance
+
+    Returns:
+        ComposioToolDefinition with detailed parameters and description
+    """
+    try:
+        composio_service = ComposioService()
+        tool_details = composio_service.get_tool_by_slug(tool_def.action)
+
+        # Extract toolkit information from API response
+        toolkit_info = tool_details.get("toolkit", {})
+        toolkit_slug = (
+            toolkit_info.get("slug", tool_def.toolkit) if isinstance(toolkit_info, dict) else tool_def.toolkit
         )
 
-    # Set proper function attributes for prompt layer introspection
-    wrapper_function.__name__ = tool_def.name
-    wrapper_function.__doc__ = tool_def.description
+        # Create a version of the tool definition with proper field extraction
+        return ComposioToolDefinition(
+            type=tool_def.type,
+            toolkit=toolkit_slug.upper() if toolkit_slug else tool_def.toolkit,
+            action=tool_details.get("slug", tool_def.action),
+            description=tool_details.get("description", tool_def.description),
+            display_name=tool_details.get("name", tool_def.display_name),
+            parameters=tool_details.get("input_parameters", tool_def.parameters),
+            version=tool_details.get("version", tool_def.version),
+            tags=tool_details.get("tags", tool_def.tags),
+        )
 
-    return wrapper_function
+    except Exception as e:
+        # If hydration fails (including no API key), log and return original
+        logger.warning(f"Failed to enhance Composio tool '{tool_def.action}': {e}")
+        return tool_def
 
 
 def create_tool_router_node(
@@ -240,12 +244,19 @@ def create_tool_router_node(
     if functions and len(functions) > 0:
         # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
-        prompt_functions = []
+        prompt_functions: List[Union[Tool, FunctionDefinition]] = []
 
         for function in functions:
-            # Convert ComposioToolDefinition to wrapper function for prompt layer
             if isinstance(function, ComposioToolDefinition):
-                prompt_functions.append(create_composio_wrapper_function(function))
+                # Get Composio tool details and hydrate the function definition
+                enhanced_function = _hydrate_composio_tool_definition(function)
+                prompt_functions.append(
+                    FunctionDefinition(
+                        name=enhanced_function.name,
+                        description=enhanced_function.description,
+                        parameters=enhanced_function.parameters,
+                    )
+                )
             else:
                 prompt_functions.append(function)
 

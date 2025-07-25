@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -23,9 +24,32 @@ class ConnectionInfo:
 class ComposioService:
     """Composio API client for managing connections and executing tools"""
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: Optional[str] = None):
+        # If no API key provided, look it up from environment variables
+        if api_key is None:
+            api_key = self._get_api_key_from_env()
+
+        if not api_key:
+            common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
+            raise NodeException(
+                "No Composio API key found. "
+                "Please provide an api_key parameter or set one of these environment variables: "
+                + ", ".join(common_env_var_names)
+            )
+
         self.api_key = api_key
         self.base_url = "https://backend.composio.dev/api/v3"
+
+    @staticmethod
+    def _get_api_key_from_env() -> Optional[str]:
+        """Get Composio API key from environment variables"""
+        common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
+
+        for env_var_name in common_env_var_names:
+            value = os.environ.get(env_var_name)
+            if value:
+                return value
+        return None
 
     def _make_request(
         self, endpoint: str, method: str = "GET", params: Optional[dict] = None, json_data: Optional[dict] = None
@@ -66,6 +90,39 @@ class ComposioService:
             for item in response.get("items", [])
         ]
 
+    def get_tool_by_slug(self, tool_slug: str) -> Dict[str, Any]:
+        """Get detailed information about a tool using its slug identifier
+
+        Args:
+            tool_slug: The unique slug identifier of the tool
+
+        Returns:
+            Dictionary containing detailed tool information including:
+            - slug, name, description
+            - toolkit info (slug, name, logo)
+            - input_parameters, output_parameters
+            - no_auth, available_versions, version
+            - scopes, tags, deprecated info
+
+        Raises:
+            NodeException: If tool not found (404), unauthorized (401), or other API errors
+        """
+        endpoint = f"/tools/{tool_slug}"
+
+        try:
+            response = self._make_request(endpoint, method="GET")
+            logger.info(f"Retrieved tool details for slug '{tool_slug}': {response}")
+            return response
+        except Exception as e:
+            # Enhanced error handling for specific cases
+            error_message = str(e)
+            if "404" in error_message:
+                raise NodeException(f"Tool with slug '{tool_slug}' not found in Composio")
+            elif "401" in error_message:
+                raise NodeException(f"Unauthorized access to tool '{tool_slug}'. Check your Composio API key.")
+            else:
+                raise NodeException(f"Failed to retrieve tool details for '{tool_slug}': {error_message}")
+
     def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
         """Execute a tool using direct API request
 
@@ -77,5 +134,5 @@ class ComposioService:
             The result of the tool execution
         """
         endpoint = f"/tools/execute/{tool_name}"
-        response = self._make_request(endpoint, method="POST", json_data=arguments)
+        response = self._make_request(endpoint, method="POST", json_data={"arguments": arguments})
         return response.get("data", response)
