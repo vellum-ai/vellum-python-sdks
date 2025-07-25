@@ -53,6 +53,21 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         item_type = get_args(annotation)[0]
         return {"type": "array", "items": compile_annotation(item_type, defs)}
 
+    if get_origin(annotation) is tuple:
+        args = get_args(annotation)
+        if len(args) == 2 and args[1] is Ellipsis:
+            # Tuple[int, ...] with homogeneous items
+            return {"type": "array", "items": compile_annotation(args[0], defs)}
+        else:
+            # Tuple[int, str] with fixed length items
+            result = {
+                "type": "array",
+                "prefixItems": [compile_annotation(arg, defs) for arg in args],
+                "minItems": len(args),
+                "maxItems": len(args),
+            }
+            return result
+
     if dataclasses.is_dataclass(annotation):
         if annotation.__name__ not in defs:
             properties = {}
