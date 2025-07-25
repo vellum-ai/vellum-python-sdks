@@ -45,3 +45,80 @@ def test_api_node_with_invalid_method():
 
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "Invalid HTTP method 'INVALID_METHOD'" == str(exc_info.value)
+
+
+def test_api_node_adds_user_agent_header_when_none_provided(requests_mock):
+    """
+    Tests that the API node adds User-Agent header when no headers are provided.
+    """
+
+    class TestAPINode(BaseAPINode):
+        method = APIRequestMethod.GET
+        url = "https://example.com/test"
+
+    response_mock = requests_mock.get(
+        "https://example.com/test",
+        json={"result": "success"},
+        status_code=200,
+    )
+
+    node = TestAPINode()
+    result = node.run()
+
+    assert response_mock.last_request
+    assert response_mock.last_request.headers.get("User-Agent") == "vellum-ai/1.0.5"
+
+    assert result.status_code == 200
+
+
+def test_api_node_adds_user_agent_header_when_headers_provided_without_user_agent(requests_mock):
+    """
+    Tests that the API node adds User-Agent header when headers are provided but don't include User-Agent.
+    """
+
+    class TestAPINode(BaseAPINode):
+        method = APIRequestMethod.POST
+        url = "https://example.com/test"
+        headers = {"Content-Type": "application/json", "Custom-Header": "value"}
+        json = {"test": "data"}
+
+    response_mock = requests_mock.post(
+        "https://example.com/test",
+        json={"result": "success"},
+        status_code=200,
+    )
+
+    node = TestAPINode()
+    result = node.run()
+
+    assert response_mock.last_request
+    assert response_mock.last_request.headers.get("User-Agent") == "vellum-ai/1.0.5"
+    assert response_mock.last_request.headers.get("Content-Type") == "application/json"
+    assert response_mock.last_request.headers.get("Custom-Header") == "value"
+
+    assert result.status_code == 200
+
+
+def test_api_node_preserves_custom_user_agent_header(requests_mock):
+    """
+    Tests that the API node preserves a custom User-Agent header if provided.
+    """
+
+    class TestAPINode(BaseAPINode):
+        method = APIRequestMethod.GET
+        url = "https://example.com/test"
+        headers = {"User-Agent": "Custom-Agent/1.0"}
+
+    response_mock = requests_mock.get(
+        "https://example.com/test",
+        json={"result": "success"},
+        status_code=200,
+    )
+
+    node = TestAPINode()
+    result = node.run()
+
+    assert response_mock.last_request
+    assert response_mock.last_request.headers.get("User-Agent") == "Custom-Agent/1.0"
+
+    assert result.status_code == 200

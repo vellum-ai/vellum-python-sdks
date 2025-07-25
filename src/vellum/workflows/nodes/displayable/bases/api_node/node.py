@@ -92,6 +92,9 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             return self._local_execute_api(data, headers, json, normalized_method, url, timeout)
 
     def _local_execute_api(self, data, headers, json, method, url, timeout):
+        headers = headers or {}
+        if "User-Agent" not in headers:
+            headers["User-Agent"] = "vellum-ai/1.0.5"
         try:
             if data is not None:
                 prepped = Request(method=method, url=url, data=data, headers=headers).prepare()
