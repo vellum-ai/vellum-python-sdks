@@ -67,7 +67,7 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
-        if self.state.prompt_iterations >= self.max_prompt_iterations:
+        if self.max_prompt_iterations is not None and self.state.prompt_iterations >= self.max_prompt_iterations:
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 

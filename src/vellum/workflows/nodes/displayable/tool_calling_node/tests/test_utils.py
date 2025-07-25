@@ -1,9 +1,14 @@
 import pytest
+from uuid import uuid4
 
+from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
+from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+from vellum.client.types.string_vellum_value import StringVellumValue
+from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.displayable.tool_calling_node.utils import get_function_name
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_tool_router_node, get_function_name
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition
@@ -76,3 +81,36 @@ def test_get_function_name_composio_tool_definition_various_toolkits(
     result = get_function_name(composio_tool)
 
     assert result == expected_result
+
+
+def test_create_tool_router_node_max_prompt_iterations(vellum_adhoc_prompt_client):
+    # GIVEN a tool router node with max_prompt_iterations set to None
+    tool_router_node = create_tool_router_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+        max_prompt_iterations=None,
+    )
+
+    def generate_prompt_events(*args, **kwargs):
+        execution_id = str(uuid4())
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=[StringVellumValue(value="test output")],
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN we run the tool router node
+    node_instance = tool_router_node()
+    outputs = list(node_instance.run())
+    assert outputs[0].name == "results"
+    assert outputs[0].value == [StringVellumValue(type="STRING", value="test output")]
+    assert outputs[1].name == "text"
+    assert outputs[1].value == "test output"
