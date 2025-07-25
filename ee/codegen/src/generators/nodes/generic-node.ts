@@ -206,17 +206,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const composioTool = f as ComposioToolFunctionArgs;
 
                   // Validate required fields and provide fallbacks for missing fields
-                  const toolkit =
-                    composioTool.toolkit ||
-                    composioTool.integration_name ||
-                    "UNKNOWN";
-                  const action =
-                    composioTool.action ||
-                    composioTool.tool_slug ||
-                    composioTool.name ||
-                    "UNKNOWN";
-                  const description =
-                    composioTool.description || "No description provided";
+                  const toolkit = composioTool.integration_name || "UNKNOWN";
+                  const action = composioTool.tool_slug || "UNKNOWN";
+                  const description = composioTool.description || "UNKNOWN";
 
                   const args = [
                     python.methodArgument({
