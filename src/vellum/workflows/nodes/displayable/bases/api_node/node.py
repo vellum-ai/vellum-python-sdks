@@ -123,6 +123,10 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     def _vellum_execute_api(self, bearer_token, data, headers, method, url, timeout):
         client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
 
+        headers = headers or {}
+        if "User-Agent" not in headers:
+            headers["User-Agent"] = "vellum-ai/1.0.5"
+
         # Create request_options if timeout is specified
         request_options = None
         if timeout is not None:

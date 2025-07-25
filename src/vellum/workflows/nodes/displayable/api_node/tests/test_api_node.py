@@ -35,7 +35,10 @@ def test_run_workflow__secrets(vellum_client):
     assert vellum_client.execute_api.call_count == 1
     assert vellum_client.execute_api.call_args.kwargs["url"] == "https://example.vellum.ai"
     assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
-    assert vellum_client.execute_api.call_args.kwargs["headers"] == {"X-Test-Header": "foo"}
+    assert vellum_client.execute_api.call_args.kwargs["headers"] == {
+        "X-Test-Header": "foo",
+        "User-Agent": "vellum-ai/1.0.5",
+    }
     bearer_token = vellum_client.execute_api.call_args.kwargs["bearer_token"]
     assert bearer_token == ClientVellumSecret(name="secret")
     assert terminal.headers == {"X-Response-Header": "bar"}
@@ -70,7 +73,10 @@ def test_api_node_raises_error_when_api_call_fails(vellum_client):
     assert vellum_client.execute_api.call_count == 1
     assert vellum_client.execute_api.call_args.kwargs["url"] == "https://example.vellum.ai"
     assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
-    assert vellum_client.execute_api.call_args.kwargs["headers"] == {"X-Test-Header": "foo"}
+    assert vellum_client.execute_api.call_args.kwargs["headers"] == {
+        "X-Test-Header": "foo",
+        "User-Agent": "vellum-ai/1.0.5",
+    }
 
 
 def test_api_node_defaults_to_get_method(vellum_client):
