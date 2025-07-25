@@ -3,7 +3,6 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .new_member_join_behavior_enum import NewMemberJoinBehaviorEnum
-from .organization_limit_config import OrganizationLimitConfig
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
@@ -13,7 +12,7 @@ class OrganizationRead(UniversalBaseModel):
     name: str
     allow_staff_access: typing.Optional[bool] = None
     new_member_join_behavior: NewMemberJoinBehaviorEnum
-    limit_config: OrganizationLimitConfig
+    limit_config: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
