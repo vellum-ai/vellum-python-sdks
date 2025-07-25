@@ -699,6 +699,8 @@ def test_compile_function_definition__annotated_complex_types():
             "required": ["location", "items", "config"],
         },
     )
+
+
 @pytest.mark.parametrize(
     "annotation,expected_schema",
     [
