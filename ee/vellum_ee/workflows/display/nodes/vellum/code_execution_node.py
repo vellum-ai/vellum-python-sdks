@@ -40,6 +40,8 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
                 node_filepath=node_file_path,
                 script_filepath=filepath,
             )
+            if not file_code:
+                raise Exception(f"Filepath '{filepath}' of node {node.__name__} does not exist")
             code_value = file_code
         else:
             code_value = ""
