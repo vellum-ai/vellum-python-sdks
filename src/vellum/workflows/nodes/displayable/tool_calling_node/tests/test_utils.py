@@ -150,7 +150,7 @@ def test_create_tool_router_node_chat_history_block_dict(vellum_adhoc_prompt_cli
 
     tool_router_node = create_tool_router_node(
         ml_model="gpt-4o-mini",
-        blocks=blocks,
+        blocks=blocks,  # type: ignore
         functions=[],
         prompt_inputs=None,
         parameters=DEFAULT_PROMPT_PARAMETERS,
