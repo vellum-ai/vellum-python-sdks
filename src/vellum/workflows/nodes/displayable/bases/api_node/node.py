@@ -92,6 +92,10 @@ class BaseAPINode(BaseNode, Generic[StateType]):
             return self._local_execute_api(data, headers, json, normalized_method, url, timeout)
 
     def _local_execute_api(self, data, headers, json, method, url, timeout):
+        headers = headers or {}
+        if "User-Agent" not in headers:
+            client_headers = self._context.vellum_client._client_wrapper.get_headers()
+            headers["User-Agent"] = client_headers.get("User-Agent")
         try:
             if data is not None:
                 prepped = Request(method=method, url=url, data=data, headers=headers).prepare()
@@ -119,6 +123,11 @@ class BaseAPINode(BaseNode, Generic[StateType]):
 
     def _vellum_execute_api(self, bearer_token, data, headers, method, url, timeout):
         client_vellum_secret = ClientVellumSecret(name=bearer_token.name) if bearer_token else None
+
+        headers = headers or {}
+        if "User-Agent" not in headers:
+            client_headers = self._context.vellum_client._client_wrapper.get_headers()
+            headers["User-Agent"] = client_headers.get("User-Agent")
 
         # Create request_options if timeout is specified
         request_options = None

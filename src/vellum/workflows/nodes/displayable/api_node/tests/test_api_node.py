@@ -16,6 +16,7 @@ def test_run_workflow__secrets(vellum_client):
         json_={"data": [1, 2, 3]},
         headers={"X-Response-Header": "bar"},
     )
+    vellum_client._client_wrapper.get_headers.return_value = {"User-Agent": "vellum-ai/1.0.6"}
 
     class SimpleBaseAPINode(APINode):
         method = APIRequestMethod.POST
@@ -35,7 +36,9 @@ def test_run_workflow__secrets(vellum_client):
     assert vellum_client.execute_api.call_count == 1
     assert vellum_client.execute_api.call_args.kwargs["url"] == "https://example.vellum.ai"
     assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
-    assert vellum_client.execute_api.call_args.kwargs["headers"] == {"X-Test-Header": "foo"}
+    headers = vellum_client.execute_api.call_args.kwargs["headers"]
+    assert headers["X-Test-Header"] == "foo"
+    assert "vellum-ai" in headers.get("User-Agent", "")
     bearer_token = vellum_client.execute_api.call_args.kwargs["bearer_token"]
     assert bearer_token == ClientVellumSecret(name="secret")
     assert terminal.headers == {"X-Response-Header": "bar"}
@@ -44,6 +47,7 @@ def test_run_workflow__secrets(vellum_client):
 def test_api_node_raises_error_when_api_call_fails(vellum_client):
     # GIVEN an API call that fails
     vellum_client.execute_api.side_effect = ApiError(status_code=400, body="API Error")
+    vellum_client._client_wrapper.get_headers.return_value = {"User-Agent": "vellum-ai/1.0.6"}
 
     class SimpleAPINode(APINode):
         method = APIRequestMethod.GET
@@ -70,7 +74,9 @@ def test_api_node_raises_error_when_api_call_fails(vellum_client):
     assert vellum_client.execute_api.call_count == 1
     assert vellum_client.execute_api.call_args.kwargs["url"] == "https://example.vellum.ai"
     assert vellum_client.execute_api.call_args.kwargs["body"] == {"key": "value"}
-    assert vellum_client.execute_api.call_args.kwargs["headers"] == {"X-Test-Header": "foo"}
+    headers = vellum_client.execute_api.call_args.kwargs["headers"]
+    assert headers["X-Test-Header"] == "foo"
+    assert "vellum-ai" in headers.get("User-Agent", "")
 
 
 def test_api_node_defaults_to_get_method(vellum_client):
