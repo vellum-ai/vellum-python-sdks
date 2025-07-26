@@ -1,9 +1,13 @@
 import pytest
 from uuid import uuid4
 
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.string_vellum_value import StringVellumValue
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -114,3 +118,106 @@ def test_create_tool_router_node_max_prompt_iterations(vellum_adhoc_prompt_clien
     assert outputs[0].value == [StringVellumValue(type="STRING", value="test output")]
     assert outputs[1].name == "text"
     assert outputs[1].value == "test output"
+
+
+def test_create_tool_router_node_chat_history_block_dict(vellum_adhoc_prompt_client):
+    # GIVEN a list of blocks with a chat history block
+    blocks = [
+        {
+            "block_type": "CHAT_MESSAGE",
+            "chat_role": "SYSTEM",
+            "blocks": [
+                {
+                    "block_type": "RICH_TEXT",
+                    "blocks": [{"block_type": "PLAIN_TEXT", "cache_config": None, "text": "first message"}],
+                }
+            ],
+        },
+        {
+            "block_type": "CHAT_MESSAGE",
+            "chat_role": "USER",
+            "blocks": [
+                {
+                    "block_type": "RICH_TEXT",
+                    "blocks": [
+                        {"block_type": "PLAIN_TEXT", "text": "second message"},
+                        {"block_type": "PLAIN_TEXT", "text": "third message"},
+                    ],
+                }
+            ],
+        },
+    ]
+
+    tool_router_node = create_tool_router_node(
+        ml_model="gpt-4o-mini",
+        blocks=blocks,
+        functions=[],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    def generate_prompt_events(*args, **kwargs):
+        execution_id = str(uuid4())
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=[StringVellumValue(value="test output")],
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN we run the tool router node
+    node_instance = tool_router_node()
+    list(node_instance.run())
+
+    # THEN the API was called with compiled blocks
+    blocks = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args[1]["blocks"]
+    assert blocks == [
+        ChatMessagePromptBlock(
+            block_type="CHAT_MESSAGE",
+            state=None,
+            cache_config=None,
+            chat_role="SYSTEM",
+            chat_source=None,
+            chat_message_unterminated=None,
+            blocks=[
+                RichTextPromptBlock(
+                    block_type="RICH_TEXT",
+                    state=None,
+                    cache_config=None,
+                    blocks=[
+                        PlainTextPromptBlock(
+                            block_type="PLAIN_TEXT", state=None, cache_config=None, text="first message"
+                        )
+                    ],
+                )
+            ],
+        ),
+        ChatMessagePromptBlock(
+            block_type="CHAT_MESSAGE",
+            state=None,
+            cache_config=None,
+            chat_role="USER",
+            chat_source=None,
+            chat_message_unterminated=None,
+            blocks=[
+                RichTextPromptBlock(
+                    block_type="RICH_TEXT",
+                    state=None,
+                    cache_config=None,
+                    blocks=[
+                        PlainTextPromptBlock(
+                            block_type="PLAIN_TEXT", state=None, cache_config=None, text="second message"
+                        ),
+                        PlainTextPromptBlock(
+                            block_type="PLAIN_TEXT", state=None, cache_config=None, text="third message"
+                        ),
+                    ],
+                )
+            ],
+        ),
+        VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
+    ]
