@@ -2,7 +2,7 @@
 
 import threading
 from uuid import UUID
-from typing import TYPE_CHECKING, Dict, Optional, Type
+from typing import TYPE_CHECKING, Dict, Optional
 
 DEFAULT_TRACE_ID = UUID("00000000-0000-0000-0000-000000000000")
 
@@ -24,14 +24,15 @@ class MonitoringContextStore:
 
     def __init__(self):
         self._lock = threading.Lock()
-        self._contexts: Dict[str, Type["ExecutionContext"]] = {}
+        self._contexts: Dict[str, "ExecutionContext"] = {}
 
     def get_current_trace_id(self) -> Optional[UUID]:
         """Get the current active trace_id that should be used by all threads."""
         with self._lock:
-            return self.retrieve_context().trace_id
+            current_context = self.retrieve_context()
+            return current_context.trace_id if current_context else None
 
-    def store_context(self, context: Optional["ExecutionContext"]) -> None:
+    def store_context(self, context: "ExecutionContext") -> None:
         """Store monitoring parent context using multiple keys for reliable retrieval."""
         # Use the context's trace_id if available, otherwise use the current trace_id
         thread_id = threading.get_ident()
@@ -41,7 +42,7 @@ class MonitoringContextStore:
             thread_key = f"thread:{str(thread_id)}"
             self._contexts[thread_key] = context
 
-    def retrieve_context(self) -> Optional[Type["ExecutionContext"]]:
+    def retrieve_context(self) -> Optional["ExecutionContext"]:
         """Retrieve monitoring parent context with multiple fallback strategies."""
         with self._lock:
             # Try exact match first
