@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Callable, Iterator, List, Optional, Type, Union, cast
+from typing import Any, Callable, Dict, Iterator, List, Optional, Type, Union, cast
 
 from pydash import snake_case
 
@@ -235,7 +235,7 @@ def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> Compo
 
 def create_tool_router_node(
     ml_model: str,
-    blocks: List[PromptBlock],
+    blocks: List[Union[PromptBlock, Dict[str, Any]]],
     functions: List[Tool],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
