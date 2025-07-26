@@ -37,4 +37,4 @@ def test_run_workflow__happy_path(requests_mock: requests_mock.mocker.Mocker):
     assert response_mock.last_request.json() == {"key": "value"}
 
     # AND the User-Agent header should be included to prevent 429 status codes
-    assert response_mock.last_request.headers.get("User-Agent") == "vellum-ai/1.0.5"
+    assert response_mock.last_request.headers.get("User-Agent") == "vellum-ai/1.0.6"
