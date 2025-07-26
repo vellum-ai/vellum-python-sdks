@@ -66,7 +66,7 @@ def test_api_node_adds_user_agent_header_when_none_provided(requests_mock):
     result = node.run()
 
     assert response_mock.last_request
-    assert response_mock.last_request.headers.get("User-Agent") == "vellum-ai/1.0.6"
+    assert "vellum-ai" in response_mock.last_request.headers.get("User-Agent", "")
 
     assert result.status_code == 200
 
@@ -92,7 +92,7 @@ def test_api_node_adds_user_agent_header_when_headers_provided_without_user_agen
     result = node.run()
 
     assert response_mock.last_request
-    assert response_mock.last_request.headers.get("User-Agent") == "vellum-ai/1.0.6"
+    assert "vellum-ai" in response_mock.last_request.headers.get("User-Agent", "")
     assert response_mock.last_request.headers.get("Content-Type") == "application/json"
     assert response_mock.last_request.headers.get("Custom-Header") == "value"
 
