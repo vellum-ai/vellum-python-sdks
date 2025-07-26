@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import logging
 from queue import Empty, Queue
 import sys
-from threading import Event as ThreadingEvent, Thread
+from threading import Event as ThreadingEvent
 import traceback
 from uuid import UUID, uuid4
 from typing import (
@@ -25,7 +25,7 @@ from typing import (
 )
 
 from vellum.workflows.constants import undefined
-from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context, set_execution_context
+from vellum.workflows.context import ExecutionContext, clear_execution_context, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events import (
@@ -46,7 +46,8 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
+from vellum.workflows.events.relational_threads import RelationalThread as Thread
+from vellum.workflows.events.types import BaseEvent, NodeParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
@@ -457,7 +458,6 @@ class WorkflowRunner(Generic[StateType]):
 
     def _create_worker_thread(self, node: BaseNode[StateType], span_id: UUID) -> Thread:
         """Create a worker thread with proper execution context."""
-        
         return Thread(
             target=self._run_work_item,
             kwargs={
@@ -533,10 +533,6 @@ class WorkflowRunner(Generic[StateType]):
                 )
                 raise e
 
-            execution = get_execution_context()
-            # Ensure the current context is stored globally before creating the worker thread
-            set_execution_context(execution)
-            
             node = node_class(state=state, context=self.workflow.context)
             state.meta.node_execution_cache.initiate_node_execution(node_class, node_span_id)
             self._active_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
@@ -883,6 +879,14 @@ class WorkflowRunner(Generic[StateType]):
 
         self._background_thread_queue.put(None)
         cancel_thread_kill_switch.set()
+
+        # Clear MonitoringContextStore at the end of root workflow execution
+        # Only clear if this is a root workflow (no parent context)
+        if not self._execution_context.parent_context or self._execution_context.parent_context.type in [
+            "WORKFLOW_RELEASE_TAG",
+            "WORKFLOW_SANDBOX",
+        ]:
+            clear_execution_context()
 
     def stream(self) -> WorkflowEventStream:
         return WorkflowEventGenerator(self._generate_events(), self._initial_state.meta.span_id)

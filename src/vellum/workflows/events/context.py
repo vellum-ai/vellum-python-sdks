@@ -2,7 +2,7 @@
 
 import threading
 from uuid import UUID
-from typing import Dict, Optional, TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Dict, Optional, Type
 
 DEFAULT_TRACE_ID = UUID("00000000-0000-0000-0000-000000000000")
 
@@ -10,7 +10,6 @@ DEFAULT_TRACE_ID = UUID("00000000-0000-0000-0000-000000000000")
 _monitoring_execution_context: threading.local = threading.local()
 # Thread-local storage for current span_id
 _current_span_id: threading.local = threading.local()
-threading.
 
 if TYPE_CHECKING:
     from vellum.workflows.context import ExecutionContext
@@ -26,90 +25,39 @@ class MonitoringContextStore:
     def __init__(self):
         self._lock = threading.Lock()
         self._contexts: Dict[str, Type["ExecutionContext"]] = {}
-        self._thread_contexts: Dict[int, Type["ExecutionContext"]] = {}
-        self._current_trace_id: Optional[UUID] = None
-
-    def set_current_trace_id(self, trace_id: UUID) -> None:
-        """Set the current active trace_id that should be used by all threads."""
-        current = self.get_current_trace_id()
-        if current in [DEFAULT_TRACE_ID, None]:
-            with self._lock:
-                self._current_trace_id = trace_id
 
     def get_current_trace_id(self) -> Optional[UUID]:
         """Get the current active trace_id that should be used by all threads."""
         with self._lock:
-            return self._current_trace_id
-
-    def set_current_span_id(self, span_id: UUID) -> None:
-        """Set the current active span_id for this thread."""
-        _current_span_id.span_id = span_id
-
-    def get_current_span_id(self) -> Optional[UUID]:
-        """Get the current active span_id for this thread."""
-        return getattr(_current_span_id, "span_id", None)
+            return self.retrieve_context().trace_id
 
     def store_context(self, context: Optional["ExecutionContext"]) -> None:
         """Store monitoring parent context using multiple keys for reliable retrieval."""
         # Use the context's trace_id if available, otherwise use the current trace_id
-        trace_id = context.trace_id if context and context.trace_id != DEFAULT_TRACE_ID else self.get_current_trace_id()
-        span_id = self.get_current_span_id() or (context.parent_context.span_id if context and context.parent_context else None)
-        
-        # Set the current trace_id if it's not set or is default
-        if context and context.trace_id and context.trace_id != DEFAULT_TRACE_ID:
-            self.set_current_trace_id(context.trace_id)
-            trace_id = context.trace_id
+        thread_id = threading.get_ident()
 
         with self._lock:
             # Use trace:span:thread for unique context storage
-            trace_span_thread_key = (
-                f"trace:{str(trace_id)}:span:{str(span_id)}"
-            )
-            self._contexts[trace_span_thread_key] = context
+            thread_key = f"thread:{str(thread_id)}"
+            self._contexts[thread_key] = context
 
-    def retrieve_context(self, trace_id: UUID, span_id: Optional[UUID] = None) -> Optional[Type["ExecutionContext"]]:
+    def retrieve_context(self) -> Optional[Type["ExecutionContext"]]:
         """Retrieve monitoring parent context with multiple fallback strategies."""
         with self._lock:
             # Try exact match first
-            span_key = f"trace:{str(trace_id)}:span:{str(span_id)}"
+            thread = threading.current_thread()
+            parent_thread = thread.get_parent_thread() if hasattr(thread, "get_parent_thread") else thread.ident
+            span_key = f"thread:{parent_thread}"
+            backup_key = f"thread:{str(thread.ident)}"
+            if backup_key in self._contexts:
+                result = self._contexts[backup_key]
+                return result
             if span_key in self._contexts:
                 result = self._contexts[span_key]
                 return result
-            
-            # If exact match fails, try to find any context with the same trace_id
-            for key, context in self._contexts.items():
-                if key.startswith(f"trace:{str(trace_id)}:"):
-                    return context
 
         return None
 
-
-# Global instance for cross-boundary context persistence
-monitoring_context_store = MonitoringContextStore()
-
-
-def get_monitoring_execution_context() -> Optional[Type["ExecutionContext"]]:
-    """Get the current monitoring execution context, with intelligent fallback."""
-    if hasattr(_monitoring_execution_context, "context"):
-        context = _monitoring_execution_context.context
-        if context.trace_id != DEFAULT_TRACE_ID and context.parent_context:
-            return context
-
-    # If no thread-local context, try to restore from global store using current trace_id
-    trace_id = monitoring_context_store.get_current_trace_id()
-    span_id = _current_span_id.span_id if hasattr(_current_span_id, "span_id") else None
-    if trace_id:
-        if trace_id != DEFAULT_TRACE_ID:
-            context = monitoring_context_store.retrieve_context(trace_id, span_id)
-            if context:
-                _monitoring_execution_context.context = context
-                return context
-    return None
-
-
-def set_monitoring_execution_context(context: Type["ExecutionContext"]) -> None:
-    """Set the current monitoring execution context and persist it for cross-boundary access."""
-    _monitoring_execution_context.context = context
-
-    if context.trace_id and context.parent_context:
-        monitoring_context_store.store_context(context)
+    def clear_context(self):
+        self._contexts = {}
+        self._current_trace_id = None

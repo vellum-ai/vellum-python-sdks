@@ -166,6 +166,9 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             self._run_subworkflow(item=item, index=index)
 
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
+        # sets context for this parent thread, to then pass on --
+        # TODO - get all threads to just auto collect
+        get_execution_context()
         context = WorkflowContext.create_from(self._context)
         subworkflow = self.subworkflow(
             parent_state=self.state,
