@@ -521,7 +521,14 @@ class WorkflowRunner(Generic[StateType]):
             state.meta.node_execution_cache.initiate_node_execution(node_class, node_span_id)
             self._active_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
 
-            worker_thread = self._create_worker_thread(node, node_span_id)
+            get_execution_context()
+            worker_thread = Thread(
+                target=self._run_work_item,
+                kwargs={
+                    "node": node,
+                    "span_id": node_span_id,
+                },
+            )
             worker_thread.start()
 
     def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[WorkflowError]:
