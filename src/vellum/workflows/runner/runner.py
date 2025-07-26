@@ -25,7 +25,7 @@ from typing import (
 )
 
 from vellum.workflows.constants import undefined
-from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
+from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context, set_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events import (
@@ -188,15 +188,16 @@ class WorkflowRunner(Generic[StateType]):
         ]
 
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
+        execution = get_execution_context()
         self._workflow_event_inner_queue.put(
             WorkflowExecutionSnapshottedEvent(
-                trace_id=self._execution_context.trace_id,
+                trace_id=execution.trace_id,
                 span_id=state.meta.span_id,
                 body=WorkflowExecutionSnapshottedBody(
                     workflow_definition=self.workflow.__class__,
                     state=state,
                 ),
-                parent=self._execution_context.parent_context,
+                parent=execution.parent_context,
             )
         )
 
@@ -454,18 +455,16 @@ class WorkflowRunner(Generic[StateType]):
 
         return None
 
-    def _context_run_work_item(
-        self,
-        node: BaseNode[StateType],
-        span_id: UUID,
-        parent_context: ParentContext,
-        trace_id: UUID,
-    ) -> None:
-        with execution_context(
-            parent_context=parent_context,
-            trace_id=trace_id,
-        ):
-            self._run_work_item(node, span_id)
+    def _create_worker_thread(self, node: BaseNode[StateType], span_id: UUID) -> Thread:
+        """Create a worker thread with proper execution context."""
+        
+        return Thread(
+            target=self._run_work_item,
+            kwargs={
+                "node": node,
+                "span_id": span_id,
+            },
+        )
 
     def _handle_invoked_ports(
         self,
@@ -519,19 +518,14 @@ class WorkflowRunner(Generic[StateType]):
                 return
 
             execution = get_execution_context()
+            # Ensure the current context is stored globally before creating the worker thread
+            set_execution_context(execution)
+            
             node = node_class(state=state, context=self.workflow.context)
             state.meta.node_execution_cache.initiate_node_execution(node_class, node_span_id)
             self._active_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
 
-            worker_thread = Thread(
-                target=self._context_run_work_item,
-                kwargs={
-                    "node": node,
-                    "span_id": node_span_id,
-                    "parent_context": execution.parent_context,
-                    "trace_id": execution.trace_id,
-                },
-            )
+            worker_thread = self._create_worker_thread(node, node_span_id)
             worker_thread.start()
 
     def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[WorkflowError]:
@@ -611,69 +605,75 @@ class WorkflowRunner(Generic[StateType]):
         return None
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
+        execution = get_execution_context()
         return WorkflowExecutionInitiatedEvent(
-            trace_id=self._execution_context.trace_id,
+            trace_id=execution.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionInitiatedBody(
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
             ),
-            parent=self._execution_context.parent_context,
+            parent=execution.parent_context,
         )
 
     def _stream_workflow_event(self, output: BaseOutput) -> WorkflowExecutionStreamingEvent:
+        execution = get_execution_context()
         return WorkflowExecutionStreamingEvent(
-            trace_id=self._execution_context.trace_id,
+            trace_id=execution.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionStreamingBody(
                 workflow_definition=self.workflow.__class__,
                 output=output,
             ),
-            parent=self._execution_context.parent_context,
+            parent=execution.parent_context,
         )
 
     def _fulfill_workflow_event(self, outputs: OutputsType) -> WorkflowExecutionFulfilledEvent:
+        execution = get_execution_context()
         return WorkflowExecutionFulfilledEvent(
-            trace_id=self._execution_context.trace_id,
+            trace_id=execution.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionFulfilledBody(
                 workflow_definition=self.workflow.__class__,
                 outputs=outputs,
             ),
-            parent=self._execution_context.parent_context,
+            parent=execution.parent_context,
         )
 
     def _reject_workflow_event(self, error: WorkflowError) -> WorkflowExecutionRejectedEvent:
+        execution = get_execution_context()
         return WorkflowExecutionRejectedEvent(
-            trace_id=self._execution_context.trace_id,
+            trace_id=execution.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionRejectedBody(
                 workflow_definition=self.workflow.__class__,
                 error=error,
             ),
-            parent=self._execution_context.parent_context,
+            parent=execution.parent_context,
         )
 
     def _resume_workflow_event(self) -> WorkflowExecutionResumedEvent:
+        execution = get_execution_context()
         return WorkflowExecutionResumedEvent(
-            trace_id=self._execution_context.trace_id,
+            trace_id=execution.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionResumedBody(
                 workflow_definition=self.workflow.__class__,
             ),
-            parent=self._execution_context.parent_context,
+            parent=execution.parent_context,
         )
 
     def _pause_workflow_event(self, external_inputs: Iterable[ExternalInputReference]) -> WorkflowExecutionPausedEvent:
+        execution = get_execution_context()
         return WorkflowExecutionPausedEvent(
-            trace_id=self._execution_context.trace_id,
+            trace_id=execution.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionPausedBody(
                 workflow_definition=self.workflow.__class__,
                 external_inputs=external_inputs,
             ),
-            parent=self._execution_context.parent_context,
+            parent=execution.parent_context,
         )
 
     def _stream(self) -> None:
