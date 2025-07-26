@@ -456,16 +456,6 @@ class WorkflowRunner(Generic[StateType]):
 
         return None
 
-    def _create_worker_thread(self, node: BaseNode[StateType], span_id: UUID) -> Thread:
-        """Create a worker thread with proper execution context."""
-        return Thread(
-            target=self._run_work_item,
-            kwargs={
-                "node": node,
-                "span_id": span_id,
-            },
-        )
-
     def _handle_invoked_ports(
         self,
         state: StateType,
