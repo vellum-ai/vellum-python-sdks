@@ -1,4 +1,4 @@
-from typing import ClassVar, Iterator, List, Optional, Set
+from typing import Any, ClassVar, Dict, Iterator, List, Optional, Set, Union
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.prompt_parameters import PromptParameters
@@ -36,7 +36,7 @@ class ToolCallingNode(BaseNode):
     """
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
-    blocks: ClassVar[List[PromptBlock]] = []
+    blocks: ClassVar[List[Union[PromptBlock, Dict[str, Any]]]] = []
     functions: ClassVar[List[Tool]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
