@@ -49,21 +49,57 @@ def test_composio_tool_definition_creation():
 
 
 @pytest.mark.parametrize(
-    "bearer_token_value",
+    "authorization_type, bearer_token_value, api_key_header_key, api_key_header_value, expected_bearer_token, expected_api_key_header",
     [
-        ("GITHUB_PERSONAL_ACCESS_TOKEN"),
-        (EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN")),
+        (
+            AuthorizationType.BEARER_TOKEN,
+            "GITHUB_PERSONAL_ACCESS_TOKEN",
+            None,
+            None,
+            "GITHUB_PERSONAL_ACCESS_TOKEN",
+            None,
+        ),
+        (
+            AuthorizationType.BEARER_TOKEN,
+            EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
+            None,
+            None,
+            EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
+            None,
+        ),
+        (
+            AuthorizationType.API_KEY,
+            None,
+            "API_KEY",
+            "GITHUB_PERSONAL_ACCESS_TOKEN",
+            None,
+            {"API_KEY": "GITHUB_PERSONAL_ACCESS_TOKEN"},
+        ),
+    ],
+    ids=[
+        "bearer_token_string",
+        "bearer_token_environment_variable",
+        "api_key_header",
     ],
 )
-def test_mcp_tool_definition_creation(bearer_token_value):
+def test_mcp_tool_definition_creation(
+    authorization_type,
+    bearer_token_value,
+    api_key_header_key,
+    api_key_header_value,
+    expected_bearer_token,
+    expected_api_key_header,
+):
     """Test that MCPToolDefinition can be created with required fields."""
     mcp_tool = MCPToolDefinition(
         name="create_repository",
         server=MCPServer(
             name="github",
             url="https://api.githubcopilot.com/mcp/",
-            authorization_type=AuthorizationType.BEARER_TOKEN,
+            authorization_type=authorization_type,
             bearer_token_value=bearer_token_value,
+            api_key_header_key=api_key_header_key,
+            api_key_header_value=api_key_header_value,
         ),
         parameters={"repository_name": "string", "description": "string"},
     )
@@ -71,11 +107,17 @@ def test_mcp_tool_definition_creation(bearer_token_value):
     assert mcp_tool.name == "create_repository"
     assert mcp_tool.server.name == "github"
     assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
-    assert mcp_tool.server.authorization_type == AuthorizationType.BEARER_TOKEN
-
-    if isinstance(mcp_tool.server.bearer_token_value, EnvironmentVariableReference):
-        assert mcp_tool.server.bearer_token_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
-    else:
-        assert mcp_tool.server.bearer_token_value == "GITHUB_PERSONAL_ACCESS_TOKEN"
-
+    assert mcp_tool.server.authorization_type == authorization_type
     assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
+
+    if authorization_type == AuthorizationType.BEARER_TOKEN:
+        if isinstance(expected_bearer_token, EnvironmentVariableReference):
+            assert mcp_tool.server.bearer_token_value.name == expected_bearer_token.name
+        else:
+            assert mcp_tool.server.bearer_token_value == expected_bearer_token
+        assert mcp_tool.server.api_key_header_key is None
+        assert mcp_tool.server.api_key_header_value is None
+    elif authorization_type == AuthorizationType.API_KEY:
+        assert mcp_tool.server.bearer_token_value is None
+        assert mcp_tool.server.api_key_header_key == api_key_header_key
+        assert mcp_tool.server.api_key_header_value == api_key_header_value
