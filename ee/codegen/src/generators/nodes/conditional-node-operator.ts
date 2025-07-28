@@ -52,3 +52,25 @@ export class AmpersandExpression extends AstNode {
     this.rhs.write(writer);
   }
 }
+
+export declare namespace ParenthesizedExpression {
+  export interface Args {
+    expression: AstNode;
+  }
+}
+
+export class ParenthesizedExpression extends AstNode {
+  private expression: AstNode;
+
+  constructor(args: ParenthesizedExpression.Args) {
+    super();
+    this.expression = args.expression;
+    this.inheritReferences(args.expression);
+  }
+
+  write(writer: Writer): void {
+    writer.write("(");
+    this.expression.write(writer);
+    writer.write(")");
+  }
+}
