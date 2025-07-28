@@ -59,14 +59,28 @@ def test_mcp_tool_definition_creation_bearer_token():
             authorization_type=AuthorizationType.BEARER_TOKEN,
             bearer_token_value=EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
         ),
-        parameters={"repository_name": "string", "description": "string"},
+        parameters={
+            "type": "object",
+            "properties": {
+                "repository_name": {"type": "string", "description": "Repository name"},
+                "description": {"type": "string", "description": "Repository description"},
+            },
+            "required": ["repository_name"],
+        },
     )
 
     assert mcp_tool.name == "create_repository"
     assert mcp_tool.server.name == "github"
     assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
     assert mcp_tool.server.authorization_type == AuthorizationType.BEARER_TOKEN
-    assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
+    assert mcp_tool.parameters == {
+        "type": "object",
+        "properties": {
+            "repository_name": {"type": "string", "description": "Repository name"},
+            "description": {"type": "string", "description": "Repository description"},
+        },
+        "required": ["repository_name"],
+    }
 
     assert isinstance(mcp_tool.server.bearer_token_value, EnvironmentVariableReference)
     assert mcp_tool.server.bearer_token_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
@@ -83,7 +97,14 @@ def test_mcp_tool_definition_creation_api_key():
             api_key_header_key="Authorization",
             api_key_header_value=VellumSecret(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
         ),
-        parameters={"repository_name": "string", "description": "string"},
+        parameters={
+            "type": "object",
+            "properties": {
+                "repository_name": {"type": "string", "description": "Repository name"},
+                "description": {"type": "string", "description": "Repository description"},
+            },
+            "required": ["repository_name"],
+        },
     )
 
     assert mcp_tool.name == "create_repository"
@@ -93,4 +114,11 @@ def test_mcp_tool_definition_creation_api_key():
     assert mcp_tool.server.api_key_header_key == "Authorization"
     assert isinstance(mcp_tool.server.api_key_header_value, VellumSecret)
     assert mcp_tool.server.api_key_header_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
-    assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
+    assert mcp_tool.parameters == {
+        "type": "object",
+        "properties": {
+            "repository_name": {"type": "string", "description": "Repository name"},
+            "description": {"type": "string", "description": "Repository description"},
+        },
+        "required": ["repository_name"],
+    }
