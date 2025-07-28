@@ -95,8 +95,9 @@ def push_command(
         and workflow_config.workflow_sandbox_id
         and workflow_config.workflow_sandbox_id != workflow_sandbox_id
     ):
-        raise ValueError(
-            f"Workflow sandbox id '{workflow_sandbox_id}' is already associated with '{workflow_config.module}'."
+        logger.warning(
+            f"Workflow sandbox id '{workflow_sandbox_id}' is already associated with '{workflow_config.module}'. "
+            f"Continuing with the provided workflow sandbox id '{workflow_sandbox_id}'."
         )
 
     client = create_vellum_client(
