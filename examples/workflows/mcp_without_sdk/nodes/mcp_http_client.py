@@ -40,7 +40,7 @@ class MCPHttpClient:
         """
 
         params = {
-            "protocolVersion": "2025-03-26",
+            "protocolVersion": "2025-06-18",
             "capabilities": {},
             "clientInfo": client_info or {"name": "custom-mcp-client", "version": "1.0.0"},
         }
