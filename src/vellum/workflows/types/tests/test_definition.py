@@ -91,5 +91,6 @@ def test_mcp_tool_definition_creation_api_key():
     assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
     assert mcp_tool.server.authorization_type == AuthorizationType.API_KEY
     assert mcp_tool.server.api_key_header_key == "Authorization"
+    assert isinstance(mcp_tool.server.api_key_header_value, VellumSecret)
     assert mcp_tool.server.api_key_header_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
     assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
