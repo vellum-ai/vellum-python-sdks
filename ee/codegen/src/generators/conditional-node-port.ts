@@ -13,7 +13,7 @@ import { Expression } from "src/generators/expression";
 import { NodeInput } from "src/generators/node-inputs";
 import {
   AmpersandExpression,
-  ParenthesizedExpression,
+  GroupExpression,
   PipeExpression,
 } from "src/generators/nodes/conditional-node-operator";
 import {
@@ -117,11 +117,11 @@ export class ConditionalNodePort extends AstNode {
         ? (lhs: AstNode, rhs: AstNode): AstNode => {
             // If rhs is a PipeExpression (OR), wrap it in parentheses for proper precedence
             if (rhs instanceof PipeExpression) {
-              rhs = new ParenthesizedExpression({ expression: rhs });
+              rhs = new GroupExpression({ expression: rhs });
             }
             // If lhs is a PipeExpression (OR), wrap it in parentheses for proper precedence
             if (lhs instanceof PipeExpression) {
-              lhs = new ParenthesizedExpression({ expression: lhs });
+              lhs = new GroupExpression({ expression: lhs });
             }
             return new AmpersandExpression({
               lhs,
@@ -131,11 +131,11 @@ export class ConditionalNodePort extends AstNode {
         : (lhs: AstNode, rhs: AstNode): AstNode => {
             // If rhs is an AmpersandExpression (AND), wrap it in parentheses for proper precedence
             if (rhs instanceof AmpersandExpression) {
-              rhs = new ParenthesizedExpression({ expression: rhs });
+              rhs = new GroupExpression({ expression: rhs });
             }
             // If lhs is an AmpersandExpression (AND), wrap it in parentheses for proper precedence
             if (lhs instanceof AmpersandExpression) {
-              lhs = new ParenthesizedExpression({ expression: lhs });
+              lhs = new GroupExpression({ expression: lhs });
             }
             return new PipeExpression({ lhs, rhs });
           };

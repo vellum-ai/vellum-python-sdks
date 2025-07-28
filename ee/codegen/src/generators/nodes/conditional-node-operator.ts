@@ -53,16 +53,16 @@ export class AmpersandExpression extends AstNode {
   }
 }
 
-export declare namespace ParenthesizedExpression {
+export declare namespace GroupExpression {
   export interface Args {
     expression: AstNode;
   }
 }
 
-export class ParenthesizedExpression extends AstNode {
+export class GroupExpression extends AstNode {
   private expression: AstNode;
 
-  constructor(args: ParenthesizedExpression.Args) {
+  constructor(args: GroupExpression.Args) {
     super();
     this.expression = args.expression;
     this.inheritReferences(args.expression);
