@@ -13,6 +13,7 @@ import { Expression } from "src/generators/expression";
 import { NodeInput } from "src/generators/node-inputs";
 import {
   AmpersandExpression,
+  GroupExpression,
   PipeExpression,
 } from "src/generators/nodes/conditional-node-operator";
 import {
@@ -114,12 +115,28 @@ export class ConditionalNodePort extends AstNode {
     const combine =
       conditionData.combinator === "AND"
         ? (lhs: AstNode, rhs: AstNode): AstNode => {
+            // If rhs is a PipeExpression (OR), wrap it in parentheses for proper precedence
+            if (rhs instanceof PipeExpression) {
+              rhs = new GroupExpression({ expression: rhs });
+            }
+            // If lhs is a PipeExpression (OR), wrap it in parentheses for proper precedence
+            if (lhs instanceof PipeExpression) {
+              lhs = new GroupExpression({ expression: lhs });
+            }
             return new AmpersandExpression({
               lhs,
               rhs,
             });
           }
         : (lhs: AstNode, rhs: AstNode): AstNode => {
+            // If rhs is an AmpersandExpression (AND), wrap it in parentheses for proper precedence
+            if (rhs instanceof AmpersandExpression) {
+              rhs = new GroupExpression({ expression: rhs });
+            }
+            // If lhs is an AmpersandExpression (AND), wrap it in parentheses for proper precedence
+            if (lhs instanceof AmpersandExpression) {
+              lhs = new GroupExpression({ expression: lhs });
+            }
             return new PipeExpression({ lhs, rhs });
           };
 

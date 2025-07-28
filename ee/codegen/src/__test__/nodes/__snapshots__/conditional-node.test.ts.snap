@@ -131,6 +131,42 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`Conditional Node with parentheses > should generate code with parentheses around AND expression when combined with OR 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        if_1 = Port.on_if(
+            (
+                ConstantValueReference("A").equals("1")
+                & ConstantValueReference("B").equals("2")
+            )
+            | ConstantValueReference("C").equals("3")
+        )
+"
+`;
+
+exports[`Conditional Node with parentheses > should generate code with parentheses around OR expression when combined with AND 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        if_1 = Port.on_if(
+            ConstantValueReference("A").equals("A")
+            & (
+                ConstantValueReference("B").equals("1")
+                | ConstantValueReference("C").equals("4")
+            )
+        )
+"
+`;
+
 exports[`ConditionalNode > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

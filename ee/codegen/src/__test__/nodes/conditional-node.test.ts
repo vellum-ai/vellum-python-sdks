@@ -1,6 +1,6 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuid4 } from "uuid";
-import { beforeEach, describe, it, expect } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
@@ -1158,6 +1158,357 @@ describe("Conditional Node with AND combinator generates ampersand operator", ()
     node.getNodeFile().write(writer);
     const generatedCode = await writer.toStringFormatted();
     expect(generatedCode).toMatchSnapshot();
+  });
+});
+
+describe("Conditional Node with parentheses", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+  });
+
+  it("should generate code with parentheses around OR expression when combined with AND", async () => {
+    const nodeData: ConditionalNodeType = {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+            type: "IF",
+            sourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+            data: {
+              id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+              rules: [
+                {
+                  id: "simple-rule",
+                  fieldNodeInputId: "field1",
+                  operator: "=",
+                  valueNodeInputId: "value1",
+                },
+                {
+                  id: "complex-rule",
+                  rules: [
+                    {
+                      id: "sub-rule1",
+                      fieldNodeInputId: "field2",
+                      operator: "=",
+                      valueNodeInputId: "value2",
+                    },
+                    {
+                      id: "sub-rule2",
+                      fieldNodeInputId: "field3",
+                      operator: "=",
+                      valueNodeInputId: "value3",
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              ],
+              combinator: "AND",
+            },
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "field1",
+          key: "simple-rule.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "A",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value1",
+          key: "simple-rule.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "A",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "field2",
+          key: "sub-rule1.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "B",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value2",
+          key: "sub-rule1.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "1",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "field3",
+          key: "sub-rule2.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "C",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value3",
+          key: "sub-rule2.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "4",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+    };
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+
+    node.getNodeFile().write(writer);
+    const generatedCode = await writer.toStringFormatted();
+    expect(generatedCode).toMatchSnapshot();
+    // Should generate: A.equals("A") & (B.equals("1") | C.equals("4"))
+  });
+
+  it("should generate code with parentheses around AND expression when combined with OR", async () => {
+    const nodeData: ConditionalNodeType = {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+            type: "IF",
+            sourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+            data: {
+              id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+              rules: [
+                {
+                  id: "complex-rule1",
+                  rules: [
+                    {
+                      id: "sub-rule1",
+                      fieldNodeInputId: "field1",
+                      operator: "=",
+                      valueNodeInputId: "value1",
+                    },
+                    {
+                      id: "sub-rule2",
+                      fieldNodeInputId: "field2",
+                      operator: "=",
+                      valueNodeInputId: "value2",
+                    },
+                  ],
+                  combinator: "AND",
+                },
+                {
+                  id: "simple-rule",
+                  fieldNodeInputId: "field3",
+                  operator: "=",
+                  valueNodeInputId: "value3",
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "field1",
+          key: "sub-rule1.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "A",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value1",
+          key: "sub-rule1.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "1",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "field2",
+          key: "sub-rule2.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "B",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value2",
+          key: "sub-rule2.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "2",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "field3",
+          key: "simple-rule.field",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "C",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "value3",
+          key: "simple-rule.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "3",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+    };
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+
+    node.getNodeFile().write(writer);
+    const generatedCode = await writer.toStringFormatted();
+    expect(generatedCode).toMatchSnapshot();
+    // Should generate: (A.equals("1") & B.equals("2")) | C.equals("3")
   });
 });
 

@@ -52,3 +52,25 @@ export class AmpersandExpression extends AstNode {
     this.rhs.write(writer);
   }
 }
+
+export declare namespace GroupExpression {
+  export interface Args {
+    expression: AstNode;
+  }
+}
+
+export class GroupExpression extends AstNode {
+  private expression: AstNode;
+
+  constructor(args: GroupExpression.Args) {
+    super();
+    this.expression = args.expression;
+    this.inheritReferences(args.expression);
+  }
+
+  write(writer: Writer): void {
+    writer.write("(");
+    this.expression.write(writer);
+    writer.write(")");
+  }
+}
