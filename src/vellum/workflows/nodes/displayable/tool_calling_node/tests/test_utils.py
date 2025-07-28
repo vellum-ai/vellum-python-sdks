@@ -15,7 +15,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_tool_router_node, get_function_name
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 
 
 def test_get_function_name_callable():
@@ -67,6 +67,19 @@ def test_get_function_name_subworkflow_deployment_uuid():
     result = get_function_name(deployment_config)
 
     assert result == "57f09bebb46340e0bf9ec972e664352f"
+
+
+def test_get_function_name_mcp_tool_definition():
+    """Test MCPToolDefinition function name generation."""
+    mcp_tool = MCPToolDefinition(
+        name="create_repository",
+        server=MCPServer(name="github", url="https://api.github.com"),
+        parameters={"repository_name": "string", "description": "string"},
+    )
+
+    result = get_function_name(mcp_tool)
+
+    assert result == "create_repository"
 
 
 @pytest.mark.parametrize(

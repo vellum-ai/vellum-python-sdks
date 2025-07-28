@@ -104,7 +104,7 @@ def test_mcp_tool_definition_creation(
     assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
 
     if authorization_type == AuthorizationType.BEARER_TOKEN:
-        if isinstance(bearer_token_value, EnvironmentVariableReference):
+        if isinstance(mcp_tool.server.bearer_token_value, EnvironmentVariableReference):
             assert mcp_tool.server.bearer_token_value.name == bearer_token_value.name
         else:
             assert mcp_tool.server.bearer_token_value == bearer_token_value
