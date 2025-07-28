@@ -138,4 +138,4 @@ class MCPToolDefinition(UniversalBaseModel):
     name: str
     server: MCPServer
     description: Optional[str] = None
-    parameters: Dict[str, str] = {}
+    parameters: Dict[str, Any] = {}
