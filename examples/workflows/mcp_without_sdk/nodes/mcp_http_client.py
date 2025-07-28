@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict, List, Optional
 
-import aiohttp
+import httpx
 
 
 class MCPHttpClient:
@@ -11,17 +11,20 @@ class MCPHttpClient:
         self.request_id = 0
         self.session_id: Optional[str] = None
         self.session_timeout = 30
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._client: Optional[httpx.AsyncClient] = None
 
     async def __aenter__(self):
         """Async context manager entry."""
-        self._session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=self.session_timeout))
+        self._client = httpx.AsyncClient(
+            timeout=httpx.Timeout(self.session_timeout),
+            headers={"Authorization": f"Bearer {self.token}"}
+        )
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit."""
-        if self._session:
-            await self._session.close()
+        if self._client:
+            await self._client.aclose()
 
     def _next_request_id(self) -> int:
         """Generate next request ID."""
@@ -60,7 +63,7 @@ class MCPHttpClient:
         Returns:
             The JSON-RPC response
         """
-        if not self._session:
+        if not self._client:
             raise RuntimeError("Client session not initialized. Use 'async with' context manager.")
 
         # Prepare JSON-RPC request
@@ -70,7 +73,6 @@ class MCPHttpClient:
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": f"Bearer {self.token}",
         }
 
         # Include session ID if we have one
@@ -80,20 +82,20 @@ class MCPHttpClient:
         print(f"Sending request: {json.dumps(request_data, indent=2)}")
 
         # Send POST request
-        async with self._session.post(self.server_url, json=request_data, headers=headers) as response:
+        response = await self._client.post(self.server_url, json=request_data, headers=headers)
 
-            # Check for session ID in response headers
-            if "Mcp-Session-Id" in response.headers:
-                self.session_id = response.headers["Mcp-Session-Id"]
-                print(f"Received session ID: {self.session_id}")
+        # Check for session ID in response headers
+        if "Mcp-Session-Id" in response.headers:
+            self.session_id = response.headers["Mcp-Session-Id"]
+            print(f"Received session ID: {self.session_id}")
 
-            response_data = await response.json()
+        response_data = response.json()
 
-            if "error" in response_data:
-                print(f"Error: {response_data['error']}")
-                raise Exception(response_data["error"])
+        if "error" in response_data:
+            print(f"Error: {response_data['error']}")
+            raise Exception(response_data["error"])
 
-            return response_data
+        return response_data
 
     async def list_tools(self) -> List[Dict[str, Any]]:
         """
