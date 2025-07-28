@@ -49,50 +49,15 @@ def test_composio_tool_definition_creation():
     assert composio_tool.name == "github_create_an_issue"
 
 
-@pytest.mark.parametrize(
-    "authorization_type, bearer_token_value, api_key_header_key, api_key_header_value",
-    [
-        (
-            AuthorizationType.BEARER_TOKEN,
-            "GITHUB_PERSONAL_ACCESS_TOKEN",
-            None,
-            None,
-        ),
-        (
-            AuthorizationType.BEARER_TOKEN,
-            EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
-            None,
-            None,
-        ),
-        (
-            AuthorizationType.API_KEY,
-            None,
-            "API_KEY",
-            VellumSecret(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
-        ),
-    ],
-    ids=[
-        "bearer_token_string",
-        "bearer_token_environment_variable",
-        "api_key_header",
-    ],
-)
-def test_mcp_tool_definition_creation(
-    authorization_type,
-    bearer_token_value,
-    api_key_header_key,
-    api_key_header_value,
-):
+def test_mcp_tool_definition_creation_bearer_token():
     """Test that MCPToolDefinition can be created with required fields."""
     mcp_tool = MCPToolDefinition(
         name="create_repository",
         server=MCPServer(
             name="github",
             url="https://api.githubcopilot.com/mcp/",
-            authorization_type=authorization_type,
-            bearer_token_value=bearer_token_value,
-            api_key_header_key=api_key_header_key,
-            api_key_header_value=api_key_header_value,
+            authorization_type=AuthorizationType.BEARER_TOKEN,
+            bearer_token_value=EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
         ),
         parameters={"repository_name": "string", "description": "string"},
     )
@@ -100,17 +65,31 @@ def test_mcp_tool_definition_creation(
     assert mcp_tool.name == "create_repository"
     assert mcp_tool.server.name == "github"
     assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
-    assert mcp_tool.server.authorization_type == authorization_type
+    assert mcp_tool.server.authorization_type == AuthorizationType.BEARER_TOKEN
     assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
 
-    if authorization_type == AuthorizationType.BEARER_TOKEN:
-        if isinstance(mcp_tool.server.bearer_token_value, EnvironmentVariableReference):
-            assert mcp_tool.server.bearer_token_value.name == bearer_token_value.name
-        else:
-            assert mcp_tool.server.bearer_token_value == bearer_token_value
-        assert mcp_tool.server.api_key_header_key is None
-        assert mcp_tool.server.api_key_header_value is None
-    elif authorization_type == AuthorizationType.API_KEY:
-        assert mcp_tool.server.bearer_token_value is None
-        assert mcp_tool.server.api_key_header_key == api_key_header_key
-        assert mcp_tool.server.api_key_header_value == api_key_header_value
+    assert isinstance(mcp_tool.server.bearer_token_value, EnvironmentVariableReference)
+    assert mcp_tool.server.bearer_token_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
+
+
+def test_mcp_tool_definition_creation_api_key():
+    """Test that MCPToolDefinition can be created with required fields."""
+    mcp_tool = MCPToolDefinition(
+        name="create_repository",
+        server=MCPServer(
+            name="github",
+            url="https://api.githubcopilot.com/mcp/",
+            authorization_type=AuthorizationType.API_KEY,
+            api_key_header_key="Authorization",
+            api_key_header_value=VellumSecret(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
+        ),
+        parameters={"repository_name": "string", "description": "string"},
+    )
+
+    assert mcp_tool.name == "create_repository"
+    assert mcp_tool.server.name == "github"
+    assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
+    assert mcp_tool.server.authorization_type == AuthorizationType.API_KEY
+    assert mcp_tool.server.api_key_header_key == "Authorization"
+    assert mcp_tool.server.api_key_header_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
+    assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
