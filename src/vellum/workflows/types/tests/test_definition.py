@@ -1,6 +1,7 @@
 import pytest
 from uuid import UUID
 
+from vellum.client.types.vellum_secret import VellumSecret
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
@@ -49,31 +50,25 @@ def test_composio_tool_definition_creation():
 
 
 @pytest.mark.parametrize(
-    "authorization_type, bearer_token_value, api_key_header_key, api_key_header_value, expected_bearer_token, expected_api_key_header",
+    "authorization_type, bearer_token_value, api_key_header_key, api_key_header_value",
     [
         (
             AuthorizationType.BEARER_TOKEN,
             "GITHUB_PERSONAL_ACCESS_TOKEN",
             None,
             None,
-            "GITHUB_PERSONAL_ACCESS_TOKEN",
-            None,
         ),
         (
             AuthorizationType.BEARER_TOKEN,
             EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
             None,
             None,
-            EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
-            None,
         ),
         (
             AuthorizationType.API_KEY,
             None,
             "API_KEY",
-            "GITHUB_PERSONAL_ACCESS_TOKEN",
-            None,
-            {"API_KEY": "GITHUB_PERSONAL_ACCESS_TOKEN"},
+            VellumSecret(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
         ),
     ],
     ids=[
@@ -87,8 +82,6 @@ def test_mcp_tool_definition_creation(
     bearer_token_value,
     api_key_header_key,
     api_key_header_value,
-    expected_bearer_token,
-    expected_api_key_header,
 ):
     """Test that MCPToolDefinition can be created with required fields."""
     mcp_tool = MCPToolDefinition(
@@ -111,10 +104,10 @@ def test_mcp_tool_definition_creation(
     assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}
 
     if authorization_type == AuthorizationType.BEARER_TOKEN:
-        if isinstance(expected_bearer_token, EnvironmentVariableReference):
-            assert mcp_tool.server.bearer_token_value.name == expected_bearer_token.name
+        if isinstance(bearer_token_value, EnvironmentVariableReference):
+            assert mcp_tool.server.bearer_token_value.name == bearer_token_value.name
         else:
-            assert mcp_tool.server.bearer_token_value == expected_bearer_token
+            assert mcp_tool.server.bearer_token_value == bearer_token_value
         assert mcp_tool.server.api_key_header_key is None
         assert mcp_tool.server.api_key_header_value is None
     elif authorization_type == AuthorizationType.API_KEY:
