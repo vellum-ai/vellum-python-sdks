@@ -1,7 +1,9 @@
 import pytest
 from uuid import UUID
 
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition
+from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 
 
 @pytest.mark.parametrize(
@@ -44,3 +46,36 @@ def test_composio_tool_definition_creation():
     assert composio_tool.description == "Create a new issue in a GitHub repository"
     assert composio_tool.display_name is None
     assert composio_tool.name == "github_create_an_issue"
+
+
+@pytest.mark.parametrize(
+    "bearer_token_value",
+    [
+        ("GITHUB_PERSONAL_ACCESS_TOKEN"),
+        (EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN")),
+    ],
+)
+def test_mcp_tool_definition_creation(bearer_token_value):
+    """Test that MCPToolDefinition can be created with required fields."""
+    mcp_tool = MCPToolDefinition(
+        name="create_repository",
+        server=MCPServer(
+            name="github",
+            url="https://api.githubcopilot.com/mcp/",
+            authorization_type=AuthorizationType.BEARER_TOKEN,
+            bearer_token_value=bearer_token_value,
+        ),
+        parameters={"repository_name": "string", "description": "string"},
+    )
+
+    assert mcp_tool.name == "create_repository"
+    assert mcp_tool.server.name == "github"
+    assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
+    assert mcp_tool.server.authorization_type == AuthorizationType.BEARER_TOKEN
+
+    if isinstance(mcp_tool.server.bearer_token_value, EnvironmentVariableReference):
+        assert mcp_tool.server.bearer_token_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
+    else:
+        assert mcp_tool.server.bearer_token_value == "GITHUB_PERSONAL_ACCESS_TOKEN"
+
+    assert mcp_tool.parameters == {"repository_name": "string", "description": "string"}

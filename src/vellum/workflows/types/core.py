@@ -13,7 +13,7 @@ from typing import (  # type: ignore[attr-defined]
 )
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPToolDefinition
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
@@ -50,4 +50,4 @@ class ConditionType(Enum):
 
 
 # Type alias for functions that can be called in tool calling nodes
-Tool = Union[Callable[..., Any], DeploymentDefinition, Type["BaseWorkflow"], ComposioToolDefinition]
+Tool = Union[MCPToolDefinition, Callable[..., Any], DeploymentDefinition, Type["BaseWorkflow"], ComposioToolDefinition]

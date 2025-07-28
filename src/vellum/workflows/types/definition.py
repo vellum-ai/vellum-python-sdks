@@ -8,6 +8,9 @@ from pydantic import BeforeValidator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
+from vellum.client.types.vellum_secret import VellumSecret
+from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
 
 def serialize_type_encoder(obj: type) -> Dict[str, Any]:
@@ -118,3 +121,21 @@ class ComposioToolDefinition(UniversalBaseModel):
     def name(self) -> str:
         """Generate a function name for this tool"""
         return self.action.lower()
+
+
+class MCPToolDefinition(UniversalBaseModel):
+    name: str
+    server: "MCPServer"
+    description: Optional[str] = None
+    parameters: Dict[str, str]
+
+
+class MCPServer(UniversalBaseModel):
+    name: str
+    url: str
+    authorization_type: AuthorizationType = AuthorizationType.BEARER_TOKEN
+    bearer_token_value: Optional[Union[str, EnvironmentVariableReference]] = None
+    api_key_header_key: Optional[str] = None
+    api_key_header_value: Optional[Union[str, VellumSecret]] = None
+
+    model_config = {"arbitrary_types_allowed": True}
