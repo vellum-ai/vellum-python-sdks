@@ -123,13 +123,6 @@ class ComposioToolDefinition(UniversalBaseModel):
         return self.action.lower()
 
 
-class MCPToolDefinition(UniversalBaseModel):
-    name: str
-    server: "MCPServer"
-    description: Optional[str] = None
-    parameters: Dict[str, str]
-
-
 class MCPServer(UniversalBaseModel):
     name: str
     url: str
@@ -139,3 +132,10 @@ class MCPServer(UniversalBaseModel):
     api_key_header_value: Optional[Union[str, VellumSecret]] = None
 
     model_config = {"arbitrary_types_allowed": True}
+
+
+class MCPToolDefinition(UniversalBaseModel):
+    name: str
+    server: MCPServer
+    description: Optional[str] = None
+    parameters: Dict[str, str] = {}
