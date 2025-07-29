@@ -237,6 +237,7 @@ def create_tool_router_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
     functions: List[Tool],
+    mcp_servers: List[MCPServer],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
