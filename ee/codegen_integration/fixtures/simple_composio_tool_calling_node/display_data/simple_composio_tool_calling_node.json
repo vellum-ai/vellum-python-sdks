@@ -151,6 +151,17 @@
                 "value": 5.0
               }
             }
+          },
+          {
+            "id": "6708bac8-c995-4134-b925-6267d898736d",
+            "name": "mcp_servers",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": []
+              }
+            }
           }
         ],
         "outputs": [
