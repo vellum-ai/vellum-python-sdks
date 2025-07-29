@@ -379,7 +379,7 @@ def create_function_node(
             },
         )
         return node
-    elif isinstance(function, MCPServer):
+    elif isinstance(function, MCPToolDefinition):
         pass
     elif is_workflow_class(function):
         node = type(
@@ -412,7 +412,7 @@ def get_function_name(function: Tool) -> str:
         return name.replace("-", "")
     elif isinstance(function, ComposioToolDefinition):
         return function.name
-    elif isinstance(function, MCPServer):
+    elif isinstance(function, MCPToolDefinition):
         return function.name
     else:
         return snake_case(function.__name__)
