@@ -28,7 +28,7 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
 CHAT_HISTORY_VARIABLE = "chat_history"
