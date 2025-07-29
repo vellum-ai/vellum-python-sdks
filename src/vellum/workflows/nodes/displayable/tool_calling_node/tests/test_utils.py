@@ -106,6 +106,7 @@ def test_create_tool_router_node_max_prompt_iterations(vellum_adhoc_prompt_clien
         ml_model="gpt-4o-mini",
         blocks=[],
         functions=[],
+        mcp_servers=[],
         prompt_inputs=None,
         parameters=DEFAULT_PROMPT_PARAMETERS,
         max_prompt_iterations=None,
@@ -165,6 +166,7 @@ def test_create_tool_router_node_chat_history_block_dict(vellum_adhoc_prompt_cli
         ml_model="gpt-4o-mini",
         blocks=blocks,  # type: ignore
         functions=[],
+        mcp_servers=[],
         prompt_inputs=None,
         parameters=DEFAULT_PROMPT_PARAMETERS,
     )

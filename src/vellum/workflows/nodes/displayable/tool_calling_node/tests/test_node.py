@@ -39,6 +39,7 @@ def test_port_condition_match_function_name():
         ml_model="test-model",
         blocks=[],
         functions=[first_function, second_function],
+        mcp_servers=[],
         prompt_inputs=None,
         parameters=DEFAULT_PROMPT_PARAMETERS,
     )
@@ -97,6 +98,7 @@ def test_tool_calling_node_inline_workflow_context():
         ml_model="test-model",
         blocks=[],
         functions=[MyWorkflow],
+        mcp_servers=[],
         prompt_inputs=None,
         parameters=DEFAULT_PROMPT_PARAMETERS,
     )
