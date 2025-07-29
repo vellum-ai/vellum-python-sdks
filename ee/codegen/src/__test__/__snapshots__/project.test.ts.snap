@@ -642,6 +642,8 @@ from .nodes.tool_call_start_node import StartNode
 
 
 class WeatherFunction(BaseWorkflow[Inputs, BaseState]):
+    """Test description for inline workflow tool"""
+
     graph = (
         CodeExecutionNode
         >> StartNode
@@ -886,6 +888,8 @@ from .nodes.tool_call_start_node import StartNode
 
 
 class WeatherFunction(BaseWorkflow[Inputs, BaseState]):
+    """Test description for inline workflow tool"""
+
     graph = (
         CodeExecutionNode
         >> StartNode

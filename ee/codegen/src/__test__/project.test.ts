@@ -4167,6 +4167,8 @@ baz = foo + bar
                       value: [
                         {
                           type: "INLINE_WORKFLOW",
+                          description:
+                            "Test description for inline workflow tool",
                           exec_config: {
                             input_variables: [
                               {

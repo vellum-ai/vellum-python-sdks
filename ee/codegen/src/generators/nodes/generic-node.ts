@@ -403,6 +403,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       this.workflowContext.createNestedWorkflowContext({
         parentNode: this,
         workflowClassName: nestedWorkflowClassName,
+        workflowClassDescription: workflow.description,
         workflowRawData: workflow.exec_config.workflowRawData,
         classNames: this.workflowContext.classNames,
         nestedWorkflowModuleName: workflowName,
