@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { isNil } from "lodash";
 
 import * as codegen from "src/codegen";
 import {
@@ -20,6 +19,7 @@ import {
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
+import { NodeTrigger } from "src/generators/node-trigger";
 import {
   AttributeConfig,
   AttributeType,
@@ -37,7 +37,6 @@ import {
 } from "src/types/vellum";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
-import {NodeTrigger} from "src/generators/node-trigger";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
