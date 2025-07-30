@@ -95,61 +95,6 @@ except ApiError as e:
     print(e.body)
 ```
 
-## Streaming
-
-The SDK supports streaming responses, as well, the response will be a generator that you can loop over.
-
-```python
-from vellum import (
-    JinjaPromptBlock,
-    PromptParameters,
-    PromptRequestStringInput,
-    Vellum,
-    VellumVariable,
-)
-
-client = Vellum(
-    api_version="YOUR_API_VERSION",
-    api_key="YOUR_API_KEY",
-)
-response = client.ad_hoc.adhoc_execute_prompt_stream(
-    ml_model="x",
-    input_values=[
-        PromptRequestStringInput(
-            key="x",
-            value="value",
-        ),
-        PromptRequestStringInput(
-            key="x",
-            value="value",
-        ),
-    ],
-    input_variables=[
-        VellumVariable(
-            id="x",
-            key="key",
-            type="STRING",
-        ),
-        VellumVariable(
-            id="x",
-            key="key",
-            type="STRING",
-        ),
-    ],
-    parameters=PromptParameters(),
-    blocks=[
-        JinjaPromptBlock(
-            template="template",
-        ),
-        JinjaPromptBlock(
-            template="template",
-        ),
-    ],
-)
-for chunk in response:
-    yield chunk
-```
-
 ## Advanced
 
 ### Retries
