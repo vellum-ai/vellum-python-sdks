@@ -1024,7 +1024,7 @@ export declare namespace NodePortSerializer {
 export declare namespace NodeTriggerSerializer {
   interface Raw {
     id: string;
-    merge_behavior: "AWAIT_ATTRIBUTES" | "AWAIT_ALL" | "AWAIT_ANY";
+    merge_behavior: "AWAIT_ATTRIBUTES" | "AWAIT_ALL" | "AWAIT_ANY" | "CUSTOM";
   }
 }
 
@@ -1039,6 +1039,7 @@ export const NodeTriggerSerializer: ObjectSchema<
       stringLiteralSchema("AWAIT_ATTRIBUTES"),
       stringLiteralSchema("AWAIT_ALL"),
       stringLiteralSchema("AWAIT_ANY"),
+        stringLiteralSchema("CUSTOM")
     ])
   ),
 });
