@@ -294,4 +294,43 @@ describe("TemplatingNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("with environment variable", () => {
+    beforeEach(async () => {
+      const nodeData = templatingNodeFactory({
+        inputs: [
+          {
+            id: "de3807c0-eaaa-4fa9-9997-309c243b9654",
+            key: "my_test_environment_variable",
+            value: {
+              rules: [
+                {
+                  type: "ENVIRONMENT_VARIABLE",
+                  data: {
+                    environmentVariable: "MY_TEST_ENVIRONMENT_VARIABLE",
+                  },
+                },
+              ],
+              combinator: "OR",
+            },
+          },
+        ],
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TemplatingNodeContext;
+
+      node = new TemplatingNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

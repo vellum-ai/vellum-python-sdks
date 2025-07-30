@@ -209,3 +209,19 @@ class TemplatingNode1(TemplatingNode[BaseState, str]):
     }
 "
 `;
+
+exports[`TemplatingNode > with environment variable > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode as BaseTemplatingNode
+from vellum.workflows.references import EnvironmentVariableReference
+from vellum.workflows.state import BaseState
+
+
+class TemplatingNode(BaseTemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {
+        "my_test_environment_variable": EnvironmentVariableReference(
+            name="MY_TEST_ENVIRONMENT_VARIABLE"
+        ),
+    }
+"
+`;
