@@ -2,13 +2,17 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { GenericNodeContext } from "src/context/node-context/generic-node";
-import { NodeTrigger as NodeTriggerType } from "src/types/vellum";
+import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { BaseNodeContext } from "src/context/node-context/base";
+import {
+  NodeTrigger as NodeTriggerType,
+  WorkflowDataNode,
+} from "src/types/vellum";
 
 export declare namespace NodeTrigger {
   export interface Args {
     nodeTrigger: NodeTriggerType;
-    nodeContext: GenericNodeContext;
+    nodeContext: BaseNodeContext<WorkflowDataNode>;
   }
 }
 
@@ -26,7 +30,7 @@ export class NodeTrigger extends AstNode {
 
   private constructNodeTrigger(
     nodeTrigger: NodeTriggerType,
-    nodeContext: GenericNodeContext
+    nodeContext: BaseNodeContext<WorkflowDataNode>
   ): AstNode {
     const baseNodeClassNameAlias =
       nodeContext.baseNodeClassName === nodeContext.nodeClassName
@@ -47,7 +51,21 @@ export class NodeTrigger extends AstNode {
     clazz.add(
       python.field({
         name: "merge_behavior",
-        initializer: python.TypeInstantiation.str(nodeTrigger.mergeBehavior),
+        initializer: python.accessAttribute({
+          lhs: python.reference({
+            name: "MergeBehavior",
+            modulePath: [
+              ...VELLUM_CLIENT_MODULE_PATH,
+              "workflows",
+              "types",
+              "core",
+            ],
+          }),
+          rhs: python.reference({
+            name: nodeTrigger.mergeBehavior,
+            modulePath: [],
+          }),
+        }),
       })
     );
     return clazz;

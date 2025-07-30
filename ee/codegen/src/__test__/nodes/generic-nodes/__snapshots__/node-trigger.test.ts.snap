@@ -2,6 +2,6 @@
 
 exports[`NodeTrigger > basic > generates correct trigger class 1`] = `
 "class NodeTrigger(BaseNode.Trigger):
-    merge_behavior = "AWAIT_ALL"
+    merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;

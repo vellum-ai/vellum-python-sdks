@@ -47,7 +47,7 @@ class MyCustomNode(BaseNode):
     default_attribute_2 = Inputs.count
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -127,7 +127,7 @@ class MyCustomNode(BaseNode):
     default_attribute_2 = Inputs.count
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -145,7 +145,7 @@ class MyCustomNode(MockNetworkingClient):
     default_attribute_2 = Inputs.count
 
     class NodeTrigger(MockNetworkingClient.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(MockNetworkingClient.Outputs):
         output = "default-value"
@@ -158,7 +158,7 @@ exports[`GenericNode > basic with custom, same module, base > getNodeFile 1`] = 
 
 class MyCustomNode(MockNetworkingClient):
     class NodeTrigger(MockNetworkingClient.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(MockNetworkingClient.Outputs):
         output = "default-value"
@@ -189,7 +189,7 @@ class TestEnvironmentVariableNode(BaseNode):
     api_key_attribute = EnvironmentVariableReference(name="API_KEY")
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -206,7 +206,7 @@ class MyCustomNode(BaseNode):
     default_attribute = ReferencedNode.Outputs.output
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -222,7 +222,7 @@ class TestBlankNode(BaseNode):
     blank_attribute = ConstantValueReference(None).is_blank()
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -238,7 +238,7 @@ class TestCoalesceNode(BaseNode):
     coalesce_attribute = ConstantValueReference(None).coalesce("fallback_value")
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -254,7 +254,7 @@ class TestNotBlankNode(BaseNode):
     not_blank_attribute = ConstantValueReference(None).is_not_blank()
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -304,7 +304,7 @@ class MyCustomNode(BaseNode):
     default_attribute = PromptNode.Outputs.text
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -333,7 +333,7 @@ class MyCustomNode(BaseNode):
     default_attribute_2 = Inputs.count
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -360,6 +360,6 @@ class MyCustomNode(BaseNode):
     default_attribute_2 = Inputs.count
 
     class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = "AWAIT_ALL"
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
