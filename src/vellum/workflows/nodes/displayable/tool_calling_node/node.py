@@ -15,6 +15,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
     create_tool_router_node,
     get_function_name,
+    hydrate_mcp_tool_definitions,
 )
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
@@ -151,6 +152,16 @@ class ToolCallingNode(BaseNode):
                 function=function,
                 tool_router_node=self.tool_router_node,
             )
+
+        for server in self.mcp_servers:
+            tool_definitions = hydrate_mcp_tool_definitions(server)
+            for tool_definition in tool_definitions:
+                function_name = get_function_name(tool_definition)
+
+                self._function_nodes[function_name] = create_function_node(
+                    function=tool_definition,
+                    tool_router_node=self.tool_router_node,
+                )
 
         graph_set = set()
 
