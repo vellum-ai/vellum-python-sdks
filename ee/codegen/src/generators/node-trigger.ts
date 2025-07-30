@@ -17,15 +17,20 @@ export declare namespace NodeTrigger {
 }
 
 export class NodeTrigger extends AstNode {
-  private astNode: AstNode;
+  private astNode: AstNode | undefined = undefined;
 
   public constructor(args: NodeTrigger.Args) {
     super();
 
-    this.astNode = this.constructNodeTrigger(
+    const trigger = this.constructNodeTrigger(
       args.nodeTrigger,
       args.nodeContext
     );
+
+    if (trigger) {
+      this.astNode = trigger;
+      this.inheritReferences(this.astNode);
+    }
   }
 
   private constructNodeTrigger(
@@ -72,6 +77,8 @@ export class NodeTrigger extends AstNode {
   }
 
   write(writer: Writer): void {
-    this.astNode.write(writer);
+    if (this.astNode) {
+      this.astNode.write(writer);
+    }
   }
 }

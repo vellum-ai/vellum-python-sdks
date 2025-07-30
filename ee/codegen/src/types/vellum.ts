@@ -189,7 +189,6 @@ export type MergeBehavior =
   | "AWAIT_ATTRIBUTES"
   | "AWAIT_ALL"
   | "AWAIT_ANY"
-  | "CUSTOM";
 
 export interface NodeTrigger {
   id: string;
