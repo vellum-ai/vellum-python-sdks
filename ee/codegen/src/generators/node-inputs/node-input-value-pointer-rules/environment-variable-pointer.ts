@@ -17,6 +17,7 @@ export class EnvironmentVariablePointerRule extends BaseNodeInputValuePointerRul
       }),
       arguments_: [
         python.methodArgument({
+          name: "name",
           value: python.TypeInstantiation.str(envVarName),
         }),
       ],
