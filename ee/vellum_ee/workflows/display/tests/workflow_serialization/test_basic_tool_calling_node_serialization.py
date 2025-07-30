@@ -176,6 +176,11 @@ def test_serialize_workflow():
                 },
             },
             {
+                "id": "fc5f98ae-5c3b-4c38-b0a6-6341db728163",
+                "name": "mcp_servers",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": []}},
+            },
+            {
                 "id": "229cd1ca-dc2f-4586-b933-c4d4966f7bd1",
                 "name": "parameters",
                 "value": {
