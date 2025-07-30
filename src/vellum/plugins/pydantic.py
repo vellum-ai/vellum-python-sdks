@@ -28,9 +28,12 @@ def import_base_descriptor():
     """
     We have to avoid importing from vellum.* in this file because it will cause a circular import.
     """
-    from vellum.workflows.descriptors.base import BaseDescriptor
+    try:
+        from vellum.workflows.descriptors.base import BaseDescriptor
 
-    return BaseDescriptor
+        return BaseDescriptor
+    except Exception:
+        return None
 
 
 # https://docs.pydantic.dev/2.8/concepts/plugins/#build-a-plugin
@@ -59,6 +62,10 @@ class OnValidatePython(ValidatePythonHandlerProtocol):
 
         self.tracked_descriptors = {}
         BaseDescriptor = import_base_descriptor()
+
+        # If BaseDescriptor import failed, skip descriptor processing
+        if BaseDescriptor is None:
+            return
 
         for key, value in input.items():
             field_info = model_fields.get(key)
