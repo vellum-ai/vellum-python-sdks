@@ -64,6 +64,7 @@ export declare namespace WorkflowContext {
     strict: boolean;
     classNames?: Set<string>;
     nestedWorkflowModuleName?: string;
+    workflowClassDescription?: string;
   };
 }
 
@@ -73,6 +74,7 @@ export class WorkflowContext {
   public readonly moduleName: string;
   public readonly label: string | undefined;
   public readonly workflowClassName: string;
+  public readonly workflowClassDescription?: string;
 
   // Maps workflow input variable IDs to the input variable
   // Tracks local and global contexts in the case of nested workflows.
@@ -155,6 +157,7 @@ export class WorkflowContext {
     absolutePathToOutputDirectory,
     moduleName,
     workflowClassName,
+    workflowClassDescription,
     globalInputVariableContextsById,
     globalStateVariableContextsById,
     globalNodeContextsByNodeId,
@@ -194,6 +197,7 @@ export class WorkflowContext {
     }
 
     this.workflowClassName = workflowClassName;
+    this.workflowClassDescription = workflowClassDescription;
     this.vellumApiKey = vellumApiKey;
     this.vellumApiEnvironment = vellumApiEnvironment;
 
@@ -240,12 +244,14 @@ export class WorkflowContext {
     workflowRawData,
     classNames,
     nestedWorkflowModuleName,
+    workflowClassDescription,
   }: {
     parentNode: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
     workflowClassName: string;
     workflowRawData: WorkflowRawData;
     classNames?: Set<string>;
     nestedWorkflowModuleName?: string;
+    workflowClassDescription?: string;
   }) {
     return new WorkflowContext({
       absolutePathToOutputDirectory: this.absolutePathToOutputDirectory,
@@ -263,6 +269,7 @@ export class WorkflowContext {
       strict: this.strict,
       classNames,
       nestedWorkflowModuleName,
+      workflowClassDescription,
     });
   }
 
