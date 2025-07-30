@@ -295,10 +295,12 @@ def create_tool_router_node(
         # lambda will capture the function_name by reference,
         # and if the function_name is changed, the port_condition will also change.
         def create_port_condition(fn_name):
-            return LazyReference(
-                lambda: (
-                    node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
-                    & node.Outputs.results[0]["value"]["name"].equals(fn_name)
+            return Port.on_if(
+                LazyReference(
+                    lambda: (
+                        node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
+                        & node.Outputs.results[0]["value"]["name"].equals(fn_name)
+                    )
                 )
             )
 
@@ -318,8 +320,7 @@ def create_tool_router_node(
 
             # Create port for this function (using original function for get_function_name)
             function_name = get_function_name(function)
-            port_condition = create_port_condition(function_name)
-            port = Port.on_if(port_condition)
+            port = create_port_condition(function_name)
             setattr(Ports, function_name, port)
 
         for server in mcp_servers:
@@ -333,8 +334,7 @@ def create_tool_router_node(
                         parameters=tool_function.parameters,
                     )
                 )
-                port_condition = create_port_condition(name)
-                port = Port.on_if(port_condition)
+                port = create_port_condition(name)
                 setattr(Ports, name, port)
 
         # Add the else port for when no function conditions match
