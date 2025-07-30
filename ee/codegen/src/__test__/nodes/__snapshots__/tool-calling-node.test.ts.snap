@@ -85,6 +85,9 @@ class ToolCallingNode(BaseToolCallingNode):
         },
     )
     max_tool_calls = 1
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -104,6 +107,9 @@ class ToolCallingNode(BaseToolCallingNode):
             display_name="Create GitHub Issue",
         )
     ]
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -123,6 +129,9 @@ class ToolCallingNode(BaseToolCallingNode):
             display_name="Create email draft",
         )
     ]
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -135,6 +144,9 @@ from vellum.workflows.types.definition import DeploymentDefinition
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [DeploymentDefinition(deployment="deployment_workflow_function_name")]
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -149,6 +161,9 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [add_numbers, Subtract]
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -163,6 +178,9 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [Subtract, add_numbers]
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -176,6 +194,9 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [Subtract]
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -215,5 +236,8 @@ Summarize the following text:
             ],
         ),
     ]
+
+    class NodeTrigger(BaseToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;

@@ -465,4 +465,52 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("with node trigger AWAIT_ALL", () => {
+    it("should generate Trigger class with AWAIT_ALL", async () => {
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
+        .withTrigger({
+          id: uuidv4(),
+          mergeBehavior: "AWAIT_ALL",
+        })
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("with node trigger AWAIT_ANY", () => {
+    it("should generate Trigger class with AWAIT_ANY", async () => {
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
+        .withTrigger({
+          id: uuidv4(),
+          mergeBehavior: "AWAIT_ANY",
+        })
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

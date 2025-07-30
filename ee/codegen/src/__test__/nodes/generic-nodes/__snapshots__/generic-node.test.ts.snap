@@ -51,6 +51,9 @@ class MyCustomNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -63,6 +66,9 @@ from vellum.workflows.nodes import BaseNode
 class MyCustomNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         output: Any
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -131,6 +137,9 @@ class MyCustomNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -149,6 +158,9 @@ class MyCustomNode(MockNetworkingClient):
 
     class Outputs(MockNetworkingClient.Outputs):
         output = "default-value"
+
+    class NodeTrigger(MockNetworkingClient.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -162,6 +174,9 @@ class MyCustomNode(MockNetworkingClient):
 
     class Outputs(MockNetworkingClient.Outputs):
         output = "default-value"
+
+    class NodeTrigger(MockNetworkingClient.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -177,6 +192,9 @@ class MyCustomNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -193,6 +211,9 @@ class TestEnvironmentVariableNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -210,6 +231,9 @@ class MyCustomNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -226,6 +250,9 @@ class TestBlankNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -242,6 +269,9 @@ class TestCoalesceNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -258,6 +288,9 @@ class TestNotBlankNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -308,6 +341,9 @@ class MyCustomNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -316,7 +352,8 @@ exports[`GenericNode > basic with only \`pass\` > getNodeFile 1`] = `
 
 
 class MyCustomNode(BaseNode):
-    pass
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -346,6 +383,9 @@ class MyCustomNode(BaseNode):
                 }
             )["foo"]
         )
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
 
@@ -358,6 +398,9 @@ from ..inputs import Inputs
 class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.count
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class NodeTrigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
