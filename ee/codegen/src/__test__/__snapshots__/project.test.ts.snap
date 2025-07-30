@@ -466,6 +466,121 @@ class GetCurrentWeatherNode(ToolCallingNode):
 "
 `;
 
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/display/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
+
+from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    label = "GetCurrentWeatherNode"
+    node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
+    attribute_ids_by_name = {
+        "ml_model": UUID("44420e39-966f-4c59-bdf8-6365a61c5d2a"),
+        "max_tool_calls": UUID("5c041b7d-732c-4773-a93a-32211f2af0b3"),
+        "blocks": UUID("669cfb4b-8c25-460e-8952-b63d91302cbc"),
+        "functions": UUID("78324739-ff89-47a5-902b-10da0cb95c6d"),
+        "prompt_inputs": UUID("0f6dc102-3460-4963-91fa-7ba85d65ef7a"),
+        "function_configs": UUID("a4e3bc9f-7112-4d2f-94fb-7362a85db27a"),
+    }
+    output_display = {
+        GetCurrentWeatherNode.Outputs.text: NodeOutputDisplay(
+            id=UUID("e62bc785-a914-4066-b79e-8c89a5d0ec6c"), name="text"
+        ),
+        GetCurrentWeatherNode.Outputs.chat_history: NodeOutputDisplay(
+            id=UUID("4674f1d9-e3af-411f-8a55-40a3a3ab5394"), name="chat_history"
+        ),
+    }
+    port_displays = {
+        GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("3cd6d78c-9dad-42aa-ad38-31f67057c379"))
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/__init__.py 1`] = `
+"# flake8: noqa: F401, F403
+
+from .nodes import *
+from .workflow import *
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
+"from .code_execution_node import CodeExecutionNodeDisplay
+from .final_output import FinalOutput3Display
+from .final_output_1 import FinalOutput4Display
+from .tool_call_start_node import StartNodeDisplay
+
+__all__ = [
+    "CodeExecutionNodeDisplay",
+    "FinalOutput3Display",
+    "FinalOutput4Display",
+    "StartNodeDisplay",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/workflow.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowDisplayData,
+    WorkflowDisplayDataViewport,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
+)
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+from .....nodes.tool_call_get_current_weather_node.weather_function.inputs import Inputs
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.code_execution_node import CodeExecutionNode
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.final_output import FinalOutput3
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.final_output_1 import FinalOutput4
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.tool_call_start_node import StartNode
+from .....nodes.tool_call_get_current_weather_node.weather_function.workflow import WeatherFunction
+
+
+class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
+    workflow_display = WorkflowMetaDisplay(
+        entrypoint_node_id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
+        entrypoint_node_source_handle_id=UUID("c55f8e1e-0422-4009-af54-86df5625ba71"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None),
+        display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
+    )
+    inputs_display = {
+        Inputs.city: WorkflowInputsDisplay(id=UUID("5246e023-8bcb-4572-be8e-ca9cf19807da"), name="city"),
+        Inputs.date: WorkflowInputsDisplay(id=UUID("c5d2aa82-10ad-4511-97ce-66b01af721a1"), name="date"),
+    }
+    entrypoint_displays = {
+        CodeExecutionNode: EntrypointDisplay(
+            id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
+            edge_display=EdgeDisplay(id=UUID("15b49a1f-c033-4f50-a12f-42daae03539e")),
+        )
+    }
+    edge_displays = {
+        (CodeExecutionNode.Ports.default, StartNode): EdgeDisplay(id=UUID("code-to-start-edge")),
+        (StartNode.Ports.default, FinalOutput3): EdgeDisplay(id=UUID("ab8c4a64-465d-4406-a407-9faa09d0326d")),
+        (StartNode.Ports.default, FinalOutput4): EdgeDisplay(id=UUID("f9dc12de-4284-419d-beb2-927452b80da0")),
+    }
+    output_displays = {
+        WeatherFunction.Outputs.temperature: WorkflowOutputDisplay(
+            id=UUID("1f300ab1-7a63-4c0f-81d5-5e6df2a5181c"), name="temperature"
+        ),
+        WeatherFunction.Outputs.reasoning: WorkflowOutputDisplay(
+            id=UUID("64c803c9-02a0-4133-8858-14a3bddc0600"), name="reasoning"
+        ),
+    }
+"
+`;
+
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/inputs.py 1`] = `
 "from vellum.workflows.inputs import BaseInputs
 
@@ -717,6 +832,121 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
         final_output = FinalOutput.Outputs.value
         text = FinalOutput1.Outputs.value
         chat_history = FinalOutput2.Outputs.value
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/display/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
+
+from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
+
+
+class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    label = "GetCurrentWeatherNode"
+    node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
+    attribute_ids_by_name = {
+        "ml_model": UUID("44420e39-966f-4c59-bdf8-6365a61c5d2a"),
+        "max_tool_calls": UUID("5c041b7d-732c-4773-a93a-32211f2af0b3"),
+        "blocks": UUID("669cfb4b-8c25-460e-8952-b63d91302cbc"),
+        "functions": UUID("78324739-ff89-47a5-902b-10da0cb95c6d"),
+        "prompt_inputs": UUID("0f6dc102-3460-4963-91fa-7ba85d65ef7a"),
+        "function_configs": UUID("a4e3bc9f-7112-4d2f-94fb-7362a85db27a"),
+    }
+    output_display = {
+        GetCurrentWeatherNode.Outputs.text: NodeOutputDisplay(
+            id=UUID("e62bc785-a914-4066-b79e-8c89a5d0ec6c"), name="text"
+        ),
+        GetCurrentWeatherNode.Outputs.chat_history: NodeOutputDisplay(
+            id=UUID("4674f1d9-e3af-411f-8a55-40a3a3ab5394"), name="chat_history"
+        ),
+    }
+    port_displays = {
+        GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("3cd6d78c-9dad-42aa-ad38-31f67057c379"))
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/__init__.py 1`] = `
+"# flake8: noqa: F401, F403
+
+from .nodes import *
+from .workflow import *
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
+"from .code_execution_node import CodeExecutionNodeDisplay
+from .final_output import FinalOutput3Display
+from .final_output_1 import FinalOutput4Display
+from .tool_call_start_node import StartNodeDisplay
+
+__all__ = [
+    "CodeExecutionNodeDisplay",
+    "FinalOutput3Display",
+    "FinalOutput4Display",
+    "StartNodeDisplay",
+]
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/workflow.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.base import (
+    EdgeDisplay,
+    EntrypointDisplay,
+    WorkflowDisplayData,
+    WorkflowDisplayDataViewport,
+    WorkflowInputsDisplay,
+    WorkflowMetaDisplay,
+    WorkflowOutputDisplay,
+)
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+from .....nodes.tool_call_get_current_weather_node.weather_function.inputs import Inputs
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.code_execution_node import CodeExecutionNode
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.final_output import FinalOutput3
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.final_output_1 import FinalOutput4
+from .....nodes.tool_call_get_current_weather_node.weather_function.nodes.tool_call_start_node import StartNode
+from .....nodes.tool_call_get_current_weather_node.weather_function.workflow import WeatherFunction
+
+
+class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
+    workflow_display = WorkflowMetaDisplay(
+        entrypoint_node_id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
+        entrypoint_node_source_handle_id=UUID("c55f8e1e-0422-4009-af54-86df5625ba71"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None),
+        display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
+    )
+    inputs_display = {
+        Inputs.city: WorkflowInputsDisplay(id=UUID("5246e023-8bcb-4572-be8e-ca9cf19807da"), name="city"),
+        Inputs.date: WorkflowInputsDisplay(id=UUID("c5d2aa82-10ad-4511-97ce-66b01af721a1"), name="date"),
+    }
+    entrypoint_displays = {
+        CodeExecutionNode: EntrypointDisplay(
+            id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
+            edge_display=EdgeDisplay(id=UUID("15b49a1f-c033-4f50-a12f-42daae03539e")),
+        )
+    }
+    edge_displays = {
+        (CodeExecutionNode.Ports.default, StartNode): EdgeDisplay(id=UUID("code-to-start-edge")),
+        (StartNode.Ports.default, FinalOutput3): EdgeDisplay(id=UUID("ab8c4a64-465d-4406-a407-9faa09d0326d")),
+        (StartNode.Ports.default, FinalOutput4): EdgeDisplay(id=UUID("f9dc12de-4284-419d-beb2-927452b80da0")),
+    }
+    output_displays = {
+        WeatherFunction.Outputs.temperature: WorkflowOutputDisplay(
+            id=UUID("1f300ab1-7a63-4c0f-81d5-5e6df2a5181c"), name="temperature"
+        ),
+        WeatherFunction.Outputs.reasoning: WorkflowOutputDisplay(
+            id=UUID("64c803c9-02a0-4133-8858-14a3bddc0600"), name="reasoning"
+        ),
+    }
 "
 `;
 

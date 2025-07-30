@@ -4935,6 +4935,38 @@ baz = foo + bar
           "workflow.py",
         ],
         ["code", "workflow.py"],
+        [
+          "code",
+          "display",
+          "nodes",
+          "tool_call_get_current_weather_node",
+          "__init__.py",
+        ],
+        [
+          "code",
+          "display",
+          "nodes",
+          "tool_call_get_current_weather_node",
+          "weather_function",
+          "nodes",
+          "__init__.py",
+        ],
+        [
+          "code",
+          "display",
+          "nodes",
+          "tool_call_get_current_weather_node",
+          "weather_function",
+          "workflow.py",
+        ],
+        [
+          "code",
+          "display",
+          "nodes",
+          "tool_call_get_current_weather_node",
+          "weather_function",
+          "__init__.py",
+        ],
       ];
 
       for (const file of expectedFiles) {
