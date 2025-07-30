@@ -17,9 +17,7 @@ import {
   InlinePromptNode as InlinePromptNodeType,
   PlainTextPromptTemplateBlock,
   FunctionArgs,
-  InlineWorkflowFunctionArgs,
-  DeploymentWorkflowFunctionArgs,
-  ComposioToolFunctionArgs,
+  Functions as FunctionsType,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -172,6 +170,28 @@ export class InlinePromptNode extends BaseNode<
           ),
         })
       );
+    }
+
+    // Move the code execution detection logic here
+    if (
+      functionsAttribute &&
+      functionsAttribute.value?.type === "CONSTANT_VALUE" &&
+      functionsAttribute.value.value?.type === "JSON" &&
+      Array.isArray(functionsAttribute.value.value.value)
+    ) {
+      const functions: FunctionsType = functionsAttribute.value.value.value;
+
+      const hasCodeExecutionFunctions = functions.some(
+        (f) => f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)
+      );
+
+      if (hasCodeExecutionFunctions) {
+        const modulePath = this.nodeContext.nodeModulePath;
+        const fileName = modulePath[modulePath.length - 1] + ".py";
+        const relativePath = `nodes/${fileName}`;
+
+        this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+      }
     }
 
     statements.push(
@@ -347,37 +367,6 @@ export class InlinePromptNode extends BaseNode<
   }
 
   public async persist(): Promise<void> {
-    // Check if this node has callable functions and mark as mergeable
-    const functionsAttribute = this.nodeData.attributes?.find(
-      (attr) => attr.name === "functions"
-    );
-
-    if (
-      functionsAttribute &&
-      functionsAttribute.value?.type === "CONSTANT_VALUE" &&
-      functionsAttribute.value.value?.type === "JSON" &&
-      Array.isArray(functionsAttribute.value.value.value)
-    ) {
-      const functions: Array<
-        | FunctionArgs
-        | InlineWorkflowFunctionArgs
-        | DeploymentWorkflowFunctionArgs
-        | ComposioToolFunctionArgs
-      > = functionsAttribute.value.value.value;
-
-      const hasCodeExecutionFunctions = functions.some(
-        (f) => f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)
-      );
-
-      if (hasCodeExecutionFunctions) {
-        const modulePath = this.nodeContext.nodeModulePath;
-        const fileName = modulePath[modulePath.length - 1] + ".py";
-        const relativePath = `nodes/${fileName}`;
-
-        this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
-      }
-    }
-
     await super.persist();
   }
 }
