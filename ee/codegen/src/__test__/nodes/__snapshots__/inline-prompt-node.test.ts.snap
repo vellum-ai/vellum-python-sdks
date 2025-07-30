@@ -1446,3 +1446,67 @@ class PromptNode(InlinePromptNode):
     )
 "
 `;
+
+exports[`InlinePromptNode > with node trigger AWAIT_ALL > should generate Trigger class with AWAIT_ALL 1`] = `
+"from vellum import JinjaPromptBlock, PromptParameters
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+from ..inputs import Inputs
+
+
+class PromptNode(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
+    ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0,
+        max_tokens=1000,
+        top_p=1,
+        top_k=0,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logit_bias={},
+        custom_parameters={},
+    )
+
+    class NodeTrigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
+
+exports[`InlinePromptNode > with node trigger AWAIT_ANY > should generate Trigger class with AWAIT_ANY 1`] = `
+"from vellum import JinjaPromptBlock, PromptParameters
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+from ..inputs import Inputs
+
+
+class PromptNode(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
+    ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0,
+        max_tokens=1000,
+        top_p=1,
+        top_k=0,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logit_bias={},
+        custom_parameters={},
+    )
+
+    class NodeTrigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
+"
+`;

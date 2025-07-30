@@ -31,6 +31,9 @@ class RouterNode(BaseNode):
     class Ports(BaseNode.Ports):
         top = Port.on_if(StartNode.Outputs.result.equals("top"))
         bottom = Port.on_else()
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -99,6 +102,9 @@ exports[`WorkflowProjectGenerator > Nodes present but not in graph > should stil
 class SecondNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         output: str
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -122,6 +128,9 @@ from vellum.workflows.references import LazyReference
 
 class FirstNode(BaseNode):
     forward = LazyReference("SecondNode.Outputs.output")
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -173,6 +182,9 @@ Summarize the following text: hello today is feb 7 bad weather
         logit_bias={},
         custom_parameters=None,
     )
+
+    class NodeTrigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 "
 `;
 
@@ -364,6 +376,9 @@ class GetCurrentWeatherNode(ToolCallingNode):
     class Outputs(ToolCallingNode.Outputs):
         text: str
         chat_history: List[ChatMessage]
+
+    class NodeTrigger(ToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -405,6 +420,9 @@ class MyToolCallingNode(ToolCallingNode):
     class Outputs(ToolCallingNode.Outputs):
         text: str
         chat_history: List[ChatMessage]
+
+    class NodeTrigger(ToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -435,6 +453,9 @@ class GetCurrentWeatherNode(ToolCallingNode):
     class Outputs(ToolCallingNode.Outputs):
         text: str
         chat_history: List[ChatMessage]
+
+    class NodeTrigger(ToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -549,6 +570,9 @@ class GetCurrentWeatherNode(ToolCallingNode):
     class Outputs(ToolCallingNode.Outputs):
         text: str
         chat_history: List[ChatMessage]
+
+    class NodeTrigger(ToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -627,6 +651,9 @@ class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         temperature: Union[float, int]
         reasoning: str
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -795,6 +822,9 @@ class GetCurrentWeatherNode(ToolCallingNode):
     class Outputs(ToolCallingNode.Outputs):
         text: str
         chat_history: List[ChatMessage]
+
+    class NodeTrigger(ToolCallingNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -873,6 +903,9 @@ class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         temperature: Union[float, int]
         reasoning: str
+
+    class NodeTrigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 

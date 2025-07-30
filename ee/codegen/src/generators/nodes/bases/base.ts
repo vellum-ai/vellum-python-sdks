@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { isNil } from "lodash";
 
 import * as codegen from "src/codegen";
 import {
@@ -36,6 +37,7 @@ import {
 } from "src/types/vellum";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
+import {NodeTrigger} from "src/generators/node-trigger";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -529,6 +531,17 @@ export abstract class BaseNode<
     }
   }
 
+  protected getNodeTrigger(): AstNode | undefined {
+    if (this.nodeData.trigger) {
+      return new NodeTrigger({
+        nodeTrigger: this.nodeData.trigger,
+        nodeContext: this.nodeContext,
+      });
+    }
+
+    return undefined;
+  }
+
   public generateNodeClass(): python.Class {
     const nodeContext = this.nodeContext;
 
@@ -558,6 +571,12 @@ export abstract class BaseNode<
 
       if (nodePorts) {
         nodeClass.add(nodePorts);
+      }
+
+      const nodeTriggers = this.getNodeTrigger();
+
+      if (nodeTriggers) {
+        nodeClass.add(nodeTriggers);
       }
     } catch (error) {
       if (error instanceof BaseCodegenError) {

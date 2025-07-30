@@ -1021,6 +1021,29 @@ export declare namespace NodePortSerializer {
     | ElseConditionNodePortSerializer.Raw;
 }
 
+export declare namespace NodeTriggerSerializer {
+  interface Raw {
+    id: string;
+    merge_behavior: "AWAIT_ATTRIBUTES" | "AWAIT_ALL" | "AWAIT_ANY" | "CUSTOM";
+  }
+}
+
+export const NodeTriggerSerializer: ObjectSchema<
+  NodeTriggerSerializer.Raw,
+  NodeTrigger
+> = objectSchema({
+  id: stringSchema(),
+  mergeBehavior: propertySchema(
+    "merge_behavior",
+    undiscriminatedUnionSchema([
+      stringLiteralSchema("AWAIT_ATTRIBUTES"),
+      stringLiteralSchema("AWAIT_ALL"),
+      stringLiteralSchema("AWAIT_ANY"),
+      stringLiteralSchema("CUSTOM"),
+    ])
+  ),
+});
+
 export declare namespace BaseWorkflowNodeSerializer {
   interface Raw {
     base?: CodeResourceDefinitionSerializer.Raw | null;
@@ -1037,6 +1060,7 @@ export declare namespace BaseDisplayableWorkflowNodeSerializer {
     outputs?: NodeOutputSerializer.Raw[] | null;
     attributes?: NodeAttributeSerializer.Raw[] | null;
     ports?: NodePortSerializer.Raw[] | null;
+    trigger?: NodeTriggerSerializer.Raw | null;
   }
 }
 
@@ -1338,6 +1362,7 @@ export const PromptNodeSerializer: ObjectSchema<
   outputs: listSchema(NodeOutputSerializer).optional(),
   attributes: listSchema(NodeAttributeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace PromptNodeSerializer {
@@ -2044,29 +2069,6 @@ export declare namespace ErrorNodeSerializer {
       error_source_input_id: string;
       error_output_id?: string | null;
     };
-  }
-}
-
-export const NodeTriggerSerializer: ObjectSchema<
-  NodeTriggerSerializer.Raw,
-  NodeTrigger
-> = objectSchema({
-  id: stringSchema(),
-  mergeBehavior: propertySchema(
-    "merge_behavior",
-    undiscriminatedUnionSchema([
-      stringLiteralSchema("AWAIT_ATTRIBUTES"),
-      stringLiteralSchema("AWAIT_ALL"),
-      stringLiteralSchema("AWAIT_ANY"),
-      stringLiteralSchema("CUSTOM"),
-    ])
-  ),
-});
-
-export declare namespace NodeTriggerSerializer {
-  interface Raw {
-    id: string;
-    merge_behavior: "AWAIT_ATTRIBUTES" | "AWAIT_ALL" | "AWAIT_ANY" | "CUSTOM";
   }
 }
 

@@ -243,6 +243,7 @@ export interface BaseDisplayableWorkflowNode extends BaseWorkflowNode {
   outputs?: NodeOutput[];
   attributes?: NodeAttribute[];
   ports?: NodePort[];
+  trigger?: NodeTrigger;
 }
 
 export interface EntrypointNodeData {

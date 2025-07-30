@@ -4,6 +4,7 @@ import {
   NodeAttribute,
   NodeOutput,
   NodePort,
+  NodeTrigger,
   WorkflowDataNode as WorkflowDataNodeType,
 } from "src/types/vellum";
 
@@ -50,6 +51,14 @@ export class NodeDataFactoryBuilder<T extends WorkflowDataNodeType> {
     this.nodeData = {
       ...this.nodeData,
       base,
+    };
+    return this;
+  }
+
+  withTrigger(trigger: NodeTrigger): NodeDataFactoryBuilder<T> {
+    this.nodeData = {
+      ...this.nodeData,
+      trigger,
     };
     return this;
   }
