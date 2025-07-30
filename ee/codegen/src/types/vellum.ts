@@ -934,3 +934,10 @@ export type ComposioToolFunctionArgs = {
   connection_id?: string;
   integration_name?: string;
 } & NameDescription;
+
+export type ToolArgs = (
+  | FunctionArgs
+  | InlineWorkflowFunctionArgs
+  | DeploymentWorkflowFunctionArgs
+  | ComposioToolFunctionArgs
+)[];

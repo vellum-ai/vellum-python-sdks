@@ -19,6 +19,10 @@ import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-fa
 import { SpyMocks } from "src/__test__/utils/SpyMocks";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowProjectGenerator } from "src/project";
+import {
+  NodeAttribute as NodeAttributeType,
+  WorkflowNodeType,
+} from "src/types/vellum";
 
 describe("WorkflowProjectGenerator", () => {
   let tempDir: string;
@@ -5183,6 +5187,146 @@ baz = foo + bar
       await project.generateCode();
 
       expectProjectFileToExist(["code", "workflow.py"]);
+    });
+  });
+
+  describe("Get inline prompt node files", () => {
+    it("should get files", async () => {
+      const functionsAttribute: NodeAttributeType = {
+        id: uuidv4(),
+        name: "functions",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [
+              {
+                type: "CODE_EXECUTION",
+                name: "my_test_function",
+                description: "Some sample test function",
+                src: 'def my_test_function(arg1: str, arg2: str) -> str:\n    """Processes input data and returns formatted output"""\n    return f"arg1: {arg1}, arg2: {arg2}"',
+                definition: {
+                  name: "my_test_function",
+                  description: "Some sample test function",
+                  parameters: {
+                    type: "object",
+                    required: ["arg1", "arg2"],
+                    properties: {
+                      arg1: { type: "string" },
+                      arg2: { type: "string" },
+                    },
+                  },
+                  state: null,
+                  cache_config: null,
+                  forced: null,
+                  strict: null,
+                },
+              },
+            ],
+          },
+        },
+      };
+
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "inline-prompt-node",
+              type: WorkflowNodeType.PROMPT,
+              attributes: [functionsAttribute],
+              inputs: [],
+              data: {
+                variant: "INLINE",
+                label: "Inline Prompt Node",
+                ml_model_name: "gpt-4",
+                output_id: "output-id",
+                array_output_id: "array-output-id",
+                source_handle_id: "source-handle-id",
+                target_handle_id: "target-handle-id",
+                exec_config: {
+                  prompt_template_block_data: {
+                    version: 1.0,
+                    blocks: [
+                      {
+                        id: "block-1",
+                        block_type: "JINJA",
+                        state: "ENABLED",
+                        properties: {
+                          template: "Hello world",
+                        },
+                      },
+                    ],
+                  },
+                  input_variables: [],
+                  parameters: {
+                    temperature: 0.7,
+                  },
+                },
+              },
+              trigger: {
+                id: "inline-prompt-trigger",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: "inline-prompt-default-port",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              base: {
+                name: "InlinePromptNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "displayable",
+                  "inline_prompt_node",
+                ],
+              },
+              outputs: [],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "inline-prompt-node",
+              target_handle_id: "inline-prompt-trigger",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+        runner_config: {},
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "inline_prompt_test",
+        vellumApiKey: "<TEST_API_KEY>",
+        workflowVersionExecConfigData: displayData,
+      });
+
+      await project.generateCode();
+      const pythonCodeMergeableNodeFiles =
+        project.getPythonCodeMergeableNodeFiles();
+      expect(pythonCodeMergeableNodeFiles).toEqual(
+        new Set(["nodes/inline_prompt_node.py"])
+      );
     });
   });
 });
