@@ -17,6 +17,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.integrations.composio_service import ComposioService
+from vellum.workflows.integrations.mcp_service import MCPService
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
@@ -196,6 +197,29 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         yield from []
 
 
+class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
+    """Node that executes an MCP tool with function call output."""
+
+    mcp_tool: MCPToolDefinition
+
+    def run(self) -> Iterator[BaseOutput]:
+        arguments = self._extract_function_arguments()
+
+        try:
+            mcp_service = MCPService()
+            result = mcp_service.execute_tool(tool_def=self.mcp_tool, arguments=arguments)
+        except Exception as e:
+            raise NodeException(
+                message=f"Error executing MCP tool '{self.mcp_tool.name}': {str(e)}",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        # Add result to chat history
+        self._add_function_result_to_chat_history(result, self.state)
+
+        yield from []
+
+
 def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> ComposioToolDefinition:
     """Hydrate a ComposioToolDefinition with detailed information from the Composio API.
 
@@ -233,6 +257,26 @@ def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> Compo
         return tool_def
 
 
+def hydrate_mcp_tool_definitions(server_def: MCPServer) -> List[MCPToolDefinition]:
+    """Hydrate an MCPToolDefinition with detailed information from the MCP server.
+
+    We do tool discovery on the MCP server to get the tool definitions.
+
+    Args:
+        tool_def: The basic MCPToolDefinition to enhance
+
+    Returns:
+        MCPToolDefinition with detailed parameters and description
+    """
+    try:
+        mcp_service = MCPService()
+        return mcp_service.hydrate_tool_definitions(server_def)
+    except Exception as e:
+        # If hydration fails, log and return original
+        logger.warning(f"Failed to enhance MCP server '{server_def.name}': {e}")
+        return []
+
+
 def create_tool_router_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
@@ -242,10 +286,21 @@ def create_tool_router_node(
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
-    if functions and len(functions) > 0:
+    if functions and len(functions) > 0 or mcp_servers and len(mcp_servers) > 0:
         # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
         prompt_functions: List[Union[Tool, FunctionDefinition]] = []
+
+        # Avoid using lambda to capture function_name
+        # lambda will capture the function_name by reference,
+        # and if the function_name is changed, the port_condition will also change.
+        def create_port_condition(fn_name):
+            return LazyReference(
+                lambda: (
+                    node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
+                    & node.Outputs.results[0]["value"]["name"].equals(fn_name)
+                )
+            )
 
         for function in functions:
             if isinstance(function, ComposioToolDefinition):
@@ -263,21 +318,24 @@ def create_tool_router_node(
 
             # Create port for this function (using original function for get_function_name)
             function_name = get_function_name(function)
-
-            # Avoid using lambda to capture function_name
-            # lambda will capture the function_name by reference,
-            # and if the function_name is changed, the port_condition will also change.
-            def create_port_condition(fn_name):
-                return LazyReference(
-                    lambda: (
-                        node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
-                        & node.Outputs.results[0]["value"]["name"].equals(fn_name)
-                    )
-                )
-
             port_condition = create_port_condition(function_name)
             port = Port.on_if(port_condition)
             setattr(Ports, function_name, port)
+
+        for server in mcp_servers:
+            tool_functions = hydrate_mcp_tool_definitions(server)
+            for tool_function in tool_functions:
+                name = get_function_name(tool_function)
+                prompt_functions.append(
+                    FunctionDefinition(
+                        name=name,
+                        description=tool_function.description,
+                        parameters=tool_function.parameters,
+                    )
+                )
+                port_condition = create_port_condition(name)
+                port = Port.on_if(port_condition)
+                setattr(Ports, name, port)
 
         # Add the else port for when no function conditions match
         setattr(Ports, "default", Port.on_else())
@@ -381,7 +439,16 @@ def create_function_node(
         )
         return node
     elif isinstance(function, MCPToolDefinition):
-        pass
+        node = type(
+            f"MCPNode_{function.name}",
+            (MCPNode,),
+            {
+                "mcp_tool": function,
+                "function_call_output": tool_router_node.Outputs.results,
+                "__module__": __name__,
+            },
+        )
+        return node
     elif is_workflow_class(function):
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",
@@ -414,6 +481,6 @@ def get_function_name(function: Tool) -> str:
     elif isinstance(function, ComposioToolDefinition):
         return function.name
     elif isinstance(function, MCPToolDefinition):
-        return function.name
+        return f"{function.server.name}__{function.name}"
     else:
         return snake_case(function.__name__)

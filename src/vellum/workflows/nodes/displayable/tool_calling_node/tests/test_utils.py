@@ -79,7 +79,7 @@ def test_get_function_name_mcp_tool_definition():
 
     result = get_function_name(mcp_tool)
 
-    assert result == "create_repository"
+    assert result == "github__create_repository"
 
 
 @pytest.mark.parametrize(
