@@ -16,14 +16,12 @@ import {
   InlinePromptNodeData,
   InlinePromptNode as InlinePromptNodeType,
   PlainTextPromptTemplateBlock,
-} from "src/types/vellum";
-import { isNilOrEmpty } from "src/utils/typing";
-import {
   FunctionArgs,
   InlineWorkflowFunctionArgs,
   DeploymentWorkflowFunctionArgs,
   ComposioToolFunctionArgs,
 } from "src/types/vellum";
+import { isNilOrEmpty } from "src/utils/typing";
 
 const INPUTS_PREFIX = "prompt_inputs";
 
