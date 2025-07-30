@@ -62,15 +62,11 @@ exports[`GenericNode > basic with a JSON output > getNodeFile 1`] = `
 "from typing import Any
 
 from vellum.workflows.nodes import BaseNode
-from vellum.workflows.types.core import MergeBehavior
 
 
 class MyCustomNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         output: Any
-
-    class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -189,7 +185,6 @@ class MyCustomNode(MockNetworkingClient):
 
 exports[`GenericNode > basic with default node trigger > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
-from vellum.workflows.types.core import MergeBehavior
 
 from ..inputs import Inputs
 
@@ -200,9 +195,6 @@ class MyCustomNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
-
-    class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -363,12 +355,10 @@ class MyCustomNode(BaseNode):
 
 exports[`GenericNode > basic with only \`pass\` > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
-from vellum.workflows.types.core import MergeBehavior
 
 
 class MyCustomNode(BaseNode):
-    class NodeTrigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+    pass
 "
 `;
 

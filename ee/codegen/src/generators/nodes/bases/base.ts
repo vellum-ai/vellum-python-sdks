@@ -531,7 +531,10 @@ export abstract class BaseNode<
   }
 
   protected getNodeTrigger(): AstNode | undefined {
-    if (this.nodeData.trigger) {
+    if (
+      this.nodeData.trigger &&
+      this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES"
+    ) {
       return new NodeTrigger({
         nodeTrigger: this.nodeData.trigger,
         nodeContext: this.nodeContext,

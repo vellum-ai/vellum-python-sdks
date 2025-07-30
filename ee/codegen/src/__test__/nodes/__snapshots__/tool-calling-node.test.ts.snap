@@ -45,7 +45,6 @@ from vellum import (
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -86,9 +85,6 @@ class ToolCallingNode(BaseToolCallingNode):
         },
     )
     max_tool_calls = 1
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -96,7 +92,6 @@ exports[`ToolCallingNode > composio tool > should generate composio tool 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.types.definition import ComposioToolDefinition
 
 
@@ -109,9 +104,6 @@ class ToolCallingNode(BaseToolCallingNode):
             display_name="Create GitHub Issue",
         )
     ]
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -119,7 +111,6 @@ exports[`ToolCallingNode > composio tool > should handle composio tool with inte
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.types.definition import ComposioToolDefinition
 
 
@@ -132,9 +123,6 @@ class ToolCallingNode(BaseToolCallingNode):
             display_name="Create email draft",
         )
     ]
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -142,15 +130,11 @@ exports[`ToolCallingNode > deployment workflow > should generate latest release 
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.types.definition import DeploymentDefinition
 
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [DeploymentDefinition(deployment="deployment_workflow_function_name")]
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -161,14 +145,10 @@ from .subtract.workflow import Subtract
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [add_numbers, Subtract]
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -179,14 +159,10 @@ from .subtract.workflow import Subtract
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [Subtract, add_numbers]
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -196,14 +172,10 @@ exports[`ToolCallingNode > inline workflow > should generate inline workflow fun
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [Subtract]
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
@@ -217,7 +189,6 @@ exports[`ToolCallingNode > input variables > should generate input variables 1`]
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
-from vellum.workflows.types.core import MergeBehavior
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -244,8 +215,5 @@ Summarize the following text:
             ],
         ),
     ]
-
-    class NodeTrigger(BaseToolCallingNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
