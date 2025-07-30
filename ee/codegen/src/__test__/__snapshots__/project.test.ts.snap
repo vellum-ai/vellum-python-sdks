@@ -23,6 +23,7 @@ class APINode(BaseAPINode):
 exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference when there is a simple loop > code/nodes/router_node.py 1`] = `
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
+from vellum.workflows.types.core import MergeBehavior
 
 from .start_node import StartNode
 
@@ -97,6 +98,7 @@ __all__ = [
 
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/nodes/second_node.py 1`] = `
 "from vellum.workflows.nodes import BaseNode
+from vellum.workflows.types.core import MergeBehavior
 
 
 class SecondNode(BaseNode):
@@ -124,6 +126,7 @@ class Workflow(BaseWorkflow):
 exports[`WorkflowProjectGenerator > Nodes with forward references > should generate a proper Lazy Reference for the first node > code/nodes/first_node.py 1`] = `
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references import LazyReference
+from vellum.workflows.types.core import MergeBehavior
 
 
 class FirstNode(BaseNode):
@@ -144,6 +147,7 @@ exports[`WorkflowProjectGenerator > adornments > should correctly generate code 
 )
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
 
 
 @RetryNode.wrap(max_attempts=5)
@@ -354,6 +358,7 @@ from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.types.core import MergeBehavior
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
@@ -408,6 +413,7 @@ exports[`WorkflowProjectGenerator > function > should generate deployment workfl
 
 from vellum import ChatMessage
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.types.definition import DeploymentDefinition
 
 
@@ -431,6 +437,7 @@ exports[`WorkflowProjectGenerator > function > should generate empty function ar
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.types.core import MergeBehavior
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
@@ -533,6 +540,7 @@ from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.types.core import MergeBehavior
 
 from ...inputs import Inputs
 
@@ -640,6 +648,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from typing import Union
 
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.types.core import MergeBehavior
 
 from ..inputs import Inputs
 
@@ -785,6 +794,7 @@ from typing import List
 
 from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.types.core import MergeBehavior
 
 from ...inputs import Inputs
 
@@ -892,6 +902,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from typing import Union
 
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.types.core import MergeBehavior
 
 from ..inputs import Inputs
 
