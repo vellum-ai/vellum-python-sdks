@@ -939,7 +939,7 @@ export type ComposioToolFunctionArgs = {
   integration_name?: string;
 } & NameDescription;
 
-export type Functions = (
+export type ToolArgs = (
   | FunctionArgs
   | InlineWorkflowFunctionArgs
   | DeploymentWorkflowFunctionArgs

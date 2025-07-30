@@ -17,7 +17,7 @@ import {
   InlinePromptNode as InlinePromptNodeType,
   PlainTextPromptTemplateBlock,
   FunctionArgs,
-  Functions as FunctionsType,
+  ToolArgs as FunctionsType,
 } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -364,9 +364,5 @@ export class InlinePromptNode extends BaseNode<
 
   protected getErrorOutputId(): string | undefined {
     return this.nodeData.data.errorOutputId;
-  }
-
-  public async persist(): Promise<void> {
-    await super.persist();
   }
 }
