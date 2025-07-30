@@ -60,7 +60,7 @@ class CreateRepositoryNode(ToolCallingNode):
     }
 
 
-class BasicToolCallingNodeWorkflowMCPTool(BaseWorkflow[Inputs, BaseState]):
+class BasicToolCallingNodeMCPWorkflow(BaseWorkflow[Inputs, BaseState]):
     """
     A workflow that uses the CreateRepositoryNode.
     """

@@ -26,7 +26,7 @@ from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.types.definition import MCPServer, MCPToolDefinition
 
-from tests.workflows.basic_tool_calling_node_mcp_tool.workflow import BasicToolCallingNodeWorkflowMCPTool, Inputs
+from tests.workflows.basic_tool_calling_node_mcp_tool.workflow import BasicToolCallingNodeMCPWorkflow, Inputs
 
 
 def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generator, monkeypatch):
@@ -109,7 +109,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
         second_call_input_id_2 = uuid4_generator()
 
         # GIVEN a repository creation workflow
-        workflow = BasicToolCallingNodeWorkflowMCPTool()
+        workflow = BasicToolCallingNodeMCPWorkflow()
 
         # WHEN the workflow is executed
         terminal_event = workflow.run(Inputs(query="Create a new test repository named new_test_repo"))
