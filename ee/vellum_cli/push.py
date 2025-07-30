@@ -67,7 +67,10 @@ def push_command(
             raise ValueError(f"No workflow config for '{module}' found in project to push.")
 
     if len(workflow_configs) > 1:
-        raise ValueError("Multiple workflows found in project to push. Pushing only a single workflow is supported.")
+        raise ValueError(
+            "Multiple workflows found. Please specify a single workflow to push. "
+            f"Found: {', '.join([w.module for w in workflow_configs])}"
+        )
 
     workflow_config = workflow_configs[0]
 

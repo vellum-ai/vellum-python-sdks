@@ -77,9 +77,8 @@ def test_push__multiple_workflows_configured__no_module_specified(mock_module):
     # THEN it should fail
     assert result.exit_code == 1
     assert result.exception
-    assert (
-        str(result.exception)
-        == "Multiple workflows found in project to push. Pushing only a single workflow is supported."
+    assert str(result.exception) == (
+        "Multiple workflows found. Please specify a single workflow to push. Found: examples.mock, examples.mock2"
     )
 
 
@@ -349,9 +348,8 @@ def test_push__workflow_sandbox_option__existing_id_different_module(mock_module
     # THEN it should fail
     assert result.exit_code == 1
     assert result.exception
-    assert (
-        str(result.exception)
-        == "Multiple workflows found in project to push. Pushing only a single workflow is supported."
+    assert str(result.exception) == (
+        f"Multiple workflows found. Please specify a single workflow to push. Found: {module}, {second_module}"
     )
 
 
