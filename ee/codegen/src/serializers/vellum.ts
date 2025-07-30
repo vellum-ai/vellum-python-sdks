@@ -1039,7 +1039,7 @@ export const NodeTriggerSerializer: ObjectSchema<
       stringLiteralSchema("AWAIT_ATTRIBUTES"),
       stringLiteralSchema("AWAIT_ALL"),
       stringLiteralSchema("AWAIT_ANY"),
-        stringLiteralSchema("CUSTOM")
+      stringLiteralSchema("CUSTOM"),
     ])
   ),
 });
