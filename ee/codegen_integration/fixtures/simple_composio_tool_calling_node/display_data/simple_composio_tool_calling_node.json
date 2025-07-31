@@ -151,17 +151,6 @@
                 "value": 5.0
               }
             }
-          },
-          {
-            "id": "4d4d63e1-ad3b-40dc-84d6-e9abde8634c6",
-            "name": "tool_sources",
-            "value": {
-              "type": "CONSTANT_VALUE",
-              "value": {
-                "type": "JSON",
-                "value": []
-              }
-            }
           }
         ],
         "outputs": [
