@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Iterator, List, Optional, Set, Union
+from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.prompt_parameters import PromptParameters
