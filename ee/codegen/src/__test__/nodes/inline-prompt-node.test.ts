@@ -524,17 +524,18 @@ describe("InlinePromptNode", () => {
         .fn()
         .mockRejectedValue(new Error("API call failed: ML model not found"));
 
-      const nodeContext = new InlinePromptNodeContext({
-        workflowContext,
-        nodeData: legacyNodeData as unknown as InlinePromptNode,
-      });
-
-      await expect(nodeContext.buildProperties()).rejects.toThrow(
-        "Failed to convert LEGACY prompt node to INLINE"
-      );
-      await expect(nodeContext.buildProperties()).rejects.toThrow(
-        /ML model name/
-      );
+      await expect(
+        createNodeContext({
+          workflowContext,
+          nodeData: legacyNodeData,
+        })
+      ).rejects.toThrow("Failed to convert LEGACY prompt node to INLINE");
+      await expect(
+        createNodeContext({
+          workflowContext,
+          nodeData: legacyNodeData,
+        })
+      ).rejects.toThrow(/ML model name/);
     });
   });
 });
