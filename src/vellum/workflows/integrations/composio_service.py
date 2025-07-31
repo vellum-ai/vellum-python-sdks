@@ -72,6 +72,16 @@ class ComposioService:
 
             response.raise_for_status()
             return response.json()
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 401:
+                try:
+                    error_data = e.response.json()
+                    error_message = error_data.get("detail", "Unauthorized: Invalid or missing Composio API key")
+                except ValueError:
+                    error_message = "Unauthorized: Invalid or missing Composio API key"
+                raise NodeException(f"401: {error_message}")
+            else:
+                raise NodeException(f"Composio API request failed: {e}")
         except Exception as e:
             raise NodeException(f"Composio API request failed: {e}")
 
