@@ -12,6 +12,10 @@ from vellum.workflows.vellum_client import create_vellum_client
 
 logger = logging.getLogger(__name__)
 
+# Event type constants
+WORKFLOW_EVENT_TYPE = "workflow.event"
+WORKFLOW_STATE_SNAPSHOTTED_TYPE = "workflow.state.snapshotted"
+
 
 class VellumEmitter(BaseWorkflowEmitter):
     """
@@ -92,7 +96,7 @@ class VellumEmitter(BaseWorkflowEmitter):
 
             # Send the state snapshot as an event
             event_data = {
-                "type": "workflow.state.snapshotted",
+                "type": WORKFLOW_STATE_SNAPSHOTTED_TYPE,
                 "data": state_data,
                 "timestamp": default_serializer(default_datetime_factory()),
             }
@@ -114,7 +118,7 @@ class VellumEmitter(BaseWorkflowEmitter):
         """
         # Use the same serialization approach as the rest of the system
         return {
-            "type": "workflow.event",
+            "type": WORKFLOW_EVENT_TYPE,
             "data": default_serializer(event),
         }
 

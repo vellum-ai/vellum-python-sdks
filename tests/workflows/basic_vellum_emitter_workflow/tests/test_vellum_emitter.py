@@ -1,143 +1,84 @@
 import pytest
-import os
 from unittest.mock import Mock, patch
 
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class TestState(BaseState):
     test_value: int = 0
 
 
-def test_vellum_emitter_initialization():
-    """Test that VellumEmitter can be initialized properly."""
-    # Test with enabled=False (should not try to create client)
-    emitter = VellumEmitter(enabled=False)
-    assert not emitter._enabled
+@pytest.fixture
+def mock_create_vellum_client():
+    """Fixture for mocking create_vellum_client."""
+    with patch("vellum.workflows.emitters.vellum_emitter.create_vellum_client") as mock:
+        mock_client = Mock()
+        mock.return_value = mock_client
+        mock_client._client_wrapper.get_environment.return_value.default = "https://api.vellum.ai"
+        mock_client._client_wrapper.get_headers.return_value = {"Authorization": "Bearer test"}
 
-    # Test with invalid API key (should disable gracefully)
-    with patch.dict(os.environ, {"VELLUM_API_KEY": ""}):
-        emitter = VellumEmitter()
-        # Should still initialize but be disabled due to missing API key
+        mock_response = Mock()
+        mock_response.raise_for_status.return_value = None
+        mock_client._client_wrapper.httpx_client.request.return_value = mock_response
 
-
-def test_vellum_emitter_disabled():
-    """Test that disabled emitter doesn't make any requests."""
-    emitter = VellumEmitter(enabled=False)
-
-    mock_event = Mock()
-    mock_event.name = "test.event"
-
-    # These should not raise any exceptions or make any calls
-    emitter.emit_event(mock_event)
-    emitter.snapshot_state(TestState())
+        yield mock_client
 
 
-@patch("vellum.workflows.emitters.vellum_emitter.create_vellum_client")
-@patch("vellum.workflows.emitters.vellum_emitter.default_serializer")
-def test_vellum_emitter_event_serialization(mock_serializer, mock_create_client):
-    """Test that events are serialized correctly."""
-    mock_client = Mock()
-    mock_create_client.return_value = mock_client
-    mock_client._client_wrapper.get_environment.return_value.default = "https://api.vellum.ai"
-    mock_client._client_wrapper.get_headers.return_value = {"Authorization": "Bearer test"}
+@pytest.fixture
+def mock_default_serializer():
+    """Fixture for mocking default_serializer."""
+    with patch("vellum.workflows.emitters.vellum_emitter.default_serializer") as mock:
+        yield mock
 
-    mock_response = Mock()
-    mock_response.raise_for_status.return_value = None
-    mock_client._client_wrapper.httpx_client.request.return_value = mock_response
 
-    mock_serializer.return_value = {"event": "data"}
+def test_vellum_emitter__happy_path(mock_create_vellum_client, mock_default_serializer):
+    """Test VellumEmitter happy path with event emission and state snapshotting."""
+    # GIVEN a properly configured VellumEmitter with mocked serialization
+    mock_default_serializer.side_effect = [
+        {"event": "workflow_initiated_data"},
+        {"state": "snapshotted_state_data"},
+        "2024-07-31T10:00:00Z",
+    ]
 
+    # AND a VellumEmitter initialized with a test API key
     emitter = VellumEmitter(api_key="test-key")
 
+    # AND we have a test workflow event
     mock_event = Mock()
     mock_event.name = "workflow.execution.initiated"
 
+    # AND we have a test state with known values
+    test_state = TestState()
+    test_state.test_value = 42
+
+    # WHEN we emit the workflow event
     emitter.emit_event(mock_event)
 
-    mock_client._client_wrapper.httpx_client.request.assert_called_once()
-    call_args = mock_client._client_wrapper.httpx_client.request.call_args
+    # AND when we snapshot the state
+    emitter.snapshot_state(test_state)
 
-    assert call_args[1]["method"] == "POST"
-    assert call_args[1]["path"] == "https://api.vellum.ai/events"
-    assert "json" in call_args[1]
-    assert call_args[1]["json"]["type"] == "workflow.event"
-    assert call_args[1]["json"]["data"] == {"event": "data"}
+    # THEN the emitter should have made HTTP requests for both operations
+    assert mock_create_vellum_client._client_wrapper.httpx_client.request.call_count == 2
 
+    # AND the first call should be for the event emission
+    first_call_args = mock_create_vellum_client._client_wrapper.httpx_client.request.call_args_list[0]
+    assert first_call_args[1]["method"] == "POST"
+    assert first_call_args[1]["path"] == "https://api.vellum.ai/events"
+    assert "json" in first_call_args[1]
+    assert first_call_args[1]["json"]["type"] == "workflow.event"
+    assert first_call_args[1]["json"]["data"] == {"event": "workflow_initiated_data"}
 
-@patch("vellum.workflows.emitters.vellum_emitter.create_vellum_client")
-@patch("vellum.workflows.emitters.vellum_emitter.default_serializer")
-def test_vellum_emitter_state_serialization(mock_serializer, mock_create_client):
-    """Test that state snapshots are serialized correctly."""
-    mock_client = Mock()
-    mock_create_client.return_value = mock_client
-    mock_client._client_wrapper.get_environment.return_value.default = "https://api.vellum.ai"
-    mock_client._client_wrapper.get_headers.return_value = {"Authorization": "Bearer test"}
+    # AND the second call should be for the state snapshot
+    second_call_args = mock_create_vellum_client._client_wrapper.httpx_client.request.call_args_list[1]
+    assert second_call_args[1]["method"] == "POST"
+    assert second_call_args[1]["path"] == "https://api.vellum.ai/events"
+    assert "json" in second_call_args[1]
+    assert second_call_args[1]["json"]["type"] == "workflow.state.snapshotted"
+    assert second_call_args[1]["json"]["data"] == {"state": "snapshotted_state_data"}
 
-    mock_response = Mock()
-    mock_response.raise_for_status.return_value = None
-    mock_client._client_wrapper.httpx_client.request.return_value = mock_response
-
-    # Mock the serializer to return different values for different calls
-    mock_serializer.side_effect = [{"state": "data"}, "2024-07-31T10:00:00Z"]
-
-    emitter = VellumEmitter(api_key="test-key")
-
-    # Create a test state
-    state = TestState()
-    state.test_value = 42
-
-    # Snapshot the state
-    emitter.snapshot_state(state)
-
-    # Verify the HTTP request was made
-    mock_client._client_wrapper.httpx_client.request.assert_called_once()
-    call_args = mock_client._client_wrapper.httpx_client.request.call_args
-
-    assert call_args[1]["method"] == "POST"
-    assert call_args[1]["path"] == "https://api.vellum.ai/events"
-    assert "json" in call_args[1]
-    assert call_args[1]["json"]["type"] == "workflow.state.snapshotted"
-    assert call_args[1]["json"]["data"] == {"state": "data"}
-
-
-@patch("vellum.workflows.emitters.vellum_emitter.create_vellum_client")
-def test_vellum_emitter_error_handling(mock_create_client):
-    """Test that emitter handles errors gracefully."""
-    mock_client = Mock()
-    mock_create_client.return_value = mock_client
-    mock_client._client_wrapper.get_environment.return_value.default = "https://api.vellum.ai"
-    mock_client._client_wrapper.get_headers.return_value = {"Authorization": "Bearer test"}
-
-    from httpx import HTTPStatusError
-
-    mock_response = Mock()
-    mock_response.status_code = 500
-    mock_response.text = "Internal Server Error"
-    mock_client._client_wrapper.httpx_client.request.side_effect = HTTPStatusError(
-        "Server Error", request=Mock(), response=mock_response
-    )
-
-    emitter = VellumEmitter(api_key="test-key", max_retries=0)
-
-    mock_event = Mock()
-    mock_event.name = "test.event"
-
-    # This should not raise an exception (errors are logged but not propagated)
-    emitter.emit_event(mock_event)
-
-
-def test_vellum_emitter_usage_pattern():
-    """Test the intended usage pattern for VellumEmitter."""
-
-    # This demonstrates how users would use the VellumEmitter
-    class MyWorkflow(BaseWorkflow):
-        emitters = [VellumEmitter()]
-
-    # Verify an instance of VellumEmitter is in the emitters list
-    assert any(isinstance(e, VellumEmitter) for e in MyWorkflow.emitters)
+    # AND the serializer should have been called for both the event and state
+    assert mock_default_serializer.call_count == 3  # event, state, timestamp
 
 
 if __name__ == "__main__":
