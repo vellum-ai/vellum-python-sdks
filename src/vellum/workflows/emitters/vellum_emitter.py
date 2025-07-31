@@ -181,7 +181,7 @@ class VellumEmitter(BaseWorkflowEmitter):
                     raise
 
             except httpx.RequestError as e:
-                last_exception: Optional[Exception] = e
+                last_exception = e
                 if attempt < self._max_retries:
                     wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
                     logger.warning(

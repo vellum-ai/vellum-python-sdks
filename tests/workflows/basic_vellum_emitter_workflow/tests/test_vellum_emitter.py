@@ -61,7 +61,7 @@ def test_vellum_emitter_event_serialization(mock_serializer, mock_create_client)
     call_args = mock_client._client_wrapper.httpx_client.request.call_args
 
     assert call_args[1]["method"] == "POST"
-    assert call_args[1]["url"] == "https://api.vellum.ai/events"
+    assert call_args[1]["path"] == "https://api.vellum.ai/events"
     assert "json" in call_args[1]
     assert call_args[1]["json"]["type"] == "workflow.event"
     assert call_args[1]["json"]["data"] == {"event": "data"}
@@ -97,7 +97,7 @@ def test_vellum_emitter_state_serialization(mock_serializer, mock_create_client)
     call_args = mock_client._client_wrapper.httpx_client.request.call_args
 
     assert call_args[1]["method"] == "POST"
-    assert call_args[1]["url"] == "https://api.vellum.ai/events"
+    assert call_args[1]["path"] == "https://api.vellum.ai/events"
     assert "json" in call_args[1]
     assert call_args[1]["json"]["type"] == "workflow.state.snapshotted"
     assert call_args[1]["json"]["data"] == {"state": "data"}
@@ -136,8 +136,8 @@ def test_vellum_emitter_usage_pattern():
     class MyWorkflow(BaseWorkflow):
         emitters = [VellumEmitter()]
 
-    # Verify the emitter is in the class definition
-    assert VellumEmitter in MyWorkflow.emitters
+    # Verify an instance of VellumEmitter is in the emitters list
+    assert any(isinstance(e, VellumEmitter) for e in MyWorkflow.emitters)
 
 
 if __name__ == "__main__":
