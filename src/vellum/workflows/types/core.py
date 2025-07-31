@@ -13,7 +13,7 @@ from typing import (  # type: ignore[attr-defined]
 )
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow

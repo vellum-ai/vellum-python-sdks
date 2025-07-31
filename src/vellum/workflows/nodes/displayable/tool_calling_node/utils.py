@@ -321,7 +321,7 @@ def create_tool_router_node(
             elif isinstance(function, MCPServer):
                 tool_functions: List[MCPToolDefinition] = hydrate_mcp_tool_definitions(function)
                 for tool_function in tool_functions:
-                    name = get_function_name(tool_function)
+                    name = get_mcp_tool_name(tool_function)
                     prompt_functions.append(
                         FunctionDefinition(
                             name=name,
@@ -438,17 +438,6 @@ def create_function_node(
             },
         )
         return node
-    elif isinstance(function, MCPToolDefinition):
-        node = type(
-            f"MCPNode_{function.name}",
-            (MCPNode,),
-            {
-                "mcp_tool": function,
-                "function_call_output": tool_router_node.Outputs.results,
-                "__module__": __name__,
-            },
-        )
-        return node
     elif is_workflow_class(function):
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",
@@ -474,13 +463,31 @@ def create_function_node(
     return node
 
 
-def get_function_name(function: Union[Tool, MCPToolDefinition]) -> str:
+def create_mcp_tool_node(
+    tool_def: MCPToolDefinition,
+    tool_router_node: Type[ToolRouterNode],
+) -> Type[BaseNode]:
+    node = type(
+        f"MCPNode_{tool_def.name}",
+        (MCPNode,),
+        {
+            "mcp_tool": tool_def,
+            "function_call_output": tool_router_node.Outputs.results,
+            "__module__": __name__,
+        },
+    )
+    return node
+
+
+def get_function_name(function: Union[Tool]) -> str:
     if isinstance(function, DeploymentDefinition):
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
     elif isinstance(function, ComposioToolDefinition):
         return function.name
-    elif isinstance(function, MCPToolDefinition):
-        return f"{function.server.name}__{function.name}"
     else:
         return snake_case(function.__name__)
+
+
+def get_mcp_tool_name(tool_def: MCPToolDefinition) -> str:
+    return f"{tool_def.server.name}__{tool_def.name}"

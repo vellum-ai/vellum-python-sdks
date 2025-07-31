@@ -13,8 +13,10 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
+    create_mcp_tool_node,
     create_tool_router_node,
     get_function_name,
+    get_mcp_tool_name,
     hydrate_mcp_tool_definitions,
 )
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
@@ -146,10 +148,10 @@ class ToolCallingNode(BaseNode):
             if isinstance(function, MCPServer):
                 tool_definitions = hydrate_mcp_tool_definitions(function)
                 for tool_definition in tool_definitions:
-                    function_name = get_function_name(tool_definition)
+                    function_name = get_mcp_tool_name(tool_definition)
 
-                    self._function_nodes[function_name] = create_function_node(
-                        function=tool_definition,
+                    self._function_nodes[function_name] = create_mcp_tool_node(
+                        tool_def=tool_definition,
                         tool_router_node=self.tool_router_node,
                     )
             else:
