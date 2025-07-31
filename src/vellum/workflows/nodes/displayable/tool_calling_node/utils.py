@@ -28,7 +28,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolSource
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
@@ -281,12 +281,12 @@ def create_tool_router_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
     functions: List[Tool],
-    mcp_servers: List[MCPServer],
+    tool_sources: List[ToolSource],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
-    if functions and len(functions) > 0 or mcp_servers and len(mcp_servers) > 0:
+    if functions and len(functions) > 0 or tool_sources and len(tool_sources) > 0:
         # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
         prompt_functions: List[Union[Tool, FunctionDefinition]] = []
@@ -323,7 +323,7 @@ def create_tool_router_node(
             port = create_port_condition(function_name)
             setattr(Ports, function_name, port)
 
-        for server in mcp_servers:
+        for server in tool_sources:
             tool_functions = hydrate_mcp_tool_definitions(server)
             for tool_function in tool_functions:
                 name = get_function_name(tool_function)

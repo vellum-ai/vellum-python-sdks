@@ -408,8 +408,8 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "fc5f98ae-5c3b-4c38-b0a6-6341db728163",
-                "name": "mcp_servers",
+                "id": "89084be2-0853-4483-9031-c24bdf872c32",
+                "name": "tool_sources",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": []}},
             },
             {

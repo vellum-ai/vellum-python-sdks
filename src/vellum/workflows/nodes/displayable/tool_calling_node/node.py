@@ -19,7 +19,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
 )
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.core import EntityInputsInterface, Tool
+from vellum.workflows.types.core import EntityInputsInterface, Tool, ToolSource
 from vellum.workflows.types.definition import MCPServer
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
@@ -32,7 +32,7 @@ class ToolCallingNode(BaseNode):
         ml_model: str - The model to use for tool calling (e.g., "gpt-4o-mini")
         blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)
         functions: List[Tool] - The functions that can be called
-        mcp_servers: List[MCPServer] - The MCP servers that can be called
+        tool_sources: List[ToolSource] - The tool sources that can be called
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
         parameters: PromptParameters - The parameters for the Prompt
         max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping
@@ -41,7 +41,7 @@ class ToolCallingNode(BaseNode):
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[Union[PromptBlock, Dict[str, Any]]]] = []
     functions: ClassVar[List[Tool]] = []
-    mcp_servers: ClassVar[List[MCPServer]] = []
+    tool_sources: ClassVar[List[ToolSource]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     max_prompt_iterations: ClassVar[Optional[int]] = 5
@@ -138,7 +138,7 @@ class ToolCallingNode(BaseNode):
             ml_model=self.ml_model,
             blocks=self.blocks,
             functions=self.functions,
-            mcp_servers=self.mcp_servers,
+            tool_sources=self.tool_sources,
             prompt_inputs=self.prompt_inputs,
             parameters=self.parameters,
             max_prompt_iterations=self.max_prompt_iterations,
@@ -153,15 +153,16 @@ class ToolCallingNode(BaseNode):
                 tool_router_node=self.tool_router_node,
             )
 
-        for server in self.mcp_servers:
-            tool_definitions = hydrate_mcp_tool_definitions(server)
-            for tool_definition in tool_definitions:
-                function_name = get_function_name(tool_definition)
+        for tool_source in self.tool_sources:
+            if isinstance(tool_source, MCPServer):
+                tool_definitions = hydrate_mcp_tool_definitions(tool_source)
+                for tool_definition in tool_definitions:
+                    function_name = get_function_name(tool_definition)
 
-                self._function_nodes[function_name] = create_function_node(
-                    function=tool_definition,
-                    tool_router_node=self.tool_router_node,
-                )
+                    self._function_nodes[function_name] = create_function_node(
+                        function=tool_definition,
+                        tool_router_node=self.tool_router_node,
+                    )
 
         graph_set = set()
 

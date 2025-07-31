@@ -153,8 +153,8 @@
             }
           },
           {
-            "id": "6708bac8-c995-4134-b925-6267d898736d",
-            "name": "mcp_servers",
+            "id": "4d4d63e1-ad3b-40dc-84d6-e9abde8634c6",
+            "name": "tool_sources",
             "value": {
               "type": "CONSTANT_VALUE",
               "value": {
