@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 
 logger = logging.getLogger(__name__)
@@ -72,6 +73,17 @@ class ComposioService:
 
             response.raise_for_status()
             return response.json()
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 401:
+                raise NodeException(
+                    message="Failed to authorize Composio request. Make sure to define a COMPOSIO_API_KEY",
+                    code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                )
+            else:
+                response_text = e.response.text if e.response else "No response"
+                raise NodeException(
+                    f"Composio API request failed with status {e.response.status_code}: {response_text}"
+                )
         except Exception as e:
             raise NodeException(f"Composio API request failed: {e}")
 
