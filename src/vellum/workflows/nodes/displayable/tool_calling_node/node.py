@@ -25,7 +25,7 @@ from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
-class ToolCallingNode(BaseNode[StateType]):
+class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
     """
     A Node that dynamically invokes the provided functions to the underlying Prompt
 
