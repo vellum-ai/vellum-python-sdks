@@ -21,10 +21,11 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface, Tool, ToolSource
 from vellum.workflows.types.definition import MCPServer
+from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
-class ToolCallingNode(BaseNode):
+class ToolCallingNode(BaseNode[StateType]):
     """
     A Node that dynamically invokes the provided functions to the underlying Prompt
 
