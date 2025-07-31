@@ -12,7 +12,7 @@ from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_tool_router_node, get_function_name
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_tool_router_node, get_function_name, get_mcp_tool_name
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
@@ -77,7 +77,7 @@ def test_get_function_name_mcp_tool_definition():
         parameters={"repository_name": "string", "description": "string"},
     )
 
-    result = get_function_name(mcp_tool)
+    result = get_mcp_tool_name(mcp_tool)
 
     assert result == "github__create_repository"
 
