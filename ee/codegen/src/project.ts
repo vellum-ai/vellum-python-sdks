@@ -416,12 +416,15 @@ ${errors.slice(0, 3).map((err) => {
       );
     }
 
-    const nodesToGenerate = await Promise.all(
+    const nodesToGenerate = await Promise.allSettled(
       this.getOrderedNodes().map(async (nodeData) => {
-        await createNodeContext({
-          workflowContext: this.workflowContext,
-          nodeData,
-        }).catch((error) => {
+        try {
+          await createNodeContext({
+            workflowContext: this.workflowContext,
+            nodeData,
+          });
+          return nodeData;
+        } catch (error) {
           if (error instanceof BaseCodegenError) {
             this.workflowContext.addError(error);
           } else {
@@ -434,8 +437,8 @@ ${errors.slice(0, 3).map((err) => {
               )
             );
           }
-        });
-        return nodeData;
+          throw error;
+        }
       })
     );
 
@@ -443,13 +446,26 @@ ${errors.slice(0, 3).map((err) => {
       workflowContext: this.workflowContext,
     });
 
-    const nodeIds = nodesToGenerate.map((nodeData) => nodeData.id);
+    const successfulNodes = nodesToGenerate
+      .filter((result) => result.status === "fulfilled")
+      .map((result) => result.value);
+    const nodeIds = successfulNodes.map((nodeData) => nodeData.id);
     const nodes = this.generateNodes(nodeIds);
 
     const workflow = codegen.workflow({
       workflowContext: this.workflowContext,
       displayData: this.workflowVersionExecConfig.workflowRawData.displayData,
     });
+
+    if (this.workflowContext.strict) {
+      const errors = this.workflowContext.getErrors();
+      const criticalErrors = errors.filter(
+        (error) => error.severity === "ERROR"
+      );
+      if (criticalErrors.length > 0) {
+        throw criticalErrors[0];
+      }
+    }
 
     return { inputs, workflow, nodes };
   }
