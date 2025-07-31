@@ -51,4 +51,5 @@ class ConditionType(Enum):
 
 
 # Type alias for functions that can be called in tool calling nodes
-Tool = Union[Callable[..., Any], DeploymentDefinition, Type["BaseWorkflow"], ComposioToolDefinition, MCPServer]
+ToolBase = Union[Callable[..., Any], DeploymentDefinition, Type["BaseWorkflow"], ComposioToolDefinition]
+Tool = Union[ToolBase, MCPServer]

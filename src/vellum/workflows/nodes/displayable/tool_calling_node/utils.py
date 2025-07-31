@@ -28,7 +28,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
@@ -397,7 +397,7 @@ def create_tool_router_node(
 
 
 def create_function_node(
-    function: Tool,
+    function: ToolBase,
     tool_router_node: Type[ToolRouterNode],
 ) -> Type[BaseNode]:
     """
@@ -479,7 +479,7 @@ def create_mcp_tool_node(
     return node
 
 
-def get_function_name(function: Union[Tool]) -> str:
+def get_function_name(function: ToolBase) -> str:
     if isinstance(function, DeploymentDefinition):
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
