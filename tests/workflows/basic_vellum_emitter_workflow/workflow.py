@@ -46,7 +46,7 @@ class BasicVellumEmitterWorkflow(BaseWorkflow[BaseInputs, State]):
     """
 
     graph = StartNode >> NextNode
-    emitters = [VellumEmitter]
+    emitters = [VellumEmitter()]
 
     class Outputs(BaseOutputs):
         final_value = NextNode.Outputs.final_value

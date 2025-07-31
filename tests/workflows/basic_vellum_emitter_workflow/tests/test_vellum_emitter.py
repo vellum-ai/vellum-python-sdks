@@ -134,7 +134,7 @@ def test_vellum_emitter_usage_pattern():
 
     # This demonstrates how users would use the VellumEmitter
     class MyWorkflow(BaseWorkflow):
-        emitters = [VellumEmitter]
+        emitters = [VellumEmitter()]
 
     # Verify the emitter is in the class definition
     assert VellumEmitter in MyWorkflow.emitters

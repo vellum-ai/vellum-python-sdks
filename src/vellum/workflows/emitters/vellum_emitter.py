@@ -146,10 +146,10 @@ class VellumEmitter(BaseWorkflowEmitter):
                 base_url = self._client._client_wrapper.get_environment().default
                 response = self._client._client_wrapper.httpx_client.request(
                     method="POST",
-                    url=f"{base_url}/{self._events_endpoint}",  # TODO: will be replaced with the correct url
+                    path=f"{base_url}/{self._events_endpoint}",  # TODO: will be replaced with the correct url
                     json=event_data,
                     headers=self._client._client_wrapper.get_headers(),
-                    timeout=self._timeout,
+                    request_options={"timeout_in_seconds": self._timeout},
                 )
 
                 response.raise_for_status()
@@ -181,7 +181,7 @@ class VellumEmitter(BaseWorkflowEmitter):
                     raise
 
             except httpx.RequestError as e:
-                last_exception = e
+                last_exception: Optional[Exception] = e
                 if attempt < self._max_retries:
                     wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
                     logger.warning(
