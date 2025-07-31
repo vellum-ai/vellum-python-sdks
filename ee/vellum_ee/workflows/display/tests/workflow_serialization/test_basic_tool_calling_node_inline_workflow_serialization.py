@@ -408,11 +408,6 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "89084be2-0853-4483-9031-c24bdf872c32",
-                "name": "tool_sources",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": []}},
-            },
-            {
                 "id": "229cd1ca-dc2f-4586-b933-c4d4966f7bd1",
                 "name": "parameters",
                 "value": {

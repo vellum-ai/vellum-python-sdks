@@ -28,7 +28,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolSource
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 
@@ -281,12 +281,11 @@ def create_tool_router_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
     functions: List[Tool],
-    tool_sources: List[ToolSource],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
 ) -> Type[ToolRouterNode]:
-    if functions and len(functions) > 0 or tool_sources and len(tool_sources) > 0:
+    if functions and len(functions) > 0:
         # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
         prompt_functions: List[Union[Tool, FunctionDefinition]] = []
@@ -315,27 +314,28 @@ def create_tool_router_node(
                         parameters=enhanced_function.parameters,
                     )
                 )
+                # Create port for this function (using original function for get_function_name)
+                function_name = get_function_name(function)
+                port = create_port_condition(function_name)
+                setattr(Ports, function_name, port)
+            elif isinstance(function, MCPServer):
+                tool_functions: List[MCPToolDefinition] = hydrate_mcp_tool_definitions(function)
+                for tool_function in tool_functions:
+                    name = get_mcp_tool_name(tool_function)
+                    prompt_functions.append(
+                        FunctionDefinition(
+                            name=name,
+                            description=tool_function.description,
+                            parameters=tool_function.parameters,
+                        )
+                    )
+                    port = create_port_condition(name)
+                    setattr(Ports, name, port)
             else:
                 prompt_functions.append(function)
-
-            # Create port for this function (using original function for get_function_name)
-            function_name = get_function_name(function)
-            port = create_port_condition(function_name)
-            setattr(Ports, function_name, port)
-
-        for server in tool_sources:
-            tool_functions = hydrate_mcp_tool_definitions(server)
-            for tool_function in tool_functions:
-                name = get_function_name(tool_function)
-                prompt_functions.append(
-                    FunctionDefinition(
-                        name=name,
-                        description=tool_function.description,
-                        parameters=tool_function.parameters,
-                    )
-                )
-                port = create_port_condition(name)
-                setattr(Ports, name, port)
+                function_name = get_function_name(function)
+                port = create_port_condition(function_name)
+                setattr(Ports, function_name, port)
 
         # Add the else port for when no function conditions match
         setattr(Ports, "default", Port.on_else())
@@ -397,7 +397,7 @@ def create_tool_router_node(
 
 
 def create_function_node(
-    function: Tool,
+    function: ToolBase,
     tool_router_node: Type[ToolRouterNode],
 ) -> Type[BaseNode]:
     """
@@ -438,17 +438,6 @@ def create_function_node(
             },
         )
         return node
-    elif isinstance(function, MCPToolDefinition):
-        node = type(
-            f"MCPNode_{function.name}",
-            (MCPNode,),
-            {
-                "mcp_tool": function,
-                "function_call_output": tool_router_node.Outputs.results,
-                "__module__": __name__,
-            },
-        )
-        return node
     elif is_workflow_class(function):
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",
@@ -474,13 +463,31 @@ def create_function_node(
     return node
 
 
-def get_function_name(function: Tool) -> str:
+def create_mcp_tool_node(
+    tool_def: MCPToolDefinition,
+    tool_router_node: Type[ToolRouterNode],
+) -> Type[BaseNode]:
+    node = type(
+        f"MCPNode_{tool_def.name}",
+        (MCPNode,),
+        {
+            "mcp_tool": tool_def,
+            "function_call_output": tool_router_node.Outputs.results,
+            "__module__": __name__,
+        },
+    )
+    return node
+
+
+def get_function_name(function: ToolBase) -> str:
     if isinstance(function, DeploymentDefinition):
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
     elif isinstance(function, ComposioToolDefinition):
         return function.name
-    elif isinstance(function, MCPToolDefinition):
-        return f"{function.server.name}__{function.name}"
     else:
         return snake_case(function.__name__)
+
+
+def get_mcp_tool_name(tool_def: MCPToolDefinition) -> str:
+    return f"{tool_def.server.name}__{tool_def.name}"

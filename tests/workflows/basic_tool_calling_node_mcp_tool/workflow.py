@@ -46,8 +46,7 @@ class CreateRepositoryNode(ToolCallingNode):
             ],
         ),
     ]
-    functions = []
-    tool_sources = [
+    functions = [
         MCPServer(
             name="github",
             url="https://api.githubcopilot.com/mcp/",
