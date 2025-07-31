@@ -2,6 +2,7 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
+import datetime as dt
 from .new_member_join_behavior_enum import NewMemberJoinBehaviorEnum
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
@@ -10,6 +11,7 @@ import pydantic
 class OrganizationRead(UniversalBaseModel):
     id: str
     name: str
+    created: typing.Optional[dt.datetime] = None
     allow_staff_access: typing.Optional[bool] = None
     new_member_join_behavior: NewMemberJoinBehaviorEnum
     limit_config: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None

@@ -27,6 +27,7 @@ class WorkflowsClient:
         id: str,
         *,
         exclude_code: typing.Optional[bool] = None,
+        exclude_display: typing.Optional[bool] = None,
         include_json: typing.Optional[bool] = None,
         include_sandbox: typing.Optional[bool] = None,
         strict: typing.Optional[bool] = None,
@@ -39,6 +40,8 @@ class WorkflowsClient:
             The ID of the Workflow to pull from
 
         exclude_code : typing.Optional[bool]
+
+        exclude_display : typing.Optional[bool]
 
         include_json : typing.Optional[bool]
 
@@ -60,6 +63,7 @@ class WorkflowsClient:
             method="GET",
             params={
                 "exclude_code": exclude_code,
+                "exclude_display": exclude_display,
                 "include_json": include_json,
                 "include_sandbox": include_sandbox,
                 "strict": strict,
@@ -165,6 +169,7 @@ class AsyncWorkflowsClient:
         id: str,
         *,
         exclude_code: typing.Optional[bool] = None,
+        exclude_display: typing.Optional[bool] = None,
         include_json: typing.Optional[bool] = None,
         include_sandbox: typing.Optional[bool] = None,
         strict: typing.Optional[bool] = None,
@@ -177,6 +182,8 @@ class AsyncWorkflowsClient:
             The ID of the Workflow to pull from
 
         exclude_code : typing.Optional[bool]
+
+        exclude_display : typing.Optional[bool]
 
         include_json : typing.Optional[bool]
 
@@ -198,6 +205,7 @@ class AsyncWorkflowsClient:
             method="GET",
             params={
                 "exclude_code": exclude_code,
+                "exclude_display": exclude_display,
                 "include_json": include_json,
                 "include_sandbox": include_sandbox,
                 "strict": strict,

@@ -22,7 +22,7 @@ class DocumentDocumentToDocumentIndex(UniversalBaseModel):
     Vellum-generated ID that uniquely identifies the environment index this document is included in.
     """
 
-    document_index_id: str = pydantic.Field()
+    document_index_id: typing.Optional[str] = pydantic.Field(default=None)
     """
     Vellum-generated ID that uniquely identifies the index this document is included in.
     """
