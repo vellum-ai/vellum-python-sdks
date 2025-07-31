@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 import httpx
 
@@ -137,7 +137,7 @@ class VellumEmitter(BaseWorkflowEmitter):
         Args:
             event_data: The serialized event data to send.
         """
-        last_exception = None
+        last_exception: Optional[Union[httpx.HTTPStatusError, httpx.RequestError]] = None
 
         for attempt in range(self._max_retries + 1):
             try:
