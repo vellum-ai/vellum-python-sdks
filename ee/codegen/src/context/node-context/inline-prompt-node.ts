@@ -64,21 +64,31 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
     const promptVersionData =
       legacyNodeData.sandboxRoutingConfig.promptVersionData;
     if (!promptVersionData) {
-      throw new NodeDefinitionGenerationError(`Prompt version data not found`);
+      throw new NodeDefinitionGenerationError(
+        `Prompt version data not found for LEGACY prompt node`
+      );
     }
 
-    // Dynamically fetch the ML Model's name via API
-    const mlModelName = await this.workflowContext.getMLModelNameById(
-      promptVersionData.mlModelToWorkspaceId
-    );
+    try {
+      // Dynamically fetch the ML Model's name via API
+      const mlModelName = await this.workflowContext.getMLModelNameById(
+        promptVersionData.mlModelToWorkspaceId
+      );
 
-    const inlinePromptNodeData: InlinePromptNodeData = {
-      ...legacyNodeData,
-      variant: "INLINE",
-      mlModelName,
-      execConfig: promptVersionData.execConfig,
-    };
+      const inlinePromptNodeData: InlinePromptNodeData = {
+        ...legacyNodeData,
+        variant: "INLINE",
+        mlModelName,
+        execConfig: promptVersionData.execConfig,
+      };
 
-    this.nodeData = { ...this.nodeData, data: inlinePromptNodeData };
+      this.nodeData = { ...this.nodeData, data: inlinePromptNodeData };
+    } catch (error) {
+      throw new NodeDefinitionGenerationError(
+        `Failed to convert LEGACY prompt node to INLINE: Unable to fetch ML model name for ID ${
+          promptVersionData.mlModelToWorkspaceId
+        }. ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 }

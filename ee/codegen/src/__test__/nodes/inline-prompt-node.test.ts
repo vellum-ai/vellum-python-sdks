@@ -513,4 +513,28 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("LEGACY prompt node API failure handling", () => {
+    it("should handle getMLModelNameById API failure gracefully", async () => {
+      const legacyNodeData = inlinePromptNodeDataLegacyVariantFactory({
+        blockType: "JINJA",
+      });
+
+      workflowContext.getMLModelNameById = vi
+        .fn()
+        .mockRejectedValue(new Error("API call failed: ML model not found"));
+
+      const nodeContext = new InlinePromptNodeContext({
+        workflowContext,
+        nodeData: legacyNodeData as unknown as InlinePromptNode,
+      });
+
+      await expect(nodeContext.buildProperties()).rejects.toThrow(
+        "Failed to convert LEGACY prompt node to INLINE"
+      );
+      await expect(nodeContext.buildProperties()).rejects.toThrow(
+        /ML model name/
+      );
+    });
+  });
 });
