@@ -2,7 +2,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { ValueGenerationError } from "src/generators/errors";
-import { InlinePromptNode, WorkflowDataNode } from "src/types/vellum";
+import { WorkflowDataNode } from "src/types/vellum";
 
 export function isDefined<TValue>(value: TValue | undefined): value is TValue {
   return value !== undefined;
