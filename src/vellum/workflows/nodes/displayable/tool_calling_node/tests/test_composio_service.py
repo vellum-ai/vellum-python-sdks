@@ -125,3 +125,46 @@ class TestComposioCoreService:
             timeout=30,
         )
         assert result == {"items": [], "total": 0}
+
+    def test_execute_tool_with_user_id(self, composio_service, mock_requests, mock_tool_execution_response):
+        """Test executing a tool with user_id parameter"""
+        # GIVEN a user_id and tool arguments
+        user_id = "test_user_123"
+        tool_args = {"param1": "value1"}
+        mock_response = Mock()
+        mock_response.json.return_value = mock_tool_execution_response
+        mock_response.raise_for_status.return_value = None
+        mock_requests.post.return_value = mock_response
+
+        # WHEN we execute a tool with user_id
+        result = composio_service.execute_tool("TEST_TOOL", tool_args, user_id=user_id)
+
+        # THEN the user_id should be included in the request payload
+        mock_requests.post.assert_called_once_with(
+            "https://backend.composio.dev/api/v3/tools/execute/TEST_TOOL",
+            headers={"x-api-key": "test-key", "Content-Type": "application/json"},
+            json={"arguments": tool_args, "user_id": user_id},
+            timeout=30,
+        )
+        assert result == {"items": [], "total": 0}
+
+    def test_execute_tool_without_user_id(self, composio_service, mock_requests, mock_tool_execution_response):
+        """Test executing a tool without user_id parameter maintains backward compatibility"""
+        # GIVEN tool arguments without user_id
+        tool_args = {"param1": "value1"}
+        mock_response = Mock()
+        mock_response.json.return_value = mock_tool_execution_response
+        mock_response.raise_for_status.return_value = None
+        mock_requests.post.return_value = mock_response
+
+        # WHEN we execute a tool without user_id
+        result = composio_service.execute_tool("TEST_TOOL", tool_args)
+
+        # THEN the user_id should NOT be included in the request payload
+        mock_requests.post.assert_called_once_with(
+            "https://backend.composio.dev/api/v3/tools/execute/TEST_TOOL",
+            headers={"x-api-key": "test-key", "Content-Type": "application/json"},
+            json={"arguments": tool_args},
+            timeout=30,
+        )
+        assert result == {"items": [], "total": 0}

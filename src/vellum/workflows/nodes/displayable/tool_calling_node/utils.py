@@ -184,7 +184,9 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         try:
             # Execute using ComposioService
             composio_service = ComposioService()
-            result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
+            result = composio_service.execute_tool(
+                tool_name=self.composio_tool.action, arguments=arguments, user_id=self.composio_tool.user_id
+            )
         except Exception as e:
             raise NodeException(
                 message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
