@@ -53,13 +53,3 @@ export function hasErrorOutput(
     "errorOutputId" in node.data
   );
 }
-
-export function isInlinePromptNode(
-  nodeData: WorkflowDataNode
-): nodeData is InlinePromptNode {
-  return (
-    nodeData.type === "PROMPT" &&
-    "data" in nodeData &&
-    nodeData.data.variant === "INLINE"
-  );
-}

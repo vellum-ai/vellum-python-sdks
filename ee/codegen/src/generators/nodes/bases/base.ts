@@ -101,7 +101,7 @@ export abstract class BaseNode<
 
   // Override to provide additional statements that should be included in the node file
   // before the node class definition.
-  public getAdditionalFileStatements(): AstNode[] {
+  public getPrefixedFileStatements(): AstNode[] {
     return [];
   }
 
@@ -838,7 +838,7 @@ class NodeImplementationFile<
   }
 
   protected getFileStatements(): AstNode[] {
-    const additionalStatements = this.node.getAdditionalFileStatements();
+    const additionalStatements = this.node.getPrefixedFileStatements();
     return [...additionalStatements, this.node.generateNodeClass()];
   }
 

@@ -323,7 +323,7 @@ export class InlinePromptNode extends BaseNode<
     return this.nodeData.data.errorOutputId;
   }
 
-  public getAdditionalFileStatements(): AstNode[] {
+  public getPrefixedFileStatements(): AstNode[] {
     const statements: AstNode[] = [];
     const functions = getCallableFunctions(this.nodeData);
 
@@ -344,6 +344,7 @@ export class InlinePromptNode extends BaseNode<
   ): AstNode[] {
     const statements: AstNode[] = [];
 
+    // Check for code execution functions first
     if (
       functionsAttribute &&
       functionsAttribute.value?.type === "CONSTANT_VALUE" &&
@@ -374,9 +375,12 @@ export class InlinePromptNode extends BaseNode<
             ),
           })
         );
+
+        return statements;
       }
     }
 
+    // Handle non-code execution functions
     if (
       functionsAttribute &&
       !this.isAttributeDefault(functionsAttribute.value, { defaultValue: null })
