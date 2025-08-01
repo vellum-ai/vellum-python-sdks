@@ -240,7 +240,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     args.push(
                       python.methodArgument({
                         name: "user_id",
-                        value: python.TypeInstantiation.str(composioTool.user_id),
+                        value: python.TypeInstantiation.str(
+                          composioTool.user_id
+                        ),
                       })
                     );
                   }
