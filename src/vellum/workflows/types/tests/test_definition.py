@@ -39,7 +39,10 @@ def test_deployment_definition(deployment_value, expected_deployment_id, expecte
 def test_composio_tool_definition_creation():
     """Test that ComposioToolDefinition can be created with required fields."""
     composio_tool = ComposioToolDefinition(
-        toolkit="GITHUB", action="GITHUB_CREATE_AN_ISSUE", description="Create a new issue in a GitHub repository"
+        toolkit="GITHUB",
+        action="GITHUB_CREATE_AN_ISSUE",
+        description="Create a new issue in a GitHub repository",
+        user_id=None,
     )
 
     assert composio_tool.toolkit == "GITHUB"

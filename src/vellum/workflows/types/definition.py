@@ -116,6 +116,7 @@ class ComposioToolDefinition(UniversalBaseModel):
     parameters: Optional[Dict[str, Any]] = None
     version: Optional[str] = None
     tags: Optional[List[str]] = None
+    user_id: Optional[str] = None
 
     @property
     def name(self) -> str:

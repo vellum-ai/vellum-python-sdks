@@ -97,7 +97,7 @@ def test_get_function_name_composio_tool_definition_various_toolkits(
     toolkit: str, action: str, description: str, expected_result: str
 ):
     """Test ComposioToolDefinition function name generation with various toolkits."""
-    composio_tool = ComposioToolDefinition(toolkit=toolkit, action=action, description=description)
+    composio_tool = ComposioToolDefinition(toolkit=toolkit, action=action, description=description, user_id=None)
 
     result = get_function_name(composio_tool)
 

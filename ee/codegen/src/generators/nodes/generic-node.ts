@@ -236,6 +236,13 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     );
                   }
 
+                  args.push(
+                    python.methodArgument({
+                      name: "user_id",
+                      value: python.TypeInstantiation.none(),
+                    })
+                  );
+
                   functionReferences.push(
                     python.instantiateClass({
                       classReference: python.reference({
