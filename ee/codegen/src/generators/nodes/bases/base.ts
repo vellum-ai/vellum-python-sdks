@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { isNil } from "lodash";
 
 import * as codegen from "src/codegen";
 import {
@@ -30,13 +31,15 @@ import { WorkflowValueDescriptor } from "src/generators/workflow-value-descripto
 import { WorkflowProjectGenerator } from "src/project";
 import {
   AdornmentNode,
+  FunctionArgs,
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
+import { getCallableFunctions } from "src/utils/nodes";
 import { doesModulePathStartWith } from "src/utils/paths";
-import { isNilOrEmpty } from "src/utils/typing";
+import { isInlinePromptNode, isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -832,7 +835,19 @@ class NodeImplementationFile<
   }
 
   protected getFileStatements(): AstNode[] {
-    return [this.node.generateNodeClass()];
+    const statements: AstNode[] = [];
+    // This is to generate functions in the same file as inline prompt node if present
+    if (isInlinePromptNode(this.node.nodeData)) {
+      const functions = getCallableFunctions(this.node.nodeData);
+      if (!isNilOrEmpty(functions)) {
+        functions?.forEach((f) => {
+          if (f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)) {
+            statements.push(python.codeBlock(f.src));
+          }
+        });
+      }
+    }
+    return [...statements, this.node.generateNodeClass()];
   }
 
   public async persist(): Promise<void> {

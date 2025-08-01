@@ -2,7 +2,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { ValueGenerationError } from "src/generators/errors";
-import { WorkflowDataNode } from "src/types/vellum";
+import { InlinePromptNode, WorkflowDataNode } from "src/types/vellum";
 
 export function isDefined<TValue>(value: TValue | undefined): value is TValue {
   return value !== undefined;
@@ -51,5 +51,15 @@ export function hasErrorOutput(
     "data" in node &&
     node.data &&
     "errorOutputId" in node.data
+  );
+}
+
+export function isInlinePromptNode(
+  nodeData: WorkflowDataNode
+): nodeData is InlinePromptNode {
+  return (
+    nodeData.type === "PROMPT" &&
+    "data" in nodeData &&
+    nodeData.data.variant === "INLINE"
   );
 }

@@ -1,6 +1,10 @@
 import { VellumError } from "vellum-ai/errors";
 
-import { WorkflowNode } from "src/types/vellum";
+import {
+  WorkflowDataNode,
+  WorkflowNode,
+  ToolArgs as FunctionsType,
+} from "src/types/vellum";
 
 export function getNodeLabel(nodeData: WorkflowNode): string {
   switch (nodeData.type) {
@@ -25,4 +29,23 @@ export function isVellumErrorWithDetail(
     "detail" in error.body &&
     typeof error.body.detail === "string"
   );
+}
+
+export function getCallableFunctions(
+  nodeData: WorkflowDataNode
+): FunctionsType | undefined {
+  const functionsAttribute = nodeData.attributes?.find(
+    (attr) => attr.name === "functions"
+  );
+
+  if (
+    functionsAttribute?.value?.type === "CONSTANT_VALUE" &&
+    functionsAttribute.value.value?.type === "JSON" &&
+    Array.isArray(functionsAttribute.value.value.value) &&
+    functionsAttribute.value.value.value.length > 0
+  ) {
+    return functionsAttribute.value.value.value as FunctionsType;
+  }
+
+  return undefined;
 }

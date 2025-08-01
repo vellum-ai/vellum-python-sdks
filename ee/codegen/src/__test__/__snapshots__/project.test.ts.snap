@@ -1,5 +1,69 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`WorkflowProjectGenerator > Get inline prompt node files > should generate the function at top level of node file > inline_prompt_test/nodes/inline_prompt_node.py 1`] = `
+"from vellum import JinjaPromptBlock, PromptParameters
+from vellum.workflows.nodes.displayable import InlinePromptNode as BaseInlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
+
+
+def my_test_function(arg1: str, arg2: str) -> str:
+    """Processes input data and returns formatted output"""
+    return f"arg1: {arg1}, arg2: {arg2}"
+
+
+class InlinePromptNode(BaseInlinePromptNode):
+    ml_model = "gpt-4"
+    blocks = [
+        JinjaPromptBlock(template="""Hello world"""),
+    ]
+    functions = [
+        {
+            "type": "CODE_EXECUTION",
+            "name": "my_test_function",
+            "description": "Some sample test function",
+            "src": 'def my_test_function(arg1: str, arg2: str) -> str:\\n    """Processes input data and returns formatted output"""\\n    return f"arg1: {arg1}, arg2: {arg2}"',
+            "definition": {
+                "name": "my_test_function",
+                "description": "Some sample test function",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "arg1",
+                        "arg2",
+                    ],
+                    "properties": {
+                        "arg1": {
+                            "type": "string",
+                        },
+                        "arg2": {
+                            "type": "string",
+                        },
+                    },
+                },
+                "state": None,
+                "cache_config": None,
+                "forced": None,
+                "strict": None,
+            },
+        },
+    ]
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0.7,
+        max_tokens=None,
+        top_p=None,
+        top_k=None,
+        frequency_penalty=None,
+        presence_penalty=None,
+        logit_bias=None,
+        custom_parameters=None,
+    )
+
+    class NodeTrigger(BaseInlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+"
+`;
+
 exports[`WorkflowProjectGenerator > LEGACY prompt node codegen > should properly handle legacy prompt node even if ml model name is not found > code/nodes/legacy_prompt_node.py 1`] = `
 "from vellum import ChatMessagePromptBlock, JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
