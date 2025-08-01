@@ -126,7 +126,7 @@ class ToolCallingNode(BaseToolCallingNode):
 
 exports[`ToolCallingNode > function ordering > should preserve order: code-exec, workflow 1`] = `
 "from .add_numbers import add_numbers
-from .subtract.workflow import Subtract
+from .subtract_workflow.workflow import SubtractWorkflow
 
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
@@ -134,13 +134,13 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
 
 
 class ToolCallingNode(BaseToolCallingNode):
-    functions = [add_numbers, Subtract]
+    functions = [add_numbers, SubtractWorkflow]
 "
 `;
 
 exports[`ToolCallingNode > function ordering > should preserve order: workflow, code-exec 1`] = `
 "from .add_numbers import add_numbers
-from .subtract.workflow import Subtract
+from .subtract_workflow.workflow import SubtractWorkflow
 
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
@@ -148,7 +148,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
 
 
 class ToolCallingNode(BaseToolCallingNode):
-    functions = [Subtract, add_numbers]
+    functions = [SubtractWorkflow, add_numbers]
 "
 `;
 
@@ -235,6 +235,6 @@ from vellum.workflows.types.definition import DeploymentDefinition
 
 
 class ToolCallingNode(BaseToolCallingNode):
-    functions = [DeploymentDefinition(deployment="workflow_deployment_function_name")]
+    functions = [DeploymentDefinition(deployment="deployment_1")]
 "
 `;
