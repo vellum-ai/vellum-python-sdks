@@ -124,18 +124,6 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
-exports[`ToolCallingNode > deployment workflow > should generate latest release tag if release_tag is null 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
-from vellum.workflows.types.definition import DeploymentDefinition
-
-
-class ToolCallingNode(BaseToolCallingNode):
-    functions = [DeploymentDefinition(deployment="deployment_workflow_function_name")]
-"
-`;
-
 exports[`ToolCallingNode > function ordering > should preserve order: code-exec, workflow 1`] = `
 "from .add_numbers import add_numbers
 from .subtract.workflow import Subtract
@@ -236,5 +224,14 @@ class ToolCallingNode(BaseToolCallingNode):
             ),
         )
     ]
+exports[`ToolCallingNode > workflow deployment > should generate latest release tag if release_tag is null 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.types.definition import DeploymentDefinition
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [DeploymentDefinition(deployment="workflow_deployment_function_name")]
 "
 `;
