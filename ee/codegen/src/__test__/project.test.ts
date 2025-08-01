@@ -6,6 +6,7 @@ import { difference } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
+import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { expect, vi } from "vitest";
 

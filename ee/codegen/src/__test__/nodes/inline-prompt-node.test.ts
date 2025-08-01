@@ -513,36 +513,4 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
-
-  describe("LEGACY prompt node API failure handling", () => {
-    it("should handle getMLModelNameById API failure gracefully", async () => {
-      const legacyNodeData = inlinePromptNodeDataLegacyVariantFactory({
-        blockType: "JINJA",
-      });
-
-      const workflowContext1 = workflowContextFactory();
-      workflowContext1.getMLModelNameById = vi
-        .fn()
-        .mockRejectedValue(new Error("API call failed: ML model not found"));
-
-      await expect(
-        createNodeContext({
-          workflowContext: workflowContext1,
-          nodeData: legacyNodeData,
-        })
-      ).rejects.toThrow("Failed to convert LEGACY prompt node to INLINE");
-
-      const workflowContext2 = workflowContextFactory();
-      workflowContext2.getMLModelNameById = vi
-        .fn()
-        .mockRejectedValue(new Error("API call failed: ML model not found"));
-
-      await expect(
-        createNodeContext({
-          workflowContext: workflowContext2,
-          nodeData: legacyNodeData,
-        })
-      ).rejects.toThrow(/ML model name/);
-    });
-  });
 });
