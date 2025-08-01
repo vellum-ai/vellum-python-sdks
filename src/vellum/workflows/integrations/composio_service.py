@@ -147,7 +147,7 @@ class ComposioService:
             The result of the tool execution
         """
         endpoint = f"/tools/execute/{tool_name}"
-        json_data = {"arguments": arguments}
+        json_data: Dict[str, Any] = {"arguments": arguments}
         if user_id is not None:
             json_data["user_id"] = user_id
         response = self._make_request(endpoint, method="POST", json_data=json_data)
