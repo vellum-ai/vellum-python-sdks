@@ -211,3 +211,25 @@ def test_tool_calling_node_with_user_provided_chat_history_block(vellum_adhoc_pr
     ]
     assert len(chat_history_inputs) == 1
     assert chat_history_inputs[0].value == [ChatMessage(role="USER", text="Hello from user")]
+
+
+def test_tool_calling_node_with_generic_type_parameter():
+    # GIVEN a custom state class
+    class State(BaseState):
+        pass
+
+    # AND a ToolCallingNode that uses the generic type parameter
+    class TestToolCallingNode(ToolCallingNode[State]):
+        ml_model = "gpt-4o-mini"
+        blocks = []
+        functions = [first_function]
+        max_prompt_iterations = 1
+
+    # WHEN we create an instance of the node
+    state = State()
+    node = TestToolCallingNode(state=state)
+
+    # THEN the node should be created successfully
+    assert node is not None
+    assert isinstance(node, TestToolCallingNode)
+    assert node.state == state

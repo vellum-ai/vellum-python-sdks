@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Iterator, List, Optional, Set, Union
+from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.prompt_parameters import PromptParameters
@@ -23,10 +23,11 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface, Tool
 from vellum.workflows.types.definition import MCPServer
+from vellum.workflows.types.generics import StateType
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
-class ToolCallingNode(BaseNode):
+class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
     """
     A Node that dynamically invokes the provided functions to the underlying Prompt
 
