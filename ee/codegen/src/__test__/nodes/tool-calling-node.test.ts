@@ -183,13 +183,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...composioToolFunction,
-            id: "composio-tool-function-id",
-            name: "github_create_an_issue",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [composioToolFunction],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -234,12 +234,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...composioToolFunction,
-            id: "composio-tool-function-id",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [composioToolFunction],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -372,18 +373,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...codeExecutionFunction,
-            id: "code-exec-function-id",
-            name: "add_numbers",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [codeExecutionFunction, inlineWorkflowFunction],
           },
-          {
-            ...inlineWorkflowFunction,
-            id: "workflow-function-id",
-            name: "subtract",
-          },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -415,18 +411,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...inlineWorkflowFunction,
-            id: "workflow-function-id",
-            name: "subtract",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [inlineWorkflowFunction, codeExecutionFunction],
           },
-          {
-            ...codeExecutionFunction,
-            id: "code-exec-function-id",
-            name: "add_numbers",
-          },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -477,13 +468,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...functions,
-            id: "workflow-function-id",
-            name: "subtract",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [functions],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -525,13 +516,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...deploymentWorkflowFunction,
-            id: "deployment-workflow-function-id",
-            name: "deployment-workflow-function-name",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [deploymentWorkflowFunction],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
