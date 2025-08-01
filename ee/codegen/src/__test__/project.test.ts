@@ -626,7 +626,7 @@ describe("WorkflowProjectGenerator", () => {
       let callCount = 0;
       const originalCreateNodeContext = contextModule.createNodeContext;
 
-      const mockCreateNodeContext = vi.fn().mockImplementation(async (args) => {
+      const mockCreateNodeContext = vi.fn().mockImplementation((args) => {
         callCount++;
         if (callCount === 2) {
           throw new Error("Mocked createNodeContext failure");
