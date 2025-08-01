@@ -16,6 +16,7 @@ class InlinePromptNode(BaseInlinePromptNode):
     blocks = [
         JinjaPromptBlock(template="""Hello world"""),
     ]
+    functions = [my_test_function]
     functions = [
         {
             "type": "CODE_EXECUTION",

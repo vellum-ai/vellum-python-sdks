@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { isNil } from "lodash";
 
 import * as codegen from "src/codegen";
 import {
@@ -31,15 +30,13 @@ import { WorkflowValueDescriptor } from "src/generators/workflow-value-descripto
 import { WorkflowProjectGenerator } from "src/project";
 import {
   AdornmentNode,
-  FunctionArgs,
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
-import { getCallableFunctions } from "src/utils/nodes";
 import { doesModulePathStartWith } from "src/utils/paths";
-import { isInlinePromptNode, isNilOrEmpty } from "src/utils/typing";
+import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -101,6 +98,12 @@ export abstract class BaseNode<
   // the error_output_id from this.nodeData. If returned, a @TryNode decorator will be
   // added to the node class.
   protected abstract getErrorOutputId(): string | undefined;
+
+  // Override to provide additional statements that should be included in the node file
+  // before the node class definition.
+  public getAdditionalFileStatements(): AstNode[] {
+    return [];
+  }
 
   // Override if the node implementation's base class needs to include generic types
   protected getNodeBaseGenericTypes(): AstNode[] | undefined {
@@ -835,19 +838,8 @@ class NodeImplementationFile<
   }
 
   protected getFileStatements(): AstNode[] {
-    const statements: AstNode[] = [];
-    // This is to generate functions in the same file as inline prompt node if present
-    if (isInlinePromptNode(this.node.nodeData)) {
-      const functions = getCallableFunctions(this.node.nodeData);
-      if (!isNilOrEmpty(functions)) {
-        functions?.forEach((f) => {
-          if (f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)) {
-            statements.push(python.codeBlock(f.src));
-          }
-        });
-      }
-    }
-    return [...statements, this.node.generateNodeClass()];
+    const additionalStatements = this.node.getAdditionalFileStatements();
+    return [...additionalStatements, this.node.generateNodeClass()];
   }
 
   public async persist(): Promise<void> {
