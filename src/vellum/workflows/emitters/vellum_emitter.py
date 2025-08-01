@@ -1,20 +1,19 @@
 import logging
 import time
-from typing import Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 import httpx
 
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
-from vellum.workflows.events.types import default_datetime_factory, default_serializer
+from vellum.workflows.events.types import default_serializer
 from vellum.workflows.events.workflow import WorkflowEvent
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.vellum_client import create_vellum_client
+
+# To protect against circular imports
+if TYPE_CHECKING:
+    from vellum.workflows.state.context import WorkflowContext
 
 logger = logging.getLogger(__name__)
-
-# Event type constants
-WORKFLOW_EVENT_TYPE = "workflow.event"
-WORKFLOW_STATE_SNAPSHOTTED_TYPE = "workflow.state.snapshotted"
 
 
 class VellumEmitter(BaseWorkflowEmitter):
@@ -26,42 +25,37 @@ class VellumEmitter(BaseWorkflowEmitter):
         class MyWorkflow(BaseWorkflow):
             emitters = [VellumEmitter]
 
-    Configuration:
-        - VELLUM_API_KEY: Environment variable for authentication
-        - Or pass api_key explicitly to constructor
+    The emitter will automatically use the same Vellum client configuration
+    as the workflow it's attached to.
     """
 
     def __init__(
         self,
         *,
-        api_key: Optional[str] = None,
-        api_url: Optional[str] = None,
         timeout: Optional[float] = 30.0,
         max_retries: int = 3,
-        enabled: bool = True,
     ):
         """
         Initialize the VellumEmitter.
 
         Args:
-            api_key: Vellum API key. If None, uses VELLUM_API_KEY environment variable.
-            api_url: Custom API URL. If None, uses default Vellum environment.
             timeout: Request timeout in seconds.
             max_retries: Maximum number of retry attempts for failed requests.
-            enabled: Whether emitting is enabled. Useful for development/testing.
         """
-        self._enabled = enabled
-        if not self._enabled:
-            return
+        self._context: Optional["WorkflowContext"] = None
+        self._timeout = timeout
+        self._max_retries = max_retries
+        self._events_endpoint = "events"  # TODO: make this configurable with the correct url
 
-        try:
-            self._client = create_vellum_client(api_key=api_key, api_url=api_url)
-            self._timeout = timeout
-            self._max_retries = max_retries
-            self._events_endpoint = "events"  # TODO: make this configurable with the correct url
-        except Exception as e:
-            logger.exception(f"Failed to initialize VellumEmitter: {e}. Events will not be emitted.")
-            self._enabled = False
+    # For now the user will need to register workflow context with the emitter via dependency injection
+    def register_context(self, context: "WorkflowContext") -> None:
+        """
+        Register the workflow context with this emitter.
+
+        Args:
+            context: The workflow context containing shared resources like vellum_client.
+        """
+        self._context = context
 
     def emit_event(self, event: WorkflowEvent) -> None:
         """
@@ -70,11 +64,11 @@ class VellumEmitter(BaseWorkflowEmitter):
         Args:
             event: The workflow event to emit.
         """
-        if not self._enabled:
+        if not self._context:
             return
 
         try:
-            event_data = self._serialize_event(event)
+            event_data = default_serializer(event)
 
             self._send_event(event_data)
 
@@ -88,51 +82,7 @@ class VellumEmitter(BaseWorkflowEmitter):
         Args:
             state: The workflow state to snapshot.
         """
-        if not self._enabled:
-            return
-
-        try:
-            state_data = self._serialize_state(state)
-
-            # Send the state snapshot as an event
-            event_data = {
-                "type": WORKFLOW_STATE_SNAPSHOTTED_TYPE,
-                "data": state_data,
-                "timestamp": default_serializer(default_datetime_factory()),
-            }
-
-            self._send_event(event_data)
-
-        except Exception as e:
-            logger.exception(f"Failed to snapshot state: {e}")
-
-    def _serialize_event(self, event: WorkflowEvent) -> Dict[str, Any]:
-        """
-        Serialize a workflow event for transmission to Vellum.
-
-        Args:
-            event: The event to serialize.
-
-        Returns:
-            Serialized event data.
-        """
-        # Use the same serialization approach as the rest of the system
-        return {
-            "type": WORKFLOW_EVENT_TYPE,
-            "data": default_serializer(event),
-        }
-
-    def _serialize_state(self, state: BaseState) -> Dict[str, Any]:
-        """
-        Serialize a workflow state for transmission to Vellum.
-
-        Args:
-            state: The state to serialize.
-
-        Returns:
-            Serialized state data.
-        """
-        return default_serializer(state)
+        pass
 
     def _send_event(self, event_data: Dict[str, Any]) -> None:
         """
@@ -141,18 +91,23 @@ class VellumEmitter(BaseWorkflowEmitter):
         Args:
             event_data: The serialized event data to send.
         """
+        if not self._context:
+            logger.warning("Cannot send event: No workflow context registered")
+            return
+
+        client = self._context.vellum_client
         last_exception: Optional[Union[httpx.HTTPStatusError, httpx.RequestError]] = None
 
         for attempt in range(self._max_retries + 1):
             try:
                 # Use the Vellum client's underlying HTTP client to make the request
                 # For proper authentication headers and configuration
-                base_url = self._client._client_wrapper.get_environment().default
-                response = self._client._client_wrapper.httpx_client.request(
+                base_url = client._client_wrapper.get_environment().default
+                response = client._client_wrapper.httpx_client.request(
                     method="POST",
                     path=f"{base_url}/{self._events_endpoint}",  # TODO: will be replaced with the correct url
                     json=event_data,
-                    headers=self._client._client_wrapper.get_headers(),
+                    headers=client._client_wrapper.get_headers(),
                     request_options={"timeout_in_seconds": self._timeout},
                 )
 
@@ -175,13 +130,13 @@ class VellumEmitter(BaseWorkflowEmitter):
                         time.sleep(wait_time)
                         continue
                     else:
-                        logger.error(
+                        logger.exception(
                             f"Server error emitting event after {self._max_retries + 1} attempts: "
                             f"{e.response.status_code} {e.response.text}"
                         )
                 else:
                     # Client errors (4xx) are not retriable
-                    logger.error(f"Client error emitting event: {e.response.status_code} {e.response.text}")
+                    logger.exception(f"Client error emitting event: {e.response.status_code} {e.response.text}")
                     raise
 
             except httpx.RequestError as e:
@@ -195,7 +150,7 @@ class VellumEmitter(BaseWorkflowEmitter):
                     time.sleep(wait_time)
                     continue
                 else:
-                    logger.error(f"Network error emitting event after {self._max_retries + 1} attempts: {e}")
+                    logger.exception(f"Network error emitting event after {self._max_retries + 1} attempts: {e}")
 
         if last_exception:
             raise last_exception

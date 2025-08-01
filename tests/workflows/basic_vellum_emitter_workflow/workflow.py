@@ -67,7 +67,6 @@ class CustomVellumEmitterWorkflow(BaseWorkflow[BaseInputs, State]):
         VellumEmitter(
             timeout=60.0,  # Custom timeout for API requests
             max_retries=5,  # More aggressive retry policy
-            enabled=True,  # Explicitly enable (useful for conditional logic)
         )
     ]
 
@@ -86,7 +85,7 @@ class DisabledVellumEmitterWorkflow(BaseWorkflow[BaseInputs, State]):
     graph = StartNode >> NextNode
 
     # Disabled VellumEmitter - no events will be sent
-    emitters = [VellumEmitter(enabled=False)]
+    emitters = [VellumEmitter()]
 
     class Outputs(BaseOutputs):
         final_value = NextNode.Outputs.final_value
