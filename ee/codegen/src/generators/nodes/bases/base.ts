@@ -99,6 +99,12 @@ export abstract class BaseNode<
   // added to the node class.
   protected abstract getErrorOutputId(): string | undefined;
 
+  // Override to provide additional statements that should be included in the node file
+  // before the node class definition.
+  public getPrefixedFileStatements(): AstNode[] {
+    return [];
+  }
+
   // Override if the node implementation's base class needs to include generic types
   protected getNodeBaseGenericTypes(): AstNode[] | undefined {
     const [firstStateVariableContext] = Array.from(
@@ -832,7 +838,8 @@ class NodeImplementationFile<
   }
 
   protected getFileStatements(): AstNode[] {
-    return [this.node.generateNodeClass()];
+    const additionalStatements = this.node.getPrefixedFileStatements();
+    return [...additionalStatements, this.node.generateNodeClass()];
   }
 
   public async persist(): Promise<void> {

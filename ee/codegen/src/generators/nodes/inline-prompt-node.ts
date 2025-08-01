@@ -18,7 +18,10 @@ import {
   PlainTextPromptTemplateBlock,
   FunctionArgs,
   ToolArgs as FunctionsType,
+  NodeAttribute,
 } from "src/types/vellum";
+import { toPythonSafeSnakeCase } from "src/utils/casing";
+import { getCallableFunctions } from "src/utils/nodes";
 import { isNilOrEmpty } from "src/utils/typing";
 
 const INPUTS_PREFIX = "prompt_inputs";
@@ -141,58 +144,12 @@ export class InlinePromptNode extends BaseNode<
       (attr) => attr.name === "functions"
     );
 
-    if (
-      functionsAttribute &&
-      !this.isAttributeDefault(functionsAttribute.value, { defaultValue: null })
-    ) {
-      statements.push(
-        python.field({
-          name: "functions",
-          initializer: new WorkflowValueDescriptor({
-            nodeContext: this.nodeContext,
-            workflowContext: this.workflowContext,
-            workflowValueDescriptor: functionsAttribute.value,
-          }),
-        })
-      );
-    } else if (functionDefinitions.length > 0) {
-      statements.push(
-        python.field({
-          name: "functions",
-          initializer: python.TypeInstantiation.list(
-            functionDefinitions.map(
-              (functionDefinition) =>
-                new FunctionDefinition({ functionDefinition })
-            ),
-            {
-              endWithComma: true,
-            }
-          ),
-        })
-      );
-    }
-
-    // Move the code execution detection logic here
-    if (
-      functionsAttribute &&
-      functionsAttribute.value?.type === "CONSTANT_VALUE" &&
-      functionsAttribute.value.value?.type === "JSON" &&
-      Array.isArray(functionsAttribute.value.value.value)
-    ) {
-      const functions: FunctionsType = functionsAttribute.value.value.value;
-
-      const hasCodeExecutionFunctions = functions.some(
-        (f) => f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)
-      );
-
-      if (hasCodeExecutionFunctions) {
-        const modulePath = this.nodeContext.nodeModulePath;
-        const fileName = modulePath[modulePath.length - 1] + ".py";
-        const relativePath = `nodes/${fileName}`;
-
-        this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
-      }
-    }
+    statements.push(
+      ...this.getFunctionsFieldStatements(
+        functionsAttribute,
+        functionDefinitions
+      )
+    );
 
     statements.push(
       python.field({
@@ -364,5 +321,97 @@ export class InlinePromptNode extends BaseNode<
 
   protected getErrorOutputId(): string | undefined {
     return this.nodeData.data.errorOutputId;
+  }
+
+  public getPrefixedFileStatements(): AstNode[] {
+    const statements: AstNode[] = [];
+    const functions = getCallableFunctions(this.nodeData);
+
+    if (!isNilOrEmpty(functions)) {
+      functions?.forEach((f) => {
+        if (f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)) {
+          statements.push(python.codeBlock(f.src));
+        }
+      });
+    }
+
+    return statements;
+  }
+
+  private getFunctionsFieldStatements(
+    functionsAttribute: NodeAttribute | undefined,
+    functionDefinitions: FunctionDefinitionPromptTemplateBlock[]
+  ): AstNode[] {
+    const statements: AstNode[] = [];
+
+    // Check for code execution functions first
+    if (
+      functionsAttribute &&
+      functionsAttribute.value?.type === "CONSTANT_VALUE" &&
+      functionsAttribute.value.value?.type === "JSON" &&
+      Array.isArray(functionsAttribute.value.value.value)
+    ) {
+      const functions: FunctionsType = functionsAttribute.value.value.value;
+
+      const codeExecutionFunctions = functions.filter(
+        (f) => f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)
+      );
+
+      if (codeExecutionFunctions.length > 0) {
+        const modulePath = this.nodeContext.nodeModulePath;
+        const fileName = modulePath[modulePath.length - 1] + ".py";
+        const relativePath = `nodes/${fileName}`;
+
+        this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+
+        statements.push(
+          python.field({
+            name: "functions",
+            initializer: python.TypeInstantiation.list(
+              codeExecutionFunctions.map((f) => {
+                const funcName = toPythonSafeSnakeCase(f.name);
+                return python.codeBlock(funcName);
+              })
+            ),
+          })
+        );
+
+        return statements;
+      }
+    }
+
+    // Handle non-code execution functions
+    if (
+      functionsAttribute &&
+      !this.isAttributeDefault(functionsAttribute.value, { defaultValue: null })
+    ) {
+      statements.push(
+        python.field({
+          name: "functions",
+          initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+            workflowValueDescriptor: functionsAttribute.value,
+          }),
+        })
+      );
+    } else if (functionDefinitions.length > 0) {
+      statements.push(
+        python.field({
+          name: "functions",
+          initializer: python.TypeInstantiation.list(
+            functionDefinitions.map(
+              (functionDefinition) =>
+                new FunctionDefinition({ functionDefinition })
+            ),
+            {
+              endWithComma: true,
+            }
+          ),
+        })
+      );
+    }
+
+    return statements;
   }
 }
