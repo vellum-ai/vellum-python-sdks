@@ -416,7 +416,7 @@ ${errors.slice(0, 3).map((err) => {
       );
     }
 
-    const nodesToGenerate = await Promise.allSettled(
+    const nodesToGenerate = await Promise.all(
       this.getOrderedNodes().map(async (nodeData) => {
         try {
           await createNodeContext({
@@ -437,7 +437,7 @@ ${errors.slice(0, 3).map((err) => {
               )
             );
           }
-          throw error;
+          return null;
         }
       })
     );
@@ -446,9 +446,9 @@ ${errors.slice(0, 3).map((err) => {
       workflowContext: this.workflowContext,
     });
 
-    const successfulNodes = nodesToGenerate
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => result.value);
+    const successfulNodes = nodesToGenerate.filter(
+      (nodeData) => nodeData !== null
+    );
     const nodeIds = successfulNodes.map((nodeData) => nodeData.id);
     const nodes = this.generateNodes(nodeIds);
 
@@ -456,16 +456,6 @@ ${errors.slice(0, 3).map((err) => {
       workflowContext: this.workflowContext,
       displayData: this.workflowVersionExecConfig.workflowRawData.displayData,
     });
-
-    if (this.workflowContext.strict) {
-      const errors = this.workflowContext.getErrors();
-      const criticalErrors = errors.filter(
-        (error) => error.severity === "ERROR"
-      );
-      if (criticalErrors.length > 0) {
-        throw criticalErrors[0];
-      }
-    }
 
     return { inputs, workflow, nodes };
   }
