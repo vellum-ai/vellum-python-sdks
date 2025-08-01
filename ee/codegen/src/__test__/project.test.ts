@@ -513,6 +513,154 @@ describe("WorkflowProjectGenerator", () => {
       expectProjectFileToExist(["code", "workflow.py"]);
       expectProjectFileToMatchSnapshot(["code", "nodes", "bad_node.py"]);
     });
+
+    it("should generate code even if createNodeContext throws an error for one node", async () => {
+      /**
+       * Tests that workflow generation continues even when createNodeContext fails for individual nodes.
+       * This reproduces the issue where a single node failure would cause entire workflow failure.
+       */
+
+      // GIVEN a workflow with two templating nodes
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "templating-node-1",
+              type: "TEMPLATING",
+              data: {
+                label: "First Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source_1",
+                target_handle_id: "template_target_1",
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello World",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            {
+              id: "templating-node-2",
+              type: "TEMPLATING",
+              data: {
+                label: "Second Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source_2",
+                target_handle_id: "template_target_2",
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello Again",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "templating-node-1",
+              target_handle_id: "template_target_1",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+            {
+              source_node_id: "templating-node-1",
+              source_handle_id: "template_source_1",
+              target_node_id: "templating-node-2",
+              target_handle_id: "template_target_2",
+              type: "DEFAULT",
+              id: "edge_2",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      const contextModule = await import("src/context");
+      let callCount = 0;
+      const originalCreateNodeContext = contextModule.createNodeContext;
+
+      const mockCreateNodeContext = vi.fn().mockImplementation((args) => {
+        callCount++;
+        if (callCount === 2) {
+          throw new Error("Mocked createNodeContext failure");
+        }
+        return originalCreateNodeContext(args);
+      });
+
+      vi.spyOn(contextModule, "createNodeContext").mockImplementation(
+        mockCreateNodeContext
+      );
+
+      await project.generateCode();
+
+      expectProjectFileToExist(["code", "workflow.py"]);
+
+      // AND only the successful node should be generated (first templating node)
+      expectProjectFileToExist(["code", "nodes", "first_node.py"]);
+
+      expect(() =>
+        expectProjectFileToExist(["code", "nodes", "second_node.py"])
+      ).toThrow();
+
+      const errors = project.workflowContext.getErrors();
+      expect(errors.length).toBeGreaterThan(0);
+      expect(
+        errors.some((error) =>
+          error.message.includes("Failed to create node context")
+        )
+      ).toBe(true);
+    });
   });
   describe("include sandbox", () => {
     const displayData = {

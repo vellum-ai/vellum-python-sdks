@@ -431,10 +431,13 @@ ${errors.slice(0, 3).map((err) => {
 
     const nodesToGenerate = await Promise.all(
       this.getOrderedNodes().map(async (nodeData) => {
-        await createNodeContext({
-          workflowContext: this.workflowContext,
-          nodeData,
-        }).catch((error) => {
+        try {
+          await createNodeContext({
+            workflowContext: this.workflowContext,
+            nodeData,
+          });
+          return nodeData;
+        } catch (error) {
           if (error instanceof BaseCodegenError) {
             this.workflowContext.addError(error);
           } else {
@@ -447,8 +450,8 @@ ${errors.slice(0, 3).map((err) => {
               )
             );
           }
-        });
-        return nodeData;
+          return null;
+        }
       })
     );
 
@@ -456,7 +459,10 @@ ${errors.slice(0, 3).map((err) => {
       workflowContext: this.workflowContext,
     });
 
-    const nodeIds = nodesToGenerate.map((nodeData) => nodeData.id);
+    const successfulNodes = nodesToGenerate.filter(
+      (nodeData) => nodeData !== null
+    );
+    const nodeIds = successfulNodes.map((nodeData) => nodeData.id);
     const nodes = this.generateNodes(nodeIds);
 
     const workflow = codegen.workflow({
