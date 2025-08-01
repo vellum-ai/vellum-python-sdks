@@ -163,6 +163,7 @@ ${errors.slice(0, 3).map((err) => {
         vellumApiEnvironment: rest.vellumApiEnvironment,
         workflowRawData: this.workflowVersionExecConfig.workflowRawData,
         strict: rest.strict ?? false,
+        pythonCodeMergeableNodeFiles: new Set<string>(),
       });
       this.sandboxInputs = rest.sandboxInputs;
     }
