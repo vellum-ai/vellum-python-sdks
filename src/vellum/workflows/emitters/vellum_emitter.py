@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 import httpx
 
@@ -8,10 +8,6 @@ from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.events.workflow import WorkflowEvent
 from vellum.workflows.state.base import BaseState
-
-# To protect against circular imports
-if TYPE_CHECKING:
-    from vellum.workflows.state.context import WorkflowContext
 
 logger = logging.getLogger(__name__)
 
@@ -42,20 +38,10 @@ class VellumEmitter(BaseWorkflowEmitter):
             timeout: Request timeout in seconds.
             max_retries: Maximum number of retry attempts for failed requests.
         """
-        self._context: Optional["WorkflowContext"] = None
+        super().__init__()
         self._timeout = timeout
         self._max_retries = max_retries
         self._events_endpoint = "events"  # TODO: make this configurable with the correct url
-
-    # For now the user will need to register workflow context with the emitter via dependency injection
-    def register_context(self, context: "WorkflowContext") -> None:
-        """
-        Register the workflow context with this emitter.
-
-        Args:
-            context: The workflow context containing shared resources like vellum_client.
-        """
-        self._context = context
 
     def emit_event(self, event: WorkflowEvent) -> None:
         """
@@ -96,7 +82,6 @@ class VellumEmitter(BaseWorkflowEmitter):
             return
 
         client = self._context.vellum_client
-        last_exception: Optional[Union[httpx.HTTPStatusError, httpx.RequestError]] = None
 
         for attempt in range(self._max_retries + 1):
             try:
@@ -118,7 +103,6 @@ class VellumEmitter(BaseWorkflowEmitter):
                 return
 
             except httpx.HTTPStatusError as e:
-                last_exception = e
                 if e.response.status_code >= 500:
                     # Server errors might be transient, retry
                     if attempt < self._max_retries:
@@ -134,13 +118,13 @@ class VellumEmitter(BaseWorkflowEmitter):
                             f"Server error emitting event after {self._max_retries + 1} attempts: "
                             f"{e.response.status_code} {e.response.text}"
                         )
+                        return
                 else:
                     # Client errors (4xx) are not retriable
                     logger.exception(f"Client error emitting event: {e.response.status_code} {e.response.text}")
-                    raise
+                    return
 
             except httpx.RequestError as e:
-                last_exception = e
                 if attempt < self._max_retries:
                     wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
                     logger.warning(
@@ -151,6 +135,4 @@ class VellumEmitter(BaseWorkflowEmitter):
                     continue
                 else:
                     logger.exception(f"Network error emitting event after {self._max_retries + 1} attempts: {e}")
-
-        if last_exception:
-            raise last_exception
+                    return

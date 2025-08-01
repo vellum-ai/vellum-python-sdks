@@ -72,20 +72,3 @@ class CustomVellumEmitterWorkflow(BaseWorkflow[BaseInputs, State]):
 
     class Outputs(BaseOutputs):
         final_value = NextNode.Outputs.final_value
-
-
-class DisabledVellumEmitterWorkflow(BaseWorkflow[BaseInputs, State]):
-    """
-    Workflow demonstrating disabled VellumEmitter for development/testing.
-
-    Shows how to disable event emission while keeping the same workflow
-    structure for development or testing scenarios.
-    """
-
-    graph = StartNode >> NextNode
-
-    # Disabled VellumEmitter - no events will be sent
-    emitters = [VellumEmitter()]
-
-    class Outputs(BaseOutputs):
-        final_value = NextNode.Outputs.final_value
