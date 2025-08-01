@@ -5966,4 +5966,206 @@ baz = foo + bar
       expect(mergeableFiles).toContain("nodes/my_addition.py"); // Nested generic node in subworkflow
     });
   });
+
+  describe("LEGACY prompt node codegen", () => {
+    it("should properly handle legacy prompt node even if ml model name is not found", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entrypoint-node",
+              type: "ENTRYPOINT",
+              inputs: [],
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "source-handle",
+                target_handle_id: "entry-target",
+              },
+              display_data: {
+                position: { x: 100, y: 100 },
+                comment: null,
+                width: null,
+                height: null,
+              },
+              base: null,
+              definition: null,
+              trigger: {
+                id: "entry-target",
+                merge_behavior: "AWAIT_ANY",
+              },
+              ports: [
+                {
+                  id: "source-handle",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              adornments: null,
+              outputs: [],
+            },
+            {
+              id: "legacy-prompt-node",
+              type: "PROMPT",
+              data: {
+                variant: "LEGACY",
+                label: "Legacy Prompt Node",
+                output_id: "output-1",
+                array_output_id: "array-output-1",
+                error_output_id: null,
+                source_handle_id: "prompt-source",
+                target_handle_id: "prompt-target",
+                sandbox_routing_config: {
+                  version: 2,
+                  prompt_version_data: {
+                    ml_model_to_workspace_id:
+                      "b73088ce-1c42-48e8-ab8f-1931101c7721",
+                    exec_config: {
+                      parameters: {
+                        stop: null,
+                        temperature: 0.0,
+                        max_tokens: 256,
+                        top_p: 1.0,
+                        top_k: 0,
+                        frequency_penalty: 0.0,
+                        presence_penalty: 0.0,
+                        logit_bias: null,
+                        custom_parameters: null,
+                      },
+                      input_variables: [
+                        {
+                          id: "input-var-1",
+                          key: "query_str",
+                          type: "STRING",
+                          required: null,
+                          default: null,
+                          extensions: null,
+                        },
+                      ],
+                      prompt_template_block_data: {
+                        blocks: [
+                          {
+                            block_type: "CHAT_MESSAGE",
+                            properties: {
+                              blocks: [
+                                {
+                                  block_type: "JINJA",
+                                  properties: {
+                                    template: "You are a helpful assistant.",
+                                    template_type: null,
+                                  },
+                                  id: "jinja-block-1",
+                                  state: "ENABLED",
+                                  cache_config: null,
+                                },
+                              ],
+                              chat_role: "SYSTEM",
+                              chat_source: null,
+                              chat_message_unterminated: false,
+                            },
+                            id: "chat-block-1",
+                            state: "ENABLED",
+                            cache_config: null,
+                          },
+                        ],
+                        version: 1,
+                      },
+                      settings: null,
+                    },
+                  },
+                },
+              },
+              inputs: [
+                {
+                  id: "input-var-1",
+                  key: "query_str",
+                  value: {
+                    rules: [
+                      {
+                        type: "INPUT_VARIABLE",
+                        data: {
+                          input_variable_id: "workflow-input-1",
+                        },
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              display_data: {
+                position: { x: 300, y: 100 },
+                comment: null,
+                width: null,
+                height: null,
+              },
+              base: null,
+              definition: null,
+              trigger: {
+                id: "prompt-target",
+                merge_behavior: "AWAIT_ANY",
+              },
+              ports: [
+                {
+                  id: "prompt-source",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              adornments: null,
+              outputs: [
+                {
+                  id: "output-1",
+                  name: "result",
+                  type: "STRING",
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              id: "edge-1",
+              source_node_id: "entrypoint-node",
+              source_handle_id: "source-handle",
+              target_node_id: "legacy-prompt-node",
+              target_handle_id: "prompt-target",
+              type: "DEFAULT",
+            },
+          ],
+        },
+        input_variables: [
+          {
+            id: "workflow-input-1",
+            key: "query_str",
+            type: "STRING",
+          },
+        ],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "test-key",
+      });
+
+      vi.spyOn(MlModels.prototype, "retrieve").mockRejectedValue(
+        new Error("ML model not found")
+      );
+
+      await project.generateCode();
+
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "legacy_prompt_node.py",
+      ]);
+
+      const allErrors = project.workflowContext.getErrors();
+      expect(allErrors).toHaveLength(1);
+      expect(allErrors[0]?.message).toContain(
+        "Failed to fetch ML model name for ID b73088ce-1c42-48e8-ab8f-1931101c7721: Error: ML model not found"
+      );
+    });
+  });
 });
