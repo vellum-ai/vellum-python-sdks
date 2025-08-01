@@ -57,6 +57,7 @@ def test_serialize_workflow():
         "parameters": None,
         "version": None,
         "tags": None,
+        "user_id": None,
     }
 
     # AND the rest of the node structure should be correct

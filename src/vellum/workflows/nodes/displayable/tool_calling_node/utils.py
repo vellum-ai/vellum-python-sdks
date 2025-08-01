@@ -249,6 +249,7 @@ def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> Compo
             parameters=tool_details.get("input_parameters", tool_def.parameters),
             version=tool_details.get("version", tool_def.version),
             tags=tool_details.get("tags", tool_def.tags),
+            user_id=tool_def.user_id,
         )
 
     except Exception as e:

@@ -236,6 +236,17 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     );
                   }
 
+                  if (composioTool.user_id != null) {
+                    args.push(
+                      python.methodArgument({
+                        name: "user_id",
+                        value: python.TypeInstantiation.str(
+                          composioTool.user_id
+                        ),
+                      })
+                    );
+                  }
+
                   functionReferences.push(
                     python.instantiateClass({
                       classReference: python.reference({
