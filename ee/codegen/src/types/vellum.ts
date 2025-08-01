@@ -920,7 +920,7 @@ export type InlineWorkflowFunctionArgs = {
   exec_config: WorkflowVersionExecConfig;
 } & NameDescription;
 
-export type DeploymentWorkflowFunctionArgs = {
+export type WorkflowDeploymentFunctionArgs = {
   type: "WORKFLOW_DEPLOYMENT";
   deployment: string;
   release_tag: string | null;
@@ -942,6 +942,6 @@ export type ComposioToolFunctionArgs = {
 export type ToolArgs = (
   | FunctionArgs
   | InlineWorkflowFunctionArgs
-  | DeploymentWorkflowFunctionArgs
+  | WorkflowDeploymentFunctionArgs
   | ComposioToolFunctionArgs
 )[];

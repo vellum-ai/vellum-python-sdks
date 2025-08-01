@@ -13,9 +13,9 @@ import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
 import {
   ComposioToolFunctionArgs,
-  DeploymentWorkflowFunctionArgs,
   FunctionArgs,
   NodePort,
+  WorkflowDeploymentFunctionArgs,
 } from "src/types/vellum";
 
 describe("ToolCallingNode", () => {
@@ -506,8 +506,8 @@ describe("ToolCallingNode", () => {
     });
   });
 
-  describe("deployment workflow", () => {
-    const deploymentWorkflowFunction: DeploymentWorkflowFunctionArgs = {
+  describe("workflow deployment", () => {
+    const workflowDeploymentFunction: WorkflowDeploymentFunctionArgs = {
       type: "WORKFLOW_DEPLOYMENT",
       name: "deployment_1",
       description: "Deployment 1 description",
@@ -527,9 +527,9 @@ describe("ToolCallingNode", () => {
         "functions",
         [
           {
-            ...deploymentWorkflowFunction,
-            id: "deployment-workflow-function-id",
-            name: "deployment-workflow-function-name",
+            ...workflowDeploymentFunction,
+            id: "workflow-deployment-function-id",
+            name: "workflow-deployment-function-name",
           },
         ]
       );
