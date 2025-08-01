@@ -54,6 +54,7 @@ export declare namespace WorkflowContext {
     globalStateVariableContextsById?: StateVariableContextsById;
     globalNodeContextsByNodeId?: NodeContextsByNodeId;
     globalOutputVariableContextsById?: OutputVariableContextsById;
+    pythonCodeMergeableNodeFiles?: Set<string>;
     parentNode?: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>;
     workflowsSdkModulePath?: readonly string[];
     portContextByName?: PortContextById;
@@ -140,7 +141,7 @@ export class WorkflowContext {
   private readonly errors: BaseCodegenError[] = [];
 
   // Track node files that will be merged by codegen-service
-  private readonly pythonCodeMergeableNodeFiles: Set<string> = new Set();
+  private readonly pythonCodeMergeableNodeFiles: Set<string>;
 
   public readonly workflowRawData: WorkflowRawData;
 
@@ -171,6 +172,7 @@ export class WorkflowContext {
     strict,
     classNames,
     nestedWorkflowModuleName,
+    pythonCodeMergeableNodeFiles,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -227,6 +229,9 @@ export class WorkflowContext {
       globalOutputVariableContextsById ?? new Map();
 
     this.classNames = classNames ?? new Set<string>();
+
+    this.pythonCodeMergeableNodeFiles =
+      pythonCodeMergeableNodeFiles ?? new Set<string>();
   }
 
   public getAbsolutePath(filePath: string): string {
@@ -261,6 +266,7 @@ export class WorkflowContext {
       globalStateVariableContextsById: this.globalStateVariableContextsById,
       globalNodeContextsByNodeId: this.globalNodeContextsByNodeId,
       globalOutputVariableContextsById: this.globalOutputVariableContextsById,
+      pythonCodeMergeableNodeFiles: this.pythonCodeMergeableNodeFiles,
       parentNode,
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,
