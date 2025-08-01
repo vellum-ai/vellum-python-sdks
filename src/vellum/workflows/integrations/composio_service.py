@@ -135,16 +135,20 @@ class ComposioService:
             else:
                 raise NodeException(f"Failed to retrieve tool details for '{tool_slug}': {error_message}")
 
-    def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
+    def execute_tool(self, tool_name: str, arguments: Dict[str, Any], user_id: Optional[str] = None) -> Any:
         """Execute a tool using direct API request
 
         Args:
             tool_name: The name of the tool to execute (e.g., "HACKERNEWS_GET_USER")
             arguments: Dictionary of arguments to pass to the tool
+            user_id: Optional user ID to identify which user's Composio connection to use
 
         Returns:
             The result of the tool execution
         """
         endpoint = f"/tools/execute/{tool_name}"
-        response = self._make_request(endpoint, method="POST", json_data={"arguments": arguments})
+        json_data: Dict[str, Any] = {"arguments": arguments}
+        if user_id is not None:
+            json_data["user_id"] = user_id
+        response = self._make_request(endpoint, method="POST", json_data=json_data)
         return response.get("data", response)
