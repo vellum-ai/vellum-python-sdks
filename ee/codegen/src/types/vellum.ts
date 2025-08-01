@@ -937,6 +937,7 @@ export type ComposioToolFunctionArgs = {
   tool_slug?: string;
   connection_id?: string;
   integration_name?: string;
+  user_id?: string | null;
 } & NameDescription;
 
 export type ToolArgs = (
