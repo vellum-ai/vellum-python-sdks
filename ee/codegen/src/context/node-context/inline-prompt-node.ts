@@ -2,7 +2,10 @@ import { VellumVariableType } from "vellum-ai/api";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
-import { NodeDefinitionGenerationError } from "src/generators/errors";
+import {
+  NodeAttributeGenerationError,
+  NodeDefinitionGenerationError,
+} from "src/generators/errors";
 import {
   InlinePromptNodeData,
   InlinePromptNode as InlinePromptNodeType,
@@ -67,26 +70,26 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
       throw new NodeDefinitionGenerationError(`Prompt version data not found`);
     }
 
-    try {
-      // Dynamically fetch the ML Model's name via API
-      const mlModelName = await this.workflowContext.getMLModelNameById(
-        promptVersionData.mlModelToWorkspaceId
-      );
+    // Dynamically fetch the ML Model's name via API
+    const mlModelName = await this.workflowContext
+      .getMLModelNameById(promptVersionData.mlModelToWorkspaceId)
+      .catch((error) => {
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `Failed to fetch ML model name for ID ${promptVersionData.mlModelToWorkspaceId}: ${error}`,
+            "WARNING"
+          )
+        );
+        return "";
+      });
 
-      const inlinePromptNodeData: InlinePromptNodeData = {
-        ...legacyNodeData,
-        variant: "INLINE",
-        mlModelName,
-        execConfig: promptVersionData.execConfig,
-      };
+    const inlinePromptNodeData: InlinePromptNodeData = {
+      ...legacyNodeData,
+      variant: "INLINE",
+      mlModelName,
+      execConfig: promptVersionData.execConfig,
+    };
 
-      this.nodeData = { ...this.nodeData, data: inlinePromptNodeData };
-    } catch (error) {
-      console.warn(
-        `Failed to convert LEGACY prompt node to INLINE: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
-    }
+    this.nodeData = { ...this.nodeData, data: inlinePromptNodeData };
   }
 }

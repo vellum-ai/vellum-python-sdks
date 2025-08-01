@@ -437,7 +437,7 @@ ${errors.slice(0, 3).map((err) => {
             workflowContext: this.workflowContext,
             nodeData,
           });
-          return nodeData;
+          return nodeData.id;
         } catch (error) {
           if (error instanceof BaseCodegenError) {
             this.workflowContext.addError(error);
@@ -460,10 +460,9 @@ ${errors.slice(0, 3).map((err) => {
       workflowContext: this.workflowContext,
     });
 
-    const successfulNodes = nodesToGenerate.filter(
-      (nodeData) => nodeData !== null
+    const nodeIds = nodesToGenerate.filter(
+      (nodeId): nodeId is string => nodeId !== null
     );
-    const nodeIds = successfulNodes.map((nodeData) => nodeData.id);
     const nodes = this.generateNodes(nodeIds);
 
     const workflow = codegen.workflow({
