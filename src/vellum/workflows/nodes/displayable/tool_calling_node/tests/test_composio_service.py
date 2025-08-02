@@ -1,8 +1,6 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import NodeException
 from vellum.workflows.integrations.composio_service import ComposioService, ConnectionInfo
 
 
@@ -197,33 +195,11 @@ class TestComposioCoreService:
         mock_requests.post.return_value = mock_response
 
         # WHEN we execute a tool that fails
-        with pytest.raises(NodeException) as exc_info:
-            composio_service.execute_tool("GITHUB_GET_PR", {"repo": "test", "pr_number": 999})
+        result = composio_service.execute_tool("GITHUB_GET_PR", {"repo": "test", "pr_number": 999})
 
-        # THEN the exception should contain the detailed error message from the API
-        assert "Composio tool execution failed" in str(exc_info.value)
-        assert "Request failed error" in str(exc_info.value)
-        assert "Not Found" in str(exc_info.value)
-        assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
-
-    def test_execute_tool_failure_with_user_id_surfaces_error(
-        self, composio_service, mock_requests, mock_tool_execution_error_response
-    ):
-        """Test that tool execution failures with user_id surface detailed error information"""
-        # GIVEN a mock response indicating tool execution failure and a user_id
-        mock_response = Mock()
-        mock_response.json.return_value = mock_tool_execution_error_response
-        mock_response.raise_for_status.return_value = None
-        mock_requests.post.return_value = mock_response
-
-        # WHEN we execute a tool with user_id that fails
-        with pytest.raises(NodeException) as exc_info:
-            composio_service.execute_tool("GITHUB_GET_PR", {"repo": "test", "pr_number": 999}, user_id="test_user")
-
-        # THEN the exception should contain the detailed error message from the API
-        assert "Composio tool execution failed" in str(exc_info.value)
-        assert "Request failed error" in str(exc_info.value)
-        assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
+        # THEN the result should contain the detailed error message from the API
+        assert "Request failed error" in result
+        assert "Not Found" in result
 
     def test_execute_tool_failure_with_generic_error_message(self, composio_service, mock_requests):
         """Test that tool execution failures with missing error field use generic message"""
@@ -237,9 +213,7 @@ class TestComposioCoreService:
         mock_requests.post.return_value = mock_response
 
         # WHEN we execute a tool that fails
-        with pytest.raises(NodeException) as exc_info:
-            composio_service.execute_tool("TEST_TOOL", {"param": "value"})
+        result = composio_service.execute_tool("TEST_TOOL", {"param": "value"})
 
-        # THEN the exception should contain the generic error message
-        assert "Composio tool execution failed: Tool execution failed" in str(exc_info.value)
-        assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
+        # THEN the result should contain the generic error message
+        assert result == "Tool execution failed"

@@ -153,10 +153,6 @@ class ComposioService:
         response = self._make_request(endpoint, method="POST", json_data=json_data)
 
         if not response.get("successful", True):
-            error_message = response.get("error", "Tool execution failed")
-            raise NodeException(
-                message=f"Composio tool execution failed: {error_message}",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            )
+            return response.get("error", "Tool execution failed")
 
         return response.get("data", response)
