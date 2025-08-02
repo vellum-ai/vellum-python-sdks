@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
     from vellum.workflows.expressions.is_null import IsNullExpression
     from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
+    from vellum.workflows.expressions.length import LengthExpression
     from vellum.workflows.expressions.less_than import LessThanExpression
     from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
     from vellum.workflows.expressions.not_between import NotBetweenExpression
@@ -376,3 +377,8 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.concat import ConcatExpression
 
         return ConcatExpression(lhs=self, rhs=other)
+
+    def length(self) -> "LengthExpression[_T]":
+        from vellum.workflows.expressions.length import LengthExpression
+
+        return LengthExpression(expression=self)
