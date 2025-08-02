@@ -151,4 +151,8 @@ class ComposioService:
         if user_id is not None:
             json_data["user_id"] = user_id
         response = self._make_request(endpoint, method="POST", json_data=json_data)
+
+        if not response.get("successful", True):
+            return response.get("error", "Tool execution failed")
+
         return response.get("data", response)

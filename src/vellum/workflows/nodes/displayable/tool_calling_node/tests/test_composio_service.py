@@ -45,6 +45,21 @@ def mock_tool_execution_response():
 
 
 @pytest.fixture
+def mock_tool_execution_error_response():
+    """Mock response for failed tool execution API"""
+    return {
+        "data": {},
+        "successful": False,
+        "error": (
+            'Request failed error: `{"message":"Not Found",'
+            '"documentation_url":"https://docs.github.com/rest/pulls/pulls#get-a-pull-request",'
+            '"status":"404"}`'
+        ),
+        "log_id": "log_raE_fIWNcDPo",
+    }
+
+
+@pytest.fixture
 def composio_service():
     """Create ComposioService with test API key"""
     return ComposioService(api_key="test-key")
@@ -168,3 +183,37 @@ class TestComposioCoreService:
             timeout=30,
         )
         assert result == {"items": [], "total": 0}
+
+    def test_execute_tool_failure_surfaces_error(
+        self, composio_service, mock_requests, mock_tool_execution_error_response
+    ):
+        """Test that tool execution failures surface detailed error information"""
+        # GIVEN a mock response indicating tool execution failure
+        mock_response = Mock()
+        mock_response.json.return_value = mock_tool_execution_error_response
+        mock_response.raise_for_status.return_value = None
+        mock_requests.post.return_value = mock_response
+
+        # WHEN we execute a tool that fails
+        result = composio_service.execute_tool("GITHUB_GET_PR", {"repo": "test", "pr_number": 999})
+
+        # THEN the result should contain the detailed error message from the API
+        assert "Request failed error" in result
+        assert "Not Found" in result
+
+    def test_execute_tool_failure_with_generic_error_message(self, composio_service, mock_requests):
+        """Test that tool execution failures with missing error field use generic message"""
+        # GIVEN a mock response indicating tool execution failure without error field
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "data": {},
+            "successful": False,
+        }
+        mock_response.raise_for_status.return_value = None
+        mock_requests.post.return_value = mock_response
+
+        # WHEN we execute a tool that fails
+        result = composio_service.execute_tool("TEST_TOOL", {"param": "value"})
+
+        # THEN the result should contain the generic error message
+        assert result == "Tool execution failed"
