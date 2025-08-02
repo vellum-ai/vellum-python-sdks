@@ -26,6 +26,7 @@ from vellum.workflows.expressions.is_not_null import IsNotNullExpression
 from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
+from vellum.workflows.expressions.length import LengthExpression
 from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
@@ -96,6 +97,8 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperato
         return "coalesce"
     elif isinstance(descriptor, ParseJsonExpression):
         return "parseJson"
+    elif isinstance(descriptor, LengthExpression):
+        return "length"
     else:
         raise ValueError(f"Unsupported descriptor type: {descriptor}")
 
@@ -133,6 +136,7 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
             IsNotNilExpression,
             IsUndefinedExpression,
             IsNotUndefinedExpression,
+            LengthExpression,
             ParseJsonExpression,
         ),
     ):
