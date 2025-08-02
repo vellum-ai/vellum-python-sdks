@@ -22,7 +22,7 @@ class LengthExpression(BaseDescriptor[int], Generic[_T]):
         expression = resolve_value(self._expression, state)
 
         if expression is undefined:
-            return 0
+            raise InvalidExpressionException("Cannot get length of undefined value")
 
         if not hasattr(expression, "__len__"):
             raise InvalidExpressionException(
