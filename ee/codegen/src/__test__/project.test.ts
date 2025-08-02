@@ -5980,7 +5980,9 @@ baz = foo + bar
       expect(mergeableFiles.size).toBe(2);
 
       expect(mergeableFiles).toContain("nodes/yet_another_addition.py"); // Top-level generic node
-      expect(mergeableFiles).toContain("nodes/my_addition.py"); // Nested generic node in subworkflow
+      expect(mergeableFiles).toContain(
+        "nodes/subworkflow/nodes/my_addition.py"
+      ); // Nested generic node in subworkflow
     });
   });
 
