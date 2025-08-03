@@ -542,6 +542,52 @@ def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_clie
     # THEN the adhoc_execute_prompt_stream should be called exactly twice
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
 
+    # AND the second call should have the correct blocks structure
+    second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]
+    assert second_call.kwargs["blocks"] == [
+        ChatMessagePromptBlock(
+            block_type="CHAT_MESSAGE",
+            state=None,
+            cache_config=None,
+            chat_role="SYSTEM",
+            chat_source=None,
+            chat_message_unterminated=None,
+            blocks=[
+                RichTextPromptBlock(
+                    block_type="RICH_TEXT",
+                    state=None,
+                    cache_config=None,
+                    blocks=[
+                        PlainTextPromptBlock(
+                            block_type="PLAIN_TEXT", state=None, cache_config=None, text="You are a weather expert"
+                        )
+                    ],
+                )
+            ],
+        ),
+        ChatMessagePromptBlock(
+            block_type="CHAT_MESSAGE",
+            state=None,
+            cache_config=None,
+            chat_role="USER",
+            chat_source=None,
+            chat_message_unterminated=None,
+            blocks=[
+                RichTextPromptBlock(
+                    block_type="RICH_TEXT",
+                    state=None,
+                    cache_config=None,
+                    blocks=[
+                        VariablePromptBlock(
+                            block_type="VARIABLE", state=None, cache_config=None, input_variable="question"
+                        )
+                    ],
+                )
+            ],
+        ),
+        VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
+    ]
+
 
 @pytest.mark.skip(reason="Testing events emission will be implemented in a follow up PR")
 def test_run_workflow__emits_subworkflow_events_with_tool_call(vellum_adhoc_prompt_client, mock_uuid4_generator):
