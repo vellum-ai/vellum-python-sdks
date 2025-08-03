@@ -225,17 +225,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     }),
                   ];
 
-                  const displayName =
-                    composioTool.display_name || composioTool.tool_name;
-                  if (displayName) {
-                    args.push(
-                      python.methodArgument({
-                        name: "display_name",
-                        value: python.TypeInstantiation.str(displayName),
-                      })
-                    );
-                  }
-
                   if (composioTool.user_id != null) {
                     args.push(
                       python.methodArgument({

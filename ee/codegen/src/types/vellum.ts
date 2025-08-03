@@ -931,8 +931,6 @@ export type ComposioToolFunctionArgs = {
   toolkit?: string;
   action?: string;
   description: string;
-  display_name?: string | null;
-  parameters?: Record<string, unknown> | null;
   tool_name?: string;
   tool_slug?: string;
   connection_id?: string;

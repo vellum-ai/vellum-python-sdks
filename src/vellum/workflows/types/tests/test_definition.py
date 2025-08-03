@@ -48,7 +48,7 @@ def test_composio_tool_definition_creation():
     assert composio_tool.toolkit == "GITHUB"
     assert composio_tool.action == "GITHUB_CREATE_AN_ISSUE"
     assert composio_tool.description == "Create a new issue in a GitHub repository"
-    assert composio_tool.display_name is None
+    assert composio_tool.user_id is None
     assert composio_tool.name == "github_create_an_issue"
 
 

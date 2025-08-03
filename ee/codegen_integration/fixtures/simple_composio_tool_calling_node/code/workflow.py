@@ -19,7 +19,6 @@ class ComposioToolCallingNode(ToolCallingNode):
             toolkit="GITHUB",
             action="GITHUB_CREATE_AN_ISSUE",
             description="Create a new issue in a GitHub repository",
-            display_name="Create GitHub Issue",
             user_id="vellum_test_user",
         )
     ]
