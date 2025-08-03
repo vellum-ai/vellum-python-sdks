@@ -552,7 +552,6 @@ def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_clie
     )
     assert chat_history_input.value == [
         ChatMessage(
-            text="I'll help you get the weather information.",
             role="ASSISTANT",
             content=ArrayChatMessageContent(
                 value=[
