@@ -101,7 +101,6 @@ class ToolCallingNode(BaseToolCallingNode):
             toolkit="GITHUB",
             action="GITHUB_CREATE_AN_ISSUE",
             description="Create a new issue in a GitHub repository",
-            display_name="Create GitHub Issue",
         )
     ]
 "
@@ -120,7 +119,6 @@ class ToolCallingNode(BaseToolCallingNode):
             toolkit="gmail",
             action="GMAIL_CREATE_EMAIL_DRAFT",
             description="Creates a gmail email draft, supporting to/cc/bcc, subject, plain/html body (ensure \`is html=true\` for html), attachments, and threading.",
-            display_name="Create email draft",
         )
     ]
 "
