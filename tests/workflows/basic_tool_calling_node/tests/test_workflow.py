@@ -542,50 +542,20 @@ def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_clie
     # THEN the adhoc_execute_prompt_stream should be called exactly twice
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
 
-    # AND the second call should have the correct blocks structure
+    # AND the second call should have the correct chat_history input value
     second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]
-    assert second_call.kwargs["blocks"] == [
-        ChatMessagePromptBlock(
-            block_type="CHAT_MESSAGE",
-            state=None,
-            cache_config=None,
-            chat_role="SYSTEM",
-            chat_source=None,
-            chat_message_unterminated=None,
-            blocks=[
-                RichTextPromptBlock(
-                    block_type="RICH_TEXT",
-                    state=None,
-                    cache_config=None,
-                    blocks=[
-                        PlainTextPromptBlock(
-                            block_type="PLAIN_TEXT", state=None, cache_config=None, text="You are a weather expert"
-                        )
-                    ],
-                )
-            ],
+    chat_history_input = next(
+        input_val
+        for input_val in second_call.kwargs["input_values"]
+        if hasattr(input_val, "key") and input_val.key == "chat_history"
+    )
+    assert chat_history_input.value == [
+        ChatMessage(
+            text="I'll help you get the weather information.",
+            role="ASSISTANT",
+            content=None,
+            source=None,
         ),
-        ChatMessagePromptBlock(
-            block_type="CHAT_MESSAGE",
-            state=None,
-            cache_config=None,
-            chat_role="USER",
-            chat_source=None,
-            chat_message_unterminated=None,
-            blocks=[
-                RichTextPromptBlock(
-                    block_type="RICH_TEXT",
-                    state=None,
-                    cache_config=None,
-                    blocks=[
-                        VariablePromptBlock(
-                            block_type="VARIABLE", state=None, cache_config=None, input_variable="question"
-                        )
-                    ],
-                )
-            ],
-        ),
-        VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
     ]
 
 
