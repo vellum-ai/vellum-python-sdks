@@ -1,3 +1,4 @@
+from dataclasses import MISSING, fields, is_dataclass
 from functools import cached_property
 import inspect
 from uuid import UUID
@@ -193,6 +194,38 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if output.instance is not None and output.instance != undefined
                 else None
             )
+
+            if value is None and output.types and len(output.types) > 0 and is_dataclass(output.types[0]):
+                dataclass_type = output.types[0]
+                type_name = dataclass_type.__name__
+                type_module = dataclass_type.__module__
+                type_id = str(uuid4_from_hash(f"{type_module}.{type_name}"))
+
+                type_schema = {}
+                for field in fields(dataclass_type):
+                    field_type = "string"
+                    if field.type == int:
+                        field_type = "integer"
+                    elif field.type == float:
+                        field_type = "number"
+                    elif field.type == bool:
+                        field_type = "boolean"
+
+                    type_schema[field.name] = {
+                        "type": field_type,
+                        "required": field.default == MISSING and field.default_factory == MISSING,
+                    }
+
+                type_definition = {"id": type_id, "name": type_name, "type_schema": type_schema}
+
+                if not hasattr(display_context, "type_definitions"):
+                    display_context.type_definitions = []
+
+                existing_def = next((td for td in display_context.type_definitions if td["id"] == type_id), None)
+                if not existing_def:
+                    display_context.type_definitions.append(type_definition)
+
+                value = {"type": "TYPE_REFERENCE", "type_definition_id": type_id}
 
             outputs.append(
                 {

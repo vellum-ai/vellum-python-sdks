@@ -1,3 +1,4 @@
+from dataclasses import is_dataclass
 import typing
 from typing import List, Tuple, Type, Union, get_args, get_origin
 
@@ -79,6 +80,9 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
         return "SEARCH_RESULTS"
     elif _is_type_optionally_in(type_, (List[VellumValue], List[VellumValueRequest])):
         return "ARRAY"
+
+    if hasattr(type_, "__origin__") or (isinstance(type_, type) and is_dataclass(type_)):
+        return "JSON"
 
     return "JSON"
 
