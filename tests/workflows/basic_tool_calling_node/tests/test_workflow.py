@@ -3,6 +3,7 @@ from unittest import mock
 from uuid import uuid4
 from typing import Iterator, List
 
+from vellum.client.types.array_chat_message_content import ArrayChatMessageContent
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
@@ -553,7 +554,18 @@ def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_clie
         ChatMessage(
             text="I'll help you get the weather information.",
             role="ASSISTANT",
-            content=None,
+            content=ArrayChatMessageContent(
+                value=[
+                    StringChatMessageContent(value="I'll help you get the weather information."),
+                    FunctionCallChatMessageContent(
+                        value=FunctionCallChatMessageContentValue(
+                            name="get_current_weather",
+                            arguments={"location": "San Francisco", "unit": "celsius"},
+                            id="call_7115tNTmEACTsQRGwKpJipJK",
+                        ),
+                    ),
+                ]
+            ),
             source=None,
         ),
     ]

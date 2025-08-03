@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Type, Union, c
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
+from vellum.client.types.array_chat_message_content import ArrayChatMessageContent
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.function_definition import FunctionDefinition
@@ -83,7 +84,32 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             if output.name == "results" and output.value:
                 values = cast(List[PromptOutput], output.value)
                 if values and len(values) > 0:
-                    if values[0].type == "STRING":
+                    string_outputs = [v for v in values if v.type == "STRING"]
+                    function_call_outputs = [v for v in values if v.type == "FUNCTION_CALL"]
+                    if string_outputs and function_call_outputs:
+                        string_content = StringChatMessageContent(value=string_outputs[0].value)
+                        function_call = function_call_outputs[0].value
+                        function_call_content = (
+                            FunctionCallChatMessageContent(
+                                value=FunctionCallChatMessageContentValue(
+                                    name=function_call.name,
+                                    arguments=function_call.arguments,
+                                    id=function_call.id,
+                                ),
+                            )
+                            if function_call is not None
+                            else None
+                        )
+                        if function_call_content:
+                            self.state.chat_history.append(
+                                ChatMessage(
+                                    role="ASSISTANT",
+                                    text=string_outputs[0].value,
+                                    content=ArrayChatMessageContent(value=[string_content, function_call_content]),
+                                )
+                            )
+                            self.state.prompt_iterations += 1
+                    elif values[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
                     elif values[0].type == "FUNCTION_CALL":
                         self.state.prompt_iterations += 1
