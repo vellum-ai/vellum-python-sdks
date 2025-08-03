@@ -53,10 +53,6 @@ def test_serialize_workflow():
         "toolkit": "GITHUB",
         "action": "GITHUB_CREATE_AN_ISSUE",
         "description": "Create a new issue in a GitHub repository",
-        "display_name": "Create GitHub Issue",
-        "parameters": None,
-        "version": None,
-        "tags": None,
         "user_id": None,
     }
 

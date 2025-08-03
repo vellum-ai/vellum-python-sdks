@@ -16,7 +16,6 @@ github_create_issue_tool_with_user_id = ComposioToolDefinition(
     toolkit="GITHUB",
     action="GITHUB_CREATE_AN_ISSUE",
     description="Create a new issue in a GitHub repository",
-    display_name="Create GitHub Issue",
     user_id="test_user_123",
 )
 

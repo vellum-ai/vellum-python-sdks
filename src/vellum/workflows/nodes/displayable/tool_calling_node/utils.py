@@ -273,10 +273,6 @@ def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> Compo
             toolkit=toolkit_slug.upper() if toolkit_slug else tool_def.toolkit,
             action=tool_details.get("slug", tool_def.action),
             description=tool_details.get("description", tool_def.description),
-            display_name=tool_details.get("name", tool_def.display_name),
-            parameters=tool_details.get("input_parameters", tool_def.parameters),
-            version=tool_details.get("version", tool_def.version),
-            tags=tool_details.get("tags", tool_def.tags),
             user_id=tool_def.user_id,
         )
 
@@ -345,7 +341,7 @@ def create_tool_router_node(
                     FunctionDefinition(
                         name=enhanced_function.name,
                         description=enhanced_function.description,
-                        parameters=enhanced_function.parameters,
+                        parameters={},
                     )
                 )
                 # Create port for this function (using original function for get_function_name)

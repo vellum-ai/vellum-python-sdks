@@ -160,17 +160,6 @@ describe("ToolCallingNode", () => {
       integration_name: "GITHUB",
       tool_slug: "GITHUB_CREATE_AN_ISSUE",
       description: "Create a new issue in a GitHub repository",
-      display_name: "Create GitHub Issue",
-      parameters: {
-        type: "object",
-        properties: {
-          title: { type: "string" },
-          body: { type: "string" },
-          owner: { type: "string" },
-          repo: { type: "string" },
-        },
-        required: ["title", "owner", "repo"],
-      },
     };
 
     it("should generate composio tool", async () => {
