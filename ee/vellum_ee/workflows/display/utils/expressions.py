@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.accessor import AccessorExpression
+from vellum.workflows.expressions.add import AddExpression
 from vellum.workflows.expressions.and_ import AndExpression
 from vellum.workflows.expressions.begins_with import BeginsWithExpression
 from vellum.workflows.expressions.between import BetweenExpression
@@ -29,6 +30,7 @@ from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.length import LengthExpression
 from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
+from vellum.workflows.expressions.minus import MinusExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
@@ -99,6 +101,10 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperato
         return "parseJson"
     elif isinstance(descriptor, LengthExpression):
         return "length"
+    elif isinstance(descriptor, AddExpression):
+        return "+"
+    elif isinstance(descriptor, MinusExpression):
+        return "-"
     else:
         raise ValueError(f"Unsupported descriptor type: {descriptor}")
 
@@ -161,6 +167,7 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
     elif isinstance(
         condition,
         (
+            AddExpression,
             AndExpression,
             BeginsWithExpression,
             CoalesceExpression,
@@ -176,6 +183,7 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
             InExpression,
             LessThanExpression,
             LessThanOrEqualToExpression,
+            MinusExpression,
             NotInExpression,
             OrExpression,
         ),

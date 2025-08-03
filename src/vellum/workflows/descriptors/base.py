@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Type, TypeVar, 
 
 if TYPE_CHECKING:
     from vellum.workflows.expressions.accessor import AccessorExpression
+    from vellum.workflows.expressions.add import AddExpression
     from vellum.workflows.expressions.and_ import AndExpression
     from vellum.workflows.expressions.begins_with import BeginsWithExpression
     from vellum.workflows.expressions.between import BetweenExpression
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.length import LengthExpression
     from vellum.workflows.expressions.less_than import LessThanExpression
     from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
+    from vellum.workflows.expressions.minus import MinusExpression
     from vellum.workflows.expressions.not_between import NotBetweenExpression
     from vellum.workflows.expressions.not_in import NotInExpression
     from vellum.workflows.expressions.or_ import OrExpression
@@ -382,3 +384,25 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.length import LengthExpression
 
         return LengthExpression(expression=self)
+
+    @overload
+    def add(self, other: "BaseDescriptor[_O]") -> "AddExpression[_T, _O]": ...
+
+    @overload
+    def add(self, other: _O) -> "AddExpression[_T, _O]": ...
+
+    def add(self, other: "Union[BaseDescriptor[_O], _O]") -> "AddExpression[_T, _O]":
+        from vellum.workflows.expressions.add import AddExpression
+
+        return AddExpression(lhs=self, rhs=other)
+
+    @overload
+    def minus(self, other: "BaseDescriptor[_O]") -> "MinusExpression[_T, _O]": ...
+
+    @overload
+    def minus(self, other: _O) -> "MinusExpression[_T, _O]": ...
+
+    def minus(self, other: "Union[BaseDescriptor[_O], _O]") -> "MinusExpression[_T, _O]":
+        from vellum.workflows.expressions.minus import MinusExpression
+
+        return MinusExpression(lhs=self, rhs=other)
