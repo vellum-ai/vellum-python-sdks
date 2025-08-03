@@ -225,7 +225,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     }),
                   ];
 
-
                   if (composioTool.user_id != null) {
                     args.push(
                       python.methodArgument({
