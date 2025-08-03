@@ -123,6 +123,10 @@ export class Expression extends AstNode {
       return `${rawLhs.toString()} | ${rhsExpression}`;
     } else if (operator === "and") {
       return `${rawLhs.toString()} & ${rhsExpression}`;
+    } else if (operator === "+") {
+      return `${rawLhs.toString()}.add${rhsExpression}`;
+    } else if (operator === "-") {
+      return `${rawLhs.toString()}.minus${rhsExpression}`;
     }
     return `${rawLhs.toString()}.${operator}${rhsExpression}`;
   }
