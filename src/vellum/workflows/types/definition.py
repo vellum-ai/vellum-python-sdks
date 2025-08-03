@@ -111,7 +111,6 @@ class ComposioToolDefinition(UniversalBaseModel):
     toolkit: str  # "GITHUB", "SLACK", etc.
     action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
     description: str
-
     user_id: Optional[str] = None
 
     @property

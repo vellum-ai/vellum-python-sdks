@@ -248,38 +248,34 @@ class ElseNode(BaseNode[ToolCallingState]):
         return self.Outputs()
 
 
-def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> ComposioToolDefinition:
+def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> FunctionDefinition:
     """Hydrate a ComposioToolDefinition with detailed information from the Composio API.
 
     Args:
         tool_def: The basic ComposioToolDefinition to enhance
 
     Returns:
-        ComposioToolDefinition with detailed parameters and description
+        FunctionDefinition with detailed parameters and description
     """
     try:
         composio_service = ComposioService()
         tool_details = composio_service.get_tool_by_slug(tool_def.action)
 
-        # Extract toolkit information from API response
-        toolkit_info = tool_details.get("toolkit", {})
-        toolkit_slug = (
-            toolkit_info.get("slug", tool_def.toolkit) if isinstance(toolkit_info, dict) else tool_def.toolkit
-        )
-
-        # Create a version of the tool definition with proper field extraction
-        return ComposioToolDefinition(
-            type=tool_def.type,
-            toolkit=toolkit_slug.upper() if toolkit_slug else tool_def.toolkit,
-            action=tool_details.get("slug", tool_def.action),
+        # Create a FunctionDefinition directly with proper field extraction
+        return FunctionDefinition(
+            name=tool_def.name,
             description=tool_details.get("description", tool_def.description),
-            user_id=tool_def.user_id,
+            parameters=tool_details.get("input_parameters", {}),
         )
 
     except Exception as e:
-        # If hydration fails (including no API key), log and return original
+        # If hydration fails (including no API key), log and return basic function definition
         logger.warning(f"Failed to enhance Composio tool '{tool_def.action}': {e}")
-        return tool_def
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_def.description,
+            parameters={},
+        )
 
 
 def hydrate_mcp_tool_definitions(server_def: MCPServer) -> List[MCPToolDefinition]:
@@ -337,13 +333,7 @@ def create_tool_router_node(
             if isinstance(function, ComposioToolDefinition):
                 # Get Composio tool details and hydrate the function definition
                 enhanced_function = _hydrate_composio_tool_definition(function)
-                prompt_functions.append(
-                    FunctionDefinition(
-                        name=enhanced_function.name,
-                        description=enhanced_function.description,
-                        parameters={},
-                    )
-                )
+                prompt_functions.append(enhanced_function)
                 # Create port for this function (using original function for get_function_name)
                 function_name = get_function_name(function)
                 port = create_port_condition(function_name)
