@@ -492,9 +492,7 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
     ]
 
 
-def test_run_workflow__string_and_function_call_outputs(
-    vellum_adhoc_prompt_client, vellum_client, mock_uuid4_generator
-):
+def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_client):
     """
     Test that the tool calling node returns both STRING and FUNCTION_CALL outputs on first invocation.
     """

@@ -1,6 +1,6 @@
 import json
 from uuid import uuid4
-from typing import Any, Iterator, List
+from typing import Any, Iterator
 
 from vellum import ChatMessage
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
@@ -15,6 +15,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_function_node, create_tool_router_node
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
@@ -44,7 +45,7 @@ def test_port_condition_match_function_name():
     )
 
     # AND a state with a function call to the first function
-    state = BaseState(
+    state = ToolCallingState(
         meta=StateMeta(
             node_outputs={
                 router_node.Outputs.results: [
@@ -115,12 +116,6 @@ def test_tool_calling_node_inline_workflow_context():
         generated_files={"script.py": "print('hello world')"},
     )
     function_node._context = parent_context
-
-    # Create a state with chat_history for the function node
-    class TestState(BaseState):
-        chat_history: List[ChatMessage] = []
-
-    function_node.state = TestState(meta=StateMeta(node_outputs={tool_router_node.Outputs.text: '{"arguments": {}}'}))
 
     # WHEN the function node runs
     outputs = list(function_node.run())

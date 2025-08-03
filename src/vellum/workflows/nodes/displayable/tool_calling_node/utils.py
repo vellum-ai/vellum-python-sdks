@@ -59,7 +59,7 @@ class FunctionCallNodeMixin:
                 content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
             )
         )
-        with state.__atomic__():
+        with state.__quiet__():
             state.current_function_calls_processed += 1
             state.current_prompt_output_index += 1
 
@@ -76,7 +76,7 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
         generator = super().run()
-        with self.state.__atomic__():
+        with self.state.__quiet__():
             self.state.current_prompt_output_index = 0
             self.state.current_function_calls_processed = 0
         for output in generator:
@@ -235,7 +235,8 @@ class ElseNode(BaseNode[ToolCallingState]):
     """Node that executes when no function conditions match."""
 
     def run(self) -> BaseNode.Outputs:
-        self.state.current_prompt_output_index += 1
+        with self.state.__quiet__():
+            self.state.current_prompt_output_index += 1
         return self.Outputs()
 
 
@@ -509,10 +510,8 @@ def create_else_node(
 ) -> Type[BaseNode]:
     class Ports(BaseNode.Ports):
         loop = Port.on_if(
-            tool_router_node.Outputs.results.length().greater_than_or_equal_to(
-                ToolCallingState.current_prompt_output_index
-            )
-            & ToolCallingState.current_function_calls_processed.greater_than(0)
+            ToolCallingState.current_prompt_output_index.less_than(tool_router_node.Outputs.results.length())
+            | ToolCallingState.current_function_calls_processed.greater_than(0)
         )
         end = Port.on_else()
 
