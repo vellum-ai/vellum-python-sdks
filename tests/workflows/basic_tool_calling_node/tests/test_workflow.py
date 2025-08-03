@@ -3,6 +3,7 @@ from unittest import mock
 from uuid import uuid4
 from typing import Iterator, List
 
+from vellum.client.types.array_chat_message_content import ArrayChatMessageContent
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
@@ -541,6 +542,32 @@ def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_clie
 
     # THEN the adhoc_execute_prompt_stream should be called exactly twice
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
+
+    # AND the second call should have the correct chat_history input value
+    second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]
+    chat_history_input = next(
+        input_val
+        for input_val in second_call.kwargs["input_values"]
+        if hasattr(input_val, "key") and input_val.key == "chat_history"
+    )
+    assert chat_history_input.value == [
+        ChatMessage(
+            role="ASSISTANT",
+            content=ArrayChatMessageContent(
+                value=[
+                    StringChatMessageContent(value="I'll help you get the weather information."),
+                    FunctionCallChatMessageContent(
+                        value=FunctionCallChatMessageContentValue(
+                            name="get_current_weather",
+                            arguments={"location": "San Francisco", "unit": "celsius"},
+                            id="call_7115tNTmEACTsQRGwKpJipJK",
+                        ),
+                    ),
+                ]
+            ),
+            source=None,
+        ),
+    ]
 
 
 @pytest.mark.skip(reason="Testing events emission will be implemented in a follow up PR")

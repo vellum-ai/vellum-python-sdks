@@ -5,6 +5,8 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Type, Union, c
 from pydash import snake_case
 
 from vellum import ChatMessage, PromptBlock
+from vellum.client.types.array_chat_message_content import ArrayChatMessageContent
+from vellum.client.types.array_chat_message_content_item import ArrayChatMessageContentItem
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.function_definition import FunctionDefinition
@@ -79,29 +81,34 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
         with self.state.__quiet__():
             self.state.current_prompt_output_index = 0
             self.state.current_function_calls_processed = 0
+            self.state.prompt_iterations += 1
         for output in generator:
-            if output.name == "results" and output.value:
-                values = cast(List[PromptOutput], output.value)
-                if values and len(values) > 0:
-                    if values[0].type == "STRING":
-                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
-                    elif values[0].type == "FUNCTION_CALL":
-                        self.state.prompt_iterations += 1
-
-                        function_call = values[0].value
-                        if function_call is not None:
-                            self.state.chat_history.append(
-                                ChatMessage(
-                                    role="ASSISTANT",
-                                    content=FunctionCallChatMessageContent(
-                                        value=FunctionCallChatMessageContentValue(
-                                            name=function_call.name,
-                                            arguments=function_call.arguments,
-                                            id=function_call.id,
-                                        ),
-                                    ),
-                                )
+            if output.name == InlinePromptNode.Outputs.results.name and output.value:
+                prompt_outputs = cast(List[PromptOutput], output.value)
+                chat_contents: List[ArrayChatMessageContentItem] = []
+                for prompt_output in prompt_outputs:
+                    if prompt_output.type == "STRING":
+                        chat_contents.append(StringChatMessageContent(value=prompt_output.value))
+                    elif prompt_output.type == "FUNCTION_CALL" and prompt_output.value:
+                        raw_function_call = prompt_output.value.model_dump()
+                        if "state" in raw_function_call:
+                            del raw_function_call["state"]
+                        chat_contents.append(
+                            FunctionCallChatMessageContent(
+                                value=FunctionCallChatMessageContentValue.model_validate(raw_function_call)
                             )
+                        )
+
+                if len(chat_contents) == 1:
+                    if chat_contents[0].type == "STRING":
+                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=chat_contents[0].value))
+                    else:
+                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", content=chat_contents[0]))
+                else:
+                    self.state.chat_history.append(
+                        ChatMessage(role="ASSISTANT", content=ArrayChatMessageContent(value=chat_contents))
+                    )
+
             yield output
 
 
