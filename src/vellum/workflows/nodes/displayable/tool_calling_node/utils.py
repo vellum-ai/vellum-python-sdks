@@ -234,6 +234,14 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 class ElseNode(BaseNode[ToolCallingState]):
     """Node that executes when no function conditions match."""
 
+    class Ports(BaseNode.Ports):
+        # Redefined in the create_else_node function, but defined here to resolve mypy errors
+        loop = Port.on_if(
+            ToolCallingState.current_prompt_output_index.less_than(1)
+            | ToolCallingState.current_function_calls_processed.greater_than(0)
+        )
+        end = Port.on_else()
+
     def run(self) -> BaseNode.Outputs:
         with self.state.__quiet__():
             self.state.current_prompt_output_index += 1
@@ -507,8 +515,8 @@ def create_mcp_tool_node(
 
 def create_else_node(
     tool_router_node: Type[ToolRouterNode],
-) -> Type[BaseNode]:
-    class Ports(BaseNode.Ports):
+) -> Type[ElseNode]:
+    class Ports(ElseNode.Ports):
         loop = Port.on_if(
             ToolCallingState.current_prompt_output_index.less_than(tool_router_node.Outputs.results.length())
             | ToolCallingState.current_function_calls_processed.greater_than(0)

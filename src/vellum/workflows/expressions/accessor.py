@@ -7,10 +7,11 @@ from pydantic_core import core_schema
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
-from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.descriptors.utils import is_resolved_instance, resolve_value
 from vellum.workflows.state.base import BaseState
 
 LHS = TypeVar("LHS")
+AccessorField = Union[str, int, BaseDescriptor[str], BaseDescriptor[int]]
 
 
 class AccessorExpression(BaseDescriptor[Any]):
@@ -18,7 +19,7 @@ class AccessorExpression(BaseDescriptor[Any]):
         self,
         *,
         base: BaseDescriptor[LHS],
-        field: Union[str, int],
+        field: AccessorField,
     ) -> None:
         super().__init__(
             name=f"{base.name}.{field}",
@@ -28,7 +29,7 @@ class AccessorExpression(BaseDescriptor[Any]):
         self._base = base
         self._field = field
 
-    def _infer_accessor_types(self, base: BaseDescriptor[LHS], field: Union[str, int]) -> tuple[Type, ...]:
+    def _infer_accessor_types(self, base: BaseDescriptor[LHS], field: AccessorField) -> tuple[Type, ...]:
         """
         Infer the types for this accessor expression based on the base descriptor's types
         and the field being accessed.
@@ -42,7 +43,7 @@ class AccessorExpression(BaseDescriptor[Any]):
             origin = get_origin(base_type)
             args = get_args(base_type)
 
-            if isinstance(field, int) and origin in (list, tuple) and args:
+            if is_resolved_instance(field, int) and origin in (list, tuple) and args:
                 if origin is list:
                     inferred_types.append(args[0])
                 elif origin is tuple and len(args) == 2 and args[1] is ...:
@@ -52,7 +53,7 @@ class AccessorExpression(BaseDescriptor[Any]):
                         inferred_types.append(args[field])
                     else:
                         inferred_types.append(args[field])
-            elif isinstance(field, str) and origin in (dict,) and len(args) >= 2:
+            elif is_resolved_instance(field, str) and origin in (dict,) and len(args) >= 2:
                 inferred_types.append(args[1])  # Value type from Dict[K, V]
 
         return tuple(set(inferred_types)) if inferred_types else ()

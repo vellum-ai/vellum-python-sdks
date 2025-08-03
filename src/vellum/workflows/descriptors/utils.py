@@ -1,7 +1,8 @@
 from collections.abc import Mapping
 import dataclasses
 import inspect
-from typing import Any, Dict, Optional, Sequence, Set, TypeVar, Union, cast, overload
+from typing import Any, Dict, Optional, Sequence, Set, Type, TypeVar, Union, cast, overload
+from typing_extensions import TypeGuard
 
 from pydantic import BaseModel
 
@@ -113,5 +114,22 @@ def is_unresolved(value: Any) -> bool:
 
     if isinstance(value, Set):
         return any(is_unresolved(item) for item in value)
+
+    return False
+
+
+_ResolvedType = TypeVar("_ResolvedType")
+
+
+def is_resolved_instance(value: Any, type_: Type[_ResolvedType]) -> TypeGuard[_ResolvedType]:
+    """
+    Checks if a value is an instance of a type or a descriptor that resolves to that type.
+    """
+
+    if isinstance(value, type_):
+        return True
+
+    if isinstance(value, BaseDescriptor) and value.types:
+        return issubclass(value.types[0], type_)
 
     return False
