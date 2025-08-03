@@ -14,7 +14,7 @@ from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
-class BasePromptNode(BaseNode, Generic[StateType]):
+class BasePromptNode(BaseNode[StateType], Generic[StateType]):
     # Inputs that are passed to the Prompt
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
 

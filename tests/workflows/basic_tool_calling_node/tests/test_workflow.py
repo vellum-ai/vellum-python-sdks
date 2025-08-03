@@ -24,6 +24,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolRouterNode
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
@@ -402,11 +403,7 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
     )
 
     tool_router_node_initiated_events = [
-        e
-        for e in events
-        if e.name == "node.execution.initiated"
-        and hasattr(e.body, "node_definition")
-        and "ToolRouterNode" in str(e.body.node_definition)
+        e for e in events if e.name == "node.execution.initiated" and issubclass(e.body.node_definition, ToolRouterNode)
     ]
 
     assert len(tool_router_node_initiated_events) == 3

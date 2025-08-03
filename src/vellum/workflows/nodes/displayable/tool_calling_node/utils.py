@@ -59,6 +59,9 @@ class FunctionCallNodeMixin:
                 content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
             )
         )
+        with state.__atomic__():
+            state.current_function_calls_processed += 1
+            state.current_prompt_output_index += 1
 
 
 class ToolRouterNode(InlinePromptNode[ToolCallingState]):
@@ -73,9 +76,12 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
 
         generator = super().run()
+        with self.state.__atomic__():
+            self.state.current_prompt_output_index = 0
+            self.state.current_function_calls_processed = 0
         for output in generator:
             if output.name == "results" and output.value:
-                values = cast(List[Any], output.value)
+                values = cast(List[PromptOutput], output.value)
                 if values and len(values) > 0:
                     if values[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=values[0].value))
@@ -225,6 +231,14 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         yield from []
 
 
+class ElseNode(BaseNode[ToolCallingState]):
+    """Node that executes when no function conditions match."""
+
+    def run(self) -> BaseNode.Outputs:
+        self.state.current_prompt_output_index += 1
+        return self.Outputs()
+
+
 def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> ComposioToolDefinition:
     """Hydrate a ComposioToolDefinition with detailed information from the Composio API.
 
@@ -303,8 +317,13 @@ def create_tool_router_node(
             return Port.on_if(
                 LazyReference(
                     lambda: (
-                        node.Outputs.results[0]["type"].equals("FUNCTION_CALL")
-                        & node.Outputs.results[0]["value"]["name"].equals(fn_name)
+                        ToolCallingState.current_prompt_output_index.less_than(node.Outputs.results.length())
+                        & node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
+                            "FUNCTION_CALL"
+                        )
+                        & node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"]["name"].equals(
+                            fn_name
+                        )
                     )
                 )
             )
@@ -479,6 +498,29 @@ def create_mcp_tool_node(
         {
             "mcp_tool": tool_def,
             "function_call_output": tool_router_node.Outputs.results,
+            "__module__": __name__,
+        },
+    )
+    return node
+
+
+def create_else_node(
+    tool_router_node: Type[ToolRouterNode],
+) -> Type[BaseNode]:
+    class Ports(BaseNode.Ports):
+        loop = Port.on_if(
+            tool_router_node.Outputs.results.length().greater_than_or_equal_to(
+                ToolCallingState.current_prompt_output_index
+            )
+            & ToolCallingState.current_function_calls_processed.greater_than(0)
+        )
+        end = Port.on_else()
+
+    node = type(
+        f"{tool_router_node.__name__}_ElseNode",
+        (ElseNode,),
+        {
+            "Ports": Ports,
             "__module__": __name__,
         },
     )

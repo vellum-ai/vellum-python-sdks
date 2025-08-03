@@ -59,37 +59,44 @@ class AccessorExpression(BaseDescriptor[Any]):
 
     def resolve(self, state: "BaseState") -> Any:
         base = resolve_value(self._base, state)
+        accessor_field = resolve_value(self._field, state)
 
         if dataclasses.is_dataclass(base):
-            if isinstance(self._field, int):
+            if isinstance(accessor_field, int):
                 raise InvalidExpressionException("Cannot access field by index on a dataclass")
 
             try:
-                return getattr(base, self._field)
+                return getattr(base, accessor_field)
             except AttributeError:
-                raise InvalidExpressionException(f"Field '{self._field}' not found on dataclass {type(base).__name__}")
+                raise InvalidExpressionException(
+                    f"Field '{accessor_field}' not found on dataclass {type(base).__name__}"
+                )
 
         if isinstance(base, BaseModel):
-            if isinstance(self._field, int):
+            if isinstance(accessor_field, int):
                 raise InvalidExpressionException("Cannot access field by index on a BaseModel")
 
             try:
-                return getattr(base, self._field)
+                return getattr(base, accessor_field)
             except AttributeError:
-                raise InvalidExpressionException(f"Field '{self._field}' not found on BaseModel {type(base).__name__}")
+                raise InvalidExpressionException(
+                    f"Field '{accessor_field}' not found on BaseModel {type(base).__name__}"
+                )
 
         if isinstance(base, Mapping):
             try:
-                return base[self._field]
+                return base[accessor_field]
             except KeyError:
-                raise InvalidExpressionException(f"Key '{self._field}' not found in mapping")
+                raise InvalidExpressionException(f"Key '{accessor_field}' not found in mapping")
 
         if isinstance(base, Sequence):
             try:
-                index = int(self._field)
+                index = int(accessor_field)
                 return base[index]
             except (IndexError, ValueError):
-                if isinstance(self._field, int) or (isinstance(self._field, str) and self._field.lstrip("-").isdigit()):
+                if isinstance(accessor_field, int) or (
+                    isinstance(accessor_field, str) and accessor_field.lstrip("-").isdigit()
+                ):
                     raise InvalidExpressionException(
                         f"Index {self._field} is out of bounds for sequence of length {len(base)}"
                     )

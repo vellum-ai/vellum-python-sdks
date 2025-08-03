@@ -12,6 +12,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
+    create_else_node,
     create_function_node,
     create_mcp_tool_node,
     create_tool_router_node,
@@ -171,7 +172,11 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             edge_graph = router_port >> FunctionNodeClass >> self.tool_router_node
             graph_set.add(edge_graph)
 
-        default_port = getattr(self.tool_router_node.Ports, "default")
+        else_node = create_else_node(self.tool_router_node)
+        default_port = self.tool_router_node.Ports.default >> {
+            else_node.Ports.loop >> self.tool_router_node,
+            else_node.Ports.end,
+        }
         graph_set.add(default_port)
 
         self._graph = Graph.from_set(graph_set)
