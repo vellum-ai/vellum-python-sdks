@@ -24,6 +24,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolRouterNode
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
@@ -402,11 +403,7 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
     )
 
     tool_router_node_initiated_events = [
-        e
-        for e in events
-        if e.name == "node.execution.initiated"
-        and hasattr(e.body, "node_definition")
-        and "ToolRouterNode" in str(e.body.node_definition)
+        e for e in events if e.name == "node.execution.initiated" and issubclass(e.body.node_definition, ToolRouterNode)
     ]
 
     assert len(tool_router_node_initiated_events) == 3
@@ -493,6 +490,57 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
             source=None,
         ),
     ]
+
+
+def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_client):
+    """
+    Test that the tool calling node returns both STRING and FUNCTION_CALL outputs on first invocation.
+    """
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                StringVellumValue(value="I'll help you get the weather information."),
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"location": "San Francisco", "unit": "celsius"},
+                        id="call_7115tNTmEACTsQRGwKpJipJK",
+                        name="get_current_weather",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [
+                StringVellumValue(
+                    value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
+                )
+            ]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    # GIVEN a get current weather workflow
+    workflow = BasicToolCallingNodeWorkflow()
+
+    # AND the mock is set up to return our events
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the workflow is executed
+    workflow.run(Inputs(query="What's the weather like in San Francisco?"))
+
+    # THEN the adhoc_execute_prompt_stream should be called exactly twice
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
 
 
 @pytest.mark.skip(reason="Testing events emission will be implemented in a follow up PR")

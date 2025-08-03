@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Iterator, Type, Union
+from typing import Any, Dict, Generic, Iterator, Type, Union
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowErrorCode
@@ -10,7 +10,7 @@ from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 
-class InlinePromptNode(BaseInlinePromptNode[StateType]):
+class InlinePromptNode(BaseInlinePromptNode[StateType], Generic[StateType]):
     """
     Used to execute a Prompt defined inline.
 

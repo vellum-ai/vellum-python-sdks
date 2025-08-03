@@ -130,7 +130,7 @@ class BaseDescriptor(Generic[_T]):
 
         return CoalesceExpression(lhs=self, rhs=other)
 
-    def __getitem__(self, field: Union[str, int]) -> "AccessorExpression":
+    def __getitem__(self, field: Union[str, int, "BaseDescriptor[str]", "BaseDescriptor[int]"]) -> "AccessorExpression":
         from vellum.workflows.expressions.accessor import AccessorExpression
 
         return AccessorExpression(base=self, field=field)

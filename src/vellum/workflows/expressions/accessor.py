@@ -7,10 +7,11 @@ from pydantic_core import core_schema
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
-from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.descriptors.utils import is_resolved_instance, resolve_value
 from vellum.workflows.state.base import BaseState
 
 LHS = TypeVar("LHS")
+AccessorField = Union[str, int, BaseDescriptor[str], BaseDescriptor[int]]
 
 
 class AccessorExpression(BaseDescriptor[Any]):
@@ -18,7 +19,7 @@ class AccessorExpression(BaseDescriptor[Any]):
         self,
         *,
         base: BaseDescriptor[LHS],
-        field: Union[str, int],
+        field: AccessorField,
     ) -> None:
         super().__init__(
             name=f"{base.name}.{field}",
@@ -28,7 +29,7 @@ class AccessorExpression(BaseDescriptor[Any]):
         self._base = base
         self._field = field
 
-    def _infer_accessor_types(self, base: BaseDescriptor[LHS], field: Union[str, int]) -> tuple[Type, ...]:
+    def _infer_accessor_types(self, base: BaseDescriptor[LHS], field: AccessorField) -> tuple[Type, ...]:
         """
         Infer the types for this accessor expression based on the base descriptor's types
         and the field being accessed.
@@ -42,7 +43,7 @@ class AccessorExpression(BaseDescriptor[Any]):
             origin = get_origin(base_type)
             args = get_args(base_type)
 
-            if isinstance(field, int) and origin in (list, tuple) and args:
+            if is_resolved_instance(field, int) and origin in (list, tuple) and args:
                 if origin is list:
                     inferred_types.append(args[0])
                 elif origin is tuple and len(args) == 2 and args[1] is ...:
@@ -52,44 +53,51 @@ class AccessorExpression(BaseDescriptor[Any]):
                         inferred_types.append(args[field])
                     else:
                         inferred_types.append(args[field])
-            elif isinstance(field, str) and origin in (dict,) and len(args) >= 2:
+            elif is_resolved_instance(field, str) and origin in (dict,) and len(args) >= 2:
                 inferred_types.append(args[1])  # Value type from Dict[K, V]
 
         return tuple(set(inferred_types)) if inferred_types else ()
 
     def resolve(self, state: "BaseState") -> Any:
         base = resolve_value(self._base, state)
+        accessor_field = resolve_value(self._field, state)
 
         if dataclasses.is_dataclass(base):
-            if isinstance(self._field, int):
+            if isinstance(accessor_field, int):
                 raise InvalidExpressionException("Cannot access field by index on a dataclass")
 
             try:
-                return getattr(base, self._field)
+                return getattr(base, accessor_field)
             except AttributeError:
-                raise InvalidExpressionException(f"Field '{self._field}' not found on dataclass {type(base).__name__}")
+                raise InvalidExpressionException(
+                    f"Field '{accessor_field}' not found on dataclass {type(base).__name__}"
+                )
 
         if isinstance(base, BaseModel):
-            if isinstance(self._field, int):
+            if isinstance(accessor_field, int):
                 raise InvalidExpressionException("Cannot access field by index on a BaseModel")
 
             try:
-                return getattr(base, self._field)
+                return getattr(base, accessor_field)
             except AttributeError:
-                raise InvalidExpressionException(f"Field '{self._field}' not found on BaseModel {type(base).__name__}")
+                raise InvalidExpressionException(
+                    f"Field '{accessor_field}' not found on BaseModel {type(base).__name__}"
+                )
 
         if isinstance(base, Mapping):
             try:
-                return base[self._field]
+                return base[accessor_field]
             except KeyError:
-                raise InvalidExpressionException(f"Key '{self._field}' not found in mapping")
+                raise InvalidExpressionException(f"Key '{accessor_field}' not found in mapping")
 
         if isinstance(base, Sequence):
             try:
-                index = int(self._field)
+                index = int(accessor_field)
                 return base[index]
             except (IndexError, ValueError):
-                if isinstance(self._field, int) or (isinstance(self._field, str) and self._field.lstrip("-").isdigit()):
+                if isinstance(accessor_field, int) or (
+                    isinstance(accessor_field, str) and accessor_field.lstrip("-").isdigit()
+                ):
                     raise InvalidExpressionException(
                         f"Index {self._field} is out of bounds for sequence of length {len(base)}"
                     )
