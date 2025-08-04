@@ -1229,6 +1229,20 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
 "
 `;
 
+exports[`WorkflowProjectGenerator > function > should not generate docstring if description is empty string > code/nodes/tool_call_get_current_weather_node/weather_function/workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.code_execution_node import CodeExecutionNode
+from .nodes.tool_call_start_node import StartNode
+
+
+class WeatherFunction(BaseWorkflow[Inputs, BaseState]):
+    graph = CodeExecutionNode >> StartNode
+"
+`;
+
 exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs > code/sandbox.py 1`] = `
 "from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
 from vellum.workflows.sandbox import WorkflowSandboxRunner

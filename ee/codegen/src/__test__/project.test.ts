@@ -5122,6 +5122,312 @@ baz = foo + bar
         expectProjectFileToMatchSnapshot(file);
       }
     });
+    it("should not generate docstring if description is empty string", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+              definition: null,
+              display_data: {
+                width: null,
+                height: null,
+                comment: null,
+                position: { x: 0.0, y: 0.0 },
+              },
+            },
+            {
+              id: "21f29cac-da87-495f-bba1-093d423f4e46",
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "displayable",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              type: "GENERIC",
+              label: "GetCurrentWeatherNode",
+              ports: [],
+              outputs: [],
+              trigger: {
+                id: "2414743b-b1dd-4552-8abf-9b7481df9762",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              adornments: null,
+              attributes: [
+                {
+                  id: "78324739-ff89-47a5-902b-10da0cb95c6d",
+                  name: "functions",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          type: "INLINE_WORKFLOW",
+                          description: "", // empty string
+                          exec_config: {
+                            input_variables: [
+                              {
+                                id: "5246e023-8bcb-4572-be8e-ca9cf19807da",
+                                key: "city",
+                                type: "STRING",
+                                default: null,
+                                required: true,
+                                extensions: { color: null },
+                              },
+                              {
+                                id: "c5d2aa82-10ad-4511-97ce-66b01af721a1",
+                                key: "date",
+                                type: "STRING",
+                                default: null,
+                                required: true,
+                                extensions: { color: null },
+                              },
+                            ],
+                            state_variables: [],
+                            output_variables: [],
+                            workflow_raw_data: {
+                              edges: [
+                                {
+                                  id: "15b49a1f-c033-4f50-a12f-42daae03539e",
+                                  type: "DEFAULT",
+                                  source_node_id:
+                                    "d97d2a36-3347-487e-b915-3bc874aaded4",
+                                  target_node_id: "code-execution-node-id",
+                                  source_handle_id:
+                                    "c55f8e1e-0422-4009-af54-86df5625ba71",
+                                  target_handle_id:
+                                    "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
+                                },
+                                {
+                                  id: "code-to-start-edge",
+                                  type: "DEFAULT",
+                                  source_node_id: "code-execution-node-id",
+                                  target_node_id: "start-node-id",
+                                  source_handle_id:
+                                    "5352eb9f-c28f-4e90-b32e-82cb970efa21",
+                                  target_handle_id:
+                                    "6492efcf-4437-4af1-9ad7-269795ccb27a",
+                                },
+                                {
+                                  id: "ab8c4a64-465d-4406-a407-9faa09d0326d",
+                                  type: "DEFAULT",
+                                  source_node_id: "start-node-id",
+                                  target_node_id:
+                                    "938ac916-6b4d-4097-a16e-cf7feb663b17",
+                                  source_handle_id:
+                                    "1e739e86-a285-4438-9725-a152c15a63e3",
+                                  target_handle_id:
+                                    "332d152e-1648-42a0-a35a-03f2e71a5752",
+                                },
+                                {
+                                  id: "f9dc12de-4284-419d-beb2-927452b80da0",
+                                  type: "DEFAULT",
+                                  source_node_id: "start-node-id",
+                                  target_node_id:
+                                    "d4abe0fd-0ba5-438c-8d20-4155ca89429e",
+                                  source_handle_id:
+                                    "1e739e86-a285-4438-9725-a152c15a63e3",
+                                  target_handle_id:
+                                    "7b3a550b-9b15-4707-8457-856976be003a",
+                                },
+                              ],
+                              nodes: [
+                                {
+                                  id: "d97d2a36-3347-487e-b915-3bc874aaded4",
+                                  base: null,
+                                  data: {
+                                    label: "Entrypoint Node",
+                                    source_handle_id:
+                                      "c55f8e1e-0422-4009-af54-86df5625ba71",
+                                  },
+                                  type: "ENTRYPOINT",
+                                  inputs: [],
+                                  definition: null,
+                                  display_data: {
+                                    position: { x: 0.0, y: 0.0 },
+                                  },
+                                },
+                                {
+                                  id: "code-execution-node-id",
+                                  data: {
+                                    label: "Code Execution Node",
+                                    filepath: null,
+                                    packages: [],
+                                    output_id:
+                                      "f2ea61aa-256e-41b0-8ab4-aa3a22e489dd",
+                                    output_type: "NUMBER",
+                                    code_input_id:
+                                      "82a5d32f-fc12-4b64-b72c-2a65f860f8cb",
+                                    log_output_id:
+                                      "77eab8ac-bc36-4f53-8449-8be6396d3331",
+                                    error_output_id: null,
+                                    runtime_input_id:
+                                      "247da47f-ad5b-412d-825a-61c29c6a3847",
+                                    source_handle_id:
+                                      "5352eb9f-c28f-4e90-b32e-82cb970efa21",
+                                    target_handle_id:
+                                      "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
+                                  },
+                                  type: "CODE_EXECUTION",
+                                  ports: [
+                                    {
+                                      id: "5352eb9f-c28f-4e90-b32e-82cb970efa21",
+                                      name: "default",
+                                      type: "DEFAULT",
+                                    },
+                                  ],
+                                  inputs: [
+                                    {
+                                      id: "82a5d32f-fc12-4b64-b72c-2a65f860f8cb",
+                                      key: "code",
+                                      value: {
+                                        rules: [
+                                          {
+                                            data: {
+                                              type: "STRING",
+                                              value:
+                                                "def main(\n    arg1: int,\n    arg2: int,\n) -> int:\n    return arg1 + arg2\n    ",
+                                            },
+                                            type: "CONSTANT_VALUE",
+                                          },
+                                        ],
+                                        combinator: "OR",
+                                      },
+                                    },
+                                    {
+                                      id: "247da47f-ad5b-412d-825a-61c29c6a3847",
+                                      key: "runtime",
+                                      value: {
+                                        rules: [
+                                          {
+                                            data: {
+                                              type: "STRING",
+                                              value: "PYTHON_3_11_6",
+                                            },
+                                            type: "CONSTANT_VALUE",
+                                          },
+                                        ],
+                                        combinator: "OR",
+                                      },
+                                    },
+                                  ],
+                                  trigger: {
+                                    id: "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
+                                    merge_behavior: "AWAIT_ANY",
+                                  },
+                                },
+                                {
+                                  id: "start-node-id",
+                                  base: {
+                                    name: "BaseNode",
+                                    module: [
+                                      "vellum",
+                                      "workflows",
+                                      "nodes",
+                                      "bases",
+                                      "base",
+                                    ],
+                                  },
+                                  type: "GENERIC",
+                                  label: "StartNode",
+                                  ports: [
+                                    {
+                                      id: "1e739e86-a285-4438-9725-a152c15a63e3",
+                                      name: "default",
+                                      type: "DEFAULT",
+                                    },
+                                  ],
+                                  outputs: [],
+                                  trigger: {
+                                    id: "6492efcf-4437-4af1-9ad7-269795ccb27a",
+                                    merge_behavior: "AWAIT_ATTRIBUTES",
+                                  },
+                                  adornments: null,
+                                  attributes: [],
+                                  definition: {
+                                    name: "StartNode",
+                                    module: [
+                                      "local_inline_subworkflow",
+                                      "nodes",
+                                      "tool_call_start_node",
+                                    ],
+                                  },
+                                  display_data: {
+                                    position: { x: 0.0, y: 0.0 },
+                                  },
+                                },
+                              ],
+                              definition: {
+                                name: "WeatherFunction",
+                                module: [
+                                  "local_inline_subworkflow",
+                                  "nodes",
+                                  "tool_call_weather_function",
+                                ],
+                              },
+                              display_data: {
+                                viewport: { x: 0.0, y: 0.0, zoom: 1.0 },
+                              },
+                              output_values: [],
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+              definition: {
+                name: "GetCurrentWeatherNode",
+                module: [
+                  "local_inline_subworkflow",
+                  "nodes",
+                  "tool_call_get_current_weather_node",
+                ],
+              },
+              display_data: {},
+            },
+          ],
+          definition: {
+            name: "Workflow",
+            module: ["local_inline_subworkflow", "workflow"],
+          },
+          display_data: { viewport: { x: 0.0, y: 0.0, zoom: 1.0 } },
+          output_values: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+      await project.generateCode();
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "tool_call_get_current_weather_node",
+        "weather_function",
+        "workflow.py",
+      ]);
+    });
     it("should generate deployment workflow tool", async () => {
       const displayData = {
         workflow_raw_data: {
