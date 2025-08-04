@@ -41,7 +41,7 @@ class VellumEmitter(BaseWorkflowEmitter):
         super().__init__()
         self._timeout = timeout
         self._max_retries = max_retries
-        self._events_endpoint = "events"  # TODO: make this configurable with the correct url
+        self._events_endpoint = "v1/events"  # TODO: make this configurable with the correct url
 
     def emit_event(self, event: WorkflowEvent) -> None:
         """
@@ -90,7 +90,8 @@ class VellumEmitter(BaseWorkflowEmitter):
                 base_url = client._client_wrapper.get_environment().default
                 response = client._client_wrapper.httpx_client.request(
                     method="POST",
-                    path=f"{base_url}/{self._events_endpoint}",  # TODO: will be replaced with the correct url
+                    base_url=base_url,
+                    path=self._events_endpoint,  # TODO: will be replaced with the correct url
                     json=event_data,
                     headers=client._client_wrapper.get_headers(),
                     request_options={"timeout_in_seconds": self._timeout},
