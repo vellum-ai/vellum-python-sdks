@@ -513,4 +513,76 @@ describe("InlinePromptNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("with functions attribute", () => {
+    it("should generate FunctionDefinition objects for CONSTANT_VALUE functions", async () => {
+      const functionsAttribute: NodeAttributeType = {
+        id: "4ef3f825-2b51-4fe2-bf9f-21a7492f6f87",
+        name: "functions",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [
+              {
+                name: "parse_text_elements",
+                state: null,
+                forced: null,
+                strict: null,
+                parameters: {
+                  type: "object",
+                  required: ["noun", "verb", "adjective", "summary", "explain"],
+                  properties: {
+                    noun: {
+                      type: "string",
+                      description:
+                        "A key noun or main subject identified in the text",
+                    },
+                    verb: {
+                      type: "string",
+                      description: "A significant action or verb from the text",
+                    },
+                    explain: {
+                      type: "string",
+                      description:
+                        "A concise explanation of why you chose these specific elements",
+                    },
+                    summary: {
+                      type: "string",
+                      description: "A brief summary of the main idea or theme",
+                    },
+                    adjective: {
+                      type: "string",
+                      description:
+                        "A descriptive adjective that characterizes the text or its subject",
+                    },
+                  },
+                },
+                description:
+                  "Extracts and analyzes key elements from provided text",
+                cache_config: null,
+              },
+            ],
+          },
+        },
+      };
+
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({})
+        .withAttributes([functionsAttribute])
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

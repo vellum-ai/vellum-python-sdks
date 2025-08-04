@@ -7,6 +7,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { FunctionDefinition } from "src/generators/function-definition";
+import { Json } from "src/generators/json";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { PromptParameters } from "src/generators/prompt-parameters-request";
 import { StatefulPromptBlock } from "src/generators/stateful-prompt-block";
@@ -378,11 +379,88 @@ export class InlinePromptNode extends BaseNode<
 
         return statements;
       }
+
+      // Handle non-code execution constant value functions - treat as raw function definitions
+      const rawFunctions = functionsAttribute.value.value.value;
+      const nonCodeExecutionFunctions = rawFunctions.filter(
+        (f) => !f.type || f.type !== "CODE_EXECUTION"
+      );
+
+      if (nonCodeExecutionFunctions.length > 0) {
+        statements.push(
+          python.field({
+            name: "functions",
+            initializer: python.TypeInstantiation.list(
+              nonCodeExecutionFunctions.map((f) => {
+                const classArgs = [];
+
+                if (!isNil(f.name)) {
+                  classArgs.push(
+                    python.methodArgument({
+                      name: "name",
+                      value: python.TypeInstantiation.str(f.name),
+                    })
+                  );
+                }
+
+                if (!isNil(f.description)) {
+                  classArgs.push(
+                    python.methodArgument({
+                      name: "description",
+                      value: python.TypeInstantiation.str(f.description),
+                    })
+                  );
+                }
+
+                if (!isNil(f.parameters)) {
+                  classArgs.push(
+                    python.methodArgument({
+                      name: "parameters",
+                      value: new Json(f.parameters),
+                    })
+                  );
+                }
+
+                if (!isNil(f.forced)) {
+                  classArgs.push(
+                    python.methodArgument({
+                      name: "function_forced",
+                      value: python.TypeInstantiation.bool(f.forced),
+                    })
+                  );
+                }
+
+                if (!isNil(f.strict)) {
+                  classArgs.push(
+                    python.methodArgument({
+                      name: "function_strict",
+                      value: python.TypeInstantiation.bool(f.strict),
+                    })
+                  );
+                }
+
+                return python.instantiateClass({
+                  classReference: python.reference({
+                    name: "FunctionDefinition",
+                    modulePath: [...VELLUM_CLIENT_MODULE_PATH],
+                  }),
+                  arguments_: classArgs,
+                });
+              }),
+              {
+                endWithComma: true,
+              }
+            ),
+          })
+        );
+
+        return statements;
+      }
     }
 
-    // Handle non-code execution functions
     if (
       functionsAttribute &&
+      functionsAttribute.value?.type !== "CONSTANT_VALUE" &&
       !this.isAttributeDefault(functionsAttribute.value, { defaultValue: null })
     ) {
       statements.push(
