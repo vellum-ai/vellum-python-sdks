@@ -215,3 +215,26 @@ Summarize the following text:
     ]
 "
 `;
+
+exports[`ToolCallingNode > mcp server > should generate mcp server 1`] = `
+"from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+from vellum.workflows.types.definition import MCP_SERVER
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        MCP_SERVER(
+            name="github",
+            url="https://api.githubcopilot.com/mcp/",
+            authorization_type=AuthorizationType.BEARER_TOKEN,
+            bearer_token_value=EnvironmentVariableReference(
+                name="GITHUB_PERSONAL_ACCESS_TOKEN"
+            ),
+        )
+    ]
+"
+`;
