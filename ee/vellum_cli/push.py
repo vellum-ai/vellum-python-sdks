@@ -295,5 +295,17 @@ Visit at: {base_url}/workflow-sandboxes/{response.workflow_sandbox_id}"""
 
 def module_exists(module_name: str) -> bool:
     """Check if a module directory exists."""
-    module_path = os.path.join(os.getcwd(), *module_name.split("."))
-    return os.path.exists(module_path) and os.path.isdir(module_path)
+    if not module_name:
+        return False
+
+    try:
+        module_parts = module_name.split(".")
+        if not all(part.strip() for part in module_parts):
+            return False
+
+        module_path = os.path.join(os.getcwd(), *module_parts)
+        module_path = os.path.normpath(module_path)
+
+        return os.path.exists(module_path) and os.path.isdir(module_path)
+    except (OSError, ValueError, TypeError):
+        return False
