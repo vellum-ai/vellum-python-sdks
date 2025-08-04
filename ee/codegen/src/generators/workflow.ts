@@ -149,7 +149,7 @@ export class Workflow {
     const workflowClass = python.class_({
       name: workflowClassName,
       extends_: [baseWorkflowClassRef],
-      docs: this.workflowContext.workflowClassDescription,
+      docs: this.workflowContext.workflowClassDescription || undefined,
     });
     workflowClass.inheritReferences(baseWorkflowClassRef);
 
