@@ -1187,18 +1187,18 @@ def test_module_exists__dotted_module_name():
     from vellum_cli.push import module_exists
 
     # GIVEN a directory structure for dotted module name
-    os.makedirs("my_workflow", exist_ok=True)
+    os.makedirs("src/my_workflow", exist_ok=True)
 
     try:
         result = module_exists("src.my_workflow")
 
-        # THEN it should return True (checking only the last part)
+        # THEN it should return True (checking the full dotted path)
         assert result is True
 
         # AND checking non-existent module should return False
         assert module_exists("nonexistent.module") is False
     finally:
-        shutil.rmtree("my_workflow", ignore_errors=True)
+        shutil.rmtree("src", ignore_errors=True)
 
 
 def test_module_exists__simple_module_name():
