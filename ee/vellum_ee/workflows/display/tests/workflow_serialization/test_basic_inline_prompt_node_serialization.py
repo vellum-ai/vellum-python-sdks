@@ -606,3 +606,99 @@ def test_inline_prompt_node__coalesce_expression_serialization():
             "value": [],
         },
     }
+
+
+def test_serialize_workflow_with_function_returning_function_definition():
+    def load_schemas():
+        return FunctionDefinition(
+            name="parse_text_elements",
+            description="Extracts and analyzes key elements from provided text",
+            parameters={
+                "type": "object",
+                "required": ["noun", "verb", "adjective", "summary", "explain"],
+                "properties": {
+                    "noun": {"type": "string", "description": "A key noun or main subject identified in the text"},
+                    "verb": {"type": "string", "description": "A significant action or verb from the text"},
+                    "adjective": {
+                        "type": "string",
+                        "description": "A descriptive adjective that characterizes the text or its subject",
+                    },
+                    "summary": {"type": "string", "description": "A brief summary of the main idea or theme"},
+                    "explain": {
+                        "type": "string",
+                        "description": "A concise explanation of why you chose these specific elements",
+                    },
+                },
+            },
+        )
+
+    class TestInputs(BaseInputs):
+        pass
+
+    class PromptNode(InlinePromptNode):
+        ml_model = "gpt-4o-mini"
+        functions = [load_schemas]
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="SYSTEM",
+                blocks=[
+                    JinjaPromptBlock(
+                        template="Summarize the following text:",
+                    ),
+                ],
+            ),
+        ]
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = PromptNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should find the prompt node
+    prompt_nodes = [node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["type"] == "PROMPT"]
+    assert len(prompt_nodes) == 1
+
+    prompt_node = prompt_nodes[0]
+
+    # AND we should find the functions attribute
+    functions_attr = None
+    for attr in prompt_node["attributes"]:
+        if attr["name"] == "functions":
+            functions_attr = attr
+            break
+
+    assert functions_attr is not None
+
+    actual_value = functions_attr["value"]
+    assert actual_value["type"] == "CONSTANT_VALUE"
+    actual_functions = actual_value["value"]["value"]
+
+    expected_function_definition = {
+        "name": "parse_text_elements",
+        "state": None,
+        "forced": None,
+        "strict": None,
+        "parameters": {
+            "type": "object",
+            "required": ["noun", "verb", "adjective", "summary", "explain"],
+            "properties": {
+                "noun": {"type": "string", "description": "A key noun or main subject identified in the text"},
+                "verb": {"type": "string", "description": "A significant action or verb from the text"},
+                "adjective": {
+                    "type": "string",
+                    "description": "A descriptive adjective that characterizes the text or its subject",
+                },
+                "summary": {"type": "string", "description": "A brief summary of the main idea or theme"},
+                "explain": {
+                    "type": "string",
+                    "description": "A concise explanation of why you chose these specific elements",
+                },
+            },
+        },
+        "description": "Extracts and analyzes key elements from provided text",
+        "cache_config": None,
+    }
+
+    assert actual_functions[0] == expected_function_definition
