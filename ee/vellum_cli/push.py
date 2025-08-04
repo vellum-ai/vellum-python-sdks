@@ -294,5 +294,5 @@ Visit at: {base_url}/workflow-sandboxes/{response.workflow_sandbox_id}"""
 
 
 def module_exists(module_name: str) -> bool:
-    module_path = os.path.join(os.getcwd(), *module_name.split("."))
-    return os.path.exists(module_path) and os.path.isdir(module_path)
+    """Check if a module directory exists."""
+    return os.path.isdir(module_name.split(".")[-1])
