@@ -163,7 +163,7 @@ def push_command(
 
     artifact = io.BytesIO()
     with tarfile.open(fileobj=artifact, mode="w:gz") as tar:
-        module_dir = workflow_config.module.split(".")[-1]
+        module_dir = workflow_config.module.replace(".", os.path.sep)
         for root, _, files in os.walk(module_dir):
             for filename in files:
                 if not filename.endswith(".py"):
@@ -294,5 +294,5 @@ Visit at: {base_url}/workflow-sandboxes/{response.workflow_sandbox_id}"""
 
 
 def module_exists(module_name: str) -> bool:
-    module_path = os.path.join(os.getcwd(), module_name.split(".")[-1])
+    module_path = os.path.join(os.getcwd(), *module_name.split("."))
     return os.path.exists(module_path) and os.path.isdir(module_path)
