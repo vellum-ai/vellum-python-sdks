@@ -14,6 +14,7 @@ from vellum.client.core.api_error import ApiError
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
 from vellum.utils.uuid import is_valid_uuid
 from vellum_cli import main as cli_main
+from vellum_cli.push import module_exists
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
 
 
@@ -1096,49 +1097,6 @@ def test_push__deploy_stores_deployment_config_in_lock_file(mock_module, vellum_
     assert deployment_config["name"] == "test-push-deploy-stores-deployment-config-in-lock-file"
 
 
-def test_push__dotted_module_name(mock_module, vellum_client):
-    """Test that dotted module names like 'src.my_workflow' work correctly."""
-    # GIVEN a dotted module name
-    temp_dir = mock_module.temp_dir
-    dotted_module = "src.my_workflow"
-
-    # AND the pyproject.toml is configured with the dotted module name
-    mock_module.set_pyproject_toml(
-        {
-            "workflows": [
-                {
-                    "module": dotted_module,
-                    "workflow_sandbox_id": mock_module.workflow_sandbox_id,
-                }
-            ]
-        }
-    )
-
-    # AND a workflow exists in the last part of the module path
-    workflow_py_content = _ensure_workflow_py(temp_dir, dotted_module)
-
-    # AND the push API call returns successfully
-    vellum_client.workflows.push.return_value = WorkflowPushResponse(
-        workflow_sandbox_id=str(uuid4()),
-    )
-
-    # WHEN calling `vellum push` with dotted module name
-    runner = CliRunner()
-    result = runner.invoke(cli_main, ["push", dotted_module])
-
-    # THEN it should succeed
-    assert result.exit_code == 0
-
-    # AND the artifact should be named correctly
-    expected_artifact_name = f"{dotted_module.replace('.', '__')}.tar.gz"
-    call_args = vellum_client.workflows.push.call_args.kwargs
-    assert call_args["artifact"].name == expected_artifact_name
-
-    # AND the artifact should contain the workflow file
-    extracted_files = _extract_tar_gz(call_args["artifact"].read())
-    assert extracted_files["workflow.py"] == workflow_py_content
-
-
 def test_push__workflows_push_dotted_module_name(mock_module, vellum_client):
     """Test that dotted module names work with 'workflows push' command."""
     # GIVEN a dotted module name
@@ -1184,7 +1142,6 @@ def test_push__workflows_push_dotted_module_name(mock_module, vellum_client):
 
 def test_module_exists__dotted_module_name():
     """Test that module_exists works correctly with dotted module names."""
-    from vellum_cli.push import module_exists
 
     # GIVEN a directory structure for dotted module name
     os.makedirs("src/my_workflow", exist_ok=True)
@@ -1203,7 +1160,6 @@ def test_module_exists__dotted_module_name():
 
 def test_module_exists__simple_module_name():
     """Test that module_exists works correctly with simple module names."""
-    from vellum_cli.push import module_exists
 
     # GIVEN a directory structure for simple module name
     os.makedirs("simple_workflow", exist_ok=True)
