@@ -192,8 +192,9 @@ export class WorkflowContext {
         ];
       }
     } else {
+      const modulePathParts = this.moduleName.split(".");
       this.modulePath = [
-        ...this.moduleName.split("."),
+        modulePathParts[modulePathParts.length - 1] || this.moduleName,
         GENERATED_WORKFLOW_MODULE_NAME,
       ];
     }
