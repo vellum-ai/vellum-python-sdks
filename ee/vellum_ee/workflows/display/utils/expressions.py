@@ -45,7 +45,7 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
-from vellum.workflows.types.definition import DeploymentDefinition
+from vellum.workflows.types.definition import DeploymentDefinition, MCPServer
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
@@ -374,6 +374,23 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                     "description": description,
                     "deployment": value.deployment,
                     "release_tag": value.release_tag,
+                },
+            },
+        }
+
+    if isinstance(value, MCPServer):
+        return {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": {
+                    "type": "MCP_SERVER",
+                    "name": value.name,
+                    "url": value.url,
+                    "authorization_type": serialize_value(display_context, value.authorization_type),
+                    "bearer_token_value": serialize_value(display_context, value.bearer_token_value),
+                    "api_key_header_key": serialize_value(display_context, value.api_key_header_key),
+                    "api_key_header_value": serialize_value(display_context, value.api_key_header_value),
                 },
             },
         }
