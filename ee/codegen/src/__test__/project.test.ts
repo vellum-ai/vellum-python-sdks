@@ -5206,43 +5206,11 @@ baz = foo + bar
                                   type: "DEFAULT",
                                   source_node_id:
                                     "d97d2a36-3347-487e-b915-3bc874aaded4",
-                                  target_node_id: "code-execution-node-id",
+                                  target_node_id: "start-node-id",
                                   source_handle_id:
                                     "c55f8e1e-0422-4009-af54-86df5625ba71",
                                   target_handle_id:
-                                    "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
-                                },
-                                {
-                                  id: "code-to-start-edge",
-                                  type: "DEFAULT",
-                                  source_node_id: "code-execution-node-id",
-                                  target_node_id: "start-node-id",
-                                  source_handle_id:
-                                    "5352eb9f-c28f-4e90-b32e-82cb970efa21",
-                                  target_handle_id:
                                     "6492efcf-4437-4af1-9ad7-269795ccb27a",
-                                },
-                                {
-                                  id: "ab8c4a64-465d-4406-a407-9faa09d0326d",
-                                  type: "DEFAULT",
-                                  source_node_id: "start-node-id",
-                                  target_node_id:
-                                    "938ac916-6b4d-4097-a16e-cf7feb663b17",
-                                  source_handle_id:
-                                    "1e739e86-a285-4438-9725-a152c15a63e3",
-                                  target_handle_id:
-                                    "332d152e-1648-42a0-a35a-03f2e71a5752",
-                                },
-                                {
-                                  id: "f9dc12de-4284-419d-beb2-927452b80da0",
-                                  type: "DEFAULT",
-                                  source_node_id: "start-node-id",
-                                  target_node_id:
-                                    "d4abe0fd-0ba5-438c-8d20-4155ca89429e",
-                                  source_handle_id:
-                                    "1e739e86-a285-4438-9725-a152c15a63e3",
-                                  target_handle_id:
-                                    "7b3a550b-9b15-4707-8457-856976be003a",
                                 },
                               ],
                               nodes: [
@@ -5259,75 +5227,6 @@ baz = foo + bar
                                   definition: null,
                                   display_data: {
                                     position: { x: 0.0, y: 0.0 },
-                                  },
-                                },
-                                {
-                                  id: "code-execution-node-id",
-                                  data: {
-                                    label: "Code Execution Node",
-                                    filepath: null,
-                                    packages: [],
-                                    output_id:
-                                      "f2ea61aa-256e-41b0-8ab4-aa3a22e489dd",
-                                    output_type: "NUMBER",
-                                    code_input_id:
-                                      "82a5d32f-fc12-4b64-b72c-2a65f860f8cb",
-                                    log_output_id:
-                                      "77eab8ac-bc36-4f53-8449-8be6396d3331",
-                                    error_output_id: null,
-                                    runtime_input_id:
-                                      "247da47f-ad5b-412d-825a-61c29c6a3847",
-                                    source_handle_id:
-                                      "5352eb9f-c28f-4e90-b32e-82cb970efa21",
-                                    target_handle_id:
-                                      "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
-                                  },
-                                  type: "CODE_EXECUTION",
-                                  ports: [
-                                    {
-                                      id: "5352eb9f-c28f-4e90-b32e-82cb970efa21",
-                                      name: "default",
-                                      type: "DEFAULT",
-                                    },
-                                  ],
-                                  inputs: [
-                                    {
-                                      id: "82a5d32f-fc12-4b64-b72c-2a65f860f8cb",
-                                      key: "code",
-                                      value: {
-                                        rules: [
-                                          {
-                                            data: {
-                                              type: "STRING",
-                                              value:
-                                                "def main(\n    arg1: int,\n    arg2: int,\n) -> int:\n    return arg1 + arg2\n    ",
-                                            },
-                                            type: "CONSTANT_VALUE",
-                                          },
-                                        ],
-                                        combinator: "OR",
-                                      },
-                                    },
-                                    {
-                                      id: "247da47f-ad5b-412d-825a-61c29c6a3847",
-                                      key: "runtime",
-                                      value: {
-                                        rules: [
-                                          {
-                                            data: {
-                                              type: "STRING",
-                                              value: "PYTHON_3_11_6",
-                                            },
-                                            type: "CONSTANT_VALUE",
-                                          },
-                                        ],
-                                        combinator: "OR",
-                                      },
-                                    },
-                                  ],
-                                  trigger: {
-                                    id: "3400f8bc-ed0a-4029-8a52-038e1bc4cb93",
-                                    merge_behavior: "AWAIT_ANY",
                                   },
                                 },
                                 {

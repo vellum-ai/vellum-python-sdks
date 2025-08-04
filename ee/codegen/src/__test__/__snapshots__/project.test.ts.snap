@@ -1234,12 +1234,11 @@ exports[`WorkflowProjectGenerator > function > should not generate docstring if 
 from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
-from .nodes.code_execution_node import CodeExecutionNode
 from .nodes.tool_call_start_node import StartNode
 
 
 class WeatherFunction(BaseWorkflow[Inputs, BaseState]):
-    graph = CodeExecutionNode >> StartNode
+    graph = StartNode
 "
 `;
 
