@@ -293,7 +293,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     );
                   }
 
-                  // Only add api_key_header_key if it exists
                   if (mcpServerFunction.api_key_header_key) {
                     arguments_.push(
                       python.methodArgument({
@@ -308,7 +307,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     );
                   }
 
-                  // Only add api_key_header_value if it exists
                   if (mcpServerFunction.api_key_header_value) {
                     arguments_.push(
                       python.methodArgument({
