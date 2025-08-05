@@ -280,9 +280,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   ];
 
                   if (
-                    mcpServerFunction.bearer_token_value &&
-                    mcpServerFunction.bearer_token_value.type ===
-                      "ENVIRONMENT_VARIABLE"
+                    mcpServerFunction.bearer_token_value?.type ===
+                    "ENVIRONMENT_VARIABLE"
                   ) {
                     arguments_.push(
                       python.methodArgument({
@@ -298,8 +297,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   }
 
                   if (
-                    mcpServerFunction.api_key_header_key &&
-                    mcpServerFunction.api_key_header_key.type ===
+                    mcpServerFunction.api_key_header_key?.type ===
                       "CONSTANT_VALUE" &&
                     mcpServerFunction.api_key_header_key.value?.type ===
                       "STRING" &&
@@ -319,9 +317,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   }
 
                   if (
-                    mcpServerFunction.api_key_header_value &&
-                    mcpServerFunction.api_key_header_value.type ===
-                      "ENVIRONMENT_VARIABLE"
+                    mcpServerFunction.api_key_header_value?.type ===
+                    "ENVIRONMENT_VARIABLE"
                   ) {
                     arguments_.push(
                       python.methodArgument({
