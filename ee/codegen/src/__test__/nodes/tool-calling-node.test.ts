@@ -556,6 +556,20 @@ describe("ToolCallingNode", () => {
         type: "ENVIRONMENT_VARIABLE",
         environmentVariable: "GITHUB_PERSONAL_ACCESS_TOKEN",
       },
+      api_key_header_key: {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "JSON",
+          value: null,
+        },
+      },
+      api_key_header_value: {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "JSON",
+          value: null,
+        },
+      },
     };
 
     it("should generate mcp server", async () => {
