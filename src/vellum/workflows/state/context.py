@@ -27,10 +27,15 @@ class WorkflowContext:
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
         self._execution_context = get_execution_context()
-        if not self._execution_context.parent_context and execution_context:
-            self._execution_context = execution_context
 
-        if not self._execution_context.parent_context and not execution_context:
+        if execution_context is not None:
+
+            self._execution_context.trace_id = execution_context.trace_id
+
+            if execution_context.parent_context is not None:
+                self._execution_context.parent_context = execution_context.parent_context
+
+        if self._execution_context.parent_context is None:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
 
         self._generated_files = generated_files

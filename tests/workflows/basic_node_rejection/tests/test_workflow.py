@@ -31,7 +31,8 @@ def test_stream_workflow__parent_context():
     # THEN the parent context be as expected
     workflow_rejected_event = events[-1]
     assert workflow_rejected_event.name == "workflow.execution.rejected"
-    assert workflow_rejected_event.parent is None
+    assert workflow_rejected_event.parent is not None
+    assert workflow_rejected_event.parent.type == "EXTERNAL"
 
     node_rejected_event = events[-2]
     assert node_rejected_event.name == "node.execution.rejected"

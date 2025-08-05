@@ -19,7 +19,8 @@ def test_run_workflow__happy_path():
     assert terminal_event.outputs == {"final_value": [5, 7, 6]}
 
     # Assert that parent is a valid field, for now empty
-    assert terminal_event.parent is None
+    assert terminal_event.parent is not None
+    assert terminal_event.parent.type == "EXTERNAL"
 
 
 def test_map_node_streaming_events():
@@ -47,7 +48,8 @@ def test_map_node_streaming_events():
 
     # Main workflow initiated event
     assert workflow_initiated_events[0].workflow_definition == SimpleMapExample
-    assert workflow_initiated_events[0].parent is None
+    assert workflow_initiated_events[0].parent is not None
+    assert workflow_initiated_events[0].parent.type == "EXTERNAL"
 
     # Subworkflow initiated events
     assert len(workflow_initiated_events) == 3  # Main + 2 subworkflows
@@ -113,7 +115,8 @@ def test_map_node_streaming_events():
     # Workflow fulfilled events
     assert len(workflow_fulfilled_events) == 3  # Main + 2 subworkflows
     assert workflow_fulfilled_events[-1].outputs == {"final_value": [apple_final_value, banana_final_value]}
-    assert workflow_fulfilled_events[-1].parent is None
+    assert workflow_fulfilled_events[-1].parent is not None
+    assert workflow_fulfilled_events[-1].parent.type == "EXTERNAL"
 
     # Workflow snapshotted events
     assert len(workflow_snapshotted_events) > 0

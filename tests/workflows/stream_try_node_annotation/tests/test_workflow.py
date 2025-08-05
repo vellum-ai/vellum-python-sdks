@@ -29,7 +29,8 @@ def test_workflow_stream__happy_path():
     # workflow initiated events
     workflow_initiated_events = [e for e in events if e.name == "workflow.execution.initiated"]
     assert workflow_initiated_events[0].workflow_definition == StreamingTryExample
-    assert workflow_initiated_events[0].parent is None
+    assert workflow_initiated_events[0].parent is not None
+    assert workflow_initiated_events[0].parent.type == "EXTERNAL"
     assert workflow_initiated_events[1].workflow_definition == InnerWorkflow
 
     assert workflow_initiated_events[1].parent is not None
