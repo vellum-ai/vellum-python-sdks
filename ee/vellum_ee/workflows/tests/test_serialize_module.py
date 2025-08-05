@@ -1,3 +1,5 @@
+import pytest
+
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
@@ -45,3 +47,13 @@ def test_serialize_module_includes_additional_files():
     assert "def helper_function():" in additional_files["helper.py"]
     assert "sample data file" in additional_files["data.txt"]
     assert "CONSTANT_VALUE" in additional_files["utils/constants.py"]
+
+
+def test_serialize_module_with_code_execution_node():
+    """Test that serialize_module works with a code execution node."""
+    module_path = "tests.workflows.code_execution_node_invalid_filepath.code_execution_node"
+
+    with pytest.raises(Exception) as exc_info:
+        BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert "Filepath 'does_not_exist.py' of node SimpleCodeExecutionNode does not exist" in str(exc_info.value)

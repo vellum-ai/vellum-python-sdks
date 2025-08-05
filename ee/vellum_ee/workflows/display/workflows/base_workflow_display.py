@@ -17,6 +17,8 @@ from vellum.workflows.edges import Edge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
+from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
+from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
@@ -897,6 +899,28 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             exec_config=exec_config,
             errors=[str(error) for error in workflow_display.errors],
         )
+
+    @staticmethod
+    def _validate_code_execution_files(workflow_class: Type[BaseWorkflow]) -> None:
+        """Validate that all code execution node files exist."""
+
+        for node_class in workflow_class.get_all_nodes():
+            if issubclass(node_class, CodeExecutionNode):
+                BaseWorkflowDisplay._raise_if_invalid_code_execution_filepath(node_class)
+
+    @staticmethod
+    def _raise_if_invalid_code_execution_filepath(node: CodeExecutionNode) -> bool:
+        filepath = getattr(node, "filepath", None)
+        if filepath:
+            filepath_str = raise_if_descriptor(filepath)
+            if filepath_str:
+                node_file_path = inspect.getfile(node)
+                file_code = read_file_from_path(
+                    node_filepath=node_file_path,
+                    script_filepath=filepath_str,
+                )
+                if not file_code:
+                    raise Exception(f"Filepath '{filepath_str}' of node {node.__name__} does not exist")
 
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
         workflow_module_path = f"{module_path}.workflow"
