@@ -12,7 +12,7 @@ import {
 import {
   GENERATED_WORKFLOW_MODULE_NAME,
   OUTPUTS_CLASS_NAME,
-  VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH,
+  VELLUM_WORKFLOW_DEFINITION_PATH,
 } from "src/constants";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
@@ -242,7 +242,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     python.instantiateClass({
                       classReference: python.reference({
                         name: "ComposioToolDefinition",
-                        modulePath: VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH,
+                        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
                       }),
                       arguments_: args,
                     })
@@ -325,7 +325,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     python.instantiateClass({
                       classReference: python.reference({
                         name: "MCP_SERVER",
-                        modulePath: VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH,
+                        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
                       }),
                       arguments_,
                     })
