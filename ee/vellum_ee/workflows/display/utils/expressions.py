@@ -358,7 +358,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         }
 
     if isinstance(value, DeploymentDefinition):
-        workflow_deployment_release = display_context.client.release_reviews.retrieve_workflow_deployment_release(
+        workflow_deployment_release = display_context.client.workflow_deployments.retrieve_workflow_deployment_release(
             value.deployment, value.release_tag
         )
         name = workflow_deployment_release.deployment.name or value.deployment
