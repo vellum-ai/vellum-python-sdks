@@ -22,6 +22,13 @@ export declare namespace BasePersistedFile {
 const VELLUM_MODULES = new Set(["vellum", "vellum_ee"]);
 
 class ImportSortedPythonFile extends PythonFile {
+  private readonly workflowContext?: WorkflowContext;
+
+  constructor(args: any) {
+    super(args);
+    this.workflowContext = args.workflowContext;
+  }
+
   writeImports({
     writer,
     uniqueReferences,
@@ -70,6 +77,19 @@ class ImportSortedPythonFile extends PythonFile {
         // If this is an __init__.py file, then we must go one more level up.
         if (this.isInitFile) {
           levelsUp++;
+
+          if (this.workflowContext?.parentNode && this.workflowContext?.nestedWorkflowModuleName) {
+            const baseModulePath = this.workflowContext.moduleName.split('.');
+            const isDottedModule = baseModulePath.length > 1;
+
+            const isToolCallingNodeContext = this.path.some(segment =>
+              segment.includes('tool_call') || segment.includes('tool_calling')
+            );
+
+            if (isDottedModule && isToolCallingNodeContext) {
+              levelsUp--;
+            }
+          }
         }
         // Build the relative import path
         let relativePath = levelsUp > 0 ? ".".repeat(levelsUp) : ".";
@@ -175,6 +195,7 @@ export abstract class BasePersistedFile extends AstNode {
       statements: fileStatements,
       imports: this.getFileImports(),
       comments: this.getComments(),
+      workflowContext: this.workflowContext,
     });
 
     file.inheritReferences(this);
