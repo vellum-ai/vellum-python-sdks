@@ -119,6 +119,7 @@ class ComposioToolDefinition(UniversalBaseModel):
 
 
 class MCPServer(UniversalBaseModel):
+    type: Literal["MCP_SERVER"] = "MCP_SERVER"
     name: str
     url: str
     authorization_type: AuthorizationType = AuthorizationType.BEARER_TOKEN

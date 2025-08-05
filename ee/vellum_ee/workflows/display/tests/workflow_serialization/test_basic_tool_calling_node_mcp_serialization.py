@@ -51,6 +51,11 @@ def test_serialize_workflow():
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
+                            "id": "bcf2713b-19fc-4b4b-8ff5-b45c8e63c665",
+                            "key": "type",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "MCP_SERVER"}},
+                        },
+                        {
                             "id": "5a3aef6f-b8a1-4f37-8688-b513da42a35a",
                             "key": "name",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "github"}},
