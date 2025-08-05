@@ -3,8 +3,8 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.definition import AuthorizationType, EnvironmentVariableReference, MCPServer
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-from vellum.workflows.types.definition import MCPServer, AuthorizationType, EnvironmentVariableReference
 
 
 def test_serialize_node__prompt_inputs__constant_value():
