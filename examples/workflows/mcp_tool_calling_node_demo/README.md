@@ -1,4 +1,4 @@
-# MCP without mcp sdk Demo
+# MCP tool calling node Demo (WIP)
 
 
 This Workflow is similar to `mcp_demo` but without using mcp sdk.
