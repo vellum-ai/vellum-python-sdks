@@ -224,6 +224,9 @@ class ToolCallingNode(BaseToolCallingNode):
             ),
         )
     ]
+"
+`;
+
 exports[`ToolCallingNode > workflow deployment > should generate latest release tag if release_tag is null 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
