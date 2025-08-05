@@ -913,18 +913,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 BaseWorkflowDisplay._raise_if_invalid_code_execution_filepath(node_class)
 
     @staticmethod
-    def _raise_if_invalid_code_execution_filepath(node: CodeExecutionNode) -> bool:
-        filepath = getattr(node, "filepath", None)
+    def _raise_if_invalid_code_execution_filepath(node_class: Type[CodeExecutionNode]) -> None:
+        filepath = getattr(node_class, "filepath", None)
         if filepath:
             filepath_str = raise_if_descriptor(filepath)
             if filepath_str:
-                node_file_path = inspect.getfile(node)
+                node_file_path = inspect.getfile(node_class)
                 file_code = read_file_from_path(
                     node_filepath=node_file_path,
                     script_filepath=filepath_str,
                 )
                 if not file_code:
-                    raise Exception(f"Filepath '{filepath_str}' of node {node.__name__} does not exist")
+                    raise Exception(f"Filepath '{filepath_str}' of node {node_class.__name__} does not exist")
 
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
         workflow_module_path = f"{module_path}.workflow"
