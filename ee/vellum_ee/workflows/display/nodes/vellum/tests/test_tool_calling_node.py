@@ -122,3 +122,67 @@ def test_serialize_node__prompt_inputs__mixed_values():
             ],
         },
     }
+
+
+def test_serialize_node__tool_calling_node__mcp_server_api_key():
+    # GIVEN a tool calling node with an mcp server
+    class MyToolCallingNode(ToolCallingNode):
+        functions = [
+            MCPServer(
+                name="my-mcp-server",
+                url="https://my-mcp-server.com",
+                authorization_type=AuthorizationType.API_KEY,
+                api_key_header_key="my-api-key-header-key",
+                api_key_header_value=EnvironmentVariableReference(name="my-api-key-header-value"),
+            )
+        ]
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the mcp server
+    my_tool_calling_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MyToolCallingNode.__id__)
+    )
+
+    mcp_server_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
+    )
+
+    assert mcp_server_attribute == {
+        "id": "6c0f7d4f-3c8a-4201-b588-8398d3c97480",
+        "name": "functions",
+        "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": [
+                    {
+                        "type": "MCP_SERVER",
+                        "name": "my-mcp-server",
+                        "url": "https://my-mcp-server.com",
+                        "authorization_type": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {"type": "STRING", "value": "API_KEY"},
+                        },
+                        "bearer_token_value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        "api_key_header_key": {
+                            "type": "CONSTANT_VALUE",
+                            "value": {"type": "STRING", "value": "my-api-key-header-key"},
+                        },
+                        "api_key_header_value": {
+                            "type": "ENVIRONMENT_VARIABLE",
+                            "environment_variable": "my-api-key-header-value",
+                        },
+                    }
+                ],
+            },
+        },
+    }
