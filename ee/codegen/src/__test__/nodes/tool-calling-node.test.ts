@@ -493,6 +493,66 @@ describe("ToolCallingNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should generate correct import paths for dotted module names", async () => {
+      const dottedModuleWorkflowContext = workflowContextFactory({
+        moduleName: "src.my_workflow",
+      });
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functions = {
+        name: "weather_function",
+        type: "INLINE_WORKFLOW",
+        description: "get weather information",
+        exec_config: {
+          runner_config: {},
+          input_variables: [],
+          state_variables: [],
+          output_variables: [],
+          workflow_raw_data: {
+            edges: [],
+            nodes: [],
+            definition: null,
+            output_values: [],
+          },
+        },
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...functions,
+            id: "workflow-function-id",
+            name: "weather_function",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext: dottedModuleWorkflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext: dottedModuleWorkflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 
   describe("deployment workflow", () => {

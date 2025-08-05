@@ -164,6 +164,19 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > inline workflow > should generate correct import paths for dotted module names 1`] = `
+"from .weather_function.workflow import WeatherFunction
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [WeatherFunction]
+"
+`;
+
 exports[`ToolCallingNode > inline workflow > should generate inline workflow function name 1`] = `
 "from .subtract.workflow import Subtract
 
