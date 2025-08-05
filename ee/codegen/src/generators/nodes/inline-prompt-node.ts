@@ -22,6 +22,7 @@ import {
   PlainTextPromptTemplateBlock,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
+import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getCallableFunctions } from "src/utils/nodes";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -370,7 +371,8 @@ export class InlinePromptNode extends BaseNode<
             name: "functions",
             initializer: python.TypeInstantiation.list(
               codeExecutionFunctions.map((f) => {
-                return python.codeBlock(this.getFunctionName(f.name));
+                const funcName = this.getFunctionName(f.name);
+                return python.codeBlock(toPythonSafeSnakeCase(funcName));
               })
             ),
           })
