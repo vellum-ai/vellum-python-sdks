@@ -515,9 +515,53 @@ describe("ToolCallingNode", () => {
           state_variables: [],
           output_variables: [],
           workflow_raw_data: {
-            edges: [],
-            nodes: [],
-            definition: null,
+            nodes: [
+              {
+                id: "entrypoint",
+                type: "ENTRYPOINT",
+                data: {
+                  label: "Entrypoint Node",
+                  source_handle_id: "entry-source",
+                },
+                inputs: [],
+              },
+              {
+                id: "weather-node",
+                type: "GENERIC",
+                label: "WeatherNode",
+                base: {
+                  name: "BaseNode",
+                  module: ["vellum", "workflows", "nodes", "bases", "base"],
+                },
+                attributes: [],
+                outputs: [
+                  {
+                    id: "weather-output",
+                    name: "result",
+                    type: "STRING",
+                  },
+                ],
+                ports: [],
+                trigger: {
+                  id: "weather-trigger",
+                  merge_behavior: "AWAIT_ATTRIBUTES",
+                },
+              },
+            ],
+            edges: [
+              {
+                id: "edge-1",
+                type: "DEFAULT",
+                source_node_id: "entrypoint",
+                source_handle_id: "entry-source",
+                target_node_id: "weather-node",
+                target_handle_id: "weather-trigger",
+              },
+            ],
+            definition: {
+              name: "WeatherFunction",
+              module: ["workflows", "weather_function"],
+            },
             output_values: [],
           },
         },
