@@ -5327,7 +5327,7 @@ baz = foo + bar
         "workflow.py",
       ]);
     });
-    it("should generate deployment workflow tool", async () => {
+    it("should generate workflow deployment tool", async () => {
       const displayData = {
         workflow_raw_data: {
           edges: [],

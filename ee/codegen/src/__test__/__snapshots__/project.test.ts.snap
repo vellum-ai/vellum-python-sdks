@@ -457,26 +457,6 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 "
 `;
 
-exports[`WorkflowProjectGenerator > function > should generate deployment workflow tool > code/nodes/workflow/__init__.py 1`] = `
-"from typing import List
-
-from vellum import ChatMessage
-from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
-from vellum.workflows.types.definition import DeploymentDefinition
-
-
-class MyToolCallingNode(ToolCallingNode):
-    ml_model = "gpt-4"
-    blocks = []
-    functions = [DeploymentDefinition(deployment="deployment_1", release_tag="LATEST")]
-    prompt_inputs = {}
-
-    class Outputs(ToolCallingNode.Outputs):
-        text: str
-        chat_history: List[ChatMessage]
-"
-`;
-
 exports[`WorkflowProjectGenerator > function > should generate empty function array if no functions are defined > code/nodes/tool_call/__init__.py 1`] = `
 "from typing import List
 
@@ -1226,6 +1206,26 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
         final_output = FinalOutput.Outputs.value
         text = FinalOutput1.Outputs.value
         chat_history = FinalOutput2.Outputs.value
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate workflow deployment tool > code/nodes/workflow/__init__.py 1`] = `
+"from typing import List
+
+from vellum import ChatMessage
+from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.types.definition import DeploymentDefinition
+
+
+class MyToolCallingNode(ToolCallingNode):
+    ml_model = "gpt-4"
+    blocks = []
+    functions = [DeploymentDefinition(deployment="deployment_1", release_tag="LATEST")]
+    prompt_inputs = {}
+
+    class Outputs(ToolCallingNode.Outputs):
+        text: str
+        chat_history: List[ChatMessage]
 "
 `;
 
