@@ -96,10 +96,10 @@ class ImportSortedPythonFile extends PythonFile {
           const baseModulePath = this.workflowContext.moduleName.split(".");
           const isDottedModule = baseModulePath.length > 1;
 
-          const isToolCallingNodeContext = this.path.some(
-            (segment) =>
-              segment.includes("tool_call") || segment.includes("tool_calling")
-          );
+          const parentNodeModule =
+            this.workflowContext?.parentNode?.nodeData?.base?.module;
+          const isToolCallingNodeContext =
+            parentNodeModule?.includes("tool_calling_node") ?? false;
 
           if (isDottedModule && isToolCallingNodeContext) {
             const pathFromBase = this.path.slice(baseModulePath.length);
