@@ -13,15 +13,15 @@ import { PromptParameters } from "src/generators/prompt-parameters-request";
 import { StatefulPromptBlock } from "src/generators/stateful-prompt-block";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
+  FunctionArgs,
   FunctionDefinitionPromptTemplateBlock,
+  ToolArgs as FunctionsType,
   InlinePromptNodeData,
   InlinePromptNode as InlinePromptNodeType,
-  PlainTextPromptTemplateBlock,
-  FunctionArgs,
-  ToolArgs as FunctionsType,
   NodeAttribute,
+  PlainTextPromptTemplateBlock,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
-import { toPythonSafeSnakeCase } from "src/utils/casing";
 import { getCallableFunctions } from "src/utils/nodes";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -370,8 +370,7 @@ export class InlinePromptNode extends BaseNode<
             name: "functions",
             initializer: python.TypeInstantiation.list(
               codeExecutionFunctions.map((f) => {
-                const funcName = toPythonSafeSnakeCase(f.name);
-                return python.codeBlock(funcName);
+                return python.codeBlock(this.getFunctionName(f.name));
               })
             ),
           })
@@ -491,5 +490,23 @@ export class InlinePromptNode extends BaseNode<
     }
 
     return statements;
+  }
+
+  private getFunctionName(value: string | WorkflowValueDescriptorType): string {
+    if (typeof value === "string") {
+      return value;
+    }
+
+    // mcp server function name is a workflow value descriptor
+    if (
+      typeof value === "object" &&
+      value.type === "CONSTANT_VALUE" &&
+      value.value.type === "STRING" &&
+      value.value.value
+    ) {
+      return value.value.value;
+    }
+
+    return "";
   }
 }
