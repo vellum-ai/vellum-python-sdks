@@ -80,6 +80,11 @@ class UnknownParentContext(BaseParentContext):
     type: Literal["UNKNOWN"] = "UNKNOWN"
 
 
+# Setting external parent context for external workflows
+class ExternalParentContext(BaseParentContext):
+    type: Literal["EXTERNAL"] = "EXTERNAL"
+
+
 def _cast_parent_context_discriminator(v: Any) -> Any:
     if v in PARENT_CONTEXT_TYPES:
         return v
@@ -138,6 +143,7 @@ ParentContext = Annotated[
         PromptDeploymentParentContext,
         WorkflowSandboxParentContext,
         APIRequestParentContext,
+        ExternalParentContext,
         UnknownParentContext,
     ],
     ParentContextDiscriminator(),

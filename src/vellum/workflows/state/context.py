@@ -1,9 +1,11 @@
 from functools import cached_property
 from queue import Queue
+from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 from vellum import Vellum
 from vellum.workflows.context import ExecutionContext, get_execution_context
+from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
@@ -27,6 +29,10 @@ class WorkflowContext:
         self._execution_context = get_execution_context()
         if not self._execution_context.parent_context and execution_context:
             self._execution_context = execution_context
+
+        if not self._execution_context.parent_context and not execution_context:
+            self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
+
         self._generated_files = generated_files
 
     @cached_property
