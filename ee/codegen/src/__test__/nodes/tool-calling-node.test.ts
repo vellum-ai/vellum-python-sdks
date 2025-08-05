@@ -15,6 +15,7 @@ import {
   ComposioToolFunctionArgs,
   DeploymentWorkflowFunctionArgs,
   FunctionArgs,
+  MCPServerFunctionArgs,
   NodePort,
 } from "src/types/vellum";
 
@@ -519,6 +520,56 @@ describe("ToolCallingNode", () => {
             ...deploymentWorkflowFunction,
             id: "deployment-workflow-function-id",
             name: "deployment-workflow-function-name",
+          },
+        ]
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+  describe("mcp server", () => {
+    const mcpServerFunction: MCPServerFunctionArgs = {
+      type: "MCP_SERVER",
+      name: "github",
+      url: "https://api.githubcopilot.com/mcp/",
+      authorization_type: "BEARER_TOKEN",
+      bearer_token_value: {
+        type: "ENVIRONMENT_VARIABLE",
+        environmentVariable: "GITHUB_PERSONAL_ACCESS_TOKEN",
+      },
+    };
+
+    it("should generate mcp server", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        [
+          {
+            ...mcpServerFunction,
+            id: "mcp-server-function-id",
+            name: "github",
           },
         ]
       );

@@ -33,6 +33,7 @@ import {
   FunctionArgs,
   GenericNode as GenericNodeType,
   InlineWorkflowFunctionArgs,
+  MCPServerFunctionArgs,
   WorkflowRawData,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
@@ -82,6 +83,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               | InlineWorkflowFunctionArgs
               | DeploymentWorkflowFunctionArgs
               | ComposioToolFunctionArgs
+              | MCPServerFunctionArgs
             > = value.value.value;
 
             const codeExecutionFunctions: FunctionArgs[] = [];
@@ -243,6 +245,89 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                         modulePath: VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH,
                       }),
                       arguments_: args,
+                    })
+                  );
+                  break;
+                }
+                case "MCP_SERVER": {
+                  const mcpServerFunction = f as MCPServerFunctionArgs;
+
+                  const arguments_: python.MethodArgument[] = [
+                    python.methodArgument({
+                      name: "name",
+                      value: python.TypeInstantiation.str(
+                        mcpServerFunction.name
+                      ),
+                    }),
+                    python.methodArgument({
+                      name: "url",
+                      value: python.TypeInstantiation.str(
+                        mcpServerFunction.url
+                      ),
+                    }),
+                    python.methodArgument({
+                      name: "authorization_type",
+                      value: python.reference({
+                        name: "AuthorizationType",
+                        modulePath: [
+                          ...this.workflowContext.sdkModulePathNames
+                            .WORKFLOWS_MODULE_PATH,
+                          "constants",
+                        ],
+                        attribute: [mcpServerFunction.authorization_type],
+                      }),
+                    }),
+                  ];
+
+                  if (mcpServerFunction.bearer_token_value) {
+                    arguments_.push(
+                      python.methodArgument({
+                        name: "bearer_token_value",
+                        value: new WorkflowValueDescriptor({
+                          workflowValueDescriptor:
+                            mcpServerFunction.bearer_token_value,
+                          nodeContext: this.nodeContext,
+                          workflowContext: this.workflowContext,
+                        }),
+                      })
+                    );
+                  }
+
+                  if (mcpServerFunction.api_key_header_key) {
+                    arguments_.push(
+                      python.methodArgument({
+                        name: "api_key_header_key",
+                        value: new WorkflowValueDescriptor({
+                          workflowValueDescriptor:
+                            mcpServerFunction.api_key_header_key,
+                          nodeContext: this.nodeContext,
+                          workflowContext: this.workflowContext,
+                        }),
+                      })
+                    );
+                  }
+
+                  if (mcpServerFunction.api_key_header_value) {
+                    arguments_.push(
+                      python.methodArgument({
+                        name: "api_key_header_value",
+                        value: new WorkflowValueDescriptor({
+                          workflowValueDescriptor:
+                            mcpServerFunction.api_key_header_value,
+                          nodeContext: this.nodeContext,
+                          workflowContext: this.workflowContext,
+                        }),
+                      })
+                    );
+                  }
+
+                  functionReferences.push(
+                    python.instantiateClass({
+                      classReference: python.reference({
+                        name: "MCP_SERVER",
+                        modulePath: VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH,
+                      }),
+                      arguments_,
                     })
                   );
                   break;
