@@ -29,11 +29,11 @@ import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   ComposioToolFunctionArgs,
-  DeploymentWorkflowFunctionArgs,
   FunctionArgs,
   GenericNode as GenericNodeType,
   InlineWorkflowFunctionArgs,
   MCPServerFunctionArgs,
+  WorkflowDeploymentFunctionArgs,
   WorkflowRawData,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
@@ -81,14 +81,14 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             const functions: Array<
               | FunctionArgs
               | InlineWorkflowFunctionArgs
-              | DeploymentWorkflowFunctionArgs
+              | WorkflowDeploymentFunctionArgs
               | ComposioToolFunctionArgs
               | MCPServerFunctionArgs
             > = value.value.value;
 
             const codeExecutionFunctions: FunctionArgs[] = [];
             const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];
-            const deploymentWorkflowFunctions: DeploymentWorkflowFunctionArgs[] =
+            const deploymentWorkflowFunctions: WorkflowDeploymentFunctionArgs[] =
               [];
             const functionReferences: python.AstNode[] = [];
 
@@ -157,7 +157,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   break;
                 }
                 case "WORKFLOW_DEPLOYMENT": {
-                  const workflowDeployment: DeploymentWorkflowFunctionArgs = {
+                  const workflowDeployment: WorkflowDeploymentFunctionArgs = {
                     type: "WORKFLOW_DEPLOYMENT",
                     name: f.name,
                     description: f.description,
