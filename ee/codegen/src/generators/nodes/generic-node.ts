@@ -255,15 +255,19 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const arguments_: python.MethodArgument[] = [
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(
-                        mcpServerFunction.name
-                      ),
+                      value: new WorkflowValueDescriptor({
+                        workflowValueDescriptor: mcpServerFunction.name,
+                        nodeContext: this.nodeContext,
+                        workflowContext: this.workflowContext,
+                      }),
                     }),
                     python.methodArgument({
                       name: "url",
-                      value: python.TypeInstantiation.str(
-                        mcpServerFunction.url
-                      ),
+                      value: new WorkflowValueDescriptor({
+                        workflowValueDescriptor: mcpServerFunction.url,
+                        nodeContext: this.nodeContext,
+                        workflowContext: this.workflowContext,
+                      }),
                     }),
                     python.methodArgument({
                       name: "authorization_type",
