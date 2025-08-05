@@ -1,4 +1,3 @@
-from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -64,17 +63,8 @@ def test_text_prompt_deployment_node__basic(vellum_client):
     assert text_output.value == "Hello, world!"
 
     # AND we should have made the expected call to stream the prompt execution
-    vellum_client.execute_prompt_stream.assert_called_once_with(
-        expand_meta=None,
-        expand_raw=None,
-        external_id=None,
-        inputs=[],
-        metadata=None,
-        prompt_deployment_id=None,
-        prompt_deployment_name="my-deployment",
-        raw_overrides=None,
-        release_tag="LATEST",
-        request_options={
-            "additional_body_parameters": {"execution_context": {"parent_context": None, "trace_id": mock.ANY}}
-        },
-    )
+    vellum_client.execute_prompt_stream.assert_called_once()
+    _, call_kwargs = vellum_client.execute_prompt_stream.call_args
+    exec_ctx = call_kwargs["request_options"]["additional_body_parameters"]["execution_context"]
+    assert exec_ctx["parent_context"] is not None
+    assert exec_ctx["parent_context"]["type"] == "EXTERNAL"

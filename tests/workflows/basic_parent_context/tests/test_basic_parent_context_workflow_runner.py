@@ -13,7 +13,8 @@ def test_run_workflow__happy_path():
     terminal_event = workflow.run()
 
     assert terminal_event.name == "workflow.execution.fulfilled"
-    assert terminal_event.parent is None
+    assert terminal_event.parent is not None
+    assert terminal_event.parent.type == "EXTERNAL"
 
 
 def test_stream_workflow__happy_path():
@@ -23,16 +24,19 @@ def test_stream_workflow__happy_path():
     assert len(events) == 4
 
     assert events[0].name == "workflow.execution.initiated"
-    assert events[0].parent is None
+    assert events[0].parent is not None
+    assert events[0].parent.type == "EXTERNAL"
 
     assert events[1].name == "node.execution.initiated"
     parent_context = events[1].parent.model_dump() if events[1].parent else {}
     assert parent_context.get("type") == "WORKFLOW"
-    assert parent_context.get("parent") is None
+    assert parent_context.get("parent") is not None
+    assert parent_context.get("parent")["type"] == "EXTERNAL"  # type: ignore[index]
     assert parent_context.get("workflow_definition") is not None
 
     assert events[-1].name == "workflow.execution.fulfilled"
-    assert events[-1].parent is None
+    assert events[-1].parent is not None
+    assert events[-1].parent.type == "EXTERNAL"
 
 
 def test_stream_workflow__happy_path_inital_context():

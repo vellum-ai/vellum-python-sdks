@@ -34,7 +34,8 @@ def test_workflow_stream__happy_path():
 
     assert workflow_initiated_events[0].name == "workflow.execution.initiated"
     assert workflow_initiated_events[0].workflow_definition == StreamingInlineSubworkflowExample
-    assert workflow_initiated_events[0].parent is None
+    assert workflow_initiated_events[0].parent is not None
+    assert workflow_initiated_events[0].parent.type == "EXTERNAL"
 
     assert workflow_initiated_events[1].name == "workflow.execution.initiated"
     assert workflow_initiated_events[1].workflow_definition == InnerWorkflow
@@ -56,7 +57,8 @@ def test_workflow_stream__happy_path():
     assert node_initiated_events[0].parent.workflow_definition == VellumCodeResourceDefinition.encode(
         StreamingInlineSubworkflowExample
     )
-    assert node_initiated_events[0].parent.parent is None
+    assert node_initiated_events[0].parent.parent is not None
+    assert node_initiated_events[0].parent.parent.type == "EXTERNAL"
 
     assert node_initiated_events[1].name == "node.execution.initiated"
     assert node_initiated_events[1].node_definition == InnerNode
