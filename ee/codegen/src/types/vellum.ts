@@ -940,8 +940,8 @@ export type ComposioToolFunctionArgs = {
 
 export type MCPServerFunctionArgs = {
   type: "MCP_SERVER";
-  name: string;
-  url: string;
+  name: WorkflowValueDescriptor;
+  url: WorkflowValueDescriptor;
   authorization_type: "BEARER_TOKEN" | "API_KEY";
   bearer_token_value?: WorkflowValueDescriptor;
   api_key_header_key?: WorkflowValueDescriptor;
