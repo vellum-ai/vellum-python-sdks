@@ -1,7 +1,6 @@
 import pytest
 from uuid import UUID
 
-from vellum.client.types.vellum_secret import VellumSecret
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
@@ -98,7 +97,7 @@ def test_mcp_tool_definition_creation_api_key():
             url="https://api.githubcopilot.com/mcp/",
             authorization_type=AuthorizationType.API_KEY,
             api_key_header_key="Authorization",
-            api_key_header_value=VellumSecret(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
+            api_key_header_value=EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
         ),
         parameters={
             "type": "object",
@@ -115,7 +114,7 @@ def test_mcp_tool_definition_creation_api_key():
     assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
     assert mcp_tool.server.authorization_type == AuthorizationType.API_KEY
     assert mcp_tool.server.api_key_header_key == "Authorization"
-    assert isinstance(mcp_tool.server.api_key_header_value, VellumSecret)
+    assert isinstance(mcp_tool.server.api_key_header_value, EnvironmentVariableReference)
     assert mcp_tool.server.api_key_header_value.name == "GITHUB_PERSONAL_ACCESS_TOKEN"
     assert mcp_tool.parameters == {
         "type": "object",
