@@ -3586,6 +3586,308 @@ baz = foo + bar
         "templating_node.py",
       ]);
     });
+
+    it("should generate correct import paths for dotted module names with tool calling nodes", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              id: "edge-1",
+              type: "DEFAULT",
+              source_node_id: "entry-node",
+              target_node_id: "tool-calling-node",
+              source_handle_id: "entry-source",
+              target_handle_id: "tool-target",
+            },
+            {
+              id: "edge-2",
+              type: "DEFAULT",
+              source_node_id: "tool-calling-node",
+              target_node_id: "final-output-node",
+              source_handle_id: "tool-source",
+              target_handle_id: "final-target",
+            },
+          ],
+          nodes: [
+            {
+              id: "entry-node",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "entry-source",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+              definition: null,
+              display_data: {
+                width: null,
+                height: null,
+                comment: null,
+                position: { x: 0.0, y: 0.0 },
+              },
+            },
+            {
+              id: "tool-calling-node",
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "displayable",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              type: "GENERIC",
+              label: "WeatherToolNode",
+              ports: [
+                {
+                  id: "tool-source",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              outputs: [
+                {
+                  id: "output-1",
+                  name: "text",
+                  type: "STRING",
+                  value: null,
+                },
+              ],
+              trigger: {
+                id: "tool-target",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              adornments: null,
+              attributes: [
+                {
+                  id: "functions-attr",
+                  name: "functions",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          type: "INLINE_WORKFLOW",
+                          description: "Get weather information",
+                          exec_config: {
+                            input_variables: [
+                              {
+                                id: "city-input",
+                                key: "city",
+                                type: "STRING",
+                                default: null,
+                              },
+                            ],
+                            state_variables: [],
+                            output_variables: [
+                              {
+                                id: "weather-output",
+                                key: "result",
+                                type: "STRING",
+                              },
+                            ],
+                            workflow_raw_data: {
+                              nodes: [
+                                {
+                                  id: "weather-entry",
+                                  base: null,
+                                  data: {
+                                    label: "Weather Entry",
+                                    source_handle_id: "weather-entry-source",
+                                  },
+                                  type: "ENTRYPOINT",
+                                  inputs: [],
+                                  definition: null,
+                                  display_data: {
+                                    width: null,
+                                    height: null,
+                                    comment: null,
+                                    position: { x: 0.0, y: 0.0 },
+                                  },
+                                },
+                                {
+                                  id: "weather-final",
+                                  base: {
+                                    name: "FinalOutputNode",
+                                    module: [
+                                      "vellum",
+                                      "workflows",
+                                      "nodes",
+                                      "displayable",
+                                      "final_output_node",
+                                      "node",
+                                    ],
+                                  },
+                                  type: "TERMINAL",
+                                  data: {
+                                    name: "result",
+                                    label: "Weather Output",
+                                    output_id: "weather-output",
+                                    output_type: "STRING",
+                                    node_input_id: "weather-final-input",
+                                    target_handle_id: "weather-final-target",
+                                  },
+                                  inputs: [
+                                    {
+                                      id: "weather-final-input",
+                                      key: "node_input",
+                                      value: {
+                                        rules: [
+                                          {
+                                            data: {
+                                              type: "STRING",
+                                              value: "Weather result",
+                                            },
+                                            type: "CONSTANT_VALUE",
+                                          },
+                                        ],
+                                        combinator: "OR",
+                                      },
+                                    },
+                                  ],
+                                  definition: null,
+                                  display_data: {
+                                    width: null,
+                                    height: null,
+                                    comment: null,
+                                    position: { x: 100.0, y: 100.0 },
+                                  },
+                                },
+                              ],
+                              edges: [
+                                {
+                                  id: "weather-edge",
+                                  type: "DEFAULT",
+                                  source_node_id: "weather-entry",
+                                  target_node_id: "weather-final",
+                                  source_handle_id: "weather-entry-source",
+                                  target_handle_id: "weather-final-target",
+                                },
+                              ],
+                              definition: {
+                                name: "GetWeatherFunction",
+                                module: [
+                                  "local_inline_subworkflow",
+                                  "nodes",
+                                  "weather_tool_node_get_weather",
+                                ],
+                              },
+                              display_data: {
+                                viewport: { x: 0.0, y: 0.0, zoom: 1.0 },
+                              },
+                              output_values: [
+                                {
+                                  value: {
+                                    type: "NODE_OUTPUT",
+                                    node_id: "weather-final",
+                                    node_output_id: "weather-output",
+                                  },
+                                  output_variable_id: "weather-output",
+                                },
+                              ],
+                            },
+                          },
+                          id: "weather-function-id",
+                          name: "get_weather",
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+              definition: null,
+              display_data: {
+                width: null,
+                height: null,
+                comment: null,
+                position: { x: 100.0, y: 100.0 },
+              },
+            },
+            {
+              id: "final-output-node",
+              base: {
+                name: "FinalOutputNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "displayable",
+                  "final_output_node",
+                  "node",
+                ],
+              },
+              type: "TERMINAL",
+              data: {
+                name: "result",
+                label: "Final Output",
+                output_id: "final-output",
+                output_type: "STRING",
+                node_input_id: "final-input",
+                target_handle_id: "final-target",
+              },
+              inputs: [
+                {
+                  id: "final-input",
+                  key: "node_input",
+                  value: {
+                    rules: [
+                      {
+                        data: {
+                          node_id: "tool-calling-node",
+                          output_id: "output-1",
+                        },
+                        type: "NODE_OUTPUT",
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              definition: null,
+              display_data: {
+                width: null,
+                height: null,
+                comment: null,
+                position: { x: 200.0, y: 200.0 },
+              },
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [
+          {
+            id: "final-output",
+            key: "result",
+            type: "STRING",
+          },
+        ],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "src.my_workflow",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      expect(project.workflowContext.getErrors()).toHaveLength(0);
+
+      expectProjectFileToMatchSnapshot([
+        "src",
+        "my_workflow",
+        "nodes",
+        "weather_tool_node",
+        "get_weather",
+        "__init__.py",
+      ]);
+    });
   });
 
   describe("state", () => {

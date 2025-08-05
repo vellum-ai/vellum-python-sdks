@@ -1297,6 +1297,13 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 "
 `;
 
+exports[`WorkflowProjectGenerator > modules > should generate correct import paths for dotted module names with tool calling nodes > src/my_workflow/nodes/weather_tool_node/get_weather/__init__.py 1`] = `
+"# flake8: noqa: F401, F403
+
+from ...display import *
+"
+`;
+
 exports[`WorkflowProjectGenerator > nodes with output values > should prioritize terminal node data over output values > code/nodes/final_output.py 1`] = `
 "from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
