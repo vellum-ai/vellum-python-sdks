@@ -883,6 +883,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             WorkflowSerializationResult containing exec_config and errors
         """
         workflow = BaseWorkflow.load_from_module(module)
+
+        # Validate code execution node files before serialization
+        BaseWorkflowDisplay._validate_code_execution_files(workflow)
+
         workflow_display = get_workflow_display(
             workflow_class=workflow,
             client=client,
