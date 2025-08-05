@@ -31,7 +31,7 @@ export const VELLUM_WORKFLOW_CONSTANTS_PATH = [
   "references",
   "constant",
 ] as const;
-export const VELLUM_WORKFLOW_COMPOSIO_TOOL_PATH = [
+export const VELLUM_WORKFLOW_DEFINITION_PATH = [
   "vellum",
   "workflows",
   "types",
