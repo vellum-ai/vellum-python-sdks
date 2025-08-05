@@ -551,7 +551,13 @@ describe("ToolCallingNode", () => {
           value: "https://api.githubcopilot.com/mcp/",
         },
       },
-      authorization_type: "BEARER_TOKEN",
+      authorization_type: {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "STRING",
+          value: "BEARER_TOKEN",
+        },
+      },
       bearer_token_value: {
         type: "ENVIRONMENT_VARIABLE",
         environmentVariable: "GITHUB_PERSONAL_ACCESS_TOKEN",

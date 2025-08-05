@@ -942,7 +942,7 @@ export type MCPServerFunctionArgs = {
   type: "MCP_SERVER";
   name: WorkflowValueDescriptor;
   url: WorkflowValueDescriptor;
-  authorization_type: "BEARER_TOKEN" | "API_KEY";
+  authorization_type: WorkflowValueDescriptor;
   bearer_token_value?: WorkflowValueDescriptor;
   api_key_header_key?: WorkflowValueDescriptor;
   api_key_header_value?: WorkflowValueDescriptor;
