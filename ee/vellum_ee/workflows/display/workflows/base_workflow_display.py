@@ -35,6 +35,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowOutputDisplay,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.exceptions import NodeValidationError
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
@@ -194,7 +195,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
             try:
                 serialized_node = node_display.serialize(self.display_context)
-            except NotImplementedError as e:
+            except (NotImplementedError, NodeValidationError) as e:
                 self.add_error(e)
                 continue
 
