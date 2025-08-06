@@ -33,5 +33,4 @@ class EnvironmentVariableReference(BaseDescriptor[str]):
 
     @serialize_as_constant.setter
     def serialize_as_constant(self, value: bool):
-        print("setting serialize_as_constant to", value)
         self._serialize_as_constant = value
