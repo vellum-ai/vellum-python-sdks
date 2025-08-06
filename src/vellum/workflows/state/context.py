@@ -1,10 +1,12 @@
 from functools import cached_property
+import os
 from queue import Queue
 from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 from vellum import Vellum
 from vellum.workflows.context import ExecutionContext, get_execution_context
+from vellum.workflows.emitters.vellum_emitter import VellumEmitter
 from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
@@ -12,6 +14,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
+    from vellum.workflows.emitters.base import BaseWorkflowEmitter
     from vellum.workflows.events.workflow import WorkflowEvent
 
 
@@ -22,23 +25,32 @@ class WorkflowContext:
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
         generated_files: Optional[dict[str, str]] = None,
+        enable_monitoring: Optional[bool] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
         self._execution_context = get_execution_context()
 
+        # Auto-enable monitoring for external workflows if VELLUM_API_KEY is set
+        if enable_monitoring is None:
+            enable_monitoring = bool(os.getenv("VELLUM_API_KEY"))
+
         if execution_context is not None:
-
             self._execution_context.trace_id = execution_context.trace_id
-
             if execution_context.parent_context is not None:
                 self._execution_context.parent_context = execution_context.parent_context
 
+        # For external workflows, ensure proper trace_id and parent context
         if self._execution_context.parent_context is None:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
 
+        # Auto-generate trace_id for external workflows if not set
+        if enable_monitoring and str(self._execution_context.trace_id) == "00000000-0000-0000-0000-000000000000":
+            self._execution_context.trace_id = uuid4()
+
         self._generated_files = generated_files
+        self._enable_monitoring = enable_monitoring
 
     @cached_property
     def vellum_client(self) -> Vellum:
@@ -55,9 +67,62 @@ class WorkflowContext:
     def generated_files(self) -> Optional[dict[str, str]]:
         return self._generated_files
 
+    @property
+    def enable_monitoring(self) -> bool:
+        """Whether workflow monitoring is enabled."""
+        return self._enable_monitoring or False
+
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
         return self._node_output_mocks_map
+
+    def get_monitoring_url(self, span_id: str) -> Optional[str]:
+        """
+        Generate the monitoring URL for this workflow execution.
+
+        Args:
+            span_id: The span ID from the workflow execution result.
+
+        Returns:
+            The URL to view execution details in Vellum UI, or None if monitoring is disabled.
+        """
+        if not self.enable_monitoring:
+            return None
+
+        def is_localhost_3000_running():
+            try:
+                import socket
+
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(1)
+                result = sock.connect_ex(("localhost", 3000))
+                sock.close()
+                return result == 0
+            except Exception:
+                return False
+
+        localhost_running = is_localhost_3000_running()
+
+        if localhost_running:
+            ui_url = "http://localhost:3000"
+        else:
+            ui_url = "https://app.vellum.ai"
+
+        return f"{ui_url}/workflows/executions/{span_id}"
+
+    def get_emitters_for_workflow(self) -> List["BaseWorkflowEmitter"]:
+        """
+        Get the default emitters that should be attached to workflows using this context.
+
+        Returns:
+            List of emitters, including VellumEmitter if monitoring is enabled.
+        """
+        emitters: List["BaseWorkflowEmitter"] = []
+
+        if self.enable_monitoring:
+            emitters.append(VellumEmitter())
+
+        return emitters
 
     def _emit_subworkflow_event(self, event: "WorkflowEvent") -> None:
         if self._event_queue:

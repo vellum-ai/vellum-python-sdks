@@ -240,11 +240,32 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         store: Optional[Store] = None,
     ):
         self._parent_state = parent_state
-        self.emitters = emitters or (self.emitters if hasattr(self, "emitters") else [])
-        self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._context = context or WorkflowContext()
+
+        # Combine explicitly passed emitters with context-provided emitters
+        context_emitters = self._context.get_emitters_for_workflow()
+        class_emitters = self.emitters if hasattr(self, "emitters") else []
+        passed_emitters = emitters or []
+
+        # Merge all emitters, avoiding duplicates by type
+        all_emitters = []
+        emitter_types = set()
+
+        for emitter_list in [context_emitters, class_emitters, passed_emitters]:
+            for emitter in emitter_list:
+                emitter_type = type(emitter)
+                if emitter_type not in emitter_types:
+                    all_emitters.append(emitter)
+                    emitter_types.add(emitter_type)
+
+        self.emitters = all_emitters
+        self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._store = store or Store()
         self._execution_context = self._context.execution_context
+
+        # Register context with all emitters
+        for emitter in self.emitters:
+            emitter.register_context(self._context)
 
         self.validate()
 
@@ -413,7 +434,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             last_event = event
 
         if not last_event:
-            return WorkflowExecutionRejectedEvent(
+            rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
                 body=WorkflowExecutionRejectedBody(
@@ -424,9 +445,11 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     workflow_definition=self.__class__,
                 ),
             )
+            rejected_event._set_context(self._context)
+            return rejected_event
 
         if not first_event:
-            return WorkflowExecutionRejectedEvent(
+            rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
                 body=WorkflowExecutionRejectedBody(
@@ -437,15 +460,23 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     workflow_definition=self.__class__,
                 ),
             )
+            rejected_event._set_context(self._context)
+            return rejected_event
 
         if (
             last_event.name == "workflow.execution.rejected"
             or last_event.name == "workflow.execution.fulfilled"
             or last_event.name == "workflow.execution.paused"
         ):
+            # Auto-print monitoring URL if monitoring is enabled
+            self._print_monitoring_info(last_event)
+
+            # Set context on event so monitoring_url property works
+            last_event._set_context(self._context)
+
             return last_event
 
-        return WorkflowExecutionRejectedEvent(
+        rejected_event = WorkflowExecutionRejectedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=first_event.span_id,
             body=WorkflowExecutionRejectedBody(
@@ -456,6 +487,17 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                 ),
             ),
         )
+        rejected_event._set_context(self._context)
+        return rejected_event
+
+    def _print_monitoring_info(self, event: TerminalWorkflowEvent) -> None:
+        """Print monitoring information if monitoring is enabled."""
+        if not self._context.enable_monitoring:
+            return
+
+        monitoring_url = self._context.get_monitoring_url(str(event.span_id))
+        if monitoring_url:
+            logger.info("Workflow Execution Monitoring - View Details: %s", monitoring_url)
 
     def stream(
         self,
