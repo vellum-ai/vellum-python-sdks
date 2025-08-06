@@ -2,17 +2,14 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawWorkflowsClient
 from ...core.request_options import RequestOptions
-from ...core.jsonable_encoder import jsonable_encoder
-from ...errors.bad_request_error import BadRequestError
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ... import core
 from ...types.workflow_push_response import WorkflowPushResponse
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawWorkflowsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -20,7 +17,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class WorkflowsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawWorkflowsClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawWorkflowsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawWorkflowsClient
+        """
+        return self._raw_client
 
     def pull(
         self,
@@ -52,45 +64,21 @@ class WorkflowsClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
 
-        Yields
-        ------
+        Returns
+        -------
         typing.Iterator[bytes]
 
         """
-        with self._client_wrapper.httpx_client.stream(
-            f"v1/workflows/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "exclude_code": exclude_code,
-                "exclude_display": exclude_display,
-                "include_json": include_json,
-                "include_sandbox": include_sandbox,
-                "strict": strict,
-            },
+        response = self._raw_client.pull(
+            id,
+            exclude_code=exclude_code,
+            exclude_display=exclude_display,
+            include_json=include_json,
+            include_sandbox=include_sandbox,
+            strict=strict,
             request_options=request_options,
-        ) as _response:
-            try:
-                if 200 <= _response.status_code < 300:
-                    _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    for _chunk in _response.iter_bytes(chunk_size=_chunk_size):
-                        yield _chunk
-                    return
-                _response.read()
-                if _response.status_code == 400:
-                    raise BadRequestError(
-                        typing.cast(
-                            typing.Optional[typing.Any],
-                            parse_obj_as(
-                                type_=typing.Optional[typing.Any],  # type: ignore
-                                object_=_response.json(),
-                            ),
-                        )
-                    )
-                _response_json = _response.json()
-            except JSONDecodeError:
-                raise ApiError(status_code=_response.status_code, body=_response.text)
-            raise ApiError(status_code=_response.status_code, body=_response_json)
+        )
+        return response.data
 
     def push(
         self,
@@ -128,41 +116,32 @@ class WorkflowsClient:
         WorkflowPushResponse
 
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/workflows/push",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            data={
-                "exec_config": exec_config,
-                "workflow_sandbox_id": workflow_sandbox_id,
-                "deployment_config": deployment_config,
-                "dry_run": dry_run,
-                "strict": strict,
-            },
-            files={
-                "artifact": artifact,
-            },
+        response = self._raw_client.push(
+            exec_config=exec_config,
+            workflow_sandbox_id=workflow_sandbox_id,
+            deployment_config=deployment_config,
+            artifact=artifact,
+            dry_run=dry_run,
+            strict=strict,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowPushResponse,
-                    parse_obj_as(
-                        type_=WorkflowPushResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncWorkflowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawWorkflowsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawWorkflowsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawWorkflowsClient
+        """
+        return self._raw_client
 
     async def pull(
         self,
@@ -194,45 +173,21 @@ class AsyncWorkflowsClient:
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
 
-        Yields
-        ------
+        Returns
+        -------
         typing.AsyncIterator[bytes]
 
         """
-        async with self._client_wrapper.httpx_client.stream(
-            f"v1/workflows/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "exclude_code": exclude_code,
-                "exclude_display": exclude_display,
-                "include_json": include_json,
-                "include_sandbox": include_sandbox,
-                "strict": strict,
-            },
+        response = await self._raw_client.pull(
+            id,
+            exclude_code=exclude_code,
+            exclude_display=exclude_display,
+            include_json=include_json,
+            include_sandbox=include_sandbox,
+            strict=strict,
             request_options=request_options,
-        ) as _response:
-            try:
-                if 200 <= _response.status_code < 300:
-                    _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size):
-                        yield _chunk
-                    return
-                await _response.aread()
-                if _response.status_code == 400:
-                    raise BadRequestError(
-                        typing.cast(
-                            typing.Optional[typing.Any],
-                            parse_obj_as(
-                                type_=typing.Optional[typing.Any],  # type: ignore
-                                object_=_response.json(),
-                            ),
-                        )
-                    )
-                _response_json = _response.json()
-            except JSONDecodeError:
-                raise ApiError(status_code=_response.status_code, body=_response.text)
-            raise ApiError(status_code=_response.status_code, body=_response_json)
+        )
+        return response.data
 
     async def push(
         self,
@@ -270,33 +225,13 @@ class AsyncWorkflowsClient:
         WorkflowPushResponse
 
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/workflows/push",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            data={
-                "exec_config": exec_config,
-                "workflow_sandbox_id": workflow_sandbox_id,
-                "deployment_config": deployment_config,
-                "dry_run": dry_run,
-                "strict": strict,
-            },
-            files={
-                "artifact": artifact,
-            },
+        response = await self._raw_client.push(
+            exec_config=exec_config,
+            workflow_sandbox_id=workflow_sandbox_id,
+            deployment_config=deployment_config,
+            artifact=artifact,
+            dry_run=dry_run,
+            strict=strict,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowPushResponse,
-                    parse_obj_as(
-                        type_=WorkflowPushResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

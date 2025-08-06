@@ -2,20 +2,15 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawDocumentsClient
 from ...core.request_options import RequestOptions
 from ...types.paginated_slim_document_list import PaginatedSlimDocumentList
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.document_read import DocumentRead
-from ...core.jsonable_encoder import jsonable_encoder
 from ...types.document_status import DocumentStatus
 from ... import core
 from ...types.upload_document_response import UploadDocumentResponse
-from ...errors.bad_request_error import BadRequestError
-from ...errors.not_found_error import NotFoundError
-from ...errors.internal_server_error import InternalServerError
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawDocumentsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -23,9 +18,24 @@ OMIT = typing.cast(typing.Any, ...)
 
 class DocumentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawDocumentsClient(client_wrapper=client_wrapper)
 
-    def list(
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawDocumentsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawDocumentsClient
+        """
+        return self._raw_client
+
+    def list_(
         self,
         *,
         document_index_id: typing.Optional[str] = None,
@@ -73,32 +83,15 @@ class DocumentsClient:
         )
         client.documents.list()
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/documents",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "document_index_id": document_index_id,
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "search": search,
-            },
+        response = self._raw_client.list(
+            document_index_id=document_index_id,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            search=search,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedSlimDocumentList,
-                    parse_obj_as(
-                        type_=PaginatedSlimDocumentList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentRead:
         """
@@ -128,25 +121,11 @@ class DocumentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentRead,
-                    parse_obj_as(
-                        type_=DocumentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -175,19 +154,11 @@ class DocumentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="DELETE",
+        response = self._raw_client.destroy(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def partial_update(
         self,
@@ -240,35 +211,15 @@ class DocumentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "label": label,
-                "status": status,
-                "keywords": keywords,
-                "metadata": metadata,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.partial_update(
+            id,
+            label=label,
+            status=status,
+            keywords=keywords,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentRead,
-                    parse_obj_as(
-                        type_=DocumentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def upload(
         self,
@@ -314,73 +265,34 @@ class DocumentsClient:
         UploadDocumentResponse
 
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/upload-document",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="POST",
-            data={
-                "add_to_index_names": add_to_index_names,
-                "external_id": external_id,
-                "label": label,
-                "keywords": keywords,
-                "metadata": metadata,
-            },
-            files={
-                "contents": contents,
-            },
+        response = self._raw_client.upload(
+            label=label,
+            contents=contents,
+            add_to_index_names=add_to_index_names,
+            external_id=external_id,
+            keywords=keywords,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    UploadDocumentResponse,
-                    parse_obj_as(
-                        type_=UploadDocumentResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncDocumentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawDocumentsClient(client_wrapper=client_wrapper)
 
-    async def list(
+    @property
+    def with_raw_response(self) -> AsyncRawDocumentsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawDocumentsClient
+        """
+        return self._raw_client
+
+    async def list_(
         self,
         *,
         document_index_id: typing.Optional[str] = None,
@@ -436,32 +348,15 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/documents",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "document_index_id": document_index_id,
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "search": search,
-            },
+        response = await self._raw_client.list(
+            document_index_id=document_index_id,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            search=search,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedSlimDocumentList,
-                    parse_obj_as(
-                        type_=PaginatedSlimDocumentList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentRead:
         """
@@ -499,25 +394,11 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentRead,
-                    parse_obj_as(
-                        type_=DocumentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -554,19 +435,11 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="DELETE",
+        response = await self._raw_client.destroy(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def partial_update(
         self,
@@ -627,35 +500,15 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/documents/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "label": label,
-                "status": status,
-                "keywords": keywords,
-                "metadata": metadata,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.partial_update(
+            id,
+            label=label,
+            status=status,
+            keywords=keywords,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentRead,
-                    parse_obj_as(
-                        type_=DocumentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def upload(
         self,
@@ -701,63 +554,13 @@ class AsyncDocumentsClient:
         UploadDocumentResponse
 
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/upload-document",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="POST",
-            data={
-                "add_to_index_names": add_to_index_names,
-                "external_id": external_id,
-                "label": label,
-                "keywords": keywords,
-                "metadata": metadata,
-            },
-            files={
-                "contents": contents,
-            },
+        response = await self._raw_client.upload(
+            label=label,
+            contents=contents,
+            add_to_index_names=add_to_index_names,
+            external_id=external_id,
+            keywords=keywords,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    UploadDocumentResponse,
-                    parse_obj_as(
-                        type_=UploadDocumentResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
