@@ -2,14 +2,11 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawDeploymentsClient
 from .types.deployments_list_request_status import DeploymentsListRequestStatus
 from ...core.request_options import RequestOptions
 from ...types.paginated_slim_deployment_read_list import PaginatedSlimDeploymentReadList
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.deployment_read import DeploymentRead
-from ...core.jsonable_encoder import jsonable_encoder
 from ...types.deployment_history_item import DeploymentHistoryItem
 from .types.list_deployment_release_tags_request_source import ListDeploymentReleaseTagsRequestSource
 from ...types.paginated_deployment_release_tag_read_list import PaginatedDeploymentReleaseTagReadList
@@ -18,12 +15,8 @@ from ...types.prompt_deployment_release import PromptDeploymentRelease
 from ...types.prompt_deployment_input_request import PromptDeploymentInputRequest
 from ...types.compile_prompt_deployment_expand_meta_request import CompilePromptDeploymentExpandMetaRequest
 from ...types.deployment_provider_payload_response import DeploymentProviderPayloadResponse
-from ...core.serialization import convert_and_respect_annotation_metadata
-from ...errors.bad_request_error import BadRequestError
-from ...errors.forbidden_error import ForbiddenError
-from ...errors.not_found_error import NotFoundError
-from ...errors.internal_server_error import InternalServerError
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawDeploymentsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -31,9 +24,24 @@ OMIT = typing.cast(typing.Any, ...)
 
 class DeploymentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawDeploymentsClient(client_wrapper=client_wrapper)
 
-    def list(
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawDeploymentsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawDeploymentsClient
+        """
+        return self._raw_client
+
+    def list_(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -77,31 +85,14 @@ class DeploymentsClient:
         )
         client.deployments.list()
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/deployments",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "status": status,
-            },
+        response = self._raw_client.list(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            status=status,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedSlimDeploymentReadList,
-                    parse_obj_as(
-                        type_=PaginatedSlimDeploymentReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DeploymentRead:
         """
@@ -132,25 +123,11 @@ class DeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentRead,
-                    parse_obj_as(
-                        type_=DeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def deployment_history_item_retrieve(
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -188,25 +165,12 @@ class DeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.deployment_history_item_retrieve(
+            history_id_or_release_tag,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentHistoryItem,
-                    parse_obj_as(
-                        type_=DeploymentHistoryItem,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list_deployment_release_tags(
         self,
@@ -257,31 +221,15 @@ class DeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "source": source,
-            },
+        response = self._raw_client.list_deployment_release_tags(
+            id,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            source=source,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDeploymentReleaseTagReadList,
-                    parse_obj_as(
-                        type_=PaginatedDeploymentReleaseTagReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve_deployment_release_tag(
         self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -318,25 +266,12 @@ class DeploymentsClient:
             name="name",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve_deployment_release_tag(
+            id,
+            name,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentReleaseTagRead,
-                    parse_obj_as(
-                        type_=DeploymentReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def update_deployment_release_tag(
         self,
@@ -381,32 +316,13 @@ class DeploymentsClient:
             name="name",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "history_item_id": history_item_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.update_deployment_release_tag(
+            id,
+            name,
+            history_item_id=history_item_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentReleaseTagRead,
-                    parse_obj_as(
-                        type_=DeploymentReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve_prompt_deployment_release(
         self, id: str, release_id_or_release_tag: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -443,25 +359,12 @@ class DeploymentsClient:
             release_id_or_release_tag="release_id_or_release_tag",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve_prompt_deployment_release(
+            id,
+            release_id_or_release_tag,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptDeploymentRelease,
-                    parse_obj_as(
-                        type_=PromptDeploymentRelease,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve_provider_payload(
         self,
@@ -530,89 +433,33 @@ class DeploymentsClient:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/deployments/provider-payload",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "deployment_id": deployment_id,
-                "deployment_name": deployment_name,
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[PromptDeploymentInputRequest], direction="write"
-                ),
-                "release_tag": release_tag,
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta,
-                    annotation=typing.Optional[CompilePromptDeploymentExpandMetaRequest],
-                    direction="write",
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.retrieve_provider_payload(
+            inputs=inputs,
+            deployment_id=deployment_id,
+            deployment_name=deployment_name,
+            release_tag=release_tag,
+            expand_meta=expand_meta,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentProviderPayloadResponse,
-                    parse_obj_as(
-                        type_=DeploymentProviderPayloadResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncDeploymentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawDeploymentsClient(client_wrapper=client_wrapper)
 
-    async def list(
+    @property
+    def with_raw_response(self) -> AsyncRawDeploymentsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawDeploymentsClient
+        """
+        return self._raw_client
+
+    async def list_(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -664,31 +511,14 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/deployments",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "status": status,
-            },
+        response = await self._raw_client.list(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            status=status,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedSlimDeploymentReadList,
-                    parse_obj_as(
-                        type_=PaginatedSlimDeploymentReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DeploymentRead:
         """
@@ -727,25 +557,11 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentRead,
-                    parse_obj_as(
-                        type_=DeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def deployment_history_item_retrieve(
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -791,25 +607,12 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.deployment_history_item_retrieve(
+            history_id_or_release_tag,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentHistoryItem,
-                    parse_obj_as(
-                        type_=DeploymentHistoryItem,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list_deployment_release_tags(
         self,
@@ -868,31 +671,15 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "source": source,
-            },
+        response = await self._raw_client.list_deployment_release_tags(
+            id,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            source=source,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDeploymentReleaseTagReadList,
-                    parse_obj_as(
-                        type_=PaginatedDeploymentReleaseTagReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve_deployment_release_tag(
         self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -937,25 +724,12 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve_deployment_release_tag(
+            id,
+            name,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentReleaseTagRead,
-                    parse_obj_as(
-                        type_=DeploymentReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def update_deployment_release_tag(
         self,
@@ -1008,32 +782,13 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "history_item_id": history_item_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.update_deployment_release_tag(
+            id,
+            name,
+            history_item_id=history_item_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentReleaseTagRead,
-                    parse_obj_as(
-                        type_=DeploymentReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve_prompt_deployment_release(
         self, id: str, release_id_or_release_tag: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1078,25 +833,12 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/deployments/{jsonable_encoder(id)}/releases/{jsonable_encoder(release_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve_prompt_deployment_release(
+            id,
+            release_id_or_release_tag,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptDeploymentRelease,
-                    parse_obj_as(
-                        type_=PromptDeploymentRelease,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve_provider_payload(
         self,
@@ -1173,79 +915,12 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/deployments/provider-payload",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "deployment_id": deployment_id,
-                "deployment_name": deployment_name,
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[PromptDeploymentInputRequest], direction="write"
-                ),
-                "release_tag": release_tag,
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta,
-                    annotation=typing.Optional[CompilePromptDeploymentExpandMetaRequest],
-                    direction="write",
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.retrieve_provider_payload(
+            inputs=inputs,
+            deployment_id=deployment_id,
+            deployment_name=deployment_name,
+            release_tag=release_tag,
+            expand_meta=expand_meta,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentProviderPayloadResponse,
-                    parse_obj_as(
-                        type_=DeploymentProviderPayloadResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

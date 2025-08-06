@@ -2,19 +2,21 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawTestSuitesClient
 from ...core.request_options import RequestOptions
 from ...types.paginated_test_suite_test_case_list import PaginatedTestSuiteTestCaseList
-from ...core.jsonable_encoder import jsonable_encoder
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.named_test_case_variable_value_request import NamedTestCaseVariableValueRequest
 from ...types.test_suite_test_case import TestSuiteTestCase
-from ...core.serialization import convert_and_respect_annotation_metadata
 from ...types.test_suite_test_case_bulk_operation_request import TestSuiteTestCaseBulkOperationRequest
 from ...types.test_suite_test_case_bulk_result import TestSuiteTestCaseBulkResult
+from ...core.jsonable_encoder import jsonable_encoder
+from ...core.serialization import convert_and_respect_annotation_metadata
+from ...core.pydantic_utilities import parse_obj_as
 import json
+from json.decoder import JSONDecodeError
+from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawTestSuitesClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -22,7 +24,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class TestSuitesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawTestSuitesClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawTestSuitesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawTestSuitesClient
+        """
+        return self._raw_client
 
     def list_test_suite_test_cases(
         self,
@@ -66,29 +83,13 @@ class TestSuitesClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/test-suites/{jsonable_encoder(id)}/test-cases",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-            },
+        response = self._raw_client.list_test_suite_test_cases(
+            id,
+            limit=limit,
+            offset=offset,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedTestSuiteTestCaseList,
-                    parse_obj_as(
-                        type_=PaginatedTestSuiteTestCaseList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def upsert_test_suite_test_case(
         self,
@@ -166,41 +167,16 @@ class TestSuitesClient:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/test-suites/{jsonable_encoder(id_)}/test-cases",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "id": id,
-                "external_id": external_id,
-                "label": label,
-                "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values,
-                    annotation=typing.Sequence[NamedTestCaseVariableValueRequest],
-                    direction="write",
-                ),
-                "evaluation_values": convert_and_respect_annotation_metadata(
-                    object_=evaluation_values,
-                    annotation=typing.Sequence[NamedTestCaseVariableValueRequest],
-                    direction="write",
-                ),
-            },
+        response = self._raw_client.upsert_test_suite_test_case(
+            id_,
+            input_values=input_values,
+            evaluation_values=evaluation_values,
+            id=id,
+            external_id=external_id,
+            label=label,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TestSuiteTestCase,
-                    parse_obj_as(
-                        type_=TestSuiteTestCase,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def test_suite_test_cases_bulk(
         self,
@@ -290,9 +266,9 @@ class TestSuitesClient:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._raw_client._client_wrapper.httpx_client.stream(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._raw_client._client_wrapper.get_environment().default,
             method="POST",
             json=convert_and_respect_annotation_metadata(
                 object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
@@ -356,24 +332,28 @@ class TestSuitesClient:
             test_case_id="test_case_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/test-suites/{jsonable_encoder(id)}/test-cases/{jsonable_encoder(test_case_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="DELETE",
+        response = self._raw_client.delete_test_suite_test_case(
+            id,
+            test_case_id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncTestSuitesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawTestSuitesClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawTestSuitesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawTestSuitesClient
+        """
+        return self._raw_client
 
     async def list_test_suite_test_cases(
         self,
@@ -425,29 +405,13 @@ class AsyncTestSuitesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/test-suites/{jsonable_encoder(id)}/test-cases",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-            },
+        response = await self._raw_client.list_test_suite_test_cases(
+            id,
+            limit=limit,
+            offset=offset,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedTestSuiteTestCaseList,
-                    parse_obj_as(
-                        type_=PaginatedTestSuiteTestCaseList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def upsert_test_suite_test_case(
         self,
@@ -533,41 +497,16 @@ class AsyncTestSuitesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/test-suites/{jsonable_encoder(id_)}/test-cases",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "id": id,
-                "external_id": external_id,
-                "label": label,
-                "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values,
-                    annotation=typing.Sequence[NamedTestCaseVariableValueRequest],
-                    direction="write",
-                ),
-                "evaluation_values": convert_and_respect_annotation_metadata(
-                    object_=evaluation_values,
-                    annotation=typing.Sequence[NamedTestCaseVariableValueRequest],
-                    direction="write",
-                ),
-            },
+        response = await self._raw_client.upsert_test_suite_test_case(
+            id_,
+            input_values=input_values,
+            evaluation_values=evaluation_values,
+            id=id,
+            external_id=external_id,
+            label=label,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TestSuiteTestCase,
-                    parse_obj_as(
-                        type_=TestSuiteTestCase,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def test_suite_test_cases_bulk(
         self,
@@ -665,9 +604,9 @@ class AsyncTestSuitesClient:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._raw_client._client_wrapper.httpx_client.stream(
             f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._raw_client._client_wrapper.get_environment().default,
             method="POST",
             json=convert_and_respect_annotation_metadata(
                 object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
@@ -739,16 +678,9 @@ class AsyncTestSuitesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/test-suites/{jsonable_encoder(id)}/test-cases/{jsonable_encoder(test_case_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="DELETE",
+        response = await self._raw_client.delete_test_suite_test_case(
+            id,
+            test_case_id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

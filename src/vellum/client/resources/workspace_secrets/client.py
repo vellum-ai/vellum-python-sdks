@@ -2,13 +2,11 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawWorkspaceSecretsClient
 from ...core.request_options import RequestOptions
 from ...types.workspace_secret_read import WorkspaceSecretRead
-from ...core.jsonable_encoder import jsonable_encoder
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawWorkspaceSecretsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -16,7 +14,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class WorkspaceSecretsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawWorkspaceSecretsClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawWorkspaceSecretsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawWorkspaceSecretsClient
+        """
+        return self._raw_client
 
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> WorkspaceSecretRead:
         """
@@ -47,25 +60,11 @@ class WorkspaceSecretsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkspaceSecretRead,
-                    parse_obj_as(
-                        type_=WorkspaceSecretRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def partial_update(
         self,
@@ -107,38 +106,29 @@ class WorkspaceSecretsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "label": label,
-                "value": value,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.partial_update(
+            id,
+            label=label,
+            value=value,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkspaceSecretRead,
-                    parse_obj_as(
-                        type_=WorkspaceSecretRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncWorkspaceSecretsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawWorkspaceSecretsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawWorkspaceSecretsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawWorkspaceSecretsClient
+        """
+        return self._raw_client
 
     async def retrieve(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -179,25 +169,11 @@ class AsyncWorkspaceSecretsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkspaceSecretRead,
-                    parse_obj_as(
-                        type_=WorkspaceSecretRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def partial_update(
         self,
@@ -247,30 +223,10 @@ class AsyncWorkspaceSecretsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workspace-secrets/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "label": label,
-                "value": value,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.partial_update(
+            id,
+            label=label,
+            value=value,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkspaceSecretRead,
-                    parse_obj_as(
-                        type_=WorkspaceSecretRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

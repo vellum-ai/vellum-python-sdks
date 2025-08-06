@@ -2,18 +2,15 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawDocumentIndexesClient
 from .types.document_indexes_list_request_status import DocumentIndexesListRequestStatus
 from ...core.request_options import RequestOptions
 from ...types.paginated_document_index_read_list import PaginatedDocumentIndexReadList
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.document_index_indexing_config_request import DocumentIndexIndexingConfigRequest
 from ...types.entity_status import EntityStatus
 from ...types.document_index_read import DocumentIndexRead
-from ...core.serialization import convert_and_respect_annotation_metadata
-from ...core.jsonable_encoder import jsonable_encoder
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawDocumentIndexesClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -21,9 +18,24 @@ OMIT = typing.cast(typing.Any, ...)
 
 class DocumentIndexesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawDocumentIndexesClient(client_wrapper=client_wrapper)
 
-    def list(
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawDocumentIndexesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawDocumentIndexesClient
+        """
+        return self._raw_client
+
+    def list_(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -74,32 +86,15 @@ class DocumentIndexesClient:
         )
         client.document_indexes.list()
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "search": search,
-                "status": status,
-            },
+        response = self._raw_client.list(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            search=search,
+            status=status,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDocumentIndexReadList,
-                    parse_obj_as(
-                        type_=PaginatedDocumentIndexReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def create(
         self,
@@ -164,38 +159,15 @@ class DocumentIndexesClient:
             ),
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "label": label,
-                "name": name,
-                "status": status,
-                "indexing_config": convert_and_respect_annotation_metadata(
-                    object_=indexing_config, annotation=DocumentIndexIndexingConfigRequest, direction="write"
-                ),
-                "copy_documents_from_index_id": copy_documents_from_index_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.create(
+            label=label,
+            name=name,
+            indexing_config=indexing_config,
+            status=status,
+            copy_documents_from_index_id=copy_documents_from_index_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentIndexRead:
         """
@@ -226,25 +198,11 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def update(
         self,
@@ -292,33 +250,13 @@ class DocumentIndexesClient:
             label="x",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PUT",
-            json={
-                "label": label,
-                "status": status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.update(
+            id,
+            label=label,
+            status=status,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -348,19 +286,11 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="DELETE",
+        response = self._raw_client.destroy(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def partial_update(
         self,
@@ -407,33 +337,13 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "label": label,
-                "status": status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.partial_update(
+            id,
+            label=label,
+            status=status,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def add_document(
         self, document_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -469,19 +379,12 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}/documents/{jsonable_encoder(document_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
+        response = self._raw_client.add_document(
+            document_id,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def remove_document(
         self, document_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -517,26 +420,30 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}/documents/{jsonable_encoder(document_id)}",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="DELETE",
+        response = self._raw_client.remove_document(
+            document_id,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncDocumentIndexesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawDocumentIndexesClient(client_wrapper=client_wrapper)
 
-    async def list(
+    @property
+    def with_raw_response(self) -> AsyncRawDocumentIndexesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawDocumentIndexesClient
+        """
+        return self._raw_client
+
+    async def list_(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -595,32 +502,15 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "search": search,
-                "status": status,
-            },
+        response = await self._raw_client.list(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            search=search,
+            status=status,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDocumentIndexReadList,
-                    parse_obj_as(
-                        type_=PaginatedDocumentIndexReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def create(
         self,
@@ -693,38 +583,15 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/document-indexes",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "label": label,
-                "name": name,
-                "status": status,
-                "indexing_config": convert_and_respect_annotation_metadata(
-                    object_=indexing_config, annotation=DocumentIndexIndexingConfigRequest, direction="write"
-                ),
-                "copy_documents_from_index_id": copy_documents_from_index_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.create(
+            label=label,
+            name=name,
+            indexing_config=indexing_config,
+            status=status,
+            copy_documents_from_index_id=copy_documents_from_index_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentIndexRead:
         """
@@ -763,25 +630,11 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def update(
         self,
@@ -837,33 +690,13 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PUT",
-            json={
-                "label": label,
-                "status": status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.update(
+            id,
+            label=label,
+            status=status,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -901,19 +734,11 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="DELETE",
+        response = await self._raw_client.destroy(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def partial_update(
         self,
@@ -968,33 +793,13 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "label": label,
-                "status": status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.partial_update(
+            id,
+            label=label,
+            status=status,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentIndexRead,
-                    parse_obj_as(
-                        type_=DocumentIndexRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def add_document(
         self, document_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1038,19 +843,12 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}/documents/{jsonable_encoder(document_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
+        response = await self._raw_client.add_document(
+            document_id,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def remove_document(
         self, document_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1094,16 +892,9 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/document-indexes/{jsonable_encoder(id)}/documents/{jsonable_encoder(document_id)}",
-            base_url=self._client_wrapper.get_environment().documents,
-            method="DELETE",
+        response = await self._raw_client.remove_document(
+            document_id,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

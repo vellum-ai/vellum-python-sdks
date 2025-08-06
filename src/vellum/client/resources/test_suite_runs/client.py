@@ -2,16 +2,13 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawTestSuiteRunsClient
 from ...types.test_suite_run_exec_config_request import TestSuiteRunExecConfigRequest
 from ...core.request_options import RequestOptions
 from ...types.test_suite_run_read import TestSuiteRunRead
-from ...core.serialization import convert_and_respect_annotation_metadata
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
-from ...core.jsonable_encoder import jsonable_encoder
 from ...types.paginated_test_suite_run_execution_list import PaginatedTestSuiteRunExecutionList
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawTestSuiteRunsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -19,7 +16,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class TestSuiteRunsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawTestSuiteRunsClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawTestSuiteRunsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawTestSuiteRunsClient
+        """
+        return self._raw_client
 
     def create(
         self,
@@ -71,36 +83,13 @@ class TestSuiteRunsClient:
             ),
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/test-suite-runs",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "test_suite_id": test_suite_id,
-                "test_suite_name": test_suite_name,
-                "exec_config": convert_and_respect_annotation_metadata(
-                    object_=exec_config, annotation=TestSuiteRunExecConfigRequest, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.create(
+            exec_config=exec_config,
+            test_suite_id=test_suite_id,
+            test_suite_name=test_suite_name,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TestSuiteRunRead,
-                    parse_obj_as(
-                        type_=TestSuiteRunRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> TestSuiteRunRead:
         """
@@ -131,25 +120,11 @@ class TestSuiteRunsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/test-suite-runs/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TestSuiteRunRead,
-                    parse_obj_as(
-                        type_=TestSuiteRunRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list_executions(
         self,
@@ -198,35 +173,30 @@ class TestSuiteRunsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/test-suite-runs/{jsonable_encoder(id)}/executions",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "expand": expand,
-                "limit": limit,
-                "offset": offset,
-            },
+        response = self._raw_client.list_executions(
+            id,
+            expand=expand,
+            limit=limit,
+            offset=offset,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedTestSuiteRunExecutionList,
-                    parse_obj_as(
-                        type_=PaginatedTestSuiteRunExecutionList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncTestSuiteRunsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawTestSuiteRunsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawTestSuiteRunsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawTestSuiteRunsClient
+        """
+        return self._raw_client
 
     async def create(
         self,
@@ -286,36 +256,13 @@ class AsyncTestSuiteRunsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/test-suite-runs",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "test_suite_id": test_suite_id,
-                "test_suite_name": test_suite_name,
-                "exec_config": convert_and_respect_annotation_metadata(
-                    object_=exec_config, annotation=TestSuiteRunExecConfigRequest, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.create(
+            exec_config=exec_config,
+            test_suite_id=test_suite_id,
+            test_suite_name=test_suite_name,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TestSuiteRunRead,
-                    parse_obj_as(
-                        type_=TestSuiteRunRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> TestSuiteRunRead:
         """
@@ -354,25 +301,11 @@ class AsyncTestSuiteRunsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/test-suite-runs/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TestSuiteRunRead,
-                    parse_obj_as(
-                        type_=TestSuiteRunRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list_executions(
         self,
@@ -429,27 +362,11 @@ class AsyncTestSuiteRunsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/test-suite-runs/{jsonable_encoder(id)}/executions",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "expand": expand,
-                "limit": limit,
-                "offset": offset,
-            },
+        response = await self._raw_client.list_executions(
+            id,
+            expand=expand,
+            limit=limit,
+            offset=offset,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedTestSuiteRunExecutionList,
-                    parse_obj_as(
-                        type_=PaginatedTestSuiteRunExecutionList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
