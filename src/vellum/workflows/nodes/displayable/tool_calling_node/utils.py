@@ -47,8 +47,10 @@ class FunctionCallNodeMixin:
 
     def _extract_function_arguments(self) -> dict:
         """Extract arguments from function call output."""
-        if self.function_call_output and len(self.function_call_output) > self.state.current_prompt_output_index:
-            function_call = self.function_call_output[self.state.current_prompt_output_index]
+        # Access state through self (the mixin will be used with BaseNode subclasses)
+        current_index = getattr(self, "state").current_prompt_output_index
+        if self.function_call_output and len(self.function_call_output) > current_index:
+            function_call = self.function_call_output[current_index]
             if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
                 return function_call.value.arguments or {}
         return {}
@@ -255,10 +257,10 @@ class ElseNode(BaseNode[ToolCallingState]):
 
     class Ports(BaseNode.Ports):
         # Redefined in the create_else_node function, but defined here to resolve mypy errors
-        loop = Port.on_if(
-            ToolCallingState.current_prompt_output_index.less_than(1)
-            | ToolCallingState.current_function_calls_processed.greater_than(0)
+        loop_to_router = Port.on_if(
+            ToolCallingState.current_prompt_output_index.less_than(ToolPromptNode.Outputs.results.length())
         )
+        loop_to_prompt = Port.on_elif(ToolCallingState.current_function_calls_processed.greater_than(0))
         end = Port.on_else()
 
     def run(self) -> BaseNode.Outputs:
