@@ -47,12 +47,12 @@ const main = async () => {
     return;
   }
 
-  if (pr.user?.login !== 'fern-api') {
+  if (pr.user?.login !== 'fern-api' && pr.user?.login !== 'fern-api[bot]') {
     console.log(`PR was not opened by fern-api user (opened by: ${pr.user?.login}), skipping auto-merge`);
     return;
   }
 
-  console.log(`PR #${PR_NUMBER} is open, has release label, and was opened by fern-api user, waiting for checks...`);
+  console.log(`PR #${PR_NUMBER} is open, has release label, and was opened by authorized user (${pr.user?.login}), waiting for checks...`);
 
   const startTime = Date.now();
   
