@@ -1,17 +1,16 @@
 # This GitHub Action is managed by the Vellum SDK Generator Repo and copied into each SDK repository.
-name: Release
+name: Auto-merge Release PRs
 
 on:
   pull_request:
-    types: [closed]
+    types: [labeled, synchronize]
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  create-release:
+  auto-merge:
     runs-on: ubuntu-latest
-    if: (github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')) || github.event_name == 'workflow_dispatch'
+    if: contains(github.event.pull_request.labels.*.name, 'release')
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -25,10 +24,12 @@ jobs:
         run: npm install
         working-directory: ee/automation
 
-      - name: Create release
+      - name: Wait for checks and auto-merge
         env:
           VELLUM_AUTOMATION_APP_ID: ${{ secrets.VELLUM_AUTOMATION_APP_ID }}
           VELLUM_AUTOMATION_PRIVATE_KEY: ${{ secrets.VELLUM_AUTOMATION_PRIVATE_KEY }}
           VELLUM_AUTOMATION_INSTALLATION_ID: ${{ secrets.VELLUM_AUTOMATION_INSTALLATION_ID }}
-        run: npm run create-release
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: npm run auto-merge
         working-directory: ee/automation
