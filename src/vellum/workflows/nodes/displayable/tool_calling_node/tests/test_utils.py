@@ -13,7 +13,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
-    create_tool_router_node,
+    create_tool_prompt_node,
     get_function_name,
     get_mcp_tool_name,
 )
@@ -104,9 +104,9 @@ def test_get_function_name_composio_tool_definition_various_toolkits(
     assert result == expected_result
 
 
-def test_create_tool_router_node_max_prompt_iterations(vellum_adhoc_prompt_client):
+def test_create_tool_prompt_node_max_prompt_iterations(vellum_adhoc_prompt_client):
     # GIVEN a tool router node with max_prompt_iterations set to None
-    tool_router_node = create_tool_router_node(
+    tool_prompt_node = create_tool_prompt_node(
         ml_model="gpt-4o-mini",
         blocks=[],
         functions=[],
@@ -129,7 +129,7 @@ def test_create_tool_router_node_max_prompt_iterations(vellum_adhoc_prompt_clien
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
     # WHEN we run the tool router node
-    node_instance = tool_router_node()
+    node_instance = tool_prompt_node()
     outputs = list(node_instance.run())
     assert outputs[0].name == "results"
     assert outputs[0].value == [StringVellumValue(type="STRING", value="test output")]
@@ -137,7 +137,7 @@ def test_create_tool_router_node_max_prompt_iterations(vellum_adhoc_prompt_clien
     assert outputs[1].value == "test output"
 
 
-def test_create_tool_router_node_chat_history_block_dict(vellum_adhoc_prompt_client):
+def test_create_tool_prompt_node_chat_history_block_dict(vellum_adhoc_prompt_client):
     # GIVEN a list of blocks with a chat history block
     blocks = [
         {
@@ -165,7 +165,7 @@ def test_create_tool_router_node_chat_history_block_dict(vellum_adhoc_prompt_cli
         },
     ]
 
-    tool_router_node = create_tool_router_node(
+    tool_prompt_node = create_tool_prompt_node(
         ml_model="gpt-4o-mini",
         blocks=blocks,  # type: ignore
         functions=[],
@@ -187,7 +187,7 @@ def test_create_tool_router_node_chat_history_block_dict(vellum_adhoc_prompt_cli
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
     # WHEN we run the tool router node
-    node_instance = tool_router_node()
+    node_instance = tool_prompt_node()
     list(node_instance.run())
 
     # THEN the API was called with compiled blocks

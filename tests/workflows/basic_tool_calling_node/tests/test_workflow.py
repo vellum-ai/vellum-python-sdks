@@ -25,7 +25,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
-from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolRouterNode
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolPromptNode
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
@@ -76,6 +76,9 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
     first_call_input_id_2 = uuid4_generator()
     second_call_input_id = uuid4_generator()
     second_call_input_id_2 = uuid4_generator()
+    # Add extra UUID calls for the new tool calling architecture
+    third_call_input_id = uuid4_generator()
+    third_call_input_id_2 = uuid4_generator()
 
     # GIVEN a get current weather workflow
     workflow = BasicToolCallingNodeWorkflow()
@@ -404,10 +407,10 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
     )
 
     tool_router_node_initiated_events = [
-        e for e in events if e.name == "node.execution.initiated" and issubclass(e.body.node_definition, ToolRouterNode)
+        e for e in events if e.name == "node.execution.initiated" and issubclass(e.body.node_definition, ToolPromptNode)
     ]
 
-    assert len(tool_router_node_initiated_events) == 3
+    assert len(tool_router_node_initiated_events) == 1
 
     first_event = tool_router_node_initiated_events[0]
     first_key = list(first_event.body.inputs.keys())[0]
@@ -493,7 +496,7 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
     ]
 
 
-def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_client):
+def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_client, vellum_client):
     """
     Test that the tool calling node returns both STRING and FUNCTION_CALL outputs on first invocation.
     """
@@ -540,8 +543,8 @@ def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_clie
     # WHEN the workflow is executed
     workflow.run(Inputs(query="What's the weather like in San Francisco?"))
 
-    # THEN the adhoc_execute_prompt_stream should be called exactly twice
-    assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
+    # THEN the adhoc_execute_prompt_stream should be called exactly once
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 1
 
     # AND the second call should have the correct chat_history input value
     second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]

@@ -16,7 +16,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
     create_mcp_tool_node,
     create_router_node,
-    create_tool_router_node,
+    create_tool_prompt_node,
     get_function_name,
     get_mcp_tool_name,
     hydrate_mcp_tool_definitions,
@@ -78,7 +78,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 graph = self._graph
 
                 class Outputs(BaseWorkflow.Outputs):
-                    text: str = self.tool_router_node.Outputs.text
+                    text: str = self.tool_prompt_node.Outputs.text
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
 
             subworkflow = ToolCallingWorkflow(
@@ -137,7 +137,8 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 )
 
     def _build_graph(self) -> None:
-        self.tool_router_node = create_tool_router_node(
+        # Create the prompt node (handles prompt logic only)
+        self.tool_prompt_node = create_tool_prompt_node(
             ml_model=self.ml_model,
             blocks=self.blocks,
             functions=self.functions,
@@ -146,11 +147,13 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             max_prompt_iterations=self.max_prompt_iterations,
         )
 
+        # Create the router node (handles routing logic only)
         self.router_node = create_router_node(
             functions=self.functions,
-            tool_router_node=self.tool_router_node,
+            tool_prompt_node=self.tool_prompt_node,
         )
 
+        # Create function nodes that reference the tool prompt node's outputs
         self._function_nodes = {}
         for function in self.functions:
             if isinstance(function, MCPServer):
@@ -160,28 +163,32 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
                     self._function_nodes[function_name] = create_mcp_tool_node(
                         tool_def=tool_definition,
-                        tool_router_node=self.tool_router_node,
+                        tool_prompt_node=self.tool_prompt_node,
                     )
             else:
                 function_name = get_function_name(function)
 
                 self._function_nodes[function_name] = create_function_node(
                     function=function,
-                    tool_router_node=self.tool_router_node,
+                    tool_prompt_node=self.tool_prompt_node,
                 )
 
         graph_set = set()
 
-        # Add connections from ports of router to function nodes and back to router
+        graph_set.add(self.tool_prompt_node >> self.router_node)
+
+        # Add connections from router to function nodes and back to router node
         for function_name, FunctionNodeClass in self._function_nodes.items():
-            router_port = getattr(self.tool_router_node.Ports, function_name)
-            edge_graph = router_port >> FunctionNodeClass >> self.tool_router_node
+            router_port = getattr(self.router_node.Ports, function_name)
+            edge_graph = router_port >> FunctionNodeClass >> self.router_node
             graph_set.add(edge_graph)
 
-        else_node = create_else_node(self.tool_router_node)
-        default_port = self.tool_router_node.Ports.default >> {
-            else_node.Ports.loop >> self.tool_router_node,
-            else_node.Ports.end,
+        # Handle the else case - when no function conditions match
+        else_node = create_else_node(self.tool_prompt_node)
+        default_port = self.router_node.Ports.default >> {
+            else_node.Ports.loop_to_router >> self.router_node,                    # More outputs to process
+            else_node.Ports.loop_to_prompt >> self.tool_prompt_node,     # Need new prompt iteration
+            else_node.Ports.end,                                         # Finished
         }
         graph_set.add(default_port)
 

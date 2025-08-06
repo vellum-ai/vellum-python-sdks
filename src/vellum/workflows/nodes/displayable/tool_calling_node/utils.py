@@ -66,13 +66,15 @@ class FunctionCallNodeMixin:
             state.current_prompt_output_index += 1
 
 
-class ToolRouterNode(InlinePromptNode[ToolCallingState]):
+class ToolPromptNode(InlinePromptNode[ToolCallingState]):
     max_prompt_iterations: Optional[int] = 5
 
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
+        print(f"DEBUG: ToolPromptNode.run() - iterations: {self.state.prompt_iterations}")
+        
         if self.max_prompt_iterations is not None and self.state.prompt_iterations >= self.max_prompt_iterations:
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
@@ -82,7 +84,11 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             self.state.current_prompt_output_index = 0
             self.state.current_function_calls_processed = 0
             self.state.prompt_iterations += 1
+            
+        print(f"DEBUG: ToolPromptNode state after reset - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}, iterations: {self.state.prompt_iterations}")
+        
         for output in generator:
+            print(f"DEBUG: ToolPromptNode yielding: {output.name}")
             if output.name == InlinePromptNode.Outputs.results.name and output.value:
                 prompt_outputs = cast(List[PromptOutput], output.value)
                 chat_contents: List[ArrayChatMessageContentItem] = []
@@ -99,6 +105,7 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
                             )
                         )
 
+                # Only add ASSISTANT messages to chat history
                 if len(chat_contents) == 1:
                     if chat_contents[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=chat_contents[0].value))
@@ -119,6 +126,7 @@ class RouterNode(BaseNode[ToolCallingState]):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
+        print(f"DEBUG: RouterNode.run() - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
         # Router node doesn't process outputs or create chat messages
         # It just handles the routing logic via its ports
         yield from []
@@ -134,8 +142,8 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
         # we do in the `__init__` method. Long term, instead of the function_call_output attribute above, we
         # want to do:
         # ```python
-        # subworkflow_inputs = tool_router_node.Outputs.results[0]['value']['arguments'].if_(
-        #     tool_router_node.Outputs.results[0]['type'].equals('FUNCTION_CALL'),
+        # subworkflow_inputs = tool_prompt_node.Outputs.results[0]['value']['arguments'].if_(
+        #     tool_prompt_node.Outputs.results[0]['type'].equals('FUNCTION_CALL'),
         #     {},
         # )
         # ```
@@ -180,10 +188,12 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
+        print(f"DEBUG: FunctionNode.run() - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
         arguments = self._extract_function_arguments()
 
         try:
             result = self.function_definition(**arguments)
+            print(f"DEBUG: FunctionNode executed with result: {result}")
         except Exception as e:
             function_name = self.function_definition.__name__
             raise NodeException(
@@ -193,6 +203,7 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
         # Add the result to the chat history
         self._add_function_result_to_chat_history(result, self.state)
+        print(f"DEBUG: FunctionNode after execution - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
 
         yield from []
 
@@ -262,8 +273,10 @@ class ElseNode(BaseNode[ToolCallingState]):
         end = Port.on_else()
 
     def run(self) -> BaseNode.Outputs:
+        print(f"DEBUG: ElseNode.run() - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
         with self.state.__quiet__():
             self.state.current_prompt_output_index += 1
+        print(f"DEBUG: ElseNode after increment - index: {self.state.current_prompt_output_index}")
         return self.Outputs()
 
 
@@ -317,46 +330,22 @@ def hydrate_mcp_tool_definitions(server_def: MCPServer) -> List[MCPToolDefinitio
         return []
 
 
-def create_tool_router_node(
+def create_tool_prompt_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
     functions: List[Tool],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
-) -> Type[ToolRouterNode]:
+) -> Type[ToolPromptNode]:
     if functions and len(functions) > 0:
-        # Create dynamic ports and convert functions in a single loop
-        Ports = type("Ports", (), {})
         prompt_functions: List[Union[Tool, FunctionDefinition]] = []
-
-        # Avoid using lambda to capture function_name
-        # lambda will capture the function_name by reference,
-        # and if the function_name is changed, the port_condition will also change.
-        def create_port_condition(fn_name):
-            return Port.on_if(
-                LazyReference(
-                    lambda: (
-                        ToolCallingState.current_prompt_output_index.less_than(node.Outputs.results.length())
-                        & node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
-                            "FUNCTION_CALL"
-                        )
-                        & node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"]["name"].equals(
-                            fn_name
-                        )
-                    )
-                )
-            )
 
         for function in functions:
             if isinstance(function, ComposioToolDefinition):
                 # Get Composio tool details and hydrate the function definition
                 enhanced_function = _hydrate_composio_tool_definition(function)
                 prompt_functions.append(enhanced_function)
-                # Create port for this function (using original function for get_function_name)
-                function_name = get_function_name(function)
-                port = create_port_condition(function_name)
-                setattr(Ports, function_name, port)
             elif isinstance(function, MCPServer):
                 tool_functions: List[MCPToolDefinition] = hydrate_mcp_tool_definitions(function)
                 for tool_function in tool_functions:
@@ -368,19 +357,9 @@ def create_tool_router_node(
                             parameters=tool_function.parameters,
                         )
                     )
-                    port = create_port_condition(name)
-                    setattr(Ports, name, port)
             else:
                 prompt_functions.append(function)
-                function_name = get_function_name(function)
-                port = create_port_condition(function_name)
-                setattr(Ports, function_name, port)
-
-        # Add the else port for when no function conditions match
-        setattr(Ports, "default", Port.on_else())
     else:
-        # If no functions exist, create a simple Ports class with just a default port
-        Ports = type("Ports", (), {"default": Port(default=True)})
         prompt_functions = []
 
     # Add a chat history block to blocks only if one doesn't already exist
@@ -416,10 +395,10 @@ def create_tool_router_node(
     }
 
     node = cast(
-        Type[ToolRouterNode],
+        Type[ToolPromptNode],
         type(
-            "ToolRouterNode",
-            (ToolRouterNode,),
+            "ToolPromptNode",
+            (ToolPromptNode,),
             {
                 "ml_model": ml_model,
                 "blocks": blocks,
@@ -427,7 +406,6 @@ def create_tool_router_node(
                 "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
-                "Ports": Ports,
                 "__module__": __name__,
             },
         ),
@@ -437,25 +415,28 @@ def create_tool_router_node(
 
 def create_router_node(
     functions: List[Tool],
-    tool_router_node: Type[ToolRouterNode],
+    tool_prompt_node: Type[InlinePromptNode[ToolCallingState]],
 ) -> Type[RouterNode]:
-    """Create a RouterNode with the same ports as ToolRouterNode."""
+    """Create a RouterNode with dynamic ports that route based on tool_prompt_node outputs."""
 
     if functions and len(functions) > 0:
         # Create dynamic ports and convert functions in a single loop
         Ports = type("Ports", (), {})
 
+        # Avoid using lambda to capture function_name
+        # lambda will capture the function_name by reference,
+        # and if the function_name is changed, the port_condition will also change.
         def create_port_condition(fn_name):
             return Port.on_if(
                 LazyReference(
                     lambda: (
                         ToolCallingState.current_prompt_output_index.less_than(
-                            tool_router_node.Outputs.results.length()
+                            tool_prompt_node.Outputs.results.length()
                         )
-                        & tool_router_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
+                        & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
                             "FUNCTION_CALL"
                         )
-                        & tool_router_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
+                        & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
                             "name"
                         ].equals(fn_name)
                     )
@@ -491,6 +472,7 @@ def create_router_node(
             (RouterNode,),
             {
                 "Ports": Ports,
+                "prompt_outputs": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         ),
@@ -500,7 +482,7 @@ def create_router_node(
 
 def create_function_node(
     function: ToolBase,
-    tool_router_node: Type[ToolRouterNode],
+    tool_prompt_node: Type[ToolPromptNode],
 ) -> Type[BaseNode]:
     """
     Create a FunctionNode class for a given function.
@@ -510,7 +492,7 @@ def create_function_node(
 
     Args:
         function: The function to create a node for
-        tool_router_node: The tool router node class
+        tool_prompt_node: The tool prompt node class
     """
     if isinstance(function, DeploymentDefinition):
         deployment = function.deployment_id or function.deployment_name
@@ -522,7 +504,7 @@ def create_function_node(
             {
                 "deployment": deployment,
                 "release_tag": release_tag,
-                "function_call_output": tool_router_node.Outputs.results,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -535,7 +517,7 @@ def create_function_node(
             (ComposioNode,),
             {
                 "composio_tool": function,
-                "function_call_output": tool_router_node.Outputs.results,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -546,7 +528,7 @@ def create_function_node(
             (DynamicInlineSubworkflowNode,),
             {
                 "subworkflow": function,
-                "function_call_output": tool_router_node.Outputs.results,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -557,7 +539,7 @@ def create_function_node(
             (FunctionNode,),
             {
                 "function_definition": lambda self, **kwargs: function(**kwargs),
-                "function_call_output": tool_router_node.Outputs.results,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -567,14 +549,14 @@ def create_function_node(
 
 def create_mcp_tool_node(
     tool_def: MCPToolDefinition,
-    tool_router_node: Type[ToolRouterNode],
+    tool_prompt_node: Type[ToolPromptNode],
 ) -> Type[BaseNode]:
     node = type(
         f"MCPNode_{tool_def.name}",
         (MCPNode,),
         {
             "mcp_tool": tool_def,
-            "function_call_output": tool_router_node.Outputs.results,
+            "function_call_output": tool_prompt_node.Outputs.results,
             "__module__": __name__,
         },
     )
@@ -582,22 +564,27 @@ def create_mcp_tool_node(
 
 
 def create_else_node(
-    tool_router_node: Type[ToolRouterNode],
+    tool_prompt_node: Type[ToolPromptNode],
 ) -> Type[ElseNode]:
     class Ports(ElseNode.Ports):
-        loop = Port.on_if(
-            ToolCallingState.current_prompt_output_index.less_than(tool_router_node.Outputs.results.length())
-            | ToolCallingState.current_function_calls_processed.greater_than(0)
+        loop_to_router = Port.on_if(
+            ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
+        )
+        loop_to_prompt = Port.on_elif(
+            ToolCallingState.current_function_calls_processed.greater_than(0)
         )
         end = Port.on_else()
 
-    node = type(
-        f"{tool_router_node.__name__}_ElseNode",
-        (ElseNode,),
-        {
-            "Ports": Ports,
-            "__module__": __name__,
-        },
+    node = cast(
+        Type[ElseNode],
+        type(
+            f"{tool_prompt_node.__name__}_ElseNode",
+            (ElseNode,),
+            {
+                "Ports": Ports,
+                "__module__": __name__,
+            },
+        ),
     )
     return node
 

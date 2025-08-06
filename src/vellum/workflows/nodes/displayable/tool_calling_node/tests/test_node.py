@@ -16,7 +16,11 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
-from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_function_node, create_tool_router_node
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
+    create_function_node,
+    create_router_node,
+    create_tool_prompt_node,
+)
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
@@ -35,8 +39,8 @@ def test_port_condition_match_function_name():
     """
     Test that the port condition correctly matches the function name.
     """
-    # GIVEN a tool router node
-    router_node = create_tool_router_node(
+    # GIVEN a tool prompt node
+    tool_prompt_node = create_tool_prompt_node(
         ml_model="test-model",
         blocks=[],
         functions=[first_function, second_function],
@@ -44,11 +48,17 @@ def test_port_condition_match_function_name():
         parameters=DEFAULT_PROMPT_PARAMETERS,
     )
 
+    # AND a router node that references the tool prompt node
+    router_node = create_router_node(
+        functions=[first_function, second_function],
+        tool_prompt_node=tool_prompt_node,
+    )
+
     # AND a state with a function call to the first function
     state = ToolCallingState(
         meta=StateMeta(
             node_outputs={
-                router_node.Outputs.results: [
+                tool_prompt_node.Outputs.results: [
                     FunctionCallVellumValue(
                         value=FunctionCall(
                             arguments={}, id="call_zp7pBQjGAOBCr7lo0AbR1HXT", name="first_function", state="FULFILLED"
@@ -93,8 +103,8 @@ def test_tool_calling_node_inline_workflow_context():
         class Outputs(BaseOutputs):
             generated_files = MyNode.Outputs.generated_files
 
-    # GIVEN a tool router node
-    tool_router_node = create_tool_router_node(
+    # GIVEN a tool prompt node
+    tool_prompt_node = create_tool_prompt_node(
         ml_model="test-model",
         blocks=[],
         functions=[MyWorkflow],
@@ -105,7 +115,7 @@ def test_tool_calling_node_inline_workflow_context():
     # WHEN we create a function node for the workflow
     function_node_class = create_function_node(
         function=MyWorkflow,
-        tool_router_node=tool_router_node,
+        tool_prompt_node=tool_prompt_node,
     )
 
     # AND we create an instance with a context containing generated_files
