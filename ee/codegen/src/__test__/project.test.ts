@@ -6433,16 +6433,6 @@ baz = foo + bar
                 template_node_input_id: "template-input-id",
                 output_id: "output-id",
                 output_type: "STRING",
-                display_data: {
-                  position: { x: 100, y: 100 },
-                  width: 300,
-                  height: 200,
-                  comment: {
-                    expanded: true,
-                    value:
-                      "This is a test comment that should appear as a docstring",
-                  },
-                },
               },
               inputs: [
                 {
@@ -6462,6 +6452,16 @@ baz = foo + bar
                   },
                 },
               ],
+              display_data: {
+                position: { x: 100, y: 100 },
+                width: 300,
+                height: 200,
+                comment: {
+                  expanded: true,
+                  value:
+                    "This is a test comment that should appear as a docstring",
+                },
+              },
             },
           ],
         },
