@@ -885,7 +885,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             WorkflowSerializationResult containing exec_config and errors
         """
         workflow = BaseWorkflow.load_from_module(module)
-
         workflow_display = get_workflow_display(
             workflow_class=workflow,
             client=client,
