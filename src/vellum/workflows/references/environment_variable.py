@@ -15,8 +15,10 @@ class EnvironmentVariableReference(BaseDescriptor[str]):
         name: str,
         # DEPRECATED - to be removed in 0.15.0 release
         default: Optional[str] = None,
+        serialize_as_constant: bool = False,
     ):
         super().__init__(name=name, types=(str,))
+        self._serialize_as_constant = serialize_as_constant
 
     def resolve(self, state: "BaseState") -> Any:
         env_value = os.environ.get(self.name)
@@ -24,3 +26,12 @@ class EnvironmentVariableReference(BaseDescriptor[str]):
             return env_value
 
         return undefined
+
+    @property
+    def serialize_as_constant(self) -> bool:
+        return self._serialize_as_constant
+
+    @serialize_as_constant.setter
+    def serialize_as_constant(self, value: bool):
+        print("setting serialize_as_constant to", value)
+        self._serialize_as_constant = value
