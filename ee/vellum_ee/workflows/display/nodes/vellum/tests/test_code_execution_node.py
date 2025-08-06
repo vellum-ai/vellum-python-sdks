@@ -197,7 +197,61 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                     "display_data": {"position": {"x": 0.0, "y": -50.0}},
                     "base": None,
                     "definition": None,
-                }
+                },
+                {
+                    "id": "ac90c0ce-f393-438c-a24f-e5e9a9286182",
+                    "type": "CODE_EXECUTION",
+                    "inputs": [
+                        {
+                            "id": "a0b9d6f6-ce59-4075-8db6-866781bc73ef",
+                            "key": "code",
+                            "value": {
+                                "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": None}}],
+                                "combinator": "OR",
+                            },
+                        },
+                        {
+                            "id": "58598cc8-aa8a-4b4f-99fb-09f6815b6c01",
+                            "key": "runtime",
+                            "value": {
+                                "rules": [
+                                    {"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}
+                                ],
+                                "combinator": "OR",
+                            },
+                        },
+                    ],
+                    "data": {
+                        "label": "My Node",
+                        "error_output_id": None,
+                        "source_handle_id": "7afa3858-f50c-4116-936a-a401e3b2c60f",
+                        "target_handle_id": "3a39ea63-9f86-4891-a902-0216a7190720",
+                        "code_input_id": "a0b9d6f6-ce59-4075-8db6-866781bc73ef",
+                        "runtime_input_id": "58598cc8-aa8a-4b4f-99fb-09f6815b6c01",
+                        "output_type": "STRING",
+                        "packages": [],
+                        "output_id": "00b2120e-b642-46e4-8276-5f3c69d8a6cb",
+                        "log_output_id": "47e3eeca-4bf8-492e-b8ac-28c7d389c886",
+                    },
+                    "display_data": {"position": {"x": 200.0, "y": -50.0}},
+                    "base": {
+                        "name": "CodeExecutionNode",
+                        "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],
+                    },
+                    "definition": {
+                        "name": "MyNode",
+                        "module": [
+                            "vellum_ee",
+                            "workflows",
+                            "display",
+                            "nodes",
+                            "vellum",
+                            "tests",
+                            "test_code_execution_node",
+                        ],
+                    },
+                    "ports": [{"id": "7afa3858-f50c-4116-936a-a401e3b2c60f", "name": "default", "type": "DEFAULT"}],
+                },
             ],
             "edges": [
                 {
