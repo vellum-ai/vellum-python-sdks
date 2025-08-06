@@ -2,16 +2,13 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawSandboxesClient
 from ...core.request_options import RequestOptions
 from ...types.deployment_read import DeploymentRead
-from ...core.jsonable_encoder import jsonable_encoder
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.named_scenario_input_request import NamedScenarioInputRequest
 from ...types.sandbox_scenario import SandboxScenario
-from ...core.serialization import convert_and_respect_annotation_metadata
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawSandboxesClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -19,7 +16,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class SandboxesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawSandboxesClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawSandboxesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawSandboxesClient
+        """
+        return self._raw_client
 
     def deploy_prompt(
         self,
@@ -78,36 +90,17 @@ class SandboxesClient:
             prompt_variant_id="prompt_variant_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/sandboxes/{jsonable_encoder(id)}/prompts/{jsonable_encoder(prompt_variant_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "prompt_deployment_id": prompt_deployment_id,
-                "prompt_deployment_name": prompt_deployment_name,
-                "label": label,
-                "release_tags": release_tags,
-                "release_description": release_description,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.deploy_prompt(
+            id,
+            prompt_variant_id,
+            prompt_deployment_id=prompt_deployment_id,
+            prompt_deployment_name=prompt_deployment_name,
+            label=label,
+            release_tags=release_tags,
+            release_description=release_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentRead,
-                    parse_obj_as(
-                        type_=DeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def upsert_sandbox_scenario(
         self,
@@ -168,36 +161,14 @@ class SandboxesClient:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/sandboxes/{jsonable_encoder(id)}/scenarios",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "label": label,
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[NamedScenarioInputRequest], direction="write"
-                ),
-                "scenario_id": scenario_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.upsert_sandbox_scenario(
+            id,
+            inputs=inputs,
+            label=label,
+            scenario_id=scenario_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    SandboxScenario,
-                    parse_obj_as(
-                        type_=SandboxScenario,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def delete_sandbox_scenario(
         self, id: str, scenario_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -233,24 +204,28 @@ class SandboxesClient:
             scenario_id="scenario_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/sandboxes/{jsonable_encoder(id)}/scenarios/{jsonable_encoder(scenario_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="DELETE",
+        response = self._raw_client.delete_sandbox_scenario(
+            id,
+            scenario_id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncSandboxesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawSandboxesClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawSandboxesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawSandboxesClient
+        """
+        return self._raw_client
 
     async def deploy_prompt(
         self,
@@ -317,36 +292,17 @@ class AsyncSandboxesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/sandboxes/{jsonable_encoder(id)}/prompts/{jsonable_encoder(prompt_variant_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "prompt_deployment_id": prompt_deployment_id,
-                "prompt_deployment_name": prompt_deployment_name,
-                "label": label,
-                "release_tags": release_tags,
-                "release_description": release_description,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.deploy_prompt(
+            id,
+            prompt_variant_id,
+            prompt_deployment_id=prompt_deployment_id,
+            prompt_deployment_name=prompt_deployment_name,
+            label=label,
+            release_tags=release_tags,
+            release_description=release_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeploymentRead,
-                    parse_obj_as(
-                        type_=DeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def upsert_sandbox_scenario(
         self,
@@ -415,36 +371,14 @@ class AsyncSandboxesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/sandboxes/{jsonable_encoder(id)}/scenarios",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "label": label,
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[NamedScenarioInputRequest], direction="write"
-                ),
-                "scenario_id": scenario_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.upsert_sandbox_scenario(
+            id,
+            inputs=inputs,
+            label=label,
+            scenario_id=scenario_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    SandboxScenario,
-                    parse_obj_as(
-                        type_=SandboxScenario,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def delete_sandbox_scenario(
         self, id: str, scenario_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -488,16 +422,9 @@ class AsyncSandboxesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/sandboxes/{jsonable_encoder(id)}/scenarios/{jsonable_encoder(scenario_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="DELETE",
+        response = await self._raw_client.delete_sandbox_scenario(
+            id,
+            scenario_id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

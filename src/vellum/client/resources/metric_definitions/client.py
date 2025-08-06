@@ -2,16 +2,13 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawMetricDefinitionsClient
 from ...types.metric_definition_input import MetricDefinitionInput
 from ...core.request_options import RequestOptions
 from ...types.metric_definition_execution import MetricDefinitionExecution
-from ...core.jsonable_encoder import jsonable_encoder
-from ...core.serialization import convert_and_respect_annotation_metadata
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.metric_definition_history_item import MetricDefinitionHistoryItem
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawMetricDefinitionsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -19,7 +16,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class MetricDefinitionsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawMetricDefinitionsClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawMetricDefinitionsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawMetricDefinitionsClient
+        """
+        return self._raw_client
 
     def execute_metric_definition(
         self,
@@ -69,35 +81,13 @@ class MetricDefinitionsClient:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/metric-definitions/{jsonable_encoder(id)}/execute",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[MetricDefinitionInput], direction="write"
-                ),
-                "release_tag": release_tag,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.execute_metric_definition(
+            id,
+            inputs=inputs,
+            release_tag=release_tag,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    MetricDefinitionExecution,
-                    parse_obj_as(
-                        type_=MetricDefinitionExecution,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def metric_definition_history_item_retrieve(
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -132,30 +122,28 @@ class MetricDefinitionsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/metric-definitions/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.metric_definition_history_item_retrieve(
+            history_id_or_release_tag,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    MetricDefinitionHistoryItem,
-                    parse_obj_as(
-                        type_=MetricDefinitionHistoryItem,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncMetricDefinitionsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawMetricDefinitionsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawMetricDefinitionsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawMetricDefinitionsClient
+        """
+        return self._raw_client
 
     async def execute_metric_definition(
         self,
@@ -213,35 +201,13 @@ class AsyncMetricDefinitionsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/metric-definitions/{jsonable_encoder(id)}/execute",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[MetricDefinitionInput], direction="write"
-                ),
-                "release_tag": release_tag,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.execute_metric_definition(
+            id,
+            inputs=inputs,
+            release_tag=release_tag,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    MetricDefinitionExecution,
-                    parse_obj_as(
-                        type_=MetricDefinitionExecution,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def metric_definition_history_item_retrieve(
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -284,22 +250,9 @@ class AsyncMetricDefinitionsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/metric-definitions/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.metric_definition_history_item_retrieve(
+            history_id_or_release_tag,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    MetricDefinitionHistoryItem,
-                    parse_obj_as(
-                        type_=MetricDefinitionHistoryItem,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

@@ -2,6 +2,7 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawAdHocClient
 from ...types.prompt_request_input import PromptRequestInput
 from ...types.vellum_variable import VellumVariable
 from ...types.prompt_parameters import PromptParameters
@@ -13,13 +14,14 @@ from ...core.request_options import RequestOptions
 from ...types.ad_hoc_execute_prompt_event import AdHocExecutePromptEvent
 from ...core.serialization import convert_and_respect_annotation_metadata
 from ...core.pydantic_utilities import parse_obj_as
+import json
 from ...errors.bad_request_error import BadRequestError
 from ...errors.forbidden_error import ForbiddenError
 from ...errors.internal_server_error import InternalServerError
 from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
-import json
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawAdHocClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -27,7 +29,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class AdHocClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawAdHocClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawAdHocClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawAdHocClient
+        """
+        return self._raw_client
 
     def adhoc_execute_prompt(
         self,
@@ -118,85 +135,18 @@ class AdHocClient:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/ad-hoc/execute-prompt",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "ml_model": ml_model,
-                "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
-                ),
-                "input_variables": convert_and_respect_annotation_metadata(
-                    object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"
-                ),
-                "parameters": convert_and_respect_annotation_metadata(
-                    object_=parameters, annotation=PromptParameters, direction="write"
-                ),
-                "settings": convert_and_respect_annotation_metadata(
-                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
-                ),
-                "blocks": convert_and_respect_annotation_metadata(
-                    object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
-                ),
-                "functions": convert_and_respect_annotation_metadata(
-                    object_=functions,
-                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
-                    direction="write",
-                ),
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.adhoc_execute_prompt(
+            ml_model=ml_model,
+            input_values=input_values,
+            input_variables=input_variables,
+            parameters=parameters,
+            blocks=blocks,
+            settings=settings,
+            functions=functions,
+            expand_meta=expand_meta,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    AdHocExecutePromptEvent,
-                    parse_obj_as(
-                        type_=AdHocExecutePromptEvent,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def adhoc_execute_prompt_stream(
         self,
@@ -289,9 +239,9 @@ class AdHocClient:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/ad-hoc/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "ml_model": ml_model,
@@ -380,7 +330,18 @@ class AdHocClient:
 
 class AsyncAdHocClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawAdHocClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawAdHocClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawAdHocClient
+        """
+        return self._raw_client
 
     async def adhoc_execute_prompt(
         self,
@@ -479,85 +440,18 @@ class AsyncAdHocClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/ad-hoc/execute-prompt",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "ml_model": ml_model,
-                "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
-                ),
-                "input_variables": convert_and_respect_annotation_metadata(
-                    object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"
-                ),
-                "parameters": convert_and_respect_annotation_metadata(
-                    object_=parameters, annotation=PromptParameters, direction="write"
-                ),
-                "settings": convert_and_respect_annotation_metadata(
-                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
-                ),
-                "blocks": convert_and_respect_annotation_metadata(
-                    object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
-                ),
-                "functions": convert_and_respect_annotation_metadata(
-                    object_=functions,
-                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
-                    direction="write",
-                ),
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.adhoc_execute_prompt(
+            ml_model=ml_model,
+            input_values=input_values,
+            input_variables=input_variables,
+            parameters=parameters,
+            blocks=blocks,
+            settings=settings,
+            functions=functions,
+            expand_meta=expand_meta,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    AdHocExecutePromptEvent,
-                    parse_obj_as(
-                        type_=AdHocExecutePromptEvent,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def adhoc_execute_prompt_stream(
         self,
@@ -658,9 +552,9 @@ class AsyncAdHocClient:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/ad-hoc/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "ml_model": ml_model,
