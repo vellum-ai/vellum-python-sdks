@@ -6393,11 +6393,11 @@ baz = foo + bar
     });
   });
 
-  describe("Node comments bug reproduction", () => {
-    it("should reproduce bug where node comments with values are not serialized to SDK", async () => {
+  describe("Node comments serialization", () => {
+    it("should serialize node comments with values as docstrings in SDK", async () => {
       /**
-       * Tests that node comments with values don't appear as docstrings in generated node classes.
-       * This reproduces the bug reported in APO-1037.
+       * Tests that node comments with values appear as docstrings in generated node classes.
+       * This verifies the fix for the bug reported in APO-1037.
        */
 
       // GIVEN a workflow with a node that has a comment with a value

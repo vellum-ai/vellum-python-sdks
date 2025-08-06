@@ -402,6 +402,7 @@ export abstract class BaseNode<
         height: nodeDisplayData.height,
         comment: {
           expanded: nodeDisplayData.comment.expanded,
+          value: nodeDisplayData.comment.value,
         },
       };
       return new NodeDisplayData({
