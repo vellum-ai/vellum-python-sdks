@@ -266,10 +266,19 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         }
 
     if isinstance(value, EnvironmentVariableReference):
-        return {
-            "type": "ENVIRONMENT_VARIABLE",
-            "environment_variable": value.name,
-        }
+        if value.serialize_as_constant:
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "STRING",
+                    "value": value.name,
+                },
+            }
+        else:
+            return {
+                "type": "ENVIRONMENT_VARIABLE",
+                "environment_variable": value.name,
+            }
 
     if isinstance(value, ExecutionCountReference):
         node_class_display = display_context.global_node_displays[value.node_class]

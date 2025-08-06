@@ -129,6 +129,16 @@ class MCPServer(UniversalBaseModel):
 
     model_config = {"arbitrary_types_allowed": True}
 
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Override to automatically set serialization flags for environment variables."""
+        super().__setattr__(name, value)
+
+        if name == "bearer_token_value" and isinstance(value, EnvironmentVariableReference):
+            value.serialize_as_constant = True
+
+        if name == "api_key_header_value" and isinstance(value, EnvironmentVariableReference):
+            value.serialize_as_constant = True
+
 
 class MCPToolDefinition(UniversalBaseModel):
     name: str
