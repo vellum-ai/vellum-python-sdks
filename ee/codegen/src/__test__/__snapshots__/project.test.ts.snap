@@ -99,6 +99,17 @@ class RouterNode(BaseNode):
 "
 `;
 
+exports[`WorkflowProjectGenerator > Node comments bug reproduction > should reproduce bug where node comments with values are not serialized to SDK > code/nodes/test_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TestNode(TemplatingNode[BaseState, str]):
+    template = """Hello world"""
+    inputs = {}
+"
+`;
+
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should generate unused_graphs if final output is not used > code/workflow.py 1`] = `
 "from vellum.workflows import BaseWorkflow
 

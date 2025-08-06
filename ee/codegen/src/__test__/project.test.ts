@@ -6479,14 +6479,7 @@ baz = foo + bar
 
       await project.generateCode();
 
-      const nodeFilePath = join(tempDir, "code", "nodes", "test_node.py");
-      expect(fs.existsSync(nodeFilePath)).toBe(true);
-
-      const generatedNodeContent = fs.readFileSync(nodeFilePath, "utf-8");
-
-      expect(generatedNodeContent).not.toContain("This is a test comment that should appear as a docstring");
-
-      expect(generatedNodeContent).toContain("class TestNode(");
+      expectProjectFileToMatchSnapshot(["code", "nodes", "test_node.py"]);
     });
   });
 });
