@@ -6392,4 +6392,101 @@ baz = foo + bar
       );
     });
   });
+
+  describe("Node comments bug reproduction", () => {
+    it("should reproduce bug where node comments with values are not serialized to SDK", async () => {
+      /**
+       * Tests that node comments with values don't appear as docstrings in generated node classes.
+       * This reproduces the bug reported in APO-1037.
+       */
+
+      // GIVEN a workflow with a node that has a comment with a value
+      const displayData = {
+        workflow_raw_data: {
+          edges: [
+            {
+              source_node_id: "entrypoint-node-id",
+              source_handle_id: "entrypoint-source-handle",
+              target_node_id: "test-node-id",
+              target_handle_id: "target-handle-id",
+              type: "DEFAULT",
+              id: "edge-1"
+            }
+          ],
+          nodes: [
+            {
+              id: "entrypoint-node-id",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entrypoint-source-handle"
+              },
+              inputs: []
+            },
+            {
+              id: "test-node-id",
+              type: "TEMPLATING",
+              data: {
+                label: "Test Node",
+                source_handle_id: "source-handle-id",
+                target_handle_id: "target-handle-id",
+                template_node_input_id: "template-input-id",
+                output_id: "output-id",
+                output_type: "STRING",
+                display_data: {
+                  position: { x: 100, y: 100 },
+                  width: 300,
+                  height: 200,
+                  comment: {
+                    expanded: true,
+                    value: "This is a test comment that should appear as a docstring"
+                  }
+                }
+              },
+              inputs: [
+                {
+                  id: "template-input-id",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello world"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: []
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        strict: true,
+      });
+
+      await project.generateCode();
+
+      const nodeFilePath = join(tempDir, "code", "nodes", "test_node.py");
+      expect(fs.existsSync(nodeFilePath)).toBe(true);
+
+      const generatedNodeContent = fs.readFileSync(nodeFilePath, "utf-8");
+
+      expect(generatedNodeContent).not.toContain("This is a test comment that should appear as a docstring");
+
+      expect(generatedNodeContent).toContain("class TestNode(");
+    });
+  });
 });
