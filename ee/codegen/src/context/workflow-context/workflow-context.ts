@@ -489,6 +489,23 @@ export class WorkflowContext {
     return nodeContext;
   }
 
+  public findLocalNodeContext(
+    nodeId: string
+  ): BaseNodeContext<WorkflowDataNode> | undefined {
+    const nodeContext = this.nodeContextsByNodeId.get(nodeId);
+    if (!nodeContext) {
+      this.addError(
+        new NodeNotFoundError(
+          `Failed to find Node with id '${nodeId}' in the current Workflow`,
+          "WARNING"
+        )
+      );
+      return undefined;
+    }
+
+    return nodeContext;
+  }
+
   public addPortContext(portContext: PortContext): void {
     const portId = portContext.portId;
 

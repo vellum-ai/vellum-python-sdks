@@ -7,10 +7,6 @@ import {
   PORTS_CLASS_NAME,
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
-import {
-  NodeDefinitionGenerationError,
-  NodeNotFoundError,
-} from "src/generators/errors";
 import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
 
 import type { WorkflowContext } from "src/context";
@@ -123,7 +119,7 @@ export class GraphAttribute extends AstNode {
       }
 
       graphMutableAst = newMutableAst;
-      const targetNode = this.resolveNodeId(edge.targetNodeId, edge.id);
+      const targetNode = this.resolveNodeId(edge.targetNodeId);
       if (!targetNode) {
         continue;
       }
@@ -277,24 +273,9 @@ export class GraphAttribute extends AstNode {
   }
 
   private resolveNodeId(
-    nodeId: string,
-    edgeId: string
+    nodeId: string
   ): BaseNodeContext<WorkflowDataNode> | null {
-    try {
-      return this.workflowContext.findNodeContext(nodeId) ?? null;
-    } catch (error) {
-      if (error instanceof NodeNotFoundError) {
-        this.workflowContext.addError(
-          new NodeDefinitionGenerationError(
-            `Failed to find target node with ID '${nodeId}' referenced from edge ${edgeId}`,
-            "WARNING"
-          )
-        );
-        return null;
-      } else {
-        throw error;
-      }
-    }
+    return this.workflowContext.findLocalNodeContext(nodeId) ?? null;
   }
 
   /**
@@ -325,13 +306,13 @@ export class GraphAttribute extends AstNode {
     if (edge.sourceNodeId === entrypointNodeId) {
       sourceNode = null;
     } else {
-      sourceNode = this.resolveNodeId(edge.sourceNodeId, edge.id);
+      sourceNode = this.resolveNodeId(edge.sourceNodeId);
       if (!sourceNode) {
         return;
       }
     }
 
-    const targetNode = this.resolveNodeId(edge.targetNodeId, edge.id);
+    const targetNode = this.resolveNodeId(edge.targetNodeId);
     if (!targetNode) {
       return;
     }
