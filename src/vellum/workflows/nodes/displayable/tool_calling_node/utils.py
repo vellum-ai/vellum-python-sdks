@@ -47,8 +47,8 @@ class FunctionCallNodeMixin:
 
     def _extract_function_arguments(self) -> dict:
         """Extract arguments from function call output."""
-        if self.function_call_output and len(self.function_call_output) > 0:
-            function_call = self.function_call_output[0]
+        if self.function_call_output and len(self.function_call_output) > self.state.current_prompt_output_index:
+            function_call = self.function_call_output[self.state.current_prompt_output_index]
             if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
                 return function_call.value.arguments or {}
         return {}
@@ -73,8 +73,6 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
-        print(f"DEBUG: ToolPromptNode.run() - iterations: {self.state.prompt_iterations}")
-        
         if self.max_prompt_iterations is not None and self.state.prompt_iterations >= self.max_prompt_iterations:
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
             raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
@@ -84,11 +82,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
             self.state.current_prompt_output_index = 0
             self.state.current_function_calls_processed = 0
             self.state.prompt_iterations += 1
-            
-        print(f"DEBUG: ToolPromptNode state after reset - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}, iterations: {self.state.prompt_iterations}")
-        
         for output in generator:
-            print(f"DEBUG: ToolPromptNode yielding: {output.name}")
             if output.name == InlinePromptNode.Outputs.results.name and output.value:
                 prompt_outputs = cast(List[PromptOutput], output.value)
                 chat_contents: List[ArrayChatMessageContentItem] = []
@@ -105,7 +99,6 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
                             )
                         )
 
-                # Only add ASSISTANT messages to chat history
                 if len(chat_contents) == 1:
                     if chat_contents[0].type == "STRING":
                         self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=chat_contents[0].value))
@@ -126,7 +119,6 @@ class RouterNode(BaseNode[ToolCallingState]):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
     def run(self) -> Iterator[BaseOutput]:
-        print(f"DEBUG: RouterNode.run() - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
         # Router node doesn't process outputs or create chat messages
         # It just handles the routing logic via its ports
         yield from []
@@ -188,12 +180,10 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        print(f"DEBUG: FunctionNode.run() - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
         arguments = self._extract_function_arguments()
 
         try:
             result = self.function_definition(**arguments)
-            print(f"DEBUG: FunctionNode executed with result: {result}")
         except Exception as e:
             function_name = self.function_definition.__name__
             raise NodeException(
@@ -203,7 +193,6 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
         # Add the result to the chat history
         self._add_function_result_to_chat_history(result, self.state)
-        print(f"DEBUG: FunctionNode after execution - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
 
         yield from []
 
@@ -273,10 +262,8 @@ class ElseNode(BaseNode[ToolCallingState]):
         end = Port.on_else()
 
     def run(self) -> BaseNode.Outputs:
-        print(f"DEBUG: ElseNode.run() - index: {self.state.current_prompt_output_index}, processed: {self.state.current_function_calls_processed}")
         with self.state.__quiet__():
             self.state.current_prompt_output_index += 1
-        print(f"DEBUG: ElseNode after increment - index: {self.state.current_prompt_output_index}")
         return self.Outputs()
 
 
@@ -538,7 +525,7 @@ def create_function_node(
             f"FunctionNode_{function.__name__}",
             (FunctionNode,),
             {
-                "function_definition": lambda self, **kwargs: function(**kwargs),
+                "function_definition": lambda self, **kwargs: function(**kwargs),  # ← Revert back to lambda
                 "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
@@ -570,9 +557,7 @@ def create_else_node(
         loop_to_router = Port.on_if(
             ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
         )
-        loop_to_prompt = Port.on_elif(
-            ToolCallingState.current_function_calls_processed.greater_than(0)
-        )
+        loop_to_prompt = Port.on_elif(ToolCallingState.current_function_calls_processed.greater_than(0))
         end = Port.on_else()
 
     node = cast(

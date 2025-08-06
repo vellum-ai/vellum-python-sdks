@@ -183,12 +183,11 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             edge_graph = router_port >> FunctionNodeClass >> self.router_node
             graph_set.add(edge_graph)
 
-        # Handle the else case - when no function conditions match
         else_node = create_else_node(self.tool_prompt_node)
         default_port = self.router_node.Ports.default >> {
-            else_node.Ports.loop_to_router >> self.router_node,                    # More outputs to process
-            else_node.Ports.loop_to_prompt >> self.tool_prompt_node,     # Need new prompt iteration
-            else_node.Ports.end,                                         # Finished
+            else_node.Ports.loop_to_router >> self.router_node,  # More outputs to process
+            else_node.Ports.loop_to_prompt >> self.tool_prompt_node,  # Need new prompt iteration
+            else_node.Ports.end,  # Finished
         }
         graph_set.add(default_port)
 
