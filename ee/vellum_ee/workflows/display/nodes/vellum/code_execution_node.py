@@ -6,6 +6,7 @@ from vellum.workflows.nodes.displayable.code_execution_node import CodeExecution
 from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
+from vellum_ee.workflows.display.exceptions import NodeValidationError
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -40,6 +41,8 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
                 node_filepath=node_file_path,
                 script_filepath=filepath,
             )
+            if not file_code:
+                raise NodeValidationError(f"Filepath '{filepath}' does not exist", node.__name__)
             code_value = file_code
         else:
             code_value = ""

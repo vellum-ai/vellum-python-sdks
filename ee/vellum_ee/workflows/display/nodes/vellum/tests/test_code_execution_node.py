@@ -6,6 +6,7 @@ from vellum.client.core.api_error import ApiError
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum_ee.workflows.display.exceptions import NodeValidationError
 from vellum_ee.workflows.display.nodes.vellum.code_execution_node import BaseCodeExecutionNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -153,3 +154,69 @@ def test_serialize_node__with_unresolved_secret_references(vellum_client):
     # warnings = list(workflow_display.errors)
     # assert len(warnings) == 1
     # assert "Failed to resolve secret reference 'MY_API_KEY'" in str(warnings[0])
+
+
+def test_serialize_node__with_non_exist_code_input_path():
+    # GIVEN a code node with a non-existent code input path
+    class MyNode(CodeExecutionNode):
+        filepath = "non_existent_file.py"
+
+    # AND a workflow with the code node
+    class Workflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    with pytest.raises(NodeValidationError) as exc_info:
+        workflow_display.serialize()
+    assert "Filepath 'non_existent_file.py' does not exist" in str(exc_info.value)
+
+
+def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
+    # GIVEN a code node with a non-existent code input path
+    class MyNode(CodeExecutionNode):
+        filepath = "non_existent_file.py"
+
+    # AND a workflow with the code node
+    class Workflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow with dry_run=True
+    workflow_display = get_workflow_display(workflow_class=Workflow, dry_run=True)
+    data: dict = workflow_display.serialize()
+
+    # THEN the workflow should not raise an error
+    assert data == {
+        "workflow_raw_data": {
+            "nodes": [
+                {
+                    "id": "9b9e2a5d-01a4-46b2-80a3-d9484b2c0e08",
+                    "type": "ENTRYPOINT",
+                    "inputs": [],
+                    "data": {"label": "Entrypoint Node", "source_handle_id": "3e2a3f52-5047-4e2e-9a21-37bd43c63250"},
+                    "display_data": {"position": {"x": 0.0, "y": -50.0}},
+                    "base": None,
+                    "definition": None,
+                }
+            ],
+            "edges": [
+                {
+                    "id": "ab6ef06e-df2c-4877-9c3e-9d7261b39748",
+                    "source_node_id": "9b9e2a5d-01a4-46b2-80a3-d9484b2c0e08",
+                    "source_handle_id": "3e2a3f52-5047-4e2e-9a21-37bd43c63250",
+                    "target_node_id": "ac90c0ce-f393-438c-a24f-e5e9a9286182",
+                    "target_handle_id": "3a39ea63-9f86-4891-a902-0216a7190720",
+                    "type": "DEFAULT",
+                }
+            ],
+            "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
+            "definition": {
+                "name": "Workflow",
+                "module": ["vellum_ee", "workflows", "display", "nodes", "vellum", "tests", "test_code_execution_node"],
+            },
+            "output_values": [],
+        },
+        "input_variables": [],
+        "state_variables": [],
+        "output_variables": [],
+    }
