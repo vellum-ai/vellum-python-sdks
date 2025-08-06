@@ -6356,6 +6356,14 @@ baz = foo + bar
                       target_handle_id: "inner-terminal-trigger",
                       type: "DEFAULT",
                     },
+                    {
+                      id: "edge-3",
+                      source_node_id: "inner-generic-node",
+                      source_handle_id: "inner-generic-port",
+                      target_node_id: "outer-generic-node",
+                      target_handle_id: "outer-generic-trigger",
+                      type: "DEFAULT",
+                    },
                   ],
                 },
                 input_variables: [],
@@ -6438,14 +6446,6 @@ baz = foo + bar
               target_handle_id: "outer-generic-trigger",
               type: "DEFAULT",
             },
-            {
-              id: "edge-3",
-              source_node_id: "inner-generic-node",
-              source_handle_id: "inner-generic-port",
-              target_node_id: "outer-generic-node",
-              target_handle_id: "outer-generic-trigger",
-              type: "DEFAULT",
-            },
           ],
         },
         input_variables: [],
@@ -6456,25 +6456,21 @@ baz = foo + bar
       const project = new WorkflowProjectGenerator({
         absolutePathToOutputDirectory: tempDir,
         workflowVersionExecConfigData: displayData,
-        moduleName: "subworkflow_test",
+        moduleName: "code",
         vellumApiKey: "test-key",
       });
 
       await project.generateCode();
 
       expectProjectFileToMatchSnapshot([
-        "subworkflow_test",
+        "code",
         "nodes",
         "subworkflow_node",
         "workflow.py",
       ]);
 
       // AND the outer generic node should be generated
-      expectProjectFileToMatchSnapshot([
-        "subworkflow_test",
-        "nodes",
-        "outer.py",
-      ]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "outer.py"]);
 
       // AND there should be no errors
       expect(project.workflowContext.getErrors()).toHaveLength(0);

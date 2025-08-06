@@ -1433,7 +1433,7 @@ class Workflow(BaseWorkflow[BaseInputs, State]):
 "
 `;
 
-exports[`WorkflowProjectGenerator > subworkflow with inner and outer generic nodes > should generate workflow with subworkflow node containing inner generic node and outer generic node > subworkflow_test/nodes/outer.py 1`] = `
+exports[`WorkflowProjectGenerator > subworkflow with inner and outer generic nodes > should generate workflow with subworkflow node containing inner generic node and outer generic node > code/nodes/outer.py 1`] = `
 "from vellum.workflows.nodes import BaseNode
 
 
@@ -1443,7 +1443,7 @@ class Outer(BaseNode):
 "
 `;
 
-exports[`WorkflowProjectGenerator > subworkflow with inner and outer generic nodes > should generate workflow with subworkflow node containing inner generic node and outer generic node > subworkflow_test/nodes/subworkflow_node/workflow.py 1`] = `
+exports[`WorkflowProjectGenerator > subworkflow with inner and outer generic nodes > should generate workflow with subworkflow node containing inner generic node and outer generic node > code/nodes/subworkflow_node/workflow.py 1`] = `
 "from vellum.workflows import BaseWorkflow
 
 from .nodes.inner import Inner
