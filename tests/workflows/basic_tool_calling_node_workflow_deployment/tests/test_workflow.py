@@ -91,7 +91,9 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
         release_tags=[],
         reviews=[],
     )
-    vellum_client.release_reviews.retrieve_workflow_deployment_release.return_value = mock_workflow_deployment_release
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = (
+        mock_workflow_deployment_release
+    )
 
     def mock_workflow_execution(*args, **kwargs):  # noqa: U100
         yield WorkflowExecutionWorkflowResultEvent(

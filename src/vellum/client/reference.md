@@ -5952,8 +5952,7 @@ client.workflow_deployments.update_workflow_release_tag(
 </dl>
 </details>
 
-## ReleaseReviews
-<details><summary><code>client.release_reviews.<a href="src/vellum/resources/release_reviews/client.py">retrieve_workflow_deployment_release</a>(...)</code></summary>
+<details><summary><code>client.workflow_deployments.<a href="src/vellum/resources/workflow_deployments/client.py">retrieve_workflow_deployment_release</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -5986,7 +5985,7 @@ client = Vellum(
     api_version="YOUR_API_VERSION",
     api_key="YOUR_API_KEY",
 )
-client.release_reviews.retrieve_workflow_deployment_release(
+client.workflow_deployments.retrieve_workflow_deployment_release(
     id="id",
     release_id_or_release_tag="release_id_or_release_tag",
 )

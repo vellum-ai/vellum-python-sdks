@@ -128,6 +128,7 @@ from .execution_string_vellum_value import ExecutionStringVellumValue
 from .execution_thinking_vellum_value import ExecutionThinkingVellumValue
 from .execution_vellum_value import ExecutionVellumValue
 from .external_input_descriptor import ExternalInputDescriptor
+from .external_parent_context import ExternalParentContext
 from .external_test_case_execution import ExternalTestCaseExecution
 from .external_test_case_execution_request import ExternalTestCaseExecutionRequest
 from .fast_embed_vectorizer_baai_bge_small_en_v_15 import FastEmbedVectorizerBaaiBgeSmallEnV15
@@ -751,6 +752,7 @@ __all__ = [
     "ExecutionThinkingVellumValue",
     "ExecutionVellumValue",
     "ExternalInputDescriptor",
+    "ExternalParentContext",
     "ExternalTestCaseExecution",
     "ExternalTestCaseExecutionRequest",
     "FastEmbedVectorizerBaaiBgeSmallEnV15",
