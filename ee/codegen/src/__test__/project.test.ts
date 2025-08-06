@@ -6410,8 +6410,8 @@ baz = foo + bar
               target_node_id: "test-node-id",
               target_handle_id: "target-handle-id",
               type: "DEFAULT",
-              id: "edge-1"
-            }
+              id: "edge-1",
+            },
           ],
           nodes: [
             {
@@ -6419,9 +6419,9 @@ baz = foo + bar
               type: "ENTRYPOINT",
               data: {
                 label: "Entrypoint",
-                source_handle_id: "entrypoint-source-handle"
+                source_handle_id: "entrypoint-source-handle",
               },
-              inputs: []
+              inputs: [],
             },
             {
               id: "test-node-id",
@@ -6439,9 +6439,10 @@ baz = foo + bar
                   height: 200,
                   comment: {
                     expanded: true,
-                    value: "This is a test comment that should appear as a docstring"
-                  }
-                }
+                    value:
+                      "This is a test comment that should appear as a docstring",
+                  },
+                },
               },
               inputs: [
                 {
@@ -6454,19 +6455,19 @@ baz = foo + bar
                         type: "CONSTANT_VALUE",
                         data: {
                           type: "STRING",
-                          value: "Hello world"
-                        }
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          ]
+                          value: "Hello world",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
         },
         input_variables: [],
         state_variables: [],
-        output_variables: []
+        output_variables: [],
       };
 
       const project = new WorkflowProjectGenerator({
