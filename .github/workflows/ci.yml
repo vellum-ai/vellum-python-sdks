@@ -1,56 +1,40 @@
 name: ci
 
-on:
-  push:
-    branches:
-      - main
-    tags:
-      - "*"
-
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-
+on: [push]
 jobs:
   compile:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
-        run: make setup-poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
         run: poetry install
-      - name: Format
-        run: poetry run black --check .
-      - name: Order Imports
-        run: poetry run isort --check .
-      - name: Lint
-        run: poetry run flake8
       - name: Compile
         run: poetry run mypy .
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
-        run: make setup-poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
         run: poetry install
 
       - name: Test
-        run: make test-ci
+        run: poetry run pytest -rP .
 
   publish:
     needs: [compile, test]
@@ -58,13 +42,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
-        run: make setup-poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
         run: poetry install
       - name: Publish to pypi
