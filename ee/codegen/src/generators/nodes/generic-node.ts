@@ -252,35 +252,18 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 case "MCP_SERVER": {
                   const mcpServerFunction = f as MCPServerFunctionArgs;
 
-                  let authorizationType;
-                  if (
-                    mcpServerFunction.authorization_type.type ===
-                      "CONSTANT_VALUE" &&
-                    mcpServerFunction.authorization_type.value.type === "STRING"
-                  ) {
-                    authorizationType = mcpServerFunction.authorization_type
-                      .value.value as string;
-                  } else {
-                    authorizationType =
-                      mcpServerFunction.authorization_type as unknown as string;
-                  }
-
                   const arguments_: python.MethodArgument[] = [
                     python.methodArgument({
                       name: "name",
-                      value: new WorkflowValueDescriptor({
-                        workflowValueDescriptor: mcpServerFunction.name,
-                        nodeContext: this.nodeContext,
-                        workflowContext: this.workflowContext,
-                      }),
+                      value: python.TypeInstantiation.str(
+                        mcpServerFunction.name
+                      ),
                     }),
                     python.methodArgument({
                       name: "url",
-                      value: new WorkflowValueDescriptor({
-                        workflowValueDescriptor: mcpServerFunction.url,
-                        nodeContext: this.nodeContext,
-                        workflowContext: this.workflowContext,
-                      }),
+                      value: python.TypeInstantiation.str(
+                        mcpServerFunction.url
+                      ),
                     }),
                     python.methodArgument({
                       name: "authorization_type",
@@ -291,58 +274,51 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                             .WORKFLOWS_MODULE_PATH,
                           "constants",
                         ],
-                        attribute: [authorizationType],
+                        attribute: [mcpServerFunction.authorization_type],
                       }),
                     }),
                   ];
 
-                  if (
-                    mcpServerFunction.bearer_token_value?.type ===
-                    "ENVIRONMENT_VARIABLE"
-                  ) {
-                    arguments_.push(
-                      python.methodArgument({
-                        name: "bearer_token_value",
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor:
-                            mcpServerFunction.bearer_token_value,
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
-                        }),
-                      })
-                    );
+                  if (mcpServerFunction.authorization_type === "BEARER_TOKEN") {
+                    if (mcpServerFunction.bearer_token_value) {
+                      arguments_.push(
+                        python.methodArgument({
+                          name: "bearer_token_value",
+                          value: new WorkflowValueDescriptor({
+                            workflowValueDescriptor: {
+                              type: "ENVIRONMENT_VARIABLE",
+                              environmentVariable:
+                                mcpServerFunction.bearer_token_value,
+                            },
+                            nodeContext: this.nodeContext,
+                            workflowContext: this.workflowContext,
+                          }),
+                        })
+                      );
+                    }
                   }
 
-                  if (
-                    mcpServerFunction.api_key_header_key?.type ===
-                      "CONSTANT_VALUE" &&
-                    mcpServerFunction.api_key_header_key.value?.type ===
-                      "STRING" &&
-                    mcpServerFunction.api_key_header_key.value.value
-                  ) {
+                  if (mcpServerFunction.api_key_header_key) {
                     arguments_.push(
                       python.methodArgument({
                         name: "api_key_header_key",
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor:
-                            mcpServerFunction.api_key_header_key,
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
-                        }),
+                        value: python.TypeInstantiation.str(
+                          mcpServerFunction.api_key_header_key
+                        ),
                       })
                     );
                   }
 
-                  if (
-                    mcpServerFunction.api_key_header_value?.type ===
-                    "ENVIRONMENT_VARIABLE"
-                  ) {
+                  if (mcpServerFunction.api_key_header_value) {
                     arguments_.push(
                       python.methodArgument({
                         name: "api_key_header_value",
                         value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor:
-                            mcpServerFunction.api_key_header_value,
+                          workflowValueDescriptor: {
+                            type: "ENVIRONMENT_VARIABLE",
+                            environmentVariable:
+                              mcpServerFunction.api_key_header_value,
+                          },
                           nodeContext: this.nodeContext,
                           workflowContext: this.workflowContext,
                         }),
