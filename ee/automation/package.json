@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "create-release": "ts-node-esm ./src/create-release.ts",
-    "upgrade-workflow-server": "ts-node-esm ./src/upgrade-workflow-server.ts"
+    "upgrade-workflow-server": "ts-node-esm ./src/upgrade-workflow-server.ts",
+    "auto-merge": "ts-node-esm ./src/auto-merge.ts"
   },
   "devDependencies": {
     "@octokit/auth-app": "^7.1.4",
