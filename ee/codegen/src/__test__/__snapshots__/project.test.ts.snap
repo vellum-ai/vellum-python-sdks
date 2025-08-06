@@ -99,6 +99,19 @@ class RouterNode(BaseNode):
 "
 `;
 
+exports[`WorkflowProjectGenerator > Node comments serialization > should serialize node comments with values as docstrings in SDK > code/nodes/test_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class TestNode(TemplatingNode[BaseState, str]):
+    """This is a test comment that should appear as a docstring"""
+
+    template = """Hello world"""
+    inputs = {}
+"
+`;
+
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should generate unused_graphs if final output is not used > code/workflow.py 1`] = `
 "from vellum.workflows import BaseWorkflow
 

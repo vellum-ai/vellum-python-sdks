@@ -31,7 +31,6 @@ import { WorkflowProjectGenerator } from "src/project";
 import {
   AdornmentNode,
   NodeDisplayComment,
-  NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
@@ -389,26 +388,6 @@ export abstract class BaseNode<
   }
 
   private generateNodeDisplayDataWithoutComment() {
-    const nodeDisplayData: NodeDisplayDataType | undefined =
-      this.nodeData.displayData;
-    if (
-      nodeDisplayData &&
-      nodeDisplayData.comment &&
-      nodeDisplayData.comment.expanded
-    ) {
-      const nodeDisplayDataWithoutComment: NodeDisplayDataType = {
-        position: nodeDisplayData.position,
-        width: nodeDisplayData.width,
-        height: nodeDisplayData.height,
-        comment: {
-          expanded: nodeDisplayData.comment.expanded,
-        },
-      };
-      return new NodeDisplayData({
-        workflowContext: this.workflowContext,
-        nodeDisplayData: nodeDisplayDataWithoutComment,
-      });
-    }
     return new NodeDisplayData({
       workflowContext: this.workflowContext,
       nodeDisplayData: this.nodeData.displayData,
