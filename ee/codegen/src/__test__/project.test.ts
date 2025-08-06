@@ -6191,6 +6191,296 @@ baz = foo + bar
     });
   });
 
+  describe("subworkflow with inner and outer generic nodes", () => {
+    it("should generate workflow with subworkflow node containing inner generic node and outer generic node", async () => {
+      /**
+       * Tests that a workflow with a subworkflow node containing an inner generic node
+       * and an outer generic node with edge from inner to outer generates correctly.
+       */
+
+      // GIVEN a workflow with subworkflow node containing inner generic node and outer generic node
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entrypoint-node",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "entrypoint-source-handle",
+              },
+              inputs: [],
+              display_data: {
+                position: { x: 0, y: -50 },
+              },
+              base: null,
+              definition: null,
+            },
+            {
+              id: "subworkflow-node",
+              type: "SUBWORKFLOW",
+              data: {
+                label: "Subworkflow Node",
+                source_handle_id: "subworkflow-source-handle",
+                target_handle_id: "subworkflow-target-handle",
+                error_output_id: null,
+                variant: "INLINE",
+                workflow_raw_data: {
+                  nodes: [
+                    {
+                      id: "inner-entrypoint-node",
+                      type: "ENTRYPOINT",
+                      data: {
+                        label: "Entrypoint Node",
+                        source_handle_id: "inner-entrypoint-source-handle",
+                      },
+                      inputs: [],
+                      display_data: {
+                        position: { x: 0, y: -50 },
+                      },
+                      base: null,
+                      definition: null,
+                    },
+                    {
+                      id: "inner-generic-node",
+                      label: "Inner",
+                      type: "GENERIC",
+                      base: {
+                        name: "BaseNode",
+                        module: [
+                          "vellum",
+                          "workflows",
+                          "nodes",
+                          "bases",
+                          "base",
+                        ],
+                      },
+                      definition: {
+                        name: "Inner",
+                        module: [
+                          "subworkflow_test",
+                          "nodes",
+                          "subworkflow_node",
+                          "nodes",
+                          "inner",
+                        ],
+                      },
+                      display_data: {
+                        position: { x: 200, y: -50 },
+                      },
+                      trigger: {
+                        id: "inner-generic-trigger",
+                        merge_behavior: "AWAIT_ATTRIBUTES",
+                      },
+                      ports: [
+                        {
+                          id: "inner-generic-port",
+                          name: "default",
+                          type: "DEFAULT",
+                        },
+                      ],
+                      attributes: [],
+                      outputs: [
+                        {
+                          id: "inner-generic-output",
+                          name: "result",
+                          type: "STRING",
+                          value: null,
+                        },
+                      ],
+                    },
+                    {
+                      id: "inner-terminal-node",
+                      type: "TERMINAL",
+                      data: {
+                        label: "Inner Terminal",
+                        name: "inner_result",
+                        target_handle_id: "inner-terminal-trigger",
+                        output_id: "inner-terminal-output",
+                        output_type: "STRING",
+                        node_input_id: "inner-terminal-input",
+                      },
+                      inputs: [
+                        {
+                          id: "inner-terminal-input",
+                          key: "inner_result",
+                          value: {
+                            combinator: "OR",
+                            rules: [
+                              {
+                                type: "NODE_OUTPUT",
+                                data: {
+                                  node_id: "inner-generic-node",
+                                  output_id: "inner-generic-output",
+                                },
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                      display_data: {
+                        position: { x: 400, y: -50 },
+                      },
+                      base: null,
+                      definition: null,
+                      trigger: {
+                        id: "inner-terminal-trigger",
+                        merge_behavior: "AWAIT_ATTRIBUTES",
+                      },
+                      ports: [],
+                      attributes: [],
+                      outputs: [
+                        {
+                          id: "inner-terminal-output",
+                          name: "inner_result",
+                          type: "STRING",
+                          value: null,
+                        },
+                      ],
+                    },
+                  ],
+                  edges: [
+                    {
+                      id: "inner-edge",
+                      source_node_id: "inner-entrypoint-node",
+                      source_handle_id: "inner-entrypoint-source-handle",
+                      target_node_id: "inner-generic-node",
+                      target_handle_id: "inner-generic-trigger",
+                      type: "DEFAULT",
+                    },
+                    {
+                      id: "inner-to-terminal-edge",
+                      source_node_id: "inner-generic-node",
+                      source_handle_id: "inner-generic-port",
+                      target_node_id: "inner-terminal-node",
+                      target_handle_id: "inner-terminal-trigger",
+                      type: "DEFAULT",
+                    },
+                  ],
+                },
+                input_variables: [],
+                output_variables: [
+                  {
+                    id: "subworkflow-output-var",
+                    key: "final-output",
+                    type: "STRING",
+                  },
+                ],
+              },
+              inputs: [],
+              display_data: {
+                position: { x: 200, y: -50 },
+              },
+              base: {
+                name: "InlineSubworkflowNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "core",
+                  "inline_subworkflow_node",
+                  "node",
+                ],
+              },
+              definition: null,
+            },
+            {
+              id: "outer-generic-node",
+              label: "Outer",
+              type: "GENERIC",
+              base: {
+                name: "BaseNode",
+                module: ["vellum", "workflows", "nodes", "bases", "base"],
+              },
+              definition: {
+                name: "Outer",
+                module: ["subworkflow_test", "nodes", "outer"],
+              },
+              display_data: {
+                position: { x: 400, y: -50 },
+              },
+              trigger: {
+                id: "outer-generic-trigger",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: "outer-generic-port",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              attributes: [],
+              outputs: [
+                {
+                  id: "outer-generic-output",
+                  name: "result",
+                  type: "STRING",
+                  value: null,
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              id: "edge-1",
+              source_node_id: "entrypoint-node",
+              source_handle_id: "entrypoint-source-handle",
+              target_node_id: "subworkflow-node",
+              target_handle_id: "subworkflow-target-handle",
+              type: "DEFAULT",
+            },
+            {
+              id: "edge-2",
+              source_node_id: "subworkflow-node",
+              source_handle_id: "subworkflow-source-handle",
+              target_node_id: "outer-generic-node",
+              target_handle_id: "outer-generic-trigger",
+              type: "DEFAULT",
+            },
+            {
+              id: "edge-3",
+              source_node_id: "inner-generic-node",
+              source_handle_id: "inner-generic-port",
+              target_node_id: "outer-generic-node",
+              target_handle_id: "outer-generic-trigger",
+              type: "DEFAULT",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "subworkflow_test",
+        vellumApiKey: "test-key",
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToMatchSnapshot([
+        "subworkflow_test",
+        "nodes",
+        "subworkflow_node",
+        "workflow.py",
+      ]);
+
+      // AND the outer generic node should be generated
+      expectProjectFileToMatchSnapshot([
+        "subworkflow_test",
+        "nodes",
+        "outer.py",
+      ]);
+
+      // AND there should be no errors
+      expect(project.workflowContext.getErrors()).toHaveLength(0);
+    });
+  });
+
   describe("LEGACY prompt node codegen", () => {
     it("should properly handle legacy prompt node even if ml model name is not found", async () => {
       const displayData = {
