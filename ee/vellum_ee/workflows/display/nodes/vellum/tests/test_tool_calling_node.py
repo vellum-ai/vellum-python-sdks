@@ -3,6 +3,7 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.definition import AuthorizationType, EnvironmentVariableReference, MCPServer
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -119,6 +120,98 @@ def test_serialize_node__prompt_inputs__mixed_values():
                     "key": "baz",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
                 },
+            ],
+        },
+    }
+
+
+def test_serialize_node__tool_calling_node__mcp_server_api_key():
+    # GIVEN a tool calling node with an mcp server
+    class MyToolCallingNode(ToolCallingNode):
+        functions = [
+            MCPServer(
+                name="my-mcp-server",
+                url="https://my-mcp-server.com",
+                authorization_type=AuthorizationType.API_KEY,
+                api_key_header_key="my-api-key-header-key",
+                api_key_header_value=EnvironmentVariableReference(name="my-api-key-header-value"),
+            )
+        ]
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the mcp server
+    my_tool_calling_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MyToolCallingNode.__id__)
+    )
+
+    functions_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
+    )
+
+    assert functions_attribute == {
+        "id": "6c0f7d4f-3c8a-4201-b588-8398d3c97480",
+        "name": "functions",
+        "value": {
+            "type": "ARRAY_REFERENCE",
+            "items": [
+                {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "id": "bcf2713b-19fc-4b4b-8ff5-b45c8e63c665",
+                            "key": "type",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "MCP_SERVER"}},
+                        },
+                        {
+                            "id": "4e00439e-ce6f-4e0a-be4c-0fc05990ec44",
+                            "key": "name",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "my-mcp-server"}},
+                        },
+                        {
+                            "id": "9a3dcca9-4595-4efb-ada6-c011721f7018",
+                            "key": "url",
+                            "value": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {"type": "STRING", "value": "https://my-mcp-server.com"},
+                            },
+                        },
+                        {
+                            "id": "21c3a6ce-7607-42a4-92b8-9d7c4061edce",
+                            "key": "authorization_type",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "API_KEY"}},
+                        },
+                        {
+                            "id": "dcf8e8f0-84d2-4ffb-b0e6-218c569015a4",
+                            "key": "bearer_token_value",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                        {
+                            "id": "fe93f516-42c0-40cf-b476-50bd04857d5f",
+                            "key": "api_key_header_key",
+                            "value": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {"type": "STRING", "value": "my-api-key-header-key"},
+                            },
+                        },
+                        {
+                            "id": "750ed8ca-3bf3-46be-96f0-2c92d19d2084",
+                            "key": "api_key_header_value",
+                            "value": {
+                                "type": "ENVIRONMENT_VARIABLE",
+                                "environment_variable": "my-api-key-header-value",
+                            },
+                        },
+                    ],
+                }
             ],
         },
     }
