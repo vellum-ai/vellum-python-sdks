@@ -252,6 +252,19 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 case "MCP_SERVER": {
                   const mcpServerFunction = f as MCPServerFunctionArgs;
 
+                  let authorizationType;
+                  if (
+                    mcpServerFunction.authorization_type.type ===
+                      "CONSTANT_VALUE" &&
+                    mcpServerFunction.authorization_type.value.type === "STRING"
+                  ) {
+                    authorizationType = mcpServerFunction.authorization_type
+                      .value.value as string;
+                  } else {
+                    authorizationType =
+                      mcpServerFunction.authorization_type as unknown as string;
+                  }
+
                   const arguments_: python.MethodArgument[] = [
                     python.methodArgument({
                       name: "name",
@@ -278,7 +291,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                             .WORKFLOWS_MODULE_PATH,
                           "constants",
                         ],
-                        attribute: [mcpServerFunction.authorization_type],
+                        attribute: [authorizationType],
                       }),
                     }),
                   ];
