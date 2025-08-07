@@ -124,3 +124,22 @@ def test_mcp_tool_definition_creation_api_key():
         },
         "required": ["repository_name"],
     }
+
+
+def test_mcp_tool_definition_creation_no_authorization():
+    """Test that MCPToolDefinition can be created with no authorization."""
+    mcp_tool = MCPToolDefinition(
+        name="create_repository",
+        server=MCPServer(
+            name="github",
+            url="https://api.githubcopilot.com/mcp/",
+        ),
+    )
+
+    assert mcp_tool.name == "create_repository"
+    assert mcp_tool.server.name == "github"
+    assert mcp_tool.server.url == "https://api.githubcopilot.com/mcp/"
+    assert mcp_tool.server.authorization_type is None
+    assert mcp_tool.server.bearer_token_value is None
+    assert mcp_tool.server.api_key_header_key is None
+    assert mcp_tool.server.api_key_header_value is None
