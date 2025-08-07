@@ -1,6 +1,6 @@
 {
-    "name": "Empty Query",
-    "inputs": [
+    "label": "Empty Query",
+    "input_values": [
         {"name": "query", "value": ""},
         {"name": "context", "value": "Some context"}
     ]

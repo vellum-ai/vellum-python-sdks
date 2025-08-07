@@ -6,7 +6,7 @@ from .nodes.final_output import FinalOutput
 from .nodes.prompt_node import PromptNode
 
 
-class EvalWorkflow(BaseWorkflow[Inputs, BaseState]):
+class Oracle(BaseWorkflow[Inputs, BaseState]):
     graph = PromptNode >> FinalOutput
 
     class Outputs(BaseWorkflow.Outputs):

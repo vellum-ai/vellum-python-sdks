@@ -2,7 +2,7 @@
   "version": "1.0",
   "workflows": [
     {
-      "module": "github_actions",
+      "module": "oracle",
       "workflow_sandbox_id": null,
       "ignore": null,
       "deployments": [],
@@ -10,13 +10,6 @@
       "container_image_tag": null,
       "workspace": "default",
       "target_directory": null
-    }
-  ],
-  "workspaces": [
-    {
-      "name": "default",
-      "api_key": "VELLUM_API_KEY",
-      "api_url": "VELLUM_API_URL"
     }
   ]
 }

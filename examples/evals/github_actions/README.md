@@ -9,9 +9,7 @@ This example demonstrates how to create an automated evaluation pipeline using G
 
 ## Structure
 
-- `workflow.py` - Main workflow definition
-- `inputs.py` - Workflow input schema
-- `nodes/` - Individual workflow nodes
+- `oracle` - Main workflow definition, a simple question and answering bot
 - `test_cases/` - JSON files containing test cases
 - `eval.py` - Main evaluation script
 - `.github/workflows/eval.yml` - GitHub Action workflow
@@ -20,21 +18,25 @@ This example demonstrates how to create an automated evaluation pipeline using G
 
 ## Usage
 
+We recommend copying this directory as a new project.
+
 ### Local Development
+
 ```bash
 # Install dependencies
-poetry install
+uv sync
 
 # Run evaluation locally
-cd examples/evals/github_actions
-poetry run python eval.py
+uv run python eval.py
 ```
 
 ### GitHub Actions
+
 The evaluation runs automatically on:
+
 - Push to main branch
 - Pull requests
-- Daily schedule (8 AM UTC)
 
 ## Configuration
-Set the `VELLUM_API_KEY` secret in your GitHub repository settings.
+
+Set the `VELLUM_API_KEY` secret in your GitHub repository settings at `https://github.com/{owner}/{repo}/settings/secrets/actions`.

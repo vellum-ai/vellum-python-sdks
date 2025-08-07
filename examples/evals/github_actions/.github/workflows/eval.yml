@@ -16,26 +16,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.10
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          version: "latest"
 
       - name: Install dependencies
-        run: |
-          pip install poetry
-          poetry install
+        run: uv sync
 
       - name: Push workflow to Vellum
-        run: |
-          cd examples/evals/github_actions
-          poetry run vellum workflows push github_actions
+        run: uv run vellum workflows push oracle
         env:
           VELLUM_API_KEY: ${{ secrets.VELLUM_API_KEY }}
 
-      - name: Run evaluation
-        run: |
-          cd examples/evals/github_actions
-          poetry run python eval.py
+      - name: Run evaluation on Vellum and report results
+        run: uv run python eval.py
         env:
           VELLUM_API_KEY: ${{ secrets.VELLUM_API_KEY }}
-
-      - name: Report results
-        run: echo "Evaluation completed - check logs for results"
