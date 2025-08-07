@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union
 from typing_extensions import TypeGuard
 
-from pydantic import PrivateAttr, field_serializer
+from pydantic import field_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
@@ -23,7 +23,6 @@ from .stream import WorkflowEventGenerator
 from .types import BaseEvent, default_serializer
 
 if TYPE_CHECKING:
-    from vellum.workflows.state.context import WorkflowContext
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -37,7 +36,6 @@ class _BaseWorkflowExecutionBody(UniversalBaseModel):
 
 class _BaseWorkflowEvent(BaseEvent):
     body: _BaseWorkflowExecutionBody
-    _context: Optional["WorkflowContext"] = PrivateAttr(default=None)
 
     @property
     def workflow_definition(self) -> Type["BaseWorkflow"]:
@@ -52,13 +50,7 @@ class _BaseWorkflowEvent(BaseEvent):
             The URL to view execution details in Vellum UI, or None if monitoring is disabled
             or context is not available.
         """
-        if self._context is None:
-            return None
-        return self._context.get_monitoring_url(str(self.span_id))
-
-    def _set_context(self, context: "WorkflowContext") -> None:
-        """Internal method to set the workflow context for monitoring URL generation."""
-        self._context = context
+        return None
 
 
 class NodeEventDisplayContext(UniversalBaseModel):

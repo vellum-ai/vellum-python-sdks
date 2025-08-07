@@ -445,7 +445,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     workflow_definition=self.__class__,
                 ),
             )
-            rejected_event._set_context(self._context)
             return rejected_event
 
         if not first_event:
@@ -460,7 +459,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     workflow_definition=self.__class__,
                 ),
             )
-            rejected_event._set_context(self._context)
             return rejected_event
 
         if (
@@ -470,9 +468,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         ):
             # Auto-print monitoring URL if monitoring is enabled
             self._print_monitoring_info(last_event)
-
-            # Set context on event so monitoring_url property works
-            last_event._set_context(self._context)
 
             return last_event
 
@@ -487,17 +482,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                 ),
             ),
         )
-        rejected_event._set_context(self._context)
         return rejected_event
-
-    def _print_monitoring_info(self, event: TerminalWorkflowEvent) -> None:
-        """Print monitoring information if monitoring is enabled."""
-        if not self._context.enable_monitoring:
-            return
-
-        monitoring_url = self._context.get_monitoring_url(str(event.span_id))
-        if monitoring_url:
-            logger.info("Workflow Execution Monitoring - View Details: %s", monitoring_url)
 
     def stream(
         self,
