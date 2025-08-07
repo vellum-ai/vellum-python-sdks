@@ -1,14 +1,20 @@
-from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes import InlinePromptNode
-from vellum.workflows.ports import Port
-from vellum.workflows.references import LazyReference
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
+from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
+from vellum.workflows.types.definition import MCPServer
 
 from ..inputs import Inputs
-from ..state import State
-from .mcp_client_node import MCPClientNode
 
 
-class MyPromptNode(InlinePromptNode):
+class MyPromptNode(ToolCallingNode):
+    """
+    A tool calling node that uses the GitHub MCP server to manage the user's GitHub account.
+    """
+
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(
@@ -18,9 +24,9 @@ class MyPromptNode(InlinePromptNode):
                     blocks=[
                         PlainTextPromptBlock(
                             text="You are a helpful assistant that will manage the user's Github account on their behalf.",
-                        )
-                    ]
-                )
+                        ),
+                    ],
+                ),
             ],
         ),
         ChatMessagePromptBlock(
@@ -31,20 +37,15 @@ class MyPromptNode(InlinePromptNode):
                 ),
             ],
         ),
-        VariablePromptBlock(
-            input_variable="chat_history",
+    ]
+    functions = [
+        MCPServer(
+            name="github",
+            url="https://api.githubcopilot.com/mcp/",
+            authorization_type=AuthorizationType.BEARER_TOKEN,
+            bearer_token_value=EnvironmentVariableReference(name="GITHUB_PERSONAL_ACCESS_TOKEN"),
         ),
     ]
     prompt_inputs = {
         "query": Inputs.query,
-        "chat_history": State.chat_history.coalesce([]),
     }
-    # Our mypy plugin is not handling list of pydantic models properly
-    functions = MCPClientNode.Outputs.tools  # type: ignore[assignment]
-
-    class Ports(InlinePromptNode.Ports):
-        action = Port.on_if(LazyReference(lambda: MyPromptNode.Outputs.results[0]["type"].equals("FUNCTION_CALL")))
-        exit = Port.on_if(LazyReference(lambda: MyPromptNode.Outputs.results[0]["type"].equals("STRING")))
-
-    class Outputs(InlinePromptNode.Outputs):
-        thinking = "Asking the model..."
