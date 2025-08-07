@@ -1373,6 +1373,13 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 "
 `;
 
+exports[`WorkflowProjectGenerator > should generate correct tool calling init file with multi-level module path > src/testsubworkflowtoolcallingnode/nodes/tool_calling_node/function_test/__init__.py 1`] = `
+"# flake8: noqa: F401, F403
+
+from ....display import *
+"
+`;
+
 exports[`WorkflowProjectGenerator > state > should generate a state.py file > code/display/workflow.py 1`] = `
 "from uuid import UUID
 
