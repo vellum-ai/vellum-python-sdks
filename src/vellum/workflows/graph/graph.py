@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Iterator, List, Set, Type, Union
+from typing import TYPE_CHECKING, Iterator, List, Optional, Set, Type, Union
 
 from orderly_set import OrderedSet
 
@@ -176,7 +176,7 @@ class Graph:
         """Build a connected flow diagram showing the graph structure."""
         lines = ["Graph:"]
 
-        adjacency = {}
+        adjacency: dict[str, list[str]] = {}
         all_nodes = set()
 
         for edge in self._edges:
@@ -206,7 +206,7 @@ class Graph:
         visited = set()
         currently_visiting = set()
 
-        def render_node(node: str, prefix: str = "  ", is_last: bool = True, path: list = None) -> None:
+        def render_node(node: str, prefix: str = "  ", is_last: bool = True, path: Optional[List[str]] = None) -> None:
             if path is None:
                 path = []
 
