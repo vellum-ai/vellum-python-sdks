@@ -210,12 +210,12 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 from vellum.workflows.references import EnvironmentVariableReference
-from vellum.workflows.types.definition import MCP_SERVER
+from vellum.workflows.types.definition import MCPServer
 
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [
-        MCP_SERVER(
+        MCPServer(
             name="github",
             url="https://api.githubcopilot.com/mcp/",
             authorization_type=AuthorizationType.BEARER_TOKEN,
