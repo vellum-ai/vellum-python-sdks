@@ -161,57 +161,20 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
         "id": "6c0f7d4f-3c8a-4201-b588-8398d3c97480",
         "name": "functions",
         "value": {
-            "type": "ARRAY_REFERENCE",
-            "items": [
-                {
-                    "type": "DICTIONARY_REFERENCE",
-                    "entries": [
-                        {
-                            "id": "bcf2713b-19fc-4b4b-8ff5-b45c8e63c665",
-                            "key": "type",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "MCP_SERVER"}},
-                        },
-                        {
-                            "id": "4e00439e-ce6f-4e0a-be4c-0fc05990ec44",
-                            "key": "name",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "my-mcp-server"}},
-                        },
-                        {
-                            "id": "9a3dcca9-4595-4efb-ada6-c011721f7018",
-                            "key": "url",
-                            "value": {
-                                "type": "CONSTANT_VALUE",
-                                "value": {"type": "STRING", "value": "https://my-mcp-server.com"},
-                            },
-                        },
-                        {
-                            "id": "21c3a6ce-7607-42a4-92b8-9d7c4061edce",
-                            "key": "authorization_type",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "API_KEY"}},
-                        },
-                        {
-                            "id": "dcf8e8f0-84d2-4ffb-b0e6-218c569015a4",
-                            "key": "bearer_token_value",
-                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
-                        },
-                        {
-                            "id": "fe93f516-42c0-40cf-b476-50bd04857d5f",
-                            "key": "api_key_header_key",
-                            "value": {
-                                "type": "CONSTANT_VALUE",
-                                "value": {"type": "STRING", "value": "my-api-key-header-key"},
-                            },
-                        },
-                        {
-                            "id": "750ed8ca-3bf3-46be-96f0-2c92d19d2084",
-                            "key": "api_key_header_value",
-                            "value": {
-                                "type": "ENVIRONMENT_VARIABLE",
-                                "environment_variable": "my-api-key-header-value",
-                            },
-                        },
-                    ],
-                }
-            ],
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": [
+                    {
+                        "type": "MCP_SERVER",
+                        "name": "my-mcp-server",
+                        "url": "https://my-mcp-server.com",
+                        "authorization_type": "API_KEY",
+                        "bearer_token_value": None,
+                        "api_key_header_key": "my-api-key-header-key",
+                        "api_key_header_value": "my-api-key-header-value",
+                    }
+                ],
+            },
         },
     }
