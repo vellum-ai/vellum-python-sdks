@@ -279,30 +279,32 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     }),
                   ];
 
-                  if (mcpServerFunction.bearer_token_value) {
-                    arguments_.push(
-                      python.methodArgument({
-                        name: "bearer_token_value",
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor:
-                            mcpServerFunction.bearer_token_value,
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
-                        }),
-                      })
-                    );
+                  if (mcpServerFunction.authorization_type === "BEARER_TOKEN") {
+                    if (mcpServerFunction.bearer_token_value) {
+                      arguments_.push(
+                        python.methodArgument({
+                          name: "bearer_token_value",
+                          value: new WorkflowValueDescriptor({
+                            workflowValueDescriptor: {
+                              type: "ENVIRONMENT_VARIABLE",
+                              environmentVariable:
+                                mcpServerFunction.bearer_token_value,
+                            },
+                            nodeContext: this.nodeContext,
+                            workflowContext: this.workflowContext,
+                          }),
+                        })
+                      );
+                    }
                   }
 
                   if (mcpServerFunction.api_key_header_key) {
                     arguments_.push(
                       python.methodArgument({
                         name: "api_key_header_key",
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor:
-                            mcpServerFunction.api_key_header_key,
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
-                        }),
+                        value: python.TypeInstantiation.str(
+                          mcpServerFunction.api_key_header_key
+                        ),
                       })
                     );
                   }
@@ -312,8 +314,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                       python.methodArgument({
                         name: "api_key_header_value",
                         value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor:
-                            mcpServerFunction.api_key_header_value,
+                          workflowValueDescriptor: {
+                            type: "ENVIRONMENT_VARIABLE",
+                            environmentVariable:
+                              mcpServerFunction.api_key_header_value,
+                          },
                           nodeContext: this.nodeContext,
                           workflowContext: this.workflowContext,
                         }),
@@ -324,7 +329,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   functionReferences.push(
                     python.instantiateClass({
                       classReference: python.reference({
-                        name: "MCP_SERVER",
+                        name: "MCPServer",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
                       }),
                       arguments_,

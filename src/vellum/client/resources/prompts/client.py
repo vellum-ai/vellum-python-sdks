@@ -2,17 +2,12 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawPromptsClient
 from ...core.request_options import RequestOptions
 from ...types.prompt_exec_config import PromptExecConfig
-from ...core.jsonable_encoder import jsonable_encoder
-from ...core.pydantic_utilities import parse_obj_as
-from ...errors.bad_request_error import BadRequestError
-from ...errors.not_found_error import NotFoundError
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.prompt_push_response import PromptPushResponse
-from ...core.serialization import convert_and_respect_annotation_metadata
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawPromptsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -20,7 +15,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class PromptsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawPromptsClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawPromptsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawPromptsClient
+        """
+        return self._raw_client
 
     def pull(
         self,
@@ -60,51 +70,12 @@ class PromptsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/prompts/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "prompt_variant_id": prompt_variant_id,
-            },
-            headers={
-                "Accept": "application/json",
-            },
+        response = self._raw_client.pull(
+            id,
+            prompt_variant_id=prompt_variant_id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptExecConfig,
-                    parse_obj_as(
-                        type_=PromptExecConfig,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def push(
         self,
@@ -179,62 +150,30 @@ class PromptsClient:
             ),
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/prompts/push",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "prompt_variant_id": prompt_variant_id,
-                "prompt_variant_label": prompt_variant_label,
-                "prompt_sandbox_id": prompt_sandbox_id,
-                "exec_config": convert_and_respect_annotation_metadata(
-                    object_=exec_config, annotation=PromptExecConfig, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.push(
+            exec_config=exec_config,
+            prompt_variant_id=prompt_variant_id,
+            prompt_variant_label=prompt_variant_label,
+            prompt_sandbox_id=prompt_sandbox_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptPushResponse,
-                    parse_obj_as(
-                        type_=PromptPushResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncPromptsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawPromptsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawPromptsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawPromptsClient
+        """
+        return self._raw_client
 
     async def pull(
         self,
@@ -282,51 +221,12 @@ class AsyncPromptsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/prompts/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "prompt_variant_id": prompt_variant_id,
-            },
-            headers={
-                "Accept": "application/json",
-            },
+        response = await self._raw_client.pull(
+            id,
+            prompt_variant_id=prompt_variant_id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptExecConfig,
-                    parse_obj_as(
-                        type_=PromptExecConfig,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def push(
         self,
@@ -409,54 +309,11 @@ class AsyncPromptsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/prompts/push",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "prompt_variant_id": prompt_variant_id,
-                "prompt_variant_label": prompt_variant_label,
-                "prompt_sandbox_id": prompt_sandbox_id,
-                "exec_config": convert_and_respect_annotation_metadata(
-                    object_=exec_config, annotation=PromptExecConfig, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.push(
+            exec_config=exec_config,
+            prompt_variant_id=prompt_variant_id,
+            prompt_variant_label=prompt_variant_label,
+            prompt_sandbox_id=prompt_sandbox_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptPushResponse,
-                    parse_obj_as(
-                        type_=PromptPushResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

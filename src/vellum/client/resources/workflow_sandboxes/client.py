@@ -2,15 +2,13 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawWorkflowSandboxesClient
 from ...core.request_options import RequestOptions
 from ...types.workflow_deployment_read import WorkflowDeploymentRead
-from ...core.jsonable_encoder import jsonable_encoder
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from .types.list_workflow_sandbox_examples_request_tag import ListWorkflowSandboxExamplesRequestTag
 from ...types.paginated_workflow_sandbox_example_list import PaginatedWorkflowSandboxExampleList
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawWorkflowSandboxesClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -18,7 +16,22 @@ OMIT = typing.cast(typing.Any, ...)
 
 class WorkflowSandboxesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawWorkflowSandboxesClient(client_wrapper=client_wrapper)
+
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawWorkflowSandboxesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawWorkflowSandboxesClient
+        """
+        return self._raw_client
 
     def deploy_workflow(
         self,
@@ -77,36 +90,17 @@ class WorkflowSandboxesClient:
             workflow_id="workflow_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-sandboxes/{jsonable_encoder(id)}/workflows/{jsonable_encoder(workflow_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "workflow_deployment_id": workflow_deployment_id,
-                "workflow_deployment_name": workflow_deployment_name,
-                "label": label,
-                "release_tags": release_tags,
-                "release_description": release_description,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.deploy_workflow(
+            id,
+            workflow_id,
+            workflow_deployment_id=workflow_deployment_id,
+            workflow_deployment_name=workflow_deployment_name,
+            label=label,
+            release_tags=release_tags,
+            release_description=release_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentRead,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list_workflow_sandbox_examples(
         self,
@@ -151,36 +145,30 @@ class WorkflowSandboxesClient:
         )
         client.workflow_sandboxes.list_workflow_sandbox_examples()
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/workflow-sandboxes/examples",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "tag": tag,
-            },
+        response = self._raw_client.list_workflow_sandbox_examples(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            tag=tag,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedWorkflowSandboxExampleList,
-                    parse_obj_as(
-                        type_=PaginatedWorkflowSandboxExampleList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncWorkflowSandboxesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawWorkflowSandboxesClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawWorkflowSandboxesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawWorkflowSandboxesClient
+        """
+        return self._raw_client
 
     async def deploy_workflow(
         self,
@@ -247,36 +235,17 @@ class AsyncWorkflowSandboxesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-sandboxes/{jsonable_encoder(id)}/workflows/{jsonable_encoder(workflow_id)}/deploy",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "workflow_deployment_id": workflow_deployment_id,
-                "workflow_deployment_name": workflow_deployment_name,
-                "label": label,
-                "release_tags": release_tags,
-                "release_description": release_description,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.deploy_workflow(
+            id,
+            workflow_id,
+            workflow_deployment_id=workflow_deployment_id,
+            workflow_deployment_name=workflow_deployment_name,
+            label=label,
+            release_tags=release_tags,
+            release_description=release_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentRead,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list_workflow_sandbox_examples(
         self,
@@ -329,28 +298,11 @@ class AsyncWorkflowSandboxesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/workflow-sandboxes/examples",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "tag": tag,
-            },
+        response = await self._raw_client.list_workflow_sandbox_examples(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            tag=tag,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedWorkflowSandboxExampleList,
-                    parse_obj_as(
-                        type_=PaginatedWorkflowSandboxExampleList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

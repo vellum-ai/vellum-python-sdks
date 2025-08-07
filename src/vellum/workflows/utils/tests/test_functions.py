@@ -448,7 +448,7 @@ def test_compile_workflow_deployment_function_definition__just_name():
     mock_release = Mock()
     mock_release.workflow_version.input_variables = []
     mock_release.description = "This is a test deployment"
-    mock_client.release_reviews.retrieve_workflow_deployment_release.return_value = mock_release
+    mock_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = mock_release
 
     deployment_config = {"deployment": "my_deployment", "release_tag": "latest"}
 
@@ -494,7 +494,7 @@ def test_compile_workflow_deployment_function_definition__all_args():
 
     mock_release.workflow_version.input_variables = mock_inputs
     mock_release.description = "This is a test deployment"
-    mock_client.release_reviews.retrieve_workflow_deployment_release.return_value = mock_release
+    mock_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = mock_release
 
     deployment_config = {"deployment": "my_deployment", "release_tag": "latest"}
 
@@ -562,7 +562,7 @@ def test_compile_workflow_deployment_function_definition__defaults():
 
     mock_release.workflow_version.input_variables = mock_inputs
     mock_release.description = "This is a test deployment"
-    mock_client.release_reviews.retrieve_workflow_deployment_release.return_value = mock_release
+    mock_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = mock_release
 
     deployment_config = {"deployment": "my_deployment", "release_tag": "latest"}
 

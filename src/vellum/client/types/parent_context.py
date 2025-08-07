@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
     from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
     from .prompt_deployment_parent_context import PromptDeploymentParentContext
     from .api_request_parent_context import ApiRequestParentContext
+    from .external_parent_context import ExternalParentContext
 ParentContext = typing.Union[
     "WorkflowParentContext",
     "NodeParentContext",
@@ -18,4 +19,5 @@ ParentContext = typing.Union[
     "WorkflowSandboxParentContext",
     "PromptDeploymentParentContext",
     "ApiRequestParentContext",
+    "ExternalParentContext",
 ]

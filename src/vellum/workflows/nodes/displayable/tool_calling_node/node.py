@@ -15,6 +15,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_else_node,
     create_function_node,
     create_mcp_tool_node,
+    create_router_node,
     create_tool_router_node,
     get_function_name,
     get_mcp_tool_name,
@@ -143,6 +144,11 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             prompt_inputs=self.prompt_inputs,
             parameters=self.parameters,
             max_prompt_iterations=self.max_prompt_iterations,
+        )
+
+        self.router_node = create_router_node(
+            functions=self.functions,
+            tool_router_node=self.tool_router_node,
         )
 
         self._function_nodes = {}

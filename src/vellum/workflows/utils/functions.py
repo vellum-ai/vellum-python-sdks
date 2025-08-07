@@ -221,7 +221,7 @@ def compile_workflow_deployment_function_definition(
     deployment = deployment_config["deployment"]
     release_tag = deployment_config["release_tag"]
 
-    workflow_deployment_release = vellum_client.release_reviews.retrieve_workflow_deployment_release(
+    workflow_deployment_release = vellum_client.workflow_deployments.retrieve_workflow_deployment_release(
         deployment, release_tag
     )
 

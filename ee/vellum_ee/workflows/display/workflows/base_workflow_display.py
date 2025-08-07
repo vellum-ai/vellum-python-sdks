@@ -6,7 +6,7 @@ import inspect
 import logging
 import os
 from uuid import UUID
-from typing import Any, Dict, ForwardRef, Generic, Iterator, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
+from typing import Any, Dict, ForwardRef, Generic, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.client import Vellum as VellumClient
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -35,6 +35,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowOutputDisplay,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.exceptions import NodeValidationError
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
@@ -95,8 +96,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
     # Used to explicitly specify display data for a workflow's ports.
     port_displays: PortDisplays = {}
 
-    _errors: List[Exception]
-
     _serialized_files: List[str]
 
     _dry_run: bool
@@ -115,7 +114,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if self._parent_display_context
             else create_vellum_client()
         )
-        self._errors = []
         self._serialized_files = []
         self._dry_run = dry_run
 
@@ -194,8 +192,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
             try:
                 serialized_node = node_display.serialize(self.display_context)
-            except NotImplementedError as e:
-                self.add_error(e)
+            except (NotImplementedError, NodeValidationError) as e:
+                self.display_context.add_error(e)
                 continue
 
             serialized_nodes[node_display.node_id] = serialized_node
@@ -314,7 +312,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # If there are terminal nodes with no workflow output reference,
         # raise a serialization error
         if len(unreferenced_final_output_node_outputs) > 0:
-            self.add_error(
+            self.display_context.add_error(
                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
             )
 
@@ -374,7 +372,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             try:
                 self._apply_auto_layout(nodes_dict_list, edges)
             except Exception as e:
-                self.add_error(e)
+                self.display_context.add_error(e)
 
         return {
             "workflow_raw_data": {
@@ -444,17 +442,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
     def workflow_id(self) -> UUID:
         """Can be overridden as a class attribute to specify a custom workflow id."""
         return self._workflow.__id__
-
-    def add_error(self, error: Exception) -> None:
-        if self._dry_run:
-            self._errors.append(error)
-            return
-
-        raise error
-
-    @property
-    def errors(self) -> Iterator[Exception]:
-        return iter(self._errors)
 
     def _enrich_global_node_output_displays(
         self,
@@ -605,6 +592,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             edge_displays=edge_displays,
             port_displays=port_displays,
             workflow_display_class=self.__class__,
+            _dry_run=self._dry_run,
         )
 
     def _generate_workflow_meta_display(self) -> WorkflowMetaDisplay:
@@ -895,7 +883,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         return WorkflowSerializationResult(
             exec_config=exec_config,
-            errors=[str(error) for error in workflow_display.errors],
+            errors=[str(error) for error in workflow_display.display_context.errors],
         )
 
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:

@@ -7,6 +7,7 @@ import pydantic
 
 
 class NodeExecutionSpanAttributes(UniversalBaseModel):
+    label: str
     node_id: str
 
     if IS_PYDANTIC_V2:

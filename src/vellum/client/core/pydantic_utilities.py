@@ -55,12 +55,19 @@ else:
 
 T = typing.TypeVar("T")
 Model = typing.TypeVar("Model", bound=pydantic.BaseModel)
+type_adapter_cache: typing.Dict[typing.Type, pydantic.TypeAdapter] = {}
+annotated_types = {"ExecuteApiResponse"}
 
 
-def parse_obj_as(type_: typing.Type[T], object_: typing.Any) -> T:
-    dealiased_object = convert_and_respect_annotation_metadata(object_=object_, annotation=type_, direction="read")
+def parse_obj_as(type_: typing.Type[T], object_: typing.Any, convert_metadata: bool = False) -> T:
+    if hasattr(type_, "__name__") and type_.__name__ in annotated_types:
+        dealiased_object = convert_and_respect_annotation_metadata(object_=object_, annotation=type_, direction="read")
+    else:
+        dealiased_object = object_
     if IS_PYDANTIC_V2:
-        adapter = pydantic.TypeAdapter(type_)  # type: ignore # Pydantic v2
+        adapter = pydantic.TypeAdapter(type_) if type_ not in type_adapter_cache else type_adapter_cache[type_]  # type: ignore # Pydantic v2
+        if type_ not in type_adapter_cache:
+            type_adapter_cache[type_] = adapter
         return adapter.validate_python(dealiased_object)
     else:
         return pydantic.parse_obj_as(type_, dealiased_object)

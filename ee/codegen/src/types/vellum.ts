@@ -943,9 +943,9 @@ export type MCPServerFunctionArgs = {
   name: string;
   url: string;
   authorization_type: "BEARER_TOKEN" | "API_KEY";
-  bearer_token_value?: WorkflowValueDescriptor;
-  api_key_header_key?: WorkflowValueDescriptor;
-  api_key_header_value?: WorkflowValueDescriptor;
+  bearer_token_value?: string | null;
+  api_key_header_key?: string | null;
+  api_key_header_value?: string | null;
 };
 
 export type ToolArgs = (

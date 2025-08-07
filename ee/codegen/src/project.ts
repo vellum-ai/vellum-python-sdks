@@ -246,12 +246,15 @@ ${errors.slice(0, 3).map((err) => {
     if (parentNode) {
       if (this.workflowContext.nestedWorkflowModuleName) {
         comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
+        const parentDisplayModulePath = parentNode.getNodeDisplayModulePath();
+        const displayIndex = parentDisplayModulePath.indexOf(
+          GENERATED_DISPLAY_MODULE_NAME
+        );
+        const sliceEnd = displayIndex !== -1 ? displayIndex + 1 : 1;
+
         imports.push(
           python.starImport({
-            modulePath: [
-              ...parentNode.getNodeDisplayModulePath().slice(0, 1),
-              GENERATED_DISPLAY_MODULE_NAME,
-            ],
+            modulePath: parentDisplayModulePath.slice(0, sliceEnd),
           })
         );
       } else {

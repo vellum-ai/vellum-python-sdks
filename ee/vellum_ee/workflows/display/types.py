@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Dict, Tuple, Type
+from typing import TYPE_CHECKING, Dict, Iterator, List, Tuple, Type
 
 from vellum.client import Vellum as VellumClient
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -51,3 +51,16 @@ class WorkflowDisplayContext:
     workflow_output_displays: WorkflowOutputDisplays = field(default_factory=dict)
     edge_displays: EdgeDisplays = field(default_factory=dict)
     port_displays: PortDisplays = field(default_factory=dict)
+    _errors: List[Exception] = field(default_factory=list)
+    _dry_run: bool = False
+
+    def add_error(self, error: Exception) -> None:
+        if self._dry_run:
+            self._errors.append(error)
+            return
+
+        raise error
+
+    @property
+    def errors(self) -> Iterator[Exception]:
+        return iter(self._errors)

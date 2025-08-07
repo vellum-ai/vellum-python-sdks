@@ -19,7 +19,7 @@ from tests.workflows.basic_tool_calling_node_workflow_deployment.workflow import
 
 
 def test_serialize_workflow(vellum_client):
-    vellum_client.release_reviews.retrieve_workflow_deployment_release.return_value = WorkflowDeploymentRelease(
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = WorkflowDeploymentRelease(
         id="test-id",
         created=datetime.now(),
         environment=ReleaseEnvironment(

@@ -112,6 +112,18 @@ class ToolRouterNode(InlinePromptNode[ToolCallingState]):
             yield output
 
 
+class RouterNode(BaseNode[ToolCallingState]):
+    """Router node that handles routing to function nodes based on outputs."""
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+
+    def run(self) -> Iterator[BaseOutput]:
+        # Router node doesn't process outputs or create chat messages
+        # It just handles the routing logic via its ports
+        yield from []
+
+
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a deployment definition with function call output."""
 
@@ -415,6 +427,69 @@ def create_tool_router_node(
                 "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
+                "Ports": Ports,
+                "__module__": __name__,
+            },
+        ),
+    )
+    return node
+
+
+def create_router_node(
+    functions: List[Tool],
+    tool_router_node: Type[ToolRouterNode],
+) -> Type[RouterNode]:
+    """Create a RouterNode with the same ports as ToolRouterNode."""
+
+    if functions and len(functions) > 0:
+        # Create dynamic ports and convert functions in a single loop
+        Ports = type("Ports", (), {})
+
+        def create_port_condition(fn_name):
+            return Port.on_if(
+                LazyReference(
+                    lambda: (
+                        ToolCallingState.current_prompt_output_index.less_than(
+                            tool_router_node.Outputs.results.length()
+                        )
+                        & tool_router_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
+                            "FUNCTION_CALL"
+                        )
+                        & tool_router_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
+                            "name"
+                        ].equals(fn_name)
+                    )
+                )
+            )
+
+        for function in functions:
+            if isinstance(function, ComposioToolDefinition):
+                function_name = get_function_name(function)
+                port = create_port_condition(function_name)
+                setattr(Ports, function_name, port)
+            elif isinstance(function, MCPServer):
+                tool_functions: List[MCPToolDefinition] = hydrate_mcp_tool_definitions(function)
+                for tool_function in tool_functions:
+                    name = get_mcp_tool_name(tool_function)
+                    port = create_port_condition(name)
+                    setattr(Ports, name, port)
+            else:
+                function_name = get_function_name(function)
+                port = create_port_condition(function_name)
+                setattr(Ports, function_name, port)
+
+        # Add the else port for when no function conditions match
+        setattr(Ports, "default", Port.on_else())
+    else:
+        # If no functions exist, create a simple Ports class with just a default port
+        Ports = type("Ports", (), {"default": Port(default=True)})
+
+    node = cast(
+        Type[RouterNode],
+        type(
+            "RouterNode",
+            (RouterNode,),
+            {
                 "Ports": Ports,
                 "__module__": __name__,
             },

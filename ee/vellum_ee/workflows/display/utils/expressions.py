@@ -266,10 +266,19 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         }
 
     if isinstance(value, EnvironmentVariableReference):
-        return {
-            "type": "ENVIRONMENT_VARIABLE",
-            "environment_variable": value.name,
-        }
+        if value.serialize_as_constant:
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "STRING",
+                    "value": value.name,
+                },
+            }
+        else:
+            return {
+                "type": "ENVIRONMENT_VARIABLE",
+                "environment_variable": value.name,
+            }
 
     if isinstance(value, ExecutionCountReference):
         node_class_display = display_context.global_node_displays[value.node_class]
@@ -358,7 +367,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         }
 
     if isinstance(value, DeploymentDefinition):
-        workflow_deployment_release = display_context.client.release_reviews.retrieve_workflow_deployment_release(
+        workflow_deployment_release = display_context.client.workflow_deployments.retrieve_workflow_deployment_release(
             value.deployment, value.release_tag
         )
         name = workflow_deployment_release.deployment.name or value.deployment

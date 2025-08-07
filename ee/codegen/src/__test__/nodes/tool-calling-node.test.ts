@@ -173,13 +173,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...composioToolFunction,
-            id: "composio-tool-function-id",
-            name: "github_create_an_issue",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [composioToolFunction],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -224,12 +224,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...composioToolFunction,
-            id: "composio-tool-function-id",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [composioToolFunction],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -362,18 +363,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...codeExecutionFunction,
-            id: "code-exec-function-id",
-            name: "add_numbers",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [codeExecutionFunction, inlineWorkflowFunction],
           },
-          {
-            ...inlineWorkflowFunction,
-            id: "workflow-function-id",
-            name: "subtract",
-          },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -405,18 +401,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...inlineWorkflowFunction,
-            id: "workflow-function-id",
-            name: "subtract",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [inlineWorkflowFunction, codeExecutionFunction],
           },
-          {
-            ...codeExecutionFunction,
-            id: "code-exec-function-id",
-            name: "add_numbers",
-          },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -467,13 +458,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...functions,
-            id: "workflow-function-id",
-            name: "subtract",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [functions],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -497,7 +488,7 @@ describe("ToolCallingNode", () => {
   });
 
   describe("workflow deployment", () => {
-    const workflowDeploymentFunction: WorkflowDeploymentFunctionArgs = {
+    const deploymentWorkflowFunction: WorkflowDeploymentFunctionArgs = {
       type: "WORKFLOW_DEPLOYMENT",
       name: "deployment_1",
       description: "Deployment 1 description",
@@ -515,13 +506,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...workflowDeploymentFunction,
-            id: "workflow-deployment-function-id",
-            name: "workflow-deployment-function-name",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [deploymentWorkflowFunction],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({
@@ -549,10 +540,9 @@ describe("ToolCallingNode", () => {
       name: "github",
       url: "https://api.githubcopilot.com/mcp/",
       authorization_type: "BEARER_TOKEN",
-      bearer_token_value: {
-        type: "ENVIRONMENT_VARIABLE",
-        environmentVariable: "GITHUB_PERSONAL_ACCESS_TOKEN",
-      },
+      bearer_token_value: "GITHUB_PERSONAL_ACCESS_TOKEN",
+      api_key_header_key: null,
+      api_key_header_value: null,
     };
 
     it("should generate mcp server", async () => {
@@ -565,13 +555,13 @@ describe("ToolCallingNode", () => {
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
-        [
-          {
-            ...mcpServerFunction,
-            id: "mcp-server-function-id",
-            name: "github",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [mcpServerFunction],
           },
-        ]
+        }
       );
 
       const nodeData = toolCallingNodeFactory({

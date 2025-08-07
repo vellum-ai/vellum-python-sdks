@@ -6,6 +6,7 @@ from .types.api_version_enum import ApiVersionEnum
 import os
 import httpx
 from .core.client_wrapper import SyncClientWrapper
+from .raw_client import RawVellum
 from .resources.ad_hoc.client import AdHocClient
 from .resources.container_images.client import ContainerImagesClient
 from .resources.deployments.client import DeploymentsClient
@@ -20,7 +21,6 @@ from .resources.sandboxes.client import SandboxesClient
 from .resources.test_suite_runs.client import TestSuiteRunsClient
 from .resources.test_suites.client import TestSuitesClient
 from .resources.workflow_deployments.client import WorkflowDeploymentsClient
-from .resources.release_reviews.client import ReleaseReviewsClient
 from .resources.workflow_executions.client import WorkflowExecutionsClient
 from .resources.workflow_sandboxes.client import WorkflowSandboxesClient
 from .resources.workflows.client import WorkflowsClient
@@ -32,25 +32,25 @@ from .types.execute_api_request_headers_value import ExecuteApiRequestHeadersVal
 from .types.execute_api_request_bearer_token import ExecuteApiRequestBearerToken
 from .core.request_options import RequestOptions
 from .types.execute_api_response import ExecuteApiResponse
-from .core.serialization import convert_and_respect_annotation_metadata
-from .core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from .core.api_error import ApiError
 from .types.code_execution_runtime import CodeExecutionRuntime
 from .types.code_executor_input import CodeExecutorInput
 from .types.code_execution_package import CodeExecutionPackage
 from .types.vellum_variable_type import VellumVariableType
 from .types.code_executor_response import CodeExecutorResponse
-from .errors.bad_request_error import BadRequestError
 from .types.prompt_deployment_input_request import PromptDeploymentInputRequest
 from .types.prompt_deployment_expand_meta_request import PromptDeploymentExpandMetaRequest
 from .types.raw_prompt_execution_overrides_request import RawPromptExecutionOverridesRequest
 from .types.execute_prompt_response import ExecutePromptResponse
+from .types.execute_prompt_event import ExecutePromptEvent
+from .core.serialization import convert_and_respect_annotation_metadata
+from .core.pydantic_utilities import parse_obj_as
+import json
+from .errors.bad_request_error import BadRequestError
 from .errors.forbidden_error import ForbiddenError
 from .errors.not_found_error import NotFoundError
 from .errors.internal_server_error import InternalServerError
-from .types.execute_prompt_event import ExecutePromptEvent
-import json
+from json.decoder import JSONDecodeError
+from .core.api_error import ApiError
 from .types.workflow_request_input_request import WorkflowRequestInputRequest
 from .types.workflow_expand_meta_request import WorkflowExpandMetaRequest
 from .types.execute_workflow_response import ExecuteWorkflowResponse
@@ -65,6 +65,7 @@ from .types.search_response import SearchResponse
 from .types.submit_completion_actual_request import SubmitCompletionActualRequest
 from .types.submit_workflow_execution_actual_request import SubmitWorkflowExecutionActualRequest
 from .core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawVellum
 from .resources.ad_hoc.client import AsyncAdHocClient
 from .resources.container_images.client import AsyncContainerImagesClient
 from .resources.deployments.client import AsyncDeploymentsClient
@@ -79,7 +80,6 @@ from .resources.sandboxes.client import AsyncSandboxesClient
 from .resources.test_suite_runs.client import AsyncTestSuiteRunsClient
 from .resources.test_suites.client import AsyncTestSuitesClient
 from .resources.workflow_deployments.client import AsyncWorkflowDeploymentsClient
-from .resources.release_reviews.client import AsyncReleaseReviewsClient
 from .resources.workflow_executions.client import AsyncWorkflowExecutionsClient
 from .resources.workflow_sandboxes.client import AsyncWorkflowSandboxesClient
 from .resources.workflows.client import AsyncWorkflowsClient
@@ -150,6 +150,7 @@ class Vellum:
             else httpx.Client(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
+        self._raw_client = RawVellum(client_wrapper=self._client_wrapper)
         self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = ContainerImagesClient(client_wrapper=self._client_wrapper)
         self.deployments = DeploymentsClient(client_wrapper=self._client_wrapper)
@@ -164,12 +165,22 @@ class Vellum:
         self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = TestSuitesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = WorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
-        self.release_reviews = ReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.workflow_executions = WorkflowExecutionsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = WorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = WorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = WorkspaceSecretsClient(client_wrapper=self._client_wrapper)
         self.workspaces = WorkspacesClient(client_wrapper=self._client_wrapper)
+
+    @property
+    def with_raw_response(self) -> RawVellum:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawVellum
+        """
+        return self._raw_client
 
     def execute_api(
         self,
@@ -214,42 +225,15 @@ class Vellum:
             url="x",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "url": url,
-                "method": method,
-                "body": convert_and_respect_annotation_metadata(
-                    object_=body, annotation=typing.Optional[ExecuteApiRequestBody], direction="write"
-                ),
-                "headers": convert_and_respect_annotation_metadata(
-                    object_=headers, annotation=typing.Dict[str, ExecuteApiRequestHeadersValue], direction="write"
-                ),
-                "bearer_token": convert_and_respect_annotation_metadata(
-                    object_=bearer_token, annotation=typing.Optional[ExecuteApiRequestBearerToken], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.execute_api(
+            url=url,
+            method=method,
+            body=body,
+            headers=headers,
+            bearer_token=bearer_token,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ExecuteApiResponse,
-                    parse_obj_as(
-                        type_=ExecuteApiResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def execute_code(
         self,
@@ -316,50 +300,15 @@ class Vellum:
             output_type="STRING",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/execute-code",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "code": code,
-                "runtime": runtime,
-                "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[CodeExecutorInput], direction="write"
-                ),
-                "packages": convert_and_respect_annotation_metadata(
-                    object_=packages, annotation=typing.Sequence[CodeExecutionPackage], direction="write"
-                ),
-                "output_type": output_type,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.execute_code(
+            code=code,
+            runtime=runtime,
+            input_values=input_values,
+            packages=packages,
+            output_type=output_type,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CodeExecutorResponse,
-                    parse_obj_as(
-                        type_=CodeExecutorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def execute_prompt(
         self,
@@ -436,90 +385,19 @@ class Vellum:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/execute-prompt",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[PromptDeploymentInputRequest], direction="write"
-                ),
-                "prompt_deployment_id": prompt_deployment_id,
-                "prompt_deployment_name": prompt_deployment_name,
-                "release_tag": release_tag,
-                "external_id": external_id,
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta,
-                    annotation=typing.Optional[PromptDeploymentExpandMetaRequest],
-                    direction="write",
-                ),
-                "raw_overrides": convert_and_respect_annotation_metadata(
-                    object_=raw_overrides,
-                    annotation=typing.Optional[RawPromptExecutionOverridesRequest],
-                    direction="write",
-                ),
-                "expand_raw": expand_raw,
-                "metadata": metadata,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.execute_prompt(
+            inputs=inputs,
+            prompt_deployment_id=prompt_deployment_id,
+            prompt_deployment_name=prompt_deployment_name,
+            release_tag=release_tag,
+            external_id=external_id,
+            expand_meta=expand_meta,
+            raw_overrides=raw_overrides,
+            expand_raw=expand_raw,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ExecutePromptResponse,
-                    parse_obj_as(
-                        type_=ExecutePromptResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def execute_prompt_stream(
         self,
@@ -598,9 +476,9 @@ class Vellum:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -758,72 +636,17 @@ class Vellum:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/execute-workflow",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
-                ),
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=typing.Optional[WorkflowExpandMetaRequest], direction="write"
-                ),
-                "workflow_deployment_id": workflow_deployment_id,
-                "workflow_deployment_name": workflow_deployment_name,
-                "release_tag": release_tag,
-                "external_id": external_id,
-                "metadata": metadata,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.execute_workflow(
+            inputs=inputs,
+            expand_meta=expand_meta,
+            workflow_deployment_id=workflow_deployment_id,
+            workflow_deployment_name=workflow_deployment_name,
+            release_tag=release_tag,
+            external_id=external_id,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ExecuteWorkflowResponse,
-                    parse_obj_as(
-                        type_=ExecuteWorkflowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def execute_workflow_stream(
         self,
@@ -898,9 +721,9 @@ class Vellum:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/execute-workflow-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -1030,79 +853,14 @@ class Vellum:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/generate",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "deployment_id": deployment_id,
-                "deployment_name": deployment_name,
-                "requests": convert_and_respect_annotation_metadata(
-                    object_=requests, annotation=typing.Sequence[GenerateRequest], direction="write"
-                ),
-                "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=typing.Optional[GenerateOptionsRequest], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.generate(
+            requests=requests,
+            deployment_id=deployment_id,
+            deployment_name=deployment_name,
+            options=options,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    GenerateResponse,
-                    parse_obj_as(
-                        type_=GenerateResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def generate_stream(
         self,
@@ -1162,9 +920,9 @@ class Vellum:
         for chunk in response:
             yield chunk
         """
-        with self._client_wrapper.httpx_client.stream(
+        with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/generate-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -1294,68 +1052,15 @@ class Vellum:
             query="x",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/search",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "index_id": index_id,
-                "index_name": index_name,
-                "query": query,
-                "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=typing.Optional[SearchRequestOptionsRequest], direction="write"
-                ),
-                "document_index": document_index,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.search(
+            query=query,
+            index_id=index_id,
+            index_name=index_name,
+            options=options,
+            document_index=document_index,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    SearchResponse,
-                    parse_obj_as(
-                        type_=SearchResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def submit_completion_actuals(
         self,
@@ -1398,60 +1103,13 @@ class Vellum:
             actuals=[SubmitCompletionActualRequest(), SubmitCompletionActualRequest()],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/submit-completion-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "deployment_id": deployment_id,
-                "deployment_name": deployment_name,
-                "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitCompletionActualRequest], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.submit_completion_actuals(
+            actuals=actuals,
+            deployment_id=deployment_id,
+            deployment_name=deployment_name,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def submit_workflow_execution_actuals(
         self,
@@ -1499,30 +1157,13 @@ class Vellum:
             ],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/submit-workflow-execution-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
-                ),
-                "execution_id": execution_id,
-                "external_id": external_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.submit_workflow_execution_actuals(
+            actuals=actuals,
+            execution_id=execution_id,
+            external_id=external_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncVellum:
@@ -1585,6 +1226,7 @@ class AsyncVellum:
             else httpx.AsyncClient(timeout=_defaulted_timeout),
             timeout=_defaulted_timeout,
         )
+        self._raw_client = AsyncRawVellum(client_wrapper=self._client_wrapper)
         self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = AsyncContainerImagesClient(client_wrapper=self._client_wrapper)
         self.deployments = AsyncDeploymentsClient(client_wrapper=self._client_wrapper)
@@ -1599,12 +1241,22 @@ class AsyncVellum:
         self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = AsyncTestSuitesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = AsyncWorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
-        self.release_reviews = AsyncReleaseReviewsClient(client_wrapper=self._client_wrapper)
         self.workflow_executions = AsyncWorkflowExecutionsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = AsyncWorkflowSandboxesClient(client_wrapper=self._client_wrapper)
         self.workflows = AsyncWorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = AsyncWorkspaceSecretsClient(client_wrapper=self._client_wrapper)
         self.workspaces = AsyncWorkspacesClient(client_wrapper=self._client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawVellum:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawVellum
+        """
+        return self._raw_client
 
     async def execute_api(
         self,
@@ -1657,42 +1309,15 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/execute-api",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "url": url,
-                "method": method,
-                "body": convert_and_respect_annotation_metadata(
-                    object_=body, annotation=typing.Optional[ExecuteApiRequestBody], direction="write"
-                ),
-                "headers": convert_and_respect_annotation_metadata(
-                    object_=headers, annotation=typing.Dict[str, ExecuteApiRequestHeadersValue], direction="write"
-                ),
-                "bearer_token": convert_and_respect_annotation_metadata(
-                    object_=bearer_token, annotation=typing.Optional[ExecuteApiRequestBearerToken], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.execute_api(
+            url=url,
+            method=method,
+            body=body,
+            headers=headers,
+            bearer_token=bearer_token,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ExecuteApiResponse,
-                    parse_obj_as(
-                        type_=ExecuteApiResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def execute_code(
         self,
@@ -1767,50 +1392,15 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/execute-code",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "code": code,
-                "runtime": runtime,
-                "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[CodeExecutorInput], direction="write"
-                ),
-                "packages": convert_and_respect_annotation_metadata(
-                    object_=packages, annotation=typing.Sequence[CodeExecutionPackage], direction="write"
-                ),
-                "output_type": output_type,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.execute_code(
+            code=code,
+            runtime=runtime,
+            input_values=input_values,
+            packages=packages,
+            output_type=output_type,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CodeExecutorResponse,
-                    parse_obj_as(
-                        type_=CodeExecutorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def execute_prompt(
         self,
@@ -1895,90 +1485,19 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/execute-prompt",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[PromptDeploymentInputRequest], direction="write"
-                ),
-                "prompt_deployment_id": prompt_deployment_id,
-                "prompt_deployment_name": prompt_deployment_name,
-                "release_tag": release_tag,
-                "external_id": external_id,
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta,
-                    annotation=typing.Optional[PromptDeploymentExpandMetaRequest],
-                    direction="write",
-                ),
-                "raw_overrides": convert_and_respect_annotation_metadata(
-                    object_=raw_overrides,
-                    annotation=typing.Optional[RawPromptExecutionOverridesRequest],
-                    direction="write",
-                ),
-                "expand_raw": expand_raw,
-                "metadata": metadata,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.execute_prompt(
+            inputs=inputs,
+            prompt_deployment_id=prompt_deployment_id,
+            prompt_deployment_name=prompt_deployment_name,
+            release_tag=release_tag,
+            external_id=external_id,
+            expand_meta=expand_meta,
+            raw_overrides=raw_overrides,
+            expand_raw=expand_raw,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ExecutePromptResponse,
-                    parse_obj_as(
-                        type_=ExecutePromptResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def execute_prompt_stream(
         self,
@@ -2065,9 +1584,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/execute-prompt-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -2233,72 +1752,17 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/execute-workflow",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "inputs": convert_and_respect_annotation_metadata(
-                    object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
-                ),
-                "expand_meta": convert_and_respect_annotation_metadata(
-                    object_=expand_meta, annotation=typing.Optional[WorkflowExpandMetaRequest], direction="write"
-                ),
-                "workflow_deployment_id": workflow_deployment_id,
-                "workflow_deployment_name": workflow_deployment_name,
-                "release_tag": release_tag,
-                "external_id": external_id,
-                "metadata": metadata,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.execute_workflow(
+            inputs=inputs,
+            expand_meta=expand_meta,
+            workflow_deployment_id=workflow_deployment_id,
+            workflow_deployment_name=workflow_deployment_name,
+            release_tag=release_tag,
+            external_id=external_id,
+            metadata=metadata,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ExecuteWorkflowResponse,
-                    parse_obj_as(
-                        type_=ExecuteWorkflowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def execute_workflow_stream(
         self,
@@ -2381,9 +1845,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/execute-workflow-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "inputs": convert_and_respect_annotation_metadata(
@@ -2521,79 +1985,14 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/generate",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "deployment_id": deployment_id,
-                "deployment_name": deployment_name,
-                "requests": convert_and_respect_annotation_metadata(
-                    object_=requests, annotation=typing.Sequence[GenerateRequest], direction="write"
-                ),
-                "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=typing.Optional[GenerateOptionsRequest], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.generate(
+            requests=requests,
+            deployment_id=deployment_id,
+            deployment_name=deployment_name,
+            options=options,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    GenerateResponse,
-                    parse_obj_as(
-                        type_=GenerateResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 403:
-                raise ForbiddenError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def generate_stream(
         self,
@@ -2661,9 +2060,9 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        async with self._client_wrapper.httpx_client.stream(
+        async with self._raw_client._client_wrapper.httpx_client.stream(
             "v1/generate-stream",
-            base_url=self._client_wrapper.get_environment().predict,
+            base_url=self._raw_client._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "deployment_id": deployment_id,
@@ -2801,68 +2200,15 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/search",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "index_id": index_id,
-                "index_name": index_name,
-                "query": query,
-                "options": convert_and_respect_annotation_metadata(
-                    object_=options, annotation=typing.Optional[SearchRequestOptionsRequest], direction="write"
-                ),
-                "document_index": document_index,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.search(
+            query=query,
+            index_id=index_id,
+            index_name=index_name,
+            options=options,
+            document_index=document_index,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    SearchResponse,
-                    parse_obj_as(
-                        type_=SearchResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def submit_completion_actuals(
         self,
@@ -2916,60 +2262,13 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/submit-completion-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "deployment_id": deployment_id,
-                "deployment_name": deployment_name,
-                "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitCompletionActualRequest], direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.submit_completion_actuals(
+            actuals=actuals,
+            deployment_id=deployment_id,
+            deployment_name=deployment_name,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 500:
-                raise InternalServerError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def submit_workflow_execution_actuals(
         self,
@@ -3025,27 +2324,10 @@ class AsyncVellum:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/submit-workflow-execution-actuals",
-            base_url=self._client_wrapper.get_environment().predict,
-            method="POST",
-            json={
-                "actuals": convert_and_respect_annotation_metadata(
-                    object_=actuals, annotation=typing.Sequence[SubmitWorkflowExecutionActualRequest], direction="write"
-                ),
-                "execution_id": execution_id,
-                "external_id": external_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.submit_workflow_execution_actuals(
+            actuals=actuals,
+            execution_id=execution_id,
+            external_id=external_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

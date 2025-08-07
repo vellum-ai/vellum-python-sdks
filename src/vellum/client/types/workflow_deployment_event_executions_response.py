@@ -3,6 +3,7 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .api_request_parent_context import ApiRequestParentContext
 from .array_vellum_value import ArrayVellumValue
+from .external_parent_context import ExternalParentContext
 from .node_parent_context import NodeParentContext
 from .prompt_deployment_parent_context import PromptDeploymentParentContext
 from .span_link import SpanLink

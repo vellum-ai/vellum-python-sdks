@@ -1,0 +1,37 @@
+name: Run Evaluation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Push workflow to Vellum
+        run: uv run vellum workflows push oracle
+        env:
+          VELLUM_API_KEY: ${{ secrets.VELLUM_API_KEY }}
+
+      - name: Run evaluation on Vellum and report results
+        run: uv run python eval.py
+        env:
+          VELLUM_API_KEY: ${{ secrets.VELLUM_API_KEY }}

@@ -25,6 +25,7 @@ class SpanLink(UniversalBaseModel):
 
 
 from .api_request_parent_context import ApiRequestParentContext  # noqa: E402
+from .external_parent_context import ExternalParentContext  # noqa: E402
 from .node_parent_context import NodeParentContext  # noqa: E402
 from .prompt_deployment_parent_context import PromptDeploymentParentContext  # noqa: E402
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext  # noqa: E402

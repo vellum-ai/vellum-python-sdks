@@ -2,14 +2,12 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawFolderEntitiesClient
 from .types.folder_entities_list_request_entity_status import FolderEntitiesListRequestEntityStatus
 from ...core.request_options import RequestOptions
 from ...types.paginated_folder_entity_list import PaginatedFolderEntityList
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
-from ...core.jsonable_encoder import jsonable_encoder
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawFolderEntitiesClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -17,9 +15,24 @@ OMIT = typing.cast(typing.Any, ...)
 
 class FolderEntitiesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawFolderEntitiesClient(client_wrapper=client_wrapper)
 
-    def list(
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawFolderEntitiesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawFolderEntitiesClient
+        """
+        return self._raw_client
+
+    def list_(
         self,
         *,
         parent_folder_id: str,
@@ -79,32 +92,15 @@ class FolderEntitiesClient:
             parent_folder_id="parent_folder_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/folder-entities",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "entity_status": entity_status,
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "parent_folder_id": parent_folder_id,
-            },
+        response = self._raw_client.list(
+            parent_folder_id=parent_folder_id,
+            entity_status=entity_status,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedFolderEntityList,
-                    parse_obj_as(
-                        type_=PaginatedFolderEntityList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def add_entity_to_folder(
         self, folder_id: str, *, entity_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -147,33 +143,30 @@ class FolderEntitiesClient:
             entity_id="entity_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/folders/{jsonable_encoder(folder_id)}/add-entity",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "entity_id": entity_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.add_entity_to_folder(
+            folder_id,
+            entity_id=entity_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncFolderEntitiesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawFolderEntitiesClient(client_wrapper=client_wrapper)
 
-    async def list(
+    @property
+    def with_raw_response(self) -> AsyncRawFolderEntitiesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawFolderEntitiesClient
+        """
+        return self._raw_client
+
+    async def list_(
         self,
         *,
         parent_folder_id: str,
@@ -241,32 +234,15 @@ class AsyncFolderEntitiesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/folder-entities",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "entity_status": entity_status,
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "parent_folder_id": parent_folder_id,
-            },
+        response = await self._raw_client.list(
+            parent_folder_id=parent_folder_id,
+            entity_status=entity_status,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedFolderEntityList,
-                    parse_obj_as(
-                        type_=PaginatedFolderEntityList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def add_entity_to_folder(
         self, folder_id: str, *, entity_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -317,23 +293,9 @@ class AsyncFolderEntitiesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/folders/{jsonable_encoder(folder_id)}/add-entity",
-            base_url=self._client_wrapper.get_environment().default,
-            method="POST",
-            json={
-                "entity_id": entity_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.add_entity_to_folder(
+            folder_id,
+            entity_id=entity_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

@@ -2,21 +2,20 @@
 
 import typing
 from ...core.client_wrapper import SyncClientWrapper
+from .raw_client import RawWorkflowDeploymentsClient
 from .types.workflow_deployments_list_request_status import WorkflowDeploymentsListRequestStatus
 from ...core.request_options import RequestOptions
 from ...types.paginated_slim_workflow_deployment_list import PaginatedSlimWorkflowDeploymentList
-from ...core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...types.workflow_deployment_read import WorkflowDeploymentRead
-from ...core.jsonable_encoder import jsonable_encoder
 from ...types.workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from ...types.workflow_event_execution_read import WorkflowEventExecutionRead
 from ...types.workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from .types.list_workflow_release_tags_request_source import ListWorkflowReleaseTagsRequestSource
 from ...types.paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
 from ...types.workflow_release_tag_read import WorkflowReleaseTagRead
+from ...types.workflow_deployment_release import WorkflowDeploymentRelease
 from ...core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawWorkflowDeploymentsClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -24,9 +23,24 @@ OMIT = typing.cast(typing.Any, ...)
 
 class WorkflowDeploymentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawWorkflowDeploymentsClient(client_wrapper=client_wrapper)
 
-    def list(
+    @property
+    def _client_wrapper(self) -> SyncClientWrapper:
+        return self._raw_client._client_wrapper
+
+    @property
+    def with_raw_response(self) -> RawWorkflowDeploymentsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawWorkflowDeploymentsClient
+        """
+        return self._raw_client
+
+    def list_(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -70,31 +84,14 @@ class WorkflowDeploymentsClient:
         )
         client.workflow_deployments.list()
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/workflow-deployments",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "status": status,
-            },
+        response = self._raw_client.list(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            status=status,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedSlimWorkflowDeploymentList,
-                    parse_obj_as(
-                        type_=PaginatedSlimWorkflowDeploymentList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowDeploymentRead:
         """
@@ -125,25 +122,11 @@ class WorkflowDeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentRead,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list_workflow_deployment_event_executions(
         self,
@@ -187,30 +170,14 @@ class WorkflowDeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "filters": filters,
-                "limit": limit,
-                "offset": offset,
-            },
+        response = self._raw_client.list_workflow_deployment_event_executions(
+            id,
+            filters=filters,
+            limit=limit,
+            offset=offset,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentEventExecutionsResponse,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentEventExecutionsResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def workflow_deployment_event_execution(
         self, execution_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -243,25 +210,12 @@ class WorkflowDeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events/{jsonable_encoder(execution_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.workflow_deployment_event_execution(
+            execution_id,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowEventExecutionRead,
-                    parse_obj_as(
-                        type_=WorkflowEventExecutionRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def workflow_deployment_history_item_retrieve(
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -299,25 +253,12 @@ class WorkflowDeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.workflow_deployment_history_item_retrieve(
+            history_id_or_release_tag,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentHistoryItem,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentHistoryItem,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list_workflow_release_tags(
         self,
@@ -368,31 +309,15 @@ class WorkflowDeploymentsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "source": source,
-            },
+        response = self._raw_client.list_workflow_release_tags(
+            id,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            source=source,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedWorkflowReleaseTagReadList,
-                    parse_obj_as(
-                        type_=PaginatedWorkflowReleaseTagReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve_workflow_release_tag(
         self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -429,25 +354,12 @@ class WorkflowDeploymentsClient:
             name="name",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = self._raw_client.retrieve_workflow_release_tag(
+            id,
+            name,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowReleaseTagRead,
-                    parse_obj_as(
-                        type_=WorkflowReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def update_workflow_release_tag(
         self,
@@ -492,39 +404,73 @@ class WorkflowDeploymentsClient:
             name="name",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "history_item_id": history_item_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.update_workflow_release_tag(
+            id,
+            name,
+            history_item_id=history_item_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowReleaseTagRead,
-                    parse_obj_as(
-                        type_=WorkflowReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
+
+    def retrieve_workflow_deployment_release(
+        self, id: str, release_id_or_release_tag: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkflowDeploymentRelease:
+        """
+        Retrieve a specific Workflow Deployment Release by either its UUID or the name of a Release Tag that points to it.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        release_id_or_release_tag : str
+            Either the UUID of Workflow Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment Release you'd like to retrieve.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowDeploymentRelease
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.workflow_deployments.retrieve_workflow_deployment_release(
+            id="id",
+            release_id_or_release_tag="release_id_or_release_tag",
+        )
+        """
+        response = self._raw_client.retrieve_workflow_deployment_release(
+            id,
+            release_id_or_release_tag,
+            request_options=request_options,
+        )
+        return response.data
 
 
 class AsyncWorkflowDeploymentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawWorkflowDeploymentsClient(client_wrapper=client_wrapper)
 
-    async def list(
+    @property
+    def with_raw_response(self) -> AsyncRawWorkflowDeploymentsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawWorkflowDeploymentsClient
+        """
+        return self._raw_client
+
+    async def list_(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -576,31 +522,14 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/workflow-deployments",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "status": status,
-            },
+        response = await self._raw_client.list(
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            status=status,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedSlimWorkflowDeploymentList,
-                    parse_obj_as(
-                        type_=PaginatedSlimWorkflowDeploymentList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -641,25 +570,11 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve(
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentRead,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list_workflow_deployment_event_executions(
         self,
@@ -711,30 +626,14 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "filters": filters,
-                "limit": limit,
-                "offset": offset,
-            },
+        response = await self._raw_client.list_workflow_deployment_event_executions(
+            id,
+            filters=filters,
+            limit=limit,
+            offset=offset,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentEventExecutionsResponse,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentEventExecutionsResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def workflow_deployment_event_execution(
         self, execution_id: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -775,25 +674,12 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/execution-events/{jsonable_encoder(execution_id)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.workflow_deployment_event_execution(
+            execution_id,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowEventExecutionRead,
-                    parse_obj_as(
-                        type_=WorkflowEventExecutionRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def workflow_deployment_history_item_retrieve(
         self, history_id_or_release_tag: str, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -839,25 +725,12 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/history/{jsonable_encoder(history_id_or_release_tag)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.workflow_deployment_history_item_retrieve(
+            history_id_or_release_tag,
+            id,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowDeploymentHistoryItem,
-                    parse_obj_as(
-                        type_=WorkflowDeploymentHistoryItem,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list_workflow_release_tags(
         self,
@@ -916,31 +789,15 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "ordering": ordering,
-                "source": source,
-            },
+        response = await self._raw_client.list_workflow_release_tags(
+            id,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            source=source,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedWorkflowReleaseTagReadList,
-                    parse_obj_as(
-                        type_=PaginatedWorkflowReleaseTagReadList,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve_workflow_release_tag(
         self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -985,25 +842,12 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="GET",
+        response = await self._raw_client.retrieve_workflow_release_tag(
+            id,
+            name,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowReleaseTagRead,
-                    parse_obj_as(
-                        type_=WorkflowReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def update_workflow_release_tag(
         self,
@@ -1056,29 +900,60 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-deployments/{jsonable_encoder(id)}/release-tags/{jsonable_encoder(name)}",
-            base_url=self._client_wrapper.get_environment().default,
-            method="PATCH",
-            json={
-                "history_item_id": history_item_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.update_workflow_release_tag(
+            id,
+            name,
+            history_item_id=history_item_id,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    WorkflowReleaseTagRead,
-                    parse_obj_as(
-                        type_=WorkflowReleaseTagRead,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
+
+    async def retrieve_workflow_deployment_release(
+        self, id: str, release_id_or_release_tag: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkflowDeploymentRelease:
+        """
+        Retrieve a specific Workflow Deployment Release by either its UUID or the name of a Release Tag that points to it.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        release_id_or_release_tag : str
+            Either the UUID of Workflow Deployment Release you'd like to retrieve, or the name of a Release Tag that's pointing to the Workflow Deployment Release you'd like to retrieve.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowDeploymentRelease
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflow_deployments.retrieve_workflow_deployment_release(
+                id="id",
+                release_id_or_release_tag="release_id_or_release_tag",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.retrieve_workflow_deployment_release(
+            id,
+            release_id_or_release_tag,
+            request_options=request_options,
+        )
+        return response.data
