@@ -502,6 +502,7 @@ class GetCurrentWeatherNode(ToolCallingNode):
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/display/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
 "from uuid import UUID
+from .weather_function.nodes import *
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
@@ -863,6 +864,7 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/display/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
 "from uuid import UUID
+from .weather_function.nodes import *
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
