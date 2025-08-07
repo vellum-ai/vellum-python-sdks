@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "workflows": [
+    {
+      "module": "oracle",
+      "workflow_sandbox_id": null,
+      "ignore": null,
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+    "label": "Complex Analysis",
+    "input_values": [
+        {"name": "query", "value": "Compare and contrast renewable vs fossil fuel energy sources"},
+        {"name": "context", "value": "Energy sources can be categorized as renewable or non-renewable based on their ability to replenish naturally."}
+    ]
+}

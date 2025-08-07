@@ -1,0 +1,7 @@
+{
+    "label": "Simple Question",
+    "input_values": [
+        {"name": "query", "value": "What is the capital of France?"},
+        {"name": "context", "value": "France is a country in Europe."}
+    ]
+}
