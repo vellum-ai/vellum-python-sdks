@@ -117,13 +117,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
 class RouterNode(BaseNode[ToolCallingState]):
     """Router node that handles routing to function nodes based on outputs."""
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
-
-    def run(self) -> Iterator[BaseOutput]:
-        # Router node doesn't process outputs or create chat messages
-        # It just handles the routing logic via its ports
-        yield from []
+    pass
 
 
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
