@@ -279,26 +279,30 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     }),
                   ];
 
-                  if (mcpServerFunction.authorization_type === "BEARER_TOKEN") {
-                    if (mcpServerFunction.bearer_token_value) {
-                      arguments_.push(
-                        python.methodArgument({
-                          name: "bearer_token_value",
-                          value: new WorkflowValueDescriptor({
-                            workflowValueDescriptor: {
-                              type: "ENVIRONMENT_VARIABLE",
-                              environmentVariable:
-                                mcpServerFunction.bearer_token_value,
-                            },
-                            nodeContext: this.nodeContext,
-                            workflowContext: this.workflowContext,
-                          }),
-                        })
-                      );
-                    }
+                  if (
+                    mcpServerFunction.authorization_type === "BEARER_TOKEN" &&
+                    mcpServerFunction.bearer_token_value
+                  ) {
+                    arguments_.push(
+                      python.methodArgument({
+                        name: "bearer_token_value",
+                        value: new WorkflowValueDescriptor({
+                          workflowValueDescriptor: {
+                            type: "ENVIRONMENT_VARIABLE",
+                            environmentVariable:
+                              mcpServerFunction.bearer_token_value,
+                          },
+                          nodeContext: this.nodeContext,
+                          workflowContext: this.workflowContext,
+                        }),
+                      })
+                    );
                   }
 
-                  if (mcpServerFunction.api_key_header_key) {
+                  if (
+                    mcpServerFunction.authorization_type === "API_KEY" &&
+                    mcpServerFunction.api_key_header_key
+                  ) {
                     arguments_.push(
                       python.methodArgument({
                         name: "api_key_header_key",
@@ -309,7 +313,10 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     );
                   }
 
-                  if (mcpServerFunction.api_key_header_value) {
+                  if (
+                    mcpServerFunction.authorization_type === "API_KEY" &&
+                    mcpServerFunction.api_key_header_value
+                  ) {
                     arguments_.push(
                       python.methodArgument({
                         name: "api_key_header_value",
