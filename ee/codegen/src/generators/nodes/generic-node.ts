@@ -329,7 +329,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   functionReferences.push(
                     python.instantiateClass({
                       classReference: python.reference({
-                        name: "MCP_SERVER",
+                        name: "MCPServer",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
                       }),
                       arguments_,
