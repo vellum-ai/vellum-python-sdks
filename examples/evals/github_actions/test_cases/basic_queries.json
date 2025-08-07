@@ -1,16 +1,7 @@
-[
-    {
-        "name": "Simple Question",
-        "inputs": [
-            {"name": "query", "value": "What is the capital of France?"},
-            {"name": "context", "value": "France is a country in Europe."}
-        ]
-    },
-    {
-        "name": "No Context Query",
-        "inputs": [
-            {"name": "query", "value": "Explain machine learning"},
-            {"name": "context", "value": null}
-        ]
-    }
-]
+{
+    "name": "Simple Question",
+    "inputs": [
+        {"name": "query", "value": "What is the capital of France?"},
+        {"name": "context", "value": "France is a country in Europe."}
+    ]
+}

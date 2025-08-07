@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """
-Evaluation script that pushes workflow to Vellum, upserts test cases, runs evaluation, and reports results.
+Evaluation script that upserts test cases, runs evaluation, and reports results.
 """
 import json
 import logging
 import os
 from pathlib import Path
-import subprocess
-import sys
 from typing import List
 
 from vellum.client.types import (
@@ -22,21 +20,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def push_workflow():
-    """Push the workflow to Vellum using CLI."""
-    logger.info("Pushing workflow to Vellum...")
-    result = subprocess.run(
-        ["vellum", "workflows", "push", "github_actions"],
-        cwd=Path(__file__).parent.parent.parent,
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        logger.error(f"Failed to push workflow: {result.stderr}")
-        sys.exit(1)
-    logger.info("Workflow pushed successfully")
-
-
 def load_test_cases() -> List[dict]:
     """Load test cases from JSON files."""
     test_cases = []
@@ -44,7 +27,8 @@ def load_test_cases() -> List[dict]:
 
     for json_file in test_cases_dir.glob("*.json"):
         with open(json_file) as f:
-            test_cases.extend(json.load(f))
+            test_case = json.load(f)
+            test_cases.append(test_case)
 
     return test_cases
 
@@ -81,6 +65,5 @@ def run_evaluation():
 
 
 if __name__ == "__main__":
-    push_workflow()
     results = run_evaluation()
     logger.info("Evaluation completed successfully!")

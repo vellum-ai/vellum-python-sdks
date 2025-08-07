@@ -18,7 +18,6 @@ module = "github_actions"
 [[tool.vellum.workspaces]]
 name = "default"
 api_url = "VELLUM_API_URL"
-api_key = "VELLUM_API_KEY"
 
 [build-system]
 requires = ["poetry-core"]

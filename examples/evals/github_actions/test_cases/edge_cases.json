@@ -1,9 +1,7 @@
-[
-    {
-        "name": "Empty Query",
-        "inputs": [
-            {"name": "query", "value": ""},
-            {"name": "context", "value": "Some context"}
-        ]
-    }
-]
+{
+    "name": "Empty Query",
+    "inputs": [
+        {"name": "query", "value": ""},
+        {"name": "context", "value": "Some context"}
+    ]
+}
