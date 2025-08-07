@@ -23,6 +23,21 @@ def pytest_collection_modifyitems(session, config, items):
         os.environ["_PYTEST_SINGLE_TEST"] = "0"
 
 
+# To avoid 429 errors from the Monitoring API during tests
+@pytest.fixture(scope="session", autouse=True)
+def disable_workflow_monitoring() -> Generator[None, None, None]:
+    """Disable external workflow monitoring network calls during tests."""
+    prev = os.environ.get("VELLUM_ENABLE_WORKFLOW_MONITORING")
+    os.environ["VELLUM_ENABLE_WORKFLOW_MONITORING"] = "0"
+    try:
+        yield
+    finally:
+        if prev is None:
+            os.environ.pop("VELLUM_ENABLE_WORKFLOW_MONITORING", None)
+        else:
+            os.environ["VELLUM_ENABLE_WORKFLOW_MONITORING"] = prev
+
+
 @pytest.fixture(scope="session", autouse=True)
 def configure_logging() -> Generator[None, None, None]:
     """Used to output logs when running tests"""

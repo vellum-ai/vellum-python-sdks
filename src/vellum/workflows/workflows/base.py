@@ -466,9 +466,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             or last_event.name == "workflow.execution.fulfilled"
             or last_event.name == "workflow.execution.paused"
         ):
-            # Auto-print monitoring URL if monitoring is enabled
-            self._print_monitoring_info(last_event)
-
             return last_event
 
         rejected_event = WorkflowExecutionRejectedEvent(

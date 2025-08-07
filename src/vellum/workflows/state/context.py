@@ -1,4 +1,6 @@
+from distutils.util import strtobool
 from functools import cached_property
+import os
 from queue import Queue
 from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
@@ -24,19 +26,21 @@ class WorkflowContext:
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
         generated_files: Optional[dict[str, str]] = None,
-        enable_monitoring: Optional[bool] = True,
+        enable_monitoring: Optional[bool] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
-        self._execution_context = get_execution_context()
+        # Clone the current thread-local execution context to avoid mutating global state
+        current_execution_context = get_execution_context()
+        self._execution_context = ExecutionContext.model_validate(current_execution_context.model_dump())
 
         if execution_context is not None:
             self._execution_context.trace_id = execution_context.trace_id
             if execution_context.parent_context is not None:
                 self._execution_context.parent_context = execution_context.parent_context
 
-        # For external workflows, ensure proper trace_id and parent context
+        # For external workflows, ensure proper trace_id and parent context (only on this cloned context)
         if self._execution_context.parent_context is None:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
 
@@ -45,7 +49,19 @@ class WorkflowContext:
             self._execution_context.trace_id = uuid4()
 
         self._generated_files = generated_files
-        self._enable_monitoring = enable_monitoring
+
+        # Determine monitoring enablement: explicit arg wins, else env var, else default True
+        if enable_monitoring is not None:
+            self._enable_monitoring = enable_monitoring
+        else:
+            env_value = os.getenv("VELLUM_ENABLE_WORKFLOW_MONITORING")
+            if env_value is None:
+                self._enable_monitoring = True
+            else:
+                try:
+                    self._enable_monitoring = bool(strtobool(env_value.strip()))
+                except ValueError:
+                    self._enable_monitoring = False
 
     @cached_property
     def vellum_client(self) -> Vellum:
@@ -77,7 +93,7 @@ class WorkflowContext:
         Get the base monitoring URL for this workflow context.
 
         Returns:
-            The base URL to view executions in Vellum UI, or None if monitoring is disabled.
+        The base URL to view executions in Vellum UI, or None if monitoring is disabled.
         """
         if not self.enable_monitoring:
             return None
@@ -91,10 +107,10 @@ class WorkflowContext:
         Generate the monitoring URL for this workflow execution.
 
         Args:
-            span_id: The span ID from the workflow execution result.
+        span_id: The span ID from the workflow execution result.
 
         Returns:
-            The URL to view execution details in Vellum UI, or None if monitoring is disabled.
+        The URL to view execution details in Vellum UI, or None if monitoring is disabled.
         """
         base_url = self.monitoring_url
         if base_url is None:
@@ -107,10 +123,10 @@ class WorkflowContext:
         Convert an API URL to the corresponding UI URL.
 
         Args:
-            api_url: The API base URL (e.g., https://api.vellum.ai or http://localhost:8000)
+        api_url: The API base URL (e.g., https://api.vellum.ai or http://localhost:8000)
 
         Returns:
-            The corresponding UI URL (e.g., https://app.vellum.ai or http://localhost:3000)
+        The corresponding UI URL (e.g., https://app.vellum.ai or http://localhost:3000)
         """
         if "localhost" in api_url:
             # For local development: localhost:8000 (API) -> localhost:3000 (UI)
