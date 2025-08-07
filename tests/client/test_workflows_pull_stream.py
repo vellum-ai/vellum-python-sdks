@@ -7,11 +7,9 @@ import pytest
 
 from vellum.client.resources.workflows.raw_client import RawWorkflowsClient
 from vellum.client.core.client_wrapper import SyncClientWrapper
-
-
-class _FakeEnv:
-    def __init__(self) -> None:
-        self.default = "https://example.test"
+from vellum.client.environment import VellumEnvironment
+from vellum.client.core.http_client import HttpClient
+from typing import cast
 
 
 class _FakeResponse:
@@ -21,7 +19,7 @@ class _FakeResponse:
         self._closed = False
         self._read_called = False
         self.text = ""
-        self._json = {}
+        self._json: typing.Dict[str, typing.Any] = {}
 
     def iter_bytes(self, chunk_size: typing.Optional[int] = None):
         if self._closed:
@@ -57,10 +55,15 @@ class _FakeHttpxClient:
 
 class _FakeClientWrapper(SyncClientWrapper):
     def __init__(self, httpx_client: _FakeHttpxClient) -> None:
-        self.httpx_client = httpx_client
-        self._environment = _FakeEnv()
+        # Provide types expected by RawWorkflowsClient
+        self.httpx_client = cast(HttpClient, httpx_client)
+        self._environment: VellumEnvironment = VellumEnvironment(
+            default="https://example.test",
+            predict="https://predict.example.test",
+            documents="https://docs.example.test",
+        )
 
-    def get_environment(self):
+    def get_environment(self) -> VellumEnvironment:
         return self._environment
 
 
