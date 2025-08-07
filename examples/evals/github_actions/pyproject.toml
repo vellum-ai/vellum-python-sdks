@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "vellum-eval-github-actions"
+version = "0.1.0"
+description = "GitHub Actions evaluation example for Vellum workflows"
+authors = ["Vellum <devops@vellum.ai>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+vellum-ai = "^0.14.78"
+
+[tool.poetry.group.dev.dependencies]
+ipdb = "^0.13.13"
+
+[[tool.vellum.workflows]]
+module = "github_actions"
+
+[[tool.vellum.workspaces]]
+name = "default"
+api_url = "VELLUM_API_URL"
+api_key = "VELLUM_API_KEY"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

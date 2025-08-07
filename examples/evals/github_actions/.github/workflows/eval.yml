@@ -1,0 +1,36 @@
+name: Run Evaluation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install
+
+      - name: Run evaluation
+        run: |
+          cd examples/evals/github_actions
+          poetry run python eval.py
+        env:
+          VELLUM_API_KEY: ${{ secrets.VELLUM_API_KEY }}
+
+      - name: Report results
+        run: echo "Evaluation completed - check logs for results"
