@@ -10,9 +10,13 @@ import subprocess
 import sys
 from typing import List
 
-from vellum import Vellum
-from vellum.client.types import NamedTestCaseVariableValueRequest, TestCaseVariableValue
+from vellum.client.types import (
+    NamedTestCaseStringVariableValueRequest,
+    NamedTestCaseVariableValueRequest,
+    TestCaseVariableValue,
+)
 from vellum.evaluations import VellumTestSuite
+from vellum.workflows.vellum_client import create_vellum_client
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,7 +54,7 @@ def run_evaluation():
     logger.info("Loading test cases...")
     load_test_cases()
 
-    client = Vellum(api_key=os.getenv("VELLUM_API_KEY"))
+    client = create_vellum_client(api_key=os.getenv("VELLUM_API_KEY"))
 
     test_suite_name = "github-actions-eval-suite"
     test_suite = VellumTestSuite(test_suite_name, client=client)
@@ -60,7 +64,7 @@ def run_evaluation():
         input_dict = {inp.name: inp.value for inp in inputs}
 
         return [
-            NamedTestCaseVariableValueRequest(
+            NamedTestCaseStringVariableValueRequest(
                 name="response", value="Mock response for: " + str(input_dict.get("query", ""))
             )
         ]
