@@ -949,5 +949,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         is_required = not has_default and not is_optional
         return is_required
 
+    def _is_node_invalid(self, node: Type[BaseNode]) -> bool:
+        """Check if a node failed to serialize and should be considered invalid."""
+        return node in self.display_context.invalid_nodes
+
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
