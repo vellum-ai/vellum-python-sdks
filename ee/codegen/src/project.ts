@@ -1,3 +1,4 @@
+import child_process from "child_process";
 import { mkdir, writeFile } from "fs/promises";
 import * as path from "path";
 import { join } from "path";
@@ -177,7 +178,7 @@ ${errors.slice(0, 3).map((err) => {
     return this.workflowContext.modulePath.slice(0, -1);
   }
 
-  public async generateCode(): Promise<void> {
+  public async generateCode(originalArtifactFile?: string): Promise<void> {
     const absolutePathToModuleDirectory = join(
       this.workflowContext.absolutePathToOutputDirectory,
       ...this.getModulePath()
@@ -232,9 +233,144 @@ ${errors.slice(0, 3).map((err) => {
       this.writeAdditionalFiles(),
     ]);
 
+    // Code merge logic - copied from codegen-service
+    const pythonCodeMergeableNodeFiles = this.getPythonCodeMergeableNodeFiles();
+    const shouldEnableCodeMerge = pythonCodeMergeableNodeFiles.size > 0;
+
+    if (shouldEnableCodeMerge && originalArtifactFile) {
+      const originalFileMap = await this.getOriginalFileMap(
+        originalArtifactFile
+      );
+
+      const filteredOriginalFileMap = Object.fromEntries(
+        Object.entries(originalFileMap).filter(([filePath]) =>
+          pythonCodeMergeableNodeFiles.has(filePath)
+        )
+      );
+
+      const generatedFiles: Record<string, string> = {};
+
+      try {
+        const codeMergeResult = await this.runProcess({
+          inputData: {
+            originalFileMap: filteredOriginalFileMap,
+            generatedFileMap: generatedFiles,
+          },
+          command:
+            process.env.NODE_ENV === "development"
+              ? "venv/bin/python"
+              : "python",
+          args: ["python_file_merging/merge_cli.py"],
+        });
+
+        if (typeof codeMergeResult !== "object") {
+          throw new Error(
+            `Code merge result returned an invalid response: ${codeMergeResult}`
+          );
+        }
+
+        // Code merge completed successfully
+      } catch (error) {
+        console.error("Code merge failed:", error);
+      }
+    }
+
     // error.log - this gets generated separately from the other files because it
     // collects errors raised by the rest of the codegen process
     await this.generateErrorLogFile().persist();
+  }
+
+  private runProcess = <INPUT, OUTPUT>({
+    inputData,
+    command,
+    args,
+  }: {
+    inputData: INPUT;
+    command: string;
+    args: string[];
+  }): Promise<OUTPUT> => {
+    return new Promise((resolve, reject) => {
+      try {
+        let errorOutput = "";
+        let output = "";
+
+        const proc = child_process.spawn(command, args, {
+          stdio: ["pipe", "pipe", "pipe"],
+          env: {
+            PYTHONPATH: ".",
+            PATH: process.env.PATH,
+          },
+        });
+
+        const timer = setTimeout(() => {
+          if (proc.exitCode === null) {
+            proc.kill();
+          }
+        }, 120 * 1000);
+
+        proc.stdout.on("data", (data) => {
+          output += data.toString();
+        });
+
+        proc.on("error", (err) => {
+          reject(`Process failed to start: ${err}`);
+        });
+
+        proc.stderr.on("data", (data) => {
+          errorOutput += data.toString();
+        });
+
+        proc.on("exit", (code) => {
+          try {
+            clearTimeout(timer);
+
+            if (code !== 0) {
+              reject(
+                `Error merging code, exit code ${code} output:\n ${errorOutput} ${output}`
+              );
+            } else {
+              resolve(JSON.parse(output));
+            }
+          } catch (e) {
+            reject(e);
+          }
+        });
+
+        if (proc.exitCode === null) {
+          proc.stdin.write(
+            JSON.stringify(inputData) + "\n--vellum-input-stop--\n"
+          );
+          proc.stdin.end();
+        }
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+
+  private async getOriginalFileMap(
+    fileName?: string
+  ): Promise<Record<string, string>> {
+    if (!fileName) {
+      return {};
+    }
+
+    try {
+      // TODO: Implement readTarFiles and getStorageObjectStream utilities
+      console.warn(
+        "Original artifact file processing not yet implemented:",
+        fileName
+      );
+      return {};
+    } catch (e) {
+      console.warn(
+        "Failed to get original artifact file",
+        fileName,
+        "Error:",
+        e
+      );
+      return {};
+    }
   }
 
   private generateRootInitFile(): InitFile {
