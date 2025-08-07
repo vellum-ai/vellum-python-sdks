@@ -265,38 +265,42 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                         mcpServerFunction.url
                       ),
                     }),
-                    python.methodArgument({
-                      name: "authorization_type",
-                      value: python.reference({
-                        name: "AuthorizationType",
-                        modulePath: [
-                          ...this.workflowContext.sdkModulePathNames
-                            .WORKFLOWS_MODULE_PATH,
-                          "constants",
-                        ],
-                        attribute: [mcpServerFunction.authorization_type],
-                      }),
-                    }),
                   ];
 
-                  if (
-                    mcpServerFunction.authorization_type === "BEARER_TOKEN" &&
-                    mcpServerFunction.bearer_token_value
-                  ) {
+                  if (mcpServerFunction.authorization_type) {
                     arguments_.push(
                       python.methodArgument({
-                        name: "bearer_token_value",
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor: {
-                            type: "ENVIRONMENT_VARIABLE",
-                            environmentVariable:
-                              mcpServerFunction.bearer_token_value,
-                          },
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
+                        name: "authorization_type",
+                        value: python.reference({
+                          name: "AuthorizationType",
+                          modulePath: [
+                            ...this.workflowContext.sdkModulePathNames
+                              .WORKFLOWS_MODULE_PATH,
+                            "constants",
+                          ],
+                          attribute: [mcpServerFunction.authorization_type],
                         }),
                       })
                     );
+                  }
+
+                  if (mcpServerFunction.authorization_type === "BEARER_TOKEN") {
+                    if (mcpServerFunction.bearer_token_value) {
+                      arguments_.push(
+                        python.methodArgument({
+                          name: "bearer_token_value",
+                          value: new WorkflowValueDescriptor({
+                            workflowValueDescriptor: {
+                              type: "ENVIRONMENT_VARIABLE",
+                              environmentVariable:
+                                mcpServerFunction.bearer_token_value,
+                            },
+                            nodeContext: this.nodeContext,
+                            workflowContext: this.workflowContext,
+                          }),
+                        })
+                      );
+                    }
                   }
 
                   if (

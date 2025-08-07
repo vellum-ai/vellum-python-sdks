@@ -227,6 +227,30 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > mcp server > should generate mcp server with no authorization type 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.types.definition import MCPServer
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [MCPServer(name="github", url="https://api.githubcopilot.com/mcp/")]
+"
+`;
+
+exports[`ToolCallingNode > mcp server > should generate mcp server with null authorization type 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.types.definition import MCPServer
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [MCPServer(name="github", url="https://api.githubcopilot.com/mcp/")]
+"
+`;
+
 exports[`ToolCallingNode > workflow deployment > should generate latest release tag if release_tag is null 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
