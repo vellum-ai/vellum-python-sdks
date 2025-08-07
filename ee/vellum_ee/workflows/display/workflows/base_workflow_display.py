@@ -193,7 +193,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             try:
                 serialized_node = node_display.serialize(self.display_context)
             except (NotImplementedError, NodeValidationError) as e:
-                self.display_context.add_error(e)
+                self.display_context.add_error(e, node)
                 continue
 
             serialized_nodes[node_display.node_id] = serialized_node
@@ -319,6 +319,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Add an edge for each edge in the workflow
         for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
             unadorned_target_node = get_unadorned_node(target_node)
+            # Skip edges to invalid nodes
+            if self._is_node_invalid(unadorned_target_node):
+                continue
+
             target_node_display = self.display_context.node_displays[unadorned_target_node]
             edges.append(
                 {
@@ -334,6 +338,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
             unadorned_source_node_port = get_unadorned_port(source_node_port)
             unadorned_target_node = get_unadorned_node(target_node)
+
+            # Skip edges that reference invalid nodes
+            if self._is_node_invalid(unadorned_target_node) or self._is_node_invalid(
+                unadorned_source_node_port.node_class
+            ):
+                continue
 
             source_node_port_display = self.display_context.port_displays[unadorned_source_node_port]
             target_node_display = self.display_context.node_displays[unadorned_target_node]
