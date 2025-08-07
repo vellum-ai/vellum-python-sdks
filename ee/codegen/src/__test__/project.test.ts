@@ -5464,6 +5464,439 @@ baz = foo + bar
     });
   });
 
+  it("should generate correct tool calling init file with multi-level module path", async () => {
+    const displayData = {
+      workflow_raw_data: {
+        edges: [
+          {
+            type: "DEFAULT",
+            id: "9332ff7d-1047-40b2-952a-d1083fac59d6",
+            source_node_id: "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+            source_handle_id: "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+            target_node_id: "035842e0-34ed-43af-97de-a706e40912ae",
+            target_handle_id: "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
+          },
+          {
+            type: "DEFAULT",
+            id: "5dadd13c-7723-4d26-ba81-d59b82db1b37",
+            source_node_id: "035842e0-34ed-43af-97de-a706e40912ae",
+            source_handle_id: "72157fce-fc16-44d8-a00d-506738a20730",
+            target_node_id: "2c368766-015e-4d2f-8f57-01937038a4b2",
+            target_handle_id: "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+          },
+        ],
+        nodes: [
+          {
+            id: "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint Node",
+              source_handle_id: "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+            },
+            inputs: [],
+            display_data: { position: { x: 0, y: -50 } },
+            base: null,
+            definition: null,
+          },
+          {
+            id: "035842e0-34ed-43af-97de-a706e40912ae",
+            label: "ToolCallingNode",
+            type: "GENERIC",
+            base: {
+              name: "ToolCallingNode",
+              module: [
+                "vellum",
+                "workflows",
+                "nodes",
+                "displayable",
+                "tool_calling_node",
+                "node",
+              ],
+            },
+            definition: {
+              name: "ToolCallingNode",
+              module: [
+                "src",
+                "testsubworkflowtoolcallingnode",
+                "nodes",
+                "tool_calling_node",
+              ],
+            },
+            display_data: { position: { x: 200, y: -50 } },
+            trigger: {
+              id: "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            ports: [
+              {
+                id: "72157fce-fc16-44d8-a00d-506738a20730",
+                name: "default",
+                type: "DEFAULT",
+              },
+            ],
+            adornments: null,
+            attributes: [
+              {
+                id: "df3761db-067a-4fe9-9fc3-ba270786fcf6",
+                name: "ml_model",
+                value: {
+                  type: "CONSTANT_VALUE",
+                  value: { type: "STRING", value: "gpt-4o-mini" },
+                },
+              },
+              {
+                id: "0079b429-3b1c-4f7c-9ccf-185ace4dcbb2",
+                name: "functions",
+                value: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "JSON",
+                    value: [
+                      {
+                        name: "FunctionTest",
+                        type: "INLINE_WORKFLOW",
+                        description: "a testing function",
+                        exec_config: {
+                          input_variables: [],
+                          state_variables: [],
+                          output_variables: [
+                            {
+                              id: "4ad75353-5845-4212-b4b1-db7193dacaac",
+                              key: "final_output",
+                              type: "STRING",
+                            },
+                          ],
+                          workflow_raw_data: {
+                            edges: [
+                              {
+                                id: "ee2bd7a2-c4db-4778-b1cf-b85de7e187a0",
+                                type: "DEFAULT",
+                                source_node_id:
+                                  "32fbca40-5f46-4b55-96c3-f05b4a9071e5",
+                                target_node_id:
+                                  "195cd69d-3d2d-41e4-a432-16c433cb8d34",
+                                source_handle_id:
+                                  "911c0ca6-80c4-4475-b7dc-4c7400082cff",
+                                target_handle_id:
+                                  "a5298668-d808-4a45-a62e-790943948e8a",
+                              },
+                              {
+                                id: "c7232331-a7dd-41a1-82de-e89af0edaabc",
+                                type: "DEFAULT",
+                                source_node_id:
+                                  "195cd69d-3d2d-41e4-a432-16c433cb8d34",
+                                target_node_id:
+                                  "eb4f0a74-c3d0-4c08-b91a-70e43e667fe9",
+                                source_handle_id:
+                                  "9a9e4ef6-febf-4093-a515-217bbb1373db",
+                                target_handle_id:
+                                  "ff540c66-cd0d-41a7-a6a5-7ba45212f2d3",
+                              },
+                            ],
+                            nodes: [
+                              {
+                                id: "32fbca40-5f46-4b55-96c3-f05b4a9071e5",
+                                base: null,
+                                data: {
+                                  label: "Entrypoint Node",
+                                  source_handle_id:
+                                    "911c0ca6-80c4-4475-b7dc-4c7400082cff",
+                                },
+                                type: "ENTRYPOINT",
+                                inputs: [],
+                                definition: null,
+                                display_data: { position: { x: 0, y: -50 } },
+                              },
+                              {
+                                id: "195cd69d-3d2d-41e4-a432-16c433cb8d34",
+                                base: {
+                                  name: "BaseNode",
+                                  module: [
+                                    "vellum",
+                                    "workflows",
+                                    "nodes",
+                                    "bases",
+                                    "base",
+                                  ],
+                                },
+                                type: "GENERIC",
+                                label: "MyAdditionNode",
+                                ports: [
+                                  {
+                                    id: "9a9e4ef6-febf-4093-a515-217bbb1373db",
+                                    name: "default",
+                                    type: "DEFAULT",
+                                  },
+                                ],
+                                outputs: [
+                                  {
+                                    id: "3d8e40cb-2aa8-44bd-ae6a-708a9fbc4779",
+                                    name: "result",
+                                    type: "NUMBER",
+                                    value: null,
+                                  },
+                                ],
+                                trigger: {
+                                  id: "a5298668-d808-4a45-a62e-790943948e8a",
+                                  merge_behavior: "AWAIT_ATTRIBUTES",
+                                },
+                                adornments: null,
+                                attributes: [
+                                  {
+                                    id: "aed3bcbb-d243-4a77-bb5e-409e9a28e868",
+                                    name: "arg1",
+                                    value: {
+                                      type: "CONSTANT_VALUE",
+                                      value: { type: "JSON", value: null },
+                                    },
+                                  },
+                                ],
+                                definition: {
+                                  name: "MyAdditionNode",
+                                  module: [
+                                    "src",
+                                    "testsubworkflowtoolcallingnode",
+                                    "nodes",
+                                    "tool_calling_node",
+                                    "function_test",
+                                    "nodes",
+                                    "my_addition",
+                                  ],
+                                },
+                                display_data: { position: { x: 200, y: -50 } },
+                              },
+                              {
+                                id: "eb4f0a74-c3d0-4c08-b91a-70e43e667fe9",
+                                base: {
+                                  name: "FinalOutputNode",
+                                  module: [
+                                    "vellum",
+                                    "workflows",
+                                    "nodes",
+                                    "displayable",
+                                    "final_output_node",
+                                    "node",
+                                  ],
+                                },
+                                data: {
+                                  name: "final_output",
+                                  label: "Final Output1",
+                                  output_id:
+                                    "d4ccb8a1-3a3a-4796-b819-659cb7840208",
+                                  output_type: "STRING",
+                                  node_input_id:
+                                    "5f0e8e8b-5382-4b40-9bf7-a75846cfa4a4",
+                                  target_handle_id:
+                                    "ff540c66-cd0d-41a7-a6a5-7ba45212f2d3",
+                                },
+                                type: "TERMINAL",
+                                inputs: [
+                                  {
+                                    id: "5f0e8e8b-5382-4b40-9bf7-a75846cfa4a4",
+                                    key: "node_input",
+                                    value: {
+                                      rules: [
+                                        {
+                                          data: {
+                                            node_id:
+                                              "195cd69d-3d2d-41e4-a432-16c433cb8d34",
+                                            output_id:
+                                              "3d8e40cb-2aa8-44bd-ae6a-708a9fbc4779",
+                                          },
+                                          type: "NODE_OUTPUT",
+                                        },
+                                      ],
+                                      combinator: "OR",
+                                    },
+                                  },
+                                ],
+                                outputs: [
+                                  {
+                                    id: "d4ccb8a1-3a3a-4796-b819-659cb7840208",
+                                    name: "value",
+                                    type: "STRING",
+                                    value: {
+                                      type: "NODE_OUTPUT",
+                                      node_id:
+                                        "195cd69d-3d2d-41e4-a432-16c433cb8d34",
+                                      node_output_id:
+                                        "3d8e40cb-2aa8-44bd-ae6a-708a9fbc4779",
+                                    },
+                                  },
+                                ],
+                                definition: {
+                                  name: "FinalOutput1",
+                                  module: [
+                                    "src",
+                                    "testsubworkflowtoolcallingnode",
+                                    "nodes",
+                                    "tool_calling_node",
+                                    "function_test",
+                                    "nodes",
+                                    "final_output",
+                                  ],
+                                },
+                                display_data: { position: { x: 400, y: -50 } },
+                              },
+                            ],
+                            definition: {
+                              name: "FunctionTest",
+                              module: [
+                                "src",
+                                "testsubworkflowtoolcallingnode",
+                                "nodes",
+                                "tool_calling_node",
+                                "function_test",
+                                "workflow",
+                              ],
+                            },
+                            display_data: { viewport: { x: 0, y: 0, zoom: 1 } },
+                            output_values: [
+                              {
+                                value: {
+                                  type: "NODE_OUTPUT",
+                                  node_id:
+                                    "eb4f0a74-c3d0-4c08-b91a-70e43e667fe9",
+                                  node_output_id:
+                                    "d4ccb8a1-3a3a-4796-b819-659cb7840208",
+                                },
+                                output_variable_id:
+                                  "4ad75353-5845-4212-b4b1-db7193dacaac",
+                              },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+            outputs: [
+              {
+                id: "c18a8725-21e1-4736-a77c-76d0fc035176",
+                name: "text",
+                type: "STRING",
+                value: null,
+              },
+              {
+                id: "5a9ad073-c670-43d2-9198-a08e9fdda7ad",
+                name: "chat_history",
+                type: "CHAT_HISTORY",
+                value: null,
+              },
+            ],
+          },
+          {
+            id: "2c368766-015e-4d2f-8f57-01937038a4b2",
+            type: "TERMINAL",
+            data: {
+              label: "Final Output",
+              name: "final_output",
+              target_handle_id: "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+              output_id: "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+              output_type: "STRING",
+              node_input_id: "287431be-000d-498d-9dd0-b8dddbce5a5a",
+            },
+            inputs: [
+              {
+                id: "287431be-000d-498d-9dd0-b8dddbce5a5a",
+                key: "node_input",
+                value: {
+                  rules: [
+                    {
+                      type: "NODE_OUTPUT",
+                      data: {
+                        node_id: "035842e0-34ed-43af-97de-a706e40912ae",
+                        output_id: "c18a8725-21e1-4736-a77c-76d0fc035176",
+                      },
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              },
+            ],
+            display_data: { position: { x: 400, y: -50 } },
+            base: null,
+            definition: {
+              name: "FinalOutput",
+              module: [
+                "src",
+                "testsubworkflowtoolcallingnode",
+                "nodes",
+                "final_output",
+              ],
+            },
+            trigger: {
+              id: "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+              merge_behavior: "AWAIT_ANY",
+            },
+            outputs: [
+              {
+                id: "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+                name: "value",
+                type: "STRING",
+                value: {
+                  type: "NODE_OUTPUT",
+                  node_id: "035842e0-34ed-43af-97de-a706e40912ae",
+                  node_output_id: "c18a8725-21e1-4736-a77c-76d0fc035176",
+                },
+              },
+            ],
+          },
+        ],
+        definition: {
+          name: "Workflow",
+          module: ["src", "testsubworkflowtoolcallingnode", "workflow"],
+        },
+        display_data: {
+          viewport: {
+            x: 66.36363636363637,
+            y: 235.89577992506412,
+            zoom: 1.4395582725300728,
+          },
+        },
+        output_values: [
+          {
+            output_variable_id: "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+            value: {
+              type: "NODE_OUTPUT",
+              node_id: "2c368766-015e-4d2f-8f57-01937038a4b2",
+              node_output_id: "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+            },
+          },
+        ],
+      },
+      input_variables: [],
+      output_variables: [
+        {
+          id: "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+          key: "final_output",
+          type: "STRING",
+        },
+      ],
+      packages: [],
+    };
+
+    const project = new WorkflowProjectGenerator({
+      absolutePathToOutputDirectory: tempDir,
+      workflowVersionExecConfigData: displayData,
+      moduleName: "src.testsubworkflowtoolcallingnode",
+      vellumApiKey: "<TEST_API_KEY>",
+    });
+
+    await project.generateCode();
+
+    expectProjectFileToMatchSnapshot([
+      "src",
+      "testsubworkflowtoolcallingnode",
+      "nodes",
+      "tool_calling_node",
+      "function_test",
+      "__init__.py",
+    ]);
+  });
+
   describe("module data with additional files", () => {
     const displayData = {
       workflow_raw_data: {
