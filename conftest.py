@@ -25,17 +25,34 @@ def pytest_collection_modifyitems(session, config, items):
 
 # To avoid 429 errors from the Monitoring API during tests
 @pytest.fixture(scope="session", autouse=True)
-def disable_workflow_monitoring() -> Generator[None, None, None]:
-    """Disable external workflow monitoring network calls during tests."""
-    prev = os.environ.get("VELLUM_ENABLE_WORKFLOW_MONITORING")
-    os.environ["VELLUM_ENABLE_WORKFLOW_MONITORING"] = "0"
+def mock_vellum_emitter_requests() -> Generator[None, None, None]:
+    """Mock only the VellumEmitter network requests (v1/events) to prevent real HTTP calls.
+
+    This keeps emitters enabled for tests that rely on them, while ensuring we don't hit the network.
+    """
+    from unittest.mock import Mock, patch
+
+    from vellum.client.core import http_client as http_client_module
+
+    original_request = http_client_module.HttpClient.request
+
+    def _request_wrapper(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        path = kwargs.get("path") if "path" in kwargs else (args[0] if len(args) > 0 else None)
+        if path == "v1/events":
+            mock_response = Mock()
+            mock_response.raise_for_status.return_value = None
+            mock_response.status_code = 200
+            mock_response.text = ""
+            mock_response.headers = {}
+            return mock_response
+        return original_request(self, *args, **kwargs)
+
+    patcher = patch("vellum.client.core.http_client.HttpClient.request", autospec=True, side_effect=_request_wrapper)
+    patcher.start()
     try:
         yield
     finally:
-        if prev is None:
-            os.environ.pop("VELLUM_ENABLE_WORKFLOW_MONITORING", None)
-        else:
-            os.environ["VELLUM_ENABLE_WORKFLOW_MONITORING"] = prev
+        patcher.stop()
 
 
 @pytest.fixture(scope="session", autouse=True)

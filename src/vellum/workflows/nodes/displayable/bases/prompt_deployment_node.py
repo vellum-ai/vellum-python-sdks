@@ -61,9 +61,6 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
 
     def _get_prompt_event_stream(self, ml_model_fallback: Optional[str] = None) -> Iterator[ExecutePromptEvent]:
         execution_context = get_execution_context()
-        # Fallback to the context's execution context if no parent context is set in thread-local.
-        if execution_context.parent_context is None:
-            execution_context = self._context.execution_context
         request_options = self.request_options or RequestOptions()
         request_options["additional_body_parameters"] = {
             "execution_context": execution_context.model_dump(mode="json"),
