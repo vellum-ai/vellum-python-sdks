@@ -611,7 +611,7 @@ class WorkflowRunner(Generic[StateType]):
         return None
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
-        workflow_version_exec_config = self.workflow.__class__.__serialize__()
+        workflow_version_exec_config = self.workflow.__class__.serialize()
         return WorkflowExecutionInitiatedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,

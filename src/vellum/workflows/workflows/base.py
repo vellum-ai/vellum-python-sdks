@@ -637,7 +637,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         return state_class(**state)
 
     @classmethod
-    def __serialize__(cls):
+    def serialize(cls):
         # Override by base workflow display
         return None
 
