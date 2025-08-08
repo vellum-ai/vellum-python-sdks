@@ -11,7 +11,7 @@ import {
   VellumError,
   VellumImage,
   VellumValue as VellumVariableValueType,
-  VellumVideo,
+  // VellumVideo,
 } from "vellum-ai/api";
 
 import { ChatMessageContent } from "./chat-message-content";
@@ -241,23 +241,28 @@ class AudioVellumValue extends AstNode {
 class VideoVellumValue extends AstNode {
   private astNode: python.AstNode;
 
-  public constructor(value: VellumVideo) {
+  public constructor(value: unknown) {
+    // VellumVideo) {
     super();
     this.astNode = this.generateAstNode(value);
   }
 
-  private generateAstNode(value: VellumVideo): AstNode {
+  private generateAstNode(value: unknown): AstNode {
+    // VellumVideo): AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
+        // @ts-ignore
         value: python.TypeInstantiation.str(value.src),
       }),
     ];
 
+    // @ts-ignore
     if (!isNil(value.metadata)) {
       arguments_.push(
         python.methodArgument({
           name: "metadata",
+          // @ts-ignore
           value: new Json(value.metadata),
         })
       );
@@ -582,7 +587,9 @@ export class VellumValue extends AstNode {
       case "AUDIO":
         this.astNode = new AudioVellumValue(vellumValue.value);
         break;
+      // @ts-expect-error
       case "VIDEO":
+        // @ts-expect-error
         this.astNode = new VideoVellumValue(vellumValue.value);
         break;
       case "IMAGE":
