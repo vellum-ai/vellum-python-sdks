@@ -284,23 +284,24 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     );
                   }
 
-                  if (mcpServerFunction.authorization_type === "BEARER_TOKEN") {
-                    if (mcpServerFunction.bearer_token_value) {
-                      arguments_.push(
-                        python.methodArgument({
-                          name: "bearer_token_value",
-                          value: new WorkflowValueDescriptor({
-                            workflowValueDescriptor: {
-                              type: "ENVIRONMENT_VARIABLE",
-                              environmentVariable:
-                                mcpServerFunction.bearer_token_value,
-                            },
-                            nodeContext: this.nodeContext,
-                            workflowContext: this.workflowContext,
-                          }),
-                        })
-                      );
-                    }
+                  if (
+                    mcpServerFunction.authorization_type === "BEARER_TOKEN" &&
+                    mcpServerFunction.bearer_token_value
+                  ) {
+                    arguments_.push(
+                      python.methodArgument({
+                        name: "bearer_token_value",
+                        value: new WorkflowValueDescriptor({
+                          workflowValueDescriptor: {
+                            type: "ENVIRONMENT_VARIABLE",
+                            environmentVariable:
+                              mcpServerFunction.bearer_token_value,
+                          },
+                          nodeContext: this.nodeContext,
+                          workflowContext: this.workflowContext,
+                        }),
+                      })
+                    );
                   }
 
                   if (
