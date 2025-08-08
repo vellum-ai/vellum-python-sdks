@@ -137,7 +137,6 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 )
 
     def _build_graph(self) -> None:
-        # Create the prompt node (handles prompt logic only)
         self.tool_prompt_node = create_tool_prompt_node(
             ml_model=self.ml_model,
             blocks=self.blocks,
@@ -153,7 +152,6 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             tool_prompt_node=self.tool_prompt_node,
         )
 
-        # Create function nodes that reference the tool prompt node's outputs
         self._function_nodes = {}
         for function in self.functions:
             if isinstance(function, MCPServer):
@@ -173,22 +171,19 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                     tool_prompt_node=self.tool_prompt_node,
                 )
 
-        graph_set = set()
+        graph: Graph = self.tool_prompt_node >> self.router_node
 
-        graph_set.add(self.tool_prompt_node >> self.router_node)
-
-        # Add connections from router to function nodes and back to router node
         for function_name, FunctionNodeClass in self._function_nodes.items():
             router_port = getattr(self.router_node.Ports, function_name)
-            edge_graph = router_port >> FunctionNodeClass >> self.router_node
-            graph_set.add(edge_graph)
+            function_subgraph = router_port >> FunctionNodeClass >> self.router_node
+            graph._extend_edges(function_subgraph.edges)
 
         else_node = create_else_node(self.tool_prompt_node)
-        default_port = self.router_node.Ports.default >> {
+        default_port_graph = self.router_node.Ports.default >> {
             else_node.Ports.loop_to_router >> self.router_node,  # More outputs to process
             else_node.Ports.loop_to_prompt >> self.tool_prompt_node,  # Need new prompt iteration
             else_node.Ports.end,  # Finished
         }
-        graph_set.add(default_port)
+        graph._extend_edges(default_port_graph.edges)
 
-        self._graph = Graph.from_set(graph_set)
+        self._graph = graph

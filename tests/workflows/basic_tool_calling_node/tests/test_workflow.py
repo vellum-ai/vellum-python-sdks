@@ -76,7 +76,6 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
     first_call_input_id_2 = uuid4_generator()
     second_call_input_id = uuid4_generator()
     second_call_input_id_2 = uuid4_generator()
-    # Add extra UUID calls for the new tool calling architecture
     uuid4_generator()
     uuid4_generator()
 

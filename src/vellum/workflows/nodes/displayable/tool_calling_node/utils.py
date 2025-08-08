@@ -47,7 +47,6 @@ class FunctionCallNodeMixin:
 
     def _extract_function_arguments(self) -> dict:
         """Extract arguments from function call output."""
-        # Access state through self (the mixin will be used with BaseNode subclasses)
         current_index = getattr(self, "state").current_prompt_output_index
         if self.function_call_output and len(self.function_call_output) > current_index:
             function_call = self.function_call_output[current_index]
