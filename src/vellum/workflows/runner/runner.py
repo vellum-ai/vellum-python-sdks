@@ -611,7 +611,7 @@ class WorkflowRunner(Generic[StateType]):
         return None
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
-        serialized_workflow_data = self.workflow.__class__.__serialize__()
+        workflow_version_exec_config = self.workflow.__class__.__serialize__()
         return WorkflowExecutionInitiatedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
@@ -619,7 +619,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
-                serialized_workflow_data=serialized_workflow_data,
+                workflow_version_exec_config=workflow_version_exec_config,
             ),
             parent=self._execution_context.parent_context,
         )

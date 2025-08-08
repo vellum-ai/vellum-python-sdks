@@ -70,7 +70,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                 body=WorkflowExecutionInitiatedBody(
                     workflow_definition=MockWorkflow,
                     inputs=MockInputs(foo="bar"),
-                    serialized_workflow_data={
+                    workflow_version_exec_config={
                         "workflow_raw_data": {
                             "nodes": [
                                 {
@@ -233,7 +233,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "inputs": {"foo": "bar"},
                     "display_context": None,
                     "initial_state": None,
-                    "serialized_workflow_data": {
+                    "workflow_version_exec_config": {
                         "workflow_raw_data": {
                             "nodes": [
                                 {
