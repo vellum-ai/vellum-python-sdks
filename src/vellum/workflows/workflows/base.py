@@ -240,11 +240,15 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         store: Optional[Store] = None,
     ):
         self._parent_state = parent_state
-        self.emitters = emitters or (self.emitters if hasattr(self, "emitters") else [])
-        self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._context = context or WorkflowContext()
+        self.emitters = emitters or self._context.get_emitters_for_workflow()
+        self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._store = store or Store()
         self._execution_context = self._context.execution_context
+
+        # Register context with all emitters
+        for emitter in self.emitters:
+            emitter.register_context(self._context)
 
         self.validate()
 
@@ -413,7 +417,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             last_event = event
 
         if not last_event:
-            return WorkflowExecutionRejectedEvent(
+            rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
                 body=WorkflowExecutionRejectedBody(
@@ -424,9 +428,10 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     workflow_definition=self.__class__,
                 ),
             )
+            return rejected_event
 
         if not first_event:
-            return WorkflowExecutionRejectedEvent(
+            rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
                 body=WorkflowExecutionRejectedBody(
@@ -437,6 +442,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                     workflow_definition=self.__class__,
                 ),
             )
+            return rejected_event
 
         if (
             last_event.name == "workflow.execution.rejected"
@@ -445,7 +451,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         ):
             return last_event
 
-        return WorkflowExecutionRejectedEvent(
+        rejected_event = WorkflowExecutionRejectedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=first_event.span_id,
             body=WorkflowExecutionRejectedBody(
@@ -456,6 +462,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
                 ),
             ),
         )
+        return rejected_event
 
     def stream(
         self,

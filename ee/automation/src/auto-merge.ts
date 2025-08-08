@@ -55,7 +55,7 @@ const main = async () => {
   console.log(`PR #${PR_NUMBER} is open, has release label, and was opened by authorized user (${pr.user?.login}), waiting for checks...`);
 
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < MAX_WAIT_TIME) {
     try {
       const { data: checkRuns } = await octokit.rest.checks.listForRef({
@@ -80,13 +80,13 @@ const main = async () => {
 
       const pendingChecks = checks.filter(check => check.status !== 'completed');
       if (pendingChecks.length > 0) {
-        console.log(`Waiting for ${pendingChecks.length} checks to complete:`, 
+        console.log(`Waiting for ${pendingChecks.length} checks to complete:`,
           pendingChecks.map(c => c.name).join(', '));
         await sleep(POLL_INTERVAL);
         continue;
       }
 
-      const failedChecks = checks.filter(check => 
+      const failedChecks = checks.filter(check =>
         check.conclusion !== 'success' && check.conclusion !== 'neutral' && check.conclusion !== 'skipped'
       );
 

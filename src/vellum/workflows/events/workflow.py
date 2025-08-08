@@ -41,6 +41,17 @@ class _BaseWorkflowEvent(BaseEvent):
     def workflow_definition(self) -> Type["BaseWorkflow"]:
         return self.body.workflow_definition
 
+    @property
+    def monitoring_url(self) -> Optional[str]:
+        """
+        Get the monitoring URL for this workflow execution.
+
+        Returns:
+            The URL to view execution details in Vellum UI, or None if monitoring is disabled
+            or context is not available.
+        """
+        return None
+
 
 class NodeEventDisplayContext(UniversalBaseModel):
     input_display: Dict[str, UUID]
