@@ -11,6 +11,7 @@ import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
 import { StateVariableContext } from "./context/state-variable-context";
+import { getAllFilesInDir } from "./utils/files";
 
 import {
   GENERATED_DISPLAY_MODULE_NAME,
@@ -178,7 +179,9 @@ ${errors.slice(0, 3).map((err) => {
     return this.workflowContext.modulePath.slice(0, -1);
   }
 
-  public async generateCode(originalArtifactFile?: string): Promise<void> {
+  public async generateCode(
+    originalArtifact?: Record<string, string>
+  ): Promise<void> {
     const absolutePathToModuleDirectory = join(
       this.workflowContext.absolutePathToOutputDirectory,
       ...this.getModulePath()
@@ -237,42 +240,8 @@ ${errors.slice(0, 3).map((err) => {
     const pythonCodeMergeableNodeFiles = this.getPythonCodeMergeableNodeFiles();
     const shouldEnableCodeMerge = pythonCodeMergeableNodeFiles.size > 0;
 
-    if (shouldEnableCodeMerge && originalArtifactFile) {
-      const originalFileMap = await this.getOriginalFileMap(
-        originalArtifactFile
-      );
-
-      const filteredOriginalFileMap = Object.fromEntries(
-        Object.entries(originalFileMap).filter(([filePath]) =>
-          pythonCodeMergeableNodeFiles.has(filePath)
-        )
-      );
-
-      const generatedFiles: Record<string, string> = {};
-
-      try {
-        const codeMergeResult = await this.runProcess({
-          inputData: {
-            originalFileMap: filteredOriginalFileMap,
-            generatedFileMap: generatedFiles,
-          },
-          command:
-            process.env.NODE_ENV === "development"
-              ? "venv/bin/python"
-              : "python",
-          args: ["python_file_merging/merge_cli.py"],
-        });
-
-        if (typeof codeMergeResult !== "object") {
-          throw new Error(
-            `Code merge result returned an invalid response: ${codeMergeResult}`
-          );
-        }
-
-        // Code merge completed successfully
-      } catch (error) {
-        console.error("Code merge failed:", error);
-      }
+    if (shouldEnableCodeMerge && originalArtifact) {
+      await this.mergeFilesWithArtifact(originalArtifact);
     }
 
     // error.log - this gets generated separately from the other files because it
@@ -348,29 +317,65 @@ ${errors.slice(0, 3).map((err) => {
     });
   };
 
-  private async getOriginalFileMap(
-    fileName?: string
-  ): Promise<Record<string, string>> {
-    if (!fileName) {
-      return {};
-    }
+  private async mergeFilesWithArtifact(
+    originalArtifact: Record<string, string>
+  ): Promise<void> {
+    const pythonCodeMergeableNodeFiles = this.getPythonCodeMergeableNodeFiles();
+
+    const filteredOriginalFileMap = Object.fromEntries(
+      Object.entries(originalArtifact).filter(([filePath]) =>
+        pythonCodeMergeableNodeFiles.has(filePath)
+      )
+    );
+
+    const absolutePathToModuleDirectory = join(
+      this.workflowContext.absolutePathToOutputDirectory,
+      ...this.getModulePath()
+    );
+
+    const generatedFiles = await getAllFilesInDir(
+      absolutePathToModuleDirectory
+    );
 
     try {
-      // TODO: Implement readTarFiles and getStorageObjectStream utilities
-      console.warn(
-        "Original artifact file processing not yet implemented:",
-        fileName
+      const codeMergeResult = await this.runProcess({
+        inputData: {
+          originalFileMap: filteredOriginalFileMap,
+          generatedFileMap: generatedFiles,
+        },
+        command:
+          process.env.NODE_ENV === "development" ? "venv/bin/python" : "python",
+        args: ["python_file_merging/merge_cli.py"],
+      });
+
+      if (typeof codeMergeResult !== "object") {
+        throw new Error(
+          `Code merge result returned an invalid response: ${codeMergeResult}`
+        );
+      }
+
+      await this.persistMergedFiles(
+        codeMergeResult as Record<string, string>,
+        absolutePathToModuleDirectory
       );
-      return {};
-    } catch (e) {
-      console.warn(
-        "Failed to get original artifact file",
-        fileName,
-        "Error:",
-        e
-      );
-      return {};
+    } catch (error) {
+      console.error("Code merge failed:", error);
     }
+  }
+
+  private async persistMergedFiles(
+    mergedFiles: Record<string, string>,
+    baseDirectory: string
+  ): Promise<void> {
+    const writePromises = Object.entries(mergedFiles).map(
+      async ([filePath, content]) => {
+        const fullPath = join(baseDirectory, filePath);
+        await mkdir(path.dirname(fullPath), { recursive: true });
+        await writeFile(fullPath, content);
+      }
+    );
+
+    await Promise.all(writePromises);
   }
 
   private generateRootInitFile(): InitFile {
