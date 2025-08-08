@@ -515,8 +515,24 @@ class WorkflowRunner(Generic[StateType]):
 
             all_deps = self._dependencies[node_class]
             node_span_id = node_class.Trigger._queue_node_execution(state, all_deps, invoked_by)
-            if not node_class.Trigger.should_initiate(state, all_deps, node_span_id):
-                return
+
+            try:
+                if not node_class.Trigger.should_initiate(state, all_deps, node_span_id):
+                    return
+            except NodeException as e:
+                execution = get_execution_context()
+
+                self._workflow_event_outer_queue.put(
+                    WorkflowExecutionRejectedEvent(
+                        trace_id=execution.trace_id,
+                        span_id=node_span_id,
+                        body=WorkflowExecutionRejectedBody(
+                            workflow_definition=self.workflow.__class__,
+                            error=e.error,
+                        ),
+                    )
+                )
+                raise e
 
             execution = get_execution_context()
             node = node_class(state=state, context=self.workflow.context)

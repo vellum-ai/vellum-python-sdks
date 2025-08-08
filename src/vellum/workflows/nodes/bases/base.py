@@ -8,6 +8,7 @@ from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, Typ
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.node import NodeExecutionStreamingEvent
@@ -302,7 +303,14 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
                     if not descriptor.instance:
                         continue
 
-                    resolved_value = resolve_value(descriptor.instance, state, path=descriptor.name)
+                    try:
+                        resolved_value = resolve_value(descriptor.instance, state, path=descriptor.name)
+                    except InvalidExpressionException as e:
+                        raise NodeException(
+                            message=str(e),
+                            code=WorkflowErrorCode.INVALID_INPUTS,
+                        ) from e
+
                     if is_unresolved(resolved_value):
                         return False
 
