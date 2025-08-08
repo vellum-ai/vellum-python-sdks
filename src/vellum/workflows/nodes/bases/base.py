@@ -4,7 +4,7 @@ from functools import cached_property, reduce
 import inspect
 from types import MappingProxyType
 from uuid import UUID, uuid4
-from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
+from typing import Any, ClassVar, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -267,6 +267,8 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
     _inputs: MappingProxyType[NodeReference, Any]
+    _enable_monitoring: ClassVar[bool] = False
+    _monitoring_initialized: ClassVar[bool] = False
 
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference
