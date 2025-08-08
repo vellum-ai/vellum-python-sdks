@@ -241,24 +241,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     ):
         self._parent_state = parent_state
         self._context = context or WorkflowContext()
-
-        # Combine explicitly passed emitters with context-provided emitters
-        context_emitters = self._context.get_emitters_for_workflow()
-        class_emitters = self.emitters if hasattr(self, "emitters") else []
-        passed_emitters = emitters or []
-
-        # Merge all emitters, avoiding duplicates by type
-        all_emitters = []
-        emitter_types = set()
-
-        for emitter_list in [context_emitters, class_emitters, passed_emitters]:
-            for emitter in emitter_list:
-                emitter_type = type(emitter)
-                if emitter_type not in emitter_types:
-                    all_emitters.append(emitter)
-                    emitter_types.add(emitter_type)
-
-        self.emitters = all_emitters
+        self.emitters = emitters or self._context.get_emitters_for_workflow()
         self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._store = store or Store()
         self._execution_context = self._context.execution_context

@@ -4,6 +4,7 @@ import sys
 import threading
 import time
 import traceback
+from unittest.mock import Mock, patch
 from uuid import UUID, uuid4
 from typing import Any, Callable, Generator, List
 
@@ -11,6 +12,7 @@ from dotenv import dotenv_values
 from pytest_mock import MockerFixture
 import requests_mock
 
+from vellum.client.core import http_client as http_client_module
 from vellum.client.environment import VellumEnvironment
 from vellum.workflows.logging import load_logger
 
@@ -30,9 +32,6 @@ def mock_vellum_emitter_requests() -> Generator[None, None, None]:
 
     This keeps emitters enabled for tests that rely on them, while ensuring we don't hit the network.
     """
-    from unittest.mock import Mock, patch
-
-    from vellum.client.core import http_client as http_client_module
 
     original_request = http_client_module.HttpClient.request
 
