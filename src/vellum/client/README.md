@@ -95,7 +95,84 @@ except ApiError as e:
     print(e.body)
 ```
 
+## Streaming
+
+The SDK supports streaming responses, as well, the response will be a generator that you can loop over.
+
+```python
+from vellum import (
+    JinjaPromptBlock,
+    PromptParameters,
+    PromptRequestStringInput,
+    Vellum,
+    VellumVariable,
+)
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+response = client.ad_hoc.adhoc_execute_prompt_stream(
+    ml_model="x",
+    input_values=[
+        PromptRequestStringInput(
+            key="x",
+            value="value",
+        ),
+        PromptRequestStringInput(
+            key="x",
+            value="value",
+        ),
+    ],
+    input_variables=[
+        VellumVariable(
+            id="x",
+            key="key",
+            type="STRING",
+        ),
+        VellumVariable(
+            id="x",
+            key="key",
+            type="STRING",
+        ),
+    ],
+    parameters=PromptParameters(),
+    blocks=[
+        JinjaPromptBlock(
+            template="template",
+        ),
+        JinjaPromptBlock(
+            template="template",
+        ),
+    ],
+)
+for chunk in response.data:
+    yield chunk
+```
+
 ## Advanced
+
+### Access Raw Response Data
+
+The SDK provides access to raw response data, including headers, through the `.with_raw_response` property.
+The `.with_raw_response` property returns a "raw" client that can be used to access the `.headers` and `.data` attributes.
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    ...,
+)
+response = client.with_raw_response.execute_prompt(...)
+print(response.headers)  # access the response headers
+print(response.data)  # access the underlying object
+with client.ad_hoc.with_raw_response.adhoc_execute_prompt_stream(
+    ...
+) as response:
+    print(response.headers)  # access the response headers
+    for chunk in response.data:
+        print(chunk)  # access the underlying object(s)
+```
 
 ### Retries
 
