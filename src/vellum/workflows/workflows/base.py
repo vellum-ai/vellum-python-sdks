@@ -643,6 +643,11 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
 
         return state_class(**state)
 
+    @classmethod
+    def serialize(cls):
+        # Override by base workflow display
+        return None
+
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
         workflow_path = f"{module_path}.workflow"
