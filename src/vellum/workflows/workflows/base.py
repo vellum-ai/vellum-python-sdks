@@ -616,10 +616,6 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     def deserialize_state(cls, state: None, workflow_inputs: Optional[InputsType] = None) -> None: ...
 
     @classmethod
-    def __serialize__(cls):
-        return None
-
-    @classmethod
     def deserialize_state(
         cls, state: Optional[dict], workflow_inputs: Optional[InputsType] = None
     ) -> Optional[StateType]:
@@ -639,6 +635,10 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             )
 
         return state_class(**state)
+
+    @classmethod
+    def __serialize__(cls):
+        return None
 
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
