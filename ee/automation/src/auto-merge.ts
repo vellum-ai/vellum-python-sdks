@@ -17,6 +17,10 @@ interface CheckRun {
   name: string;
 }
 
+const isAutoMergeCheck = (checkName: string): boolean => {
+  return checkName.toLowerCase().includes('auto-merge');
+};
+
 const main = async () => {
   if (!SDK_REPO || !PR_NUMBER || !HEAD_SHA) {
     throw new Error('Missing required environment variables: FERN_SDK_REPO, PR_NUMBER, HEAD_SHA');
@@ -66,19 +70,27 @@ const main = async () => {
 
       console.log(`Found ${checkRuns.total_count} check runs`);
 
-      if (checkRuns.total_count === 0) {
-        console.log('No check runs found, waiting...');
-        await sleep(POLL_INTERVAL);
-        continue;
-      }
-
       const checks: CheckRun[] = checkRuns.check_runs.map(run => ({
         status: run.status,
         conclusion: run.conclusion,
         name: run.name,
       }));
 
-      const pendingChecks = checks.filter(check => check.status !== 'completed');
+      const autoMergeChecks = checks.filter(check => isAutoMergeCheck(check.name));
+      if (autoMergeChecks.length > 0) {
+        console.log(`Excluding ${autoMergeChecks.length} auto-merge checks:`, 
+          autoMergeChecks.map(c => c.name).join(', '));
+      }
+
+      if (checkRuns.total_count === 0) {
+        console.log('No check runs found, waiting...');
+        await sleep(POLL_INTERVAL);
+        continue;
+      }
+
+      const pendingChecks = checks.filter(check => 
+        check.status !== 'completed' && !isAutoMergeCheck(check.name)
+      );
       if (pendingChecks.length > 0) {
         console.log(`Waiting for ${pendingChecks.length} checks to complete:`, 
           pendingChecks.map(c => c.name).join(', '));
@@ -87,7 +99,10 @@ const main = async () => {
       }
 
       const failedChecks = checks.filter(check => 
-        check.conclusion !== 'success' && check.conclusion !== 'neutral' && check.conclusion !== 'skipped'
+        check.conclusion !== 'success' && 
+        check.conclusion !== 'neutral' && 
+        check.conclusion !== 'skipped' &&
+        !isAutoMergeCheck(check.name)
       );
 
       if (failedChecks.length > 0) {
