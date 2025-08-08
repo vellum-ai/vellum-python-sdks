@@ -51,7 +51,10 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     final_event = workflow.run()
 
     # AND we wait for the emitter to emit all of the events
-    time.sleep(0.01)
+    deadline = time.time() + 2.0
+    expected_event_count = 10
+    while len(list(emitter.events)) < expected_event_count and time.time() < deadline:
+        time.sleep(0.01)
 
     # THEN the emitter should have emitted all of the expected events
     events = list(emitter.events)
