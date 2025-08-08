@@ -21,7 +21,6 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.stack import Stack
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
-
 # Import for display class registration
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
