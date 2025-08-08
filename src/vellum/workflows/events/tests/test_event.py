@@ -34,6 +34,8 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import VellumSecret
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
 class MockInputs(BaseInputs):
@@ -728,3 +730,20 @@ def test_parent_context__deserialize_from_json__invalid_parent_context():
     assert event.parent.type == "UNKNOWN"
     assert event.parent.span_id == UUID("123e4567-e89b-12d3-a456-426614174000")
     assert event.parent.parent is None
+
+
+def test_workflow_serialization_failure_handling():
+    """Test that workflow serialization failures are handled gracefully."""
+
+    # GIVEN a workflow with a display class that throws an exception during serialization
+    class TestWorkflowDisplay(BaseWorkflowDisplay[MockWorkflow]):
+        def serialize(self) -> dict:
+            raise Exception("Serialization failed")
+
+    register_workflow_display_class(MockWorkflow, TestWorkflowDisplay)
+
+    # WHEN we serialize the workflow that throws an exception
+    result = MockWorkflow.serialize()
+
+    # THEN the serialization should handle the error gracefully
+    assert result is None

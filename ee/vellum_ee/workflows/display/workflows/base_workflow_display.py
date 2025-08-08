@@ -677,7 +677,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Override the workflow class's serialize method to use this display class
         def serialize():
             workflow_display = cls(dry_run=True)
-            return workflow_display.serialize()
+            try:
+                return workflow_display.serialize()
+            except Exception as e:
+                workflow_display.display_context.add_error(e)
+                return None
 
         workflow_class.serialize = serialize
 

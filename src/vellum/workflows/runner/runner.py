@@ -46,7 +46,13 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
+from vellum.workflows.events.types import (
+    BaseEvent,
+    ExternalParentContext,
+    NodeParentContext,
+    ParentContext,
+    WorkflowParentContext,
+)
 from vellum.workflows.events.workflow import (
     WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
@@ -611,7 +617,17 @@ class WorkflowRunner(Generic[StateType]):
         return None
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
-        workflow_version_exec_config = self.workflow.__class__.serialize()
+        def is_subworkflow(workflow: "BaseWorkflow[InputsType, StateType]") -> bool:
+            execution_context = workflow.context.execution_context
+            parent_context = execution_context.parent_context
+
+            if parent_context is None:
+                return False
+
+            return not isinstance(parent_context, ExternalParentContext)
+
+        workflow_version_exec_config = self.workflow.__class__.serialize() if is_subworkflow(self.workflow) else None
+
         return WorkflowExecutionInitiatedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,

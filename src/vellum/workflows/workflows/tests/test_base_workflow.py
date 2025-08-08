@@ -1,15 +1,29 @@
 import pytest
 import logging
 from uuid import UUID, uuid4
+from typing import Iterator, List
 
+from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum.client.types.execute_prompt_event import ExecutePromptEvent
+from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
+from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
+from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+from vellum.client.types.prompt_output import PromptOutput
+from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.stack import Stack
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
+# Import for display class registration
+from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
 class GlobalTestWorkflow(BaseWorkflow):
@@ -684,3 +698,228 @@ def test_base_workflow__deserialize_state_with_invalid_workflow_definition(raw_w
 
     # AND the workflow definition should be BaseWorkflow
     assert state.meta.workflow_definition == BaseWorkflow
+
+
+def test_workflow_version_exec_config_exists__tool_calling_node_inline_workflow(
+    vellum_adhoc_prompt_client, mock_uuid4_generator
+):
+    """
+    Test workflow_version_exec_config without any mocks to see if that's the issue.
+    """
+
+    def generate_prompt_events(*args, **kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"var_1": 1, "var_2": 2},
+                        id="call_123",
+                        name="add_numbers_workflow",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [StringVellumValue(value="The result is 3")]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    # Set up the mock to return our events
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # Define inputs and outputs for the inline workflow
+    class AddNumbersInputs(BaseInputs):
+        var_1: int
+        var_2: int
+
+    # Define a node for the inline workflow
+    class AddNode(BaseNode):
+        var_1 = AddNumbersInputs.var_1
+        var_2 = AddNumbersInputs.var_2
+
+        class Outputs(BaseNode.Outputs):
+            result: int
+
+        def run(self) -> Outputs:
+            return self.Outputs(result=self.var_1 + self.var_2)
+
+    # Define an inline workflow that the tool calling node can call
+    class AddNumbersWorkflow(BaseWorkflow[AddNumbersInputs, BaseState]):
+        """
+        A simple workflow that adds two numbers.
+        """
+
+        graph = AddNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = AddNode.Outputs.result
+
+    # Create a display class for the inline workflow
+    class AddNumbersWorkflowDisplay(BaseWorkflowDisplay[AddNumbersWorkflow]):
+        def serialize(self) -> dict:
+            return {"config": "inline workflow"}
+
+    # Register the display class for the inline workflow
+    register_workflow_display_class(AddNumbersWorkflow, AddNumbersWorkflowDisplay)
+
+    # Define inputs for the main workflow
+    class WorkflowInputs(BaseInputs):
+        query: str
+
+    # Test tool calling node
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="SYSTEM",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            PlainTextPromptBlock(
+                                text="You are a helpful assistant.",
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(
+                                input_variable="question",
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [AddNumbersWorkflow]
+        prompt_inputs = {
+            "question": WorkflowInputs.query,
+        }
+
+    # GIVEN a workflow with just a tool calling node
+    class ToolCallingWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
+        graph = TestToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text: str = TestToolCallingNode.Outputs.text
+            chat_history: List[ChatMessage] = TestToolCallingNode.Outputs.chat_history
+
+    class ToolCallingWorkflowDisplay(BaseWorkflowDisplay[ToolCallingWorkflow]):
+        def serialize(self) -> dict:
+            return {"config": "tool calling workflow"}
+
+    register_workflow_display_class(ToolCallingWorkflow, ToolCallingWorkflowDisplay)
+
+    workflow = ToolCallingWorkflow()
+
+    # WHEN the workflow is executed and we capture all events
+    events = list(workflow.stream(inputs=WorkflowInputs(query="what is 1 + 2"), event_filter=all_workflow_event_filter))
+
+    # AND we should find workflow execution initiated events
+    initiated_events = [event for event in events if event.name == "workflow.execution.initiated"]
+    assert len(initiated_events) == 3  # Main workflow + tool calling internal + inline workflow
+
+    assert initiated_events[0].body.workflow_version_exec_config is None  # Main workflow
+    assert initiated_events[1].body.workflow_version_exec_config is None  # Tool calling internal
+    assert initiated_events[2].body.workflow_version_exec_config == {  # Inline workflow tool
+        "config": "inline workflow"
+    }
+
+
+def test_workflow_version_exec_config_exists__subworkflow_node(vellum_adhoc_prompt_client, mock_uuid4_generator):
+    """
+    Test workflow_version_exec_config for subworkflow nodes without any mocks to see if that's the issue.
+    """
+
+    # Define inputs and outputs for the subworkflow
+    class SubWorkflowInputs(BaseInputs):
+        var_1: int
+        var_2: int
+
+    # Define a node for the subworkflow
+    class AddNode(BaseNode):
+        var_1 = SubWorkflowInputs.var_1
+        var_2 = SubWorkflowInputs.var_2
+
+        class Outputs(BaseNode.Outputs):
+            result: int
+
+        def run(self) -> Outputs:
+            return self.Outputs(result=self.var_1 + self.var_2)
+
+    # Define a subworkflow that adds two numbers
+    class AddNumbersSubWorkflow(BaseWorkflow[SubWorkflowInputs, BaseState]):
+        """
+        A simple subworkflow that adds two numbers.
+        """
+
+        graph = AddNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = AddNode.Outputs.result
+
+    # Create a display class for the subworkflow
+    class AddNumbersSubWorkflowDisplay(BaseWorkflowDisplay[AddNumbersSubWorkflow]):
+        def serialize(self) -> dict:
+            return {"subworkflow": "config"}
+
+    # Register the display class for the subworkflow
+    register_workflow_display_class(AddNumbersSubWorkflow, AddNumbersSubWorkflowDisplay)
+
+    # Define inputs for the main workflow
+    class WorkflowInputs(BaseInputs):
+        var_1: int
+        var_2: int
+
+    # Test subworkflow node
+    class TestSubworkflowNode(InlineSubworkflowNode):
+        subworkflow = AddNumbersSubWorkflow
+        subworkflow_inputs = {
+            "var_1": WorkflowInputs.var_1,
+            "var_2": WorkflowInputs.var_2,
+        }
+
+        class Outputs(InlineSubworkflowNode.Outputs):
+            result = AddNumbersSubWorkflow.Outputs.result
+
+    # GIVEN a workflow with just a subworkflow node
+    class SubworkflowWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
+        graph = TestSubworkflowNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result: int = TestSubworkflowNode.Outputs.result
+
+    # Create a simple display class for the workflow
+    class SubworkflowWorkflowDisplay(BaseWorkflowDisplay[SubworkflowWorkflow]):
+        def serialize(self) -> dict:
+            return {"main": "config"}
+
+    # Register the display class
+    register_workflow_display_class(SubworkflowWorkflow, SubworkflowWorkflowDisplay)
+
+    workflow = SubworkflowWorkflow()
+
+    # WHEN the workflow is executed and we capture all events
+    events = list(workflow.stream(inputs=WorkflowInputs(var_1=1, var_2=2), event_filter=all_workflow_event_filter))
+
+    # AND we should find workflow execution initiated events
+    initiated_events = [event for event in events if event.name == "workflow.execution.initiated"]
+    assert len(initiated_events) == 2  # Main workflow + subworkflow
+
+    assert initiated_events[0].body.workflow_version_exec_config is None  # Main workflow
+    assert initiated_events[1].body.workflow_version_exec_config == {"subworkflow": "config"}  # Subworkflow
