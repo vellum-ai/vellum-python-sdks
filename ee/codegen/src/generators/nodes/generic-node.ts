@@ -265,19 +265,24 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                         mcpServerFunction.url
                       ),
                     }),
-                    python.methodArgument({
-                      name: "authorization_type",
-                      value: python.reference({
-                        name: "AuthorizationType",
-                        modulePath: [
-                          ...this.workflowContext.sdkModulePathNames
-                            .WORKFLOWS_MODULE_PATH,
-                          "constants",
-                        ],
-                        attribute: [mcpServerFunction.authorization_type],
-                      }),
-                    }),
                   ];
+
+                  if (mcpServerFunction.authorization_type) {
+                    arguments_.push(
+                      python.methodArgument({
+                        name: "authorization_type",
+                        value: python.reference({
+                          name: "AuthorizationType",
+                          modulePath: [
+                            ...this.workflowContext.sdkModulePathNames
+                              .WORKFLOWS_MODULE_PATH,
+                            "constants",
+                          ],
+                          attribute: [mcpServerFunction.authorization_type],
+                        }),
+                      })
+                    );
+                  }
 
                   if (
                     mcpServerFunction.authorization_type === "BEARER_TOKEN" &&
