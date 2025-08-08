@@ -135,5 +135,42 @@ describe("Workflow Sandbox", () => {
       const result = await writer.toStringFormatted();
       expect(result).toMatchSnapshot();
     });
+
+    it("should properly handle escaped newlines in input values", async () => {
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "multiline_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      // Create sandbox input with text containing escaped newlines
+      const sandboxInputs: WorkflowSandboxInputs[] = [
+        [
+          {
+            name: inputVariable.key,
+            type: "STRING",
+            value: "First line\nSecond line\nThird line",
+          },
+        ],
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+      expect(result).toMatchSnapshot();
+    });
   });
 });

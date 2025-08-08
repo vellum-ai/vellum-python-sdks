@@ -87,6 +87,27 @@ runner.run()
 "
 `;
 
+exports[`Workflow Sandbox > write > should properly handle escaped newlines in input values 1`] = `
+"from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .workflow import TestWorkflow
+
+if __name__ != "__main__":
+    raise Exception("This file is not meant to be imported")
+
+
+runner = WorkflowSandboxRunner(
+    workflow=TestWorkflow(),
+    inputs=[
+        Inputs(multiline_input="First line\\\\nSecond line\\\\nThird line"),
+    ],
+)
+
+runner.run()
+"
+`;
+
 exports[`Workflow Sandbox > write > should properly handle special characters with escaped quotes 1`] = `
 "from vellum.workflows.sandbox import WorkflowSandboxRunner
 
