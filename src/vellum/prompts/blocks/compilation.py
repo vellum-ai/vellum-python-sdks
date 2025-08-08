@@ -19,6 +19,8 @@ from vellum.client.types.image_vellum_value import ImageVellumValue
 from vellum.client.types.number_input import NumberInput
 from vellum.client.types.vellum_audio import VellumAudio
 from vellum.client.types.vellum_image import VellumImage
+from vellum.client.types.vellum_video import VellumVideo
+from vellum.client.types.video_vellum_value import VideoVellumValue
 from vellum.prompts.blocks.exceptions import PromptCompilationError
 from vellum.prompts.blocks.types import CompiledChatMessagePromptBlock, CompiledPromptBlock, CompiledValuePromptBlock
 from vellum.utils.templating.constants import DEFAULT_JINJA_CUSTOM_FILTERS, DEFAULT_JINJA_GLOBALS
@@ -142,18 +144,6 @@ def compile_prompt_blocks(
             )
             compiled_blocks.append(function_call_block)
 
-        elif block.block_type == "IMAGE":
-            image_block = CompiledValuePromptBlock(
-                content=ImageVellumValue(
-                    value=VellumImage(
-                        src=block.src,
-                        metadata=block.metadata,
-                    ),
-                ),
-                cache_config=block.cache_config,
-            )
-            compiled_blocks.append(image_block)
-
         elif block.block_type == "AUDIO":
             audio_block = CompiledValuePromptBlock(
                 content=AudioVellumValue(
@@ -165,6 +155,30 @@ def compile_prompt_blocks(
                 cache_config=block.cache_config,
             )
             compiled_blocks.append(audio_block)
+
+        elif block.block_type == "VIDEO":
+            video_block = CompiledValuePromptBlock(
+                content=VideoVellumValue(
+                    value=VellumVideo(
+                        src=block.src,
+                        metadata=block.metadata,
+                    ),
+                ),
+                cache_config=block.cache_config,
+            )
+            compiled_blocks.append(video_block)
+
+        elif block.block_type == "IMAGE":
+            image_block = CompiledValuePromptBlock(
+                content=ImageVellumValue(
+                    value=VellumImage(
+                        src=block.src,
+                        metadata=block.metadata,
+                    ),
+                ),
+                cache_config=block.cache_config,
+            )
+            compiled_blocks.append(image_block)
 
         elif block.block_type == "DOCUMENT":
             document_block = CompiledValuePromptBlock(

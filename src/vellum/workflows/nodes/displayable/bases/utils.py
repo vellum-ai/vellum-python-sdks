@@ -28,6 +28,8 @@ from vellum.client.types.string_vellum_value_request import StringVellumValueReq
 from vellum.client.types.vellum_error import VellumError
 from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_value_request import VellumValueRequest
+from vellum.client.types.video_vellum_value import VideoVellumValue
+from vellum.client.types.video_vellum_value_request import VideoVellumValueRequest
 from vellum.workflows.errors.types import WorkflowError, workflow_error_to_vellum_error
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
@@ -35,8 +37,9 @@ VELLUM_VALUE_REQUEST_TUPLE = (
     StringVellumValueRequest,
     NumberVellumValueRequest,
     JsonVellumValueRequest,
-    ImageVellumValueRequest,
     AudioVellumValueRequest,
+    VideoVellumValueRequest,
+    ImageVellumValueRequest,
     FunctionCallVellumValueRequest,
     ErrorVellumValueRequest,
     ArrayVellumValueRequest,
@@ -78,8 +81,9 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
             StringVellumValue,
             NumberVellumValue,
             JsonVellumValue,
-            ImageVellumValue,
             AudioVellumValue,
+            VideoVellumValue,
+            ImageVellumValue,
             FunctionCallVellumValue,
             ErrorVellumValue,
             ArrayVellumValue,
