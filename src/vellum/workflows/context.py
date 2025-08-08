@@ -5,6 +5,7 @@ from uuid import UUID
 from typing import Iterator, Optional, cast
 
 from vellum.client.core import UniversalBaseModel
+from vellum.workflows.events.context import MonitoringContextStore
 from vellum.workflows.events.types import ParentContext
 
 
@@ -17,15 +18,36 @@ _CONTEXT_KEY = "_execution_context"
 
 local = threading.local()
 
+monitoring_context_store = MonitoringContextStore()
+
 
 def get_execution_context() -> ExecutionContext:
-    """Retrieve the current execution context."""
-    return getattr(local, _CONTEXT_KEY, ExecutionContext())
+    """Get the current monitoring execution context, with intelligent fallback."""
+    context = getattr(local, _CONTEXT_KEY, ExecutionContext())
+    if context.parent_context:
+        return context
+
+    # If no thread-local context, try to restore from global store using current trace_id
+    context = monitoring_context_store.retrieve_context()
+    if context and context.parent_context:
+        set_execution_context(context)
+        return context
+    return ExecutionContext()
 
 
 def set_execution_context(context: ExecutionContext) -> None:
-    """Set the current execution context."""
+    """Set the current monitoring execution context and persist it for cross-boundary access."""
     setattr(local, _CONTEXT_KEY, context)
+
+    # Always store in global store for cross-thread access
+    monitoring_context_store.store_context(context)
+
+
+def clear_execution_context() -> None:
+    """Clear the current monitoring execution context."""
+    if hasattr(local, _CONTEXT_KEY):
+        delattr(local, _CONTEXT_KEY)
+    monitoring_context_store.clear_context()
 
 
 def get_parent_context() -> ParentContext:
