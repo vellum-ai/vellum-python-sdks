@@ -70,6 +70,151 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                 body=WorkflowExecutionInitiatedBody(
                     workflow_definition=MockWorkflow,
                     inputs=MockInputs(foo="bar"),
+                    serialized_workflow_data={
+                        "workflow_raw_data": {
+                            "nodes": [
+                                {
+                                    "id": "2af2d891-7d30-43e4-9153-7a397d88a904",
+                                    "type": "ENTRYPOINT",
+                                    "inputs": [],
+                                    "data": {
+                                        "label": "Entrypoint Node",
+                                        "source_handle_id": "9b6b60b1-3915-434c-b32f-bb931b35d75f",
+                                    },
+                                    "display_data": {
+                                        "position": {"x": 1545.0, "y": 330.0},
+                                        "width": 124,
+                                        "height": 48,
+                                    },
+                                    "base": None,
+                                    "definition": None,
+                                },
+                                {
+                                    "id": "7153219a-dcd7-4d07-94ba-43e964173659",
+                                    "type": "TERMINAL",
+                                    "data": {
+                                        "label": "Final Output",
+                                        "name": "final-output",
+                                        "target_handle_id": "f0ae3621-add6-4c57-825d-1a9524037d22",
+                                        "output_id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                        "output_type": "CHAT_HISTORY",
+                                        "node_input_id": "db9eef66-ee14-4d69-bb6c-79abb831b2f0",
+                                    },
+                                    "inputs": [
+                                        {
+                                            "id": "db9eef66-ee14-4d69-bb6c-79abb831b2f0",
+                                            "key": "node_input",
+                                            "value": {
+                                                "rules": [
+                                                    {
+                                                        "type": "NODE_OUTPUT",
+                                                        "data": {
+                                                            "node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                                            "output_id": "48af6ab7-1e2c-4f8b-80c3-7b6ec4c11d09",
+                                                        },
+                                                    }
+                                                ],
+                                                "combinator": "OR",
+                                            },
+                                        }
+                                    ],
+                                    "display_data": {
+                                        "position": {"x": 2750.0, "y": 210.0},
+                                        "width": 521,
+                                        "height": 596,
+                                    },
+                                    "base": {
+                                        "name": "FinalOutputNode",
+                                        "module": [
+                                            "vellum",
+                                            "workflows",
+                                            "nodes",
+                                            "displayable",
+                                            "final_output_node",
+                                            "node",
+                                        ],
+                                    },
+                                    "definition": {
+                                        "name": "FinalOutput",
+                                        "module": [
+                                            "250ccd75-df59-4b3b-8a57-8f4b83ab80fe",
+                                            "nodes",
+                                            "final_output",
+                                        ],
+                                    },
+                                    "outputs": [
+                                        {
+                                            "id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                            "name": "value",
+                                            "type": "CHAT_HISTORY",
+                                            "value": {
+                                                "type": "NODE_OUTPUT",
+                                                "node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                                "node_output_id": "48af6ab7-1e2c-4f8b-80c3-7b6ec4c11d09",
+                                            },
+                                        }
+                                    ],
+                                },
+                            ],
+                            "edges": [
+                                {
+                                    "id": "5af9a602-3eba-490d-ac46-1655d06d879e",
+                                    "source_node_id": "2af2d891-7d30-43e4-9153-7a397d88a904",
+                                    "source_handle_id": "9b6b60b1-3915-434c-b32f-bb931b35d75f",
+                                    "target_node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                    "target_handle_id": "535a7f00-ecc8-4e8a-a31f-54a9da232705",
+                                    "type": "DEFAULT",
+                                },
+                                {
+                                    "id": "eab21531-dc5f-4f43-9fa3-e54ec00f2171",
+                                    "source_node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                    "source_handle_id": "3271cf27-9e6b-4ad9-a0ac-b0aedf6b7c3e",
+                                    "target_node_id": "7153219a-dcd7-4d07-94ba-43e964173659",
+                                    "target_handle_id": "f0ae3621-add6-4c57-825d-1a9524037d22",
+                                    "type": "DEFAULT",
+                                },
+                            ],
+                            "display_data": {
+                                "viewport": {
+                                    "x": -1233.1262509217315,
+                                    "y": 259.2560385680397,
+                                    "zoom": 0.8453597387548719,
+                                }
+                            },
+                            "definition": {
+                                "name": "Workflow",
+                                "module": ["250ccd75-df59-4b3b-8a57-8f4b83ab80fe", "workflow"],
+                            },
+                            "output_values": [
+                                {
+                                    "output_variable_id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                    "value": {
+                                        "type": "NODE_OUTPUT",
+                                        "node_id": "7153219a-dcd7-4d07-94ba-43e964173659",
+                                        "node_output_id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                    },
+                                }
+                            ],
+                        },
+                        "input_variables": [
+                            {
+                                "id": "ccf5bcc8-6940-423e-b732-4620f4b52cb9",
+                                "key": "text",
+                                "type": "STRING",
+                                "default": None,
+                                "required": True,
+                                "extensions": {"color": None},
+                            }
+                        ],
+                        "state_variables": [],
+                        "output_variables": [
+                            {
+                                "id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                "key": "final-output",
+                                "type": "CHAT_HISTORY",
+                            }
+                        ],
+                    },
                 ),
             ),
             {
@@ -85,11 +230,146 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                         "name": "MockWorkflow",
                         "module": module_root + ["events", "tests", "test_event"],
                     },
-                    "inputs": {
-                        "foo": "bar",
-                    },
+                    "inputs": {"foo": "bar"},
                     "display_context": None,
                     "initial_state": None,
+                    "serialized_workflow_data": {
+                        "workflow_raw_data": {
+                            "nodes": [
+                                {
+                                    "id": "2af2d891-7d30-43e4-9153-7a397d88a904",
+                                    "type": "ENTRYPOINT",
+                                    "inputs": [],
+                                    "data": {
+                                        "label": "Entrypoint Node",
+                                        "source_handle_id": "9b6b60b1-3915-434c-b32f-bb931b35d75f",
+                                    },
+                                    "display_data": {"position": {"x": 1545.0, "y": 330.0}, "width": 124, "height": 48},
+                                    "base": None,
+                                    "definition": None,
+                                },
+                                {
+                                    "id": "7153219a-dcd7-4d07-94ba-43e964173659",
+                                    "type": "TERMINAL",
+                                    "data": {
+                                        "label": "Final Output",
+                                        "name": "final-output",
+                                        "target_handle_id": "f0ae3621-add6-4c57-825d-1a9524037d22",
+                                        "output_id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                        "output_type": "CHAT_HISTORY",
+                                        "node_input_id": "db9eef66-ee14-4d69-bb6c-79abb831b2f0",
+                                    },
+                                    "inputs": [
+                                        {
+                                            "id": "db9eef66-ee14-4d69-bb6c-79abb831b2f0",
+                                            "key": "node_input",
+                                            "value": {
+                                                "rules": [
+                                                    {
+                                                        "type": "NODE_OUTPUT",
+                                                        "data": {
+                                                            "node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                                            "output_id": "48af6ab7-1e2c-4f8b-80c3-7b6ec4c11d09",
+                                                        },
+                                                    }
+                                                ],
+                                                "combinator": "OR",
+                                            },
+                                        }
+                                    ],
+                                    "display_data": {
+                                        "position": {"x": 2750.0, "y": 210.0},
+                                        "width": 521,
+                                        "height": 596,
+                                    },
+                                    "base": {
+                                        "name": "FinalOutputNode",
+                                        "module": [
+                                            "vellum",
+                                            "workflows",
+                                            "nodes",
+                                            "displayable",
+                                            "final_output_node",
+                                            "node",
+                                        ],
+                                    },
+                                    "definition": {
+                                        "name": "FinalOutput",
+                                        "module": ["250ccd75-df59-4b3b-8a57-8f4b83ab80fe", "nodes", "final_output"],
+                                    },
+                                    "outputs": [
+                                        {
+                                            "id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                            "name": "value",
+                                            "type": "CHAT_HISTORY",
+                                            "value": {
+                                                "type": "NODE_OUTPUT",
+                                                "node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                                "node_output_id": "48af6ab7-1e2c-4f8b-80c3-7b6ec4c11d09",
+                                            },
+                                        }
+                                    ],
+                                },
+                            ],
+                            "edges": [
+                                {
+                                    "id": "5af9a602-3eba-490d-ac46-1655d06d879e",
+                                    "source_node_id": "2af2d891-7d30-43e4-9153-7a397d88a904",
+                                    "source_handle_id": "9b6b60b1-3915-434c-b32f-bb931b35d75f",
+                                    "target_node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                    "target_handle_id": "535a7f00-ecc8-4e8a-a31f-54a9da232705",
+                                    "type": "DEFAULT",
+                                },
+                                {
+                                    "id": "eab21531-dc5f-4f43-9fa3-e54ec00f2171",
+                                    "source_node_id": "02a9662a-afdc-450e-a627-6086ac1b2b1c",
+                                    "source_handle_id": "3271cf27-9e6b-4ad9-a0ac-b0aedf6b7c3e",
+                                    "target_node_id": "7153219a-dcd7-4d07-94ba-43e964173659",
+                                    "target_handle_id": "f0ae3621-add6-4c57-825d-1a9524037d22",
+                                    "type": "DEFAULT",
+                                },
+                            ],
+                            "display_data": {
+                                "viewport": {
+                                    "x": -1233.1262509217315,
+                                    "y": 259.2560385680397,
+                                    "zoom": 0.8453597387548719,
+                                }
+                            },
+                            "definition": {
+                                "name": "Workflow",
+                                "module": ["250ccd75-df59-4b3b-8a57-8f4b83ab80fe", "workflow"],
+                            },
+                            "output_values": [
+                                {
+                                    "output_variable_id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                    "value": {
+                                        "type": "NODE_OUTPUT",
+                                        "node_id": "7153219a-dcd7-4d07-94ba-43e964173659",
+                                        "node_output_id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                    },
+                                }
+                            ],
+                        },
+                        "input_variables": [
+                            {
+                                "id": "ccf5bcc8-6940-423e-b732-4620f4b52cb9",
+                                "key": "text",
+                                "type": "STRING",
+                                "default": None,
+                                "required": True,
+                                "extensions": {"color": None},
+                            }
+                        ],
+                        "state_variables": [],
+                        "output_variables": [
+                            {
+                                "id": "3de991de-d916-4719-b7c3-78477c37ca9c",
+                                "key": "final-output",
+                                "type": "CHAT_HISTORY",
+                            }
+                        ],
+                    },
                 },
                 "parent": None,
             },

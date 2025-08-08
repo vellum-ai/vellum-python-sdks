@@ -674,6 +674,16 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         workflow_class = get_args(cls.__orig_bases__[0])[0]  # type: ignore [attr-defined]
         register_workflow_display_class(workflow_class=workflow_class, workflow_display_class=cls)
 
+        # Override the workflow class's __serialize__ method to use this display class
+        def create_serialize_method():
+            def __serialize__():
+                workflow_display = cls(dry_run=True)
+                return workflow_display.serialize()
+
+            return __serialize__
+
+        workflow_class.__serialize__ = create_serialize_method()
+
     @staticmethod
     def gather_event_display_context(
         module_path: str,
