@@ -22,6 +22,8 @@ class WorkflowContext:
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
         generated_files: Optional[dict[str, str]] = None,
+        workspace_api_key: Optional[str] = None,
+        workspace_hmac_secret: Optional[str] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
@@ -39,6 +41,8 @@ class WorkflowContext:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
 
         self._generated_files = generated_files
+        self._workspace_api_key = workspace_api_key
+        self._workspace_hmac_secret = workspace_hmac_secret
 
     @cached_property
     def vellum_client(self) -> Vellum:
@@ -54,6 +58,14 @@ class WorkflowContext:
     @cached_property
     def generated_files(self) -> Optional[dict[str, str]]:
         return self._generated_files
+
+    @cached_property
+    def workspace_api_key(self) -> Optional[str]:
+        return self._workspace_api_key
+
+    @cached_property
+    def workspace_hmac_secret(self) -> Optional[str]:
+        return self._workspace_hmac_secret
 
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:

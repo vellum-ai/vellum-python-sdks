@@ -1,4 +1,8 @@
 import pytest
+import base64
+import hashlib
+import hmac
+from unittest.mock import patch
 
 from vellum import ExecuteApiResponse, VellumSecret as ClientVellumSecret
 from vellum.client.core.api_error import ApiError
@@ -6,6 +10,7 @@ from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes import APINode
+from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import VellumSecret
 
 
@@ -269,3 +274,151 @@ def test_api_node_passes_timeout_to_vellum_client(vellum_client):
     # AND the call should include RequestOptions with the correct timeout
     assert request_options is not None
     assert request_options["timeout_in_seconds"] == 25
+
+
+def test_api_node_with_hmac_signing_adds_signature_headers(mock_requests):
+    """Test that API node adds HMAC signature headers when workspace_hmac_secret is provided."""
+    # GIVEN a mock response for the API call
+    mock_response = mock_requests.post(
+        "https://api.example.com/test",
+        status_code=200,
+        json={"result": "success"},
+    )
+
+    # AND an API node with HMAC signing enabled
+    class APINodeWithHMAC(APINode):
+        method = APIRequestMethod.POST
+        url = "https://api.example.com/test"
+        json = {"key": "value"}
+
+    context = WorkflowContext(workspace_hmac_secret="test-hmac-secret")
+
+    # WHEN the API node is executed with the context
+    node = APINodeWithHMAC()
+    node._context = context
+
+    with patch("time.time", return_value=1234567890):
+        node.run()
+
+    # THEN the request should have been made
+    assert mock_response.call_count == 1
+
+    # AND the request should include HMAC signature headers
+    request = mock_response.last_request
+    assert "X-Vellum-Timestamp" in request.headers
+    assert "X-Vellum-Signature" in request.headers
+    assert request.headers["X-Vellum-Timestamp"] == "1234567890"
+
+    # AND the signature should be correctly calculated
+    expected_message = b'1234567890\nPOST\nhttps://api.example.com/test\n{"key": "value"}'
+    expected_signature = hmac.new(b"test-hmac-secret", expected_message, hashlib.sha256)
+    expected_signature_b64 = base64.b64encode(expected_signature.digest()).decode("utf-8")
+    assert request.headers["X-Vellum-Signature"] == expected_signature_b64
+
+
+def test_api_node_without_hmac_secret_does_not_add_signature_headers(mock_requests):
+    """Test that API node does not add HMAC signature headers when workspace_hmac_secret is not provided."""
+    # GIVEN a mock response for the API call
+    mock_response = mock_requests.post(
+        "https://api.example.com/test",
+        status_code=200,
+        json={"result": "success"},
+    )
+
+    # AND an API node without HMAC signing
+    class APINodeWithoutHMAC(APINode):
+        method = APIRequestMethod.POST
+        url = "https://api.example.com/test"
+        json = {"key": "value"}
+
+    context = WorkflowContext()
+
+    # WHEN the API node is executed with the context
+    node = APINodeWithoutHMAC()
+    node._context = context
+    node.run()
+
+    # THEN the request should have been made
+    assert mock_response.call_count == 1
+
+    # AND the request should not include HMAC signature headers
+    request = mock_response.last_request
+    assert "X-Vellum-Timestamp" not in request.headers
+    assert "X-Vellum-Signature" not in request.headers
+
+
+def test_api_node_hmac_signing_with_empty_body(mock_requests):
+    """Test that HMAC signing works correctly with empty request body."""
+    # GIVEN a mock response for the API call
+    mock_response = mock_requests.get(
+        "https://api.example.com/test",
+        status_code=200,
+        json={"result": "success"},
+    )
+
+    # AND an API node with GET method (no body)
+    class APINodeWithEmptyBody(APINode):
+        method = APIRequestMethod.GET
+        url = "https://api.example.com/test"
+
+    context = WorkflowContext(workspace_hmac_secret="test-hmac-secret")
+
+    # WHEN the API node is executed with the context
+    node = APINodeWithEmptyBody()
+    node._context = context
+
+    with patch("time.time", return_value=1234567890):
+        node.run()
+
+    # THEN the request should have been made
+    assert mock_response.call_count == 1
+
+    # AND the request should include HMAC signature headers
+    request = mock_response.last_request
+    assert "X-Vellum-Timestamp" in request.headers
+    assert "X-Vellum-Signature" in request.headers
+
+    # AND the signature should be correctly calculated for empty body
+    expected_message = b"1234567890\nGET\nhttps://api.example.com/test\n"
+    expected_signature = hmac.new(b"test-hmac-secret", expected_message, hashlib.sha256)
+    expected_signature_b64 = base64.b64encode(expected_signature.digest()).decode("utf-8")
+    assert request.headers["X-Vellum-Signature"] == expected_signature_b64
+
+
+def test_api_node_hmac_signing_with_string_body(mock_requests):
+    """Test that HMAC signing works correctly when request body is a string."""
+    # GIVEN a mock response for the API call
+    mock_response = mock_requests.post(
+        "https://api.example.com/test",
+        status_code=200,
+        json={"result": "success"},
+    )
+
+    # AND an API node with string data
+    class APINodeWithStringData(APINode):
+        method = APIRequestMethod.POST
+        url = "https://api.example.com/test"
+        data = "string data"
+
+    context = WorkflowContext(workspace_hmac_secret="test-hmac-secret")
+
+    # WHEN the API node is executed with the context
+    node = APINodeWithStringData()
+    node._context = context
+
+    with patch("time.time", return_value=1234567890):
+        node.run()
+
+    # THEN the request should have been made
+    assert mock_response.call_count == 1
+
+    # AND the request should include HMAC signature headers
+    request = mock_response.last_request
+    assert "X-Vellum-Timestamp" in request.headers
+    assert "X-Vellum-Signature" in request.headers
+
+    # AND the signature should be correctly calculated for string body
+    expected_message = b"1234567890\nPOST\nhttps://api.example.com/test\nstring data"
+    expected_signature = hmac.new(b"test-hmac-secret", expected_message, hashlib.sha256)
+    expected_signature_b64 = base64.b64encode(expected_signature.digest()).decode("utf-8")
+    assert request.headers["X-Vellum-Signature"] == expected_signature_b64
