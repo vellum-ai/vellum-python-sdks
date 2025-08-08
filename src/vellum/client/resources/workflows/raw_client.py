@@ -75,8 +75,9 @@ class RawWorkflowsClient:
             try:
                 if 200 <= _response.status_code < 300:
                     _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    _chunks: typing.List[bytes] = list(_response.iter_bytes(chunk_size=_chunk_size))
-                    return HttpResponse(response=_response, data=(chunk for chunk in _chunks))
+                    return HttpResponse(
+                        response=_response, data=(_chunk for _chunk in _response.iter_bytes(chunk_size=_chunk_size))
+                    )
                 _response.read()
                 if _response.status_code == 400:
                     raise BadRequestError(
@@ -217,15 +218,10 @@ class AsyncRawWorkflowsClient:
             try:
                 if 200 <= _response.status_code < 300:
                     _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    _chunks: typing.List[bytes] = [
-                        _chunk async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size)
-                    ]
-
-                    async def _iter():
-                        for c in _chunks:
-                            yield c
-
-                    return AsyncHttpResponse(response=_response, data=_iter())
+                    return AsyncHttpResponse(
+                        response=_response,
+                        data=(_chunk async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size)),
+                    )
                 await _response.aread()
                 if _response.status_code == 400:
                     raise BadRequestError(

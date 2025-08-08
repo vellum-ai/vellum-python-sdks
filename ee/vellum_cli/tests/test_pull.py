@@ -8,6 +8,8 @@ from uuid import uuid4
 import zipfile
 
 from click.testing import CliRunner
+from httpx import Response as HttpxResponse
+from pytest_mock import MockerFixture
 
 from vellum.client.core.api_error import ApiError
 from vellum_cli import main as cli_main
@@ -1359,3 +1361,40 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
+
+
+@pytest.fixture
+def mock_httpx_stream(mocker: MockerFixture):
+    return mocker.patch("httpx._client.Client.stream")
+
+
+def test_raw_workflows_pull_buffers_stream(mock_httpx_stream, mock_module):
+    # GIVEN a module and workflow_sandbox_id
+    module = mock_module.module
+
+    # AND a zip file with a workflow.py file
+    payload = _zip_file_map({"workflow.py": "print('hello')"})
+    chunks = [payload]
+
+    # AND a fake response from httpx
+    fake_resp = HttpxResponse(
+        status_code=200,
+        content=chunks,
+        # stream=iter(chunks),
+    )
+
+    mock_httpx_stream.return_value.__enter__.return_value = fake_resp
+
+    # WHEN calling `vellum pull` with --workspace
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_main,
+        [
+            "workflows",
+            "pull",
+            module,
+        ],
+    )
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0, result.exception
