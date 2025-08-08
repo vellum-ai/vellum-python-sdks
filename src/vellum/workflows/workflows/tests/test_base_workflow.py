@@ -901,7 +901,7 @@ def test_workflow_version_exec_config_exists__subworkflow_node(vellum_adhoc_prom
         graph = TestSubworkflowNode
 
         class Outputs(BaseWorkflow.Outputs):
-            result: int = TestSubworkflowNode.Outputs.result
+            result = TestSubworkflowNode.Outputs.result
 
     # Create a simple display class for the workflow
     class SubworkflowWorkflowDisplay(BaseWorkflowDisplay[SubworkflowWorkflow]):
