@@ -1,6 +1,6 @@
 import pytest
-from uuid import uuid4
-from typing import Optional
+from uuid import UUID, uuid4
+from typing import Any, Optional
 
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -11,11 +11,13 @@ from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.core import JsonObject
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
+from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -955,3 +957,43 @@ def test_serialize_workflow__state_variables():
         "required": False,
         "extensions": {"color": None},
     }
+
+
+def test_serialize_workflow__with_complete_node_failure_prunes_edges():
+    """Test that edges are pruned when a node completely fails to serialize (serialized_node is null)."""
+
+    # GIVEN a node that completely fails to serialize
+    class FailingNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class FailingNodeDisplay(BaseNodeDisplay[FailingNode]):
+        def serialize(
+            self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **kwargs: Any
+        ) -> JsonObject:
+            raise NotImplementedError("Complete node serialization failure")
+
+    # AND a workflow with the failing node connected to another node
+    class WorkingNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            value: str
+
+    class Workflow(BaseWorkflow):
+        graph = FailingNode >> WorkingNode
+
+    # WHEN we serialize the workflow with dry_run=True
+    workflow_display = get_workflow_display(workflow_class=Workflow, dry_run=True)
+
+    # AND we register the failing display class
+    workflow_display.display_context.node_displays[FailingNode] = FailingNodeDisplay()
+
+    data: dict = workflow_display.serialize()
+
+    # THEN the workflow should serialize but with no edges (pruned due to invalid node)
+    assert data["workflow_raw_data"]["edges"] == []
+
+    # AND only the working node and entrypoint should be in the serialized nodes
+    assert len(data["workflow_raw_data"]["nodes"]) == 2
+    node_types = [node["type"] for node in data["workflow_raw_data"]["nodes"]]
+    assert "ENTRYPOINT" in node_types
+    assert "GENERIC" in node_types  # This is the WorkingNode that should still be serialized

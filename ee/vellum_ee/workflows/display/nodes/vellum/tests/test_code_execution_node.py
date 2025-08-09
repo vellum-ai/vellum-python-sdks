@@ -172,38 +172,6 @@ def test_serialize_node__with_non_exist_code_input_path():
     assert "Filepath 'non_existent_file.py' does not exist" in str(exc_info.value)
 
 
-def test_serialize_node__with_complete_node_failure_prunes_edges():
-    # GIVEN a code node that completely fails to serialize
-    class FailingNode(CodeExecutionNode):
-        pass
-
-    class FailingNodeDisplay(BaseCodeExecutionNodeDisplay[FailingNode]):  # type: ignore[valid-type]
-        def serialize(self, display_context):
-            raise NotImplementedError("Complete node serialization failure")
-
-    # AND a workflow with the failing node
-    class Workflow(BaseWorkflow):
-        graph = FailingNode
-
-    # WHEN we serialize the workflow with dry_run=True
-    workflow_display = get_workflow_display(workflow_class=Workflow, dry_run=True)
-
-    # AND we register the failing display class
-    workflow_display.display_context.node_displays[FailingNode] = FailingNodeDisplay()
-
-    data: dict = workflow_display.serialize()
-
-    # THEN the workflow should serialize but with no edges (pruned due to invalid node)
-    assert data["workflow_raw_data"]["edges"] == []
-
-    # AND the failing node should not be in the serialized nodes
-    node_types = [node["type"] for node in data["workflow_raw_data"]["nodes"]]
-    assert "CODE_EXECUTION" not in node_types
-
-    assert len(data["workflow_raw_data"]["nodes"]) == 1
-    assert data["workflow_raw_data"]["nodes"][0]["type"] == "ENTRYPOINT"
-
-
 def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
     # GIVEN a code node with a non-existent code input path
     class MyNode(CodeExecutionNode):
