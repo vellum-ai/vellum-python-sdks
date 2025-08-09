@@ -627,4 +627,11 @@ export class WorkflowContext {
       workspaceSecretId
     );
   }
+
+  public getRootModulePath(): string[] {
+    if (this.parentNode) {
+      return this.parentNode.workflowContext.getRootModulePath();
+    }
+    return this.modulePath;
+  }
 }
