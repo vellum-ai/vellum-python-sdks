@@ -59,7 +59,7 @@ const main = async () => {
   console.log(`PR #${PR_NUMBER} is open, has release label, and was opened by authorized user (${pr.user?.login}), waiting for checks...`);
 
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < MAX_WAIT_TIME) {
     try {
       const { data: checkRuns } = await octokit.rest.checks.listForRef({
@@ -78,7 +78,7 @@ const main = async () => {
 
       const autoMergeChecks = checks.filter(check => isAutoMergeCheck(check.name));
       if (autoMergeChecks.length > 0) {
-        console.log(`Excluding ${autoMergeChecks.length} auto-merge checks:`, 
+        console.log(`Excluding ${autoMergeChecks.length} auto-merge checks:`,
           autoMergeChecks.map(c => c.name).join(', '));
       }
 
@@ -88,19 +88,19 @@ const main = async () => {
         continue;
       }
 
-      const pendingChecks = checks.filter(check => 
+      const pendingChecks = checks.filter(check =>
         check.status !== 'completed' && !isAutoMergeCheck(check.name)
       );
       if (pendingChecks.length > 0) {
-        console.log(`Waiting for ${pendingChecks.length} checks to complete:`, 
+        console.log(`Waiting for ${pendingChecks.length} checks to complete:`,
           pendingChecks.map(c => c.name).join(', '));
         await sleep(POLL_INTERVAL);
         continue;
       }
 
-      const failedChecks = checks.filter(check => 
-        check.conclusion !== 'success' && 
-        check.conclusion !== 'neutral' && 
+      const failedChecks = checks.filter(check =>
+        check.conclusion !== 'success' &&
+        check.conclusion !== 'neutral' &&
         check.conclusion !== 'skipped' &&
         !isAutoMergeCheck(check.name)
       );
