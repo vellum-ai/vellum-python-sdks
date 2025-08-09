@@ -113,7 +113,7 @@ build-backend = "poetry.core.masonry.api"
 vellum = "vellum_cli:main"
 
 [tool.isort]
-skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows", "src/vellum/client/raw_client.py"]
+skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows", "src/vellum/client/raw_client.py", "ee/codegen/python_file_merging/tests/fixtures"]
 multi_line_output = 3
 force_grid_wrap = 0
 line_length = 120
