@@ -237,10 +237,7 @@ ${errors.slice(0, 3).map((err) => {
     ]);
 
     // Code merge logic - copied from codegen-service
-    const pythonCodeMergeableNodeFiles = this.getPythonCodeMergeableNodeFiles();
-    const shouldEnableCodeMerge = pythonCodeMergeableNodeFiles.size > 0;
-
-    if (shouldEnableCodeMerge && originalArtifact) {
+    if (originalArtifact) {
       await this.mergeFilesWithArtifact(originalArtifact);
     }
 
@@ -321,6 +318,11 @@ ${errors.slice(0, 3).map((err) => {
     originalArtifact: Record<string, string>
   ): Promise<void> {
     const pythonCodeMergeableNodeFiles = this.getPythonCodeMergeableNodeFiles();
+    const shouldEnableCodeMerge = pythonCodeMergeableNodeFiles.size > 0;
+
+    if (!shouldEnableCodeMerge) {
+      return;
+    }
 
     const filteredOriginalFileMap = Object.fromEntries(
       Object.entries(originalArtifact).filter(([filePath]) =>
