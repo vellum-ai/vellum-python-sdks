@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Dict, Iterator, List, Tuple, Type
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
 from vellum.client import Vellum as VellumClient
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -52,15 +52,28 @@ class WorkflowDisplayContext:
     edge_displays: EdgeDisplays = field(default_factory=dict)
     port_displays: PortDisplays = field(default_factory=dict)
     _errors: List[Exception] = field(default_factory=list)
+    _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)
     _dry_run: bool = False
 
-    def add_error(self, error: Exception) -> None:
+    def add_error(self, error: Exception, node: Optional[Type[BaseNode]] = None) -> None:
         if self._dry_run:
             self._errors.append(error)
+            if node is not None:
+                self.add_invalid_node(node)
             return
 
         raise error
 
+    def add_invalid_node(self, node: Type[BaseNode]) -> None:
+        """Track a node that failed to serialize."""
+        if node not in self._invalid_nodes:
+            self._invalid_nodes.append(node)
+
     @property
     def errors(self) -> Iterator[Exception]:
         return iter(self._errors)
+
+    @property
+    def invalid_nodes(self) -> Iterator[Type[BaseNode]]:
+        """Get an iterator over nodes that failed to serialize."""
+        return iter(self._invalid_nodes)

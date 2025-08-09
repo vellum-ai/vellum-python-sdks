@@ -194,7 +194,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                     "type": "ENTRYPOINT",
                     "inputs": [],
                     "data": {"label": "Entrypoint Node", "source_handle_id": "3e2a3f52-5047-4e2e-9a21-37bd43c63250"},
-                    "display_data": {"position": {"x": 0.0, "y": -50.0}},
+                    "display_data": {"position": {"x": 0.0, "y": -175.0}},
                     "base": None,
                     "definition": None,
                 },
@@ -233,7 +233,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                         "output_id": "00b2120e-b642-46e4-8276-5f3c69d8a6cb",
                         "log_output_id": "47e3eeca-4bf8-492e-b8ac-28c7d389c886",
                     },
-                    "display_data": {"position": {"x": 200.0, "y": -50.0}},
+                    "display_data": {"position": {"x": 0.0, "y": 75.0}},
                     "base": {
                         "name": "CodeExecutionNode",
                         "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],
@@ -253,16 +253,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                     "ports": [{"id": "7afa3858-f50c-4116-936a-a401e3b2c60f", "name": "default", "type": "DEFAULT"}],
                 },
             ],
-            "edges": [
-                {
-                    "id": "ab6ef06e-df2c-4877-9c3e-9d7261b39748",
-                    "source_node_id": "9b9e2a5d-01a4-46b2-80a3-d9484b2c0e08",
-                    "source_handle_id": "3e2a3f52-5047-4e2e-9a21-37bd43c63250",
-                    "target_node_id": "ac90c0ce-f393-438c-a24f-e5e9a9286182",
-                    "target_handle_id": "3a39ea63-9f86-4891-a902-0216a7190720",
-                    "type": "DEFAULT",
-                }
-            ],
+            "edges": [],
             "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
             "definition": {
                 "name": "Workflow",
