@@ -417,8 +417,8 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         if explicit_value and explicit_value.comment and docstring:
             comment = (
                 NodeDisplayComment(value=docstring, expanded=explicit_value.comment.expanded)
-                if explicit_value.comment.expanded
-                else NodeDisplayComment(value=docstring)
+                if explicit_value.comment.expanded is not None
+                else NodeDisplayComment(value=docstring, expanded=True)
             )
             return NodeDisplayData(
                 position=explicit_value.position,
@@ -432,7 +432,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         if docstring:
             return NodeDisplayData(
-                comment=NodeDisplayComment(value=docstring),
+                comment=NodeDisplayComment(value=docstring, expanded=True),
             )
 
         return NodeDisplayData()

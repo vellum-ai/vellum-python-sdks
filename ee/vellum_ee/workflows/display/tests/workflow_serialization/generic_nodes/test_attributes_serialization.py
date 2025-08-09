@@ -670,3 +670,53 @@ def test_serialize_node__pydantic_with_node_output_reference(serialize_node):
     assert any(
         entry["key"] == "node_ref" and entry["value"]["type"] == "NODE_OUTPUT" for entry in attr_value["entries"]
     )
+
+
+def test_serialize_node__comment_expanded_true_when_content_exists(serialize_node):
+    """
+    Tests that node comment serialization sets expanded=True when comment has content.
+    """
+
+    class NodeWithComment(BaseNode):
+        """This is a test comment for the node."""
+
+        pass
+
+    serialized_node = serialize_node(NodeWithComment)
+
+    # WHEN the node is serialized
+    display_data = serialized_node["display_data"]
+
+    # THEN the comment should have expanded=True
+    assert "comment" in display_data
+    assert display_data["comment"]["value"] == "This is a test comment for the node."
+    assert display_data["comment"]["expanded"] is True
+
+
+def test_serialize_node__comment_expanded_preserved_when_explicitly_set(serialize_node):
+    """
+    Tests that explicitly set expanded value is preserved during serialization.
+    """
+    from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
+    from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+
+    class NodeWithExplicitComment(BaseNode):
+        """This is a test comment."""
+
+        pass
+
+    class NodeWithExplicitCommentDisplay(BaseNodeDisplay[NodeWithExplicitComment]):
+        display_data = NodeDisplayData(comment=NodeDisplayComment(value="Custom comment", expanded=False))
+
+    serialized_node = serialize_node(
+        NodeWithExplicitComment,
+        global_node_displays={NodeWithExplicitComment: NodeWithExplicitCommentDisplay()},
+    )
+
+    # WHEN the node is serialized
+    display_data = serialized_node["display_data"]
+
+    # THEN the comment should preserve expanded=False
+    assert "comment" in display_data
+    assert display_data["comment"]["value"] == "This is a test comment."
+    assert display_data["comment"]["expanded"] is False
