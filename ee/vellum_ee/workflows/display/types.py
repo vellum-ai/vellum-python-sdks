@@ -58,8 +58,6 @@ class WorkflowDisplayContext:
     def add_error(self, error: Exception, node: Optional[Type[BaseNode]] = None) -> None:
         if self._dry_run:
             self._errors.append(error)
-            if node is not None:
-                self.add_invalid_node(node)
             return
 
         raise error

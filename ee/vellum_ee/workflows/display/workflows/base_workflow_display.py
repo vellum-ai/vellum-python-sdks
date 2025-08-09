@@ -193,7 +193,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             try:
                 serialized_node = node_display.serialize(self.display_context)
             except (NotImplementedError, NodeValidationError) as e:
-                self.display_context.add_error(e, node)
+                self.display_context.add_error(e)
+                self.display_context.add_invalid_node(node)
                 continue
 
             serialized_nodes[node_display.node_id] = serialized_node
