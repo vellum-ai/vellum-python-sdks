@@ -2558,7 +2558,10 @@ baz = foo + bar
     });
   });
   describe("Get generic node files", () => {
-    it("should get generic node files", async () => {
+    it.each([
+      { moduleName: "generic_test" },
+      { moduleName: "my.generic.test" },
+    ])("should get generic node files", async ({ moduleName }) => {
       const displayData = {
         workflow_raw_data: {
           nodes: [
@@ -2614,7 +2617,7 @@ baz = foo + bar
 
       const project = new WorkflowProjectGenerator({
         absolutePathToOutputDirectory: tempDir,
-        moduleName: "generic_test",
+        moduleName,
         vellumApiKey: "<TEST_API_KEY>",
         workflowVersionExecConfigData: displayData,
       });

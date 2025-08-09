@@ -680,11 +680,14 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     // Exclude nodes in the core, displayable, or experimental modules
     if (!this.isExcludedModulePath()) {
       const modulePath = this.getModulePath();
-      const fileName = modulePath[modulePath.length - 1] + ".py";
+      const rootModulePath = this.workflowContext.getRootModulePath();
 
       // Build the full relative path from the module path
-      // We are starting from 1-index since we need want the relative path and up until the n-1 index like above
-      const relativePath = `${modulePath.slice(1, -1).join("/")}/${fileName}`;
+      // We are excluding the root module path since we need the
+      // relative path from the root module
+      const relativePath = `${modulePath
+        .slice(rootModulePath.length - 1)
+        .join("/")}.py`;
 
       this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
     }
