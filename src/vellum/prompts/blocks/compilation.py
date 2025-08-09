@@ -142,18 +142,6 @@ def compile_prompt_blocks(
             )
             compiled_blocks.append(function_call_block)
 
-        elif block.block_type == "IMAGE":
-            image_block = CompiledValuePromptBlock(
-                content=ImageVellumValue(
-                    value=VellumImage(
-                        src=block.src,
-                        metadata=block.metadata,
-                    ),
-                ),
-                cache_config=block.cache_config,
-            )
-            compiled_blocks.append(image_block)
-
         elif block.block_type == "AUDIO":
             audio_block = CompiledValuePromptBlock(
                 content=AudioVellumValue(
@@ -165,6 +153,30 @@ def compile_prompt_blocks(
                 cache_config=block.cache_config,
             )
             compiled_blocks.append(audio_block)
+
+        # elif block.block_type == "VIDEO":
+        #     video_block = CompiledValuePromptBlock(
+        #         content=VideoVellumValue(
+        #             value=VellumVideo(
+        #                 src=block.src,
+        #                 metadata=block.metadata,
+        #             ),
+        #         ),
+        #         cache_config=block.cache_config,
+        #     )
+        #     compiled_blocks.append(video_block)
+
+        elif block.block_type == "IMAGE":
+            image_block = CompiledValuePromptBlock(
+                content=ImageVellumValue(
+                    value=VellumImage(
+                        src=block.src,
+                        metadata=block.metadata,
+                    ),
+                ),
+                cache_config=block.cache_config,
+            )
+            compiled_blocks.append(image_block)
 
         elif block.block_type == "DOCUMENT":
             document_block = CompiledValuePromptBlock(

@@ -16,6 +16,8 @@ import {
   VellumAudioRequest as VellumAudioRequestType,
   VellumDocument as VellumDocumentType,
   VellumDocumentRequest as VellumDocumentRequestType,
+  // VellumVideo as VellumVideoType,
+  // VellumVideoRequest as VellumVideoRequestType,
 } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
@@ -183,69 +185,6 @@ class ArrayChatMessageContent extends AstNode {
   }
 }
 
-class ImageChatMessageContent extends AstNode {
-  private astNode: AstNode;
-
-  public constructor(
-    value: VellumImageType | VellumImageRequestType,
-    isRequestType: boolean
-  ) {
-    super();
-    this.astNode = this.generateAstNode(value, isRequestType);
-  }
-
-  private generateAstNode(
-    value: VellumImageType | VellumImageRequestType,
-    isRequestType: boolean
-  ): AstNode {
-    const imageChatMessageContentRequestRef = python.reference({
-      name: "ImageChatMessageContent" + (isRequestType ? "Request" : ""),
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-
-    const imageArgs = [
-      python.methodArgument({
-        name: "src",
-        value: python.TypeInstantiation.str(value.src),
-      }),
-    ];
-
-    if (!isNil(value.metadata)) {
-      const metadataJson = new Json(value.metadata);
-      imageArgs.push(
-        python.methodArgument({
-          name: "metadata",
-          value: metadataJson,
-        })
-      );
-    }
-
-    const arguments_ = [
-      python.methodArgument({
-        name: "value",
-        value: python.instantiateClass({
-          classReference: python.reference({
-            name: "VellumImage" + (isRequestType ? "Request" : ""),
-            modulePath: VELLUM_CLIENT_MODULE_PATH,
-          }),
-          arguments_: imageArgs,
-        }),
-      }),
-    ];
-
-    const astNode = python.instantiateClass({
-      classReference: imageChatMessageContentRequestRef,
-      arguments_: arguments_,
-    });
-    this.inheritReferences(astNode);
-    return astNode;
-  }
-
-  public write(writer: Writer): void {
-    this.astNode.write(writer);
-  }
-}
-
 class AudioChatMessageContent extends AstNode {
   private astNode: AstNode;
 
@@ -298,6 +237,135 @@ class AudioChatMessageContent extends AstNode {
 
     const astNode = python.instantiateClass({
       classReference: audioChatMessageContentRequestRef,
+      arguments_: arguments_,
+    });
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
+class VideoChatMessageContent extends AstNode {
+  private astNode: AstNode;
+
+  public constructor(
+    value: unknown, // VellumVideoType | VellumVideoRequestType,
+    isRequestType: boolean
+  ) {
+    super();
+    this.astNode = this.generateAstNode(value, isRequestType);
+  }
+
+  private generateAstNode(
+    value: unknown, // VellumVideoType | VellumVideoRequestType,
+    isRequestType: boolean
+  ): AstNode {
+    const videoChatMessageContentRequestRef = python.reference({
+      name: "VideoChatMessageContent" + (isRequestType ? "Request" : ""),
+      modulePath: VELLUM_CLIENT_MODULE_PATH,
+    });
+
+    const videoArgs = [
+      python.methodArgument({
+        name: "src",
+        // @ts-ignore
+        value: python.TypeInstantiation.str(value.src),
+      }),
+    ];
+
+    // @ts-ignore
+    if (!isNil(value.metadata)) {
+      // @ts-ignore
+      const metadataJson = new Json(value.metadata);
+      videoArgs.push(
+        python.methodArgument({
+          name: "metadata",
+          value: metadataJson,
+        })
+      );
+    }
+
+    const arguments_ = [
+      python.methodArgument({
+        name: "value",
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "VellumVideo" + (isRequestType ? "Request" : ""),
+            modulePath: VELLUM_CLIENT_MODULE_PATH,
+          }),
+          arguments_: videoArgs,
+        }),
+      }),
+    ];
+
+    const astNode = python.instantiateClass({
+      classReference: videoChatMessageContentRequestRef,
+      arguments_: arguments_,
+    });
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
+class ImageChatMessageContent extends AstNode {
+  private astNode: AstNode;
+
+  public constructor(
+    value: VellumImageType | VellumImageRequestType,
+    isRequestType: boolean
+  ) {
+    super();
+    this.astNode = this.generateAstNode(value, isRequestType);
+  }
+
+  private generateAstNode(
+    value: VellumImageType | VellumImageRequestType,
+    isRequestType: boolean
+  ): AstNode {
+    const imageChatMessageContentRequestRef = python.reference({
+      name: "ImageChatMessageContent" + (isRequestType ? "Request" : ""),
+      modulePath: VELLUM_CLIENT_MODULE_PATH,
+    });
+
+    const imageArgs = [
+      python.methodArgument({
+        name: "src",
+        value: python.TypeInstantiation.str(value.src),
+      }),
+    ];
+
+    if (!isNil(value.metadata)) {
+      const metadataJson = new Json(value.metadata);
+      imageArgs.push(
+        python.methodArgument({
+          name: "metadata",
+          value: metadataJson,
+        })
+      );
+    }
+
+    const arguments_ = [
+      python.methodArgument({
+        name: "value",
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "VellumImage" + (isRequestType ? "Request" : ""),
+            modulePath: VELLUM_CLIENT_MODULE_PATH,
+          }),
+          arguments_: imageArgs,
+        }),
+      }),
+    ];
+
+    const astNode = python.instantiateClass({
+      classReference: imageChatMessageContentRequestRef,
       arguments_: arguments_,
     });
     this.inheritReferences(astNode);
@@ -419,15 +487,24 @@ export class ChatMessageContent extends AstNode {
         );
         break;
       }
-      case "IMAGE": {
-        astNode = new ImageChatMessageContent(
+      case "AUDIO": {
+        astNode = new AudioChatMessageContent(
           chatMessageContent.value,
           isRequestType
         );
         break;
       }
-      case "AUDIO": {
-        astNode = new AudioChatMessageContent(
+      // @ts-expect-error
+      case "VIDEO": {
+        astNode = new VideoChatMessageContent(
+          // @ts-expect-error
+          chatMessageContent.value,
+          isRequestType
+        );
+        break;
+      }
+      case "IMAGE": {
+        astNode = new ImageChatMessageContent(
           chatMessageContent.value,
           isRequestType
         );

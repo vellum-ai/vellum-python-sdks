@@ -1,7 +1,7 @@
 import typing
 from typing import List, Tuple, Type, Union, get_args, get_origin
 
-from vellum import (
+from vellum import (  # VellumVideo,; VellumVideoRequest,
     ChatMessage,
     ChatMessageRequest,
     FunctionCall,
@@ -65,10 +65,12 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
         return "NUMBER"
     elif _is_type_optionally_in(type_, (FunctionCall, FunctionCallRequest)):
         return "FUNCTION_CALL"
-    elif _is_type_optionally_in(type_, (VellumImage, VellumImageRequest)):
-        return "IMAGE"
     elif _is_type_optionally_in(type_, (VellumAudio, VellumAudioRequest)):
         return "AUDIO"
+    # elif _is_type_optionally_in(type_, (VellumVideo, VellumVideoRequest)):
+    #     return "VIDEO"
+    elif _is_type_optionally_in(type_, (VellumImage, VellumImageRequest)):
+        return "IMAGE"
     elif _is_type_optionally_in(type_, (VellumDocument, VellumDocumentRequest)):
         return "DOCUMENT"
     elif _is_type_optionally_in(type_, (VellumError, VellumErrorRequest)):
@@ -101,9 +103,11 @@ def vellum_variable_type_to_openapi_type(vellum_type: VellumVariableType) -> str
         return "array"
     elif vellum_type == "FUNCTION_CALL":
         return "object"
-    elif vellum_type == "IMAGE":
-        return "object"
     elif vellum_type == "AUDIO":
+        return "object"
+    elif vellum_type == "VIDEO":
+        return "object"
+    elif vellum_type == "IMAGE":
         return "object"
     elif vellum_type == "DOCUMENT":
         return "object"

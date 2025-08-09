@@ -11,6 +11,7 @@ import {
   VellumError,
   VellumImage,
   VellumValue as VellumVariableValueType,
+  // VellumVideo,
 } from "vellum-ai/api";
 
 import { ChatMessageContent } from "./chat-message-content";
@@ -195,6 +196,95 @@ class ErrorVellumValue extends AstNode {
   }
 }
 
+class AudioVellumValue extends AstNode {
+  private astNode: python.AstNode;
+
+  public constructor(value: VellumAudio) {
+    super();
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: VellumAudio): AstNode {
+    const arguments_ = [
+      python.methodArgument({
+        name: "src",
+        value: python.TypeInstantiation.str(value.src),
+      }),
+    ];
+
+    if (!isNil(value.metadata)) {
+      arguments_.push(
+        python.methodArgument({
+          name: "metadata",
+          value: new Json(value.metadata),
+        })
+      );
+    }
+
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "VellumAudio",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
+class VideoVellumValue extends AstNode {
+  private astNode: python.AstNode;
+
+  public constructor(value: unknown) {
+    // VellumVideo) {
+    super();
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: unknown): AstNode {
+    // VellumVideo): AstNode {
+    const arguments_ = [
+      python.methodArgument({
+        name: "src",
+        // @ts-ignore
+        value: python.TypeInstantiation.str(value.src),
+      }),
+    ];
+
+    // @ts-ignore
+    if (!isNil(value.metadata)) {
+      arguments_.push(
+        python.methodArgument({
+          name: "metadata",
+          // @ts-ignore
+          value: new Json(value.metadata),
+        })
+      );
+    }
+
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "VellumVideo",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
 class ImageVellumValue extends AstNode {
   private astNode: AstNode;
 
@@ -238,6 +328,48 @@ class ImageVellumValue extends AstNode {
   }
 }
 
+class DocumentVellumValue extends AstNode {
+  private astNode: python.AstNode;
+
+  public constructor(value: VellumDocument) {
+    super();
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: VellumDocument): AstNode {
+    const arguments_ = [
+      python.methodArgument({
+        name: "src",
+        value: python.TypeInstantiation.str(value.src),
+      }),
+    ];
+
+    if (!isNil(value.metadata)) {
+      arguments_.push(
+        python.methodArgument({
+          name: "metadata",
+          value: new Json(value.metadata),
+        })
+      );
+    }
+
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "VellumDocument",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
 class ArrayVellumValue extends AstNode {
   private astNode: python.AstNode;
 
@@ -260,48 +392,6 @@ class ArrayVellumValue extends AstNode {
       value.map((item) => new VellumValue({ vellumValue: item })),
       iterableConfig ?? { endWithComma: true }
     );
-
-    this.inheritReferences(astNode);
-    return astNode;
-  }
-
-  public write(writer: Writer): void {
-    this.astNode.write(writer);
-  }
-}
-
-class AudioVellumValue extends AstNode {
-  private astNode: python.AstNode;
-
-  public constructor(value: VellumAudio) {
-    super();
-    this.astNode = this.generateAstNode(value);
-  }
-
-  private generateAstNode(value: VellumAudio): AstNode {
-    const arguments_ = [
-      python.methodArgument({
-        name: "src",
-        value: python.TypeInstantiation.str(value.src),
-      }),
-    ];
-
-    if (!isNil(value.metadata)) {
-      arguments_.push(
-        python.methodArgument({
-          name: "metadata",
-          value: new Json(value.metadata),
-        })
-      );
-    }
-
-    const astNode = python.instantiateClass({
-      classReference: python.reference({
-        name: "VellumAudio",
-        modulePath: VELLUM_CLIENT_MODULE_PATH,
-      }),
-      arguments_: arguments_,
-    });
 
     this.inheritReferences(astNode);
     return astNode;
@@ -442,48 +532,6 @@ class SearchResultsVellumValue extends AstNode {
   }
 }
 
-class DocumentVellumValue extends AstNode {
-  private astNode: python.AstNode;
-
-  public constructor(value: VellumDocument) {
-    super();
-    this.astNode = this.generateAstNode(value);
-  }
-
-  private generateAstNode(value: VellumDocument): AstNode {
-    const arguments_ = [
-      python.methodArgument({
-        name: "src",
-        value: python.TypeInstantiation.str(value.src),
-      }),
-    ];
-
-    if (!isNil(value.metadata)) {
-      arguments_.push(
-        python.methodArgument({
-          name: "metadata",
-          value: new Json(value.metadata),
-        })
-      );
-    }
-
-    const astNode = python.instantiateClass({
-      classReference: python.reference({
-        name: "VellumDocument",
-        modulePath: VELLUM_CLIENT_MODULE_PATH,
-      }),
-      arguments_: arguments_,
-    });
-
-    this.inheritReferences(astNode);
-    return astNode;
-  }
-
-  public write(writer: Writer): void {
-    this.astNode.write(writer);
-  }
-}
-
 export namespace VellumValue {
   export type Args = {
     vellumValue: VellumVariableValueType;
@@ -536,23 +584,28 @@ export class VellumValue extends AstNode {
       case "ERROR":
         this.astNode = new ErrorVellumValue(vellumValue.value);
         break;
+      case "AUDIO":
+        this.astNode = new AudioVellumValue(vellumValue.value);
+        break;
+      // @ts-expect-error
+      case "VIDEO":
+        // @ts-expect-error
+        this.astNode = new VideoVellumValue(vellumValue.value);
+        break;
       case "IMAGE":
         this.astNode = new ImageVellumValue(vellumValue.value);
         break;
+      case "DOCUMENT":
+        this.astNode = new DocumentVellumValue(vellumValue.value);
+        break;
       case "ARRAY":
         this.astNode = new ArrayVellumValue(vellumValue.value, iterableConfig);
-        break;
-      case "AUDIO":
-        this.astNode = new AudioVellumValue(vellumValue.value);
         break;
       case "SEARCH_RESULTS":
         this.astNode = new SearchResultsVellumValue(vellumValue.value);
         break;
       case "FUNCTION_CALL":
         this.astNode = new FunctionCallVellumValue(vellumValue.value);
-        break;
-      case "DOCUMENT":
-        this.astNode = new DocumentVellumValue(vellumValue.value);
         break;
       // TODO: Implement Document vellum variable type support
       // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
