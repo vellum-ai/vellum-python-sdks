@@ -178,3 +178,49 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
             },
         },
     }
+
+
+def test_serialize_tool_router_node():
+    """
+    Test that the tool router node created by ToolCallingNode serializes successfully.
+    """
+
+    # GIVEN a simple function for tool calling
+    def my_function(arg1: str) -> str:
+        return f"Result: {arg1}"
+
+    class MyToolCallingNode(ToolCallingNode):
+        functions = [my_function]
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the workflow should serialize successfully
+    assert serialized_workflow is not None
+    assert isinstance(serialized_workflow, dict)
+    assert "workflow_raw_data" in serialized_workflow
+
+    nodes = serialized_workflow["workflow_raw_data"]["nodes"]
+    assert isinstance(nodes, list)
+    assert len(nodes) >= 2
+
+    router_nodes = [
+        node for node in nodes if "router" in node.get("label", "").lower() or node.get("type") == "GENERIC"
+    ]
+    assert len(router_nodes) >= 1
+
+    router_node = router_nodes[0]
+    assert "id" in router_node
+    assert "type" in router_node
+    assert "ports" in router_node
+    assert "attributes" in router_node
+    assert "outputs" in router_node
+
+    ports = router_node["ports"]
+    assert isinstance(ports, list)
+    assert len(ports) >= 1
