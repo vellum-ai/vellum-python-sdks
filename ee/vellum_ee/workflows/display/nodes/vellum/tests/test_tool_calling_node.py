@@ -219,70 +219,116 @@ def test_serialize_tool_router_node():
     # WHEN we serialize the router node
     serialized_router_node = router_node_display.serialize(display_context)
 
-    # THEN the router node should serialize successfully with the expected structure
-    assert serialized_router_node is not None
-    assert isinstance(serialized_router_node, dict)
-
-    # AND it should have the expected top-level structure
-    assert serialized_router_node["adornments"] is None
-    assert serialized_router_node["type"] == "GENERIC"
-    assert serialized_router_node["label"] == "RouterNode"
-    assert serialized_router_node["outputs"] == []
-
-    # AND it should have the correct base and definition
-    assert serialized_router_node["base"] == {
-        "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
-        "name": "RouterNode",
+    # THEN the router node should serialize to the exact expected structure
+    assert serialized_router_node == {
+        "adornments": None,
+        "attributes": [
+            {
+                "id": "cd208919-c66b-451b-a739-bcf7d3451dea",
+                "name": "prompt_outputs",
+                "value": {
+                    "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
+                    "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                    "type": "NODE_OUTPUT",
+                },
+            }
+        ],
+        "base": {
+            "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
+            "name": "RouterNode",
+        },
+        "definition": {
+            "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
+            "name": "RouterNode",
+        },
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "id": "690c66e1-1e18-4984-b695-84beb0157541",
+        "label": "RouterNode",
+        "outputs": [],
+        "ports": [
+            {
+                "expression": {
+                    "lhs": {
+                        "lhs": {
+                            "lhs": {
+                                "state_variable_id": "0dd7f5a1-1d73-4153-9191-ca828ace4920",
+                                "type": "WORKFLOW_STATE",
+                            },
+                            "operator": "<",
+                            "rhs": {
+                                "lhs": {
+                                    "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
+                                    "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                                    "type": "NODE_OUTPUT",
+                                },
+                                "operator": "length",
+                                "type": "UNARY_EXPRESSION",
+                            },
+                            "type": "BINARY_EXPRESSION",
+                        },
+                        "operator": "and",
+                        "rhs": {
+                            "lhs": {
+                                "lhs": {
+                                    "lhs": {
+                                        "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
+                                        "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                                        "type": "NODE_OUTPUT",
+                                    },
+                                    "operator": "accessField",
+                                    "rhs": {
+                                        "state_variable_id": "0dd7f5a1-1d73-4153-9191-ca828ace4920",
+                                        "type": "WORKFLOW_STATE",
+                                    },
+                                    "type": "BINARY_EXPRESSION",
+                                },
+                                "operator": "accessField",
+                                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "type"}},
+                                "type": "BINARY_EXPRESSION",
+                            },
+                            "operator": "=",
+                            "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "FUNCTION_CALL"}},
+                            "type": "BINARY_EXPRESSION",
+                        },
+                        "type": "BINARY_EXPRESSION",
+                    },
+                    "operator": "and",
+                    "rhs": {
+                        "lhs": {
+                            "lhs": {
+                                "lhs": {
+                                    "lhs": {
+                                        "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
+                                        "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                                        "type": "NODE_OUTPUT",
+                                    },
+                                    "operator": "accessField",
+                                    "rhs": {
+                                        "state_variable_id": "0dd7f5a1-1d73-4153-9191-ca828ace4920",
+                                        "type": "WORKFLOW_STATE",
+                                    },
+                                    "type": "BINARY_EXPRESSION",
+                                },
+                                "operator": "accessField",
+                                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "value"}},
+                                "type": "BINARY_EXPRESSION",
+                            },
+                            "operator": "accessField",
+                            "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "name"}},
+                            "type": "BINARY_EXPRESSION",
+                        },
+                        "operator": "=",
+                        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "my_function"}},
+                        "type": "BINARY_EXPRESSION",
+                    },
+                    "type": "BINARY_EXPRESSION",
+                },
+                "id": "afb4b09d-659b-459e-9a28-cf73ba6e0574",
+                "name": "my_function",
+                "type": "IF",
+            },
+            {"expression": None, "id": "4ecd916e-b5d0-407e-aab4-35551c76d02c", "name": "default", "type": "ELSE"},
+        ],
+        "trigger": {"id": "73a96f44-c2dd-40cc-96f6-49b9f914b166", "merge_behavior": "AWAIT_ATTRIBUTES"},
+        "type": "GENERIC",
     }
-    assert serialized_router_node["definition"] == {
-        "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
-        "name": "RouterNode",
-    }
-
-    assert "display_data" in serialized_router_node
-    display_data = serialized_router_node["display_data"]
-    assert isinstance(display_data, dict)
-    assert display_data["position"] == {"x": 0.0, "y": 0.0}
-
-    assert "trigger" in serialized_router_node
-    trigger = serialized_router_node["trigger"]
-    assert isinstance(trigger, dict)
-    assert trigger["merge_behavior"] == "AWAIT_ATTRIBUTES"
-    assert "id" in trigger
-
-    assert "attributes" in serialized_router_node
-    attributes = serialized_router_node["attributes"]
-    assert isinstance(attributes, list)
-    assert len(attributes) == 1
-    prompt_outputs_attr = attributes[0]
-    assert isinstance(prompt_outputs_attr, dict)
-    assert prompt_outputs_attr["name"] == "prompt_outputs"
-    prompt_outputs_value = prompt_outputs_attr["value"]
-    assert isinstance(prompt_outputs_value, dict)
-    assert prompt_outputs_value["type"] == "NODE_OUTPUT"
-    assert "node_id" in prompt_outputs_value
-    assert "node_output_id" in prompt_outputs_value
-
-    assert "ports" in serialized_router_node
-    ports = serialized_router_node["ports"]
-    assert isinstance(ports, list)
-    assert len(ports) == 2
-
-    my_function_port = ports[0]
-    assert isinstance(my_function_port, dict)
-    assert my_function_port["name"] == "my_function"
-    assert my_function_port["type"] == "IF"
-    assert "expression" in my_function_port
-    assert "id" in my_function_port
-
-    expression = my_function_port["expression"]
-    assert isinstance(expression, dict)
-    assert expression["type"] == "BINARY_EXPRESSION"
-    assert expression["operator"] == "and"
-
-    default_port = ports[1]
-    assert isinstance(default_port, dict)
-    assert default_port["name"] == "default"
-    assert default_port["type"] == "ELSE"
-    assert default_port["expression"] is None
-    assert "id" in default_port
