@@ -27,24 +27,10 @@ A full reference for this library is available [here](https://github.com/vellum-
 Instantiate and use the client with the following:
 
 ```python
-from vellum import StringInputRequest, Vellum
-
-client = Vellum(
-    api_version="YOUR_API_VERSION",
-    api_key="YOUR_API_KEY",
-)
-client.execute_prompt(
-    inputs=[
-        StringInputRequest(
-            name="x",
-            value="value",
-        ),
-        StringInputRequest(
-            name="x",
-            value="value",
-        ),
-    ],
-)
+from vellum import Vellum
+from vellum import StringInputRequest
+client = Vellum(api_version="YOUR_API_VERSION", api_key="YOUR_API_KEY", )
+client.execute_prompt(inputs=[StringInputRequest(name='x', value='value', ), StringInputRequest(name='x', value='value', )], )
 ```
 
 ## Async Client
@@ -52,33 +38,13 @@ client.execute_prompt(
 The SDK also exports an `async` client so that you can make non-blocking calls to our API.
 
 ```python
+from vellum import AsyncVellum
+from vellum import StringInputRequest
 import asyncio
-
-from vellum import AsyncVellum, StringInputRequest
-
-client = AsyncVellum(
-    api_version="YOUR_API_VERSION",
-    api_key="YOUR_API_KEY",
-)
-
-
+client = AsyncVellum(api_version="YOUR_API_VERSION", api_key="YOUR_API_KEY", )
 async def main() -> None:
-    await client.execute_prompt(
-        inputs=[
-            StringInputRequest(
-                name="x",
-                value="value",
-            ),
-            StringInputRequest(
-                name="x",
-                value="value",
-            ),
-        ],
-    )
-
-
-asyncio.run(main())
-```
+    await client.execute_prompt(inputs=[StringInputRequest(name='x', value='value', ), StringInputRequest(name='x', value='value', )], )
+asyncio.run(main())```
 
 ## Exception Handling
 
@@ -87,7 +53,6 @@ will be thrown.
 
 ```python
 from vellum.core.api_error import ApiError
-
 try:
     client.execute_prompt(...)
 except ApiError as e:
@@ -100,57 +65,34 @@ except ApiError as e:
 The SDK supports streaming responses, as well, the response will be a generator that you can loop over.
 
 ```python
-from vellum import (
-    JinjaPromptBlock,
-    PromptParameters,
-    PromptRequestStringInput,
-    Vellum,
-    VellumVariable,
-)
-
-client = Vellum(
-    api_version="YOUR_API_VERSION",
-    api_key="YOUR_API_KEY",
-)
-response = client.ad_hoc.adhoc_execute_prompt_stream(
-    ml_model="x",
-    input_values=[
-        PromptRequestStringInput(
-            key="x",
-            value="value",
-        ),
-        PromptRequestStringInput(
-            key="x",
-            value="value",
-        ),
-    ],
-    input_variables=[
-        VellumVariable(
-            id="x",
-            key="key",
-            type="STRING",
-        ),
-        VellumVariable(
-            id="x",
-            key="key",
-            type="STRING",
-        ),
-    ],
-    parameters=PromptParameters(),
-    blocks=[
-        JinjaPromptBlock(
-            template="template",
-        ),
-        JinjaPromptBlock(
-            template="template",
-        ),
-    ],
-)
+from vellum import Vellum
+from vellum import PromptRequestStringInput
+from vellum import VellumVariable
+from vellum import PromptParameters
+from vellum import JinjaPromptBlock
+client = Vellum(api_version="YOUR_API_VERSION", api_key="YOUR_API_KEY", )
+response = client.ad_hoc.adhoc_execute_prompt_stream(ml_model='x', input_values=[PromptRequestStringInput(key='x', value='value', ), PromptRequestStringInput(key='x', value='value', )], input_variables=[VellumVariable(id='x', key='key', type="STRING", ), VellumVariable(id='x', key='key', type="STRING", )], parameters=PromptParameters(), blocks=[JinjaPromptBlock(template='template', ), JinjaPromptBlock(template='template', )], )
 for chunk in response.data:
     yield chunk
 ```
 
 ## Advanced
+
+### Access Raw Response Data
+
+The SDK provides access to raw response data, including headers, through the `.with_raw_response` property.
+The `.with_raw_response` property returns a "raw" client that can be used to access the `.headers` and `.data` attributes.
+
+```python
+from vellum import Vellum
+client = Vellum(..., )
+response = client.with_raw_response.execute_prompt(...)
+print(response.headers)  # access the response headers
+print(response.data)  # access the underlying object
+with client.ad_hoc.with_raw_response.adhoc_execute_prompt_stream(...) as response:
+    print(response.headers)  # access the response headers
+    for chunk in response.data:
+        print(chunk)  # access the underlying object(s)```
 
 ### Retries
 
@@ -179,12 +121,7 @@ The SDK defaults to a 60 second timeout. You can configure this with a timeout o
 ```python
 
 from vellum import Vellum
-
-client = Vellum(
-    ...,
-    timeout=20.0,
-)
-
+client = Vellum(..., timeout=20.0, )
 
 # Override timeout for a specific method
 client.execute_prompt(..., request_options={
@@ -198,15 +135,7 @@ You can override the `httpx` client to customize it for your use-case. Some comm
 and transports.
 
 ```python
-import httpx
 from vellum import Vellum
-
-client = Vellum(
-    ...,
-    httpx_client=httpx.Client(
-        proxies="http://my.test.proxy.example.com",
-        transport=httpx.HTTPTransport(local_address="0.0.0.0"),
-    ),
-)
-```
+import httpx
+client = Vellum(..., httpx_client=httpx.Client(proxies="http://my.test.proxy.example.com", transport=httpx.HTTPTransport(local_address="0.0.0.0"), ))```
 
