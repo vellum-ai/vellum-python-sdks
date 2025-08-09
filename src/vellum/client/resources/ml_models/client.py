@@ -57,10 +57,7 @@ class MlModelsClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
 
@@ -116,8 +113,5 @@ class AsyncMlModelsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data

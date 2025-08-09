@@ -3,14 +3,16 @@
 import typing
 from .string_chat_message_content_request import StringChatMessageContentRequest
 from .function_call_chat_message_content_request import FunctionCallChatMessageContentRequest
-from .image_chat_message_content_request import ImageChatMessageContentRequest
 from .audio_chat_message_content_request import AudioChatMessageContentRequest
+from .video_chat_message_content_request import VideoChatMessageContentRequest
+from .image_chat_message_content_request import ImageChatMessageContentRequest
 from .document_chat_message_content_request import DocumentChatMessageContentRequest
 
 ArrayChatMessageContentItemRequest = typing.Union[
     StringChatMessageContentRequest,
     FunctionCallChatMessageContentRequest,
-    ImageChatMessageContentRequest,
     AudioChatMessageContentRequest,
+    VideoChatMessageContentRequest,
+    ImageChatMessageContentRequest,
     DocumentChatMessageContentRequest,
 ]

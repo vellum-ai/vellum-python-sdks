@@ -35,7 +35,7 @@ class DocumentIndexesClient:
         """
         return self._raw_client
 
-    def list_(
+    def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -87,12 +87,7 @@ class DocumentIndexesClient:
         client.document_indexes.list()
         """
         response = self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            search=search,
-            status=status,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, search=search, status=status, request_options=request_options
         )
         return response.data
 
@@ -198,10 +193,7 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     def update(
@@ -250,12 +242,7 @@ class DocumentIndexesClient:
             label="x",
         )
         """
-        response = self._raw_client.update(
-            id,
-            label=label,
-            status=status,
-            request_options=request_options,
-        )
+        response = self._raw_client.update(id, label=label, status=status, request_options=request_options)
         return response.data
 
     def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
@@ -286,10 +273,7 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        response = self._raw_client.destroy(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.destroy(id, request_options=request_options)
         return response.data
 
     def partial_update(
@@ -337,12 +321,7 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        response = self._raw_client.partial_update(
-            id,
-            label=label,
-            status=status,
-            request_options=request_options,
-        )
+        response = self._raw_client.partial_update(id, label=label, status=status, request_options=request_options)
         return response.data
 
     def add_document(
@@ -379,11 +358,7 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        response = self._raw_client.add_document(
-            document_id,
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.add_document(document_id, id, request_options=request_options)
         return response.data
 
     def remove_document(
@@ -420,11 +395,7 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        response = self._raw_client.remove_document(
-            document_id,
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.remove_document(document_id, id, request_options=request_options)
         return response.data
 
 
@@ -443,7 +414,7 @@ class AsyncDocumentIndexesClient:
         """
         return self._raw_client
 
-    async def list_(
+    async def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -503,12 +474,7 @@ class AsyncDocumentIndexesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            search=search,
-            status=status,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, search=search, status=status, request_options=request_options
         )
         return response.data
 
@@ -630,10 +596,7 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     async def update(
@@ -690,12 +653,7 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.update(
-            id,
-            label=label,
-            status=status,
-            request_options=request_options,
-        )
+        response = await self._raw_client.update(id, label=label, status=status, request_options=request_options)
         return response.data
 
     async def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
@@ -734,10 +692,7 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.destroy(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.destroy(id, request_options=request_options)
         return response.data
 
     async def partial_update(
@@ -794,10 +749,7 @@ class AsyncDocumentIndexesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.partial_update(
-            id,
-            label=label,
-            status=status,
-            request_options=request_options,
+            id, label=label, status=status, request_options=request_options
         )
         return response.data
 
@@ -843,11 +795,7 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.add_document(
-            document_id,
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.add_document(document_id, id, request_options=request_options)
         return response.data
 
     async def remove_document(
@@ -892,9 +840,5 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.remove_document(
-            document_id,
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.remove_document(document_id, id, request_options=request_options)
         return response.data

@@ -343,6 +343,152 @@ client.execute_prompt(
 </dl>
 </details>
 
+<details><summary><code>client.<a href="src/vellum/client.py">execute_prompt_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Executes a deployed Prompt and streams back the results.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import StringInputRequest, Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+response = client.execute_prompt_stream(
+    inputs=[
+        StringInputRequest(
+            name="x",
+            value="value",
+        ),
+        StringInputRequest(
+            name="x",
+            value="value",
+        ),
+    ],
+)
+for chunk in response.data:
+    yield chunk
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Sequence[PromptDeploymentInputRequest]` — A list consisting of the Prompt Deployment's input variables and their values.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_deployment_id:** `typing.Optional[str]` — The ID of the Prompt Deployment. Must provide either this or prompt_deployment_name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_deployment_name:** `typing.Optional[str]` — The unique name of the Prompt Deployment. Must provide either this or prompt_deployment_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Prompt Deployment
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand_meta:** `typing.Optional[PromptDeploymentExpandMetaRequest]` — An optionally specified configuration used to opt in to including additional metadata about this prompt execution in the API response. Corresponding values will be returned under the `meta` key of the API response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**raw_overrides:** `typing.Optional[RawPromptExecutionOverridesRequest]` — Overrides for the raw API request sent to the model host. Combined with `expand_raw`, it can be used to access new features from models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand_raw:** `typing.Optional[typing.Sequence[str]]` — A list of keys whose values you'd like to directly return from the JSON response of the model provider. Useful if you need lower-level info returned by model providers that Vellum would otherwise omit. Corresponding key/value pairs will be returned under the `raw` key of the API response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.<a href="src/vellum/client.py">execute_workflow</a>(...)</code></summary>
 <dl>
 <dd>
@@ -471,6 +617,144 @@ client.execute_workflow(
 </dl>
 </details>
 
+<details><summary><code>client.<a href="src/vellum/client.py">execute_workflow_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Executes a deployed Workflow and streams back its results.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum, WorkflowRequestStringInputRequest
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+response = client.execute_workflow_stream(
+    inputs=[
+        WorkflowRequestStringInputRequest(
+            name="x",
+            value="value",
+        ),
+        WorkflowRequestStringInputRequest(
+            name="x",
+            value="value",
+        ),
+    ],
+)
+for chunk in response.data:
+    yield chunk
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Sequence[WorkflowRequestInputRequest]` — The list of inputs defined in the Workflow's Deployment with their corresponding values.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand_meta:** `typing.Optional[WorkflowExpandMetaRequest]` — An optionally specified configuration used to opt in to including additional metadata about this workflow execution in the API response. Corresponding values will be returned under the `execution_meta` key within NODE events in the response stream.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**workflow_deployment_id:** `typing.Optional[str]` — The ID of the Workflow Deployment. Must provide either this or workflow_deployment_name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**workflow_deployment_name:** `typing.Optional[str]` — The name of the Workflow Deployment. Must provide either this or workflow_deployment_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**event_types:** `typing.Optional[typing.Sequence[WorkflowExecutionEventType]]` — Optionally specify which events you want to receive. Defaults to only WORKFLOW events. Note that the schema of non-WORKFLOW events is unstable and should be used with caution.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.<a href="src/vellum/client.py">generate</a>(...)</code></summary>
 <dl>
 <dd>
@@ -517,6 +801,113 @@ client.generate(
         ),
     ],
 )
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**requests:** `typing.Sequence[GenerateRequest]` — The generation request to make. Bulk requests are no longer supported, this field must be an array of length 1.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deployment_id:** `typing.Optional[str]` — The ID of the deployment. Must provide either this or deployment_name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deployment_name:** `typing.Optional[str]` — The name of the deployment. Must provide either this or deployment_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**options:** `typing.Optional[GenerateOptionsRequest]` — Additional configuration that can be used to control what's included in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.<a href="src/vellum/client.py">generate_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Generate a stream of completions using a previously defined deployment.
+
+Important: This endpoint is DEPRECATED and has been superseded by
+[execute-prompt-stream](/api-reference/api-reference/execute-prompt-stream).
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import GenerateRequest, Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+response = client.generate_stream(
+    requests=[
+        GenerateRequest(
+            input_values={"input_values": {"key": "value"}},
+        ),
+        GenerateRequest(
+            input_values={"input_values": {"key": "value"}},
+        ),
+    ],
+)
+for chunk in response.data:
+    yield chunk
 
 ```
 </dd>
@@ -918,6 +1309,158 @@ client.ad_hoc.adhoc_execute_prompt(
         ),
     ],
 )
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**ml_model:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**input_values:** `typing.Sequence[PromptRequestInput]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**input_variables:** `typing.Sequence[VellumVariable]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parameters:** `PromptParameters` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**blocks:** `typing.Sequence[PromptBlock]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**settings:** `typing.Optional[PromptSettings]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**functions:** `typing.Optional[typing.Sequence[FunctionDefinition]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand_meta:** `typing.Optional[AdHocExpandMeta]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.ad_hoc.<a href="src/vellum/resources/ad_hoc/client.py">adhoc_execute_prompt_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import (
+    JinjaPromptBlock,
+    PromptParameters,
+    PromptRequestStringInput,
+    Vellum,
+    VellumVariable,
+)
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+response = client.ad_hoc.adhoc_execute_prompt_stream(
+    ml_model="x",
+    input_values=[
+        PromptRequestStringInput(
+            key="x",
+            value="value",
+        ),
+        PromptRequestStringInput(
+            key="x",
+            value="value",
+        ),
+    ],
+    input_variables=[
+        VellumVariable(
+            id="x",
+            key="key",
+            type="STRING",
+        ),
+        VellumVariable(
+            id="x",
+            key="key",
+            type="STRING",
+        ),
+    ],
+    parameters=PromptParameters(),
+    blocks=[
+        JinjaPromptBlock(
+            template="template",
+        ),
+        JinjaPromptBlock(
+            template="template",
+        ),
+    ],
+)
+for chunk in response.data:
+    yield chunk
 
 ```
 </dd>
@@ -4516,6 +5059,136 @@ client.test_suites.upsert_test_suite_test_case(
 <dd>
 
 **label:** `typing.Optional[str]` — A human-readable label used to convey the intention of this Test Case
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.test_suites.<a href="src/vellum/resources/test_suites/client.py">test_suite_test_cases_bulk</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Created, replace, and delete Test Cases within the specified Test Suite in bulk
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import (
+    CreateTestSuiteTestCaseRequest,
+    NamedTestCaseStringVariableValueRequest,
+    TestSuiteTestCaseCreateBulkOperationRequest,
+    Vellum,
+)
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+response = client.test_suites.test_suite_test_cases_bulk(
+    id="id",
+    request=[
+        TestSuiteTestCaseCreateBulkOperationRequest(
+            id="id",
+            data=CreateTestSuiteTestCaseRequest(
+                input_values=[
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                ],
+                evaluation_values=[
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                ],
+            ),
+        ),
+        TestSuiteTestCaseCreateBulkOperationRequest(
+            id="id",
+            data=CreateTestSuiteTestCaseRequest(
+                input_values=[
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                ],
+                evaluation_values=[
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                    NamedTestCaseStringVariableValueRequest(
+                        name="x",
+                    ),
+                ],
+            ),
+        ),
+    ],
+)
+for chunk in response.data:
+    yield chunk
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Either the Test Suites' ID or its unique name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `typing.Sequence[TestSuiteTestCaseBulkOperationRequest]` 
     
 </dd>
 </dl>

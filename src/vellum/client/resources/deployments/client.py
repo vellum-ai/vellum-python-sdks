@@ -41,7 +41,7 @@ class DeploymentsClient:
         """
         return self._raw_client
 
-    def list_(
+    def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -86,11 +86,7 @@ class DeploymentsClient:
         client.deployments.list()
         """
         response = self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            status=status,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, status=status, request_options=request_options
         )
         return response.data
 
@@ -123,10 +119,7 @@ class DeploymentsClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     def deployment_history_item_retrieve(
@@ -166,9 +159,7 @@ class DeploymentsClient:
         )
         """
         response = self._raw_client.deployment_history_item_retrieve(
-            history_id_or_release_tag,
-            id,
-            request_options=request_options,
+            history_id_or_release_tag, id, request_options=request_options
         )
         return response.data
 
@@ -222,12 +213,7 @@ class DeploymentsClient:
         )
         """
         response = self._raw_client.list_deployment_release_tags(
-            id,
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            source=source,
-            request_options=request_options,
+            id, limit=limit, offset=offset, ordering=ordering, source=source, request_options=request_options
         )
         return response.data
 
@@ -266,11 +252,7 @@ class DeploymentsClient:
             name="name",
         )
         """
-        response = self._raw_client.retrieve_deployment_release_tag(
-            id,
-            name,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve_deployment_release_tag(id, name, request_options=request_options)
         return response.data
 
     def update_deployment_release_tag(
@@ -317,10 +299,7 @@ class DeploymentsClient:
         )
         """
         response = self._raw_client.update_deployment_release_tag(
-            id,
-            name,
-            history_item_id=history_item_id,
-            request_options=request_options,
+            id, name, history_item_id=history_item_id, request_options=request_options
         )
         return response.data
 
@@ -360,9 +339,7 @@ class DeploymentsClient:
         )
         """
         response = self._raw_client.retrieve_prompt_deployment_release(
-            id,
-            release_id_or_release_tag,
-            request_options=request_options,
+            id, release_id_or_release_tag, request_options=request_options
         )
         return response.data
 
@@ -459,7 +436,7 @@ class AsyncDeploymentsClient:
         """
         return self._raw_client
 
-    async def list_(
+    async def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -512,11 +489,7 @@ class AsyncDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            status=status,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, status=status, request_options=request_options
         )
         return response.data
 
@@ -557,10 +530,7 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     async def deployment_history_item_retrieve(
@@ -608,9 +578,7 @@ class AsyncDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.deployment_history_item_retrieve(
-            history_id_or_release_tag,
-            id,
-            request_options=request_options,
+            history_id_or_release_tag, id, request_options=request_options
         )
         return response.data
 
@@ -672,12 +640,7 @@ class AsyncDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list_deployment_release_tags(
-            id,
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            source=source,
-            request_options=request_options,
+            id, limit=limit, offset=offset, ordering=ordering, source=source, request_options=request_options
         )
         return response.data
 
@@ -724,11 +687,7 @@ class AsyncDeploymentsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve_deployment_release_tag(
-            id,
-            name,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve_deployment_release_tag(id, name, request_options=request_options)
         return response.data
 
     async def update_deployment_release_tag(
@@ -783,10 +742,7 @@ class AsyncDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.update_deployment_release_tag(
-            id,
-            name,
-            history_item_id=history_item_id,
-            request_options=request_options,
+            id, name, history_item_id=history_item_id, request_options=request_options
         )
         return response.data
 
@@ -834,9 +790,7 @@ class AsyncDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.retrieve_prompt_deployment_release(
-            id,
-            release_id_or_release_tag,
-            request_options=request_options,
+            id, release_id_or_release_tag, request_options=request_options
         )
         return response.data
 

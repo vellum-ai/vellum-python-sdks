@@ -33,7 +33,7 @@ class ContainerImagesClient:
         """
         return self._raw_client
 
-    def list_(
+    def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -73,12 +73,7 @@ class ContainerImagesClient:
         )
         client.container_images.list()
         """
-        response = self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            request_options=request_options,
-        )
+        response = self._raw_client.list(limit=limit, offset=offset, ordering=ordering, request_options=request_options)
         return response.data
 
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> ContainerImageRead:
@@ -110,10 +105,7 @@ class ContainerImagesClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     def docker_service_token(self, *, request_options: typing.Optional[RequestOptions] = None) -> DockerServiceToken:
@@ -138,9 +130,7 @@ class ContainerImagesClient:
         )
         client.container_images.docker_service_token()
         """
-        response = self._raw_client.docker_service_token(
-            request_options=request_options,
-        )
+        response = self._raw_client.docker_service_token(request_options=request_options)
         return response.data
 
     def push_container_image(
@@ -182,12 +172,7 @@ class ContainerImagesClient:
             tags=["tags", "tags"],
         )
         """
-        response = self._raw_client.push_container_image(
-            name=name,
-            sha=sha,
-            tags=tags,
-            request_options=request_options,
-        )
+        response = self._raw_client.push_container_image(name=name, sha=sha, tags=tags, request_options=request_options)
         return response.data
 
 
@@ -206,7 +191,7 @@ class AsyncContainerImagesClient:
         """
         return self._raw_client
 
-    async def list_(
+    async def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -255,10 +240,7 @@ class AsyncContainerImagesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, request_options=request_options
         )
         return response.data
 
@@ -299,10 +281,7 @@ class AsyncContainerImagesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     async def docker_service_token(
@@ -337,9 +316,7 @@ class AsyncContainerImagesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.docker_service_token(
-            request_options=request_options,
-        )
+        response = await self._raw_client.docker_service_token(request_options=request_options)
         return response.data
 
     async def push_container_image(
@@ -390,9 +367,6 @@ class AsyncContainerImagesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.push_container_image(
-            name=name,
-            sha=sha,
-            tags=tags,
-            request_options=request_options,
+            name=name, sha=sha, tags=tags, request_options=request_options
         )
         return response.data

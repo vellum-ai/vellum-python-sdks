@@ -5,8 +5,9 @@ import typing
 from .string_vellum_value_request import StringVellumValueRequest
 from .number_vellum_value_request import NumberVellumValueRequest
 from .json_vellum_value_request import JsonVellumValueRequest
-from .image_vellum_value_request import ImageVellumValueRequest
 from .audio_vellum_value_request import AudioVellumValueRequest
+from .video_vellum_value_request import VideoVellumValueRequest
+from .image_vellum_value_request import ImageVellumValueRequest
 from .document_vellum_value_request import DocumentVellumValueRequest
 from .function_call_vellum_value_request import FunctionCallVellumValueRequest
 from .error_vellum_value_request import ErrorVellumValueRequest
@@ -21,8 +22,9 @@ VellumValueRequest = typing.Union[
     StringVellumValueRequest,
     NumberVellumValueRequest,
     JsonVellumValueRequest,
-    ImageVellumValueRequest,
     AudioVellumValueRequest,
+    VideoVellumValueRequest,
+    ImageVellumValueRequest,
     DocumentVellumValueRequest,
     FunctionCallVellumValueRequest,
     ErrorVellumValueRequest,

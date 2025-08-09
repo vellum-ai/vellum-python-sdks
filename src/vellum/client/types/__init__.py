@@ -549,7 +549,14 @@ from .vellum_value_request import VellumValueRequest
 from .vellum_variable import VellumVariable
 from .vellum_variable_extensions import VellumVariableExtensions
 from .vellum_variable_type import VellumVariableType
+from .vellum_video import VellumVideo
+from .vellum_video_request import VellumVideoRequest
 from .vellum_workflow_execution_event import VellumWorkflowExecutionEvent
+from .video_chat_message_content import VideoChatMessageContent
+from .video_chat_message_content_request import VideoChatMessageContentRequest
+from .video_prompt_block import VideoPromptBlock
+from .video_vellum_value import VideoVellumValue
+from .video_vellum_value_request import VideoVellumValueRequest
 from .workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from .workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
@@ -586,6 +593,7 @@ from .workflow_execution_streaming_body import WorkflowExecutionStreamingBody
 from .workflow_execution_streaming_event import WorkflowExecutionStreamingEvent
 from .workflow_execution_usage_calculation_error import WorkflowExecutionUsageCalculationError
 from .workflow_execution_usage_calculation_error_code_enum import WorkflowExecutionUsageCalculationErrorCodeEnum
+from .workflow_execution_usage_calculation_fulfilled_body import WorkflowExecutionUsageCalculationFulfilledBody
 from .workflow_execution_usage_result import WorkflowExecutionUsageResult
 from .workflow_execution_view_online_eval_metric_result import WorkflowExecutionViewOnlineEvalMetricResult
 from .workflow_execution_workflow_result_event import WorkflowExecutionWorkflowResultEvent
@@ -1153,7 +1161,14 @@ __all__ = [
     "VellumVariable",
     "VellumVariableExtensions",
     "VellumVariableType",
+    "VellumVideo",
+    "VellumVideoRequest",
     "VellumWorkflowExecutionEvent",
+    "VideoChatMessageContent",
+    "VideoChatMessageContentRequest",
+    "VideoPromptBlock",
+    "VideoVellumValue",
+    "VideoVellumValueRequest",
     "WorkflowDeploymentEventExecutionsResponse",
     "WorkflowDeploymentHistoryItem",
     "WorkflowDeploymentParentContext",
@@ -1190,6 +1205,7 @@ __all__ = [
     "WorkflowExecutionStreamingEvent",
     "WorkflowExecutionUsageCalculationError",
     "WorkflowExecutionUsageCalculationErrorCodeEnum",
+    "WorkflowExecutionUsageCalculationFulfilledBody",
     "WorkflowExecutionUsageResult",
     "WorkflowExecutionViewOnlineEvalMetricResult",
     "WorkflowExecutionWorkflowResultEvent",

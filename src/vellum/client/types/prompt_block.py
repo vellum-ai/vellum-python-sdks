@@ -5,8 +5,9 @@ import typing
 from .jinja_prompt_block import JinjaPromptBlock
 from .variable_prompt_block import VariablePromptBlock
 from .rich_text_prompt_block import RichTextPromptBlock
-from .audio_prompt_block import AudioPromptBlock
 from .function_call_prompt_block import FunctionCallPromptBlock
+from .audio_prompt_block import AudioPromptBlock
+from .video_prompt_block import VideoPromptBlock
 from .image_prompt_block import ImagePromptBlock
 from .document_prompt_block import DocumentPromptBlock
 import typing
@@ -18,8 +19,9 @@ PromptBlock = typing.Union[
     "ChatMessagePromptBlock",
     VariablePromptBlock,
     RichTextPromptBlock,
-    AudioPromptBlock,
     FunctionCallPromptBlock,
+    AudioPromptBlock,
+    VideoPromptBlock,
     ImagePromptBlock,
     DocumentPromptBlock,
 ]

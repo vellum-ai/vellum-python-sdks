@@ -19,6 +19,8 @@ from ...errors.forbidden_error import ForbiddenError
 from ...errors.internal_server_error import InternalServerError
 from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
+import json
+import contextlib
 from ...core.client_wrapper import AsyncClientWrapper
 from ...core.http_response import AsyncHttpResponse
 
@@ -151,6 +153,143 @@ class RawAdHocClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    @contextlib.contextmanager
+    def adhoc_execute_prompt_stream(
+        self,
+        *,
+        ml_model: str,
+        input_values: typing.Sequence[PromptRequestInput],
+        input_variables: typing.Sequence[VellumVariable],
+        parameters: PromptParameters,
+        blocks: typing.Sequence[PromptBlock],
+        settings: typing.Optional[PromptSettings] = OMIT,
+        functions: typing.Optional[typing.Sequence[FunctionDefinition]] = OMIT,
+        expand_meta: typing.Optional[AdHocExpandMeta] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[AdHocExecutePromptEvent]]]:
+        """
+        Parameters
+        ----------
+        ml_model : str
+
+        input_values : typing.Sequence[PromptRequestInput]
+
+        input_variables : typing.Sequence[VellumVariable]
+
+        parameters : PromptParameters
+
+        blocks : typing.Sequence[PromptBlock]
+
+        settings : typing.Optional[PromptSettings]
+
+        functions : typing.Optional[typing.Sequence[FunctionDefinition]]
+
+        expand_meta : typing.Optional[AdHocExpandMeta]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.Iterator[HttpResponse[typing.Iterator[AdHocExecutePromptEvent]]]
+
+        """
+        with self._client_wrapper.httpx_client.stream(
+            "v1/ad-hoc/execute-prompt-stream",
+            base_url=self._client_wrapper.get_environment().predict,
+            method="POST",
+            json={
+                "ml_model": ml_model,
+                "input_values": convert_and_respect_annotation_metadata(
+                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
+                ),
+                "input_variables": convert_and_respect_annotation_metadata(
+                    object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"
+                ),
+                "parameters": convert_and_respect_annotation_metadata(
+                    object_=parameters, annotation=PromptParameters, direction="write"
+                ),
+                "settings": convert_and_respect_annotation_metadata(
+                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
+                ),
+                "blocks": convert_and_respect_annotation_metadata(
+                    object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
+                ),
+                "functions": convert_and_respect_annotation_metadata(
+                    object_=functions,
+                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
+                    direction="write",
+                ),
+                "expand_meta": convert_and_respect_annotation_metadata(
+                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
+                ),
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[AdHocExecutePromptEvent]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        def _iter():
+                            for _text in _response.iter_lines():
+                                try:
+                                    if len(_text) == 0:
+                                        continue
+                                    yield typing.cast(
+                                        AdHocExecutePromptEvent,
+                                        parse_obj_as(
+                                            type_=AdHocExecutePromptEvent,  # type: ignore
+                                            object_=json.loads(_text),
+                                        ),
+                                    )
+                                except Exception:
+                                    pass
+                            return
+
+                        return HttpResponse(response=_response, data=_iter())
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield stream()
+
 
 class AsyncRawAdHocClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -276,3 +415,140 @@ class AsyncRawAdHocClient:
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    @contextlib.asynccontextmanager
+    async def adhoc_execute_prompt_stream(
+        self,
+        *,
+        ml_model: str,
+        input_values: typing.Sequence[PromptRequestInput],
+        input_variables: typing.Sequence[VellumVariable],
+        parameters: PromptParameters,
+        blocks: typing.Sequence[PromptBlock],
+        settings: typing.Optional[PromptSettings] = OMIT,
+        functions: typing.Optional[typing.Sequence[FunctionDefinition]] = OMIT,
+        expand_meta: typing.Optional[AdHocExpandMeta] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[AdHocExecutePromptEvent]]]:
+        """
+        Parameters
+        ----------
+        ml_model : str
+
+        input_values : typing.Sequence[PromptRequestInput]
+
+        input_variables : typing.Sequence[VellumVariable]
+
+        parameters : PromptParameters
+
+        blocks : typing.Sequence[PromptBlock]
+
+        settings : typing.Optional[PromptSettings]
+
+        functions : typing.Optional[typing.Sequence[FunctionDefinition]]
+
+        expand_meta : typing.Optional[AdHocExpandMeta]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[AdHocExecutePromptEvent]]]
+
+        """
+        async with self._client_wrapper.httpx_client.stream(
+            "v1/ad-hoc/execute-prompt-stream",
+            base_url=self._client_wrapper.get_environment().predict,
+            method="POST",
+            json={
+                "ml_model": ml_model,
+                "input_values": convert_and_respect_annotation_metadata(
+                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
+                ),
+                "input_variables": convert_and_respect_annotation_metadata(
+                    object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"
+                ),
+                "parameters": convert_and_respect_annotation_metadata(
+                    object_=parameters, annotation=PromptParameters, direction="write"
+                ),
+                "settings": convert_and_respect_annotation_metadata(
+                    object_=settings, annotation=typing.Optional[PromptSettings], direction="write"
+                ),
+                "blocks": convert_and_respect_annotation_metadata(
+                    object_=blocks, annotation=typing.Sequence[PromptBlock], direction="write"
+                ),
+                "functions": convert_and_respect_annotation_metadata(
+                    object_=functions,
+                    annotation=typing.Optional[typing.Sequence[FunctionDefinition]],
+                    direction="write",
+                ),
+                "expand_meta": convert_and_respect_annotation_metadata(
+                    object_=expand_meta, annotation=typing.Optional[AdHocExpandMeta], direction="write"
+                ),
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[AdHocExecutePromptEvent]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        async def _iter():
+                            async for _text in _response.aiter_lines():
+                                try:
+                                    if len(_text) == 0:
+                                        continue
+                                    yield typing.cast(
+                                        AdHocExecutePromptEvent,
+                                        parse_obj_as(
+                                            type_=AdHocExecutePromptEvent,  # type: ignore
+                                            object_=json.loads(_text),
+                                        ),
+                                    )
+                                except Exception:
+                                    pass
+                            return
+
+                        return AsyncHttpResponse(response=_response, data=_iter())
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 403:
+                        raise ForbiddenError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    if _response.status_code == 500:
+                        raise InternalServerError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield await stream()

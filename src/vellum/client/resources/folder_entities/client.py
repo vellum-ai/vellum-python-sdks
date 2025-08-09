@@ -32,7 +32,7 @@ class FolderEntitiesClient:
         """
         return self._raw_client
 
-    def list_(
+    def list(
         self,
         *,
         parent_folder_id: str,
@@ -144,9 +144,7 @@ class FolderEntitiesClient:
         )
         """
         response = self._raw_client.add_entity_to_folder(
-            folder_id,
-            entity_id=entity_id,
-            request_options=request_options,
+            folder_id, entity_id=entity_id, request_options=request_options
         )
         return response.data
 
@@ -166,7 +164,7 @@ class AsyncFolderEntitiesClient:
         """
         return self._raw_client
 
-    async def list_(
+    async def list(
         self,
         *,
         parent_folder_id: str,
@@ -294,8 +292,6 @@ class AsyncFolderEntitiesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.add_entity_to_folder(
-            folder_id,
-            entity_id=entity_id,
-            request_options=request_options,
+            folder_id, entity_id=entity_id, request_options=request_options
         )
         return response.data

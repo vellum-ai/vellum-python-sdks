@@ -12,6 +12,10 @@ from ...core.api_error import ApiError
 from ...types.named_test_case_variable_value_request import NamedTestCaseVariableValueRequest
 from ...types.test_suite_test_case import TestSuiteTestCase
 from ...core.serialization import convert_and_respect_annotation_metadata
+from ...types.test_suite_test_case_bulk_operation_request import TestSuiteTestCaseBulkOperationRequest
+from ...types.test_suite_test_case_bulk_result import TestSuiteTestCaseBulkResult
+import json
+import contextlib
 from ...core.client_wrapper import AsyncClientWrapper
 from ...core.http_response import AsyncHttpResponse
 
@@ -162,6 +166,72 @@ class RawTestSuitesClient:
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    @contextlib.contextmanager
+    def test_suite_test_cases_bulk(
+        self,
+        id: str,
+        *,
+        request: typing.Sequence[TestSuiteTestCaseBulkOperationRequest],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[typing.List[TestSuiteTestCaseBulkResult]]]]:
+        """
+        Created, replace, and delete Test Cases within the specified Test Suite in bulk
+
+        Parameters
+        ----------
+        id : str
+            Either the Test Suites' ID or its unique name
+
+        request : typing.Sequence[TestSuiteTestCaseBulkOperationRequest]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.Iterator[HttpResponse[typing.Iterator[typing.List[TestSuiteTestCaseBulkResult]]]]
+
+        """
+        with self._client_wrapper.httpx_client.stream(
+            f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
+            ),
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[typing.List[TestSuiteTestCaseBulkResult]]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        def _iter():
+                            for _text in _response.iter_lines():
+                                try:
+                                    if len(_text) == 0:
+                                        continue
+                                    yield typing.cast(
+                                        typing.List[TestSuiteTestCaseBulkResult],
+                                        parse_obj_as(
+                                            type_=typing.List[TestSuiteTestCaseBulkResult],  # type: ignore
+                                            object_=json.loads(_text),
+                                        ),
+                                    )
+                                except Exception:
+                                    pass
+                            return
+
+                        return HttpResponse(response=_response, data=_iter())
+                    _response.read()
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield stream()
 
     def delete_test_suite_test_case(
         self, id: str, test_case_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -342,6 +412,72 @@ class AsyncRawTestSuitesClient:
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    @contextlib.asynccontextmanager
+    async def test_suite_test_cases_bulk(
+        self,
+        id: str,
+        *,
+        request: typing.Sequence[TestSuiteTestCaseBulkOperationRequest],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[typing.List[TestSuiteTestCaseBulkResult]]]]:
+        """
+        Created, replace, and delete Test Cases within the specified Test Suite in bulk
+
+        Parameters
+        ----------
+        id : str
+            Either the Test Suites' ID or its unique name
+
+        request : typing.Sequence[TestSuiteTestCaseBulkOperationRequest]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[typing.List[TestSuiteTestCaseBulkResult]]]]
+
+        """
+        async with self._client_wrapper.httpx_client.stream(
+            f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
+            ),
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[typing.List[TestSuiteTestCaseBulkResult]]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        async def _iter():
+                            async for _text in _response.aiter_lines():
+                                try:
+                                    if len(_text) == 0:
+                                        continue
+                                    yield typing.cast(
+                                        typing.List[TestSuiteTestCaseBulkResult],
+                                        parse_obj_as(
+                                            type_=typing.List[TestSuiteTestCaseBulkResult],  # type: ignore
+                                            object_=json.loads(_text),
+                                        ),
+                                    )
+                                except Exception:
+                                    pass
+                            return
+
+                        return AsyncHttpResponse(response=_response, data=_iter())
+                    await _response.aread()
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
 
     async def delete_test_suite_test_case(
         self, id: str, test_case_id: str, *, request_options: typing.Optional[RequestOptions] = None

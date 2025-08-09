@@ -60,10 +60,7 @@ class WorkspaceSecretsClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     def partial_update(
@@ -106,12 +103,7 @@ class WorkspaceSecretsClient:
             id="id",
         )
         """
-        response = self._raw_client.partial_update(
-            id,
-            label=label,
-            value=value,
-            request_options=request_options,
-        )
+        response = self._raw_client.partial_update(id, label=label, value=value, request_options=request_options)
         return response.data
 
 
@@ -169,10 +161,7 @@ class AsyncWorkspaceSecretsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     async def partial_update(
@@ -223,10 +212,5 @@ class AsyncWorkspaceSecretsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.partial_update(
-            id,
-            label=label,
-            value=value,
-            request_options=request_options,
-        )
+        response = await self._raw_client.partial_update(id, label=label, value=value, request_options=request_options)
         return response.data

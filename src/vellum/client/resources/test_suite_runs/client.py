@@ -120,10 +120,7 @@ class TestSuiteRunsClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     def list_executions(
@@ -174,11 +171,7 @@ class TestSuiteRunsClient:
         )
         """
         response = self._raw_client.list_executions(
-            id,
-            expand=expand,
-            limit=limit,
-            offset=offset,
-            request_options=request_options,
+            id, expand=expand, limit=limit, offset=offset, request_options=request_options
         )
         return response.data
 
@@ -301,10 +294,7 @@ class AsyncTestSuiteRunsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     async def list_executions(
@@ -363,10 +353,6 @@ class AsyncTestSuiteRunsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list_executions(
-            id,
-            expand=expand,
-            limit=limit,
-            offset=offset,
-            request_options=request_options,
+            id, expand=expand, limit=limit, offset=offset, request_options=request_options
         )
         return response.data

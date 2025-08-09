@@ -35,7 +35,7 @@ class DocumentsClient:
         """
         return self._raw_client
 
-    def list_(
+    def list(
         self,
         *,
         document_index_id: typing.Optional[str] = None,
@@ -121,10 +121,7 @@ class DocumentsClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
@@ -154,10 +151,7 @@ class DocumentsClient:
             id="id",
         )
         """
-        response = self._raw_client.destroy(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.destroy(id, request_options=request_options)
         return response.data
 
     def partial_update(
@@ -212,12 +206,7 @@ class DocumentsClient:
         )
         """
         response = self._raw_client.partial_update(
-            id,
-            label=label,
-            status=status,
-            keywords=keywords,
-            metadata=metadata,
-            request_options=request_options,
+            id, label=label, status=status, keywords=keywords, metadata=metadata, request_options=request_options
         )
         return response.data
 
@@ -292,7 +281,7 @@ class AsyncDocumentsClient:
         """
         return self._raw_client
 
-    async def list_(
+    async def list(
         self,
         *,
         document_index_id: typing.Optional[str] = None,
@@ -394,10 +383,7 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     async def destroy(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
@@ -435,10 +421,7 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.destroy(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.destroy(id, request_options=request_options)
         return response.data
 
     async def partial_update(
@@ -501,12 +484,7 @@ class AsyncDocumentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.partial_update(
-            id,
-            label=label,
-            status=status,
-            keywords=keywords,
-            metadata=metadata,
-            request_options=request_options,
+            id, label=label, status=status, keywords=keywords, metadata=metadata, request_options=request_options
         )
         return response.data
 

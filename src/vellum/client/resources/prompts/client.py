@@ -70,11 +70,7 @@ class PromptsClient:
             id="id",
         )
         """
-        response = self._raw_client.pull(
-            id,
-            prompt_variant_id=prompt_variant_id,
-            request_options=request_options,
-        )
+        response = self._raw_client.pull(id, prompt_variant_id=prompt_variant_id, request_options=request_options)
         return response.data
 
     def push(
@@ -221,11 +217,7 @@ class AsyncPromptsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.pull(
-            id,
-            prompt_variant_id=prompt_variant_id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.pull(id, prompt_variant_id=prompt_variant_id, request_options=request_options)
         return response.data
 
     async def push(

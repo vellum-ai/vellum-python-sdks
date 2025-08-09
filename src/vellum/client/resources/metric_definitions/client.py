@@ -82,10 +82,7 @@ class MetricDefinitionsClient:
         )
         """
         response = self._raw_client.execute_metric_definition(
-            id,
-            inputs=inputs,
-            release_tag=release_tag,
-            request_options=request_options,
+            id, inputs=inputs, release_tag=release_tag, request_options=request_options
         )
         return response.data
 
@@ -123,9 +120,7 @@ class MetricDefinitionsClient:
         )
         """
         response = self._raw_client.metric_definition_history_item_retrieve(
-            history_id_or_release_tag,
-            id,
-            request_options=request_options,
+            history_id_or_release_tag, id, request_options=request_options
         )
         return response.data
 
@@ -202,10 +197,7 @@ class AsyncMetricDefinitionsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.execute_metric_definition(
-            id,
-            inputs=inputs,
-            release_tag=release_tag,
-            request_options=request_options,
+            id, inputs=inputs, release_tag=release_tag, request_options=request_options
         )
         return response.data
 
@@ -251,8 +243,6 @@ class AsyncMetricDefinitionsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.metric_definition_history_item_retrieve(
-            history_id_or_release_tag,
-            id,
-            request_options=request_options,
+            history_id_or_release_tag, id, request_options=request_options
         )
         return response.data

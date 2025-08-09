@@ -9,12 +9,6 @@ from ...types.named_test_case_variable_value_request import NamedTestCaseVariabl
 from ...types.test_suite_test_case import TestSuiteTestCase
 from ...types.test_suite_test_case_bulk_operation_request import TestSuiteTestCaseBulkOperationRequest
 from ...types.test_suite_test_case_bulk_result import TestSuiteTestCaseBulkResult
-from ...core.jsonable_encoder import jsonable_encoder
-from ...core.serialization import convert_and_respect_annotation_metadata
-from ...core.pydantic_utilities import parse_obj_as
-import json
-from json.decoder import JSONDecodeError
-from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper
 from .raw_client import AsyncRawTestSuitesClient
 
@@ -84,10 +78,7 @@ class TestSuitesClient:
         )
         """
         response = self._raw_client.list_test_suite_test_cases(
-            id,
-            limit=limit,
-            offset=offset,
-            request_options=request_options,
+            id, limit=limit, offset=offset, request_options=request_options
         )
         return response.data
 
@@ -266,37 +257,8 @@ class TestSuitesClient:
         for chunk in response:
             yield chunk
         """
-        with self._raw_client._client_wrapper.httpx_client.stream(
-            f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
-            base_url=self._raw_client._client_wrapper.get_environment().default,
-            method="POST",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
-            ),
-            request_options=request_options,
-            omit=OMIT,
-        ) as _response:
-            try:
-                if 200 <= _response.status_code < 300:
-                    for _text in _response.iter_lines():
-                        try:
-                            if len(_text) == 0:
-                                continue
-                            yield typing.cast(
-                                typing.List[TestSuiteTestCaseBulkResult],
-                                parse_obj_as(
-                                    type_=typing.List[TestSuiteTestCaseBulkResult],  # type: ignore
-                                    object_=json.loads(_text),
-                                ),
-                            )
-                        except Exception:
-                            pass
-                    return
-                _response.read()
-                _response_json = _response.json()
-            except JSONDecodeError:
-                raise ApiError(status_code=_response.status_code, body=_response.text)
-            raise ApiError(status_code=_response.status_code, body=_response_json)
+        with self._raw_client.test_suite_test_cases_bulk(id, request=request, request_options=request_options) as r:
+            yield from r.data
 
     def delete_test_suite_test_case(
         self, id: str, test_case_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -332,11 +294,7 @@ class TestSuitesClient:
             test_case_id="test_case_id",
         )
         """
-        response = self._raw_client.delete_test_suite_test_case(
-            id,
-            test_case_id,
-            request_options=request_options,
-        )
+        response = self._raw_client.delete_test_suite_test_case(id, test_case_id, request_options=request_options)
         return response.data
 
 
@@ -406,10 +364,7 @@ class AsyncTestSuitesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list_test_suite_test_cases(
-            id,
-            limit=limit,
-            offset=offset,
-            request_options=request_options,
+            id, limit=limit, offset=offset, request_options=request_options
         )
         return response.data
 
@@ -604,37 +559,11 @@ class AsyncTestSuitesClient:
 
         asyncio.run(main())
         """
-        async with self._raw_client._client_wrapper.httpx_client.stream(
-            f"v1/test-suites/{jsonable_encoder(id)}/test-cases-bulk",
-            base_url=self._raw_client._client_wrapper.get_environment().default,
-            method="POST",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=typing.Sequence[TestSuiteTestCaseBulkOperationRequest], direction="write"
-            ),
-            request_options=request_options,
-            omit=OMIT,
-        ) as _response:
-            try:
-                if 200 <= _response.status_code < 300:
-                    async for _text in _response.aiter_lines():
-                        try:
-                            if len(_text) == 0:
-                                continue
-                            yield typing.cast(
-                                typing.List[TestSuiteTestCaseBulkResult],
-                                parse_obj_as(
-                                    type_=typing.List[TestSuiteTestCaseBulkResult],  # type: ignore
-                                    object_=json.loads(_text),
-                                ),
-                            )
-                        except Exception:
-                            pass
-                    return
-                await _response.aread()
-                _response_json = _response.json()
-            except JSONDecodeError:
-                raise ApiError(status_code=_response.status_code, body=_response.text)
-            raise ApiError(status_code=_response.status_code, body=_response_json)
+        async with self._raw_client.test_suite_test_cases_bulk(
+            id, request=request, request_options=request_options
+        ) as r:
+            async for data in r.data:
+                yield data
 
     async def delete_test_suite_test_case(
         self, id: str, test_case_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -678,9 +607,5 @@ class AsyncTestSuitesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.delete_test_suite_test_case(
-            id,
-            test_case_id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.delete_test_suite_test_case(id, test_case_id, request_options=request_options)
         return response.data

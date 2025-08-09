@@ -146,11 +146,7 @@ class WorkflowSandboxesClient:
         client.workflow_sandboxes.list_workflow_sandbox_examples()
         """
         response = self._raw_client.list_workflow_sandbox_examples(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            tag=tag,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, tag=tag, request_options=request_options
         )
         return response.data
 
@@ -299,10 +295,6 @@ class AsyncWorkflowSandboxesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list_workflow_sandbox_examples(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            tag=tag,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, tag=tag, request_options=request_options
         )
         return response.data

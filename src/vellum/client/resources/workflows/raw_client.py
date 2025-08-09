@@ -9,6 +9,7 @@ from ...errors.bad_request_error import BadRequestError
 from ...core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
+import contextlib
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ... import core
@@ -24,6 +25,7 @@ class RawWorkflowsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    @contextlib.contextmanager
     def pull(
         self,
         id: str,
@@ -34,7 +36,7 @@ class RawWorkflowsClient:
         include_sandbox: typing.Optional[bool] = None,
         strict: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[typing.Iterator[bytes]]:
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[bytes]]]:
         """
         Parameters
         ----------
@@ -56,7 +58,7 @@ class RawWorkflowsClient:
 
         Returns
         -------
-        HttpResponse[typing.Iterator[bytes]]
+        typing.Iterator[HttpResponse[typing.Iterator[bytes]]]
 
         """
         with self._client_wrapper.httpx_client.stream(
@@ -72,27 +74,31 @@ class RawWorkflowsClient:
             },
             request_options=request_options,
         ) as _response:
-            try:
-                if 200 <= _response.status_code < 300:
-                    _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    return HttpResponse(
-                        response=_response, data=(_chunk for _chunk in _response.iter_bytes(chunk_size=_chunk_size))
-                    )
-                _response.read()
-                if _response.status_code == 400:
-                    raise BadRequestError(
-                        typing.cast(
-                            typing.Optional[typing.Any],
-                            parse_obj_as(
-                                type_=typing.Optional[typing.Any],  # type: ignore
-                                object_=_response.json(),
-                            ),
+
+            def stream() -> HttpResponse[typing.Iterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return HttpResponse(
+                            response=_response, data=(_chunk for _chunk in _response.iter_bytes(chunk_size=_chunk_size))
                         )
-                    )
-                _response_json = _response.json()
-            except JSONDecodeError:
-                raise ApiError(status_code=_response.status_code, body=_response.text)
-            raise ApiError(status_code=_response.status_code, body=_response_json)
+                    _response.read()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield stream()
 
     def push(
         self,
@@ -142,7 +148,7 @@ class RawWorkflowsClient:
                 "strict": strict,
             },
             files={
-                "artifact": artifact,
+                **({"artifact": artifact} if artifact is not None else {}),
             },
             request_options=request_options,
             omit=OMIT,
@@ -167,6 +173,7 @@ class AsyncRawWorkflowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    @contextlib.asynccontextmanager
     async def pull(
         self,
         id: str,
@@ -177,7 +184,7 @@ class AsyncRawWorkflowsClient:
         include_sandbox: typing.Optional[bool] = None,
         strict: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[typing.AsyncIterator[bytes]]:
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]:
         """
         Parameters
         ----------
@@ -199,7 +206,7 @@ class AsyncRawWorkflowsClient:
 
         Returns
         -------
-        AsyncHttpResponse[typing.AsyncIterator[bytes]]
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]
 
         """
         async with self._client_wrapper.httpx_client.stream(
@@ -215,28 +222,32 @@ class AsyncRawWorkflowsClient:
             },
             request_options=request_options,
         ) as _response:
-            try:
-                if 200 <= _response.status_code < 300:
-                    _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
-                    return AsyncHttpResponse(
-                        response=_response,
-                        data=(_chunk async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size)),
-                    )
-                await _response.aread()
-                if _response.status_code == 400:
-                    raise BadRequestError(
-                        typing.cast(
-                            typing.Optional[typing.Any],
-                            parse_obj_as(
-                                type_=typing.Optional[typing.Any],  # type: ignore
-                                object_=_response.json(),
-                            ),
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[bytes]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+                        _chunk_size = request_options.get("chunk_size", None) if request_options is not None else None
+                        return AsyncHttpResponse(
+                            response=_response,
+                            data=(_chunk async for _chunk in _response.aiter_bytes(chunk_size=_chunk_size)),
                         )
-                    )
-                _response_json = _response.json()
-            except JSONDecodeError:
-                raise ApiError(status_code=_response.status_code, body=_response.text)
-            raise ApiError(status_code=_response.status_code, body=_response_json)
+                    await _response.aread()
+                    if _response.status_code == 400:
+                        raise BadRequestError(
+                            typing.cast(
+                                typing.Optional[typing.Any],
+                                parse_obj_as(
+                                    type_=typing.Optional[typing.Any],  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
 
     async def push(
         self,
@@ -286,7 +297,7 @@ class AsyncRawWorkflowsClient:
                 "strict": strict,
             },
             files={
-                "artifact": artifact,
+                **({"artifact": artifact} if artifact is not None else {}),
             },
             request_options=request_options,
             omit=OMIT,

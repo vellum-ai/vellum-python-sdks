@@ -56,10 +56,7 @@ class WorkflowExecutionsClient:
             execution_id="execution_id",
         )
         """
-        response = self._raw_client.retrieve_workflow_execution_detail(
-            execution_id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve_workflow_execution_detail(execution_id, request_options=request_options)
         return response.data
 
 
@@ -115,7 +112,6 @@ class AsyncWorkflowExecutionsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.retrieve_workflow_execution_detail(
-            execution_id,
-            request_options=request_options,
+            execution_id, request_options=request_options
         )
         return response.data

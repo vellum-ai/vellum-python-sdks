@@ -69,7 +69,7 @@ class WorkflowsClient:
         typing.Iterator[bytes]
 
         """
-        response = self._raw_client.pull(
+        with self._raw_client.pull(
             id,
             exclude_code=exclude_code,
             exclude_display=exclude_display,
@@ -77,8 +77,8 @@ class WorkflowsClient:
             include_sandbox=include_sandbox,
             strict=strict,
             request_options=request_options,
-        )
-        return response.data
+        ) as r:
+            yield from r.data
 
     def push(
         self,
@@ -178,7 +178,7 @@ class AsyncWorkflowsClient:
         typing.AsyncIterator[bytes]
 
         """
-        response = await self._raw_client.pull(
+        async with self._raw_client.pull(
             id,
             exclude_code=exclude_code,
             exclude_display=exclude_display,
@@ -186,8 +186,9 @@ class AsyncWorkflowsClient:
             include_sandbox=include_sandbox,
             strict=strict,
             request_options=request_options,
-        )
-        return response.data
+        ) as r:
+            async for data in r.data:
+                yield data
 
     async def push(
         self,

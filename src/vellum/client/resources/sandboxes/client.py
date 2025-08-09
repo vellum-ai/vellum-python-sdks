@@ -162,11 +162,7 @@ class SandboxesClient:
         )
         """
         response = self._raw_client.upsert_sandbox_scenario(
-            id,
-            inputs=inputs,
-            label=label,
-            scenario_id=scenario_id,
-            request_options=request_options,
+            id, inputs=inputs, label=label, scenario_id=scenario_id, request_options=request_options
         )
         return response.data
 
@@ -204,11 +200,7 @@ class SandboxesClient:
             scenario_id="scenario_id",
         )
         """
-        response = self._raw_client.delete_sandbox_scenario(
-            id,
-            scenario_id,
-            request_options=request_options,
-        )
+        response = self._raw_client.delete_sandbox_scenario(id, scenario_id, request_options=request_options)
         return response.data
 
 
@@ -372,11 +364,7 @@ class AsyncSandboxesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.upsert_sandbox_scenario(
-            id,
-            inputs=inputs,
-            label=label,
-            scenario_id=scenario_id,
-            request_options=request_options,
+            id, inputs=inputs, label=label, scenario_id=scenario_id, request_options=request_options
         )
         return response.data
 
@@ -422,9 +410,5 @@ class AsyncSandboxesClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.delete_sandbox_scenario(
-            id,
-            scenario_id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.delete_sandbox_scenario(id, scenario_id, request_options=request_options)
         return response.data

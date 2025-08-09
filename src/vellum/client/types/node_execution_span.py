@@ -12,6 +12,7 @@ from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
 import typing
 from .vellum_node_execution_event import VellumNodeExecutionEvent
 from .node_execution_span_attributes import NodeExecutionSpanAttributes
+from .workflow_execution_usage_calculation_fulfilled_body import WorkflowExecutionUsageCalculationFulfilledBody
 import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
@@ -21,6 +22,7 @@ class NodeExecutionSpan(UniversalBaseModel):
     name: typing.Literal["node.execution"] = "node.execution"
     events: typing.List[VellumNodeExecutionEvent]
     attributes: NodeExecutionSpanAttributes
+    usage_result: typing.Optional[WorkflowExecutionUsageCalculationFulfilledBody] = None
     span_id: str
     start_ts: dt.datetime
     end_ts: dt.datetime

@@ -40,7 +40,7 @@ class WorkflowDeploymentsClient:
         """
         return self._raw_client
 
-    def list_(
+    def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -85,11 +85,7 @@ class WorkflowDeploymentsClient:
         client.workflow_deployments.list()
         """
         response = self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            status=status,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, status=status, request_options=request_options
         )
         return response.data
 
@@ -122,10 +118,7 @@ class WorkflowDeploymentsClient:
             id="id",
         )
         """
-        response = self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     def list_workflow_deployment_event_executions(
@@ -171,11 +164,7 @@ class WorkflowDeploymentsClient:
         )
         """
         response = self._raw_client.list_workflow_deployment_event_executions(
-            id,
-            filters=filters,
-            limit=limit,
-            offset=offset,
-            request_options=request_options,
+            id, filters=filters, limit=limit, offset=offset, request_options=request_options
         )
         return response.data
 
@@ -211,9 +200,7 @@ class WorkflowDeploymentsClient:
         )
         """
         response = self._raw_client.workflow_deployment_event_execution(
-            execution_id,
-            id,
-            request_options=request_options,
+            execution_id, id, request_options=request_options
         )
         return response.data
 
@@ -254,9 +241,7 @@ class WorkflowDeploymentsClient:
         )
         """
         response = self._raw_client.workflow_deployment_history_item_retrieve(
-            history_id_or_release_tag,
-            id,
-            request_options=request_options,
+            history_id_or_release_tag, id, request_options=request_options
         )
         return response.data
 
@@ -310,12 +295,7 @@ class WorkflowDeploymentsClient:
         )
         """
         response = self._raw_client.list_workflow_release_tags(
-            id,
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            source=source,
-            request_options=request_options,
+            id, limit=limit, offset=offset, ordering=ordering, source=source, request_options=request_options
         )
         return response.data
 
@@ -354,11 +334,7 @@ class WorkflowDeploymentsClient:
             name="name",
         )
         """
-        response = self._raw_client.retrieve_workflow_release_tag(
-            id,
-            name,
-            request_options=request_options,
-        )
+        response = self._raw_client.retrieve_workflow_release_tag(id, name, request_options=request_options)
         return response.data
 
     def update_workflow_release_tag(
@@ -405,10 +381,7 @@ class WorkflowDeploymentsClient:
         )
         """
         response = self._raw_client.update_workflow_release_tag(
-            id,
-            name,
-            history_item_id=history_item_id,
-            request_options=request_options,
+            id, name, history_item_id=history_item_id, request_options=request_options
         )
         return response.data
 
@@ -448,9 +421,7 @@ class WorkflowDeploymentsClient:
         )
         """
         response = self._raw_client.retrieve_workflow_deployment_release(
-            id,
-            release_id_or_release_tag,
-            request_options=request_options,
+            id, release_id_or_release_tag, request_options=request_options
         )
         return response.data
 
@@ -470,7 +441,7 @@ class AsyncWorkflowDeploymentsClient:
         """
         return self._raw_client
 
-    async def list_(
+    async def list(
         self,
         *,
         limit: typing.Optional[int] = None,
@@ -523,11 +494,7 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list(
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            status=status,
-            request_options=request_options,
+            limit=limit, offset=offset, ordering=ordering, status=status, request_options=request_options
         )
         return response.data
 
@@ -570,10 +537,7 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve(
-            id,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve(id, request_options=request_options)
         return response.data
 
     async def list_workflow_deployment_event_executions(
@@ -627,11 +591,7 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list_workflow_deployment_event_executions(
-            id,
-            filters=filters,
-            limit=limit,
-            offset=offset,
-            request_options=request_options,
+            id, filters=filters, limit=limit, offset=offset, request_options=request_options
         )
         return response.data
 
@@ -675,9 +635,7 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.workflow_deployment_event_execution(
-            execution_id,
-            id,
-            request_options=request_options,
+            execution_id, id, request_options=request_options
         )
         return response.data
 
@@ -726,9 +684,7 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.workflow_deployment_history_item_retrieve(
-            history_id_or_release_tag,
-            id,
-            request_options=request_options,
+            history_id_or_release_tag, id, request_options=request_options
         )
         return response.data
 
@@ -790,12 +746,7 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.list_workflow_release_tags(
-            id,
-            limit=limit,
-            offset=offset,
-            ordering=ordering,
-            source=source,
-            request_options=request_options,
+            id, limit=limit, offset=offset, ordering=ordering, source=source, request_options=request_options
         )
         return response.data
 
@@ -842,11 +793,7 @@ class AsyncWorkflowDeploymentsClient:
 
         asyncio.run(main())
         """
-        response = await self._raw_client.retrieve_workflow_release_tag(
-            id,
-            name,
-            request_options=request_options,
-        )
+        response = await self._raw_client.retrieve_workflow_release_tag(id, name, request_options=request_options)
         return response.data
 
     async def update_workflow_release_tag(
@@ -901,10 +848,7 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.update_workflow_release_tag(
-            id,
-            name,
-            history_item_id=history_item_id,
-            request_options=request_options,
+            id, name, history_item_id=history_item_id, request_options=request_options
         )
         return response.data
 
@@ -952,8 +896,6 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         response = await self._raw_client.retrieve_workflow_deployment_release(
-            id,
-            release_id_or_release_tag,
-            request_options=request_options,
+            id, release_id_or_release_tag, request_options=request_options
         )
         return response.data
