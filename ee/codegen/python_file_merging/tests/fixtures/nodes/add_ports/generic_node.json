@@ -1,0 +1,27 @@
+{
+  "outputs": [
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "value",
+      "type": "STRING",
+      "value": null
+    }
+  ],
+  "ports": [
+    {
+      "id": "03f06075-cd90-4472-82a5-afb172fbdf40",
+      "name": "if_branch",
+      "type": "IF"
+    },
+    {
+      "id": "04f06075-cd90-4472-82a5-afb172fbdf41",
+      "name": "another_if_branch",
+      "type": "IF"
+    },
+    {
+      "id": "05f06075-cd90-4472-82a5-afb172fbdf42",
+      "name": "else_branch",
+      "type": "ELSE"
+    }
+  ]
+}

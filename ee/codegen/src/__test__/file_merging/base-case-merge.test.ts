@@ -15,7 +15,7 @@ const rootDir = join(
   "python_file_merging/tests/fixtures/nodes"
 );
 
-const fixtureFilter = /base_case/;
+// const fixtureFilter = /base_case/;
 
 const getFixturePaths = () => {
   const fixtureDirs = fs
@@ -24,7 +24,6 @@ const getFixturePaths = () => {
     .map((d) => join(rootDir, d.name));
 
   return fixtureDirs
-    .filter((d) => fixtureFilter.test(d))
     .map((d) => {
       const originalFilePath = join(d, "original.py");
       const generatedFilePath = join(d, "generic_node.json");
