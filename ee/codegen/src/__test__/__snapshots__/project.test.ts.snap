@@ -60,7 +60,7 @@ class LegacyPromptNode(InlinePromptNode):
         custom_parameters=None,
     )
 
-    class NodeTrigger(InlinePromptNode.Trigger):
+    class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 "
 `;
@@ -253,7 +253,7 @@ Summarize the following text: hello today is feb 7 bad weather
         custom_parameters=None,
     )
 
-    class NodeTrigger(InlinePromptNode.Trigger):
+    class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 "
 `;
