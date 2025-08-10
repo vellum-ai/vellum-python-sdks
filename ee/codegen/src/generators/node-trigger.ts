@@ -42,7 +42,7 @@ export class NodeTrigger extends AstNode {
         ? `Base${nodeContext.baseNodeClassName}`
         : undefined;
     const clazz = python.class_({
-      name: "NodeTrigger",
+      name: "Trigger",
       extends_: [
         python.reference({
           name: nodeContext.baseNodeClassName,

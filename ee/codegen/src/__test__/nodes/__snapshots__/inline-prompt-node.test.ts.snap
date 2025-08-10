@@ -1542,7 +1542,7 @@ class PromptNode(InlinePromptNode):
         custom_parameters={},
     )
 
-    class NodeTrigger(InlinePromptNode.Trigger):
+    class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
@@ -1575,7 +1575,7 @@ class PromptNode(InlinePromptNode):
         custom_parameters={},
     )
 
-    class NodeTrigger(InlinePromptNode.Trigger):
+    class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 "
 `;
