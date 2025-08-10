@@ -56,10 +56,8 @@ class DefaultStateEncoder(JSONEncoder):
         if isinstance(obj, Queue):
             return list(obj.queue)
 
-        if is_dataclass(obj):
-            # Technically, obj is DataclassInstance | type[DataclassInstance], but asdict expects a DataclassInstance
-            # in practice, we only ever pass the former
-            return asdict(obj)  # type: ignore[call-overload]
+        if is_dataclass(obj) and not isinstance(obj, type):
+            return asdict(obj)
 
         if isinstance(obj, type):
             return str(obj)
