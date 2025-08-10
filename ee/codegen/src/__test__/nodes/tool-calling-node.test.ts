@@ -674,4 +674,70 @@ describe("ToolCallingNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("no tools with jinja blocks", () => {
+    it("should reproduce codegen failure when tool calling node has no tools but has jinja blocks", async () => {
+      /**
+       * Tests that a tool calling node with empty functions array but jinja blocks causes codegen failure.
+       */
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const blocksAttribute = nodeAttributeFactory(
+        "blocks-attr-id",
+        "blocks",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [
+              {
+                id: "jinja-block-1",
+                blockType: "JINJA",
+                properties: {
+                  template: "Hello {{ name }}! Please help with: {{ question }}",
+                },
+                state: "ENABLED",
+              },
+            ],
+          },
+        }
+      );
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [blocksAttribute, functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      expect(() => {
+        node.getNodeFile().write(writer);
+      }).toThrow("Failed to parse block");
+    });
+  });
 });
