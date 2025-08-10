@@ -120,6 +120,7 @@
             "y": 213.93599376731305
           },
           "comment": {
+            "expanded": true,
             "value": "This is my code execution node"
           }
         },
