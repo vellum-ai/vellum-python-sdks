@@ -98,5 +98,5 @@ def test_serialize_display_data():
     # THEN the condition should be serialized correctly
     assert data["display_data"] == {
         "position": {"x": 0.0, "y": 0.0},
-        "comment": {"value": "I hope this works"},
+        "comment": {"expanded": True, "value": "I hope this works"},
     }

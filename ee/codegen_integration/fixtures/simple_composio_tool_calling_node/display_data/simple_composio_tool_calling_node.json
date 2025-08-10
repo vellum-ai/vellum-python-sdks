@@ -28,6 +28,7 @@
             "y": -50.0
           },
           "comment": {
+            "expanded": true,
             "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    "
           }
         },

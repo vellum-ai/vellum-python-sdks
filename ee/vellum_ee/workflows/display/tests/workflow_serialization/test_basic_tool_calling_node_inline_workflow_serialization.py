@@ -44,7 +44,10 @@ def test_serialize_workflow():
         "type": "GENERIC",
         "display_data": {
             "position": {"x": 200.0, "y": -50.0},
-            "comment": {"value": "\n    A tool calling node that calls the get_current_weather function.\n    "},
+            "comment": {
+                "expanded": True,
+                "value": "\n    A tool calling node that calls the get_current_weather function.\n    ",
+            },
         },
         "base": {
             "name": "ToolCallingNode",
