@@ -57,6 +57,7 @@ repos:
         name: flake8
         entry: bash -c "poetry run flake8"
         language: system
+        exclude: ee/codegen/python_file_merging/tests/fixtures/.+
 
   - repo: local
     hooks:

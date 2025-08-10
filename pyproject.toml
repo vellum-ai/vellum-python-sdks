@@ -95,7 +95,7 @@ plugins = [
     "vellum.plugins.vellum_mypy",
 ]
 check_untyped_defs = true
-exclude = ["venv", "examples/workflows"]
+exclude = ["venv", "examples/workflows", "ee/codegen/python_file_merging/tests/fixtures"]
 overrides = [
     { module = "deepdiff.*", ignore_missing_imports = true },
     { module = "docker.*", ignore_missing_imports = true },
@@ -155,11 +155,11 @@ target-version = [
     "py38",
 ]
 include = ".*\\.py$"
-exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows)"
+exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows|ee/codegen/python_file_merging/tests/fixtures)"
 
 [tool.flake8]
 max-line-length = 120
-exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/raw_client.py,src/vellum/resources,src/vellum/types,tests/client,examples/workflows"
+exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/raw_client.py,src/vellum/resources,src/vellum/types,tests/client,examples/workflows,ee/codegen/python_file_merging/tests/fixtures"
 ignore = "E203, W503, E704, U100, U101"
 
 [tool.coverage.run]
