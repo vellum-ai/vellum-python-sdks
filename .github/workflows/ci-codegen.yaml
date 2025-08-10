@@ -51,6 +51,20 @@ jobs:
         run: npm install
         working-directory: ee/codegen
 
+      # Needed to get file merging tests to pass
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Bootstrap poetry
+        run: make setup-poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: debug
+        run: |
+          ls -al
+          ls -al .venv/bin
+
       - name: Test
         run: npm test
         working-directory: ee/codegen

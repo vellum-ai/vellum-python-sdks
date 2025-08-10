@@ -2,39 +2,147 @@ import { mkdir, rm } from "fs/promises";
 import * as fs from "node:fs";
 import { join } from "path";
 
-import { expect, vi } from "vitest";
 import { v4 as uuidv4 } from "uuid";
-import { DocumentIndexRead } from "vellum-ai/api";
-import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
-import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
-import { makeTempDir } from "../helpers/temp-dir";
 
+import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { WorkflowProjectGenerator } from "src/project";
-import { WorkflowNodeType, type NodeAttribute } from "src/types/vellum";
+
+const rootDir = join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "python_file_merging/tests/fixtures/nodes"
+);
+
+const fixtureFilter = /base_case/;
+
+const getFixturePaths = () => {
+  const fixtureDirs = fs
+    .readdirSync(rootDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => join(rootDir, d.name));
+
+  return fixtureDirs
+    .filter((d) => fixtureFilter.test(d))
+    .map((d) => {
+      const originalFilePath = join(d, "original.py");
+      const generatedFilePath = join(d, "generic_node.json");
+      const expectedFilePath = join(d, "expected.py");
+
+      return {
+        originalFilePath,
+        generatedFilePath,
+        expectedFilePath,
+        label: d.split("/").pop() ?? "Unknown",
+      };
+    });
+};
+
+const nodeFileContents = getFixturePaths();
+
+const singleGenericNodeWorkflowFactory = (
+  genericNodeData: Record<string, string> = {}
+) => {
+  const entrypointNodeId = uuidv4();
+  const entrypointSourceHandleId = uuidv4();
+  const entrypointTargetHandleId = uuidv4();
+
+  const genericNodeId = uuidv4();
+  const genericSourceHandleId = uuidv4();
+  const genericTriggerId = uuidv4();
+  const genericDefaultPortId = uuidv4();
+
+  const terminalNodeId = uuidv4();
+  const terminalSourceHandleId = uuidv4();
+  const terminalTargetHandleId = uuidv4();
+
+  return {
+    workflow_raw_data: {
+      nodes: [
+        {
+          id: entrypointNodeId,
+          type: "ENTRYPOINT",
+          data: {
+            label: "Entrypoint",
+            source_handle_id: entrypointSourceHandleId,
+            target_handle_id: entrypointTargetHandleId,
+          },
+          inputs: [],
+        },
+        {
+          id: genericNodeId,
+          type: "GENERIC",
+          label: "My Custom Node",
+          attributes: [],
+          inputs: [],
+          trigger: {
+            id: genericTriggerId,
+            merge_behavior: "AWAIT_ATTRIBUTES",
+          },
+          ports: [
+            {
+              id: genericDefaultPortId,
+              name: "default",
+              type: "DEFAULT",
+            },
+          ],
+          base: {
+            name: "BaseNode",
+            module: ["vellum", "workflows", "nodes", "bases", "base"],
+          },
+          outputs: [],
+          ...genericNodeData,
+        },
+        {
+          id: terminalNodeId,
+          type: "TERMINAL",
+          data: {
+            label: "Terminal",
+            source_handle_id: terminalSourceHandleId,
+            target_handle_id: terminalTargetHandleId,
+            name: "output",
+            output_id: uuidv4(),
+            output_type: "STRING",
+            node_input_id: uuidv4(),
+          },
+          inputs: [],
+        },
+      ],
+      edges: [
+        {
+          source_node_id: entrypointNodeId,
+          source_handle_id: "entry_source",
+          target_node_id: genericNodeId,
+          target_handle_id: genericTriggerId,
+          type: "DEFAULT",
+          id: uuidv4(),
+        },
+        {
+          source_node_id: genericNodeId,
+          source_handle_id: genericSourceHandleId,
+          target_node_id: terminalNodeId,
+          target_handle_id: terminalTargetHandleId,
+          type: "DEFAULT",
+          id: uuidv4(),
+        },
+      ],
+    },
+    input_variables: [],
+    state_variables: [],
+    output_variables: [],
+    runner_config: {},
+  };
+};
 
 /**
- * Emulates a simple Python file merging scenario at the TypeScript level by using
+ * Emulates various Python file merging scenarios at the TypeScript level by using
  * generateCode(originalArtifact) and asserting merged content is preserved.
  */
-describe("TS-level Python file merging", () => {
+describe("Python file merging", () => {
   let tempDir: string;
 
   beforeEach(async () => {
-    vi.spyOn(DocumentIndexesClient.prototype, "retrieve").mockResolvedValue(
-      {} as unknown as DocumentIndexRead
-    );
-    vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
-      // @ts-ignore
-      async (idOrName: string) => {
-        return {
-          id: idOrName,
-          name: "TEST_SECRET",
-          modified: new Date(),
-          label: idOrName,
-          secretType: "USER_DEFINED",
-        };
-      }
-    );
     tempDir = makeTempDir("file-merging-test");
     await mkdir(tempDir, { recursive: true });
   });
@@ -43,193 +151,43 @@ describe("TS-level Python file merging", () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
-  it("should preserve content when originalArtifact equals previously generated content (base-case)", async () => {
-    /**
-     * Tests end-to-end merging using generateCode(originalArtifact).
-     */
+  it.each(nodeFileContents)(
+    "should preserve content when originalArtifact equals previously generated content ($label)",
+    async ({ originalFilePath, generatedFilePath, expectedFilePath }) => {
+      /**
+       * Tests end-to-end merging using generateCode(originalArtifact).
+       */
 
-    // GIVEN a temp directory and inline display data that yields at least one mergeable node file
-    const functionsAttribute: NodeAttribute = {
-      id: uuidv4(),
-      name: "functions",
-      value: {
-        type: "CONSTANT_VALUE",
-        value: {
-          type: "JSON",
-          value: [
-            {
-              type: "CODE_EXECUTION",
-              name: "my_test_function",
-              description: "Some sample test function",
-              src: 'def my_test_function(arg1: str, arg2: str) -> str:\n    """Processes input data and returns formatted output"""\n    return f"arg1: {arg1}, arg2: {arg2}"',
-              definition: {
-                name: "my_test_function",
-                description: "Some sample test function",
-                parameters: {
-                  type: "object",
-                  required: ["arg1", "arg2"],
-                  properties: {
-                    arg1: { type: "string" },
-                    arg2: { type: "string" },
-                  },
-                },
-                state: null,
-                cache_config: null,
-                forced: null,
-                strict: null,
-              },
-            },
-          ],
-        },
-      },
-    };
+      // GIVEN a temp directory and inline display data that yields at least one mergeable node file
+      const genericNodeData = fs.readFileSync(generatedFilePath, "utf-8");
+      const displayData = singleGenericNodeWorkflowFactory(
+        JSON.parse(genericNodeData)
+      );
 
-    const displayData = {
-      workflow_raw_data: {
-        nodes: [
-          {
-            id: "entry",
-            type: "ENTRYPOINT",
-            data: {
-              label: "Entrypoint",
-              source_handle_id: "entry_source",
-              target_handle_id: "entry_target",
-            },
-            inputs: [],
-          },
-          {
-            id: "inline-prompt-node",
-            type: WorkflowNodeType.PROMPT,
-            attributes: [functionsAttribute],
-            inputs: [],
-            data: {
-              variant: "INLINE",
-              label: "Inline Prompt Node",
-              ml_model_name: "gpt-4",
-              output_id: "output-id",
-              array_output_id: "array-output-id",
-              source_handle_id: "source-handle-id",
-              target_handle_id: "target-handle-id",
-              exec_config: {
-                prompt_template_block_data: {
-                  version: 1.0,
-                  blocks: [
-                    {
-                      id: "block-1",
-                      block_type: "JINJA",
-                      state: "ENABLED",
-                      properties: {
-                        template: "Hello world",
-                      },
-                    },
-                  ],
-                },
-                input_variables: [],
-                parameters: {
-                  temperature: 0.7,
-                },
-              },
-            },
-            trigger: {
-              id: "inline-prompt-trigger",
-              merge_behavior: "AWAIT_ATTRIBUTES",
-            },
-            ports: [
-              {
-                id: "inline-prompt-default-port",
-                name: "default",
-                type: "DEFAULT",
-              },
-            ],
-            base: {
-              name: "InlinePromptNode",
-              module: [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "inline_prompt_node",
-              ],
-            },
-            outputs: [],
-          },
-        ],
-        edges: [
-          {
-            source_node_id: "entry",
-            source_handle_id: "entry_source",
-            target_node_id: "inline-prompt-node",
-            target_handle_id: "inline-prompt-trigger",
-            type: "DEFAULT",
-            id: "edge_1",
-          },
-        ],
-      },
-      input_variables: [],
-      state_variables: [],
-      output_variables: [],
-      runner_config: {},
-    } as const;
+      const initialProject = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        vellumApiKey: "<TEST_API_KEY>",
+        moduleName: "code",
+      });
 
-    const initialProject = new WorkflowProjectGenerator({
-      absolutePathToOutputDirectory: tempDir,
-      workflowVersionExecConfigData: displayData,
-      moduleName: "code",
-      vellumApiKey: "<TEST_API_KEY>",
-      options: {
-        codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
-      },
-      strict: true,
-    });
-    // AND an initial project used to generate files for capturing the original artifact
+      // WHEN we generate code with the original artifact
+      await initialProject.generateCode({
+        "nodes/my_custom_node.py": fs.readFileSync(originalFilePath, "utf-8"),
+      });
 
-    await initialProject.generateCode();
+      // THEN the generated file should match the expected file
+      const expectedContent = fs.readFileSync(expectedFilePath, "utf-8");
 
-    const mergeable = initialProject.getPythonCodeMergeableNodeFiles();
-    expect(
-      mergeable.size,
-      "Expected at least one mergeable node file to be present."
-    ).toBeGreaterThan(0);
+      const mergedFilePath = join(
+        tempDir,
+        ...initialProject.getModulePath(),
+        "nodes",
+        "my_custom_node.py"
+      );
+      const actualContent = fs.readFileSync(mergedFilePath, "utf-8");
 
-    const mergeablePath = Array.from(mergeable)[0] as string;
-    const initialModuleDir = join(tempDir, ...initialProject.getModulePath());
-    const originalContent = fs.readFileSync(
-      join(initialModuleDir, mergeablePath),
-      "utf-8"
-    );
-    const originalArtifact: Record<string, string> = {
-      [mergeablePath]: originalContent,
-    };
-    // AND we capture the mergeable file contents as the original artifact
-
-    // AND we reset the output directory to simulate a fresh generation
-    await rm(tempDir, { recursive: true, force: true });
-    await mkdir(tempDir, { recursive: true });
-
-    const project = new WorkflowProjectGenerator({
-      absolutePathToOutputDirectory: tempDir,
-      workflowVersionExecConfigData: displayData,
-      moduleName: "code",
-      vellumApiKey: "<TEST_API_KEY>",
-      options: {
-        codeExecutionNodeCodeRepresentationOverride: "STANDALONE",
-      },
-      strict: true,
-    });
-
-    // WHEN we generate code with originalArtifact to trigger Python file merging
-    await project.generateCode(originalArtifact);
-
-    const mergedModuleDir = join(tempDir, ...project.getModulePath());
-    const mergedFilePath = join(mergedModuleDir, mergeablePath);
-    // THEN the merged file exists
-    expect(fs.existsSync(mergedFilePath)).toBe(true);
-
-    const mergedContent = fs.readFileSync(mergedFilePath, "utf-8");
-    expect(mergedContent.length).toBeGreaterThan(0);
-    expect(mergedContent).toContain("def my_test_function(");
-    expect(mergedContent).toContain('class InlinePromptNode(BaseInlinePromptNode):');
-    expect(mergedContent).toContain('functions = [my_test_function]');
-    expect(mergedContent).toMatch(/blocks\s*=\s*\[.*JinjaPromptBlock\(template="Hello world"\).*]/s);
-  });
+      expect(actualContent).toBe(expectedContent);
+    }
+  );
 });
