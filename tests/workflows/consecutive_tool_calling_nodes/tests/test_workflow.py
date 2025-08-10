@@ -40,7 +40,13 @@ def test_consecutive_tool_calling_nodes__should_call_both_nodes(vellum_adhoc_pro
     # Set up the mock to return our events
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
-    mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
+    uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
 
     workflow = ConsecutiveToolCallingNodesWorkflow()
 
