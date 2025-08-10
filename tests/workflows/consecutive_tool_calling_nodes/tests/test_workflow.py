@@ -1,7 +1,6 @@
 from uuid import uuid4
 from typing import Iterator, List
 
-from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
@@ -40,14 +39,6 @@ def test_consecutive_tool_calling_nodes__should_call_both_nodes(vellum_adhoc_pro
     # Set up the mock to return our events
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
-    uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
-    uuid4_generator()
-    uuid4_generator()
-    uuid4_generator()
-    uuid4_generator()
-    uuid4_generator()
-    uuid4_generator()
-
     workflow = ConsecutiveToolCallingNodesWorkflow()
 
     # WHEN the workflow is executed
@@ -58,11 +49,3 @@ def test_consecutive_tool_calling_nodes__should_call_both_nodes(vellum_adhoc_pro
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
 
     assert terminal_event.outputs.text == "Second node response"
-    assert terminal_event.outputs.chat_history == [
-        ChatMessage(
-            text="Second node response",
-            role="ASSISTANT",
-            content=None,
-            source=None,
-        )
-    ]

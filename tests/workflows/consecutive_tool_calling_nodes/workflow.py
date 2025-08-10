@@ -1,6 +1,4 @@
-from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
-from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
-from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
+from vellum.prompts.blocks import TextUserMessage
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.workflows.base import BaseWorkflow
 
@@ -10,31 +8,10 @@ class FirstToolCallingNode(ToolCallingNode):
     First tool calling node with no tools defined.
     """
 
-    ml_model = "gpt-4o-mini"
+    ml_model = "gpt-5"
     blocks = [
-        ChatMessagePromptBlock(
-            chat_role="SYSTEM",
-            blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            text="You are a helpful assistant. This is the first node.",
-                        ),
-                    ],
-                ),
-            ],
-        ),
-        ChatMessagePromptBlock(
-            chat_role="USER",
-            blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            text="Please respond with 'First node response'",
-                        ),
-                    ],
-                ),
-            ],
+        TextUserMessage(
+            "You are a helpful assistant. This is the first node. Please respond with 'First node response'"
         ),
     ]
     functions = []
@@ -46,31 +23,10 @@ class SecondToolCallingNode(ToolCallingNode):
     Second tool calling node with no tools defined.
     """
 
-    ml_model = "gpt-4o-mini"
+    ml_model = "gpt-5"
     blocks = [
-        ChatMessagePromptBlock(
-            chat_role="SYSTEM",
-            blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            text="You are a helpful assistant. This is the second node.",
-                        ),
-                    ],
-                ),
-            ],
-        ),
-        ChatMessagePromptBlock(
-            chat_role="USER",
-            blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            text="Please respond with 'Second node response'",
-                        ),
-                    ],
-                ),
-            ],
+        TextUserMessage(
+            "You are a helpful assistant. This is the second node. Please respond with 'Second node response'"
         ),
     ]
     functions = []
