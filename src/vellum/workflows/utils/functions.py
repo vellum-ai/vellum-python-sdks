@@ -68,7 +68,7 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             }
             return result
 
-    if dataclasses.is_dataclass(annotation):
+    if dataclasses.is_dataclass(annotation) and isinstance(annotation, type):
         if annotation.__name__ not in defs:
             properties = {}
             required = []
